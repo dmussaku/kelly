@@ -4,7 +4,7 @@ from django.views.generic.edit import UpdateView
 from django.core.urlresolvers import reverse_lazy
 
 from user.models import User
-from user.forms import UserBaseSettingsForm
+from user.forms import UserBaseSettingsForm, UserPasswordSettingsForm
 
 class UserListView(ListView):
     pass
