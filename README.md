@@ -8,8 +8,9 @@ This system is used to organise, automate and synchronise all of the customer fa
 
 ```
 virtualenv --no-site-packages alma.net
-mkdir alma.net
+cd alma.net
 . ./bin/activate
+mkdir alma.net
 git init .
 git remote add origin git@github.com:Mafioso/alma.net.git
 git pull origin develop
