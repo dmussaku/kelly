@@ -1,0 +1,8 @@
+{% extends "user/base.html" %}
+{% load i18n %}
+{% block head_title %} {{ _("User List Page") }} {% endblock %}
+{% block content %}
+<ul>{% for u in object_list %}
+    <li> {{ u.first_name }} {{ u.last_name }} </li>
+{% endfor %}</ul>
+{% endblock %}
