@@ -1,9 +1,10 @@
 from django.views.generic import ListView
 from django.views.generic.base import TemplateView
-from django.template.response import TemplateResponse
+from django.views.generic.edit import UpdateView
+from django.core.urlresolvers import reverse_lazy
 
 from user.models import User
-
+from user.forms import UserBaseSettingsForm
 
 class UserListView(ListView):
     pass
@@ -13,9 +14,6 @@ class UserProfileView(TemplateView):
 	Shows users profile info
 	"""
 
-	# should be:
-	# user = request.user
-
 	def get_context_data(self, **kwargs):
 		ctx = super(UserProfileView, self).get_context_data(**kwargs)
 		# should be:
@@ -23,5 +21,14 @@ class UserProfileView(TemplateView):
 		ctx['user'] = User.objects.get(id=1)
 		return ctx
 
-def user_profile_settings():
-	pass
+class UserProfileSettings(UpdateView):
+	"""
+	Profile settings base view
+	"""
+
+	model = User
+	form_class = UserBaseSettingsForm
+	success_url = reverse_lazy('user_profile_url')
+
+	def get_object(self, **kwargs):
+		return User.objects.get(id=1)

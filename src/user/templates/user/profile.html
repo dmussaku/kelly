@@ -1,6 +1,6 @@
 {% extends "user/base.html" %}
 {% load i18n %}
-{% block head_title %} {{ _("User List Page") }} {% endblock %}
+{% block head_title %} {{ _("User Profile Page") }} {% endblock %}
 {% block content %}
 <h1>User profile</h1>
 <ul>
@@ -8,5 +8,5 @@
     <li><b>Last name: </b> {{ user.last_name }} </li>
     <li><b>Email: </b> {{ user.email }} </li>
 </ul>
-<a href="{% url 'profile_settings_url' %}">Settings</a>
+<a href="{% url 'user_profile_settings_url' %}">Settings</a>
 {% endblock %}
