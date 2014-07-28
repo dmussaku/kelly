@@ -10,25 +10,25 @@ class UserListView(ListView):
     pass
 
 class UserProfileView(TemplateView):
-	"""
-	Shows users profile info
-	"""
+    """
+    Shows users profile info
+    """
 
-	def get_context_data(self, **kwargs):
-		ctx = super(UserProfileView, self).get_context_data(**kwargs)
-		# should be:
-		# kwargs['user'] = self.request.user
-		ctx['user'] = User.objects.get(id=1)
-		return ctx
+    def get_context_data(self, **kwargs):
+        ctx = super(UserProfileView, self).get_context_data(**kwargs)
+        # should be:
+        # kwargs['user'] = self.request.user
+        ctx['user'] = User.objects.get(id=1)
+        return ctx
 
 class UserProfileSettings(UpdateView):
-	"""
-	Profile settings base view
-	"""
+    """
+    Profile settings base view
+    """
 
-	model = User
-	form_class = UserBaseSettingsForm
-	success_url = reverse_lazy('user_profile_url')
+    model = User
+    form_class = UserBaseSettingsForm
+    success_url = reverse_lazy('user_profile_url')
 
-	def get_object(self, **kwargs):
-		return User.objects.get(id=1)
+    def get_object(self, **kwargs):
+        return User.objects.get(id=1)

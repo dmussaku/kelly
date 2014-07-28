@@ -4,9 +4,9 @@
 {% block content %}
 <h1>User base settings</h1>
 <form action='' method="post">
-	{% csrf_token %}
-	{{ form.as_p }}
-	<input type="submit" />
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" />
 </form>
 <a href="{% url 'user_profile_password_settings_url' %}">Password settings</a>
 {% endblock %}
