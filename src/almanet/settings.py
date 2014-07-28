@@ -122,3 +122,4 @@ ANONYMOUS_DEFAULT_USERNAME_VALUE = 'Anonymous'
 
 DB_PREFIX = 'alma_{}'
 
+COUNTRIES = [('Kazakhstan', 'Kazakhstan'), ('Russia', 'Russia')]
