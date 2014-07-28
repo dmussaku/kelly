@@ -1,8 +1,17 @@
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser, UserManager
+from django.contrib.auth.models import AbstractBaseUser, UserManager as contrib_user_manager
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 
+class UserManager(contrib_user_manager):
+    """
+    had to override just because of missing username field in model
+    """
+    def create_user(self, first_name, last_name, email, password):
+        user = User(first_name=first_name, last_name=last_name, email=email)
+        user.set_password(password)
+        user.save()
+        return user
 
 class User(AbstractBaseUser):
 

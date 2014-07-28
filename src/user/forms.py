@@ -33,12 +33,12 @@ class UserPasswordSettingsForm(forms.Form):
         return old_password
 
     def clean(self):
-    password = self.cleaned_data['password']
-    password2 = self.cleaned_data['password2']
-    if password and password2:
-        if password != password2:
-            raise forms.ValidationError(self.error_messages['password_mismatch'])
-    return self.cleaned_data
+        password = self.cleaned_data['password']
+        password2 = self.cleaned_data['password2']
+        if password and password2:
+            if password != password2:
+                raise forms.ValidationError(self.error_messages['password_mismatch'])
+        return self.cleaned_data
 
     def save(self, *args, **kwargs):
         self.user.set_password(self.cleaned_data['password'])
