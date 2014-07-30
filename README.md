@@ -6,6 +6,12 @@ This system is used to organise, automate and synchronise all of the customer fa
 
 ### How to start the project
 
+### Dependencies
+
+```
+sudo apt-get install sudo apt-get install -y libmemcached-dev zlib1g-dev libssl-dev python-dev build-essential
+```
+
 ```
 virtualenv --no-site-packages alma.net
 cd alma.net
@@ -26,4 +32,3 @@ cd src
 ```
 nose2 # run from dir where manage.py is located
 ```
-
