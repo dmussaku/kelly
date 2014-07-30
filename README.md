@@ -20,3 +20,10 @@ cd src
 ./manage.py runserver localhost:8000
 
 ```
+
+### How to launch test suite
+
+Run the following command from dir, where manage.py located
+
+```nose2```
+
