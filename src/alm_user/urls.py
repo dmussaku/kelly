@@ -14,5 +14,10 @@ urlpatterns = patterns(
     url (r'^registration/$', UserRegistrationView.as_view(),
     	name='user_registration',
     	),
+
+    url (r'^login/$', UserRegistrationView.as_view(),
+    	name='user_registration',
+    	),
+
     )
 
