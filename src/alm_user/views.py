@@ -1,6 +1,7 @@
 from django.views.generic import ListView
 from django.views.generic.edit import CreateView
 from alm_user.models import User
+from alm_user.forms import RegistrationForm
 from django.core.urlresolvers import reverse_lazy
 
 class UserListView(ListView):
@@ -8,10 +9,10 @@ class UserListView(ListView):
 
 
 class UserRegistrationView(CreateView):
-	model=User
-	fields=['first_name','last_name','email', 'password']
+	form_class=RegistrationForm
 	success_url=reverse_lazy('list')
 	template_name='user/user_registration.html'
+	
 
 
 
