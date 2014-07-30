@@ -23,7 +23,7 @@ cd src
 
 ### How to launch test suite
 
-Run the following command from dir, where manage.py located
-
-```nose2```
+```
+nose2 # run from dir where manage.py is located
+```
 
