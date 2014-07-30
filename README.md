@@ -8,6 +8,8 @@ This system is used to organise, automate and synchronise all of the customer fa
 
 ### Dependencies
 
+PyLibMC - client for working with Memcached protocol
+
 ```
 sudo apt-get install sudo apt-get install -y libmemcached-dev zlib1g-dev libssl-dev python-dev build-essential
 ```
