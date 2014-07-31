@@ -2,3 +2,8 @@ build
 *.pyc
 *.pth
 *.save
+<<<<<<< Updated upstream
+=======
+venv
+*.DS_store
+>>>>>>> Stashed changes
