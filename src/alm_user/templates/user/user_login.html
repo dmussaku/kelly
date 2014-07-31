@@ -2,11 +2,16 @@
 {% load i18n %}
 {% block content %}
 	<h2>Login </h2>
+    {{message}}
 	<form action="" method="post">{% csrf_token %}
-		<label for="email">Email: </label>
-	    <input id="email" type="text" name="email"/>
-	    <label for="password">Password: </label>
-	    <input id="password" type="password" name="password"/>
-		<input type="submit" value="login"/>
+        {{ form.errors }}
+        <li><label for="id_username">Email: </label>
+	        <input id="id_username" type="text" name="username"/>
+        </li>
+	    <li>
+            <label for="password">Password: </label>
+    	    <input id="password" type="password" name="password"/>
+		</li>
+        <input type="submit" value="login"/>
 	</form>
 {% endblock %}

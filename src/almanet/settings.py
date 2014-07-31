@@ -102,6 +102,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.tz',
     'django.core.context_processors.request',
     'django.contrib.messages.context_processors.messages',
+    "django.contrib.auth.context_processors.auth",
     # 'launch.context_processors.launch',
 )
 
@@ -122,10 +123,15 @@ STATICFILES_DIRS = (
 )
 STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.CachedStaticFilesStorage'
 
-AUTH_USER_MODEL = 'user.User'
+from django.core.urlresolvers import reverse_lazy
+
+LOGIN_REDIRECT_URL = reverse_lazy('user_list')
+
+AUTH_USER_MODEL = 'alm_user.User'
 ANONYMOUS_USER_ID = -1
 ANONYMOUS_DEFAULT_USERNAME_VALUE = 'Anonymous'
 
 
 DB_PREFIX = 'alma_{}'
-
+AUTHENTICATION_BACKENDS = (
+    'alm_user.authbackend.MyAuthBackend',)
