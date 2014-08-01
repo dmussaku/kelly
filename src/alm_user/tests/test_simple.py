@@ -1,9 +1,8 @@
-from nose2.tools import such, params
+from nose2.tools import such
 from alm_user.models import User
 from django.test import TestCase
-from selenium import webdriver
-from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
-
+# from selenium import webdriver
+# from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
 
 class AlmaUserLayer(object):
@@ -14,9 +13,9 @@ class AlmaUserLayer(object):
         it.url = 'http://bb.co.uk/user/signin'
         it.email = "r.kamun@gmail.com"
         #driver = webdriver.Firefox()
-        it.driver = webdriver.Remote(
-            command_executor='http://192.168.233.1:4444/wd/hub',
-            desired_capabilities=DesiredCapabilities.FIREFOX)
+        # it.driver = webdriver.Remote(
+        #     command_executor='http://192.168.233.1:4444/wd/hub',
+        #     desired_capabilities=DesiredCapabilities.FIREFOX)
 
     @classmethod
     def tearDown(cls):
@@ -39,10 +38,10 @@ with such.A('Global auth system') as it:
     def test():
         it.assertEqual(it.email, 'r.kamun@gmail.com')
 
-    @it.should('ask a google')
-    def test_selenium():
-        it.driver.get("http://www.google.com")
-        it.assertIn("Google", it.driver.title)
+    # @it.should('ask a google')
+    # def test_selenium():
+    #     it.driver.get("http://www.google.com")
+    #     it.assertIn("Google", it.driver.title)
 
 
 it.createTests(globals())
@@ -51,7 +50,11 @@ it.createTests(globals())
 class SimpleTestCase(TestCase):
 
     def test_user(self):
-        u = User(last_name='Kamun')
+        u = User()
+        u.first_name = "k"
+        u.set_password('123')
         self.assertEqual(u.email, '')
+        self.assertEqual(u.say_hi(), 'hi')
+        self.assertTrue(u.check_password('123'))
 
 

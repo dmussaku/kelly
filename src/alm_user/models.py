@@ -19,3 +19,6 @@ class User(AbstractBaseUser):
         db_table = settings.DB_PREFIX.format('user')
 
     objects = UserManager()
+
+    def say_hi(self):
+        return 'hi'
