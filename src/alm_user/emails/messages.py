@@ -25,3 +25,18 @@ class UserResetPasswordEmail(
 
     subject_template_name = 'emails/password_reset_subject.txt'
     body_template_name = 'emails/password_reset_email.txt'
+
+class UserRegistrationEmail(
+        ContextMixin, UserMixin, DomainMixin, TemplatedEmailMessageView):
+    r"""Sends a greeting email after registration to the `user_email`.
+    The activation email uses two templates:
+
+        ``emails/registration_greeting_subject.txt``
+          subject of the email
+
+        ``emails/registration_greeting_email.txt``
+          body of the email
+    """
+
+    subject_template_name = 'emails/registration_greeting_subject.txt'
+    body_template_name = 'emails/registration_greeting_email.txt'
