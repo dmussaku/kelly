@@ -1,0 +1,9 @@
+{% block header %}Hi, {{ user.get_username }}!{% endblock %}
+{% block body %}{% endblock %}
+{% block footer %}
+
+----
+Sincerely,
+{{ site_name }} team
+Email: info@v3na.com
+{% endblock %}

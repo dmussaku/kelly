@@ -6,7 +6,6 @@ from django.conf import settings
 
 class User(AbstractBaseUser):
 
-
     #REQUIRED_FIELDS = ['email']
     first_name = models.CharField(_('first name'), max_length=31,
                                   null=False, blank=False)
@@ -23,3 +22,6 @@ class User(AbstractBaseUser):
 
     def is_authenticated(self):
         return True
+
+    def get_username(self):
+        return "%s %s" % (self.first_name, self.last_name)

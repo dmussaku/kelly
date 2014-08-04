@@ -1,11 +1,19 @@
 Django==1.6.5
 Fabric==1.9.0
 South==1.0
+argparse==1.2.1
+cov-core==1.13.0
+coverage==3.7.1
+django-mailviews==0.6.3
+djrill==1.1.1
 ecdsa==0.11
 nose2==0.4.7
+nose2-cov==1.0a4
+-e git+git@github.com:Rustem/nose2django.git@faabed3a92b1a38f3fb96970a7eb82b4b8ab3d59#egg=nose2django
 paramiko==1.14.0
 pycrypto==2.6.1
+pylibmc==1.3.0
+requests==2.3.0
+selenium==2.42.1
 six==1.3.0
 wsgiref==0.1.2
-pylibmc
--e git+git@github.com:Rustem/nose2django.git@hotfix/djver-incompat#egg=nose2django

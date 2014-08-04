@@ -1,12 +1,14 @@
 from django.views.generic import ListView
 from django.views.generic.edit import CreateView
-from alm_user.models import User
 from alm_user.forms import RegistrationForm
+from alm_user.models import User
 from django.core.urlresolvers import reverse_lazy
-from django.contrib import auth
-from authbackend import MyAuthBackend
-from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import render
+from django.http import HttpResponseRedirect
+from django.contrib.auth.tokens import default_token_generator
+from django.contrib.auth.forms import SetPasswordForm
+from django.views.decorators.debug import sensitive_post_parameters
+from django.views.decorators.cache import never_cache
+from django.views.generic.base import TemplateResponse
 
 
 class UserListView(ListView):
@@ -22,42 +24,44 @@ class UserRegistrationView(CreateView):
     template_name = 'user/user_registration.html'
 
 
-def user_login(request):
-    if request.method == 'POST':
-        email = request.POST.get('email', '')
-        password = request.POST.get('password', '')
-        m = MyAuthBackend()
-        user = m.authenticate(email, password)
-        if user is not None:
-            if user.is_active:
-                auth.login(request, user)
-                return HttpResponseRedirect(reverse_lazy('user_list'))
+@sensitive_post_parameters()
+@never_cache
+def password_reset_confirm(request, user_pk=None, token=None,
+                           template_name='registration/password_reset_confirm.html',
+                           token_generator=default_token_generator,
+                           set_password_form=SetPasswordForm,
+                           post_reset_redirect=None, extra_context=None):
+    """
+    View that checks the hash in a password reset link and presents a
+    form for entering a new password.
+    """
+    assert user_pk is not None and token is not None  # checked by URLconf
+    if post_reset_redirect is None:
+        post_reset_redirect = reverse_lazy('password_reset_complete')
+    else:
+        post_reset_redirect = reverse_lazy(post_reset_redirect)
+
+    try:
+        user = User._default_manager.get(pk=user_pk)
+    except User.DoesNotExist:
+        user = None
+
+    if user is not None and token_generator.check_token(user, token):
+        validlink = True
+        if request.method == 'POST':
+            form = set_password_form(user, request.POST)
+            if form.is_valid():
+                form.save()
+                return HttpResponseRedirect(post_reset_redirect)
         else:
-            return render(request, 'user/user_login.html',
-                          {'message': 'Email or password incorrect'})
-    return render(request, 'user/user_login.html')
-
-
-def user_logout(request):
-    auth.logout(request)
-    return HttpResponseRedirect(reverse_lazy('user_list'))
-
-
-def password_reset(request):
-    #template_name='user/password_reset.html'
-    if request.method == 'POST':
-        email = request.POST.get('email', '')
-        if email:
-            try:
-                u = User.objects.get(email=email)
-                #make a user reset the password
-                u.first_name
-                return HttpResponse('Email with password change has been sent')
-            except:
-                return render(request, 'user/password_reset.html',
-                              {'message': 'No user With that particular email'
-                               })
-        else:
-            return render(request, 'user/password_reset.html',
-                          {'message': 'Email wasnt entered'})
-    return render(request, 'user/password_reset.html')
+            form = set_password_form(None)
+    else:
+        validlink = False
+        form = None
+    context = {
+        'form': form,
+        'validlink': validlink,
+    }
+    if extra_context is not None:
+        context.update(extra_context)
+    return TemplateResponse(request, template_name, context)

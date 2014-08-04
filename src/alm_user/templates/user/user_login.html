@@ -12,6 +12,6 @@
             <label for="password">Password: </label>
     	    <input id="password" type="password" name="password"/>
 		</li>
-        <input type="submit" value="login"/>
+        <input type="submit" value="login"/> or <a href="{% url 'password_reset' %}">{{ _("Reset your password") }}</a>
 	</form>
 {% endblock %}
