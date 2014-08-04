@@ -150,6 +150,7 @@ ANONYMOUS_DEFAULT_USERNAME_VALUE = 'Anonymous'
 PASSWORD_RESET_TIMEOUT_DAYS = 15
 
 DB_PREFIX = 'alma_{}'
+
 AUTHENTICATION_BACKENDS = (
     'alm_user.authbackend.MyAuthBackend',)
 
