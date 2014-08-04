@@ -7,6 +7,7 @@ from django.contrib.auth.hashers import check_password
 from django.contrib.auth.tokens import default_token_generator
 from alm_user.models import User
 from alm_user.emails import UserResetPasswordEmail
+from alm_company.models import Company
 
 # need to finish validation errors for the passwords form
 
@@ -17,6 +18,7 @@ class RegistrationForm(forms.ModelForm):
                                max_length=100)
     confirm_password = forms.CharField(widget=forms.PasswordInput(),
                                        max_length=100)
+    company_name = forms.CharField(max_length=100)
 
     class Meta:
 
@@ -39,6 +41,8 @@ class RegistrationForm(forms.ModelForm):
         user = super(RegistrationForm, self).save(commit=commit)
         user.set_password(self.cleaned_data['password'])
         if commit:
+            company = Company(name=self.cleaned_data['company_name'], owner=user, subdomain=Company.generate_subdomain(self.cleaned_data['company_name']))
+            company.save()
             user.save()
         return user
 

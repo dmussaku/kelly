@@ -45,7 +45,7 @@ INSTALLED_APPS = (
     'south',
     'almanet',   # commons, entry point
     'alm_user',
-
+    'alm_company',
 )
 
 MIDDLEWARE_CLASSES = (
