@@ -33,4 +33,5 @@ cd src
 
 ```
 nose2 # run from dir where manage.py is located
+nose2 -v --with-cov --cov-config coverage.cfg
 ```

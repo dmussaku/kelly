@@ -75,10 +75,3 @@ class PasswordResetForm(forms.Form):
             to=(self.cached_user.email,),
             bcc=settings.BCC_EMAILS)
 
-
-
-            # subject = loader.render_to_string(subject_template_name, c)
-            # # Email subject *must not* contain newlines
-            # subject = ''.join(subject.splitlines())
-            # email = loader.render_to_string(email_template_name, c)
-            # send_mail(subject, email, from_email, [user.email])

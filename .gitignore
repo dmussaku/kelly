@@ -1,4 +1,7 @@
 build
+venv
 *.pyc
 *.pth
 *.save
+*.DS_store
+.coverage
