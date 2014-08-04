@@ -37,3 +37,7 @@ class User(AbstractBaseUser):
 
     def get_username(self):
         return "%s %s" % (self.first_name, self.last_name)
+
+    def say_hi(self):
+        return 'hi'
+
