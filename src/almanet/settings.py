@@ -36,12 +36,15 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = (
     # 'django.contrib.admin',
     # 'django.contrib.auth',
+    'mailviews',
+    'djrill',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'south',
-    'user',
+    'almanet',   # commons, entry point
+    'alm_user',
 
 )
 
@@ -66,6 +69,13 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': rel('../..', 'db.sqlite3'),
+    }
+}
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.memcached.PyLibMCCache',
+        'LOCATION': '127.0.0.1:11211'
     }
 }
 
@@ -95,6 +105,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.tz',
     'django.core.context_processors.request',
     'django.contrib.messages.context_processors.messages',
+    "django.contrib.auth.context_processors.auth",
     # 'launch.context_processors.launch',
 )
 
@@ -115,11 +126,35 @@ STATICFILES_DIRS = (
 )
 STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.CachedStaticFilesStorage'
 
-AUTH_USER_MODEL = 'user.User'
+
+EMAIL_HOST_USER = 'adm@v3na.com'
+EMAIL_HOST_PASSWORD = ''
+EMAIL_SUBJECT_PREFIX = '[alma.net] '
+SERVER_EMAIL = u'Alma.net services <r.kamun@gmail.com>'
+DEFAULT_FROM_EMAIL = u'Alma.net services <r.kamun@gmail.com>'
+
+EMAIL_BACKEND = 'djrill.mail.backends.djrill.DjrillBackend'
+MANDRILL_API_KEY = 'pMC2w0tuVIuYRZiAjbu8mA'
+ADMINS = (('Rustem', 'adm+r.kamun@v3na.com'),)
+MANAGERS = ADMINS
+BCC_EMAILS = ()
+
+
+from django.core.urlresolvers import reverse_lazy
+
+LOGIN_REDIRECT_URL = reverse_lazy('user_list')
+
+AUTH_USER_MODEL = 'alm_user.User'
 ANONYMOUS_USER_ID = -1
 ANONYMOUS_DEFAULT_USERNAME_VALUE = 'Anonymous'
-
+PASSWORD_RESET_TIMEOUT_DAYS = 15
 
 DB_PREFIX = 'alma_{}'
+AUTHENTICATION_BACKENDS = (
+    'alm_user.authbackend.MyAuthBackend',)
+
 
 COUNTRIES = [('Kazakhstan', 'Kazakhstan'), ('Russia', 'Russia')]
+
+SITE_NAME = 'Alma.net'
+SITE_DOMAIN = 'http://localhost:8000'

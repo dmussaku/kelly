@@ -13,12 +13,12 @@ class Migration(SchemaMigration):
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('password', self.gf('django.db.models.fields.CharField')(max_length=128)),
             ('last_login', self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime.now)),
-            ('first_name', self.gf('django.db.models.fields.CharField')(max_length=30)),
+            ('first_name', self.gf('django.db.models.fields.CharField')(max_length=31)),
             ('last_name', self.gf('django.db.models.fields.CharField')(max_length=30)),
             ('email', self.gf('django.db.models.fields.EmailField')(unique=True, max_length=75)),
             ('is_active', self.gf('django.db.models.fields.BooleanField')(default=True)),
         ))
-        db.send_create_signal(u'user', ['User'])
+        db.send_create_signal(u'alm_user', ['User'])
 
 
     def backwards(self, orm):
@@ -27,10 +27,10 @@ class Migration(SchemaMigration):
 
 
     models = {
-        u'user.user': {
+        u'alm_user.user': {
             'Meta': {'object_name': 'User', 'db_table': "'alma_user'"},
             'email': ('django.db.models.fields.EmailField', [], {'unique': 'True', 'max_length': '75'}),
-            'first_name': ('django.db.models.fields.CharField', [], {'max_length': '30'}),
+            'first_name': ('django.db.models.fields.CharField', [], {'max_length': '31'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'is_active': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
             'last_login': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
@@ -39,4 +39,4 @@ class Migration(SchemaMigration):
         }
     }
 
-    complete_apps = ['user']
+    complete_apps = ['alm_user']

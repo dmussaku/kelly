@@ -1,0 +1,67 @@
+from django.views.generic import ListView
+from django.views.generic.edit import CreateView
+from alm_user.forms import RegistrationForm
+from alm_user.models import User
+from django.core.urlresolvers import reverse_lazy
+from django.http import HttpResponseRedirect
+from django.contrib.auth.tokens import default_token_generator
+from django.contrib.auth.forms import SetPasswordForm
+from django.views.decorators.debug import sensitive_post_parameters
+from django.views.decorators.cache import never_cache
+from django.views.generic.base import TemplateResponse
+
+
+class UserListView(ListView):
+
+    def get_context_data(self, **kwargs):
+        return super(UserListView, self).get_context_data(**kwargs)
+
+
+class UserRegistrationView(CreateView):
+
+    form_class = RegistrationForm
+    success_url = reverse_lazy('user_list')
+    template_name = 'user/user_registration.html'
+
+
+@sensitive_post_parameters()
+@never_cache
+def password_reset_confirm(request, user_pk=None, token=None,
+                           template_name='registration/password_reset_confirm.html',
+                           token_generator=default_token_generator,
+                           set_password_form=SetPasswordForm,
+                           post_reset_redirect=None, extra_context=None):
+    """
+    View that checks the hash in a password reset link and presents a
+    form for entering a new password.
+    """
+    assert user_pk is not None and token is not None  # checked by URLconf
+    if post_reset_redirect is None:
+        post_reset_redirect = reverse_lazy('password_reset_complete')
+    else:
+        post_reset_redirect = reverse_lazy(post_reset_redirect)
+
+    try:
+        user = User._default_manager.get(pk=user_pk)
+    except User.DoesNotExist:
+        user = None
+
+    if user is not None and token_generator.check_token(user, token):
+        validlink = True
+        if request.method == 'POST':
+            form = set_password_form(user, request.POST)
+            if form.is_valid():
+                form.save()
+                return HttpResponseRedirect(post_reset_redirect)
+        else:
+            form = set_password_form(None)
+    else:
+        validlink = False
+        form = None
+    context = {
+        'form': form,
+        'validlink': validlink,
+    }
+    if extra_context is not None:
+        context.update(extra_context)
+    return TemplateResponse(request, template_name, context)
