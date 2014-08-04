@@ -1,13 +1,14 @@
 from django.views.generic import ListView
-from django.views.generic.edit import CreateView
-from alm_user.models import User
-from alm_user.forms import RegistrationForm
+from django.views.generic.base import TemplateView
+from django.views.generic.edit import CreateView, UpdateView
 from django.core.urlresolvers import reverse_lazy
 from django.contrib import auth
 from authbackend import MyAuthBackend
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 
+from alm_user.models import User
+from alm_user.forms import RegistrationForm, UserBaseSettingsForm, UserPasswordSettingsForm
 
 class UserListView(ListView):
 
@@ -61,3 +62,27 @@ def password_reset(request):
             return render(request, 'user/password_reset.html',
                           {'message': 'Email wasnt entered'})
     return render(request, 'user/password_reset.html')
+
+class UserProfileView(TemplateView):
+    """
+    Shows users profile info
+    """
+
+    def get_context_data(self, **kwargs):
+        ctx = super(UserProfileView, self).get_context_data(**kwargs)
+        # should be:
+        # kwargs['user'] = self.request.user
+        ctx['user'] = User.objects.get(id=1)
+        return ctx
+
+class UserProfileSettings(UpdateView):
+    """
+    Profile settings base view
+    """
+
+    model = User
+    form_class = UserBaseSettingsForm
+    success_url = reverse_lazy('user_profile_url')
+
+    def get_object(self, **kwargs):
+        return User.objects.get(id=1)

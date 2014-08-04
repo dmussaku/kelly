@@ -133,10 +133,10 @@ ANONYMOUS_DEFAULT_USERNAME_VALUE = 'Anonymous'
 
 
 DB_PREFIX = 'alma_{}'
-<<<<<<< HEAD
+
 
 COUNTRIES = [('Kazakhstan', 'Kazakhstan'), ('Russia', 'Russia')]
-=======
+
 AUTHENTICATION_BACKENDS = (
-    'alm_user.authbackend.MyAuthBackend',)
->>>>>>> c09c60952be04515e5a5e15150c218ae8ff6685a
+    'alm_user.authbackend.MyAuthBackend',
+)
