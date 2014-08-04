@@ -41,7 +41,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'south',
-    'user',
+    'alm_user',
 
 )
 
@@ -66,6 +66,13 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': rel('../..', 'db.sqlite3'),
+    }
+}
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.memcached.PyLibMCCache',
+        'LOCATION': '127.0.0.1:11211'
     }
 }
 
@@ -95,6 +102,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.tz',
     'django.core.context_processors.request',
     'django.contrib.messages.context_processors.messages',
+    "django.contrib.auth.context_processors.auth",
     # 'launch.context_processors.launch',
 )
 
@@ -115,11 +123,20 @@ STATICFILES_DIRS = (
 )
 STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.CachedStaticFilesStorage'
 
-AUTH_USER_MODEL = 'user.User'
+from django.core.urlresolvers import reverse_lazy
+
+LOGIN_REDIRECT_URL = reverse_lazy('user_list')
+
+AUTH_USER_MODEL = 'alm_user.User'
 ANONYMOUS_USER_ID = -1
 ANONYMOUS_DEFAULT_USERNAME_VALUE = 'Anonymous'
 
 
 DB_PREFIX = 'alma_{}'
+<<<<<<< HEAD
 
 COUNTRIES = [('Kazakhstan', 'Kazakhstan'), ('Russia', 'Russia')]
+=======
+AUTHENTICATION_BACKENDS = (
+    'alm_user.authbackend.MyAuthBackend',)
+>>>>>>> c09c60952be04515e5a5e15150c218ae8ff6685a
