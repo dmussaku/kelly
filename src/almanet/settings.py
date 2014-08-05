@@ -155,7 +155,7 @@ AUTHENTICATION_BACKENDS = (
     'alm_user.authbackend.MyAuthBackend',)
 
 
-COUNTRIES = [('Kazakhstan', 'Kazakhstan'), ('Russia', 'Russia')]
+COUNTRIES = (('Kazakhstan', 'Kazakhstan'),)
 
 SITE_NAME = 'Alma.net'
 SITE_DOMAIN = 'http://localhost:8000'
