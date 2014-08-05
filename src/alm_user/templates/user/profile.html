@@ -11,4 +11,5 @@
     <li><b>Country: </b> {{ user.country }} </li>
 </ul>
 <a href="{% url 'user_profile_settings_url' %}">Settings</a>
+{% if user.company %}<a href="{% url 'user_company_settings_url' %}">Company Settings</a>{% endif %}
 {% endblock %}

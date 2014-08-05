@@ -10,6 +10,7 @@ from django.conf import settings
 urlpatterns = patterns(
     '',
     url(r'^auth/', include('alm_user.urls')),
+    url(r'^profile/company/', include('alm_company.urls')),
     # url(r'^admin/', include(admin.site.urls)),
 )
 

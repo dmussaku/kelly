@@ -6,8 +6,8 @@ import re
 
 class Company(models.Model):
     name = models.CharField(max_length=100, blank=False)
-    owner = models.ForeignKey('alm_user.User')
-    subdomain = models.CharField(_('subdomain'), max_length=300, blank=False)
+    owner = models.ForeignKey('alm_user.User', related_name='company')
+    subdomain = models.CharField(_('subdomain'), max_length=300, blank=False, unique=True)
 
     class Meta:
         verbose_name = _('company')
