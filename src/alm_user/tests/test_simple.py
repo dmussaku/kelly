@@ -1,8 +1,11 @@
 from nose2.tools import such
 from alm_user.models import User
 from django.test import TestCase
+from django.conf import settings
 # from selenium import webdriver
 # from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+
+print settings.SELENIUM_TESTSERVER_HOST
 
 
 class AlmaUserLayer(object):
