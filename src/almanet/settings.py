@@ -45,6 +45,7 @@ INSTALLED_APPS = (
     'south',
     'almanet',   # commons, entry point
     'alm_user',
+    'timezone_field',
 
 )
 

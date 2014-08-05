@@ -11,6 +11,9 @@ from django.views.decorators.cache import never_cache
 from alm_user.models import User
 from alm_user.forms import RegistrationForm, UserBaseSettingsForm, UserPasswordSettingsForm
 
+# for testing, need to be deleted
+from datetime import datetime
+
 class UserListView(ListView):
 
     def get_context_data(self, **kwargs):
@@ -75,6 +78,7 @@ class UserProfileView(TemplateView):
     def get_context_data(self, **kwargs):
         ctx = super(UserProfileView, self).get_context_data(**kwargs)
         ctx['user'] = self.request.user
+        ctx['time'] = datetime.now()  # for testing, need to be deleted
         return ctx
 
 class UserProfileSettings(UpdateView):

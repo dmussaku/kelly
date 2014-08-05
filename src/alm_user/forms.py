@@ -82,7 +82,7 @@ class UserBaseSettingsForm(ModelForm):
 
     class Meta:
         model = User
-        fields = ['first_name', 'last_name', 'city', 'country']
+        fields = ['first_name', 'last_name', 'city', 'country', 'timezone']
 
 class UserPasswordSettingsForm(forms.Form):
 
