@@ -7,7 +7,7 @@
 <body>
 {{user}}
 {% if user.is_authenticated %}
-<a href="{% url 'user_logout' %}">Logout</a>
+<a id="logout" href="{% url 'user_logout' %}">Logout</a>
 {% else %}
 <a href="{% url 'user_login' %}">Login</a>
 or
