@@ -3,8 +3,8 @@
 {% blocktrans %}Thanks for registration at {{ site_name }}.{% endblocktrans %}
 
 {% block body %}
-{% trans "Registration is completed. Please go the following link to view your profile" %}
-{% absurl 'user_profile_url' %}
+{% trans "Registration is completed. Please use the following link to sign in" %}
+{% absurl 'user_login' %}
 {% endblock %}
 
 
