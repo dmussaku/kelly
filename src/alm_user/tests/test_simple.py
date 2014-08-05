@@ -1,50 +1,58 @@
 from nose2.tools import such
+from almanet.test_utils import MainSeleniumLayer
 from alm_user.models import User
+from alm_utils import pj
 from django.test import TestCase
 from django.conf import settings
-# from selenium import webdriver
-# from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
-
-print settings.SELENIUM_TESTSERVER_HOST
+from django.core.urlresolvers import reverse
+from alm_user.models import User
 
 
-class AlmaUserLayer(object):
-    description = '*** Auth System layer ***'
+def create_test_user():
+    u = User()
+    u.first_name = 'Rustem'
+    u.last_name = 'Kamun'
+    u.email = 'r.kamun@gmail.com'
+    u.save()
+    u.set_password('123')
 
-    @classmethod
-    def setUp(cls):
-        it.url = 'http://bb.co.uk/user/signin'
-        it.email = "r.kamun@gmail.com"
-        #driver = webdriver.Firefox()
-        # it.driver = webdriver.Remote(
-        #     command_executor='http://192.168.233.1:4444/wd/hub',
-        #     desired_capabilities=DesiredCapabilities.FIREFOX)
+    return u
 
-    @classmethod
-    def tearDown(cls):
-        del it.url
-        del it.email
 
-with such.A('Global auth system') as it:
-
-    it.uses(AlmaUserLayer)
+with such.A('Alma.net accessibility') as it:
+    it.uses(MainSeleniumLayer)
 
     @it.has_setup
     def setup():
-        pass
+        it.app_url = settings.SITE_DOMAIN
+        MainSeleniumLayer.share_vars(it)
 
-    @it.has_teardown
-    def teardown():
-        pass
-
-    @it.should('say hi')
+    @it.should('Show login page')
     def test():
-        it.assertEqual(it.email, 'r.kamun@gmail.com')
+        it.driver.get(it.app_url)
+        it.assertIn('login', it.driver.title.lower())
 
-    # @it.should('ask a google')
-    # def test_selenium():
-    #     it.driver.get("http://www.google.com")
-    #     it.assertIn("Google", it.driver.title)
+    with it.having('User has session'):
+
+
+        @it.has_setup
+        def setup():
+            it.login_url = it.app_url + reverse('user_login')
+            it.current_user = create_test_user()
+            # login
+            it.driver.get(it.login_url)
+            elem = it.driver.find_element_by_name('username')
+            elem.send_keys(it.current_user.email)
+
+            elem = it.driver.find_element_by_name('password')
+            elem.send_keys('123')
+
+            it.driver.find_element_by_id('id_submit').click()
+
+        @it.should('Redirect to profile page')
+        def test():
+            it.driver.get(it.app_url)
+            it.assertIn('profile', it.driver.title.lower())
 
 
 it.createTests(globals())

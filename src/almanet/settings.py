@@ -155,14 +155,14 @@ class BaseConfiguration(Configuration):
 
 
 class DevConfiguration(BaseConfiguration):
-    SITE_DOMAIN = 'http://alma.dev'
+    SITE_DOMAIN = 'http://alma.dev:8000'
     DEBUG = True
     TEMPLATE_DEBUG = DEBUG
 
 
 class TestConfiguration(BaseConfiguration):
-    SITE_DOMAIN = 'http://alma.dev'
-    SELENIUM_TESTSERVER_HOST = 'http://127.0.0.1'
+    SITE_DOMAIN = 'http://alma.dev:8000'
+    SELENIUM_TESTSERVER_HOST = 'http://192.168.233.1'
     SELENIUM_TESTSERVER_PORT = '4444'
     SELENIUM_CAPABILITY = 'FIREFOX'
 

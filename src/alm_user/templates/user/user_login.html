@@ -3,7 +3,7 @@
 {% block content %}
 	<h2>Login </h2>
     {{message}}
-	<form action="" method="post">{% csrf_token %}
+	<form name="login-form" action="" method="post">{% csrf_token %}
         {{ form.errors }}
         <li><label for="id_username">Email: </label>
 	        <input id="id_username" type="text" name="username"/>
@@ -12,6 +12,6 @@
             <label for="password">Password: </label>
     	    <input id="password" type="password" name="password"/>
 		</li>
-        <input type="submit" value="login"/> or <a href="{% url 'password_reset' %}">{{ _("Reset your password") }}</a>
+        <input name="submit" id="id_submit" type="submit" value="login"/> or <a href="{% url 'password_reset' %}">{{ _("Reset your password") }}</a>
 	</form>
 {% endblock %}
