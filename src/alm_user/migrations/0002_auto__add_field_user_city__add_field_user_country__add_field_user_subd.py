@@ -19,9 +19,9 @@ class Migration(SchemaMigration):
                       keep_default=False)
 
         # Adding field 'User.subdomain'
-        db.add_column('alma_user', 'subdomain',
-                      self.gf('django.db.models.fields.CharField')(default='subdomain', max_length=300),
-                      keep_default=False)
+        # db.add_column('alma_user', 'subdomain',
+        #               self.gf('django.db.models.fields.CharField')(default='subdomain', max_length=300),
+        #               keep_default=False)
 
 
     def backwards(self, orm):
@@ -32,7 +32,7 @@ class Migration(SchemaMigration):
         db.delete_column('alma_user', 'country')
 
         # Deleting field 'User.subdomain'
-        db.delete_column('alma_user', 'subdomain')
+        # db.delete_column('alma_user', 'subdomain')
 
 
     models = {
@@ -47,7 +47,7 @@ class Migration(SchemaMigration):
             'last_login': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
             'last_name': ('django.db.models.fields.CharField', [], {'max_length': '30'}),
             'password': ('django.db.models.fields.CharField', [], {'max_length': '128'}),
-            'subdomain': ('django.db.models.fields.CharField', [], {'max_length': '300'})
+            # 'subdomain': ('django.db.models.fields.CharField', [], {'max_length': '300'})
         }
     }
 
