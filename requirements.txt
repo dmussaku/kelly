@@ -18,3 +18,4 @@ argparse==1.2.1
 selenium==2.42.1
 wsgiref==0.1.2
 django-configurations
+django-timezone-field

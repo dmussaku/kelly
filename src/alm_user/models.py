@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, UserManager as contrib_user_manager
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
+from timezone_field import TimeZoneField
 
 class UserManager(contrib_user_manager):
     """
@@ -25,6 +26,7 @@ class User(AbstractBaseUser):
 
     city = models.CharField(_('city'), max_length=30)
     country = models.CharField(_('country'), max_length=30, choices=settings.COUNTRIES)
+    timezone = TimeZoneField()
 
     class Meta:
         verbose_name = _('user')

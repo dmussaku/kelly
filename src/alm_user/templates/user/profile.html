@@ -1,5 +1,6 @@
 {% extends "user/base.html" %}
 {% load i18n %}
+{% load tz %}
 {% block head_title %} {{ _("User Profile") }} {% endblock %}
 {% block content %}
 <h1>User profile</h1>
@@ -10,5 +11,6 @@
     <li><b>City: </b> {{ user.city }} </li>
     <li><b>Country: </b> {{ user.country }} </li>
 </ul>
+<p><b>Your time is:</b> {{ time|timezone:user.timezone }} </p>
 <a href="{% url 'user_profile_settings_url' %}">Settings</a>
 {% endblock %}

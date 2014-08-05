@@ -46,6 +46,7 @@ class BaseConfiguration(Configuration):
         'django.contrib.messages',
         'django.contrib.staticfiles',
         'south',
+        'timezone_field',
         'almanet',   # commons, entry point
         'alm_user',
 
