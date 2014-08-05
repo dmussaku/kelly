@@ -1,8 +1,17 @@
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser, UserManager
+from django.contrib.auth.models import AbstractBaseUser, UserManager as contrib_user_manager
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 
+class UserManager(contrib_user_manager):
+    """
+    had to override just because of missing username field in model
+    """
+    def create_user(self, first_name, last_name, email, password):
+        user = User(first_name=first_name, last_name=last_name, email=email)
+        user.set_password(password)
+        user.save()
+        return user
 
 class User(AbstractBaseUser):
 
@@ -13,6 +22,9 @@ class User(AbstractBaseUser):
     email = models.EmailField(_('email address'), unique=True, blank=False)
     is_active = models.BooleanField(_('active'), default=True)
     USERNAME_FIELD = 'email'
+
+    city = models.CharField(_('city'), max_length=30)
+    country = models.CharField(_('country'), max_length=30, choices=settings.COUNTRIES)
 
     class Meta:
         verbose_name = _('user')

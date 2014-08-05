@@ -1,15 +1,16 @@
 from django.conf.urls import patterns, include, url
 from django.conf.urls.static import static
 from django.conf import settings
+from almanet.views import fork_index
 
 # from django.contrib import admin
-
 
 # admin.autodiscover()
 
 urlpatterns = patterns(
     '',
     url(r'^auth/', include('alm_user.urls')),
+    url(r'^$', fork_index)
     # url(r'^admin/', include(admin.site.urls)),
 )
 

@@ -152,6 +152,8 @@ class BaseConfiguration(Configuration):
 
     SITE_NAME = 'Alma.net'
     SITE_DOMAIN = 'http://localhost:8000'
+    
+    COUNTRIES = [('Kazakhstan', 'Kazakhstan'), ('Russia', 'Russia')]
 
 
 class DevConfiguration(BaseConfiguration):
