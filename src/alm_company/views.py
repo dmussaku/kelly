@@ -4,6 +4,7 @@ from django.core.urlresolvers import reverse_lazy
 from alm_company.models import Company
 from alm_company.forms import CompanySettingsForm
 
+
 class CompanySettingsView(UpdateView):
     """
     Company settings view
@@ -14,4 +15,4 @@ class CompanySettingsView(UpdateView):
     success_url = reverse_lazy('user_profile_url')
 
     def get_object(self, **kwargs):
-        return self.request.user.company.all()[0]
+        return self.request.user.owned_company
