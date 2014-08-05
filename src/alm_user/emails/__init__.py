@@ -1,1 +1,1 @@
-from .messages import UserResetPasswordEmail
+from .messages import UserResetPasswordEmail, UserRegistrationEmail

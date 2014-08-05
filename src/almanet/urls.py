@@ -6,6 +6,7 @@ from django.core.urlresolvers import reverse_lazy
 from alm_user.forms import UserPasswordSettingsForm
 from alm_user.views import UserProfileView, UserProfileSettings
 from django.contrib.auth import views as contrib_auth_views
+from django.contrib.auth.decorators import login_required
 
 
 # from django.contrib import admin
@@ -15,11 +16,11 @@ from django.contrib.auth import views as contrib_auth_views
 urlpatterns = patterns(
     '',
     url(r'^auth/', include('alm_user.urls')),
-    url(r'^profile/$', UserProfileView.as_view(
-        template_name='user/profile.html'),
+    url(r'^profile/$', login_required(UserProfileView.as_view(
+        template_name='user/profile.html')),
         name='user_profile_url'),
-    url(r'^profile/settings/$', UserProfileSettings.as_view(
-        template_name='user/settings.html'),
+    url(r'^profile/settings/$', login_required(UserProfileSettings.as_view(
+        template_name='user/settings.html')),
         name='user_profile_settings_url'),
     url(r'^profile/settings/passwords$', contrib_auth_views.password_change,
         {'password_change_form': UserPasswordSettingsForm,

@@ -140,6 +140,8 @@ class BaseConfiguration(Configuration):
     BCC_EMAILS = ()
 
     LOGIN_REDIRECT_URL = reverse_lazy('user_list')
+    LOGIN_URL = reverse_lazy('user_login')
+    LOGOUT_URL = reverse_lazy('user_logout')
 
     AUTH_USER_MODEL = 'alm_user.User'
     ANONYMOUS_USER_ID = -1
