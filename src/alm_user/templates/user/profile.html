@@ -2,6 +2,7 @@
 {% load i18n %}
 {% block head_title %} {{ _("User Profile Page") }} {% endblock %}
 {% block content %}
+
 <h1>User profile</h1>
 <ul>
     <li><b>First name: </b> {{ user.first_name }} </li>
@@ -9,6 +10,7 @@
     <li><b>Email: </b> {{ user.email }} </li>
     <li><b>City: </b> {{ user.city }} </li>
     <li><b>Country: </b> {{ user.country }} </li>
+    <li><b>Company: </b> {{company.name}}</li>
 </ul>
 <a href="{% url 'user_profile_settings_url' %}">Settings</a>
 {% if user.owned_company %}<a href="{% url 'user_company_settings_url' %}">Company Settings</a>{% endif %}

@@ -142,7 +142,7 @@ BCC_EMAILS = ()
 
 from django.core.urlresolvers import reverse_lazy
 
-LOGIN_REDIRECT_URL = reverse_lazy('user_list')
+LOGIN_REDIRECT_URL = reverse_lazy('user_profile_url')
 
 AUTH_USER_MODEL = 'alm_user.User'
 ANONYMOUS_USER_ID = -1
