@@ -15,4 +15,4 @@ class CompanySettingsView(UpdateView):
     success_url = reverse_lazy('user_profile_url')
 
     def get_object(self, **kwargs):
-        return self.request.user.owned_company
+        return self.request.user.get_owned_company()

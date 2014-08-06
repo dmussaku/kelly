@@ -28,6 +28,8 @@ class User(AbstractBaseUser):
     city = models.CharField(_('city'), max_length=30)
     country = models.CharField(_('country'), max_length=30, choices=settings.COUNTRIES)
 
+    company = models.ManyToManyField('alm_company.Company', related_name='users')
+
     class Meta:
         verbose_name = _('user')
         db_table = settings.DB_PREFIX.format('user')
@@ -42,4 +44,16 @@ class User(AbstractBaseUser):
 
     def say_hi(self):
         return 'hi'
+
+    def get_company(self):
+        co = self.company.all()
+        if len(co) > 0:
+            return co[0]
+        return None
+
+    def get_owned_company(self):
+        oco = self.owned_company.all()
+        if len(oco) > 0:
+            return oco[0]
+        return None
 

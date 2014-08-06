@@ -6,7 +6,7 @@ import re
 
 class Company(models.Model):
     name = models.CharField(max_length=100, blank=False)
-    owner = models.OneToOneField('alm_user.User', related_name='owned_company')
+    owner = models.ManyToManyField('alm_user.User', related_name='owned_company')
     subdomain = models.CharField(_('subdomain'), max_length=300, blank=False, unique=True)
 
     class Meta:
@@ -27,3 +27,15 @@ class Company(models.Model):
                 test_sd = sd + str(i)
                 i += 1
         return test_sd
+
+    def get_owner(self):
+        o = self.owner.all()
+        if len(o > 0):
+            return o[0]
+        return None
+
+    def get_users(self):
+        us = self.users.all()
+        if len(us > 0):
+            return us
+        return None

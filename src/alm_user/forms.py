@@ -41,9 +41,11 @@ class RegistrationForm(forms.ModelForm):
         user = super(RegistrationForm, self).save(commit=commit)
         user.set_password(self.cleaned_data['password'])
         if commit:
-            company = Company(name=self.cleaned_data['company_name'], owner=user, subdomain=Company.generate_subdomain(self.cleaned_data['company_name']))
+            company = Company(name=self.cleaned_data['company_name'], subdomain=Company.generate_subdomain(self.cleaned_data['company_name']))
             company.save()
             user.save()
+            company.users.add(user)
+            user.owned_company.add(company)
         return user
 
 

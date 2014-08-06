@@ -3,6 +3,6 @@
 {% block head_title %} {{ _("User List Page") }} {% endblock %}
 {% block content %}
 <ul>{% for u in object_list %}
-    <li> {{ u.first_name }} {{ u.last_name }} {{ u.owned_company }}</li>
+    <li> {{ u.first_name }} {{ u.last_name }} {{ u.get_company.name }}</li>
 {% endfor %}</ul>
 {% endblock %}
