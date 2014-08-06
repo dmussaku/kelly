@@ -4,6 +4,8 @@ from django.conf import settings
 
 # from django.contrib import admin
 
+# TODO: delete this
+from almanet.views import TestView2
 
 # admin.autodiscover()
 
@@ -11,6 +13,7 @@ urlpatterns = patterns(
     '',
     url(r'^auth/', include('alm_user.urls')),
     url(r'^profile/company/', include('alm_company.urls')),
+    url(r'^crm/$', TestView2.as_view(template_name='almanet/about_crm.html')),
     # url(r'^admin/', include(admin.site.urls)),
 )
 

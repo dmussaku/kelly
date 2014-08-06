@@ -1,4 +1,5 @@
 {% extends "user/base.html" %}
+{% load almanet_utils_tags %}
 {% load i18n %}
 {% block head_title %} {{ _("User Profile Page") }} {% endblock %}
 {% block content %}
@@ -12,4 +13,5 @@
 </ul>
 <a href="{% url 'user_profile_settings_url' %}">Settings</a>
 {% if user.get_owned_company %}<a href="{% url 'user_company_settings_url' %}">Company Settings</a>{% endif %}
+<a href="{% subdomain_url 'user_profile_settings_url' subdomain=user.get_owned_company.subdomain %}">Settings</a>
 {% endblock %}

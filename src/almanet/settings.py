@@ -42,10 +42,12 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_hosts',
     'south',
     'almanet',   # commons, entry point
     'alm_user',
     'alm_company',
+    'utils',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -55,9 +57,19 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django_hosts.middleware.HostsMiddleware',
+    'utils.middleware.GetSubdomainMiddleware',
 )
 
+SESSION_COOKIE_DOMAIN = '.alma.net'
+
 ROOT_URLCONF = 'almanet.urls'
+
+ROOT_HOSTCONF = 'almanet.hosts'
+PARENT_HOST = 'alma.net:8000'
+DEFAULT_HOST = 'default'
+
+HOSTCONF_REGEX = r'(alma\.net:8000)'
 
 WSGI_APPLICATION = 'almanet.wsgi.application'
 
