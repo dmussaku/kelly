@@ -9,6 +9,7 @@ from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.cache import never_cache
 
 from alm_user.models import User
+from alm_company.models import Company
 from alm_user.forms import RegistrationForm, UserBaseSettingsForm, UserPasswordSettingsForm
 
 class UserListView(ListView):
@@ -20,7 +21,7 @@ class UserListView(ListView):
 class UserRegistrationView(CreateView):
 
     form_class = RegistrationForm
-    success_url = reverse_lazy('user_list')
+    success_url = reverse_lazy('user_profile_url')
     template_name = 'user/user_registration.html'
 
 
@@ -39,7 +40,7 @@ def password_reset_confirm(request, user_pk=None, token=None,
     if post_reset_redirect is None:
         post_reset_redirect = reverse_lazy('password_reset_complete')
     else:
-        post_reset_redirect = reverse_lazy(post_reset_redirect)
+        post_reset_redirect = reverse_lazy('user_login')
 
     try:
         user = User._default_manager.get(pk=user_pk)
@@ -75,6 +76,10 @@ class UserProfileView(TemplateView):
     def get_context_data(self, **kwargs):
         ctx = super(UserProfileView, self).get_context_data(**kwargs)
         ctx['user'] = self.request.user
+        try:
+            ctx['company'] = Company.objects.get(owner=self.request.user)
+        except:
+            pass
         return ctx
 
 class UserProfileSettings(UpdateView):

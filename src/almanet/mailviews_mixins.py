@@ -39,8 +39,13 @@ class UserMixin(object):
             if key.startswith('gu__'):
                 _, dest, search_field = key.split('__')
                 User = get_user_model()
+                #initial expression
+                '''
                 result[dest] = User.objects.filter(
                     **{search_field: value}).first()
+                '''
+                result[dest] = User.objects.filter(
+                    **{search_field: value})[0]
         kwargs.update(result)
         return super(UserMixin, self).get_context_data(**kwargs)
 
