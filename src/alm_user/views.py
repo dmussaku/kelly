@@ -77,7 +77,7 @@ class UserProfileView(TemplateView):
         ctx = super(UserProfileView, self).get_context_data(**kwargs)
         ctx['user'] = self.request.user
         try:
-            ctx['company']=Company.objects.get(owner=self.request.user)
+            ctx['company'] = Company.objects.get(owner=self.request.user)
         except:
             pass
         return ctx
