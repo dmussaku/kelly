@@ -152,7 +152,7 @@ MANAGERS = ADMINS
 BCC_EMAILS = ()
 
 
-from django.core.urlresolvers import reverse_lazy
+from utils import reverse_lazy
 
 LOGIN_REDIRECT_URL = reverse_lazy('user_profile_url')
 
@@ -171,3 +171,5 @@ COUNTRIES = [('Kazakhstan', 'Kazakhstan'), ('Russia', 'Russia')]
 
 SITE_NAME = 'Alma.net'
 SITE_DOMAIN = 'http://localhost:8000'
+
+DEFAULT_URL_SCHEME = 'http'

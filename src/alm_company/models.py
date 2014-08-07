@@ -6,8 +6,10 @@ import re
 
 class Company(models.Model):
     name = models.CharField(max_length=100, blank=False)
-    owner = models.ManyToManyField('alm_user.User', related_name='owned_company')
-    subdomain = models.CharField(_('subdomain'), max_length=300, blank=False, unique=True)
+    owner = models.ManyToManyField('alm_user.User',
+                                   related_name='owned_company')
+    subdomain = models.CharField(_('subdomain'), max_length=300,
+                                 blank=False, unique=True)
 
     class Meta:
         verbose_name = _('company')
@@ -29,13 +31,18 @@ class Company(models.Model):
         return test_sd
 
     def get_owner(self):
-        o = self.owner.all()
-        if len(o > 0):
-            return o[0]
-        return None
+        return self.owner.first()
 
     def get_users(self):
-        us = self.users.all()
-        if len(us > 0):
-            return us
-        return None
+        return self.users.all()
+
+    @classmethod
+    def verify_company_by_subdomain(cls, company, subdomain):
+        lco = company
+        try:
+            rco = cls.objects.get(subdomain=subdomain)
+        except cls.DoesNotExist:
+            rco = None
+        if rco is None:
+            return False
+        return lco.pk == rco.pk

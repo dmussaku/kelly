@@ -46,14 +46,7 @@ class User(AbstractBaseUser):
         return 'hi'
 
     def get_company(self):
-        co = self.company.all()
-        if len(co) > 0:
-            return co[0]
-        return None
+        return self.company.first()
 
     def get_owned_company(self):
-        oco = self.owned_company.all()
-        if len(oco) > 0:
-            return oco[0]
-        return None
-
+        return self.owned_company.first()
