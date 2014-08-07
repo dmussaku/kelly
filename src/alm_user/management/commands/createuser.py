@@ -3,7 +3,7 @@ from optparse import make_option
 from django.core.management.base import BaseCommand
 from django.utils.translation import ugettext as _
 
-from user.models import User, UserManager
+from alm_user.models import User, UserManager
 
 class Command(BaseCommand):
     option_list = BaseCommand.option_list + (
@@ -28,6 +28,5 @@ class Command(BaseCommand):
             User.objects.get(email=email,)
         except (User.DoesNotExist, KeyError):
             UserManager().create_user(first_name, last_name, email, password)
-                # **{'first_name':first_name, 'last_name':last_name, 'email':email, 'password':password}
         else:
             sys.stderr.write("Error: That email is already taken.\n")
