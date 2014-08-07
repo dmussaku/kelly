@@ -1,4 +1,6 @@
 from django.views.generic import TemplateView
+from django.http import HttpResponseRedirect
+from django.core.urlresolvers import reverse_lazy
 
 from alm_company.models import Company
 
@@ -13,3 +15,9 @@ class TestView1(TemplateView):
 
 class TestView2(TemplateView):
     pass
+
+def fork_index(request):
+    if request.user.is_authenticated():
+        return HttpResponseRedirect(reverse_lazy('user_profile_url'))
+    else:
+        return HttpResponseRedirect(reverse_lazy('user_login'))

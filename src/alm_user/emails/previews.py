@@ -5,7 +5,7 @@ from almanet.mailviews_mixins import PreviewForm
 from django.utils.translation import ugettext_lazy as _
 from django import forms
 from mailviews.previews import site, Preview
-from .messages import UserResetPasswordEmail
+from .messages import UserResetPasswordEmail, UserRegistrationEmail
 
 
 def gen_activation_key():
@@ -17,10 +17,18 @@ class UserResetPasswordEmailForm(PreviewForm):
     site_name = forms.CharField(label=_('Site name'), initial='Alma.net')
     protocol = forms.CharField(label=_('Http protocol'), initial='https')
 
-
 class UserResetPasswordEmailPreview(Preview):
     message_view = UserResetPasswordEmail
     form_class = UserResetPasswordEmailForm
 
 
+class UserRegistrationEmailForm(PreviewForm):
+	pass
+	
+class UserRegistrationEmailPreview(Preview):
+    message_view = UserRegistrationEmail
+    form_class = UserRegistrationEmailForm
+
+
 site.register(UserResetPasswordEmailPreview)
+site.register(UserRegistrationEmailPreview)

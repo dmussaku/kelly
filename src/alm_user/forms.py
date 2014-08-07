@@ -5,8 +5,9 @@ from django.utils.translation import ugettext_lazy as _
 from django.contrib import auth
 from django.contrib.auth.hashers import check_password
 from django.contrib.auth.tokens import default_token_generator
+
 from alm_user.models import User
-from alm_user.emails import UserResetPasswordEmail
+from alm_user.emails import UserResetPasswordEmail, UserRegistrationEmail
 from alm_company.models import Company
 
 # need to finish validation errors for the passwords form
@@ -46,6 +47,13 @@ class RegistrationForm(forms.ModelForm):
             user.save()
             company.users.add(user)
             user.owned_company.add(company)
+            mail_context = {
+                'site_name': settings.SITE_NAME,
+                'gu__user__email': user.email,
+            }
+            UserRegistrationEmail(**mail_context).send(
+                to=(user.email,),
+                bcc=settings.BCC_EMAILS)
         return user
 
 
@@ -88,7 +96,7 @@ class UserBaseSettingsForm(ModelForm):
 
     class Meta:
         model = User
-        fields = ['first_name', 'last_name', 'city', 'country']
+        fields = ['first_name', 'last_name', 'city', 'country', 'timezone']
 
 class UserPasswordSettingsForm(forms.Form):
 

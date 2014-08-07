@@ -12,6 +12,9 @@ from alm_user.models import User
 from alm_company.models import Company
 from alm_user.forms import RegistrationForm, UserBaseSettingsForm, UserPasswordSettingsForm
 
+# for testing, need to be deleted
+from datetime import datetime
+
 class UserListView(ListView):
 
     def get_context_data(self, **kwargs):
@@ -76,10 +79,8 @@ class UserProfileView(TemplateView):
     def get_context_data(self, **kwargs):
         ctx = super(UserProfileView, self).get_context_data(**kwargs)
         ctx['user'] = self.request.user
-        try:
-            ctx['company'] = Company.objects.get(owner=self.request.user)
-        except:
-            pass
+        ctx['company'] = self.request.user.get_owned_company()
+        ctx['time'] = datetime.now()  # for testing, need to be deleted
         return ctx
 
 class UserProfileSettings(UpdateView):

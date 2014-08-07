@@ -1,6 +1,6 @@
 {% extends "user/base.html" %}
-{% load i18n almanet_tags %}
-{% block head_title %} {{ _("User Profile Page") }} {% endblock %}
+{% load i18n tz almanet_tags %}
+{% block head_title %} {{ _("User Profile") }} {% endblock %}
 {% block content %}
 
 <h1>User profile</h1>
@@ -12,6 +12,7 @@
     <li><b>Country: </b> {{ user.country }} </li>
     <li><b>Company: </b> {{company.name}}</li>
 </ul>
+<p><b>Your time is:</b> {{ time|timezone:user.timezone }} </p>
 <a href="{% url 'user_profile_settings_url' %}">Settings</a>
 {% if user.get_owned_company %}<a href="{% url 'user_company_settings_url' %}">Company Settings</a>{% endif %}
 <a href="{% subdomain_url 'user_profile_settings_url' subdomain=user.get_owned_company.subdomain %}">Settings</a>
