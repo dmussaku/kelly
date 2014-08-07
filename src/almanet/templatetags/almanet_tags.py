@@ -1,11 +1,12 @@
  # Import template library
+from utils import reverse
 from django import template
 import urlparse
 from django.utils.safestring import mark_safe
 from django.template.defaulttags import URLNode, url
 from django.core.serializers.json import DjangoJSONEncoder
 import json as json_ser
-# Set register
+
 register = template.Library()
 
 
@@ -261,3 +262,9 @@ def absurl(parser, token, node_cls=AbsoluteURLNode):
 absurl = register.tag(absurl)
 
 
+@register.simple_tag
+def subdomain_url(view, subdomain='', *args, **kwargs):
+    """Like url but accepts subdomain parameter"""
+    if subdomain is '':
+        subdomain = None
+    return reverse(view, subdomain=subdomain, args=args, kwargs=kwargs)
