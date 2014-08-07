@@ -10,7 +10,7 @@ from django.contrib.auth.decorators import login_required
 
 
 # TODO: delete this
-from almanet.views import TestView2
+from almanet.views import TestView2, ProductList, connect_product, disconnect_product
 
 # from django.contrib import admin
 
@@ -20,7 +20,13 @@ urlpatterns = patterns(
     '',
     url(r'^auth/', include('alm_user.urls')),
     url(r'^profile/company/', include('alm_company.urls')),
+    # TODO: temp, needs to be deleted
     url(r'^crm/$', TestView2.as_view(template_name='almanet/about_crm.html')),
+    url(r'^products/$', ProductList.as_view(
+        template_name='almanet/product_list.html'), 
+        name='product_list'),
+    url(r'^products/connect/(?P<slug>\w+)/$', connect_product, name='connect_product'),
+    url(r'^products/disconnect/(?P<slug>\w+)/$', disconnect_product, name='disconnect_product'),
     url(r'^profile/$', login_required(UserProfileView.as_view(
         template_name='user/profile.html')),
         name='user_profile_url'),

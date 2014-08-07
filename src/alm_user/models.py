@@ -52,3 +52,35 @@ class User(AbstractBaseUser):
 
     def get_owned_company(self):
         return self.owned_company.first()
+
+    def get_subscriptions(self):
+        return self.subscriptions.all()
+
+    def get_active_subscriptions(self):
+        return self.subscriptions.filter(is_active=True)
+
+    def connected_products(self):
+        rv = []
+        for s in self.get_active_subscriptions():
+            rv.append(s.product)
+        return rv
+
+    def is_product_connected(self, product):
+        return product in self.connected_products()
+
+    def connect_product(self, product):
+        from almanet.models import Subscription
+        try:
+            s = Subscription.objects.get(product=product, user=self)
+        except Subscription.DoesNotExist:
+            s = Subscription(product=product, user=self)
+        else:
+            s.is_active = True
+        s.save()
+
+        
+    def disconnect_product(self, product):
+        s = self.subscriptions.filter(is_active=True, product=product).first()
+        if s:
+            s.is_active = False
+            s.save()

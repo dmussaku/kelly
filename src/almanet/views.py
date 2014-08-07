@@ -1,8 +1,10 @@
-from django.views.generic import TemplateView
-from django.http import HttpResponseRedirect
+from django.views.generic import TemplateView, ListView
+from django.http import Http404, HttpResponseRedirect
 from django.core.urlresolvers import reverse_lazy
+from django.contrib.auth.decorators import login_required
 
 from alm_company.models import Company
+from .models import Product
 
 # TODO: this needs to be deleted
 class TestView1(TemplateView):
@@ -21,3 +23,33 @@ def fork_index(request):
         return HttpResponseRedirect(reverse_lazy('user_profile_url'))
     else:
         return HttpResponseRedirect(reverse_lazy('user_login'))
+
+class ProductList(ListView):
+
+    model = Product
+    queryset = Product.objects.all()
+
+    def get_context_data(self, **kwargs):
+        ctx = super(ProductList, self).get_context_data(**kwargs)
+        ctx['user'] = self.request.user
+        return ctx
+
+@login_required
+def connect_product(request, slug, *args, **kwargs):
+    try:
+        product = Product.objects.get(slug=slug)
+    except Product.DoesNotExist:
+        raise Http404
+    else:
+        request.user.connect_product(product)
+        return HttpResponseRedirect(reverse_lazy('user_profile_url'))
+
+@login_required
+def disconnect_product(request, slug, *args, **kwargs):
+    try:
+        product = Product.objects.get(slug=slug)
+    except Product.DoesNotExist:
+        raise Http404
+    else:
+        request.user.disconnect_product(product)
+        return HttpResponseRedirect(reverse_lazy('user_profile_url'))
