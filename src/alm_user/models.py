@@ -28,7 +28,7 @@ class User(AbstractBaseUser):
 
     city = models.CharField(_('city'), max_length=30)
     country = models.CharField(_('country'), max_length=30, choices=settings.COUNTRIES)
-    timezone = TimeZoneField()
+    timezone = TimeZoneField(default='Asia/Almaty')
 
     company = models.ManyToManyField('alm_company.Company', related_name='users')
 
