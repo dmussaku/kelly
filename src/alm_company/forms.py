@@ -9,9 +9,9 @@ class CompanySettingsForm(forms.ModelForm):
         model = Company
         fields = ['name', 'subdomain']
 
-    def clean(self):
+    def clean_subdomain(self):
         subdomain=self.cleaned_data.get('subdomain', None)
         if subdomain in BUSY_SUBDOMAINS:
             raise forms.ValidationError('Cannot take this subdomain')
         else:
-            return super(CompanySettingsForm, self).clean()
+            return subdomain
