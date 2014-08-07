@@ -171,6 +171,7 @@ class BaseConfiguration(Configuration):
     DEFAULT_URL_SCHEME = 'http'
 
     COUNTRIES = [('Kazakhstan', 'Kazakhstan'), ('Russia', 'Russia')]
+    BUSY_SUBDOMAINS = ['my', 'billing', 'api']
 
 
 class DevConfiguration(BaseConfiguration):
