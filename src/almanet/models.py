@@ -2,8 +2,6 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 
-from alm_user.models import User
-
 class Product(models.Model):
 
 	title = models.CharField(_('product title'), max_length=100, blank=False)
@@ -16,7 +14,7 @@ class Product(models.Model):
 
 class Subscription(models.Model):
 
-	product = models.OneToOneField(Product)
+	product = models.ForeignKey(Product, related_name='subscriptions')
 	user = models.ForeignKey('alm_user.User', related_name='subscriptions')
 	is_active = models.BooleanField(default=True)
 

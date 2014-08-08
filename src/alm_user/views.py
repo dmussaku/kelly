@@ -1,7 +1,7 @@
 from django.views.generic import ListView
 from django.views.generic.base import TemplateView, TemplateResponse
 from django.views.generic.edit import CreateView, UpdateView
-from django.core.urlresolvers import reverse_lazy
+# from django.core.urlresolvers import reverse_lazy
 from django.http import HttpResponseRedirect
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth.forms import SetPasswordForm
@@ -11,6 +11,7 @@ from django.views.decorators.cache import never_cache
 from alm_user.models import User
 from alm_user.forms import RegistrationForm, UserBaseSettingsForm, UserPasswordSettingsForm
 from almanet.models import Product
+from utils import reverse_lazy
 
 # for testing, need to be deleted
 from datetime import datetime
@@ -24,7 +25,7 @@ class UserListView(ListView):
 class UserRegistrationView(CreateView):
 
     form_class = RegistrationForm
-    success_url = reverse_lazy('user_profile_url')
+    success_url = reverse_lazy('user_profile_url', subdomain='my')
     template_name = 'user/user_registration.html'
 
 
