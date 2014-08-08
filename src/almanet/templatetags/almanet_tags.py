@@ -267,7 +267,7 @@ def subdomain_url(view, subdomain='', *args, **kwargs):
     """Like url but accepts subdomain parameter"""
     if subdomain is '':
         subdomain = None
-    return reverse(view, subdomain=subdomain)
+    return reverse(view, subdomain=subdomain, args=args, kwargs=kwargs)
 
 @register.inclusion_tag('almanet/tags/con_discon_button.html')
 def connect_disconnect_button(user, product):
