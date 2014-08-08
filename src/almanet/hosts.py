@@ -4,6 +4,7 @@ from django.conf import settings
 SUBDOMAIN_REGEX_PATH = ''.join(['\w+', '\.', settings.HOSTCONF_REGEX])
 host_patterns = patterns(
     '',
+    host(r'my', 'alm_user.my_urls', name='my'),
     host(SUBDOMAIN_REGEX_PATH, 'almanet.app_urls', name='apps'),
     host(settings.HOSTCONF_REGEX, settings.ROOT_URLCONF, name='default'),
 )

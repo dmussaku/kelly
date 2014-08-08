@@ -1,7 +1,8 @@
-{% extends "almanet/base.html" %}
+{% extends "user/base.html" %}
 {% load i18n almanet_tags %}
 {% block head_title %} {{ _("Product List Page") }} {% endblock %}
 {% block content %}
+<h2>Connected services:</h2>
 <ul>
 	{% for product in object_list %}
 	    <li>
@@ -14,4 +15,5 @@
     	<li>You have no products connected.</li>
 	{% endfor %}
 </ul>
+<p><a href="{% subdomain_url 'user_profile_url' subdomain='my' %}">Back to profile</a></p>
 {% endblock %}

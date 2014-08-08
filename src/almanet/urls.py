@@ -19,7 +19,6 @@ from almanet.views import TestView2, ProductList, connect_product, disconnect_pr
 urlpatterns = patterns(
     '',
     url(r'^auth/', include('alm_user.urls')),
-    url(r'^profile/company/', include('alm_company.urls')),
     # TODO: temp, needs to be deleted
     url(r'^crm/$', TestView2.as_view(template_name='almanet/about_crm.html')),
     url(r'^products/$', ProductList.as_view(
@@ -27,17 +26,6 @@ urlpatterns = patterns(
         name='product_list'),
     url(r'^products/connect/(?P<slug>\w+)/$', connect_product, name='connect_product'),
     url(r'^products/disconnect/(?P<slug>\w+)/$', disconnect_product, name='disconnect_product'),
-    url(r'^profile/$', login_required(UserProfileView.as_view(
-        template_name='user/profile.html')),
-        name='user_profile_url'),
-    url(r'^profile/settings/$', login_required(UserProfileSettings.as_view(
-        template_name='user/settings.html')),
-        name='user_profile_settings_url'),
-    url(r'^profile/settings/passwords$', contrib_auth_views.password_change,
-        {'password_change_form': UserPasswordSettingsForm,
-         'post_change_redirect': reverse_lazy('user_profile_url'),
-         'template_name': 'user/settings_password.html'},
-        name='user_profile_password_settings_url'),
     url(r'^$', fork_index),
     # url(r'^admin/', include(admin.site.urls)),
 )

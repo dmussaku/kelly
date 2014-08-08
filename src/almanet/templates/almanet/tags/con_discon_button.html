@@ -1,6 +1,6 @@
 {% load almanet_tags %}
 {% if connected %}
-	-- <span>already connected</span>: <a href="{% url 'disconnect_product' product.slug %}">disconnect</a> or <a href="{% subdomain_url 'crm_app_url' subdomain=user.get_owned_company.subdomain %}">view</a>
+	-- <span>already connected</span>: <a href="{% subdomain_url 'disconnect_product' subdomain='' slug=product.slug %}">disconnect</a> or <a href="{% subdomain_url 'crm_app_url' subdomain=user.get_owned_company.subdomain %}">view</a>
 {% else %}
-	-- <a href="{% url 'connect_product' product.slug %}">connect</a>
+	-- <a href="{% subdomain_url 'connect_product' subdomain='' slug=product.slug %}">connect</a>
 {% endif %}

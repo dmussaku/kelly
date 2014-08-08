@@ -7,20 +7,16 @@ from django.utils.functional import lazy
 
 
 def get_domain():
-    domain = getattr(settings, 'PARENT_HOST', 'almanet.dev')
+    domain = getattr(settings, 'PARENT_HOST', 'alma.net:8000')
     return domain
 
 def reverse(viewname, subdomain=None, scheme=None,
             args=None, kwargs=None, current_app=None):
-    if subdomain is None:
-        pattern = settings.PARENT_HOST
-    else:
-        pattern = '.'.join([subdomain, settings.PARENT_HOST])
-    host, _ = HostsMiddleware().get_host(pattern)
-    urlconf = host.urlconf
     domain = get_domain()
-    if subdomain is not None:
+    if subdomain is not None and subdomain != '':
         domain = '%s.%s' % (subdomain, domain)
+    host, _ = HostsMiddleware().get_host(domain)
+    urlconf = host.urlconf
     path = django_reverse(
         viewname, urlconf=urlconf, args=args,
         kwargs=kwargs, current_app=current_app) or ''

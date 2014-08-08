@@ -13,13 +13,7 @@
     <li><b>Company: </b> {{company.name}}</li>
 </ul>
 
-<h2>Connected services:</h2>
-<ul>
-	{% for product in user.connected_products %}
-    	<li>{{ product.title }}</li>
-    {% endfor %}
-</ul>
 <p><b>Your time is:</b> {{ time|timezone:user.timezone }} </p>
-<a href="{% url 'user_profile_settings_url' %}">Settings</a>
-{% if user.get_owned_company %}<a href="{% url 'user_company_settings_url' %}">Company Settings</a>{% endif %}
+<p><a href="{% url 'user_profile_settings_url' %}">Settings</a></p>
+<p><a href="{% url 'user_services_url' %}">View connected services</a></p>
 {% endblock %}

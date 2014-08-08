@@ -152,9 +152,14 @@ class BaseConfiguration(Configuration):
     MANAGERS = ADMINS
     BCC_EMAILS = ()
 
-    LOGIN_REDIRECT_URL = reverse_lazy('user_profile_url')
-    LOGIN_URL = reverse_lazy('user_login')
-    LOGOUT_URL = reverse_lazy('user_logout')
+    # LOGIN_REDIRECT_URL = reverse_lazy('user_profile_url')
+    # LOGIN_URL = reverse_lazy('user_login')
+    # LOGOUT_URL = reverse_lazy('user_logout')
+
+    # TODO : reverse urls:
+    LOGIN_REDIRECT_URL = "http://my.alma.net:8000"
+    LOGIN_URL = "http://alma.net:8000/auth/signin"
+    LOGOUT_URL = "http://alma.net:8000/auth/logout"
 
     AUTH_USER_MODEL = 'alm_user.User'
     ANONYMOUS_USER_ID = -1

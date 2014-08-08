@@ -9,8 +9,8 @@ from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.cache import never_cache
 
 from alm_user.models import User
-from alm_company.models import Company
 from alm_user.forms import RegistrationForm, UserBaseSettingsForm, UserPasswordSettingsForm
+from almanet.models import Product
 
 # for testing, need to be deleted
 from datetime import datetime
@@ -94,3 +94,16 @@ class UserProfileSettings(UpdateView):
 
     def get_object(self, **kwargs):
         return self.request.user
+
+class UserServicesView(ListView):
+
+    model = Product
+
+    def get_context_data(self, **kwargs):
+        ctx = super(UserServicesView, self).get_context_data(**kwargs)
+        ctx['user'] = self.request.user
+        return ctx
+
+    def get_queryset(self, *args, **kwargs):
+        queryset = self.request.user.connected_products()
+        return queryset
