@@ -42,7 +42,7 @@ def connect_product(request, slug, *args, **kwargs):
         raise Http404
     else:
         request.user.connect_product(product)
-        return HttpResponseRedirect(reverse_lazy('user_profile_url'))
+        return HttpResponseRedirect(reverse_lazy('product_list'))
 
 @login_required
 def disconnect_product(request, slug, *args, **kwargs):
@@ -52,4 +52,4 @@ def disconnect_product(request, slug, *args, **kwargs):
         raise Http404
     else:
         request.user.disconnect_product(product)
-        return HttpResponseRedirect(reverse_lazy('user_profile_url'))
+        return HttpResponseRedirect(reverse_lazy('product_list'))

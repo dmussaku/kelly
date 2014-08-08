@@ -73,7 +73,7 @@ class BaseConfiguration(Configuration):
     PARENT_HOST = 'alma.net:8000'
     DEFAULT_HOST = 'default'
 
-    HOSTCONF_REGEX = r'(alma\.net:8000)'
+    HOSTCONF_REGEX = r'alma\.net:8000'
 
     WSGI_APPLICATION = 'almanet.wsgi.application'
 
