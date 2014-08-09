@@ -1,5 +1,4 @@
 from models import User
-from django.contrib.auth import models
 
 
 class MyAuthBackend(object):
