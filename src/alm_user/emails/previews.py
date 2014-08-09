@@ -17,14 +17,16 @@ class UserResetPasswordEmailForm(PreviewForm):
     site_name = forms.CharField(label=_('Site name'), initial='Alma.net')
     protocol = forms.CharField(label=_('Http protocol'), initial='https')
 
+
 class UserResetPasswordEmailPreview(Preview):
     message_view = UserResetPasswordEmail
     form_class = UserResetPasswordEmailForm
 
 
 class UserRegistrationEmailForm(PreviewForm):
-	pass
-	
+    pass
+
+
 class UserRegistrationEmailPreview(Preview):
     message_view = UserRegistrationEmail
     form_class = UserRegistrationEmailForm
