@@ -8,13 +8,17 @@ class ContactListView(ListView):
     
     model = Contact
     paginate_by = 10
-    
-
 
 class ContactCreateView(CreateView):
     form_class = ContactForm
     template_name = "contact/contact_create.html"
     success_url = reverse_lazy('contact_list')
+
+    def form_valid(self, form):
+        if self.request.user:
+            kwargs = {'timezone' : self.request.user.timezone}
+            form.save(kwargs)
+        return super(ContactCreateView, self).form_valid(form)
 
 class ContactUpdateView(UpdateView):
     model = Contact

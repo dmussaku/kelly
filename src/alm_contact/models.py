@@ -1,6 +1,7 @@
 from django.db import models
 from almanet import settings
 import datetime
+import pytz
 #Contact model: (first_name, last_name, company_name, phone, email)
 class Contact(models.Model):
     first_name = models.CharField(max_length=31,
@@ -16,6 +17,7 @@ class Contact(models.Model):
         db_table = settings.DB_PREFIX.format('contact')
 
     def save(self, **kwargs):
+        print kwargs
         if (not self.date_created):
             self.date_created = datetime.datetime.now()
         super(Contact, self).save(**kwargs)
