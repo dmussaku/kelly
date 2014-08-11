@@ -22,7 +22,16 @@ class RegistrationForm(forms.ModelForm):
     class Meta:
 
         model = User
-        fields = ['first_name', 'last_name', 'email']
+        fields = ['first_name', 'last_name', 'email', 'timezone']
+
+    def clean_company_name(self):
+        company_name = self.cleaned_data['company_name']
+        if company_name in settings.BUSY_SUBDOMAINS:
+            busy_subdomains = ', '.join(settings.BUSY_SUBDOMAINS)
+            raise forms.ValidationError(_(
+                "The following company names are busy: %(names)s") % {
+                'names': busy_subdomains})
+        return company_name
 
     def clean(self):
         password = self.cleaned_data.get('password', None)
