@@ -268,3 +268,12 @@ def subdomain_url(view, subdomain='', *args, **kwargs):
     if subdomain is '':
         subdomain = None
     return reverse(view, subdomain=subdomain, args=args, kwargs=kwargs)
+
+@register.inclusion_tag('almanet/tags/con_discon_button.html')
+def connect_disconnect_button(user, product):
+    """ Show connect or disconnect links according to user - product relation """
+    return {
+        'user': user,
+        'product': product,
+        'connected': user.is_product_connected(product)
+    }

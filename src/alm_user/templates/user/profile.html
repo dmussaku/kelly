@@ -12,8 +12,8 @@
     <li><b>Country: </b> {{ user.country }} </li>
     <li><b>Company: </b> {{company.name}}</li>
 </ul>
+
 <p><b>Your time is:</b> {{ time|timezone:user.timezone }} </p>
-<a href="{% url 'user_profile_settings_url' %}">Settings</a>
-{% if user.get_owned_company %}<a href="{% url 'user_company_settings_url' %}">Company Settings</a>{% endif %}
-<a href="{% subdomain_url 'user_profile_settings_url' subdomain=user.get_owned_company.subdomain %}">Settings</a>
+<p><a href="{% url 'user_profile_settings_url' %}">Settings</a></p>
+<p><a href="{% url 'user_services_url' %}">View connected services</a></p>
 {% endblock %}

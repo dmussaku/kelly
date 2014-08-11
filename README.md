@@ -42,6 +42,9 @@ nose2 -v --with-cov --cov-config coverage.cfg
 sudo nano /etc/hosts
 127.0.0.1    alma.net
 127.0.0.1    bwayne.alma.net
+127.0.0.1    my.alma.net
 
-create default user and company (email: b.wayne@batman.bat, password:123, company subdomain: bwayne):
+create default user and company
+(email: b.wayne@batman.bat, password:123, company subdomain: bwayne):
 ./manage.py createdefaultuser
+```

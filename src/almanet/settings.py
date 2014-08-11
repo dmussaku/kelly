@@ -10,8 +10,8 @@ https://docs.djangoproject.com/en/1.6/ref/settings/
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
-from configurations import Configuration
-from django.core.urlresolvers import reverse_lazy
+from django.utils.functional import lazy
+from configurations import Configuration, pristinemethod
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 
@@ -20,6 +20,14 @@ def rel(*x):
 
 
 class BaseConfiguration(Configuration):
+
+    @pristinemethod
+    def reverse_lazy(viewname, **kw):
+        def __inner():
+            from utils.url_resolvers import reverse
+            return reverse(viewname, **kw)
+
+        return lazy(__inner, str)
 
     BASE_DIR = BASE_DIR
     # Quick-start development settings - unsuitable for production
@@ -73,7 +81,7 @@ class BaseConfiguration(Configuration):
     PARENT_HOST = 'alma.net:8000'
     DEFAULT_HOST = 'default'
 
-    HOSTCONF_REGEX = r'(alma\.net:8000)'
+    HOSTCONF_REGEX = r'alma\.net:8000'
 
     WSGI_APPLICATION = 'almanet.wsgi.application'
 
@@ -152,9 +160,17 @@ class BaseConfiguration(Configuration):
     MANAGERS = ADMINS
     BCC_EMAILS = ()
 
-    LOGIN_REDIRECT_URL = reverse_lazy('user_profile_url')
-    LOGIN_URL = reverse_lazy('user_login')
-    LOGOUT_URL = reverse_lazy('user_logout')
+    @property
+    def LOGIN_REDIRECT_URL(self):
+        return self.__class__.reverse_lazy('user_profile_url', subdomain='my')
+
+    @property
+    def LOGIN_URL(self):
+        return self.__class__.reverse_lazy('user_login', subdomain=None)
+
+    @property
+    def LOGOUT_URL(self):
+        return self.__class__.reverse_lazy('user_logout', subdomain=None)
 
     AUTH_USER_MODEL = 'alm_user.User'
     ANONYMOUS_USER_ID = -1
@@ -171,16 +187,19 @@ class BaseConfiguration(Configuration):
     DEFAULT_URL_SCHEME = 'http'
 
     COUNTRIES = [('Kazakhstan', 'Kazakhstan'), ('Russia', 'Russia')]
+    BUSY_SUBDOMAINS = ['my', 'billing', 'api', 'www', 'marketplace', 'shop']
 
 
 class DevConfiguration(BaseConfiguration):
-    SITE_DOMAIN = 'http://alma.dev:8000'
+    PARENT_HOST = 'alma.net:8000'
+    SITE_DOMAIN = PARENT_HOST
     DEBUG = True
     TEMPLATE_DEBUG = DEBUG
 
 
 class TestConfiguration(BaseConfiguration):
-    SITE_DOMAIN = 'http://alma.dev:8000'
+    PARENT_HOST = 'alma.net:8000'
+    SITE_DOMAIN = PARENT_HOST
     SELENIUM_TESTSERVER_HOST = 'http://192.168.233.1'
     SELENIUM_TESTSERVER_PORT = '4444'
     SELENIUM_CAPABILITY = 'FIREFOX'

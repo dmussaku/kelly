@@ -8,5 +8,8 @@
     {{ form.as_p }}
     <input type="submit" />
 </form>
-<a href="{% url 'user_profile_password_settings_url' %}">Password settings</a>
+<p><a href="{% url 'user_profile_password_settings_url' %}">Password settings</a></p>
+{% if user.get_owned_company %}
+	<p><a href="{% url 'user_company_settings_url' %}">Company Settings</a></p>
+{% endif %}
 {% endblock %}
