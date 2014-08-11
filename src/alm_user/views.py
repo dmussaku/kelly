@@ -84,6 +84,7 @@ class UserProfileView(TemplateView):
         ctx['time'] = datetime.now()  # for testing, need to be deleted
         return ctx
 
+
 class UserProfileSettings(UpdateView):
     """
     Profile settings base view
@@ -91,10 +92,11 @@ class UserProfileSettings(UpdateView):
 
     model = User
     form_class = UserBaseSettingsForm
-    success_url = reverse_lazy('user_profile_url')
+    success_url = reverse_lazy('user_profile_url', subdomain='my')
 
     def get_object(self, **kwargs):
         return self.request.user
+
 
 class UserServicesView(ListView):
 
@@ -108,3 +110,4 @@ class UserServicesView(ListView):
     def get_queryset(self, *args, **kwargs):
         queryset = self.request.user.connected_products()
         return queryset
+

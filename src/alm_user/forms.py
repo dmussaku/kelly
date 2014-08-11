@@ -2,10 +2,8 @@ from django import forms
 from django.forms import ModelForm
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
-from django.contrib import auth
 from django.contrib.auth.hashers import check_password
 from django.contrib.auth.tokens import default_token_generator
-
 from alm_user.models import User
 from alm_user.emails import UserResetPasswordEmail, UserRegistrationEmail
 from alm_company.models import Company
@@ -42,7 +40,11 @@ class RegistrationForm(forms.ModelForm):
         user = super(RegistrationForm, self).save(commit=commit)
         user.set_password(self.cleaned_data['password'])
         if commit:
-            company = Company(name=self.cleaned_data['company_name'], subdomain=Company.generate_subdomain(self.cleaned_data['company_name']))
+            gened_subdomain = Company.generate_subdomain(
+                self.cleaned_data['company_name'])
+            company = Company(
+                name=self.cleaned_data['company_name'],
+                subdomain=gened_subdomain)
             company.save()
             user.save()
             company.users.add(user)
@@ -92,17 +94,22 @@ class PasswordResetForm(forms.Form):
             to=(self.cached_user.email,),
             bcc=settings.BCC_EMAILS)
 
+
 class UserBaseSettingsForm(ModelForm):
 
     class Meta:
         model = User
-        fields = ['first_name', 'last_name', 'city', 'country', 'timezone']
+        fields = ['first_name', 'last_name', 'timezone']
+
 
 class UserPasswordSettingsForm(forms.Form):
 
-    old_password = forms.CharField(widget=forms.PasswordInput, label=_("Old password"))
-    password = forms.CharField(widget=forms.PasswordInput(), label=_('New Password'))
-    password2 = forms.CharField(widget=forms.PasswordInput(), label=_('Repeat your password'))
+    old_password = forms.CharField(
+        widget=forms.PasswordInput, label=_("Old password"))
+    password = forms.CharField(
+        widget=forms.PasswordInput(), label=_('New Password'))
+    password2 = forms.CharField(
+        widget=forms.PasswordInput(), label=_('Repeat your password'))
 
     error_messages = {
         'password_mismatch': _("New passwords are not equal"),
@@ -116,7 +123,8 @@ class UserPasswordSettingsForm(forms.Form):
     def clean_old_password(self):
         old_password = self.cleaned_data['old_password']
         if not check_password(old_password, self.user.password):
-            raise forms.ValidationError(self.error_messages['old_password_incorrect'])
+            raise forms.ValidationError(
+                self.error_messages['old_password_incorrect'])
         return old_password
 
     def clean(self):
@@ -124,7 +132,8 @@ class UserPasswordSettingsForm(forms.Form):
         password2 = self.cleaned_data['password2']
         if password and password2:
             if password != password2:
-                raise forms.ValidationError(self.error_messages['password_mismatch'])
+                raise forms.ValidationError(
+                    self.error_messages['password_mismatch'])
         return self.cleaned_data
 
     def save(self, *args, **kwargs):

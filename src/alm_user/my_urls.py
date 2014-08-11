@@ -1,16 +1,10 @@
 from django.conf.urls import patterns, include, url
-from django.conf.urls.static import static
-from django.conf import settings
-from almanet.views import fork_index
 from django.core.urlresolvers import reverse_lazy
 from alm_user.forms import UserPasswordSettingsForm
-from alm_user.views import UserProfileView, UserProfileSettings, UserServicesView
+from alm_user.views import (
+    UserProfileView, UserProfileSettings, UserServicesView,)
 from django.contrib.auth import views as contrib_auth_views
 from django.contrib.auth.decorators import login_required
-
-
-# TODO: delete this
-from almanet.views import TestView2, ProductList, connect_product, disconnect_product
 
 urlpatterns = patterns(
     '',
