@@ -2,7 +2,11 @@
 {% load i18n %}
 {% block head_title %} {{ _("User List Page") }} {% endblock %}
 {% block content %}
-<ul>{% for u in object_list %}
-    <li> {{ u.first_name }} {{ u.last_name }} {{ u.company }}</li>
-{% endfor %}</ul>
+<h1> Contact List </h1>
+	<ul>{% for c in contacts %}
+	    <li> {{ c.first_name }} {{ c.last_name }} {{ c.company_name }} 
+	   		 <a href="{% url 'contact_update' pk=c.id %}">Update</a>
+	    </li>
+	{% endfor %}</ul>
+
 {% endblock %}
