@@ -1,9 +1,7 @@
 from django.db import models
 from django.utils import timezone
 from almanet import settings
-import datetime
-import pytz
-#Contact model: (first_name, last_name, company_name, phone, email)
+
 class Contact(models.Model):
     first_name = models.CharField(max_length=31,
                                   null=False, blank=False)
