@@ -9,5 +9,5 @@ class Contact(models.Model):
     email = models.EmailField(_('email address'), unique=True, blank=False)
 
     class Meta:
-        verbose_name = _('user')
-        db_table = settings.DB_PREFIX.format('user')
+        verbose_name = _('contact')
+        db_table = settings.DB_PREFIX.format('contact')
