@@ -21,3 +21,4 @@ django-hosts
 tldextract
 django-configurations
 django-timezone-field
+vobject
