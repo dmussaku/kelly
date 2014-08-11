@@ -15,9 +15,6 @@ class ContactCreateView(CreateView):
     success_url = reverse_lazy('contact_list')
 
     def form_valid(self, form):
-        if self.request.user:
-            kwargs = {'timezone' : self.request.user.timezone}
-            form.save(kwargs)
         return super(ContactCreateView, self).form_valid(form)
 
 class ContactUpdateView(UpdateView):
