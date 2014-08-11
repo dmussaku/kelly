@@ -21,6 +21,7 @@ urlpatterns = patterns(
     url(r'^products/disconnect/(?P<slug>\w+)/$', disconnect_product,
         name='disconnect_product'),
     url(r'^$', fork_index),
+    url(r'^contacts/', include('alm_contact.urls')),
     # url(r'^admin/', include(admin.site.urls)),
 )
 
