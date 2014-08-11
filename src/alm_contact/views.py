@@ -7,6 +7,7 @@ from models import Contact
 class ContactListView(ListView):
     
     model = Contact
+    paginate_by = 10
     template_name = "contact/contact_list.html"
 
 
