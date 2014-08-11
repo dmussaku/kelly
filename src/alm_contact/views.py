@@ -9,10 +9,6 @@ class ContactListView(ListView):
     model = Contact
     template_name = "contact/contact_list.html"
 
-    def get_context_data(self, **kwargs):
-        context = super(ContactListView, self).get_context_data(**kwargs)
-        context['contacts'] = Contact.objects.all()
-        return context
 
 class ContactCreateView(CreateView):
     form_class = ContactForm

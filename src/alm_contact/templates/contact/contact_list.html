@@ -3,6 +3,7 @@
 {% block head_title %} {{ _("User List Page") }} {% endblock %}
 {% block content %}
 <h1> Contact List </h1>
+	<a href="{% url 'contact_create' %}"> Create a Contact </a>
 	<ul>{% for c in contacts %}
 	    <li> {{ c.first_name }} {{ c.last_name }} {{ c.company_name }} 
 	   		 <a href="{% url 'contact_update' pk=c.id %}">Update</a>  
