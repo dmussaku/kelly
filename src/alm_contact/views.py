@@ -1,4 +1,4 @@
-from django.views.generic import ListView
+from django.views.generic import ListView, DetailView
 from django.views.generic.edit import CreateView, UpdateView
 from utils import reverse_lazy
 from forms import ContactForm
@@ -25,6 +25,6 @@ class ContactUpdateView(UpdateView):
     success_url = reverse_lazy('contact_list')
     template_name = "contact/contact_update.html"
 
-    '''def get_object(self, **kwargs):
-                    print kwargs
-                    return Contact.objects.get(pk=kwargs['pk'])'''
+class ContactDetailView(DetailView):
+    model = Contact
+    template_name = "contact/contact_detail.html"
