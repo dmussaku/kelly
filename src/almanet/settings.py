@@ -128,6 +128,7 @@ class BaseConfiguration(Configuration):
         'django.core.context_processors.request',
         'django.contrib.messages.context_processors.messages',
         "django.contrib.auth.context_processors.auth",
+        'utils.context_processors.available_subdomains',
         # 'launch.context_processors.launch',
     )
 
@@ -162,7 +163,7 @@ class BaseConfiguration(Configuration):
 
     @property
     def LOGIN_REDIRECT_URL(self):
-        return self.__class__.reverse_lazy('user_profile_url', subdomain='my')
+        return self.__class__.reverse_lazy('user_profile_url', subdomain=self.SUBDOMAINS['MY_SD'])
 
     @property
     def LOGIN_URL(self):
@@ -186,8 +187,18 @@ class BaseConfiguration(Configuration):
 
     DEFAULT_URL_SCHEME = 'http'
 
-    COUNTRIES = [('Kazakhstan', 'Kazakhstan'), ('Russia', 'Russia')]
-    BUSY_SUBDOMAINS = ['my', 'billing', 'api', 'www', 'marketplace', 'shop']
+    # BUSY_SUBDOMAINS = ['my', 'billing', 'api', 'www', 'marketplace', 'shop']
+    SUBDOMAINS = {
+        "MY_SD" : 'my',
+        "BILLING_SD" : 'billing',
+        "API_SD" : 'api',
+        "WWW_SD" : 'www',
+        "MARKETPLACE_SD" : 'marketplace',
+        "SHOP_SD" : 'shop',
+    }
+
+    def BUSY_SUBDOMAINS(self):
+        return [v for k,v in self.SUBDOMAINS.iteritems()]
 
 
 class DevConfiguration(BaseConfiguration):

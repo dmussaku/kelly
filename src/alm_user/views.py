@@ -7,6 +7,7 @@ from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth.forms import SetPasswordForm
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.cache import never_cache
+from django.conf import settings
 
 from alm_user.models import User
 from alm_user.forms import RegistrationForm, UserBaseSettingsForm, UserPasswordSettingsForm
@@ -25,7 +26,7 @@ class UserListView(ListView):
 class UserRegistrationView(CreateView):
 
     form_class = RegistrationForm
-    success_url = reverse_lazy('user_profile_url', subdomain='my')
+    success_url = reverse_lazy('user_profile_url', subdomain=settings.SUBDOMAINS['MY_SD'])
     template_name = 'user/user_registration.html'
 
 
@@ -92,7 +93,7 @@ class UserProfileSettings(UpdateView):
 
     model = User
     form_class = UserBaseSettingsForm
-    success_url = reverse_lazy('user_profile_url', subdomain='my')
+    success_url = reverse_lazy('user_profile_url', subdomain=settings.SUBDOMAINS['MY_SD'])
 
     def get_object(self, **kwargs):
         return self.request.user

@@ -15,5 +15,5 @@
     	<li>You have no products connected.</li>
 	{% endfor %}
 </ul>
-<p><a href="{% subdomain_url 'user_profile_url' subdomain='my' %}">Back to profile</a></p>
+<p><a href="{% subdomain_url 'user_profile_url' subdomain=available_subdomains.MY_SD %}">Back to profile</a></p>
 {% endblock %}
