@@ -16,7 +16,13 @@ class Subscription(models.Model):
 
 	product = models.ForeignKey(Product, related_name='subscriptions')
 	user = models.ForeignKey('alm_user.User', related_name='subscriptions')
+	organization = models.ForeignKey('alm_company.Company', related_name='subscriptions')
 	is_active = models.BooleanField(default=True)
+
+	def __init__(self, *args, **kwargs):
+		super(Subscription, self).__init__(**kwargs)
+		if self.user is not None:
+			self.organization = self.user.get_company()
 
 	class Meta:
 		verbose_name = _('subscription')
