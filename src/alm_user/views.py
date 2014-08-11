@@ -1,7 +1,7 @@
 from django.views.generic import ListView
 from django.views.generic.base import TemplateView, TemplateResponse
 from django.views.generic.edit import CreateView, UpdateView
-from django.core.urlresolvers import reverse_lazy
+# from django.core.urlresolvers import reverse_lazy
 from django.http import HttpResponseRedirect
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth.forms import SetPasswordForm
@@ -9,8 +9,9 @@ from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.cache import never_cache
 
 from alm_user.models import User
-from alm_company.models import Company
 from alm_user.forms import RegistrationForm, UserBaseSettingsForm, UserPasswordSettingsForm
+from almanet.models import Product
+from utils import reverse_lazy
 
 # for testing, need to be deleted
 from datetime import datetime
@@ -24,7 +25,7 @@ class UserListView(ListView):
 class UserRegistrationView(CreateView):
 
     form_class = RegistrationForm
-    success_url = reverse_lazy('user_profile_url')
+    success_url = reverse_lazy('user_profile_url', subdomain='my')
     template_name = 'user/user_registration.html'
 
 
@@ -83,6 +84,7 @@ class UserProfileView(TemplateView):
         ctx['time'] = datetime.now()  # for testing, need to be deleted
         return ctx
 
+
 class UserProfileSettings(UpdateView):
     """
     Profile settings base view
@@ -90,7 +92,22 @@ class UserProfileSettings(UpdateView):
 
     model = User
     form_class = UserBaseSettingsForm
-    success_url = reverse_lazy('user_profile_url')
+    success_url = reverse_lazy('user_profile_url', subdomain='my')
 
     def get_object(self, **kwargs):
         return self.request.user
+
+
+class UserServicesView(ListView):
+
+    model = Product
+
+    def get_context_data(self, **kwargs):
+        ctx = super(UserServicesView, self).get_context_data(**kwargs)
+        ctx['user'] = self.request.user
+        return ctx
+
+    def get_queryset(self, *args, **kwargs):
+        queryset = self.request.user.connected_products()
+        return queryset
+

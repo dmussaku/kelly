@@ -6,5 +6,5 @@ from almanet.views import TestView1
 urlpatterns = patterns(
     '',
     url(r'^crm/$', subdomain_required(
-        TestView1.as_view(template_name='almanet/crm.html'))),
+        TestView1.as_view(template_name='almanet/crm.html')), name='crm_app_url'),
 )

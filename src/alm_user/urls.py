@@ -28,7 +28,6 @@ urlpatterns = patterns(
         'password_reset_form': PasswordResetForm,
         'email_template_name': 'emails/password_reset_email.txt',
         'subject_template_name': 'emails/password_reset_subject.txt',
-        
         }, name='password_reset'),
     url(r'^password-reset/done/$', django_password_reset_done, {
         'template_name': 'user/password_reset_done.html'},

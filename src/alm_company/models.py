@@ -2,6 +2,7 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 import re
+from almanet.settings import BUSY_SUBDOMAINS
 
 
 class Company(models.Model):
@@ -18,6 +19,8 @@ class Company(models.Model):
     @classmethod
     def generate_subdomain(self, subdomain):
         sd = re.sub('[\W]', '', subdomain).lower()
+        if (sd in BUSY_SUBDOMAINS):
+            sd += str(1)
         i = 1
         test_sd = sd
         while(True):
