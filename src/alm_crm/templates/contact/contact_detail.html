@@ -7,4 +7,5 @@
 	<li> Phone - {{contact.phone}}</li>
 	<li> Email - {{contact.email}}</li>
 	<a href="{% url 'contact_update' pk=contact.id %}">Update</a>  
+	<a href="{% url 'contact_delete' pk=contact.id %}">Delete</a>
 {% endblock %}

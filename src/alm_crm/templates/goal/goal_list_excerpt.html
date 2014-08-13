@@ -5,10 +5,16 @@
 <h1> Contact List </h1>
 	<a href="{% url 'contact_create' %}"> Create a Contact </a>
 	<ul>{% for c in contacts %}
-	    <li> {{ c.first_name }} {{ c.last_name }} {{ c.company_name }} 
-	   		 <a href="{% url 'contact_update' pk=c.id %}">Update</a>  
-	   		 <a href="{% url 'contact_detail' pk=c.id %}">Detail</a>  
-             <a href="{% url 'contact_delete' pk=c.id %}">Delete</a>
+	    <li>
+            <h2> {{ c.first_name }} {{ c.last_name }} </h2>
+             <ul>
+                <li> Company Name - {{ c.company_name }} </li>
+                <li> Phone Number - {{ c.phone }} </li>
+                <li> Email - {{ c.email }} </li>
+                <li> Date Created UTC - {{ c.date_created }} </li>
+             </ul>  
+             <a href="{% url 'contact_update' pk=c.id %}">Update</a>  
+             <a href="{% url 'contact_detail' pk=c.id %}">Detail</a>
 	    </li>
 	{% endfor %}</ul>
 	<div class="pagination">

@@ -12,7 +12,7 @@ class Product(models.Model):
 
     class Meta:
         verbose_name = _('product')
-    db_table = settings.DB_PREFIX.format('product')
+        db_table = settings.DB_PREFIX.format('product')
 
 
 class Subscription(models.Model):

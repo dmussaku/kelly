@@ -5,6 +5,7 @@ from utils.decorators import subdomain_required
 from alm_crm.views import UserProductView
 
 urlpatterns = patterns(
+	'',
 	url(r'^(?P<slug>[\w-]+)/$', subdomain_required(
 			login_required(
 				UserProductView.as_view()),
