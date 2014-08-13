@@ -1,5 +1,6 @@
 from django.views.generic import ListView, DetailView
 from django.views.generic.edit import CreateView, UpdateView
+from django.http import HttpResponse
 from utils import reverse_lazy
 from forms import ContactForm
 from models import Contact
@@ -26,3 +27,10 @@ class ContactUpdateView(UpdateView):
 class ContactDetailView(DetailView):
     model = Contact
     template_name = "contact/contact_detail.html"
+
+def contact_export(request, pk, *args, **kwargs):
+    c = Contact.objects.get(pk=pk)
+    vcard = c.to_vcard().serialize()
+    response = HttpResponse(vcard, mimetype='text/x-vcard')
+    response['Content-Disposition'] = "attachment; filename=%s_%s.vcf" % (c.first_name, c.last_name)
+    return response

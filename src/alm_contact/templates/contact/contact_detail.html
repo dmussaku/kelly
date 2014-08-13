@@ -6,5 +6,6 @@
 	<li> Company - {{contact.company_name}}</li>
 	<li> Phone - {{contact.phone}}</li>
 	<li> Email - {{contact.email}}</li>
-	<a href="{% url 'contact_update' pk=contact.id %}">Update</a>
+	<p><a href="{% url 'contact_update' pk=contact.id %}">Update</a></p>
+	<p><a href="{% url 'contact_export' pk=contact.id %}">Export vCard</a></p>
 {% endblock %}
