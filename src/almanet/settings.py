@@ -100,10 +100,10 @@ class BaseConfiguration(Configuration):
     ROOT_URLCONF = 'almanet.urls'
 
     ROOT_HOSTCONF = 'almanet.hosts'
-    PARENT_HOST = 'alma1.net:8000'
+    PARENT_HOST = 'alma.net:8000'
     DEFAULT_HOST = 'default'
 
-    HOSTCONF_REGEX = r'alma1\.net:8000'
+    HOSTCONF_REGEX = r'alma\.net:8000'
 
     WSGI_APPLICATION = 'almanet.wsgi.application'
 
@@ -203,7 +203,7 @@ class BaseConfiguration(Configuration):
     AUTHENTICATION_BACKENDS = (
         'alm_user.authbackend.MyAuthBackend',)
 
-    SITE_NAME = 'alma1.net'
+    SITE_NAME = 'alma.net'
     SITE_DOMAIN = 'http://localhost:8000'
 
     DEFAULT_URL_SCHEME = 'http'

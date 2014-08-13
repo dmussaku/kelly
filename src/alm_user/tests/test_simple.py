@@ -145,7 +145,7 @@ with such.A('Alma.net Registration') as it:
         def setup():
             it.login_url = it.app_url + reverse('user_login')
             it.current_user = create_test_user()
-                # login
+            # login
             it.driver.get(it.login_url)
             elem = it.driver.find_element_by_name('username')
             elem.send_keys(it.current_user.email)
@@ -185,38 +185,35 @@ with such.A('Alma.net Registration') as it:
 
         @it.should('report user is inactive')
         def test():
-
-            # find list of errors
-            #it.driver.find_element_by_class_name('errorlist')
-            # assert that inactive user error is in the errorlist
+            # assert that inactive user stays on login page
             it.assertIn('login page', it.driver.title.lower())
+            # delete inactive user
             delete_test_user(it.current_user)
 
 
     # case 4.d. TEST 5
-
-    with it.having('User activates user session'):
+    with it.having('User activate user session'):
 
         @it.has_setup
         def setup():
-            it.login_url = it.app_url + "/auth/signin"
+            it.login_url = it.app_url + reverse('user_login')
             it.current_user = create_test_user()
-    #         # locate username field
+            # locate username field
             elem = it.driver.find_element_by_name('username')
-    #         # send the correct username info
+            # send the correct username info
             elem.send_keys(it.current_user.email)
-    #         # locate password field
+            # locate password field
             elem = it.driver.find_element_by_name('password')
-    #         # send the correct password info
+            # send the correct password info
             elem.send_keys("123")
-    #         # click submit
+            # click submit
             it.driver.find_element_by_id('id_submit').click()
 
         @it.should('user has session id')
         def test():
             # extract the cookie to see it it's none
             it.cookie = extract_sessionid(it.driver.get_cookies())
-    #         # fail if it's NONE
+            # fail if it's NONE
             it.assertIsNotNone(it.cookie)
             delete_test_user(it.current_user)
 
@@ -225,30 +222,25 @@ with such.A('Alma.net Registration') as it:
     #2 TEST 7
     with it.having('session'):
 
-
         @it.has_setup
         def setup():
             it.login_url = it.app_url + reverse('user_login')
             it.current_user = create_test_user()
             # login
             it.driver.get(it.login_url)
+            # find the field and fill it in
             elem = it.driver.find_element_by_name('username')
             elem.send_keys(it.current_user.email)
-
-
+            # find the field and fill it in
             elem = it.driver.find_element_by_name('password')
             elem.send_keys('123')
-
-
+            # click on submit button
             it.driver.find_element_by_id('id_submit').click()
 
         @it.should('Redirect to profile page')
         def test():
-            #it.driver.get(it.app_url)
+            # assert that user profile was opened
             it.assertIn('user profile', it.driver.title.lower())
-            #delete_test_user(it.current_user)
-
-
 
     
     #3 TEST 8
@@ -263,23 +255,19 @@ with such.A('Alma.net Registration') as it:
         def test():
             # assert that we're in settings change page
             it.assertIn('user profile settings page', it.driver.title.lower())
-    # THIS TEST MAY NOT BE THOROUGH
+            # THIS TEST MAY NOT BE THOROUGH
 
 
-        #4 TEST 9
+    #4 TEST 9
     with it.having('User log out'):
 
         @it.has_setup
         def setup():
-            it.login_url = it.app_url + reverse('user_list')
-            it.driver.get(it.login_url)
             it.old_cookie = extract_sessionid(it.driver.get_cookies())
             it.driver.find_element_by_id('logout').click()
 
-        @it.should('Redirect to profile page')
+        @it.should('Redirect to login page')
         def test():
-            #it.driver.get(it.app_url)
-            auth_val, auth_key = None, settings.SESSION_COOKIE_NAME
             it.assertIn('login page', it.driver.title.lower())
 
         @it.should('Have different session value or empty')
@@ -289,34 +277,31 @@ with such.A('Alma.net Registration') as it:
             it.assertTrue(not new_cookie is None)
 
 
-
-
-    # added by Alibek start
     #5 TEST 10
     with it.having('User password reset'):
 
         @it.has_setup
         def setup():
             # get the right url
-            it.login_url = it.app_url + "/auth/signin/"
-            # find reset password link
-            #elem = it.driver.find_element_by_xpath("/html/body/form/a")
+            it.login_url = it.app_url + reverse('user_login')
+            # find reset password button
             elem = it.driver.find_element_by_link_text("Reset your password")
             # click it
             elem.click()
         # on click browser should redirect us to password resetting page
-        @it.should('Redirect to password reset page')
-        # test case
+        @it.should('contain h1 tag with password reset title')
+        def test():
+            # check if page contains h1 tag with 'password reset'
+            # get the h1 heading content and compare it against given text
+            xpath = '//h1'
+            elem = it.driver.find_element_by_xpath(xpath)
+            value = elem.text
+            it.assertIn('password reset', value.lower())
+
+        @it.should('redirect to password reset titled page')
         def test():
             # check the title page
             it.assertIn('password reset', it.driver.title.lower())
-            # check if page contains h1 tag with 'password reset text'
-            # get the h1 heading content and compare it against given text
-            heading1 = it.driver.find_element_by_tag_name('h1')
-            it.assertIn('password reset', heading1.lower())
-
-
-    # added by Alibek end
 
 
 
