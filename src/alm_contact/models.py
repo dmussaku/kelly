@@ -27,10 +27,10 @@ class Contact(models.Model):
                                                         prefix='', 
                                                         suffix='' )
                         },
-            'tel':      { 'type': 'CELL', 'value': self.phone },
+            'tel':      [{ 'type': 'CELL', 'value': self.phone }, { 'type': 'HOME', 'value': '+77272348956' }],
             'email':    { 'type': 'INTERNET', 'value': self.email },
-            'org':      { 'type': None, 'value': 'Google' },
-            'adr':      { 'type': 'BUSINESS', 'value': vobject.vcard.Address(
+            'org':      { 'type': None, 'value': 'Apple' },
+            'adr':      [{ 'type': 'WORK', 'value': vobject.vcard.Address(
                                                         box='12',
                                                         extended='222',
                                                         code='6000', 
@@ -38,16 +38,32 @@ class Contact(models.Model):
                                                         city='Almaty', 
                                                         street='Dostyk', 
                                                         region='Almalinskii')
-                        },
+                        }, { 'type': 'HOME', 'value': vobject.vcard.Address(
+                                                        box='12',
+                                                        extended='222',
+                                                        code='6000', 
+                                                        country='Kazakhstan', 
+                                                        city='Almaty', 
+                                                        street='Dostyk', 
+                                                        region='Almalinskii')
+                        }],
             'bday':     { 'type': None, 'value': "%s-%s-%s" % ('2012', '03', '30') },
             'url':      { 'type': None, 'value':'http://google.com' },
             'note':     { 'type': None, 'value':'test note' },
         }
 
-        vcard = vobject.vCard()
-        for attribute, desc in VCARD_MAPPING.iteritems():
+        def add_attribute(vcard, attribute, desc):
             rv = vcard.add(attribute)
             if desc['type'] is not None:
                 rv.type_param = desc['type']
             rv.value = desc['value']
+
+        vcard = vobject.vCard()
+        for attribute, desc in VCARD_MAPPING.iteritems():
+            if isinstance(desc, list):
+                for item in desc:
+                    add_attribute(vcard, attribute, item)
+            else:
+                add_attribute(vcard, attribute, desc)
+            
         return vcard
