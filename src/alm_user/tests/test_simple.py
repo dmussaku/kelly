@@ -157,6 +157,9 @@ with such.A('Alma.net Registration') as it:
         @it.should('incorrect password')
         def test():
             it.driver.find_element_by_class_name("errorlist")
+
+        @it.should('stay on login page')
+        def test():
             it.assertIn('login page', it.driver.title.lower())
             delete_test_user(it.current_user)
 
@@ -182,11 +185,13 @@ with such.A('Alma.net Registration') as it:
 
         @it.should('report user is inactive')
         def test():
+
             # find list of errors
             #it.driver.find_element_by_class_name('errorlist')
             # assert that inactive user error is in the errorlist
             it.assertIn('login page', it.driver.title.lower())
             delete_test_user(it.current_user)
+
 
     # case 4.d. TEST 5
 
@@ -220,6 +225,7 @@ with such.A('Alma.net Registration') as it:
     #2 TEST 7
     with it.having('session'):
 
+
         @it.has_setup
         def setup():
             it.login_url = it.app_url + reverse('user_login')
@@ -229,8 +235,10 @@ with such.A('Alma.net Registration') as it:
             elem = it.driver.find_element_by_name('username')
             elem.send_keys(it.current_user.email)
 
+
             elem = it.driver.find_element_by_name('password')
             elem.send_keys('123')
+
 
             it.driver.find_element_by_id('id_submit').click()
 
@@ -239,6 +247,7 @@ with such.A('Alma.net Registration') as it:
             #it.driver.get(it.app_url)
             it.assertIn('user profile', it.driver.title.lower())
             #delete_test_user(it.current_user)
+
 
         #4 TEST 9
     with it.having('User log out'):
