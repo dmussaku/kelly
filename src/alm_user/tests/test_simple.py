@@ -240,6 +240,23 @@ with such.A('Alma.net Registration') as it:
             it.assertIn('user profile', it.driver.title.lower())
             #delete_test_user(it.current_user)
 
+
+    
+    #3 TEST 8
+    with it.having('User change settings'):
+
+        @it.has_setup
+        def setup():
+            # as we're logged in, click on Settings href
+            it.driver.find_element_by_link_text('Settings').click()
+
+        @it.should('show page Edit settings')
+        def test():
+            # assert that we're in settings change page
+            it.assertIn('user profile settings page', it.driver.title.lower())
+    # THIS TEST MAY NOT BE THOROUGH
+
+
         #4 TEST 9
     with it.having('User log out'):
 
@@ -262,23 +279,6 @@ with such.A('Alma.net Registration') as it:
             it.assertNotEqual(it.old_cookie, new_cookie)
             it.assertTrue(not new_cookie is None)
 
-    #3 TEST 8
-    # with it.having('User change settings'):
-
-    #     @it.has_setup
-    #     def setup():
-    #         it.login_url = it.app_url + '/auth/profile/'
-    #         # login
-    #         it.driver.get(it.login_url)
-
-    #         #it.driver.find_element_by_id('settings').click()
-
-    #     @it.should('show page Edit settings')
-    #     def test():
-    #         #it.driver.get(it.app_url)
-    #         it.assertIn('change user settings', it.driver.title.lower())
-    #         delete_test_user(it.current_user)
-            #it.driver.find_element_by_name("profile-page-form")
 
 
 
@@ -305,6 +305,7 @@ with such.A('Alma.net Registration') as it:
             # get the h1 heading content and compare it against given text
             heading1 = it.driver.find_element_by_tag_name('h1')
             it.assertIn('password reset', heading1.lower())
+
 
     # added by Alibek end
 

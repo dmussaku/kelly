@@ -73,15 +73,15 @@ class BaseConfiguration(Configuration):
         'utils.middleware.GetSubdomainMiddleware',
     )
 
-    SESSION_COOKIE_DOMAIN = '.alma.net'
+    SESSION_COOKIE_DOMAIN = '.alma1.net'
 
     ROOT_URLCONF = 'almanet.urls'
 
     ROOT_HOSTCONF = 'almanet.hosts'
-    PARENT_HOST = 'alma.net:8000'
+    PARENT_HOST = 'alma1.net:8000'
     DEFAULT_HOST = 'default'
 
-    HOSTCONF_REGEX = r'alma\.net:8000'
+    HOSTCONF_REGEX = r'alma1\.net:8000'
 
     WSGI_APPLICATION = 'almanet.wsgi.application'
 
@@ -151,8 +151,8 @@ class BaseConfiguration(Configuration):
     EMAIL_HOST_USER = 'adm@v3na.com'
     EMAIL_HOST_PASSWORD = ''
     EMAIL_SUBJECT_PREFIX = '[alma.net] '
-    SERVER_EMAIL = u'Alma.net services <r.kamun@gmail.com>'
-    DEFAULT_FROM_EMAIL = u'Alma.net services <r.kamun@gmail.com>'
+    SERVER_EMAIL = u'alma1.net services <r.kamun@gmail.com>'
+    DEFAULT_FROM_EMAIL = u'alma1.net services <r.kamun@gmail.com>'
 
     EMAIL_BACKEND = 'djrill.mail.backends.djrill.DjrillBackend'
     MANDRILL_API_KEY = 'pMC2w0tuVIuYRZiAjbu8mA'
@@ -181,7 +181,7 @@ class BaseConfiguration(Configuration):
     AUTHENTICATION_BACKENDS = (
         'alm_user.authbackend.MyAuthBackend',)
 
-    SITE_NAME = 'Alma.net'
+    SITE_NAME = 'alma1.net'
     SITE_DOMAIN = 'http://localhost:8000'
 
     DEFAULT_URL_SCHEME = 'http'
@@ -191,7 +191,7 @@ class BaseConfiguration(Configuration):
 
 
 class DevConfiguration(BaseConfiguration):
-    PARENT_HOST = 'alma.net:8000'
+    PARENT_HOST = 'alma1.net:8000'
     SITE_DOMAIN = PARENT_HOST
     DEBUG = True
     TEMPLATE_DEBUG = DEBUG
@@ -199,7 +199,7 @@ class DevConfiguration(BaseConfiguration):
 
 class TestConfiguration(BaseConfiguration):
     SELENIUM_TESTSERVER_HOST = 'http://10.8.0.18'
-    PARENT_HOST = 'alma.net:8000'
+    PARENT_HOST = 'alma1.net:8000'
     SITE_DOMAIN = PARENT_HOST
     SELENIUM_TESTSERVER_PORT = '4444'
     SELENIUM_CAPABILITY = 'FIREFOX'
