@@ -19,3 +19,22 @@ class Contact(models.Model):
         if (not self.date_created):
             self.date_created = timezone.now()
         super(Contact, self).save(**kwargs)
+
+class Value(models.Model):
+	SALARY_OPTIONS = (
+		('monthly', 'Monthly'),
+		('annualy', 'Annualy'),
+		('instant', 'Instant'),
+		)
+	CURRENCY_OPTIONS = (
+		('USD', 'US Dollar'),
+		('RUB', 'Rubbles'),
+		('KZT', 'Tenge'),
+		)
+	salary = models.CharField(max_length=7, choices=SALARY_OPTIONS, default='instant')
+	amount = models.IntegerField()
+	currency = models.CharField(max_length=3, choices=CURRENCY_OPTIONS, default='KZT')
+
+	class Meta:
+        verbose_name = _('value')
+        db_table = settings.DB_PREFIX.format('value')
