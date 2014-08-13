@@ -7,5 +7,6 @@
 	<li> Phone - {{contact.phone}}</li>
 	<li> Email - {{contact.email}}</li>
 	<p><a href="{% url 'contact_update' pk=contact.id %}">Update</a></p>
-	<p><a href="{% url 'contact_export' pk=contact.id %}">Export vCard</a></p>
+	<p><a href="{% url 'contact_export' pk=contact.id %}">View vCard</a></p>
+	<p><a href="{% url 'contact_export' pk=contact.id format='vcf' %}">Export vCard</a></p>
 {% endblock %}

@@ -31,6 +31,7 @@ urlpatterns = patterns(
 	),
 	url(r'^create/$', ContactCreateView.as_view(), name='contact_create'),
 	url(r'^update/(?P<pk>\d+)/$', ContactUpdateView.as_view(), name='contact_update'), 
-	url(r'^export/(?P<pk>\d+)$', contact_export, name='contact_export'),
+	url(r'^vcard/(?P<pk>\d+)/$', contact_export, name='contact_export'),
+	url(r'^vcard/(?P<pk>\d+)/(?P<format>(vcf|web)?)/$', contact_export, name='contact_export'),
 	url(r'^(?P<pk>\d+)/$', ContactDetailView.as_view(), name='contact_detail'), 
 )

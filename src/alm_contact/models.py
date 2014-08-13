@@ -12,6 +12,8 @@ from .fields import AddressField
 class Contact(models.Model):
     first_name = models.CharField(_('first name'), max_length=31,
                                   null=False, blank=False)
+    middle_name = models.CharField(_('middle name'), max_length=31,
+                                  null=False, blank=False)
     last_name = models.CharField(max_length=30, blank=False)
     company_name = models.CharField(max_length=50, blank=True)
     phone = models.CharField(max_length=12, blank=True)
