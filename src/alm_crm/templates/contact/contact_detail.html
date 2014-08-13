@@ -1,0 +1,10 @@
+{% extends "user/base.html" %}
+{% load i18n %}
+{% block head_title %} {{ _("User List Page") }} {% endblock %}
+{% block content %}
+<h1> {{ contact.first_name }} {{ contact.last_name }} </h1>
+	<li> Company - {{contact.company_name}}</li>
+	<li> Phone - {{contact.phone}}</li>
+	<li> Email - {{contact.email}}</li>
+	<a href="{% url 'contact_update' pk=contact.id %}">Update</a>  
+{% endblock %}
