@@ -8,8 +8,13 @@ from almanet import settings
 
 from .fields import AddressField
 
+STATUSES = (_('new_contact'), _('lead_contact'), _('opportunity_contact'), _('client_contact') )
+STATUS_NAMES = (NEW, LEAD, OPPORTUNITY, CLIENT) = range(len(STATUSES))
+
 #Contact model: (first_name, last_name, company_name, phone, email)
 class Contact(models.Model):
+    STATUS_CODES = dict(zip(STATUS_NAMES, STATUSES))
+
     first_name = models.CharField(_('first name'), max_length=31,
                                   null=False, blank=False)
     middle_name = models.CharField(_('middle name'), max_length=31,
@@ -20,6 +25,7 @@ class Contact(models.Model):
     email = models.EmailField(unique=True, blank=False)
     date_created = models.DateTimeField(blank=True, auto_now_add=True)
     job_address = AddressField(_('job address'), max_length=200, blank=True)
+    status = models.IntegerField(_('contact status'), max_length=30, choices=enumerate(STATUSES), default=NEW)
 
     class Meta:
         verbose_name = _('contact')
@@ -81,6 +87,18 @@ class Contact(models.Model):
         if (not self.date_created):
             self.date_created = timezone.now()
         super(Contact, self).save(**kwargs)
+
+    def is_new(self):
+        return self.status == NEW
+
+    def is_lead(self):
+        return self.status == LEAD
+
+    def is_opportunity(self):
+        return self.status == OPPORTUNITY
+
+    def is_client(self):
+        return self.status == CLIENT
 
 
 class Address(object):
