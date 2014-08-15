@@ -61,6 +61,7 @@ class BaseConfiguration(Configuration):
         'alm_company',
         'alm_contact',
         'utils',
+        'alm_crm',
     )
 
     MIDDLEWARE_CLASSES = (

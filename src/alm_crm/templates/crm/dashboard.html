@@ -1,0 +1,9 @@
+{% extends "user/base.html" %}
+{% load i18n %}
+{% block head_title %} {{ _("User List Page") }} {% endblock %}
+{% block content %}
+	{% if product %}
+		<h2> {{ product.title }} </h2>
+	{% endif %}
+{% endfor %}
+{% endblock %}
