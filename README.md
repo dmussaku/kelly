@@ -48,3 +48,17 @@ create default user and company
 (email: b.wayne@batman.bat, password:123, company subdomain: bwayne):
 ./manage.py createdefaultuser
 ```
+
+```
+To execute tests on test server using selenium you need to create configuration file in your system 
+mkdir ~/.almanet
+cd ~/.almanet
+nano almanet.conf.py
+
+HOSTCONF_REGEX = r'alma1\.net:8000'
+PARENT_HOST = 'alma1.net:8000'
+SESSION_COOKIE_DOMAIN = '.alma1.net'
+SITE_DOMAIN = PARENT_HOST
+
+put this config to almanet.conf.py file. After this you need to connect to vpn and write on test server host file your vpn ip and your domain
+```
