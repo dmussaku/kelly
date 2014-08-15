@@ -2,6 +2,8 @@ from django.views.generic import ListView, DetailView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from utils import reverse_lazy
 from alm_user.models import User
+from django.http import HttpResponse
+from django.shortcuts import render
 from almanet.models import Product, Subscription
 from forms import ContactForm, GoalForm
 from models import Contact, Goal
@@ -53,6 +55,16 @@ class ContactDeleteView(DeleteView):
     success_url = reverse_lazy('contact_list')
     template_name = 'contact/contact_delete.html'
 
+
+def contact_export(request, pk, format="web", locale='ru_RU', *args, **kwargs):
+    c = Contact.objects.get(pk=pk)
+    if format == 'vcf':
+        vcard = c.to_vcard().serialize()
+        response = HttpResponse(vcard, mimetype='text/x-vcard')
+        response['Content-Disposition'] = "attachment; filename=%s_%s.vcf" % (c.first_name, c.last_name)
+        return response
+    # locale = request.user.get_locale() or locale
+    return render(request, 'contact/vcards/vcard.%s.html' % (locale), {"contact": c})
 
 class GoalListView(ListView):
     

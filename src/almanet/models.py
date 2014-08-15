@@ -14,6 +14,9 @@ class Product(models.Model):
         verbose_name = _('product')
         db_table = settings.DB_PREFIX.format('product')
 
+    def __unicode__(self):
+        return self.title
+
 
 class Subscription(models.Model):
 
@@ -31,3 +34,5 @@ class Subscription(models.Model):
     class Meta:
         verbose_name = _('subscription')
         db_table = settings.DB_PREFIX.format('subscription')
+
+
