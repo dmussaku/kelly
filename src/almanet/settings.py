@@ -59,6 +59,7 @@ class BaseConfiguration(Configuration):
         'almanet',   # commons, entry point
         'alm_user',
         'alm_company',
+        'alm_contact',
         'utils',
     )
 
