@@ -27,6 +27,7 @@ class Contact(models.Model):
             self.date_created = timezone.now()
         super(Contact, self).save(**kwargs)
 
+
 class Value(models.Model):
     SALARY_OPTIONS = (
         ('monthly', 'Monthly'),
