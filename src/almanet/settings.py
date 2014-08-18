@@ -51,6 +51,8 @@ class BaseConfiguration(Configuration):
 
         return lazy(__inner, str)
 
+    TEST_RUNNER = "djnose2.TestRunner"
+
     BASE_DIR = BASE_DIR
     # Quick-start development settings - unsuitable for production
     # See https://docs.djangoproject.com/en/1.6/howto/deployment/checklist/
@@ -113,7 +115,11 @@ class BaseConfiguration(Configuration):
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
             'NAME': rel('../..', 'db.sqlite3'),
-        }
+        },
+        'test': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': rel('../..', 'test_db.sqlite3'),
+        },
     }
 
     CACHES = {
@@ -227,3 +233,17 @@ class TestConfiguration(FileSettings('~/.almanet/almanet.conf.py'), BaseConfigur
     #SITE_DOMAIN = PARENT_HOST
     SELENIUM_TESTSERVER_PORT = '4444'
     SELENIUM_CAPABILITY = 'FIREFOX'
+
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': rel('../..', 'test_db.sqlite3'),
+        },
+        # 'test': {
+        #     'ENGINE': 'django.db.backends.sqlite3',
+        #     'NAME': rel('../..', 'test_db.sqlite3'),
+        # },
+    }
+
+    DEBUG = True
+

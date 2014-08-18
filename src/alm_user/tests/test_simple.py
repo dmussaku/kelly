@@ -1,41 +1,39 @@
+from mock import MagicMock
 from nose2.tools import such
 from almanet.test_utils import MainSeleniumLayer
 from alm_user.models import User
-from alm_utils import pj
-from django.test import TestCase
 from django.conf import settings
 from django.core.urlresolvers import reverse
-from alm_user.models import User
 
-class AttrDict(dict):
-    def __init__(self, *args, **kwargs):
-        super(AttrDict, self).__init__(*args, **kwargs)
-        self.__dict__ = self
+TEST_EMAIL = 'asdasd@mail.ru'
 
 
 def test_user():
-    u = AttrDict()
+    u = MagicMock()
     u.first_name = 'Rustem'
     u.last_name = 'Kamun'
-    u.email = 'r.kamun@gmail.com'
+    u.email = TEST_EMAIL
     u.password = '123'
     u.company = 'almacloud'
 
     return u
 
+
 def create_test_user():
     u = User()
     u.first_name = 'Rustem'
     u.last_name = 'Kamun'
-    u.email = 'r.kamun@gmail.com'
+    u.email = TEST_EMAIL
     u.save()
     u.set_password('123')
 
     return u
 
+
 def delete_test_user(user):
     u = User.objects.get(email=user.email)
     u.delete()
+
 
 def create_inactive_test_user():
     u = User()
@@ -47,6 +45,7 @@ def create_inactive_test_user():
     u.set_password('qwe')
 
     return u
+
 
 def extract_sessionid(cookies):
     for cookie_obj in cookies:
@@ -79,7 +78,6 @@ with such.A('Alma.net Registration') as it:
 
         it.registration_url = it.app_url + reverse('user_registration')
 
-
         it.driver.get(it.registration_url)
         elem = it.driver.find_element_by_name('first_name')
         elem.send_keys(it.current_user.first_name)
@@ -101,13 +99,16 @@ with such.A('Alma.net Registration') as it:
 
         it.driver.find_element_by_xpath("//input[@type='submit']").click()
 
+    @it.has_teardown
+    def teardown():
+        User.objects.filter(email=TEST_EMAIL).delete()
+
+
     @it.should('Complete registration')
     def test():
         it.assertIn('login page', it.driver.title.lower())
 
-
-
-    #case 4.a. TEST 2
+    # case 4.a. TEST 2
     with it.having('User sign in: Incorrect email'):
 
         @it.has_setup
@@ -124,10 +125,16 @@ with such.A('Alma.net Registration') as it:
             elem.send_keys(fake_email)
             # locate the password field
             elem = it.driver.find_element_by_name('password')
-            # enter the correct password                ??? DIFFERENT TEST CASE FOR INCORRECT PASSWORD
+            # enter the correct password                ??? DIFFERENT TEST CASE
+            # FOR INCORRECT PASSWORD
             elem.send_keys("123")
             # click submit
             it.driver.find_element_by_id('id_submit').click()
+
+
+        @it.has_teardown
+        def teardown():
+            User.objects.filter(email=TEST_EMAIL).delete()
 
         @it.should('report user with such email does not exist')
         def test():
@@ -137,7 +144,7 @@ with such.A('Alma.net Registration') as it:
             it.assertIn('login page', it.driver.title.lower())
             delete_test_user(it.current_user)
 
-    #case 4.b.  TEST 3
+    # case 4.b.  TEST 3
     # this case was handled in 1, see above
     with it.having('User enters incorrect password'):
 
@@ -154,6 +161,10 @@ with such.A('Alma.net Registration') as it:
             elem.send_keys('qweqwe')
             it.driver.find_element_by_id('id_submit').click()
 
+        @it.has_teardown
+        def teardown():
+            User.objects.filter(email=TEST_EMAIL).delete()
+
         @it.should('incorrect password')
         def test():
             it.driver.find_element_by_class_name("errorlist")
@@ -163,9 +174,9 @@ with such.A('Alma.net Registration') as it:
             it.assertIn('login page', it.driver.title.lower())
             delete_test_user(it.current_user)
 
-
-    #case 4.c. TEST 4
-    # if user has not activated their profile, they should stay on login page after submitting form
+    # case 4.c. TEST 4
+    # if user has not activated their profile, they should stay on login page
+    # after submitting form
     with it.having('User has not activated their account'):
 
         @it.has_setup
@@ -190,6 +201,9 @@ with such.A('Alma.net Registration') as it:
             # delete inactive user
             delete_test_user(it.current_user)
 
+        @it.has_teardown
+        def teardown():
+            User.objects.filter(email=TEST_EMAIL).delete()
 
     # case 4.d. TEST 5
     with it.having('User activate user session'):
@@ -217,9 +231,11 @@ with such.A('Alma.net Registration') as it:
             it.assertIsNotNone(it.cookie)
             delete_test_user(it.current_user)
 
+        @it.has_teardown
+        def teardown():
+            User.objects.filter(email=TEST_EMAIL).delete()
 
-
-    #2 TEST 7
+    # 2 TEST 7
     with it.having('session'):
 
         @it.has_setup
@@ -242,8 +258,11 @@ with such.A('Alma.net Registration') as it:
             # assert that user profile was opened
             it.assertIn('user profile', it.driver.title.lower())
 
-    
-    #3 TEST 8
+        @it.has_teardown
+        def teardown():
+            User.objects.filter(email=TEST_EMAIL).delete()
+
+    # 3 TEST 8
     with it.having('User change settings'):
 
         @it.has_setup
@@ -257,8 +276,7 @@ with such.A('Alma.net Registration') as it:
             it.assertIn('user profile settings page', it.driver.title.lower())
             # THIS TEST MAY NOT BE THOROUGH
 
-
-    #4 TEST 9
+    # 4 TEST 9
     with it.having('User log out'):
 
         @it.has_setup
@@ -276,8 +294,7 @@ with such.A('Alma.net Registration') as it:
             it.assertNotEqual(it.old_cookie, new_cookie)
             it.assertTrue(not new_cookie is None)
 
-
-    #5 TEST 10
+    # 5 TEST 10
     with it.having('User password reset'):
 
         @it.has_setup
@@ -289,6 +306,7 @@ with such.A('Alma.net Registration') as it:
             # click it
             elem.click()
         # on click browser should redirect us to password resetting page
+
         @it.should('contain h1 tag with password reset title')
         def test():
             # check if page contains h1 tag with 'password reset'
@@ -302,9 +320,6 @@ with such.A('Alma.net Registration') as it:
         def test():
             # check the title page
             it.assertIn('password reset', it.driver.title.lower())
-
-
-
 
     # SECOND SET OF REQS
     """
@@ -322,7 +337,7 @@ with such.A('Alma.net Registration') as it:
         Billing information
         Credit card details
     """
-    # PREP TEST TO MAKE SURE WE'RE LOGGED IN 
+    # PREP TEST TO MAKE SURE WE'RE LOGGED IN
     with it.having('logging in'):
 
         @it.has_setup
@@ -347,10 +362,11 @@ with such.A('Alma.net Registration') as it:
         @it.should('have certain fields')
         def test():
             # fields to compare against
-            stack_of_fields = ["Company", "Country", "City", "Email", "Last name", "First name"]
+            stack_of_fields = [
+                "Company", "Country", "City", "Email", "Last name", "First name"]
             # getting all elements using xpath
             all_elements = it.driver.find_elements_by_css_selector('li')
-            # check against stack of specified fields 
+            # check against stack of specified fields
             for elem in all_elements:
                 field = stack_of_fields.pop()
                 it.assertIn(field, elem.text)
@@ -358,10 +374,11 @@ with such.A('Alma.net Registration') as it:
         @it.should('NOT have certain fields')
         def test():
             # fields to compare against
-            stack_of_fields = ["Fizz", "Buzz", "FizzBuzz", "Foo", "Bar", "FooBar"]
+            stack_of_fields = [
+                "Fizz", "Buzz", "FizzBuzz", "Foo", "Bar", "FooBar"]
             # getting all elements using xpath
             all_elements = it.driver.find_elements_by_css_selector('li')
-            # check against stack of specified fields 
+            # check against stack of specified fields
             for elem in all_elements:
                 field = stack_of_fields.pop()
                 it.assertNotEqual(field, elem.text)
@@ -377,17 +394,13 @@ with such.A('Alma.net Registration') as it:
         def test():
             s = "View connected services"
             # find href with services text link
-            # this makes sure that it is a link bc we're using partial_link_text 
-            #                                    and it has the specified string
+            # this makes sure that it is a link bc we're using partial_link_text
+            # and it has the specified string
             elem = it.driver.find_element_by_partial_link_text('services')
             it.assertIn(s, elem.text)
 
-    # YET TO DO BILLING INFO AND CREDIT CARD INFO TESTS. 
-    # TO BE DONE AFTER CLARIFYING EXACT REQS WITH YERNAR. 
-
-
-
-
+    # YET TO DO BILLING INFO AND CREDIT CARD INFO TESTS.
+    # TO BE DONE AFTER CLARIFYING EXACT REQS WITH YERNAR.
 
     # THIRD SET OF REQS
     """
@@ -407,16 +420,17 @@ with such.A('Alma.net Registration') as it:
         @it.should('be in user profile page')
         def test():
             it.assertIn('user profile', it.driver.title.lower())
-            
+
     with it.having('clicked the settings link on profile page'):
 
         @it.has_setup
         def setup():
             # go to the settings page. could be accomplished in 2 ways, just clicking settings or
-            # going to specific url that directs us to user settings page. Chose the first. 
+            # going to specific url that directs us to user settings page.
+            # Chose the first.
             elem = it.driver.find_element_by_link_text('Settings')
             elem.click()
-        
+
         @it.should('go to setttings page')
         def test():
             it.assertIn('user profile settings page', it.driver.title.lower())
@@ -430,11 +444,13 @@ with such.A('Alma.net Registration') as it:
             last_name = "Mailubai"
             # changing name fields
             elem = it.driver.find_element_by_name('first_name')
-            # clears out field from previous value, i.e. different first name to be changed
+            # clears out field from previous value, i.e. different first name
+            # to be changed
             elem.clear()
             elem.send_keys(first_name)
             elem = it.driver.find_element_by_name('last_name')
-            # clears out field from previous value, i.e. different last name to be changed
+            # clears out field from previous value, i.e. different last name to
+            # be changed
             elem.clear()
             elem.send_keys(last_name)
             # changing the timezone field
@@ -446,9 +462,9 @@ with such.A('Alma.net Registration') as it:
 
         @it.should('successfully fill out name fields and redirects to user profile')
         def test():
-            # as soon as user updates fields and submits -- redirect to profile page
+            # as soon as user updates fields and submits -- redirect to profile
+            # page
             it.assertIn('user profile', it.driver.title.lower())
-
 
         @it.should('should contain headline - notifies of successfully updated profile')
         def test():
@@ -459,6 +475,3 @@ with such.A('Alma.net Registration') as it:
 
 
 it.createTests(globals())
-
-
-
