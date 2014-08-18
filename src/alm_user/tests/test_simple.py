@@ -116,7 +116,7 @@ with such.A('Alma.net Registration') as it:
             # Steps 1.2.3. are part of setup. 4 a.b.c.d. and 5 is what to be tested
             # Setting up 1.
             it.login_url = it.app_url + reverse('user_login')
-            it.current_user = create_test_user()
+            # it.current_user = create_test_user()
             it.driver.get(it.login_url)
             # locate username field
             elem = it.driver.find_element_by_name('username')
@@ -130,11 +130,6 @@ with such.A('Alma.net Registration') as it:
             elem.send_keys("123")
             # click submit
             it.driver.find_element_by_id('id_submit').click()
-
-
-        @it.has_teardown
-        def teardown():
-            User.objects.filter(email=TEST_EMAIL).delete()
 
         @it.should('report user with such email does not exist')
         def test():

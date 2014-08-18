@@ -233,7 +233,7 @@ class TestConfiguration(FileSettings('~/.almanet/almanet.conf.py'), BaseConfigur
     #SITE_DOMAIN = PARENT_HOST
     SELENIUM_TESTSERVER_PORT = '4444'
     SELENIUM_CAPABILITY = 'FIREFOX'
-
+    DEFAULT_SERVER_PORT = 8000
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',

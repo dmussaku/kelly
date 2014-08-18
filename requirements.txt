@@ -21,3 +21,5 @@ django-hosts
 tldextract
 django-configurations
 django-timezone-field
+mock
+TEST_RUNNER="djnose2.TestRunner"
