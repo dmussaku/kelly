@@ -137,7 +137,11 @@ with such.A('Alma.net Registration') as it:
             it.driver.find_element_by_class_name('errorlist')
             # assert that incorrect email error is in the errorlist
             it.assertIn('login page', it.driver.title.lower())
-            delete_test_user(it.current_user)
+
+        @it.has_teardown
+        def teardown():
+            User.objects.get(email=TEST_EMAIL).delete()
+
 
     # case 4.b.  TEST 3
     # this case was handled in 1, see above
@@ -167,7 +171,6 @@ with such.A('Alma.net Registration') as it:
         @it.should('stay on login page')
         def test():
             it.assertIn('login page', it.driver.title.lower())
-            delete_test_user(it.current_user)
 
     # case 4.c. TEST 4
     # if user has not activated their profile, they should stay on login page
@@ -194,7 +197,6 @@ with such.A('Alma.net Registration') as it:
             # assert that inactive user stays on login page
             it.assertIn('login page', it.driver.title.lower())
             # delete inactive user
-            delete_test_user(it.current_user)
 
         @it.has_teardown
         def teardown():
@@ -224,7 +226,7 @@ with such.A('Alma.net Registration') as it:
             it.cookie = extract_sessionid(it.driver.get_cookies())
             # fail if it's NONE
             it.assertIsNotNone(it.cookie)
-            delete_test_user(it.current_user)
+
 
         @it.has_teardown
         def teardown():
