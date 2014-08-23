@@ -26,7 +26,7 @@ class UserListView(ListView):
 class UserRegistrationView(CreateView):
 
     form_class = RegistrationForm
-    success_url = reverse_lazy('user_profile_url', subdomain=settings.SUBDOMAINS['MY_SD'])
+    success_url = reverse_lazy('user_profile_url', subdomain=settings.MY_SD)
     template_name = 'user/user_registration.html'
 
 
@@ -93,7 +93,7 @@ class UserProfileSettings(UpdateView):
 
     model = User
     form_class = UserBaseSettingsForm
-    success_url = reverse_lazy('user_profile_url', subdomain=settings.SUBDOMAINS['MY_SD'])
+    success_url = reverse_lazy('user_profile_url', subdomain=settings.MY_SD)
 
     def get_object(self, **kwargs):
         return self.request.user

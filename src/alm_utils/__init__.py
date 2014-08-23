@@ -1,3 +1,1 @@
-import os
-
-pj = os.path.join
+from .system import pj

@@ -19,7 +19,29 @@ def rel(*x):
     return os.path.join(BASE_DIR, *x)
 
 
-class BaseConfiguration(Configuration):
+class SubdomainConfiguration:
+    MY_SD = 'my'
+    BILLING_SD = 'billing'
+    API_SD = 'api'
+    WWW_SD = 'www'
+    MARKETPLACE_SD = 'marketplace'
+    SHOP_SD = 'shop'
+    BUSY_SUBDOMAINS = (MY_SD,
+                       BILLING_SD,
+                       API_SD,
+                       WWW_SD,
+                       MARKETPLACE_SD,
+                       SHOP_SD,)
+
+    @property
+    def SUBDOMAIN_MAP(self):
+        if not hasattr(self, '__SUBDOMAIN_MAP'):
+            rv = {}
+            for attr in dir(self.__class__):
+                if attr.endswith('SD'):
+                    rv[attr] = getattr(self.__class__, attr)
+            setattr(self, '__SUBDOMAIN_MAP', rv)
+        return getattr(self, '__SUBDOMAIN_MAP')
 
     @pristinemethod
     def reverse_lazy(viewname, **kw):
@@ -28,6 +50,9 @@ class BaseConfiguration(Configuration):
             return reverse(viewname, **kw)
 
         return lazy(__inner, str)
+
+
+class BaseConfiguration(SubdomainConfiguration, Configuration):
 
     BASE_DIR = BASE_DIR
     # Quick-start development settings - unsuitable for production
@@ -71,7 +96,7 @@ class BaseConfiguration(Configuration):
         'django.contrib.messages.middleware.MessageMiddleware',
         # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
         'django_hosts.middleware.HostsMiddleware',
-        'utils.middleware.GetSubdomainMiddleware',
+        'almanet.middleware.GetSubdomainMiddleware',
     )
 
     SESSION_COOKIE_DOMAIN = '.alma.net'
@@ -129,7 +154,7 @@ class BaseConfiguration(Configuration):
         'django.core.context_processors.request',
         'django.contrib.messages.context_processors.messages',
         "django.contrib.auth.context_processors.auth",
-        'utils.context_processors.available_subdomains',
+        'almanet.context_processors.available_subdomains',
         # 'launch.context_processors.launch',
     )
 
@@ -164,7 +189,8 @@ class BaseConfiguration(Configuration):
 
     @property
     def LOGIN_REDIRECT_URL(self):
-        return self.__class__.reverse_lazy('user_profile_url', subdomain=self.SUBDOMAINS['MY_SD'])
+        return self.__class__.reverse_lazy('user_profile_url',
+                                           subdomain=self.MY_SD)
 
     @property
     def LOGIN_URL(self):
@@ -187,19 +213,6 @@ class BaseConfiguration(Configuration):
     SITE_DOMAIN = 'http://localhost:8000'
 
     DEFAULT_URL_SCHEME = 'http'
-
-    # BUSY_SUBDOMAINS = ['my', 'billing', 'api', 'www', 'marketplace', 'shop']
-    SUBDOMAINS = {
-        "MY_SD" : 'my',
-        "BILLING_SD" : 'billing',
-        "API_SD" : 'api',
-        "WWW_SD" : 'www',
-        "MARKETPLACE_SD" : 'marketplace',
-        "SHOP_SD" : 'shop',
-    }
-
-    def BUSY_SUBDOMAINS(self):
-        return [v for k,v in self.SUBDOMAINS.iteritems()]
 
 
 class DevConfiguration(BaseConfiguration):

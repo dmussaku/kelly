@@ -19,7 +19,7 @@ class Company(models.Model):
     @classmethod
     def generate_subdomain(self, subdomain):
         sd = re.sub('[\W]', '', subdomain).lower()
-        if (sd in BUSY_SUBDOMAINS):
+        if sd in BUSY_SUBDOMAINS:
             sd += str(1)
         i = 1
         test_sd = sd
