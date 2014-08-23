@@ -6,7 +6,6 @@ from alm_crm.views import UserProductView
 urlpatterns = patterns(
     '',
     url(r'^(?P<slug>[\w-]+)/$', subdomain_required(
-        login_required(
-            UserProductView.as_view()),
-        name='user_product_view')),
+        login_required(UserProductView.as_view())),
+        name='user_product_view'),
 )

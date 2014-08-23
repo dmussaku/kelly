@@ -84,7 +84,6 @@ class BaseConfiguration(SubdomainConfiguration, Configuration):
         'almanet',   # commons, entry point
         'alm_user',
         'alm_company',
-        'utils',
         'alm_crm',
     )
 

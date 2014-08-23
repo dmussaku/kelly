@@ -15,8 +15,8 @@ or
 <a href="{% subdomain_url 'user_registration' %}">Register</a>
 {% endif %}
 <br>
-<a href="{% url 'contact_list' %}">Contacts</a> 
-<a href="{% url 'goal_list' %}">Goals</a> 
+<a href="{% subdomain_url 'contact_list' %}">Contacts</a>
+<a href="{% subdomain_url 'goal_list' %}">Goals</a>
 {% block content %}
 {% endblock %}
 

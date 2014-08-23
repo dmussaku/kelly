@@ -8,19 +8,21 @@ from almanet.models import Product, Subscription
 from forms import ContactForm, GoalForm
 from models import Contact, Goal
 
-class UserProductView(ListView):
-	template_name = 'crm/dashboard.html'
 
-	def get_context_data(self, **kwargs):
-		context = super(UserProductView, self).get_context_data(**kwargs)
-		context['user'] = User.objects.get(id=self.request.user.id)
-		p = Product.filter(slug=kwargs['slug'])
-		u = self.request.user
-		if (kwargs['slug'] != None and p):
-			subscr = u.get_active_subscriptions().filter(product__slug=kwargs['slug'])
-			if subscr:
-				context['product'] = subscr.product
-		return context
+class UserProductView(ListView):
+    template_name = 'crm/dashboard.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(UserProductView, self).get_context_data(**kwargs)
+        context['user'] = User.objects.get(id=self.request.user.id)
+        p = Product.filter(slug=kwargs['slug'])
+        u = self.request.user
+        if (kwargs['slug'] != None and p):
+            subscr = u.get_active_subscriptions().filter(
+                product__slug=kwargs['slug'])
+            if subscr:
+                context['product'] = subscr.product
+        return context
 
 
 class ContactListView(ListView):
@@ -61,10 +63,12 @@ def contact_export(request, pk, format="web", locale='ru_RU', *args, **kwargs):
     if format == 'vcf':
         vcard = c.to_vcard().serialize()
         response = HttpResponse(vcard, mimetype='text/x-vcard')
-        response['Content-Disposition'] = "attachment; filename=%s_%s.vcf" % (c.first_name, c.last_name)
+        response[
+            'Content-Disposition'] = "attachment; filename=%s_%s.vcf" % (c.first_name, c.last_name)
         return response
     # locale = request.user.get_locale() or locale
     return render(request, 'contact/vcards/vcard.%s.html' % (locale), {"contact": c})
+
 
 class GoalListView(ListView):
 

@@ -78,7 +78,6 @@ class User(AbstractBaseUser):
             s.is_active = True
         s.save()
 
-
     def disconnect_product(self, product):
         s = self.subscriptions.filter(is_active=True, product=product).first()
         if s:

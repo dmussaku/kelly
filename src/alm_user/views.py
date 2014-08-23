@@ -17,6 +17,7 @@ from almanet.url_resolvers import reverse_lazy
 # for testing, need to be deleted
 from datetime import datetime
 
+
 class UserListView(ListView):
 
     def get_context_data(self, **kwargs):
