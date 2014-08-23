@@ -31,6 +31,7 @@ class User(AbstractBaseUser):
 
     company = models.ManyToManyField('alm_company.Company',
                                      related_name='users')
+    is_admin = models.BooleanField(default=False)
 
     class Meta:
         verbose_name = _('user')
@@ -38,8 +39,29 @@ class User(AbstractBaseUser):
 
     objects = UserManager()
 
+    @property
+    def is_staff(self):
+        "Is the user a member of staff?"
+        # Simplest possible answer: All admins are staff
+        return self.is_admin
+
+    @property
+    def is_superuser(self):
+        return self.is_admin
+
     def is_authenticated(self):
         return True
+
+    def has_module_perms(self, module):
+        if self.is_admin:
+            return True
+        return False
+
+    def has_perm(self, perm, obj=None):
+        return self.is_admin
+
+    def get_short_name(self):
+        return self.first_name
 
     def get_username(self):
         return "%s %s" % (self.first_name, self.last_name)

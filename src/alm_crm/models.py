@@ -14,6 +14,7 @@ from .fields import AddressField
 STATUSES = (_('new_contact'), _('lead_contact'), _('opportunity_contact'), _('client_contact') )
 STATUS_NAMES = (NEW, LEAD, OPPORTUNITY, CLIENT) = range(len(STATUSES))
 
+
 class Contact(models.Model):
 
     STATUS_CODES = dict(zip(STATUS_NAMES, STATUSES))
@@ -27,7 +28,6 @@ class Contact(models.Model):
     job_address = AddressField(_('job address'), max_length=200, blank=True)
     status = models.IntegerField(_('contact status'), max_length=30, choices=enumerate(STATUSES), default=NEW)
 
-
     class Meta:
         verbose_name = _('contact')
         db_table = settings.DB_PREFIX.format('contact')
@@ -38,32 +38,38 @@ class Contact(models.Model):
     def to_vcard(self):
 
         VCARD_MAPPING = {
-            'fn':       { 'type': None, 'value': "%s %s" % (self.first_name, self.last_name) }, 
-            'n' :       { 'type': None, 'value': vobject.vcard.Name(
-                                                        family=self.last_name,
-                                                        given=self.first_name, 
-                                                        additional='', 
-                                                        prefix='', 
-                                                        suffix='' )
-                        },
-            'tel':      [{ 'type': 'CELL', 'value': self.phone }, { 'type': 'HOME', 'value': '+77272348956' }],
-            'email':    { 'type': 'INTERNET', 'value': self.email },
-            'org':      { 'type': None, 'value': 'Apple' },
-            'adr':      [{ 'type': 'WORK', 'value': vobject.vcard.Address(
-                                                        box=self.job_address.box,
+            'fn': {
+                'type': None,
+                'value': "%s %s" % (self.first_name, self.last_name)
+            }, 'n': {
+                'type': None,
+                'value': vobject.vcard.Name(family=self.last_name,
+                                            given=self.first_name,
+                                            additional='',
+                                            prefix='',
+                                            suffix='' )},
+            'tel': [{
+                'type': 'CELL',
+                'value': self.phone}, {
+                'type': 'HOME',
+                'value': '+77272348956'}],
+            'email': {'type': 'INTERNET', 'value': self.email},
+            'org': {'type': None, 'value': 'Apple'},
+            'adr': [{'type': 'WORK',
+                     'value': vobject.vcard.Address(box=self.job_address.box,
                                                         extended=self.job_address.extended,
-                                                        code=self.job_address.code, 
-                                                        country=self.job_address.country, 
-                                                        city=self.job_address.city, 
-                                                        street=self.job_address.street, 
+                                                        code=self.job_address.code,
+                                                        country=self.job_address.country,
+                                                        city=self.job_address.city,
+                                                        street=self.job_address.street,
                                                         region=self.job_address.region)
                         }, { 'type': 'HOME', 'value': vobject.vcard.Address(
                                                         box='12',
                                                         extended='222',
-                                                        code='6000', 
-                                                        country='Kazakhstan', 
-                                                        city='Almaty', 
-                                                        street='Dostyk', 
+                                                        code='6000',
+                                                        country='Kazakhstan',
+                                                        city='Almaty',
+                                                        street='Dostyk',
                                                         region='Almalinskii')
                         }],
             'bday':     { 'type': None, 'value': "%s-%s-%s" % ('2012', '03', '30') },
@@ -84,7 +90,7 @@ class Contact(models.Model):
                     add_attribute(vcard, attribute, item)
             else:
                 add_attribute(vcard, attribute, desc)
-            
+
         return vcard
 
     def is_new(self):
@@ -98,7 +104,6 @@ class Contact(models.Model):
 
     def is_client(self):
         return self.status == CLIENT
-
 
     def save(self, **kwargs):
         if (not self.date_created):
@@ -135,10 +140,10 @@ class Goal(models.Model):
         ('C', 'Completed'),
         ('N', 'New'),
         )
-    product = models.OneToOneField(Product, related_name='goal_product') 
+    product = models.OneToOneField(Product, related_name='goal_product')
     assignee = models.ForeignKey(User, related_name='goal_assignee')
     followers = models.ManyToManyField(User, related_name='goal_followers')
-    contact = models.OneToOneField(Contact) 
+    contact = models.OneToOneField(Contact)
     project_value = models.OneToOneField(Value, related_name='goal_project_value')
     real_value = models.OneToOneField(Value, related_name = 'goal_real_value')
     name = models.CharField(max_length=30, blank=False)
@@ -165,5 +170,5 @@ class Address(object):
         self.region = region
         self.country = country
 
-    def __unicode__():
+    def __unicode__(self):
         return self.country

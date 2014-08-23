@@ -22,3 +22,5 @@ tldextract
 django-configurations
 django-timezone-field
 vobject
+#django-vcard
+-e git+http://github.com/guidocalvano/django-vcard.git#egg=django-vcard

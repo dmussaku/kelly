@@ -70,7 +70,7 @@ class BaseConfiguration(SubdomainConfiguration, Configuration):
 
     # Application definition
     INSTALLED_APPS = (
-        # 'django.contrib.admin',
+        'django.contrib.admin',
         # 'django.contrib.auth',
         'mailviews',
         'djrill',
@@ -81,6 +81,7 @@ class BaseConfiguration(SubdomainConfiguration, Configuration):
         'django_hosts',
         'south',
         'timezone_field',
+        'vcard',
         'almanet',   # commons, entry point
         'alm_user',
         'alm_company',
@@ -206,7 +207,8 @@ class BaseConfiguration(SubdomainConfiguration, Configuration):
 
     DB_PREFIX = 'alma_{}'
     AUTHENTICATION_BACKENDS = (
-        'alm_user.authbackend.MyAuthBackend',)
+        'django.contrib.auth.backends.ModelBackend',
+        'alm_user.authbackend.MyAuthBackend',)  # for admin
 
     SITE_NAME = 'Alma.net'
     SITE_DOMAIN = 'http://localhost:8000'

@@ -1,3 +1,5 @@
+from django.contrib import admin
+
 from django.conf.urls import patterns, include, url
 from django.conf.urls.static import static
 from django.conf import settings
@@ -7,6 +9,8 @@ from almanet.views import (
     ProductList,
     connect_product,
     disconnect_product)
+
+admin.autodiscover()
 
 urlpatterns = patterns(
     '',
@@ -21,7 +25,7 @@ urlpatterns = patterns(
     url(r'^products/disconnect/(?P<slug>\w+)/$', disconnect_product,
         name='disconnect_product'),
     url(r'^$', fork_index),
-    # url(r'^admin/', include(admin.site.urls)),
+    url(r'^admin/', include(admin.site.urls)),
 )
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
