@@ -46,7 +46,7 @@ class SubdomainConfiguration:
     @pristinemethod
     def reverse_lazy(viewname, **kw):
         def __inner():
-            from utils.url_resolvers import reverse
+            from almanet.url_resolvers import reverse
             return reverse(viewname, **kw)
 
         return lazy(__inner, str)

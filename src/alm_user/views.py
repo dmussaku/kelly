@@ -12,7 +12,7 @@ from django.conf import settings
 from alm_user.models import User
 from alm_user.forms import RegistrationForm, UserBaseSettingsForm, UserPasswordSettingsForm
 from almanet.models import Product
-from utils import reverse_lazy
+from almanet.url_resolvers import reverse_lazy
 
 # for testing, need to be deleted
 from datetime import datetime

@@ -1,5 +1,5 @@
  # Import template library
-from utils import reverse
+from almanet.url_resolvers import reverse
 from django import template
 import urlparse
 from django.utils.safestring import mark_safe

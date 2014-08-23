@@ -1,6 +1,6 @@
 from django.views.generic import ListView, DetailView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
-from utils import reverse_lazy
+from almanet.url_resolvers import reverse_lazy
 from alm_user.models import User
 from django.http import HttpResponse
 from django.shortcuts import render
@@ -24,7 +24,7 @@ class UserProductView(ListView):
 
 
 class ContactListView(ListView):
-    
+
     model = Contact
     paginate_by = 10
 
@@ -67,7 +67,7 @@ def contact_export(request, pk, format="web", locale='ru_RU', *args, **kwargs):
     return render(request, 'contact/vcards/vcard.%s.html' % (locale), {"contact": c})
 
 class GoalListView(ListView):
-    
+
     model = Goal
     paginate_by = 10
 
@@ -96,4 +96,4 @@ class GoalDetailView(DetailView):
 class GoalDeleteView(DeleteView):
     model = Goal
     success_url = reverse_lazy('goal_list')
-    template_name = 'goal/goal_delete.html'    
+    template_name = 'goal/goal_delete.html'

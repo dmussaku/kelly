@@ -1,6 +1,6 @@
 import functools
 from alm_company.models import Company
-from utils import reverse
+from almanet.url_resolvers import reverse
 from django.contrib import messages
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
@@ -17,7 +17,7 @@ def subdomain_required(fn):
             if flag:
                 return fn(request, *a, **kw)
         messages.warning(request, _("To access this page subdomain required"))
-        redirect_url = settings.LOGIN_REDIRECT_URL
+        # redirect_url = settings.LOGIN_REDIRECT_URL
         return HttpResponseRedirect(reverse('user_profile_url'))
 
     return inner
