@@ -58,16 +58,18 @@ class ContactDeleteView(DeleteView):
     template_name = 'contact/contact_delete.html'
 
 
-def contact_export(request, pk, format="web", locale='ru_RU', *args, **kwargs):
+def contact_export(request, pk, format="html", locale='ru_RU', *args, **kwargs):
     c = Contact.objects.get(pk=pk)
+    exported_vcard = c.export_to(format, locale=locale)
     if format == 'vcf':
-        vcard = c.to_vcard().serialize()
+        vcard = c.to_vcard()
         response = HttpResponse(vcard, mimetype='text/x-vcard')
-        response[
-            'Content-Disposition'] = "attachment; filename=%s_%s.vcf" % (c.first_name, c.last_name)
+        response['Content-Disposition'] = \
+            "attachment; filename=%s_%s.vcf" % (exported_vcard)
         return response
     # locale = request.user.get_locale() or locale
-    return render(request, 'contact/vcards/vcard.%s.html' % (locale), {"contact": c})
+    return render(request, 'contact/detail_vcard.html',
+                  {"contact": exported_vcard})
 
 
 class GoalListView(ListView):

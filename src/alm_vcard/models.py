@@ -768,6 +768,9 @@ class Email(models.Model):
         verbose_name = _("email")
         verbose_name_plural = _("emails")
 
+    def __unicode__(self):
+        return '%s' % self.value
+
 
 class Geo(models.Model):
     """

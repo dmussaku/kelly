@@ -1,11 +1,10 @@
 from django.db import models
-from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from almanet import settings
-from alm_company.models import Company
 from alm_user.models import User
 from almanet.models import Product
-import vobject
+from django.template.loader import render_to_string
+
 # import vcard as django_vcard
 
 
@@ -23,7 +22,6 @@ class Contact(models.Model):
     TYPES = (COMPANY_TP, USER_TP) = ('co', 'user')
     TYPES_WITH_CAPS = zip((COMPANY_TP, _('company type')),
                           (USER_TP, _('user type')))
-    vcard = models.ForeignKey('alm_vcard.VCard')
     status = models.IntegerField(
         _('contact status'),
         max_length=30,
@@ -33,6 +31,9 @@ class Contact(models.Model):
         max_length=30,
         choices=TYPES_WITH_CAPS, default=USER_TP)
     date_created = models.DateTimeField(blank=True, auto_now_add=True)
+    vcard = models.ForeignKey('alm_vcard.VCard', blank=True, null=True)
+    company_contact = models.ForeignKey(
+        'Contact', blank=True, null=True, related_name='user_contacts')
     # first_name = models.CharField(max_length=31,
     #                               null=False, blank=False)
     # last_name = models.CharField(max_length=30, blank=False)
@@ -47,7 +48,16 @@ class Contact(models.Model):
         db_table = settings.DB_PREFIX.format('contact')
 
     def __unicode__(self):
-        return "%s %s" % (self.first_name, self.last_name)
+        return "%s %s" % (self.vcard, self.tp)
+
+    @property
+    def name(self):
+        if not self.vcard:
+            return 'Unknown'
+        return self.vcard.fn
+
+    def get_tp(self):
+        return dict(self.TYPES_WITH_CAPS).get(self.tp, None)
 
     def is_new(self):
         return self.status == NEW
@@ -60,6 +70,20 @@ class Contact(models.Model):
 
     def is_client(self):
         return self.status == CLIENT
+
+    def export_to(self, tp, **options):
+        if not tp in ('html', 'vcard'):
+            return False
+        exporter = getattr(self, 'to_{}'.format(tp))
+        return exporter(**options)
+
+    def to_vcard(self, locale='ru_RU'):
+        return self.vcard.exportTo('vCard')
+
+    def to_html(self, locale='ru_RU'):
+        tpl_name = 'vcard/_detail.%s.html' % locale
+        context = {'object': self.vcard}
+        return render_to_string(tpl_name, context)
 
 
 class Value(models.Model):

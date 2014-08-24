@@ -8,62 +8,22 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Adding model 'Contact'
-        db.create_table('alma_contact', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('vcard', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['alm_vcard.VCard'])),
-            ('status', self.gf('django.db.models.fields.IntegerField')(default=0, max_length=30)),
-            ('tp', self.gf('django.db.models.fields.CharField')(default='user', max_length=30)),
-            ('date_created', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
-        ))
-        db.send_create_signal(u'alm_crm', ['Contact'])
+        # Adding field 'Contact.company_contact'
+        db.add_column('alma_contact', 'company_contact',
+                      self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='user_contacts', null=True, to=orm['alm_crm.Contact']),
+                      keep_default=False)
 
-        # Adding model 'Value'
-        db.create_table('alma_value', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('salary', self.gf('django.db.models.fields.CharField')(default='instant', max_length=7)),
-            ('amount', self.gf('django.db.models.fields.IntegerField')()),
-            ('currency', self.gf('django.db.models.fields.CharField')(default='KZT', max_length=3)),
-        ))
-        db.send_create_signal(u'alm_crm', ['Value'])
 
-        # Adding model 'Goal'
-        db.create_table('alma_goal', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('product', self.gf('django.db.models.fields.related.OneToOneField')(related_name='goal_product', unique=True, to=orm['almanet.Product'])),
-            ('assignee', self.gf('django.db.models.fields.related.ForeignKey')(related_name='goal_assignee', to=orm['alm_user.User'])),
-            ('contact', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['alm_crm.Contact'], unique=True)),
-            ('project_value', self.gf('django.db.models.fields.related.OneToOneField')(related_name='goal_project_value', unique=True, to=orm['alm_crm.Value'])),
-            ('real_value', self.gf('django.db.models.fields.related.OneToOneField')(related_name='goal_real_value', unique=True, to=orm['alm_crm.Value'])),
-            ('name', self.gf('django.db.models.fields.CharField')(max_length=30)),
-            ('status', self.gf('django.db.models.fields.CharField')(default='N', max_length=2)),
-            ('date_created', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
-        ))
-        db.send_create_signal(u'alm_crm', ['Goal'])
-
-        # Adding M2M table for field followers on 'Goal'
-        m2m_table_name = db.shorten_name('alma_goal_followers')
-        db.create_table(m2m_table_name, (
-            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
-            ('goal', models.ForeignKey(orm[u'alm_crm.goal'], null=False)),
-            ('user', models.ForeignKey(orm[u'alm_user.user'], null=False))
-        ))
-        db.create_unique(m2m_table_name, ['goal_id', 'user_id'])
-
+        # Changing field 'Contact.vcard'
+        db.alter_column('alma_contact', 'vcard_id', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['alm_vcard.VCard'], null=True))
 
     def backwards(self, orm):
-        # Deleting model 'Contact'
-        db.delete_table('alma_contact')
+        # Deleting field 'Contact.company_contact'
+        db.delete_column('alma_contact', 'company_contact_id')
 
-        # Deleting model 'Value'
-        db.delete_table('alma_value')
 
-        # Deleting model 'Goal'
-        db.delete_table('alma_goal')
-
-        # Removing M2M table for field followers on 'Goal'
-        db.delete_table(db.shorten_name('alma_goal_followers'))
-
+        # Changing field 'Contact.vcard'
+        db.alter_column('alma_contact', 'vcard_id', self.gf('django.db.models.fields.related.ForeignKey')(default=None, to=orm['alm_vcard.VCard']))
 
     models = {
         u'alm_company.company': {
@@ -75,11 +35,12 @@ class Migration(SchemaMigration):
         },
         u'alm_crm.contact': {
             'Meta': {'object_name': 'Contact', 'db_table': "'alma_contact'"},
+            'company_contact': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'user_contacts'", 'null': 'True', 'to': u"orm['alm_crm.Contact']"}),
             'date_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'status': ('django.db.models.fields.IntegerField', [], {'default': '0', 'max_length': '30'}),
             'tp': ('django.db.models.fields.CharField', [], {'default': "'user'", 'max_length': '30'}),
-            'vcard': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['alm_vcard.VCard']"})
+            'vcard': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['alm_vcard.VCard']", 'null': 'True', 'blank': 'True'})
         },
         u'alm_crm.goal': {
             'Meta': {'object_name': 'Goal', 'db_table': "'alma_goal'"},

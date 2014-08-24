@@ -1,0 +1,6 @@
+{% load i18n %}
+{% block content %}
+    <h2>Contact vCard </h2>
+    Имя: {{ object.fn }}<br />
+    Почта: {{ object.email_set.first }}<br />
+{% endblock %}
