@@ -81,10 +81,10 @@ class BaseConfiguration(SubdomainConfiguration, Configuration):
         'django_hosts',
         'south',
         'timezone_field',
-        'vcard',
         'almanet',   # commons, entry point
         'alm_user',
         'alm_company',
+        'alm_vcard',
         'alm_crm',
     )
 
