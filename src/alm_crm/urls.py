@@ -1,7 +1,7 @@
 from django.conf.urls import patterns, url
 from django.core.urlresolvers import reverse_lazy
 from views import (
-    ContactListView, 
+    ContactListView,
     ContactCreateView,
     ContactUpdateView,
     ContactDetailView,
@@ -44,9 +44,9 @@ urlpatterns = patterns(
     url(r'^contacts/create/$', ContactCreateView.as_view(), name='contact_create'),
     url(r'^contacts/update/(?P<pk>\d+)/$', ContactUpdateView.as_view(), name='contact_update'),
     url(r'^vcard/(?P<pk>\d+)/$', contact_export, name='contact_export'),
-    url(r'^vcard/(?P<pk>\d+)/(?P<format>(vcf|web)?)/$', contact_export, name='contact_export'), 
-    url(r'^contacts/(?P<pk>\d+)/$', ContactDetailView.as_view(), name='contact_detail'), 
-    url(r'^contacts/delete/(?P<pk>\d+)/$', ContactDeleteView.as_view(), name='contact_delete'), 
+    url(r'^vcard/(?P<pk>\d+)/(?P<format>(vcf|web)?)/$', contact_export, name='contact_export'),
+    url(r'^contacts/(?P<pk>\d+)/$', ContactDetailView.as_view(), name='contact_detail'),
+    url(r'^contacts/delete/(?P<pk>\d+)/$', ContactDeleteView.as_view(), name='contact_delete'),
 
     url(r'^goals/$', GoalListView.as_view(
             queryset = Goal.objects.all(),
@@ -61,7 +61,7 @@ urlpatterns = patterns(
         ), name='goal_list_by_date_created'
     ),
     url(r'^goals/create/$', GoalCreateView.as_view(), name='goal_create'),
-    url(r'^goals/update/(?P<pk>\d+)/$', GoalUpdateView.as_view(), name='goal_update'), 
-    url(r'^goals/(?P<pk>\d+)/$', GoalDetailView.as_view(), name='goal_detail'), 
-    url(r'^goals/delete/(?P<pk>\d+)/$', GoalDeleteView.as_view(), name='goal_delete'), 
+    url(r'^goals/update/(?P<pk>\d+)/$', GoalUpdateView.as_view(), name='goal_update'),
+    url(r'^goals/(?P<pk>\d+)/$', GoalDetailView.as_view(), name='goal_detail'),
+    url(r'^goals/delete/(?P<pk>\d+)/$', GoalDeleteView.as_view(), name='goal_delete'),
 )
