@@ -6,14 +6,20 @@ from views import (
     ContactUpdateView,
     ContactDetailView,
     ContactDeleteView,
-    GoalListView,
-    GoalCreateView,
-    GoalUpdateView,
-    GoalDetailView,
-    GoalDeleteView,
+    SalesCycleListView,
+    SalesCycleCreateView,
+    SalesCycleUpdateView,
+    SalesCycleDetailView,
+    SalesCycleDeleteView,
+    ActivityCreateView,
+    ActivityListView,
+    ActivityDetailView,
+    ActivityUpdateView,
+    ActivityDeleteView,
+    add_mention,
     contact_export
     )
-from models import Contact, Goal
+from models import Contact, SalesCycle, Activity
 
 urlpatterns = patterns(
     '',
@@ -48,20 +54,28 @@ urlpatterns = patterns(
     url(r'^contacts/(?P<pk>\d+)/$', ContactDetailView.as_view(), name='contact_detail'), 
     url(r'^contacts/delete/(?P<pk>\d+)/$', ContactDeleteView.as_view(), name='contact_delete'), 
 
-    url(r'^goals/$', GoalListView.as_view(
-            queryset = Goal.objects.all(),
-            context_object_name="goals",
-            template_name = "goal/goal_list.html",
-        ), name='goal_list'
+    url(r'^sales_cycles/$', SalesCycleListView.as_view(
+            queryset = SalesCycle.objects.all(),
+            context_object_name="sales_cycles",
+            template_name = "sales_cycle/sales_cycle_list.html",
+        ), name='sales_cycle_list'
     ),
-    url(r'^goals/recent/$', GoalListView.as_view(
-            queryset = Goal.objects.order_by("-date_created"),
-            context_object_name="goals",
-            template_name = "goals/goals_list.html",
-        ), name='goal_list_by_date_created'
+    url(r'^sales_cycles/recent/$', SalesCycleListView.as_view(
+            queryset = SalesCycle.objects.order_by("-date_created"),
+            context_object_name="sales_cycles",
+            template_name = "sales_cycles/sales_cycles_list.html",
+        ), name='sales_cycle_list_by_date_created'
     ),
-    url(r'^goals/create/$', GoalCreateView.as_view(), name='goal_create'),
-    url(r'^goals/update/(?P<pk>\d+)/$', GoalUpdateView.as_view(), name='goal_update'), 
-    url(r'^goals/(?P<pk>\d+)/$', GoalDetailView.as_view(), name='goal_detail'), 
-    url(r'^goals/delete/(?P<pk>\d+)/$', GoalDeleteView.as_view(), name='goal_delete'), 
+    url(r'^sales_cycles/create/$', SalesCycleCreateView.as_view(), name='sales_cycle_create'),
+    url(r'^sales_cycles/update/(?P<pk>\d+)/$', SalesCycleUpdateView.as_view(), name='sales_cycle_update'), 
+    url(r'^sales_cycles/(?P<pk>\d+)/$', SalesCycleDetailView.as_view(), name='sales_cycle_detail'), 
+    url(r'^sales_cycles/delete/(?P<pk>\d+)/$', SalesCycleDeleteView.as_view(), name='sales_cycle_delete'), 
+
+    url(r'^activities/create/$', ActivityCreateView.as_view(), name='activity_create'),
+    url(r'^activities/$', ActivityListView.as_view(), name='activity_list'),
+    url(r'^activities/(?P<pk>\d+)/$', ActivityDetailView.as_view(), name='activity_detail'),
+    url(r'^activities/update/(?P<pk>\d+)/$', ActivityUpdateView.as_view(), name='activity_update'),
+    url(r'^activities/delete/(?P<pk>\d+)/$', ActivityDeleteView.as_view(), name='activity_delete'),
+
+    url(r'^mention/$', add_mention, name='mention_create'),
 )

@@ -8,24 +8,14 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Adding field 'Contact.job_address'
-        db.add_column('alma_contact', 'job_address',
-                      self.gf('alm_crm.fields.AddressField')(default='######', max_length=200, blank=True),
-                      keep_default=False)
 
-        # Adding field 'Contact.status'
-        db.add_column('alma_contact', 'status',
-                      self.gf('django.db.models.fields.IntegerField')(default=0, max_length=30),
-                      keep_default=False)
-
+        # Changing field 'SalesCycle.latest_activity'
+        db.alter_column('alma_sales_cycle', 'latest_activity_id', self.gf('django.db.models.fields.related.OneToOneField')(unique=True, null=True, to=orm['alm_crm.Activity']))
 
     def backwards(self, orm):
-        # Deleting field 'Contact.job_address'
-        db.delete_column('alma_contact', 'job_address')
 
-        # Deleting field 'Contact.status'
-        db.delete_column('alma_contact', 'status')
-
+        # Changing field 'SalesCycle.latest_activity'
+        db.alter_column('alma_sales_cycle', 'latest_activity_id', self.gf('django.db.models.fields.related.OneToOneField')(default=datetime.datetime(2014, 8, 26, 0, 0), unique=True, to=orm['alm_crm.Activity']))
 
     models = {
         u'alm_company.company': {
@@ -34,6 +24,26 @@ class Migration(SchemaMigration):
             'name': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'owner': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'owned_company'", 'symmetrical': 'False', 'to': u"orm['alm_user.User']"}),
             'subdomain': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '300'})
+        },
+        u'alm_crm.activity': {
+            'Meta': {'object_name': 'Activity', 'db_table': "'alma_activity'"},
+            'author': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'activity_author'", 'to': u"orm['alm_user.User']"}),
+            'description': ('django.db.models.fields.CharField', [], {'max_length': '500'}),
+            'feedback': ('django.db.models.fields.CharField', [], {'max_length': '300'}),
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'sales_cycle': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'activity_sales_cycle'", 'to': u"orm['alm_crm.SalesCycle']"}),
+            'status': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '1'}),
+            'title': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
+            'when': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'})
+        },
+        u'alm_crm.activity_comment': {
+            'Meta': {'object_name': 'Activity_Comment'},
+            'author': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'comment_author'", 'to': u"orm['alm_user.User']"}),
+            'comment': ('django.db.models.fields.CharField', [], {'max_length': '140'}),
+            'context_id': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'context_id'", 'to': u"orm['alm_user.User']"}),
+            'context_type': ('django.db.models.fields.CharField', [], {'max_length': '1000'}),
+            'date_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'})
         },
         u'alm_crm.contact': {
             'Meta': {'object_name': 'Contact', 'db_table': "'alma_contact'"},
@@ -44,21 +54,24 @@ class Migration(SchemaMigration):
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'job_address': ('alm_crm.fields.AddressField', [], {'max_length': '200', 'blank': 'True'}),
             'last_name': ('django.db.models.fields.CharField', [], {'max_length': '30'}),
+            'latest_activity': ('django.db.models.fields.related.OneToOneField', [], {'related_name': "'contact_latest_activity'", 'unique': 'True', 'null': 'True', 'to': u"orm['alm_crm.Activity']"}),
             'phone': ('django.db.models.fields.CharField', [], {'max_length': '12', 'blank': 'True'}),
             'status': ('django.db.models.fields.IntegerField', [], {'default': '0', 'max_length': '30'})
         },
-        u'alm_crm.goal': {
-            'Meta': {'object_name': 'Goal', 'db_table': "'alma_goal'"},
-            'assignee': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'goal_assignee'", 'to': u"orm['alm_user.User']"}),
-            'contact': ('django.db.models.fields.related.OneToOneField', [], {'to': u"orm['alm_crm.Contact']", 'unique': 'True'}),
+        u'alm_crm.salescycle': {
+            'Meta': {'object_name': 'SalesCycle', 'db_table': "'alma_sales_cycle'"},
+            'contact': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['alm_crm.Contact']"}),
             'date_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            'followers': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'goal_followers'", 'symmetrical': 'False', 'to': u"orm['alm_user.User']"}),
+            'followers': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'sales_cycle_followers'", 'symmetrical': 'False', 'to': u"orm['alm_user.User']"}),
+            'from_date': ('django.db.models.fields.DateTimeField', [], {}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '30'}),
-            'product': ('django.db.models.fields.related.OneToOneField', [], {'related_name': "'goal_product'", 'unique': 'True', 'to': u"orm['almanet.Product']"}),
-            'project_value': ('django.db.models.fields.related.OneToOneField', [], {'related_name': "'goal_project_value'", 'unique': 'True', 'to': u"orm['alm_crm.Value']"}),
-            'real_value': ('django.db.models.fields.related.OneToOneField', [], {'related_name': "'goal_real_value'", 'unique': 'True', 'to': u"orm['alm_crm.Value']"}),
-            'status': ('django.db.models.fields.CharField', [], {'default': "'N'", 'max_length': '2'})
+            'latest_activity': ('django.db.models.fields.related.OneToOneField', [], {'related_name': "'latest_activity'", 'unique': 'True', 'null': 'True', 'to': u"orm['alm_crm.Activity']"}),
+            'owner': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'salescycle_owner'", 'to': u"orm['alm_user.User']"}),
+            'products': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'sales_cycle_product'", 'symmetrical': 'False', 'to': u"orm['almanet.Product']"}),
+            'project_value': ('django.db.models.fields.related.OneToOneField', [], {'related_name': "'sales_cycle_project_value'", 'unique': 'True', 'to': u"orm['alm_crm.Value']"}),
+            'real_value': ('django.db.models.fields.related.OneToOneField', [], {'related_name': "'sales_cycle_real_value'", 'unique': 'True', 'to': u"orm['alm_crm.Value']"}),
+            'status': ('django.db.models.fields.CharField', [], {'default': "'N'", 'max_length': '2'}),
+            'to_date': ('django.db.models.fields.DateTimeField', [], {})
         },
         u'alm_crm.value': {
             'Meta': {'object_name': 'Value', 'db_table': "'alma_value'"},

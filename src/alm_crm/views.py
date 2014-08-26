@@ -5,8 +5,8 @@ from alm_user.models import User
 from django.http import HttpResponse
 from django.shortcuts import render
 from almanet.models import Product, Subscription
-from forms import ContactForm, GoalForm
-from models import Contact, Goal
+from forms import ContactForm, SalesCycleForm, MentionForm
+from models import Contact, SalesCycle, Activity, Mention
 
 
 class UserProductView(ListView):
@@ -70,34 +70,77 @@ def contact_export(request, pk, format="web", locale='ru_RU', *args, **kwargs):
     return render(request, 'contact/vcards/vcard.%s.html' % (locale), {"contact": c})
 
 
-class GoalListView(ListView):
-
-    model = Goal
+class SalesCycleListView(ListView):
+    model = SalesCycle
     paginate_by = 10
 
-
-class GoalCreateView(CreateView):
-    form_class = GoalForm
-    template_name = "goal/goal_create.html"
-    success_url = reverse_lazy('goal_list')
-
-    def form_valid(self, form):
-        return super(GoalCreateView, self).form_valid(form)
+    def get_context_data(self, **kwargs):
+        context = super(SalesCycleListView, self).get_context_data(**kwargs)
+        context['form'] = MentionForm
+        return context
 
 
-class GoalUpdateView(UpdateView):
-    model = Goal
-    form_clas = GoalForm
-    success_url = reverse_lazy('goal_list')
-    template_name = "goal/goal_update.html"
+class SalesCycleCreateView(CreateView):
+    form_class = SalesCycleForm
+    template_name = "sales_cycle/sales_cycle_create.html"
+    success_url = reverse_lazy('sales_cycle_list')
 
 
-class GoalDetailView(DetailView):
-    model = Goal
-    template_name = "goal/goal_detail.html"
+class SalesCycleUpdateView(UpdateView):
+    model = SalesCycle
+    form_clas = SalesCycleForm
+    success_url = reverse_lazy('sales_cycle_list')
+    template_name = "sales_cycle/sales_cycle_update.html"
 
 
-class GoalDeleteView(DeleteView):
-    model = Goal
-    success_url = reverse_lazy('goal_list')
-    template_name = 'goal/goal_delete.html'
+class SalesCycleDetailView(DetailView):
+    model = SalesCycle
+    template_name = "sales_cycle/sales_cycle_detail.html"
+
+class SalesCycleDeleteView(DeleteView):
+    model = SalesCycle
+    success_url = reverse_lazy('sales_cycle_list')
+    template_name = 'sales_cycle/sales_cycle_delete.html'
+
+
+class ActivityCreateView(CreateView):
+    model = Activity 
+    template_name = 'activity/activity_create.html'
+    success_url = reverse_lazy('activity_list')
+
+
+class ActivityListView(ListView):
+    model = Activity
+    template_name = 'activity/activity_list.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(ActivityListView, self).get_context_data(**kwargs)
+        context['activities'] = Activity.objects.all()
+        return context
+
+ 
+class ActivityDetailView(DetailView):
+    model = Activity
+    template_name = 'activity/activity_detail.html'
+
+
+class ActivityUpdateView(UpdateView):
+    model = Activity
+    template_name = 'activity/activity_update.html'
+
+    def get_success_url(self):
+        return reverse_lazy('activity_detail', kwargs={'pk': self.kwargs['pk']})
+
+
+class ActivityDeleteView(DeleteView):
+    model = Activity
+    success_url = reverse_lazy('activity_list')
+    template_name = 'activity/activity_delete.html'
+
+
+def add_mention(request):
+    if request.method==POST:
+        return HttpResponse( 'asd' + str(request.POST['user_id']) )
+
+
+"""add_mention context_object_id, context_type"""
