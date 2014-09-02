@@ -18,6 +18,7 @@ from .fields import AddressField
 STATUSES = (_('new_contact'), _('lead_contact'), _('opportunity_contact'), _('client_contact') )
 STATUS_NAMES = (NEW, LEAD, OPPORTUNITY, CLIENT) = range(len(STATUSES))
 
+
 class Contact(models.Model):
 
     STATUS_CODES = dict(zip(STATUS_NAMES, STATUSES))
@@ -31,6 +32,7 @@ class Contact(models.Model):
     job_address = AddressField(_('job address'), max_length=200, blank=True)
     status = models.IntegerField(_('contact status'), max_length=30, choices=enumerate(STATUSES), default=NEW)
     latest_activity = models.OneToOneField('Activity', related_name ='contact_latest_activity', null=True)
+    mentions = generic.GenericRelation('Mention')
 
     class Meta:
         verbose_name = _('contact')
@@ -108,6 +110,12 @@ class Contact(models.Model):
     def get_latest_activity(self):
         return self.sales_cycles.aggregate(Max('contact_latest_activity'))
 
+    def add_mention(self, user_ids=None):
+        assert not user_ids is None and isinstance(user_ids, (list, set, tuple))
+        self.mentions = [Mention.build_new(user_id, content_class=self.__class__, object_id=self.pk, save=True) for user_id in user_ids]
+        self.save()
+
+
     @receiver(signals.post_save, sender='Activity')
     def set_latest_activity(sender, instance, created, **kwargs):
         if created:
@@ -161,7 +169,7 @@ class SalesCycle(models.Model):
     mentions = generic.GenericRelation('Mention')
 
     class Meta:
-        verbose_name = 'sales cycle'
+        verbose_name = 'sales_cycle'
         db_table = settings.DB_PREFIX.format('sales_cycle')
 
     def get_latest_activity(self):
@@ -243,7 +251,7 @@ class Mention(models.Model):
     content_object = generic.GenericForeignKey('content_type', 'object_id')
 
     def __unicode__(self):
-        return "%s %s" % (self.user, self.content_object)
+        return "%s %s" % (self.user_id, self.content_object)
 
     @classmethod
     def build_new(cls, user_id, content_class=None, object_id=None, save=False):
@@ -254,9 +262,34 @@ class Mention(models.Model):
             mention.save()
         return mention
 
-class Activity_Comment(models.Model):
+class Comment(models.Model):
     comment = models.CharField(max_length=140)
     author = models.ForeignKey(User, related_name='comment_author')
     date_created = models.DateTimeField(blank=True, auto_now_add=True)
+    date_edited = models.DateTimeField(blank=True)
     object_id = models.ForeignKey(User, related_name='object_id')
     content_type = models.CharField(max_length=1000)
+    content_object = generic.GenericForeignKey('content_type', 'object_id')
+    mentions = generic.GenericRelation('Mention')
+
+    def __unicode__(self):
+        return "%s's comment" % (self.author)
+
+    def save(self, **kwargs):
+        if self.date_created:
+            self.date_edited = timezone.now()
+            self.save()
+
+    def add_mention(self, user_ids=None):
+        assert not user_ids is None and isinstance(user_ids, (list, set, tuple))
+        self.mentions = [Mention.build_new(user_id, content_class=self.__class__, object_id=self.pk, save=True) for user_id in user_ids]
+        self.save()
+
+    @classmethod
+    def build_new(cls, user_id, content_class=None, object_id=None, save=False):
+        comment = cls(user_id=user_id)
+        comment.content_type = ContentType.objects.get_for_model(content_class)
+        comment.object_id = object_id
+        if save:
+            comment.save()
+        return comment
