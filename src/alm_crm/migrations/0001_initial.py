@@ -19,7 +19,7 @@ class Migration(SchemaMigration):
             ('date_created', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
             ('job_address', self.gf('alm_crm.fields.AddressField')(max_length=200, blank=True)),
             ('status', self.gf('django.db.models.fields.IntegerField')(default=0, max_length=30)),
-            ('latest_activity', self.gf('django.db.models.fields.related.OneToOneField')(related_name='contact_latest_activity', unique=True, to=orm['alm_crm.Activity'])),
+            ('latest_activity', self.gf('django.db.models.fields.related.OneToOneField')(related_name='contact_latest_activity', unique=True, null=True, to=orm['alm_crm.Activity'])),
         ))
         db.send_create_signal(u'alm_crm', ['Contact'])
 
@@ -37,13 +37,13 @@ class Migration(SchemaMigration):
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('owner', self.gf('django.db.models.fields.related.ForeignKey')(related_name='salescycle_owner', to=orm['alm_user.User'])),
             ('contact', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['alm_crm.Contact'])),
-            ('latest_activity', self.gf('django.db.models.fields.related.OneToOneField')(related_name='latest_activity', unique=True, to=orm['alm_crm.Activity'])),
+            ('latest_activity', self.gf('django.db.models.fields.related.OneToOneField')(related_name='latest_activity', unique=True, null=True, to=orm['alm_crm.Activity'])),
             ('project_value', self.gf('django.db.models.fields.related.OneToOneField')(related_name='sales_cycle_project_value', unique=True, to=orm['alm_crm.Value'])),
             ('real_value', self.gf('django.db.models.fields.related.OneToOneField')(related_name='sales_cycle_real_value', unique=True, to=orm['alm_crm.Value'])),
             ('status', self.gf('django.db.models.fields.CharField')(default='N', max_length=2)),
             ('date_created', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
-            ('from_date', self.gf('django.db.models.fields.DateTimeField')()),
-            ('to_date', self.gf('django.db.models.fields.DateTimeField')()),
+            ('from_date', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
+            ('to_date', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
         ))
         db.send_create_signal(u'alm_crm', ['SalesCycle'])
 
@@ -78,6 +78,15 @@ class Migration(SchemaMigration):
         ))
         db.send_create_signal(u'alm_crm', ['Activity'])
 
+        # Adding model 'Mention'
+        db.create_table(u'alm_crm_mention', (
+            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('user_id', self.gf('django.db.models.fields.IntegerField')()),
+            ('context_type', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['contenttypes.ContentType'])),
+            ('context_id', self.gf('django.db.models.fields.IntegerField')()),
+        ))
+        db.send_create_signal(u'alm_crm', ['Mention'])
+
         # Adding model 'Activity_Comment'
         db.create_table(u'alm_crm_activity_comment', (
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
@@ -108,6 +117,9 @@ class Migration(SchemaMigration):
 
         # Deleting model 'Activity'
         db.delete_table('alma_activity')
+
+        # Deleting model 'Mention'
+        db.delete_table(u'alm_crm_mention')
 
         # Deleting model 'Activity_Comment'
         db.delete_table(u'alm_crm_activity_comment')
@@ -150,24 +162,31 @@ class Migration(SchemaMigration):
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'job_address': ('alm_crm.fields.AddressField', [], {'max_length': '200', 'blank': 'True'}),
             'last_name': ('django.db.models.fields.CharField', [], {'max_length': '30'}),
-            'latest_activity': ('django.db.models.fields.related.OneToOneField', [], {'related_name': "'contact_latest_activity'", 'unique': 'True', 'to': u"orm['alm_crm.Activity']"}),
+            'latest_activity': ('django.db.models.fields.related.OneToOneField', [], {'related_name': "'contact_latest_activity'", 'unique': 'True', 'null': 'True', 'to': u"orm['alm_crm.Activity']"}),
             'phone': ('django.db.models.fields.CharField', [], {'max_length': '12', 'blank': 'True'}),
             'status': ('django.db.models.fields.IntegerField', [], {'default': '0', 'max_length': '30'})
+        },
+        u'alm_crm.mention': {
+            'Meta': {'object_name': 'Mention'},
+            'context_id': ('django.db.models.fields.IntegerField', [], {}),
+            'context_type': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['contenttypes.ContentType']"}),
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'user_id': ('django.db.models.fields.IntegerField', [], {})
         },
         u'alm_crm.salescycle': {
             'Meta': {'object_name': 'SalesCycle', 'db_table': "'alma_sales_cycle'"},
             'contact': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['alm_crm.Contact']"}),
             'date_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'followers': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'sales_cycle_followers'", 'symmetrical': 'False', 'to': u"orm['alm_user.User']"}),
-            'from_date': ('django.db.models.fields.DateTimeField', [], {}),
+            'from_date': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'latest_activity': ('django.db.models.fields.related.OneToOneField', [], {'related_name': "'latest_activity'", 'unique': 'True', 'to': u"orm['alm_crm.Activity']"}),
+            'latest_activity': ('django.db.models.fields.related.OneToOneField', [], {'related_name': "'latest_activity'", 'unique': 'True', 'null': 'True', 'to': u"orm['alm_crm.Activity']"}),
             'owner': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'salescycle_owner'", 'to': u"orm['alm_user.User']"}),
             'products': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'sales_cycle_product'", 'symmetrical': 'False', 'to': u"orm['almanet.Product']"}),
             'project_value': ('django.db.models.fields.related.OneToOneField', [], {'related_name': "'sales_cycle_project_value'", 'unique': 'True', 'to': u"orm['alm_crm.Value']"}),
             'real_value': ('django.db.models.fields.related.OneToOneField', [], {'related_name': "'sales_cycle_real_value'", 'unique': 'True', 'to': u"orm['alm_crm.Value']"}),
             'status': ('django.db.models.fields.CharField', [], {'default': "'N'", 'max_length': '2'}),
-            'to_date': ('django.db.models.fields.DateTimeField', [], {})
+            'to_date': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'})
         },
         u'alm_crm.value': {
             'Meta': {'object_name': 'Value', 'db_table': "'alma_value'"},
@@ -194,6 +213,13 @@ class Migration(SchemaMigration):
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'slug': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '30'}),
             'title': ('django.db.models.fields.CharField', [], {'max_length': '100'})
+        },
+        u'contenttypes.contenttype': {
+            'Meta': {'ordering': "('name',)", 'unique_together': "(('app_label', 'model'),)", 'object_name': 'ContentType', 'db_table': "'django_content_type'"},
+            'app_label': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'model': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
+            'name': ('django.db.models.fields.CharField', [], {'max_length': '100'})
         }
     }
 

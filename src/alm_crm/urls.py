@@ -9,6 +9,7 @@ from views import (
     SalesCycleListView,
     SalesCycleCreateView,
     SalesCycleUpdateView,
+    SalesCycleAddMentionView,
     SalesCycleDetailView,
     SalesCycleDeleteView,
     ActivityCreateView,
@@ -16,7 +17,7 @@ from views import (
     ActivityDetailView,
     ActivityUpdateView,
     ActivityDeleteView,
-    add_mention,
+    
     contact_export
     )
 from models import Contact, SalesCycle, Activity
@@ -68,6 +69,7 @@ urlpatterns = patterns(
     ),
     url(r'^sales_cycles/create/$', SalesCycleCreateView.as_view(), name='sales_cycle_create'),
     url(r'^sales_cycles/update/(?P<pk>\d+)/$', SalesCycleUpdateView.as_view(), name='sales_cycle_update'), 
+    url(r'^sales_cycles/add_mention/(?P<pk>\d+)/$', SalesCycleAddMentionView.as_view(), name='sales_cycle_add_mention'),
     url(r'^sales_cycles/(?P<pk>\d+)/$', SalesCycleDetailView.as_view(), name='sales_cycle_detail'), 
     url(r'^sales_cycles/delete/(?P<pk>\d+)/$', SalesCycleDeleteView.as_view(), name='sales_cycle_delete'), 
 
@@ -77,5 +79,5 @@ urlpatterns = patterns(
     url(r'^activities/update/(?P<pk>\d+)/$', ActivityUpdateView.as_view(), name='activity_update'),
     url(r'^activities/delete/(?P<pk>\d+)/$', ActivityDeleteView.as_view(), name='activity_delete'),
 
-    url(r'^mention/$', add_mention, name='mention_create'),
+
 )

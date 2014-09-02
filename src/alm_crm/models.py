@@ -169,12 +169,14 @@ class SalesCycle(models.Model):
 
     def __unicode__(self):
         return '%s %s' % (self.contact, self.status )
-
+    
+    # Adds mentions to a current class, takes a lsit of user_ids as an input
+    # and then runs through the list and calls the function build_new which
+    # is declared in Mention class
     def add_mention(self, user_ids=None):
         assert not user_ids is None and isinstance(user_ids, (list, set, tuple))
-        user_mentions = map(lambda user_id: Mention.build_new(
-            user_id, context_class=self.__class__, context_object_id=self.pk, save=True))
-        return user_mentions
+        self.mentions = [Mention.build_new(user_id, content_class=self.__class__, object_id=self.pk, save=True) for user_id in user_ids]
+        self.save()
 
     # @receiver(signals.post_save, sender='Activity')
     # def set_latest_activity(sender, instance, created, **kwargs):
@@ -187,10 +189,10 @@ class SalesCycle(models.Model):
     #         pass
 
 class Address(object):
-    """
+    '''
         Class for representing complex address model,
         do not have its own db table, stored as serialized string in Contact model's AddressField
-    """
+    '''
 
     def __init__(self, box = None, extended = None, code = None, street = None, city = None, region = None, country = None):
         self.box = box
@@ -236,18 +238,18 @@ class Activity(models.Model):
 
 class Mention(models.Model):
     user_id = models.IntegerField()
-    context_type = models.ForeignKey(ContentType)  
-    context_id = models.IntegerField()
-    context_object = generic.GenericForeignKey('context_type', 'context_id')
+    content_type = models.ForeignKey(ContentType)  
+    object_id = models.IntegerField()
+    content_object = generic.GenericForeignKey('content_type', 'object_id')
 
     def __unicode__(self):
-        return "%s %s" % (self.user, self.context_object)
+        return "%s %s" % (self.user, self.content_object)
 
     @classmethod
-    def build_new(cls, user_id, context_class=None, context_object_id=None, save=False):
+    def build_new(cls, user_id, content_class=None, object_id=None, save=False):
         mention = cls(user_id=user_id)
-        mention.context_type = ContentType.objects.get_for_model(context_class)
-        mention.context_object_id = context_object_id
+        mention.content_type = ContentType.objects.get_for_model(content_class)
+        mention.object_id = object_id
         if save:
             mention.save()
         return mention
@@ -256,5 +258,5 @@ class Activity_Comment(models.Model):
     comment = models.CharField(max_length=140)
     author = models.ForeignKey(User, related_name='comment_author')
     date_created = models.DateTimeField(blank=True, auto_now_add=True)
-    context_id = models.ForeignKey(User, related_name='context_id')
-    context_type = models.CharField(max_length=1000)
+    object_id = models.ForeignKey(User, related_name='object_id')
+    content_type = models.CharField(max_length=1000)

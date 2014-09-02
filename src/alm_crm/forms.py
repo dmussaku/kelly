@@ -16,8 +16,18 @@ class SalesCycleForm(ModelForm):
 		model = SalesCycle
 		exclude = ['status','date_created', 'from_date', 'to_date', 'latest_activity']
 
+def get_user_choices():
+	index_list=[]
+	user_list=[]
+	for i in User.objects.all():
+		index_list.append(str(i.id))
+		user_list.append(str(i))
+	return tuple(zip(index_list,user_list))
+
+
 class MentionForm(ModelForm):
-	
+	user_id = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple,
+                                         choices=get_user_choices())
 	class Meta:
 		model=Mention
-		exclude = ['context_type', 'context_id']
+		exclude = ['content_type', 'content_id', 'object_id']

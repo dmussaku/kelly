@@ -8,19 +8,39 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Adding M2M table for field mentions on 'Contact'
-        m2m_table_name = db.shorten_name('alma_contact_mentions')
-        db.create_table(m2m_table_name, (
-            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
-            ('contact', models.ForeignKey(orm[u'alm_crm.contact'], null=False)),
-            ('mention', models.ForeignKey(orm[u'alm_crm.mention'], null=False))
-        ))
-        db.create_unique(m2m_table_name, ['contact_id', 'mention_id'])
+        # Deleting field 'Activity_Comment.context_type'
+        db.delete_column(u'alm_crm_activity_comment', 'context_type')
+
+        # Adding field 'Activity_Comment.content_type'
+        db.add_column(u'alm_crm_activity_comment', 'content_type',
+                      self.gf('django.db.models.fields.CharField')(default=14124123213124L, max_length=1000),
+                      keep_default=False)
+
+        # Deleting field 'Mention.context_type'
+        db.delete_column(u'alm_crm_mention', 'context_type_id')
+
+        # Adding field 'Mention.content_type'
+        db.add_column(u'alm_crm_mention', 'content_type',
+                      self.gf('django.db.models.fields.related.ForeignKey')(default=42142131231241L, to=orm['contenttypes.ContentType']),
+                      keep_default=False)
 
 
     def backwards(self, orm):
-        # Removing M2M table for field mentions on 'Contact'
-        db.delete_table(db.shorten_name('alma_contact_mentions'))
+        # Adding field 'Activity_Comment.context_type'
+        db.add_column(u'alm_crm_activity_comment', 'context_type',
+                      self.gf('django.db.models.fields.CharField')(default=13124124124L, max_length=1000),
+                      keep_default=False)
+
+        # Deleting field 'Activity_Comment.content_type'
+        db.delete_column(u'alm_crm_activity_comment', 'content_type')
+
+        # Adding field 'Mention.context_type'
+        db.add_column(u'alm_crm_mention', 'context_type',
+                      self.gf('django.db.models.fields.related.ForeignKey')(default=2414214124124L, to=orm['contenttypes.ContentType']),
+                      keep_default=False)
+
+        # Deleting field 'Mention.content_type'
+        db.delete_column(u'alm_crm_mention', 'content_type_id')
 
 
     models = {
@@ -46,10 +66,10 @@ class Migration(SchemaMigration):
             'Meta': {'object_name': 'Activity_Comment'},
             'author': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'comment_author'", 'to': u"orm['alm_user.User']"}),
             'comment': ('django.db.models.fields.CharField', [], {'max_length': '140'}),
-            'context_id': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'context_id'", 'to': u"orm['alm_user.User']"}),
-            'context_type': ('django.db.models.fields.CharField', [], {'max_length': '1000'}),
+            'content_type': ('django.db.models.fields.CharField', [], {'max_length': '1000'}),
             'date_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'})
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'object_id': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'object_id'", 'to': u"orm['alm_user.User']"})
         },
         u'alm_crm.contact': {
             'Meta': {'object_name': 'Contact', 'db_table': "'alma_contact'"},
@@ -61,16 +81,15 @@ class Migration(SchemaMigration):
             'job_address': ('alm_crm.fields.AddressField', [], {'max_length': '200', 'blank': 'True'}),
             'last_name': ('django.db.models.fields.CharField', [], {'max_length': '30'}),
             'latest_activity': ('django.db.models.fields.related.OneToOneField', [], {'related_name': "'contact_latest_activity'", 'unique': 'True', 'null': 'True', 'to': u"orm['alm_crm.Activity']"}),
-            'mentions': ('django.db.models.fields.related.ManyToManyField', [], {'symmetrical': 'False', 'related_name': "'contact_mentions'", 'null': 'True', 'to': u"orm['alm_crm.Mention']"}),
             'phone': ('django.db.models.fields.CharField', [], {'max_length': '12', 'blank': 'True'}),
             'status': ('django.db.models.fields.IntegerField', [], {'default': '0', 'max_length': '30'})
         },
         u'alm_crm.mention': {
             'Meta': {'object_name': 'Mention'},
-            'context_id': ('django.db.models.fields.IntegerField', [], {}),
-            'context_type': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['contenttypes.ContentType']"}),
+            'content_type': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['contenttypes.ContentType']"}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'user': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'mention_user'", 'to': u"orm['alm_user.User']"})
+            'object_id': ('django.db.models.fields.IntegerField', [], {}),
+            'user_id': ('django.db.models.fields.IntegerField', [], {})
         },
         u'alm_crm.salescycle': {
             'Meta': {'object_name': 'SalesCycle', 'db_table': "'alma_sales_cycle'"},

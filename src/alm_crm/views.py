@@ -88,14 +88,30 @@ class SalesCycleCreateView(CreateView):
 
 class SalesCycleUpdateView(UpdateView):
     model = SalesCycle
-    form_clas = SalesCycleForm
+    form_class = SalesCycleForm
     success_url = reverse_lazy('sales_cycle_list')
     template_name = "sales_cycle/sales_cycle_update.html"
+
+class SalesCycleAddMentionView(UpdateView):
+    model = SalesCycle
+    form_class = MentionForm #context_type, context_id
+    success_url = reverse_lazy('sales_cycle_list')
+    template_name = "sales_cycle/sales_cycle_add_mention.html"
+
+    def post(self, request, *args, **kwargs):
+        self.model.objects.get(id=self.kwargs['pk']).add_mention(list(request.POST['user_id']))
+        return super(SalesCycleAddMentionView, self).post(request, *args, **kwargs)
 
 
 class SalesCycleDetailView(DetailView):
     model = SalesCycle
     template_name = "sales_cycle/sales_cycle_detail.html"
+
+    def get_context_data(self, **kwargs):
+        context = super(SalesCycleDetailView, self).get_context_data(**kwargs)
+        print SalesCycle.objects.get(id=self.kwargs['pk'])
+        context['sales_cycle'] = SalesCycle.objects.get(id=self.kwargs['pk'])
+        return context
 
 class SalesCycleDeleteView(DeleteView):
     model = SalesCycle
@@ -138,9 +154,3 @@ class ActivityDeleteView(DeleteView):
     template_name = 'activity/activity_delete.html'
 
 
-def add_mention(request):
-    if request.method==POST:
-        return HttpResponse( 'asd' + str(request.POST['user_id']) )
-
-
-"""add_mention context_object_id, context_type"""

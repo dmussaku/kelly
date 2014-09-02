@@ -8,14 +8,40 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
+        # Deleting field 'Activity_Comment.context_id'
+        db.delete_column(u'alm_crm_activity_comment', 'context_id_id')
 
-        # Changing field 'SalesCycle.latest_activity'
-        db.alter_column('alma_sales_cycle', 'latest_activity_id', self.gf('django.db.models.fields.related.OneToOneField')(unique=True, null=True, to=orm['alm_crm.Activity']))
+        # Adding field 'Activity_Comment.object_id'
+        db.add_column(u'alm_crm_activity_comment', 'object_id',
+                      self.gf('django.db.models.fields.related.ForeignKey')(default=12312312, related_name='object_id', to=orm['alm_user.User']),
+                      keep_default=False)
+
+        # Deleting field 'Mention.context_id'
+        db.delete_column(u'alm_crm_mention', 'context_id')
+
+        # Adding field 'Mention.object_id'
+        db.add_column(u'alm_crm_mention', 'object_id',
+                      self.gf('django.db.models.fields.IntegerField')(default=123123123),
+                      keep_default=False)
+
 
     def backwards(self, orm):
+        # Adding field 'Activity_Comment.context_id'
+        db.add_column(u'alm_crm_activity_comment', 'context_id',
+                      self.gf('django.db.models.fields.related.ForeignKey')(default=12312312, related_name='context_id', to=orm['alm_user.User']),
+                      keep_default=False)
 
-        # Changing field 'SalesCycle.latest_activity'
-        db.alter_column('alma_sales_cycle', 'latest_activity_id', self.gf('django.db.models.fields.related.OneToOneField')(default=datetime.datetime(2014, 8, 26, 0, 0), unique=True, to=orm['alm_crm.Activity']))
+        # Deleting field 'Activity_Comment.object_id'
+        db.delete_column(u'alm_crm_activity_comment', 'object_id_id')
+
+        # Adding field 'Mention.context_id'
+        db.add_column(u'alm_crm_mention', 'context_id',
+                      self.gf('django.db.models.fields.IntegerField')(default=12312312),
+                      keep_default=False)
+
+        # Deleting field 'Mention.object_id'
+        db.delete_column(u'alm_crm_mention', 'object_id')
+
 
     models = {
         u'alm_company.company': {
@@ -40,10 +66,10 @@ class Migration(SchemaMigration):
             'Meta': {'object_name': 'Activity_Comment'},
             'author': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'comment_author'", 'to': u"orm['alm_user.User']"}),
             'comment': ('django.db.models.fields.CharField', [], {'max_length': '140'}),
-            'context_id': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'context_id'", 'to': u"orm['alm_user.User']"}),
             'context_type': ('django.db.models.fields.CharField', [], {'max_length': '1000'}),
             'date_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'})
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'object_id': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'object_id'", 'to': u"orm['alm_user.User']"})
         },
         u'alm_crm.contact': {
             'Meta': {'object_name': 'Contact', 'db_table': "'alma_contact'"},
@@ -58,12 +84,19 @@ class Migration(SchemaMigration):
             'phone': ('django.db.models.fields.CharField', [], {'max_length': '12', 'blank': 'True'}),
             'status': ('django.db.models.fields.IntegerField', [], {'default': '0', 'max_length': '30'})
         },
+        u'alm_crm.mention': {
+            'Meta': {'object_name': 'Mention'},
+            'context_type': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['contenttypes.ContentType']"}),
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'object_id': ('django.db.models.fields.IntegerField', [], {}),
+            'user_id': ('django.db.models.fields.IntegerField', [], {})
+        },
         u'alm_crm.salescycle': {
             'Meta': {'object_name': 'SalesCycle', 'db_table': "'alma_sales_cycle'"},
             'contact': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['alm_crm.Contact']"}),
             'date_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'followers': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'sales_cycle_followers'", 'symmetrical': 'False', 'to': u"orm['alm_user.User']"}),
-            'from_date': ('django.db.models.fields.DateTimeField', [], {}),
+            'from_date': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'latest_activity': ('django.db.models.fields.related.OneToOneField', [], {'related_name': "'latest_activity'", 'unique': 'True', 'null': 'True', 'to': u"orm['alm_crm.Activity']"}),
             'owner': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'salescycle_owner'", 'to': u"orm['alm_user.User']"}),
@@ -71,7 +104,7 @@ class Migration(SchemaMigration):
             'project_value': ('django.db.models.fields.related.OneToOneField', [], {'related_name': "'sales_cycle_project_value'", 'unique': 'True', 'to': u"orm['alm_crm.Value']"}),
             'real_value': ('django.db.models.fields.related.OneToOneField', [], {'related_name': "'sales_cycle_real_value'", 'unique': 'True', 'to': u"orm['alm_crm.Value']"}),
             'status': ('django.db.models.fields.CharField', [], {'default': "'N'", 'max_length': '2'}),
-            'to_date': ('django.db.models.fields.DateTimeField', [], {})
+            'to_date': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'})
         },
         u'alm_crm.value': {
             'Meta': {'object_name': 'Value', 'db_table': "'alma_value'"},
@@ -98,6 +131,13 @@ class Migration(SchemaMigration):
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'slug': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '30'}),
             'title': ('django.db.models.fields.CharField', [], {'max_length': '100'})
+        },
+        u'contenttypes.contenttype': {
+            'Meta': {'ordering': "('name',)", 'unique_together': "(('app_label', 'model'),)", 'object_name': 'ContentType', 'db_table': "'django_content_type'"},
+            'app_label': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'model': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
+            'name': ('django.db.models.fields.CharField', [], {'max_length': '100'})
         }
     }
 
