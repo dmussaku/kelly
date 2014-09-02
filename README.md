@@ -20,3 +20,6 @@ cd src
 ./manage.py runserver localhost:8000
 
 ```
+
+for pylibmc dependencies
+sudo apt-get install sudo apt-get install -y libmemcached-dev zlib1g-dev libssl-dev python-dev build-essential
