@@ -6,7 +6,8 @@ from almanet.views import (
     TestView2,
     ProductList,
     connect_product,
-    disconnect_product)
+    disconnect_product,
+    ProductCreateView,)
 
 urlpatterns = patterns(
     '',
@@ -21,6 +22,7 @@ urlpatterns = patterns(
     url(r'^products/disconnect/(?P<slug>\w+)/$', disconnect_product,
         name='disconnect_product'),
     url(r'^$', fork_index),
+    url(r'^products/product_create/$', ProductCreateView.as_view(), name='product_create')
     # url(r'^admin/', include(admin.site.urls)),
 )
 
