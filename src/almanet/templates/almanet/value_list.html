@@ -5,6 +5,9 @@
 <ul>
 	{% for value in value_list %}
 	    <li> 
+	    	{{ value.salary }} 
+	    	{{ value.currency }}
+	    	{{ value.amount }}   
 	    	{% if user.is_authenticated and user.get_owned_company %}
 	    		{% connect_disconnect_button user value %}
 	    	{% endif %}
