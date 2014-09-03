@@ -1,4 +1,4 @@
-from models import Contact, SalesCycle, Mention, Comment, Activity
+from models import Contact, SalesCycle, Mention, Comment, Activity, Value
 from alm_user.models import User
 from django import forms
 from django.forms import ModelForm
@@ -43,3 +43,9 @@ class CommentForm(ModelForm):
 	class Meta:
 		model=Comment
 		fields = ['comment']
+
+class ValueForm(ModelForm):
+
+	class Meta:
+		model = Value
+		field = ['salary', 'amount', 'currency']

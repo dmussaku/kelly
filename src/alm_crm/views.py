@@ -6,8 +6,8 @@ from alm_user.models import User
 from django.http import HttpResponse
 from django.shortcuts import render
 from almanet.models import Product, Subscription
-from forms import ContactForm, SalesCycleForm, MentionForm, ActivityForm, CommentForm
-from models import Contact, SalesCycle, Activity, Mention, Comment
+from forms import ContactForm, SalesCycleForm, MentionForm, ActivityForm, CommentForm, ValueForm
+from models import Contact, SalesCycle, Activity, Mention, Comment, Value
 
 
 class UserProductView(ListView):
@@ -198,3 +198,39 @@ class CommentAddMentionView(CreateView):
     def post(self, request, *args, **kwargs):
         self.model.objects.get(id=self.kwargs['pk']).add_mention(list(request.POST['user_id']))
         return super(CommentAddMentionView, self).post(request, *args, **kwargs)
+
+
+class ValueListView(ListView):
+
+    model = Value
+    queryset = Value.objects.all()
+
+
+    def get_context_data(self, **kwargs):
+        ctx = super(ValueList, self).get_context_data(**kwargs)
+        ctx['user'] = self.request.user
+        return ctx
+
+
+class ValueCreateView(CreateView):
+    form_class = ValueForm
+    template_name = "almanet/value/value_create.html"
+    success_url = reverse_lazy('value_list')
+
+
+class ValueUpdateView(UpdateView):
+    model = Value
+    form_class = ValueForm
+    template_name = "almanet/value/value_update.html"
+    success_url = reverse_lazy('value_list')
+
+
+class ValueDetailView(DetailView):
+    model = Value
+    template_name = "almanet/value/value_detail.html"
+
+
+class ValueDeleteView(DeleteView):
+    model = Value
+    template_name = "almanet/value/value_delete.html"
+    success_url = reverse_lazy('value_list')

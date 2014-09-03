@@ -7,7 +7,7 @@ from django.conf import settings
 from alm_company.models import Company
 from .models import Product
 from alm_crm.models import Value
-from .forms import ProductCreateForm, ValueCreateForm
+from .forms import ProductCreateForm
 
 # TODO: this needs to be deleted
 
@@ -68,41 +68,6 @@ class ProductDeleteView(DeleteView):
     template_name = "almanet/product/product_delete.html"
     success_url = reverse_lazy('product_list')
 
-
-class ValueList(ListView):
-
-    model = Value
-    queryset = Value.objects.all()
-
-
-    def get_context_data(self, **kwargs):
-        ctx = super(ValueList, self).get_context_data(**kwargs)
-        ctx['user'] = self.request.user
-        return ctx
-
-
-class ValueCreateView(CreateView):
-    form_class = ValueCreateForm
-    template_name = "almanet/value/value_create.html"
-    success_url = reverse_lazy('value_list')
-
-
-class ValueUpdateView(UpdateView):
-    model = Value
-    form_class = ValueCreateForm
-    template_name = "almanet/value/value_update.html"
-    success_url = reverse_lazy('value_list')
-
-
-class ValueDetailView(DetailView):
-    model = Value
-    template_name = "almanet/value/value_detail.html"
-
-
-class ValueDeleteView(DeleteView):
-    model = Value
-    template_name = "almanet/value/value_delete.html"
-    success_url = reverse_lazy('value_list')
 
 
 @login_required
