@@ -9,9 +9,13 @@
 	    	{% if user.is_authenticated and user.get_owned_company %}
 	    		{% connect_disconnect_button user product %}
 	    	{% endif %}
+	    	<a href="{% url 'product_update' pk=product.id %}">Update</a>  
+	   		<a href="{% url 'product_detail' pk=product.id %}">Detail</a>  
+            <a href="{% url 'product_delete' pk=product.id %}">Delete</a>
 	    </li>
     {% empty %}
     	<li>You have no products connected.</li>
 	{% endfor %}
 </ul>
+<a href="{% url 'product_create'%}">Create a Product</a>
 {% endblock %}
