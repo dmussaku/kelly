@@ -1,12 +1,13 @@
 from django.views.generic import ListView, DetailView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
+from django.utils import timezone
 from almanet.url_resolvers import reverse_lazy
 from alm_user.models import User
 from django.http import HttpResponse
 from django.shortcuts import render
 from almanet.models import Product, Subscription
-from forms import ContactForm, SalesCycleForm, MentionForm, ActivityForm
-from models import Contact, SalesCycle, Activity, Mention
+from forms import ContactForm, SalesCycleForm, MentionForm, ActivityForm, CommentForm
+from models import Contact, SalesCycle, Activity, Mention, Comment
 
 
 class UserProductView(ListView):
@@ -45,6 +46,17 @@ class ContactUpdateView(UpdateView):
     form_clas = ContactForm
     success_url = reverse_lazy('contact_list')
     template_name = "contact/contact_update.html"
+
+
+class ContactAddMentionView(UpdateView):
+    model = Contact
+    form_class = MentionForm #context_type, context_id
+    success_url = reverse_lazy('contact_list')
+    template_name = "contact/contact_add_mention.html"
+
+    def post(self, request, *args, **kwargs):
+        self.model.objects.get(id=self.kwargs['pk']).add_mention(list(request.POST['user_id']))
+        return super(ContactAddMentionView, self).post(request, *args, **kwargs)
 
 
 class ContactDetailView(DetailView):
@@ -126,6 +138,7 @@ class ActivityCreateView(CreateView):
     success_url = reverse_lazy('activity_list')
 
 
+
 class ActivityListView(ListView):
     model = Activity
     template_name = 'activity/activity_list.html'
@@ -155,3 +168,33 @@ class ActivityDeleteView(DeleteView):
     template_name = 'activity/activity_delete.html'
 
 
+class CommentListView(ListView):
+    model = Comment
+    template_name = 'comment/comment_list.html'
+
+
+class CommentCreateView(CreateView):
+    model = Comment
+    form_class = CommentForm
+    success_url = reverse_lazy('comment_list')
+    template_name = 'comment/comment_create.html'
+    '''
+    def get_initial(self):
+       return {'author' : self.request.user}
+    '''
+
+    def form_valid(self, form):
+        form.instance.author = self.request.user
+        form.instance.date_edited = timezone.now()
+        return super(CommentCreateView, self).form_valid(form)
+        
+
+class CommentAddMentionView(CreateView):
+    model = Comment
+    form_class = MentionForm #context_type, context_id
+    success_url = reverse_lazy('comment_list')
+    template_name = "comment/comment_add_mention.html"
+
+    def post(self, request, *args, **kwargs):
+        self.model.objects.get(id=self.kwargs['pk']).add_mention(list(request.POST['user_id']))
+        return super(CommentAddMentionView, self).post(request, *args, **kwargs)

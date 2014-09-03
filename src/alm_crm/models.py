@@ -267,7 +267,7 @@ class Comment(models.Model):
     author = models.ForeignKey(User, related_name='comment_author')
     date_created = models.DateTimeField(blank=True, auto_now_add=True)
     date_edited = models.DateTimeField(blank=True)
-    object_id = models.ForeignKey(User, related_name='object_id')
+    object_id = models.IntegerField(null=True, blank=False)
     content_type = models.CharField(max_length=1000, blank=True)
     content_object = generic.GenericForeignKey('content_type', 'object_id')
     mentions = generic.GenericRelation('Mention')
@@ -278,7 +278,7 @@ class Comment(models.Model):
     def save(self, **kwargs):
         if self.date_created:
             self.date_edited = timezone.now()
-            self.save()
+        super(Comment,self).save(**kwargs)
 
     def add_mention(self, user_ids=None):
         assert not user_ids is None and isinstance(user_ids, (list, set, tuple))

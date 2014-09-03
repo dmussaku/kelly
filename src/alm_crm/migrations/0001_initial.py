@@ -94,7 +94,7 @@ class Migration(SchemaMigration):
             ('author', self.gf('django.db.models.fields.related.ForeignKey')(related_name='comment_author', to=orm['alm_user.User'])),
             ('date_created', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
             ('date_edited', self.gf('django.db.models.fields.DateTimeField')(blank=True)),
-            ('object_id', self.gf('django.db.models.fields.related.ForeignKey')(related_name='object_id', to=orm['alm_user.User'])),
+            ('object_id', self.gf('django.db.models.fields.IntegerField')(null=True)),
             ('content_type', self.gf('django.db.models.fields.CharField')(max_length=1000, blank=True)),
         ))
         db.send_create_signal(u'alm_crm', ['Comment'])
@@ -153,7 +153,7 @@ class Migration(SchemaMigration):
             'date_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'date_edited': ('django.db.models.fields.DateTimeField', [], {'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'object_id': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'object_id'", 'to': u"orm['alm_user.User']"})
+            'object_id': ('django.db.models.fields.IntegerField', [], {'null': 'True'})
         },
         u'alm_crm.contact': {
             'Meta': {'object_name': 'Contact', 'db_table': "'alma_contact'"},

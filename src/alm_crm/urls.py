@@ -6,6 +6,7 @@ from views import (
     ContactUpdateView,
     ContactDetailView,
     ContactDeleteView,
+    ContactAddMentionView,
     SalesCycleListView,
     SalesCycleCreateView,
     SalesCycleUpdateView,
@@ -17,10 +18,13 @@ from views import (
     ActivityDetailView,
     ActivityUpdateView,
     ActivityDeleteView,
-    
+    CommentCreateView,
+    CommentListView,
+    CommentAddMentionView,
+
     contact_export
     )
-from models import Contact, SalesCycle, Activity
+from models import Contact, SalesCycle, Activity, Comment
 
 urlpatterns = patterns(
     '',
@@ -53,6 +57,7 @@ urlpatterns = patterns(
     url(r'^vcard/(?P<pk>\d+)/$', contact_export, name='contact_export'),
     url(r'^vcard/(?P<pk>\d+)/(?P<format>(vcf|web)?)/$', contact_export, name='contact_export'), 
     url(r'^contacts/(?P<pk>\d+)/$', ContactDetailView.as_view(), name='contact_detail'), 
+    url(r'^contacts/add_mention/(?P<pk>\d+)/$', ContactAddMentionView.as_view(), name='contact_add_mention'),
     url(r'^contacts/delete/(?P<pk>\d+)/$', ContactDeleteView.as_view(), name='contact_delete'), 
 
     url(r'^sales_cycles/$', SalesCycleListView.as_view(
@@ -78,6 +83,15 @@ urlpatterns = patterns(
     url(r'^activities/(?P<pk>\d+)/$', ActivityDetailView.as_view(), name='activity_detail'),
     url(r'^activities/update/(?P<pk>\d+)/$', ActivityUpdateView.as_view(), name='activity_update'),
     url(r'^activities/delete/(?P<pk>\d+)/$', ActivityDeleteView.as_view(), name='activity_delete'),
+
+    url(r'^comments/$', CommentListView.as_view(
+            queryset = Comment.objects.all(),
+            context_object_name="comments",
+            template_name = "comment/comment_list.html",
+        ), name='comment_list'
+    ),
+    url(r'^comments/create/$', CommentCreateView.as_view(), name='comment_create'),
+    url(r'^comments/add_mention/(?P<pk>\d+)/$', CommentAddMentionView.as_view(), name='comment_add_mention'),
 
 
 )
