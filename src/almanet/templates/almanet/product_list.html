@@ -6,12 +6,17 @@
 	{% for product in object_list %}
 	    <li>
 	    	{{ product.title }} 
-	    	{% if user.is_authenticated and user.get_owned_company %}
-	    		{% connect_disconnect_button user product %}
-	    	{% endif %}
+	    	{% comment %}
+		    	{% if user.is_authenticated and user.get_owned_company %}
+		    		{% connect_disconnect_button user product %}
+		    	{% endif %}
+	    	{% endcomment %}
 	    </li>
     {% empty %}
     	<li>You have no products connected.</li>
 	{% endfor %}
 </ul>
+	{% comment %}
+	<a href="{% subdomain_url 'product_create' %}">Create a product</a>
+	{% endcomment %}
 {% endblock %}

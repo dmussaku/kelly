@@ -5,7 +5,7 @@ from alm_user.models import User
 from django.http import HttpResponse
 from django.shortcuts import render
 from almanet.models import Product, Subscription
-from forms import ContactForm, SalesCycleForm, MentionForm
+from forms import ContactForm, SalesCycleForm, MentionForm, ActivityForm
 from models import Contact, SalesCycle, Activity, Mention
 
 
@@ -121,6 +121,7 @@ class SalesCycleDeleteView(DeleteView):
 
 class ActivityCreateView(CreateView):
     model = Activity 
+    form_class = ActivityForm
     template_name = 'activity/activity_create.html'
     success_url = reverse_lazy('activity_list')
 

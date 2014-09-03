@@ -1,7 +1,13 @@
-from models import Contact, SalesCycle, Mention
+from models import Contact, SalesCycle, Mention, Comment, Activity
 from alm_user.models import User
 from django import forms
 from django.forms import ModelForm
+
+class ActivityForm(ModelForm):
+
+	class Meta:
+		model = Activity
+		exclude = ['feedback']
 
 
 class ContactForm(ModelForm):
@@ -14,7 +20,7 @@ class SalesCycleForm(ModelForm):
 	
 	class Meta:
 		model = SalesCycle
-		exclude = ['status','date_created', 'from_date', 'to_date', 'latest_activity']
+		exclude = ['status','date_created', 'latest_activity']
 
 def get_user_choices():
 	index_list=[]
@@ -31,3 +37,9 @@ class MentionForm(ModelForm):
 	class Meta:
 		model=Mention
 		exclude = ['content_type', 'content_id', 'object_id']
+
+class CommentForm(ModelForm):
+
+	class Meta:
+		model=Comment
+		fields = ['comment']

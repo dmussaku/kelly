@@ -268,7 +268,7 @@ class Comment(models.Model):
     date_created = models.DateTimeField(blank=True, auto_now_add=True)
     date_edited = models.DateTimeField(blank=True)
     object_id = models.ForeignKey(User, related_name='object_id')
-    content_type = models.CharField(max_length=1000)
+    content_type = models.CharField(max_length=1000, blank=True)
     content_object = generic.GenericForeignKey('content_type', 'object_id')
     mentions = generic.GenericRelation('Mention')
 
