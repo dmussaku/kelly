@@ -2,14 +2,17 @@
 {% load i18n %}
 {% block head_title %} {{ _("User List Page") }} {% endblock %}
 {% block content %}
-<h1> Contact List </h1>
-	<a href="{% url 'contact_create' %}"> Create a Contact </a>
-	<ul>{% for c in contacts %}
-	    <li> {{ c.first_name }} {{ c.last_name }} {{ c.company_name }} 
+<h1> Comment List </h1>
+	<a href="{% url 'comment_create' %}"> Create a Comment </a>
+	<ul>{% for c in comments %}
+	    <li> {{ c.comment }} {{ c.author }} {{ c.date_created }} 
+        <a href="{% url 'comment_add_mention' pk=c.id %}">Mention</a>
+        {% comment %}
 	   		 <a href="{% url 'contact_update' pk=c.id %}">Update</a>  
 	   		 <a href="{% url 'contact_detail' pk=c.id %}">Detail</a>  
              <a href="{% url 'contact_delete' pk=c.id %}">Delete</a>
              <a href="{% url 'contact_add_mention' pk=c.id %}">Mention</a>
+        {% endcomment %}
 	    </li>
 	{% endfor %}</ul>
 	<div class="pagination">

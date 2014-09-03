@@ -48,3 +48,7 @@ create default user and company
 (email: b.wayne@batman.bat, password:123, company subdomain: bwayne):
 ./manage.py createdefaultuser
 ```
+
+issues:
+Change DB diagram:
+	1) Remove deal_type in SalesCycle
