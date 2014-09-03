@@ -1,0 +1,9 @@
+{% extends "user/base.html" %}
+{% load i18n %}
+{% block head_title %} {{ _("Product List Page") }} {% endblock %}
+{% block content %}
+<h1> {{ product.title }} </h1>
+	<p>Description - {{product.description}}</p>
+	<a href="{% url 'product_update' pk=product.id %}">Update</a>  
+	<a href="{% url 'product_delete' pk=product.id %}">Delete</a>
+{% endblock %}
