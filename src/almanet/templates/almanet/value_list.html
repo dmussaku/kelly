@@ -1,0 +1,20 @@
+{% extends "almanet/base.html" %}
+{% load i18n almanet_tags %}
+{% block head_title %} {{ _("Value List Page") }} {% endblock %}
+{% block content %}
+<ul>
+	{% for value in value_list %}
+	    <li> 
+	    	{% if user.is_authenticated and user.get_owned_company %}
+	    		{% connect_disconnect_button user value %}
+	    	{% endif %}
+	    	<a href="{% url 'value_update' pk=value.id %}">Update</a>  
+	   		<a href="{% url 'value_detail' pk=value.id %}">Detail</a>  
+            <a href="{% url 'value_delete' pk=value.id %}">Delete</a>
+	    </li>
+    {% empty %}
+    	<li>You have no values connected.</li>
+	{% endfor %}
+</ul>
+<a href="{% url 'value_create'%}">Create a Value</a>
+{% endblock %}
