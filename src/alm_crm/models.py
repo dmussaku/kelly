@@ -5,8 +5,6 @@ from almanet import settings
 from alm_company.models import Company
 from alm_user.models import User
 from almanet.models import Product
-from django.db.models import signals
-from django.dispatch import receiver
 import vobject
 from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
@@ -30,8 +28,12 @@ class Contact(models.Model):
     email = models.EmailField(unique=True, blank=False)
     date_created = models.DateTimeField(blank=True, auto_now_add=True)
     job_address = AddressField(_('job address'), max_length=200, blank=True)
-    status = models.IntegerField(_('contact status'), max_length=30, choices=enumerate(STATUSES), default=NEW)
-    latest_activity = models.OneToOneField('Activity', related_name ='contact_latest_activity', null=True)
+    status = models.IntegerField(_('contact status'), max_length=30,
+                                 choices=enumerate(STATUSES), default=NEW)
+    latest_activity = models.OneToOneField('Activity',
+                                           related_name='contact_latest_activity',
+                                           blank=True, null=True,
+                                           on_delete=models.SET_NULL)
     mentions = generic.GenericRelation('Mention')
 
     class Meta:
@@ -44,12 +46,12 @@ class Contact(models.Model):
     def to_vcard(self):
 
         VCARD_MAPPING = {
-            'fn':       { 'type': None, 'value': "%s %s" % (self.first_name, self.last_name) }, 
+            'fn':       { 'type': None, 'value': "%s %s" % (self.first_name, self.last_name) },
             'n' :       { 'type': None, 'value': vobject.vcard.Name(
                                                         family=self.last_name,
-                                                        given=self.first_name, 
-                                                        additional='', 
-                                                        prefix='', 
+                                                        given=self.first_name,
+                                                        additional='',
+                                                        prefix='',
                                                         suffix='' )
                         },
             'tel':      [{ 'type': 'CELL', 'value': self.phone }, { 'type': 'HOME', 'value': '+77272348956' }],
@@ -58,18 +60,18 @@ class Contact(models.Model):
             'adr':      [{ 'type': 'WORK', 'value': vobject.vcard.Address(
                                                         box=self.job_address.box,
                                                         extended=self.job_address.extended,
-                                                        code=self.job_address.code, 
-                                                        country=self.job_address.country, 
-                                                        city=self.job_address.city, 
-                                                        street=self.job_address.street, 
+                                                        code=self.job_address.code,
+                                                        country=self.job_address.country,
+                                                        city=self.job_address.city,
+                                                        street=self.job_address.street,
                                                         region=self.job_address.region)
                         }, { 'type': 'HOME', 'value': vobject.vcard.Address(
                                                         box='12',
                                                         extended='222',
-                                                        code='6000', 
-                                                        country='Kazakhstan', 
-                                                        city='Almaty', 
-                                                        street='Dostyk', 
+                                                        code='6000',
+                                                        country='Kazakhstan',
+                                                        city='Almaty',
+                                                        street='Dostyk',
                                                         region='Almalinskii')
                         }],
             'bday':     { 'type': None, 'value': "%s-%s-%s" % ('2012', '03', '30') },
@@ -90,7 +92,7 @@ class Contact(models.Model):
                     add_attribute(vcard, attribute, item)
             else:
                 add_attribute(vcard, attribute, desc)
-            
+
         return vcard
 
     def is_new(self):
@@ -105,23 +107,17 @@ class Contact(models.Model):
     def is_client(self):
         return self.status == CLIENT
 
-    
-
     def get_latest_activity(self):
-        return self.sales_cycles.aggregate(Max('contact_latest_activity'))
+        sales_cycle = self.sales_cycle_contact\
+            .annotate(models.Max('latest_activity__when'))\
+            .order_by('-latest_activity__when__max')\
+            .first()
+        return sales_cycle.latest_activity if not sales_cycle is None else None
 
     def add_mention(self, user_ids=None):
         assert not user_ids is None and isinstance(user_ids, (list, set, tuple))
         self.mentions = [Mention.build_new(user_id, content_class=self.__class__, object_id=self.pk, save=True) for user_id in user_ids]
         self.save()
-
-
-    @receiver(signals.post_save, sender='Activity')
-    def set_latest_activity(sender, instance, created, **kwargs):
-        if created:
-            contact = instance.sales_cycle.contact
-            contact.latest_activity = instance
-            contact.save()
 
 
 class Value(models.Model):
@@ -136,9 +132,11 @@ class Value(models.Model):
         ('RUB', 'Rubbles'),
         ('KZT', 'Tenge'),
         )
-    salary = models.CharField(max_length=7, choices=SALARY_OPTIONS, default='instant')
+    salary = models.CharField(max_length=7, choices=SALARY_OPTIONS,
+                              default='instant')
     amount = models.IntegerField()
-    currency = models.CharField(max_length=3, choices=CURRENCY_OPTIONS, default='KZT')
+    currency = models.CharField(max_length=3, choices=CURRENCY_OPTIONS,
+                                default='KZT')
 
     class Meta:
         verbose_name = 'value'
@@ -154,15 +152,23 @@ class SalesCycle(models.Model):
         ('C', 'Completed'),
         ('N', 'New'),
         )
-    products = models.ManyToManyField(Product, related_name='sales_cycle_product') 
+    products = models.ManyToManyField(Product,
+                                      related_name='sales_cycle_product')
     owner = models.ForeignKey(User, related_name='salescycle_owner')
-    followers = models.ManyToManyField(User, related_name='sales_cycle_followers')
-    contact = models.ForeignKey(Contact) 
-    latest_activity = models.OneToOneField('Activity', related_name='latest_activity', null=True)
-    project_value = models.OneToOneField(Value, related_name='sales_cycle_project_value')
-    real_value = models.OneToOneField(Value, related_name = 'sales_cycle_real_value')
+    followers = models.ManyToManyField(User,
+                                       related_name='sales_cycle_followers')
+    contact = models.ForeignKey(Contact, related_name='sales_cycle_contact')
+    latest_activity = models.OneToOneField('Activity',
+                                           related_name='latest_activity',
+                                           blank=True, null=True,
+                                           on_delete=models.SET_NULL)
+    project_value = models.OneToOneField(Value,
+                                         related_name='sales_cycle_project_value')
+    real_value = models.OneToOneField(Value,
+                                      related_name='sales_cycle_real_value')
     #name = models.CharField(max_length=30, blank=False)
-    status = models.CharField(max_length=2, choices=STATUS_OPTIONS, default='N')
+    status = models.CharField(max_length=2,
+                              choices=STATUS_OPTIONS, default='N')
     date_created = models.DateTimeField(blank=True, auto_now_add=True)
     from_date = models.DateTimeField(blank=False, auto_now_add=True)
     to_date = models.DateTimeField(blank=False, auto_now_add=True)
@@ -173,11 +179,14 @@ class SalesCycle(models.Model):
         db_table = settings.DB_PREFIX.format('sales_cycle')
 
     def get_latest_activity(self):
-        return self.activities.aggregate(Max('when'))
+        return self.activity_sales_cycle\
+            .annotate(when_max=models.Max('when'))\
+            .order_by('-when_max')\
+            .first()
 
     def __unicode__(self):
-        return '%s %s' % (self.contact, self.status )
-    
+        return '%s %s' % (self.contact, self.status)
+
     # Adds mentions to a current class, takes a lsit of user_ids as an input
     # and then runs through the list and calls the function build_new which
     # is declared in Mention class
@@ -186,23 +195,16 @@ class SalesCycle(models.Model):
         self.mentions = [Mention.build_new(user_id, content_class=self.__class__, object_id=self.pk, save=True) for user_id in user_ids]
         self.save()
 
-    # @receiver(signals.post_save, sender='Activity')
-    # def set_latest_activity(sender, instance, created, **kwargs):
-    #     if created:
-    #         instance.sales_cycle.latest_activity = instance
-
-    # @receiver(signals.post_delete, sender='Activity')
-    # def update_latest_activity(sender, instance, **kwargs):
-    #     if instance.sales_cycle.latest_activity == instance:
-    #         pass
 
 class Address(object):
     '''
         Class for representing complex address model,
-        do not have its own db table, stored as serialized string in Contact model's AddressField
+        do not have its own db table, stored as serialized string
+        in Contact model's AddressField
     '''
 
-    def __init__(self, box = None, extended = None, code = None, street = None, city = None, region = None, country = None):
+    def __init__(self, box=None, extended=None, code=None, street=None,
+                 city=None, region=None, country=None):
         self.box = box
         self.extended = extended
         self.code = code
@@ -215,25 +217,27 @@ class Address(object):
         verbose_name = 'address'
         db_table = settings.DB_PREFIX.format('address')
 
-    def __unicode__():
+    def __unicode__(self):
         return self.country
+
 
 class Activity(models.Model):
     STATUS_OPTIONS = (
-            ('W', 'waiting'),
-            ('$', '1000'),
-            ('1', 'Client is happy'),
-            ('2', 'Client is OK'),
-            ('3', 'Client is neutral'),
-            ('4', 'Client is disappointed'),
-            ('5', 'Client is angry')
-        )
+        ('W', 'waiting'),
+        ('$', '1000'),
+        ('1', 'Client is happy'),
+        ('2', 'Client is OK'),
+        ('3', 'Client is neutral'),
+        ('4', 'Client is disappointed'),
+        ('5', 'Client is angry')
+    )
     title = models.CharField(max_length=100)
     description = models.CharField(max_length=500)
     when = models.DateTimeField(blank=True, auto_now_add=True)
     status = models.CharField(max_length=1, choices=STATUS_OPTIONS, default='')
     feedback = models.CharField(max_length=300)
-    sales_cycle = models.ForeignKey(SalesCycle, related_name='activity_sales_cycle')
+    sales_cycle = models.ForeignKey(SalesCycle,
+                                    related_name='activity_sales_cycle')
     author = models.ForeignKey(User, related_name='activity_author')
 
     class Meta:
@@ -246,7 +250,7 @@ class Activity(models.Model):
 
 class Mention(models.Model):
     user_id = models.IntegerField()
-    content_type = models.ForeignKey(ContentType)  
+    content_type = models.ForeignKey(ContentType)
     object_id = models.IntegerField()
     content_object = generic.GenericForeignKey('content_type', 'object_id')
 
