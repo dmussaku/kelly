@@ -207,30 +207,30 @@ class ValueListView(ListView):
 
 
     def get_context_data(self, **kwargs):
-        ctx = super(ValueList, self).get_context_data(**kwargs)
+        ctx = super(ValueListView, self).get_context_data(**kwargs)
         ctx['user'] = self.request.user
         return ctx
 
 
 class ValueCreateView(CreateView):
     form_class = ValueForm
-    template_name = "almanet/value/value_create.html"
+    template_name = "value/value_create.html"
     success_url = reverse_lazy('value_list')
 
 
 class ValueUpdateView(UpdateView):
     model = Value
     form_class = ValueForm
-    template_name = "almanet/value/value_update.html"
+    template_name = "value/value_update.html"
     success_url = reverse_lazy('value_list')
 
 
 class ValueDetailView(DetailView):
     model = Value
-    template_name = "almanet/value/value_detail.html"
+    template_name = "value/value_detail.html"
 
 
 class ValueDeleteView(DeleteView):
     model = Value
-    template_name = "almanet/value/value_delete.html"
+    template_name = "value/value_delete.html"
     success_url = reverse_lazy('value_list')

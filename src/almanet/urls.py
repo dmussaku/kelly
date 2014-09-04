@@ -19,7 +19,7 @@ urlpatterns = patterns(
     # TODO: temp, needs to be deleted
     url(r'^crm/', include('alm_crm.urls')),
     url(r'^products/$', ProductList.as_view(
-        template_name='almanet/product_list.html'),
+        template_name='almanet/product/product_list.html'),
         name='product_list'),
     
     url(r'^products/connect/(?P<slug>[-a-zA-Z0-9_]+)/$', connect_product,

@@ -99,7 +99,7 @@ urlpatterns = patterns(
     url(r'^comments/add_mention/(?P<pk>\d+)/$', CommentAddMentionView.as_view(), name='comment_add_mention'),
 
     url(r'^values/$', ValueListView.as_view(
-        template_name='almanet/value_list.html'),
+        template_name='value/value_list.html'),
         name='value_list'),
     url(r'^values/value_create/$', ValueCreateView.as_view(), name='value_create'),
     url(r'^values/value_update/(?P<pk>\d+)/$', ValueUpdateView.as_view(), name='value_update'),
