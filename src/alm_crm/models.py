@@ -1,19 +1,22 @@
+import functools
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from almanet import settings
-from alm_company.models import Company
 from alm_user.models import User
 from almanet.models import Product
 import vobject
 from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
-
-from almanet import settings
+from django.db.models import signals
+from django.dispatch import receiver
 
 from .fields import AddressField
 
-STATUSES = (_('new_contact'), _('lead_contact'), _('opportunity_contact'), _('client_contact') )
+STATUSES = (_('new_contact'),
+            _('lead_contact'),
+            _('opportunity_contact'),
+            _('client_contact') )
 STATUS_NAMES = (NEW, LEAD, OPPORTUNITY, CLIENT) = range(len(STATUSES))
 
 
@@ -107,17 +110,30 @@ class Contact(models.Model):
     def is_client(self):
         return self.status == CLIENT
 
-    def get_latest_activity(self):
-        sales_cycle = self.sales_cycle_contact\
-            .annotate(models.Max('latest_activity__when'))\
-            .order_by('-latest_activity__when__max')\
-            .first()
-        return sales_cycle.latest_activity if not sales_cycle is None else None
+    def find_latest_activity(self):
+        """Find latest activity among all sales_cycle_contacts."""
+        sales_cycle = self.sales_cycles.order_by(
+            'latest_activity__when').first()
+        return sales_cycle and sales_cycle.latest_activity or None
 
     def add_mention(self, user_ids=None):
-        assert not user_ids is None and isinstance(user_ids, (list, set, tuple))
-        self.mentions = [Mention.build_new(user_id, content_class=self.__class__, object_id=self.pk, save=True) for user_id in user_ids]
+        if isinstance(user_ids, int):
+            user_ids = [user_ids]
+        build_single_mention = functools.partial(Mention.build_new,
+                                                 content_class=self.__class__,
+                                                 object_id=self.pk,
+                                                 save=True)
+        self.mentions = map(build_single_mention, user_ids)
         self.save()
+
+    @classmethod
+    def upd_lst_activity_on_create(cls, sender, created=False,
+                                   instance=None, **kwargs):
+        if not created:
+            return
+        c = instance.sales_cycle.contact
+        c.latest_activity = instance
+        c.save()
 
 
 class Value(models.Model):
@@ -155,18 +171,19 @@ class SalesCycle(models.Model):
     products = models.ManyToManyField(Product,
                                       related_name='sales_cycle_product')
     owner = models.ForeignKey(User, related_name='salescycle_owner')
-    followers = models.ManyToManyField(User,
-                                       related_name='sales_cycle_followers')
-    contact = models.ForeignKey(Contact, related_name='sales_cycle_contact')
+    followers = models.ManyToManyField(
+        User, related_name='sales_cycle_followers',
+        null=True, blank=True)
+    contact = models.ForeignKey(Contact, related_name='sales_cycles')
     latest_activity = models.OneToOneField('Activity',
                                            related_name='latest_activity',
                                            blank=True, null=True,
                                            on_delete=models.SET_NULL)
-    project_value = models.OneToOneField(Value,
-                                         related_name='sales_cycle_project_value')
-    real_value = models.OneToOneField(Value,
-                                      related_name='sales_cycle_real_value')
-    #name = models.CharField(max_length=30, blank=False)
+    projected_value = models.OneToOneField(
+        Value, related_name='sales_cycle_projected_value', null=True)
+    real_value = models.OneToOneField(
+        Value, related_name='sales_cycle_real_value',
+        null=True, blank=True,)
     status = models.CharField(max_length=2,
                               choices=STATUS_OPTIONS, default='N')
     date_created = models.DateTimeField(blank=True, auto_now_add=True)
@@ -178,11 +195,8 @@ class SalesCycle(models.Model):
         verbose_name = 'sales_cycle'
         db_table = settings.DB_PREFIX.format('sales_cycle')
 
-    def get_latest_activity(self):
-        return self.activity_sales_cycle\
-            .annotate(when_max=models.Max('when'))\
-            .order_by('-when_max')\
-            .first()
+    def find_latest_activity(self):
+        return self.activity_sales_cycles.order_by('-when').first()
 
     def __unicode__(self):
         return '%s %s' % (self.contact, self.status)
@@ -191,9 +205,23 @@ class SalesCycle(models.Model):
     # and then runs through the list and calls the function build_new which
     # is declared in Mention class
     def add_mention(self, user_ids=None):
-        assert not user_ids is None and isinstance(user_ids, (list, set, tuple))
-        self.mentions = [Mention.build_new(user_id, content_class=self.__class__, object_id=self.pk, save=True) for user_id in user_ids]
+        if isinstance(user_ids, int):
+            user_ids = [user_ids]
+        build_single_mention = functools.partial(Mention.build_new,
+                                                 content_class=self.__class__,
+                                                 object_id=self.pk,
+                                                 save=True)
+        self.mentions = map(build_single_mention, user_ids)
         self.save()
+
+    @classmethod
+    def upd_lst_activity_on_create(cls, sender,
+                                   created=False, instance=None, **kwargs):
+        if not created:
+            return
+        sales_cycle = instance.sales_cycle
+        sales_cycle.latest_activity = sales_cycle.find_latest_activity()
+        sales_cycle.save()
 
 
 class Address(object):
@@ -237,7 +265,7 @@ class Activity(models.Model):
     status = models.CharField(max_length=1, choices=STATUS_OPTIONS, default='')
     feedback = models.CharField(max_length=300)
     sales_cycle = models.ForeignKey(SalesCycle,
-                                    related_name='activity_sales_cycle')
+                                    related_name='activity_sales_cycles')
     author = models.ForeignKey(User, related_name='activity_author')
 
     class Meta:
@@ -266,6 +294,7 @@ class Mention(models.Model):
             mention.save()
         return mention
 
+
 class Comment(models.Model):
     comment = models.CharField(max_length=140)
     author = models.ForeignKey(User, related_name='comment_author')
@@ -282,18 +311,41 @@ class Comment(models.Model):
     def save(self, **kwargs):
         if self.date_created:
             self.date_edited = timezone.now()
-        super(Comment,self).save(**kwargs)
+        super(Comment, self).save(**kwargs)
 
     def add_mention(self, user_ids=None):
-        assert not user_ids is None and isinstance(user_ids, (list, set, tuple))
-        self.mentions = [Mention.build_new(user_id, content_class=self.__class__, object_id=self.pk, save=True) for user_id in user_ids]
+        if isinstance(user_ids, int):
+            user_ids = [user_ids]
+        build_single_mention = functools.partial(Mention.build_new,
+                                                 content_class=self.__class__,
+                                                 object_id=self.pk,
+                                                 save=True)
+        self.mentions = map(build_single_mention, user_ids)
         self.save()
 
     @classmethod
-    def build_new(cls, user_id, content_class=None, object_id=None, save=False):
+    def build_new(cls, user_id, content_class=None,
+                  object_id=None, save=False):
         comment = cls(user_id=user_id)
         comment.content_type = ContentType.objects.get_for_model(content_class)
         comment.object_id = object_id
         if save:
             comment.save()
         return comment
+
+signals.post_save.connect(
+    Contact.upd_lst_activity_on_create, sender=Activity)
+signals.post_save.connect(
+    SalesCycle.upd_lst_activity_on_create, sender=Activity)
+
+
+def on_activity_delete(sender, instance=None, **kwargs):
+    sales_cycle = instance.sales_cycle
+    sales_cycle.latest_activity = sales_cycle.find_latest_activity()
+    sales_cycle.save()
+
+    contact = sales_cycle.contact
+    contact.latest_activity = contact.find_latest_activity()
+    contact.save()
+
+signals.post_delete.connect(on_activity_delete, sender=Activity)

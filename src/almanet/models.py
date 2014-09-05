@@ -3,6 +3,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from django.utils.text import slugify
 
+
 class Product(models.Model):
 
     title = models.CharField(_('product title'), max_length=100, blank=False)
