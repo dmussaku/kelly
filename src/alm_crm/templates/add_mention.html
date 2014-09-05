@@ -1,0 +1,5 @@
+<form action="{% url 'sales_cycle_detail' pk=g.id %}" method="post"> {% csrf_token %}
+    {{form.as_p}}
+    <input name='context_type' value='{{ type }}'/>
+    <input type="submit" value="add mention"/>
+</form>

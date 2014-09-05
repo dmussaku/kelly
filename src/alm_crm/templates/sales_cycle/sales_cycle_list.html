@@ -2,13 +2,15 @@
 {% load i18n %}
 {% block head_title %} {{ _("User List Page") }} {% endblock %}
 {% block content %}
-<h1> Goal List </h1>
-	<a href="{% url 'goal_create' %}"> Create a Goal </a>
-	<ul>{% for g in goals %}
-	    <li> {{ g.name }}
-	   		 <a href="{% url 'goal_update' pk=g.id %}">Update</a>  
-	   		 <a href="{% url 'goal_detail' pk=g.id %}">Detail</a>  
-             <a href="{% url 'goal_delete' pk=g.id %}">Delete</a>  
+<h1> Sales Cycle List </h1>
+	<a href="{% url 'sales_cycle_create' %}"> Create a Sales Cycle </a>
+	<ul>{% for g in sales_cycles %}
+	    <li> {{ g.contact }}
+	   		 <a href="{% url 'sales_cycle_update' pk=g.id %}">Update</a>  
+	   		 <a href="{% url 'sales_cycle_detail' pk=g.id %}">Detail</a>  
+             <a href="{% url 'sales_cycle_delete' pk=g.id %}">Delete</a> 
+             <a href="{% url 'sales_cycle_add_mention' pk=g.id %}">Mention</a> 
+
 	    </li>
 	{% endfor %}</ul>
 	<div class="pagination">

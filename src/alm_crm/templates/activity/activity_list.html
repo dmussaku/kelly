@@ -1,0 +1,14 @@
+{% extends "user/base.html" %}
+{% load i18n %}
+{% block head_title %} {{ _("Activities List Page") }} {% endblock %}
+{% block content %}
+
+	<h1> Activities List </h1>
+	<a href="{% url 'activity_create' %}"> Create a Activity </a>
+	<ul>{% for a in activities %}
+	    <li> {{ a.title }} - {{ a.status }}
+	    	<a href='{% url "activity_detail" pk=a.id %}'> Show </a>
+	    </li>
+	{% endfor %}</ul>
+
+{% endblock %}
