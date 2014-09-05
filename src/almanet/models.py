@@ -1,7 +1,7 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
-
+from django.utils.text import slugify
 
 class Product(models.Model):
 
@@ -16,6 +16,11 @@ class Product(models.Model):
 
     def __unicode__(self):
         return self.title
+
+    def save(self, **kwargs):
+        if not self.slug and self.title:
+            self.slug = slugify(self.title)
+        super(Product, self).save(**kwargs)
 
 
 class Subscription(models.Model):

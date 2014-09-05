@@ -1,0 +1,10 @@
+{% extends "user/base.html" %}
+{% load i18n %}
+{% block head_title %} {{ _("Value List Page") }} {% endblock %}
+{% block content %}
+	<p>Salary - {{value.salary}}</p>
+	<p>Currency - {{value.currency}}</p>
+	<p>Amount - {{value.amount}}</p>
+	<a href="{% url 'value_update' pk=value.id %}">Update</a>  
+	<a href="{% url 'value_delete' pk=value.id %}">Delete</a>
+{% endblock %}

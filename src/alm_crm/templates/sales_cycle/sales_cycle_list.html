@@ -2,14 +2,15 @@
 {% load i18n %}
 {% block head_title %} {{ _("User List Page") }} {% endblock %}
 {% block content %}
-<h1> Contact List </h1>
-	<a href="{% url 'contact_create' %}"> Create a Contact </a>
-	<ul>{% for c in contacts %}
-	    <li> {{ c.name }}
-	   		 <a href="{% url 'contact_update' pk=c.id %}">Update</a>
-	   		 <a href="{% url 'contact_detail' pk=c.id %}">Detail</a>
-             <a href="{% url 'contact_delete' pk=c.id %}">Delete</a>
-             <a href="{% url 'contact_add_mention' pk=c.id %}">Mention</a>
+<h1> Sales Cycle List </h1>
+	<a href="{% url 'sales_cycle_create' %}"> Create a Sales Cycle </a>
+	<ul>{% for g in sales_cycles %}
+	    <li> {{ g.contact }}
+	   		 <a href="{% url 'sales_cycle_update' pk=g.id %}">Update</a>  
+	   		 <a href="{% url 'sales_cycle_detail' pk=g.id %}">Detail</a>  
+             <a href="{% url 'sales_cycle_delete' pk=g.id %}">Delete</a> 
+             <a href="{% url 'sales_cycle_add_mention' pk=g.id %}">Mention</a> 
+
 	    </li>
 	{% endfor %}</ul>
 	<div class="pagination">
