@@ -281,3 +281,22 @@ class Comment(models.Model):
         if save:
             comment.save()
         return comment
+
+
+class CRMUser(models.Model):
+
+    user_id = models.IntegerField()
+    is_supervisor = models.BooleanField()
+
+    def get_billing_user(self):
+        from user.models import User
+        user = User.objects.get(pk=self.user_id)
+        return user
+
+
+
+# def invite_crm_user(email=None, first_name=None, last_name=None):
+#     invite_billing_user(email=None, first_name=None, last_name=None)
+#          1. User(is_active=True, password=..., vcard=) create user
+#          2. CRMUser(user_id=user_id, is_supervisor=False)
+#          3. email
