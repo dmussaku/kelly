@@ -19,12 +19,14 @@ virtualenv --no-site-packages alma.net
 cd alma.net
 . ./bin/activate
 mkdir alma.net
+cd alma.net
 git init .
 git remote add origin git@github.com:Mafioso/alma.net.git
 git pull origin develop
 pip install -r requirements.txt
 cd src
 ./manage.py syncdb
+./manage.py migrate
 ./manage.py runserver localhost:8000
 
 ```

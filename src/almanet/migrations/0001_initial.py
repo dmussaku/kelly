@@ -9,19 +9,20 @@ class Migration(SchemaMigration):
 
     def forwards(self, orm):
         # Adding model 'Product'
-        db.create_table(u'almanet_product', (
+        db.create_table('alma_product', (
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('title', self.gf('django.db.models.fields.CharField')(max_length=100)),
             ('description', self.gf('django.db.models.fields.TextField')()),
-            ('slug', self.gf('django.db.models.fields.CharField')(max_length=30)),
+            ('slug', self.gf('django.db.models.fields.CharField')(unique=True, max_length=30)),
         ))
         db.send_create_signal(u'almanet', ['Product'])
 
         # Adding model 'Subscription'
         db.create_table('alma_subscription', (
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('product', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['almanet.Product'], unique=True)),
+            ('product', self.gf('django.db.models.fields.related.ForeignKey')(related_name='subscriptions', to=orm['almanet.Product'])),
             ('user', self.gf('django.db.models.fields.related.ForeignKey')(related_name='subscriptions', to=orm['alm_user.User'])),
+            ('organization', self.gf('django.db.models.fields.related.ForeignKey')(related_name='subscriptions', to=orm['alm_company.Company'])),
             ('is_active', self.gf('django.db.models.fields.BooleanField')(default=True)),
         ))
         db.send_create_signal(u'almanet', ['Subscription'])
@@ -29,7 +30,7 @@ class Migration(SchemaMigration):
 
     def backwards(self, orm):
         # Deleting model 'Product'
-        db.delete_table(u'almanet_product')
+        db.delete_table('alma_product')
 
         # Deleting model 'Subscription'
         db.delete_table('alma_subscription')
@@ -45,30 +46,30 @@ class Migration(SchemaMigration):
         },
         u'alm_user.user': {
             'Meta': {'object_name': 'User', 'db_table': "'alma_user'"},
-            'city': ('django.db.models.fields.CharField', [], {'max_length': '30'}),
             'company': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'users'", 'symmetrical': 'False', 'to': u"orm['alm_company.Company']"}),
-            'country': ('django.db.models.fields.CharField', [], {'max_length': '30'}),
             'email': ('django.db.models.fields.EmailField', [], {'unique': 'True', 'max_length': '75'}),
             'first_name': ('django.db.models.fields.CharField', [], {'max_length': '31'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'is_active': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
+            'is_admin': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'last_login': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
             'last_name': ('django.db.models.fields.CharField', [], {'max_length': '30'}),
             'password': ('django.db.models.fields.CharField', [], {'max_length': '128'}),
             'timezone': ('timezone_field.fields.TimeZoneField', [], {'default': "'Asia/Almaty'"})
         },
         u'almanet.product': {
-            'Meta': {'object_name': 'Product'},
+            'Meta': {'object_name': 'Product', 'db_table': "'alma_product'"},
             'description': ('django.db.models.fields.TextField', [], {}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'slug': ('django.db.models.fields.CharField', [], {'max_length': '30'}),
+            'slug': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '30'}),
             'title': ('django.db.models.fields.CharField', [], {'max_length': '100'})
         },
         u'almanet.subscription': {
             'Meta': {'object_name': 'Subscription', 'db_table': "'alma_subscription'"},
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'is_active': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
-            'product': ('django.db.models.fields.related.OneToOneField', [], {'to': u"orm['almanet.Product']", 'unique': 'True'}),
+            'organization': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'subscriptions'", 'to': u"orm['alm_company.Company']"}),
+            'product': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'subscriptions'", 'to': u"orm['almanet.Product']"}),
             'user': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'subscriptions'", 'to': u"orm['alm_user.User']"})
         }
     }

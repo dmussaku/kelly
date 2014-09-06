@@ -11,19 +11,12 @@ from models import Contact, SalesCycle, Activity, Mention, Comment, Value
 
 
 class UserProductView(ListView):
-    template_name = 'crm/dashboard.html'
 
-    def get_context_data(self, **kwargs):
-        context = super(UserProductView, self).get_context_data(**kwargs)
-        context['user'] = User.objects.get(id=self.request.user.id)
-        p = Product.filter(slug=kwargs['slug'])
+    def get_queryset(self):
         u = self.request.user
-        if (kwargs['slug'] != None and p):
-            subscr = u.get_active_subscriptions().filter(
-                product__slug=kwargs['slug'])
-            if subscr:
-                context['product'] = subscr.product
-        return context
+        subscrs = u.get_active_subscriptions().filter(
+            product__slug=self.kwargs['slug'])
+        return subscrs
 
 
 class ContactListView(ListView):
@@ -134,7 +127,7 @@ class SalesCycleDeleteView(DeleteView):
 
 
 class ActivityCreateView(CreateView):
-    model = Activity 
+    model = Activity
     form_class = ActivityForm
     template_name = 'activity/activity_create.html'
     success_url = reverse_lazy('activity_list')
@@ -150,7 +143,7 @@ class ActivityListView(ListView):
         context['activities'] = Activity.objects.all()
         return context
 
- 
+
 class ActivityDetailView(DetailView):
     model = Activity
     template_name = 'activity/activity_detail.html'
@@ -189,7 +182,7 @@ class CommentCreateView(CreateView):
         form.instance.author = self.request.user
         form.instance.date_edited = timezone.now()
         return super(CommentCreateView, self).form_valid(form)
-        
+
 
 class CommentAddMentionView(CreateView):
     model = Comment

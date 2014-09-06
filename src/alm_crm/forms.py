@@ -4,8 +4,6 @@ from django import forms
 from django.forms import ModelForm
 
 
-
-
 class ActivityForm(ModelForm):
 
     class Meta:
@@ -28,12 +26,8 @@ class SalesCycleForm(ModelForm):
 
 
 def get_user_choices():
-    index_list = []
-    user_list = []
-    for i in User.objects.all():
-        index_list.append(str(i.id))
-        user_list.append(str(i))
-    return tuple(zip(index_list, user_list))
+    for u in User.objects.all():
+        yield (u.pk, u)
 
 
 class MentionForm(ModelForm):
