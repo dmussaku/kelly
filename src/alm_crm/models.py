@@ -244,6 +244,26 @@ class Activity(models.Model):
                                     related_name='rel_activities')
     author = models.ForeignKey(User, related_name='owned_activities')
 
+    @classmethod
+    def get_activities_by_contact(cls, contact_id):
+        return Activity.objects.filter(sales_cycle__contact_id=contact_id)
+
+    @classmethod
+    def get_mentioned_activities_of(cls, user_ids=set([])):
+        """
+        to get filter with OR statements, like below:
+            Activity.objects.filter(
+                Q(sales_cycle__mentions__id=user_ids[0]) |
+                Q(sales_cycle__mentions__id=user_ids[1])
+            )
+        used functional python's reduce
+        """
+
+        q = reduce(lambda q, f: q | models.Q(sales_cycle__mentions__id=f),
+                   user_ids, models.Q())
+
+        return Activity.objects.filter(q)
+
     class Meta:
         verbose_name = 'activity'
         db_table = settings.DB_PREFIX.format('activity')
