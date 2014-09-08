@@ -13,6 +13,7 @@ from django.dispatch import receiver
 from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
 from django.utils import timezone
+from dateutil.relativedelta import relativedelta
 
 
 STATUSES_CAPS = (
@@ -134,6 +135,35 @@ class Contact(models.Model):
         c = instance.sales_cycle.contact
         c.latest_activity = instance
         c.save()
+
+    @classmethod
+    def group_contacts_by_status(cls, status, limit=10, offset=0):
+        return Contact.objects.filter(status=status)[offset:limit]
+
+    @classmethod
+    def group_contacts_by_activity_period(cls, queryset_contact,
+                                          periods=['week', 'month', 'year']):
+        grouped = {}
+
+        if 'year' in periods:
+            grouped['year'] = queryset_contact.filter(
+                latest_activity__when__range=(
+                    timezone.now() + relativedelta(months=-12),
+                    timezone.now()))
+
+        if 'month' in periods:
+            grouped['month'] = queryset_contact.filter(
+                latest_activity__when__range=(
+                    timezone.now() + relativedelta(months=-1),
+                    timezone.now()))
+
+        if 'week' in periods:
+            grouped['week'] = queryset_contact.filter(
+                latest_activity__when__range=(
+                    timezone.now() + relativedelta(days=-7),
+                    timezone.now()))
+
+        return grouped
 
 
 class Value(models.Model):
