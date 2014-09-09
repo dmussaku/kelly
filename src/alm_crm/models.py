@@ -5,15 +5,11 @@ from almanet import settings
 from alm_user.models import User
 from almanet.models import Product
 from django.template.loader import render_to_string
-
-# import vcard as django_vcard
-
 from django.db.models import signals
-from django.dispatch import receiver
 from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
 from django.utils import timezone
-from dateutil.relativedelta import relativedelta
+# from dateutil.relativedelta import relativedelta
 
 
 STATUSES_CAPS = (
@@ -22,6 +18,8 @@ STATUSES_CAPS = (
     _('opportunity_contact'),
     _('client_contact'))
 STATUSES = (NEW, LEAD, OPPORTUNITY, CLIENT) = range(len(STATUSES_CAPS))
+
+ALLOWED_TIME_PERIODS = ['week', 'month', 'year']
 
 
 class Contact(models.Model):
@@ -42,6 +40,12 @@ class Contact(models.Model):
     vcard = models.ForeignKey('alm_vcard.VCard', blank=True, null=True)
     company_contact = models.ForeignKey(
         'Contact', blank=True, null=True, related_name='user_contacts')
+    followers = models.ManyToManyField(
+        User, related_name='following_contacts',
+        null=True, blank=True)
+    assignees = models.ManyToManyField(
+        User, related_name='assigned_contacts',
+        null=True, blank=True)
 
     # Commented by Rustem K
     # first_name = models.CharField(max_length=31,
@@ -52,8 +56,6 @@ class Contact(models.Model):
     # email = models.EmailField(unique=True, blank=False)
 
     # job_address = AddressField(_('job address'), max_length=200, blank=True)
-    status = models.IntegerField(
-        _('contact status'), max_length=30, choices=enumerate(STATUSES), default=NEW)
     latest_activity = models.OneToOneField(
         'Activity', on_delete=models.SET_NULL,
         related_name='contact_latest_activity', null=True)
@@ -87,6 +89,9 @@ class Contact(models.Model):
     def is_client(self):
         return self.status == CLIENT
 
+    def change_status(self, new_status, save=False):
+        """TODO Set status to contact. Return instance (self)"""
+
     def export_to(self, tp, **options):
         if not tp in ('html', 'vcard'):
             return False
@@ -100,16 +105,6 @@ class Contact(models.Model):
         tpl_name = 'vcard/_detail.%s.html' % locale
         context = {'object': self.vcard}
         return render_to_string(tpl_name, context)
-
-    def get_latest_activity(self):
-        return self.sales_cycles.aggregate(Max('contact_latest_activity'))
-
-    @receiver(signals.post_save, sender='Activity')
-    def set_latest_activity(sender, instance, created, **kwargs):
-        if created:
-            contact = instance.sales_cycle.contact
-            contact.latest_activity = instance
-            contact.save()
 
     def find_latest_activity(self):
         """Find latest activity among all sales_cycle_contacts."""
@@ -127,6 +122,22 @@ class Contact(models.Model):
         self.mentions = map(build_single_mention, user_ids)
         self.save()
 
+    def assign_user(self, user_id):
+        """TODO Assign user to contact."""
+        pass
+
+    @classmethod
+    def assign_user_to_contact(cls, user_id, contact_id):
+        """TODO Assign user with `user_id` to contact with `contact_id`"""
+        return cls.assign_user_to_contacts(user_id, [contact_id])
+
+    @classmethod
+    def assign_user_to_contacts(cls, user_id, contact_ids):
+        """TODO Assign user `user_id` to set of contacts
+        defined by `contact_ids`."""
+        assert isinstance(contact_ids, (list, tuple)), 'Must be a list'
+        pass
+
     @classmethod
     def upd_lst_activity_on_create(cls, sender, created=False,
                                    instance=None, **kwargs):
@@ -137,33 +148,112 @@ class Contact(models.Model):
         c.save()
 
     @classmethod
-    def group_contacts_by_status(cls, status, limit=10, offset=0):
+    def get_contacts_by_status(cls, status, limit=10, offset=0):
         return Contact.objects.filter(status=status)[offset:limit]
 
     @classmethod
-    def group_contacts_by_activity_period(cls, queryset_contact,
-                                          periods=['week', 'month', 'year']):
-        grouped = {}
+    def create_contact_with_vcard(cls, contact_attrs, vcard_attrs):
+        """TODO Create contact with vcard. Returns True on success."""
+        pass
 
-        if 'year' in periods:
-            grouped['year'] = queryset_contact.filter(
-                latest_activity__when__range=(
-                    timezone.now() + relativedelta(months=-12),
-                    timezone.now()))
+    @classmethod
+    def get_contacts_for_last_activity_period(
+            cls, user_id, from_dt=None, to_dt=None):
+        r"""TODO:
+        Retrieves all contacts according to the following criteria:
+            - user contacted for that time period (`from_dt`, `to_dt`)
+        user contacted means user have activities with at least one
+        contact for that period.
 
-        if 'month' in periods:
-            grouped['month'] = queryset_contact.filter(
-                latest_activity__when__range=(
-                    timezone.now() + relativedelta(months=-1),
-                    timezone.now()))
+        Parameters
+        ----------
+           user_id - who is contacted
+           from_dt - date from
+           to_dt - date to
 
-        if 'week' in periods:
-            grouped['week'] = queryset_contact.filter(
-                latest_activity__when__range=(
-                    timezone.now() + relativedelta(days=-7),
-                    timezone.now()))
+        Returns
+        -------
+        Queryset of Contacts with whom `user_id` get contacted for that period.
+        """
+        pass
+        # assert periods in ALLOWED_TIME_PERIODS
+        # rv = []
 
-        return grouped
+        # if 'year' in periods:
+        #     rv = queryset_contact.filter(
+        #         latest_activity__when__range=(
+        #             timezone.now() + relativedelta(months=-12),
+        #             timezone.now()))
+
+        # elif 'month' in periods:
+        #     rv = queryset_contact.filter(
+        #         latest_activity__when__range=(
+        #             timezone.now() + relativedelta(months=-1),
+        #             timezone.now()))
+
+        # elif 'week' in periods:
+        #     grouped['week'] = queryset_contact.filter(
+        #         latest_activity__when__range=(
+        #             timezone.now() + relativedelta(days=-7),
+        #             timezone.now()))
+
+        # return grouped
+
+    @classmethod
+    def filter_contacts_by_vcard(cls, search_text, search_params=None,
+                                 limit=20, offset=0):
+        r"""TODO Make a search query for contacts by their vcard.
+        Important! Search params have one of the following formats:
+            - name of vcard field, if simple field
+            - entity.name of vcard related field, if via foreign key
+
+        Parameters
+        ---------
+            search_text - text by which we execute a search
+            search_params - list of vcard fields [
+                'fn', 'organization.unit', 'bday']
+
+            order_by - sort results by fields e.g. ('-pk', '...')
+            limit - how much rows must be returned
+            offset - from which row to start
+        Returns
+        -------
+            Queryset<Contact> that found by search
+            len(Queryset<Contact>) <= limit
+        """
+        assert isinstance(search_params, list), "Must be a list"
+        pass
+
+    @classmethod
+    def get_contact_detail(cls, contact_id, with_vcard=False):
+        """TODO Returns contact detail by `contact_id`."""
+        pass
+
+    @classmethod
+    def upload_contacts(cls, upload_type, file_obj, save=False):
+        """TODO Extracts contacts from source: vcard file or csv file or any
+        other file objects. Build queryset from them and save if required.
+        Parameters
+        ----------
+            upload_type  - csv or vcard or ...
+            file_obj - file instance"""
+        ALLOWED_CONTACT_UPLOAD_TYPES = ('csv', 'vcard')
+        assert upload_type in ALLOWED_CONTACT_UPLOAD_TYPES, ""
+        upload_handler = getattr(cls, '_upload_contacts_by_%s' % upload_type)
+        contacts = upload_handler(file_obj)
+        if save:
+            contacts.save()
+        return contacts
+
+    @classmethod
+    def _upload_contacts_by_vcard(cls, file_obj):
+        """TODO Extracts contacts from vcard. Returns Queryset<Contact>."""
+        pass
+
+    @classmethod
+    def _upload_contacts_by_csv(cls, file_obj):
+        """TODO Extracts contacts from csv. Returns Queryset<Contact>."""
+        pass
 
 
 class Value(models.Model):
