@@ -255,6 +255,26 @@ class Contact(models.Model):
         """TODO Extracts contacts from csv. Returns Queryset<Contact>."""
         pass
 
+    @classmethod
+    def get_contacts_by_last_activity_date(
+            cls, user_id, include_activities=False, limit=20, offset=0):
+        """TODO Returns list of contacts ordered by last activity date.
+            Returns:
+                Queryset<Contact>
+                if includes:
+                    Queryset<Activity>
+                    contact_activity_map {1: [2], 3: [4, 5, 6]}
+            example: (contacts, activities, contact_activity_map)
+        """
+
+    @classmethod
+    def get_cold_base(cls, limit=20, offset=0):
+        """TODO Returns list of contacts that are considered cold.
+        Cold contacts should satisfy two conditions:
+            1. no assignee for contact
+            2. status is NEW"""
+        pass
+
 
 class Value(models.Model):
     # Type of payment
@@ -335,6 +355,35 @@ class SalesCycle(models.Model):
         self.mentions = map(build_single_mention, user_ids)
         self.save()
 
+    def assign_user(self, user_id, save=False):
+        """TODO Assign user to salescycle."""
+        pass
+
+    def get_activities(self, limit=20, offset=0):
+        """TODO Returns list of activities ordered by date."""
+        pass
+
+    def add_product(self, product_id, **kw):
+        """TODO Assigns products to salescycle"""
+        return self.add_product([product_id], **kw)
+
+    def add_products(self, product_ids=None, save=False):
+        """TODO Assigns products to salescycle"""
+        assert isinstance(product_ids, (tuple, list)), "must be a list"
+
+    def set_result(self, value_obj, save=False):
+        """TODO Set salescycle.real_value to value_obj. Saves the salescycle
+        if `save` is true"""
+        pass
+
+    def add_follower(self, user_id, **kw):
+        """TODO Set follower to salescycle"""
+        return self.add_followers([user_id], **kw)
+
+    def add_followers(self, user_ids, save=False):
+        """TODO Set followers to salescycle"""
+        assert isinstance(user_ids, (tuple, list)), 'must be a list'
+
     @classmethod
     def upd_lst_activity_on_create(cls, sender,
                                    created=False, instance=None, **kwargs):
@@ -343,6 +392,24 @@ class SalesCycle(models.Model):
         sales_cycle = instance.sales_cycle
         sales_cycle.latest_activity = sales_cycle.find_latest_activity()
         sales_cycle.save()
+
+    @classmethod
+    def get_salescyles_by_last_activity_date(
+            cls, user_id, limit=20, offset=0):
+        """TODO Returns user salescycles ordered by last activity date.
+
+            Returns
+            -------
+                Queryset<SalesCycle>
+                Queryset<Activity>
+                sales_cycle_activity_map =  {1: [2, 3, 4], 2:[3, 5, 7]}
+        """
+        pass
+
+    @classmethod
+    def get_salescycles_by_contact(cls, contact_id, limit=20, offset=0):
+        """TODO Returns queryset of sales cycles by contact"""
+        pass
 
 
 class Activity(models.Model):
@@ -364,9 +431,25 @@ class Activity(models.Model):
                                     related_name='rel_activities')
     author = models.ForeignKey(User, related_name='owned_activities')
 
+    class Meta:
+        verbose_name = 'activity'
+        db_table = settings.DB_PREFIX.format('activity')
+
+    def __unicode__(self):
+        return self.title
+
+    def set_feedback(self, feedback_obj, save=False):
+        """Set feedback to activity instance. Saves if `save` is set(True)."""
+        pass
+
     @classmethod
     def get_activities_by_contact(cls, contact_id):
         return Activity.objects.filter(sales_cycle__contact_id=contact_id)
+
+    @classmethod
+    def get_activities_by_salescycle(cls, sales_cycle_id, limit=20, offset=0):
+        """TODO Returns list of activities by sales cycle id."""
+        pass
 
     @classmethod
     def get_mentioned_activities_of(cls, user_ids=set([])):
@@ -384,12 +467,31 @@ class Activity(models.Model):
 
         return Activity.objects.filter(q)
 
-    class Meta:
-        verbose_name = 'activity'
-        db_table = settings.DB_PREFIX.format('activity')
+    @classmethod
+    def get_activity_detail(
+            cls, activity_id, include_sales_cycle=False,
+            include_mentioned_users=False, include_comments=True):
+        """TODO Returns activity details with comments by default.
+        If `include_mentioned_users` is ON, then includes mentioned user.
+        If `include_sales_cycle` is ON, then include its sales cycle.
 
-    def __unicode__(self):
-        return self.title
+        Returns
+        --------
+            activity - Activity object
+            sales_cycle (if included)
+            comments (if included)
+            mentioned_users (if included)
+            {'activity': {'object': ..., 'comments': [], sales_cycle: ..}}
+        """
+
+    @classmethod
+    def get_number_of_activities_by_day(cls, user_id,
+                                        from_dt=None, to_dt=None):
+        """TODO
+        Returns
+        -------
+            {'2018-22-05': 12, '2018-22-06': 14, ...}
+        """
 
 
 class Mention(models.Model):
@@ -409,6 +511,15 @@ class Mention(models.Model):
         if save:
             mention.save()
         return mention
+
+    @classmethod
+    def get_all_mentions_of(cls, user_id):
+        """TODO Returns all mentions of user.
+        Returns
+        ----------
+            Queryset<Mention>
+        """
+        pass
 
 
 class Comment(models.Model):
@@ -448,6 +559,12 @@ class Comment(models.Model):
         if save:
             comment.save()
         return comment
+
+    @classmethod
+    def get_comments_by_context(cls, context_object_id, context_class,
+                                limit=20, offset=0):
+        """TODO Returns list of comments by context."""
+        pass
 
 
 class CRMUser(models.Model):
