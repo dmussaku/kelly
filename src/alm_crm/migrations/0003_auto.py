@@ -22,9 +22,9 @@ class Migration(SchemaMigration):
         db.create_table(m2m_table_name, (
             ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
             ('contact', models.ForeignKey(orm[u'alm_crm.contact'], null=False)),
-            ('user', models.ForeignKey(orm[u'alm_user.user'], null=False))
+            ('crmuser', models.ForeignKey(orm[u'alm_crm.crmuser'], null=False))
         ))
-        db.create_unique(m2m_table_name, ['contact_id', 'user_id'])
+        db.create_unique(m2m_table_name, ['contact_id', 'crmuser_id'])
 
 
     def backwards(self, orm):
