@@ -361,7 +361,7 @@ class SalesCycle(models.Model):
 
     def get_activities(self, limit=20, offset=0):
         """TODO Returns list of activities ordered by date."""
-        pass
+        return self.rel_activities.order_by('-when')[offset:offset + limit]
 
     def add_product(self, product_id, **kw):
         """TODO Assigns products to salescycle"""
