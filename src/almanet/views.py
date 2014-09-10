@@ -5,9 +5,9 @@ from django.core.urlresolvers import reverse_lazy
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from alm_company.models import Company
-from .models import Product
+from .models import Service
 from alm_crm.models import Value
-from .forms import ProductCreateForm
+from .forms import ServiceCreateForm
 
 # TODO: this needs to be deleted
 
@@ -33,62 +33,62 @@ def fork_index(request):
         return HttpResponseRedirect(reverse_lazy('user_login'))
 
 
-class ProductList(ListView):
+class ServiceList(ListView):
 
-    model = Product
-    queryset = Product.objects.all()
+    model = Service
+    queryset = Service.objects.all()
 
 
     def get_context_data(self, **kwargs):
-        ctx = super(ProductList, self).get_context_data(**kwargs)
+        ctx = super(ServiceList, self).get_context_data(**kwargs)
         ctx['user'] = self.request.user
         return ctx
 
 
-class ProductCreateView(CreateView):
-    form_class = ProductCreateForm
-    template_name = "almanet/product/product_create.html"
-    success_url = reverse_lazy('product_list')
+class ServiceCreateView(CreateView):
+    form_class = ServiceCreateForm
+    template_name = "almanet/service/service_create.html"
+    success_url = reverse_lazy('service_list')
 
 
-class ProductUpdateView(UpdateView):
-    model = Product
-    form_class = ProductCreateForm
-    template_name = "almanet/product/product_update.html"
-    success_url = reverse_lazy('product_list')
+class ServiceUpdateView(UpdateView):
+    model = Service
+    form_class = ServiceCreateForm
+    template_name = "almanet/service/service_update.html"
+    success_url = reverse_lazy('service_list')
 
 
-class ProductDetailView(DetailView):
-    model = Product
-    template_name = "almanet/product/product_detail.html"
+class ServiceDetailView(DetailView):
+    model = Service
+    template_name = "almanet/service/service_detail.html"
 
 
-class ProductDeleteView(DeleteView):
-    model = Product
-    template_name = "almanet/product/product_delete.html"
-    success_url = reverse_lazy('product_list')
+class ServiceDeleteView(DeleteView):
+    model = Service
+    template_name = "almanet/service/service_delete.html"
+    success_url = reverse_lazy('service_list')
 
 
 
 @login_required
-def connect_product(request, slug, *args, **kwargs):
+def connect_service(request, slug, *args, **kwargs):
     try:
-        product = Product.objects.get(slug=slug)
-    except Product.DoesNotExist:
+        service = Service.objects.get(slug=slug)
+    except Service.DoesNotExist:
         raise Http404
     else:
-        request.user.connect_product(product)
+        request.user.connect_service(service)
         return HttpResponseRedirect(request.META['HTTP_REFERER'])
 
 
 @login_required
-def disconnect_product(request, slug, *args, **kwargs):
+def disconnect_service(request, slug, *args, **kwargs):
     try:
-        product = Product.objects.get(slug=slug)
-    except Product.DoesNotExist:
+        service = Service.objects.get(slug=slug)
+    except Service.DoesNotExist:
         raise Http404
     else:
-        request.user.disconnect_product(product)
+        request.user.disconnect_service(service)
         return HttpResponseRedirect(request.META['HTTP_REFERER'])
 
 

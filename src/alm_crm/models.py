@@ -2,8 +2,6 @@ import functools
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from almanet import settings
-from alm_user.models import User
-from almanet.models import Product
 from django.template.loader import render_to_string
 from django.db.models import signals
 from django.contrib.contenttypes import generic
@@ -20,6 +18,20 @@ STATUSES_CAPS = (
 STATUSES = (NEW, LEAD, OPPORTUNITY, CLIENT) = range(len(STATUSES_CAPS))
 
 ALLOWED_TIME_PERIODS = ['week', 'month', 'year']
+
+
+class CRMUser(models.Model):
+
+    user_id = models.IntegerField(_('user id'))
+    is_supervisor = models.BooleanField(_('is supervisor'), default=False)
+
+    def get_billing_user(self):
+        """Returns a original user.
+        Raises:
+           User.DoesNotExist exception if no such relation exist"""
+        from alm_user.models import User
+        user = User.objects.get(pk=self.user_id)
+        return user
 
 
 class Contact(models.Model):
@@ -41,10 +53,10 @@ class Contact(models.Model):
     company_contact = models.ForeignKey(
         'Contact', blank=True, null=True, related_name='user_contacts')
     followers = models.ManyToManyField(
-        User, related_name='following_contacts',
+        CRMUser, related_name='following_contacts',
         null=True, blank=True)
     assignees = models.ManyToManyField(
-        User, related_name='assigned_contacts',
+        CRMUser, related_name='assigned_contacts',
         null=True, blank=True)
 
     # Commented by Rustem K
@@ -302,6 +314,18 @@ class Value(models.Model):
         return "%s %s %s" % (self.amount, self.currency, self.salary)
 
 
+class Product(models.Model):
+    title = models.CharField(_('product title'), max_length=100, blank=False)
+    description = models.TextField(_('product description'))
+
+    class Meta:
+        verbose_name = _('product')
+        db_table = settings.DB_PREFIX.format('product')
+
+    def __unicode__(self):
+        return self.title
+
+
 class SalesCycle(models.Model):
     STATUS_OPTIONS = (
         ('P', 'Pending'),
@@ -310,9 +334,9 @@ class SalesCycle(models.Model):
         )
     products = models.ManyToManyField(Product,
                                       related_name='sales_cycles')
-    owner = models.ForeignKey(User, related_name='owned_sales_cycles')
+    owner = models.ForeignKey(CRMUser, related_name='owned_sales_cycles')
     followers = models.ManyToManyField(
-        User, related_name='follow_sales_cycles',
+        CRMUser, related_name='follow_sales_cycles',
         null=True, blank=True)
     contact = models.ForeignKey(
         Contact, related_name='sales_cycles',
@@ -429,7 +453,7 @@ class Activity(models.Model):
     feedback = models.CharField(max_length=300)
     sales_cycle = models.ForeignKey(SalesCycle,
                                     related_name='rel_activities')
-    author = models.ForeignKey(User, related_name='owned_activities')
+    author = models.ForeignKey(CRMUser, related_name='owned_activities')
 
     class Meta:
         verbose_name = 'activity'
@@ -524,7 +548,7 @@ class Mention(models.Model):
 
 class Comment(models.Model):
     comment = models.CharField(max_length=140)
-    author = models.ForeignKey(User, related_name='comment_author')
+    author = models.ForeignKey(CRMUser, related_name='comment_author')
     date_created = models.DateTimeField(blank=True, auto_now_add=True)
     date_edited = models.DateTimeField(blank=True)
     object_id = models.IntegerField(null=True, blank=False)
@@ -565,20 +589,6 @@ class Comment(models.Model):
                                 limit=20, offset=0):
         """TODO Returns list of comments by context."""
         pass
-
-
-class CRMUser(models.Model):
-
-    user_id = models.IntegerField(_('user id'))
-    is_supervisor = models.BooleanField(_('is supervisor'), default=False)
-
-    def get_billing_user(self):
-        """Returns a original user.
-        Raises:
-           User.DoesNotExist exception if no such relation exist"""
-        from user.models import User
-        user = User.objects.get(pk=self.user_id)
-        return user
 
 
 signals.post_save.connect(

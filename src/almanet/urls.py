@@ -6,13 +6,13 @@ from django.conf import settings
 from almanet.views import fork_index
 from almanet.views import (
     TestView2,
-    ProductList,
-    connect_product,
-    disconnect_product,
-    ProductCreateView,
-    ProductUpdateView,
-    ProductDeleteView,
-    ProductDetailView,
+    ServiceList,
+    connect_service,
+    disconnect_service,
+    ServiceCreateView,
+    ServiceUpdateView,
+    ServiceDeleteView,
+    ServiceDetailView,
     )
 
 admin.autodiscover()
@@ -22,20 +22,20 @@ urlpatterns = patterns(
     url(r'^auth/', include('alm_user.urls')),
     # TODO: temp, needs to be deleted
     url(r'^crm/', include('alm_crm.urls')),
-    url(r'^products/$', ProductList.as_view(
-        template_name='almanet/product/product_list.html'),
-        name='product_list'),
+    url(r'^services/$', ServiceList.as_view(
+        template_name='almanet/service/service_list.html'),
+        name='service_list'),
 
-    url(r'^products/connect/(?P<slug>[-a-zA-Z0-9_]+)/$', connect_product,
-        name='connect_product'),
-    url(r'^products/disconnect/(?P<slug>[-a-zA-Z0-9_]+)/$', disconnect_product,
-        name='disconnect_product'),
+    url(r'^services/connect/(?P<slug>[-a-zA-Z0-9_]+)/$', connect_service,
+        name='connect_service'),
+    url(r'^services/disconnect/(?P<slug>[-a-zA-Z0-9_]+)/$', disconnect_service,
+        name='disconnect_service'),
     url(r'^$', fork_index),
     url(r'^admin/', include(admin.site.urls)),
-    url(r'^products/product_create/$', ProductCreateView.as_view(), name='product_create'),
-    url(r'^products/product_update/(?P<pk>\d+)/$', ProductUpdateView.as_view(), name='product_update'),
-    url(r'^products/product_detail/(?P<pk>\d+)/$', ProductDetailView.as_view(), name='product_detail'),
-    url(r'^products/product_delete/(?P<pk>\d+)/$', ProductDeleteView.as_view(), name='product_delete'),
+    url(r'^services/service_create/$', ServiceCreateView.as_view(), name='service_create'),
+    url(r'^services/service_update/(?P<pk>\d+)/$', ServiceUpdateView.as_view(), name='service_update'),
+    url(r'^services/service_detail/(?P<pk>\d+)/$', ServiceDetailView.as_view(), name='service_detail'),
+    url(r'^services/service_delete/(?P<pk>\d+)/$', ServiceDeleteView.as_view(), name='service_delete'),
 
 )
 

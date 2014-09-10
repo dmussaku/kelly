@@ -81,27 +81,27 @@ class User(AbstractBaseUser):
     def get_active_subscriptions(self):
         return self.subscriptions.filter(is_active=True)
 
-    def connected_products(self):
+    def connected_services(self):
         rv = []
         for s in self.get_active_subscriptions():
-            rv.append(s.product)
+            rv.append(s.service)
         return rv
 
-    def is_product_connected(self, product):
-        return product in self.connected_products()
+    def is_service_connected(self, service):
+        return service in self.connected_services()
 
-    def connect_product(self, product):
+    def connect_service(self, service):
         from almanet.models import Subscription
         try:
-            s = Subscription.objects.get(product=product, user=self)
+            s = Subscription.objects.get(service=service, user=self)
         except Subscription.DoesNotExist:
-            s = Subscription(product=product, user=self)
+            s = Subscription(service=service, user=self)
         else:
             s.is_active = True
         s.save()
 
-    def disconnect_product(self, product):
-        s = self.subscriptions.filter(is_active=True, product=product).first()
+    def disconnect_service(self, service):
+        s = self.subscriptions.filter(is_active=True, service=service).first()
         if s:
             s.is_active = False
             s.save()
