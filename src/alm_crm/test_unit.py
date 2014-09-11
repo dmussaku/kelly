@@ -8,12 +8,12 @@ class ContactTestCase(TestCase):
 
     def setUp(self):
         super(ContactTestCase, self).setUp()
-        self.contact_1 = Contact.objects.get(pk=1)
+        self.contact1 = Contact.objects.get(pk=1)
 
     def test_assign_user(self):
-        self.assertEqual(len(self.contact_1.assignees.all()), 0)
-        self.assertTrue(self.contact_1.assign_user(user_id=1))
-        self.assertEqual(len(self.contact_1.assignees.all()), 1)
+        self.assertEqual(len(self.contact1.assignees.all()), 0)
+        self.assertTrue(self.contact1.assign_user(user_id=1))
+        self.assertEqual(len(self.contact1.assignees.all()), 1)
 
     def test_assign_user_to_contacts(self):
         for pk in range(1, 4):
@@ -30,4 +30,9 @@ class ContactTestCase(TestCase):
 
     def test_get_cold_base(self):
         self.assertEqual(len(Contact.get_cold_base()), 1)
+
+    def test_change_status(self):
+        self.assertEqual(self.contact1.status, 0)
+        self.contact1.change_status(1)
+        self.assertEqual(self.contact1.status, 1)
 

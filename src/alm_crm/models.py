@@ -25,6 +25,8 @@ ALLOWED_TIME_PERIODS = ['week', 'month', 'year']
 class CRMUser(models.Model):
 
     user_id = models.IntegerField(_('user id'))
+    organization_id = models.IntegerField(_('organization id'))
+    subscription_id = models.IntegerField(_('subscription id'))
     is_supervisor = models.BooleanField(_('is supervisor'), default=False)
 
     def get_billing_user(self):
@@ -104,6 +106,10 @@ class Contact(models.Model):
 
     def change_status(self, new_status, save=False):
         """TODO Set status to contact. Return instance (self)"""
+        self.status = new_status
+        if save:
+            self.save()
+        return self
 
     def export_to(self, tp, **options):
         if not tp in ('html', 'vcard'):
@@ -278,8 +284,11 @@ class Contact(models.Model):
     def _upload_contacts_by_vcard(cls, file_obj):
         """Extracts contacts from vcard. Returns Queryset<Contact>."""
         vcard = VCard.importFrom('vCard', file_obj)
+        vcard.save()
         contact = cls()
+        # contact.save()
         contact.vcard = vcard
+        contact.save()
         return contact
 
     @classmethod
