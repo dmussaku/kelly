@@ -365,11 +365,17 @@ class SalesCycle(models.Model):
 
     def add_product(self, product_id, **kw):
         """TODO Assigns products to salescycle"""
-        return self.add_product([product_id], **kw)
+        try:
+            product = Product.objects.get(id=product_id)
+            self.products.add(product)
+            return True
+        except Product.DoesNotExist:
+            return False
 
     def add_products(self, product_ids=None, save=False):
         """TODO Assigns products to salescycle"""
         assert isinstance(product_ids, (tuple, list)), "must be a list"
+        return [self.add_products(pid) for pid in product_ids]
 
     def set_result(self, value_obj, save=False):
         """TODO Set salescycle.real_value to value_obj. Saves the salescycle
