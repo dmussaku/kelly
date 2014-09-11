@@ -7,7 +7,7 @@ from django.utils.text import slugify
 class Service(models.Model):
 
     title = models.CharField(_('service title'), max_length=100, blank=False)
-    description = models.TextField(_('service description'))
+    description = models.TextField(_('service description'), null=True)
     slug = models.CharField(
         _('service slug'), max_length=30, unique=True, blank=False)
 

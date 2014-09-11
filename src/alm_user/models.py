@@ -97,6 +97,10 @@ class User(AbstractBaseUser):
         except Subscription.DoesNotExist:
             s = Subscription(service=service, user=self)
         else:
+            # create user in corresponding service
+            # eg.: CRMUser in CRM service, CRM's slug = crm
+            create_user = getattr(self, 'create_{}user'.format(product.slug)) 
+            create_user(s, self.company)
             s.is_active = True
         s.save()
 
@@ -105,3 +109,17 @@ class User(AbstractBaseUser):
         if s:
             s.is_active = False
             s.save()
+
+    def create_crmuser(self, subscription, organization):
+        from alm_crm.models import CRMUser
+        # this should be further resolved when multiple database will be configured
+        # and DecoupledModel applied to connect User and CRMUser
+        # if not self.crmuser and self.is_active: 
+        crmuser = CRMUser(user_id=self.pk, 
+                          is_supervisor=True, 
+                          subscription_id=subscription.pk, 
+                          organization_id=organization.pk)
+        crmuser.save()
+        # self.crmuser = crmuser
+        self.save()
+        return self.crmuser

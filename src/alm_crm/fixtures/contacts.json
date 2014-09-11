@@ -1,0 +1,54 @@
+[
+    {
+        "pk": 1, 
+        "model": "alm_crm.Contact", 
+        "fields": {
+            "status":0,
+            "tp":"user",
+            "date_created":"2014-09-10 00:00:00",
+            "vcard":null,
+            "company_contact":null,
+            "followers":[],
+            "assignees":[]
+        }
+    }, 
+    {
+        "pk": 2, 
+        "model": "alm_crm.Contact", 
+        "fields": {
+            "status":1,
+            "tp":"user",
+            "date_created":"2014-09-10 00:00:00",
+            "vcard":null,
+            "company_contact":null,
+            "followers":[],
+            "assignees":[]
+        }
+    }, 
+    {
+        "pk": 3, 
+        "model": "alm_crm.Contact", 
+        "fields": {
+            "status":1,
+            "tp":"user",
+            "date_created":"2014-09-10 00:00:00",
+            "vcard":null,
+            "company_contact":null,
+            "followers":[],
+            "assignees":[]
+        }
+    }, 
+    {
+        "pk": 4, 
+        "model": "alm_crm.Contact", 
+        "fields": {
+            "status":2,
+            "tp":"user",
+            "date_created":"2014-09-10 00:00:00",
+            "vcard":null,
+            "company_contact":null,
+            "followers":[],
+            "assignees":[]
+        }
+    }
+]
