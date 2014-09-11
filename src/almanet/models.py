@@ -4,16 +4,16 @@ from django.conf import settings
 from django.utils.text import slugify
 
 
-class Product(models.Model):
+class Service(models.Model):
 
-    title = models.CharField(_('product title'), max_length=100, blank=False)
-    description = models.TextField(_('product description'))
+    title = models.CharField(_('service title'), max_length=100, blank=False)
+    description = models.TextField(_('service description'), null=True)
     slug = models.CharField(
-        _('product slug'), max_length=30, unique=True, blank=False)
+        _('service slug'), max_length=30, unique=True, blank=False)
 
     class Meta:
-        verbose_name = _('product')
-        db_table = settings.DB_PREFIX.format('product')
+        verbose_name = _('service')
+        db_table = settings.DB_PREFIX.format('service')
 
     def __unicode__(self):
         return self.title
@@ -21,12 +21,12 @@ class Product(models.Model):
     def save(self, **kwargs):
         if not self.slug and self.title:
             self.slug = slugify(self.title)
-        super(Product, self).save(**kwargs)
+        super(Service, self).save(**kwargs)
 
 
 class Subscription(models.Model):
 
-    product = models.ForeignKey(Product, related_name='subscriptions')
+    service = models.ForeignKey(Service, related_name='subscriptions')
     user = models.ForeignKey('alm_user.User', related_name='subscriptions')
     organization = models.ForeignKey(
         'alm_company.Company', related_name='subscriptions')

@@ -11,7 +11,7 @@ from django.conf import settings
 
 from alm_user.models import User
 from alm_user.forms import RegistrationForm, UserBaseSettingsForm, UserPasswordSettingsForm
-from almanet.models import Product
+from almanet.models import Service
 from almanet.url_resolvers import reverse_lazy
 
 # for testing, need to be deleted
@@ -102,7 +102,7 @@ class UserProfileSettings(UpdateView):
 
 class UserServicesView(ListView):
 
-    model = Product
+    model = Service
 
     def get_context_data(self, **kwargs):
         ctx = super(UserServicesView, self).get_context_data(**kwargs)
@@ -110,6 +110,6 @@ class UserServicesView(ListView):
         return ctx
 
     def get_queryset(self, *args, **kwargs):
-        queryset = self.request.user.connected_products()
+        queryset = self.request.user.connected_services()
         return queryset
 

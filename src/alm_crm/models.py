@@ -2,8 +2,7 @@ import functools
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from almanet import settings
-from alm_user.models import User
-from almanet.models import Product
+from alm_vcard.models import VCard
 from django.template.loader import render_to_string
 from django.db.models import signals
 from django.contrib.contenttypes import generic
@@ -20,6 +19,22 @@ STATUSES_CAPS = (
 STATUSES = (NEW, LEAD, OPPORTUNITY, CLIENT) = range(len(STATUSES_CAPS))
 
 ALLOWED_TIME_PERIODS = ['week', 'month', 'year']
+
+
+class CRMUser(models.Model):
+
+    user_id = models.IntegerField(_('user id'))
+    organization_id = models.IntegerField(_('organization id'))
+    subscription_id = models.IntegerField(_('subscription id'))
+    is_supervisor = models.BooleanField(_('is supervisor'), default=False)
+
+    def get_billing_user(self):
+        """Returns a original user.
+        Raises:
+           User.DoesNotExist exception if no such relation exist"""
+        from user.models import User
+        user = User.objects.get(pk=self.user_id)
+        return user
 
 
 class Contact(models.Model):
@@ -41,10 +56,10 @@ class Contact(models.Model):
     company_contact = models.ForeignKey(
         'Contact', blank=True, null=True, related_name='user_contacts')
     followers = models.ManyToManyField(
-        User, related_name='following_contacts',
+        CRMUser, related_name='following_contacts',
         null=True, blank=True)
     assignees = models.ManyToManyField(
-        User, related_name='assigned_contacts',
+        CRMUser, related_name='assigned_contacts',
         null=True, blank=True)
 
     # Commented by Rustem K
@@ -91,6 +106,10 @@ class Contact(models.Model):
 
     def change_status(self, new_status, save=False):
         """TODO Set status to contact. Return instance (self)"""
+        self.status = new_status
+        if save:
+            self.save()
+        return self
 
     def export_to(self, tp, **options):
         if not tp in ('html', 'vcard'):
@@ -123,8 +142,13 @@ class Contact(models.Model):
         self.save()
 
     def assign_user(self, user_id):
-        """TODO Assign user to contact."""
-        pass
+        """Assign user to contact."""
+        try:
+            user = CRMUser.objects.get(user_id=user_id)
+            self.assignees.add(user)
+            return True
+        except CRMUser.DoesNotExist:
+            return False
 
     @classmethod
     def assign_user_to_contact(cls, user_id, contact_id):
@@ -133,10 +157,21 @@ class Contact(models.Model):
 
     @classmethod
     def assign_user_to_contacts(cls, user_id, contact_ids):
-        """TODO Assign user `user_id` to set of contacts
+        """Assign user `user_id` to set of contacts
         defined by `contact_ids`."""
         assert isinstance(contact_ids, (list, tuple)), 'Must be a list'
-        pass
+        try:
+            user = CRMUser.objects.get(user_id=user_id)
+            for contact_id in contact_ids:
+                try:
+                    contact = cls.objects.get(pk=contact_id)
+                    contact.assignees.add(user)
+                    contact.save()
+                except cls.DoesNotExist:
+                    pass
+            return True
+        except CRMUser.DoesNotExist:
+            return False
 
     @classmethod
     def upd_lst_activity_on_create(cls, sender, created=False,
@@ -149,7 +184,7 @@ class Contact(models.Model):
 
     @classmethod
     def get_contacts_by_status(cls, status, limit=10, offset=0):
-        return Contact.objects.filter(status=status)[offset:limit]
+        return Contact.objects.filter(status=status)[offset:offset+limit]
 
     @classmethod
     def create_contact_with_vcard(cls, contact_attrs, vcard_attrs):
@@ -247,8 +282,14 @@ class Contact(models.Model):
 
     @classmethod
     def _upload_contacts_by_vcard(cls, file_obj):
-        """TODO Extracts contacts from vcard. Returns Queryset<Contact>."""
-        pass
+        """Extracts contacts from vcard. Returns Queryset<Contact>."""
+        vcard = VCard.importFrom('vCard', file_obj)
+        vcard.save()
+        contact = cls()
+        # contact.save()
+        contact.vcard = vcard
+        contact.save()
+        return contact
 
     @classmethod
     def _upload_contacts_by_csv(cls, file_obj):
@@ -273,7 +314,8 @@ class Contact(models.Model):
         Cold contacts should satisfy two conditions:
             1. no assignee for contact
             2. status is NEW"""
-        pass
+        return cls.objects.filter(
+            assignees__isnull=True, status=NEW)[offset:offset+limit]
 
 
 class Value(models.Model):
@@ -302,6 +344,18 @@ class Value(models.Model):
         return "%s %s %s" % (self.amount, self.currency, self.salary)
 
 
+class Product(models.Model):
+    title = models.CharField(_('product title'), max_length=100, blank=False)
+    description = models.TextField(_('product description'))
+
+    class Meta:
+        verbose_name = _('product')
+        db_table = settings.DB_PREFIX.format('product')
+
+    def __unicode__(self):
+        return self.title
+
+
 class SalesCycle(models.Model):
     STATUS_OPTIONS = (
         ('P', 'Pending'),
@@ -310,9 +364,9 @@ class SalesCycle(models.Model):
         )
     products = models.ManyToManyField(Product,
                                       related_name='sales_cycles')
-    owner = models.ForeignKey(User, related_name='owned_sales_cycles')
+    owner = models.ForeignKey(CRMUser, related_name='owned_sales_cycles')
     followers = models.ManyToManyField(
-        User, related_name='follow_sales_cycles',
+        CRMUser, related_name='follow_sales_cycles',
         null=True, blank=True)
     contact = models.ForeignKey(
         Contact, related_name='sales_cycles',
@@ -435,7 +489,7 @@ class Activity(models.Model):
     feedback = models.CharField(max_length=300)
     sales_cycle = models.ForeignKey(SalesCycle,
                                     related_name='rel_activities')
-    author = models.ForeignKey(User, related_name='owned_activities')
+    author = models.ForeignKey(CRMUser, related_name='owned_activities')
 
     class Meta:
         verbose_name = 'activity'
@@ -510,7 +564,8 @@ class Mention(models.Model):
         return "%s %s" % (self.user_id, self.content_object)
 
     @classmethod
-    def build_new(cls, user_id, content_class=None, object_id=None, save=False):
+    def build_new(cls, user_id, content_class=None,
+                  object_id=None, save=False):
         mention = cls(user_id=user_id)
         mention.content_type = ContentType.objects.get_for_model(content_class)
         mention.object_id = object_id
@@ -530,7 +585,7 @@ class Mention(models.Model):
 
 class Comment(models.Model):
     comment = models.CharField(max_length=140)
-    author = models.ForeignKey(User, related_name='comment_author')
+    author = models.ForeignKey(CRMUser, related_name='comment_author')
     date_created = models.DateTimeField(blank=True, auto_now_add=True)
     date_edited = models.DateTimeField(blank=True)
     object_id = models.IntegerField(null=True, blank=False)
@@ -571,20 +626,6 @@ class Comment(models.Model):
                                 limit=20, offset=0):
         """TODO Returns list of comments by context."""
         pass
-
-
-class CRMUser(models.Model):
-
-    user_id = models.IntegerField(_('user id'))
-    is_supervisor = models.BooleanField(_('is supervisor'), default=False)
-
-    def get_billing_user(self):
-        """Returns a original user.
-        Raises:
-           User.DoesNotExist exception if no such relation exist"""
-        from user.models import User
-        user = User.objects.get(pk=self.user_id)
-        return user
 
 
 signals.post_save.connect(

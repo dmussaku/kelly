@@ -81,27 +81,45 @@ class User(AbstractBaseUser):
     def get_active_subscriptions(self):
         return self.subscriptions.filter(is_active=True)
 
-    def connected_products(self):
+    def connected_services(self):
         rv = []
         for s in self.get_active_subscriptions():
-            rv.append(s.product)
+            rv.append(s.service)
         return rv
 
-    def is_product_connected(self, product):
-        return product in self.connected_products()
+    def is_service_connected(self, service):
+        return service in self.connected_services()
 
-    def connect_product(self, product):
+    def connect_service(self, service):
         from almanet.models import Subscription
         try:
-            s = Subscription.objects.get(product=product, user=self)
+            s = Subscription.objects.get(service=service, user=self)
         except Subscription.DoesNotExist:
-            s = Subscription(product=product, user=self)
+            s = Subscription(service=service, user=self)
         else:
+            # create user in corresponding service
+            # eg.: CRMUser in CRM service, CRM's slug = crm
+            create_user = getattr(self, 'create_{}user'.format(product.slug)) 
+            create_user(s, self.company)
             s.is_active = True
         s.save()
 
-    def disconnect_product(self, product):
-        s = self.subscriptions.filter(is_active=True, product=product).first()
+    def disconnect_service(self, service):
+        s = self.subscriptions.filter(is_active=True, service=service).first()
         if s:
             s.is_active = False
             s.save()
+
+    def create_crmuser(self, subscription, organization):
+        from alm_crm.models import CRMUser
+        # this should be further resolved when multiple database will be configured
+        # and DecoupledModel applied to connect User and CRMUser
+        # if not self.crmuser and self.is_active: 
+        crmuser = CRMUser(user_id=self.pk, 
+                          is_supervisor=True, 
+                          subscription_id=subscription.pk, 
+                          organization_id=organization.pk)
+        crmuser.save()
+        # self.crmuser = crmuser
+        self.save()
+        return self.crmuser

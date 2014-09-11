@@ -36,6 +36,12 @@ cd src
 ```
 nose2 # run from dir where manage.py is located
 nose2 -v --with-cov --cov-config coverage.cfg
+
+
+# functional (view, selenium)
+DJANGO_CONFIGURATION=TestConfiguration ./manage.py test --verbosity=3 --configuration=TestConfiguration --liveserver=0.0.0.0:8000
+
+# unit
 ```
 
 ### hosts configurations
@@ -51,6 +57,17 @@ create default user and company
 ./manage.py createdefaultuser
 ```
 
-issues:
-Change DB diagram:
-	1) Remove deal_type in SalesCycle
+
+```
+To execute tests on test server using selenium you need to create configuration file in your system
+mkdir ~/.almanet
+cd ~/.almanet
+nano almanet.conf.py
+
+HOSTCONF_REGEX = r'alma1\.net:8000'
+PARENT_HOST = 'alma1.net:8000'
+SESSION_COOKIE_DOMAIN = '.alma1.net'
+SITE_DOMAIN = PARENT_HOST
+
+put this config to almanet.conf.py file. After this you need to connect to vpn and write on test server host file your vpn ip and your domain
+```

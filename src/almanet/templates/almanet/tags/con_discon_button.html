@@ -1,6 +1,6 @@
 {% load almanet_tags %}
 {% if connected %}
-	-- <span>already connected</span>: <a href="{% subdomain_url 'disconnect_product' subdomain='' slug=product.slug %}">disconnect</a>
+	-- <span>already connected</span>: <a href="{% subdomain_url 'disconnect_service' subdomain='' slug=service.slug %}">disconnect</a>
 {% else %}
-	-- <a href="{% subdomain_url 'connect_product' subdomain='' slug=product.slug %}">connect</a>
+	-- <a href="{% subdomain_url 'connect_service' subdomain='' slug=service.slug %}">connect</a>
 {% endif %}

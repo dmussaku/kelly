@@ -1,18 +1,18 @@
 {% extends "user/base.html" %}
 {% load i18n almanet_tags %}
-{% block head_title %} {{ _("Product List Page") }} {% endblock %}
+{% block head_title %} {{ _("Service List Page") }} {% endblock %}
 {% block content %}
 <h2>Connected services:</h2>
 <ul>
-	{% for product in object_list %}
+	{% for service in object_list %}
 	    <li>
-	    	{{ product.title }}
+	    	{{ service.title }}
 	    	{% if user.is_authenticated and user.get_owned_company %}
-	    		{% connect_disconnect_button user product %}
+	    		{% connect_disconnect_button user service %}
 	    	{% endif %}
 	    </li>
     {% empty %}
-    	<li>You have no products connected.</li>
+    	<li>You have no services connected.</li>
 	{% endfor %}
 </ul>
 <p><a href="{% subdomain_url 'user_profile_url' subdomain=MY_SD %}">Back to profile</a></p>

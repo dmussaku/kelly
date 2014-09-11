@@ -5,7 +5,7 @@ from almanet.url_resolvers import reverse_lazy
 from alm_user.models import User
 from django.http import HttpResponse
 from django.shortcuts import render
-from almanet.models import Product, Subscription
+from almanet.models import Subscription
 from forms import ContactForm, SalesCycleForm, MentionForm, ActivityForm, CommentForm, ValueForm
 from models import Contact, SalesCycle, Activity, Mention, Comment, Value
 
@@ -15,7 +15,7 @@ class UserProductView(ListView):
     def get_queryset(self):
         u = self.request.user
         subscrs = u.get_active_subscriptions().filter(
-            product__slug=self.kwargs['slug'])
+            service__slug=self.kwargs['slug'])
         return subscrs
 
 

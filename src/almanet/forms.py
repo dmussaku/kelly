@@ -1,12 +1,12 @@
 from django.forms import ModelForm
-from models import Product
+from models import Service
 
 
 
-class ProductCreateForm(ModelForm):
+class ServiceCreateForm(ModelForm):
 
 	class Meta:
-		model = Product
+		model = Service
 		fields = ['title', 'description']
 
 

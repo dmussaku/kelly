@@ -1,0 +1,9 @@
+{% extends "user/base.html" %}
+{% load i18n %}
+{% block head_title %} {{ _("Service List Page") }} {% endblock %}
+{% block content %}
+<h1> {{ service.title }} </h1>
+	<p>Description - {{service.description}}</p>
+	<a href="{% url 'service_update' pk=service.id %}">Update</a>  
+	<a href="{% url 'service_delete' pk=service.id %}">Delete</a>
+{% endblock %}
