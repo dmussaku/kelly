@@ -10,8 +10,10 @@ https://docs.djangoproject.com/en/1.6/ref/settings/
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
+import imp
 from django.utils.functional import lazy
 from configurations import Configuration, pristinemethod
+from configurations.utils import uppercase_attributes
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 
@@ -43,6 +45,30 @@ class SubdomainConfiguration:
             setattr(self, '__SUBDOMAIN_MAP', rv)
         return getattr(self, '__SUBDOMAIN_MAP')
 
+
+def FileSettings(path):
+    path = os.path.expanduser(path)
+
+    class Holder(object):
+
+        def __init__(self, *args, **kwargs):
+            mod = imp.new_module('almanet.local')
+            mod.__file__ = path
+
+            try:
+                execfile(path, mod.__dict__)
+            except IOError, e:
+                print("Notice: Unable to load configuration file %s (%s), "
+                      "using default settings\n\n" % (path, e.strerror))
+
+            for name, value in uppercase_attributes(mod).items():
+                setattr(self, name, value)
+
+    return Holder
+
+
+class BaseConfiguration(SubdomainConfiguration, Configuration):
+
     @pristinemethod
     def reverse_lazy(viewname, **kw):
         def __inner():
@@ -51,8 +77,7 @@ class SubdomainConfiguration:
 
         return lazy(__inner, str)
 
-
-class BaseConfiguration(SubdomainConfiguration, Configuration):
+    TEST_RUNNER = "djnose2.TestRunner"
 
     BASE_DIR = BASE_DIR
     # Quick-start development settings - unsuitable for production
@@ -99,7 +124,7 @@ class BaseConfiguration(SubdomainConfiguration, Configuration):
         'almanet.middleware.GetSubdomainMiddleware',
     )
 
-    SESSION_COOKIE_DOMAIN = '.alma.net'
+    SESSION_COOKIE_DOMAIN = '.alma1.net'
 
     ROOT_URLCONF = 'almanet.urls'
 
@@ -117,7 +142,11 @@ class BaseConfiguration(SubdomainConfiguration, Configuration):
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
             'NAME': rel('../..', 'db.sqlite3'),
-        }
+        },
+        'test': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': rel('../..', 'test_db.sqlite3'),
+        },
     }
 
     CACHES = {
@@ -178,8 +207,8 @@ class BaseConfiguration(SubdomainConfiguration, Configuration):
     EMAIL_HOST_USER = 'adm@v3na.com'
     EMAIL_HOST_PASSWORD = ''
     EMAIL_SUBJECT_PREFIX = '[alma.net] '
-    SERVER_EMAIL = u'Alma.net services <r.kamun@gmail.com>'
-    DEFAULT_FROM_EMAIL = u'Alma.net services <r.kamun@gmail.com>'
+    SERVER_EMAIL = u'alma1.net services <r.kamun@gmail.com>'
+    DEFAULT_FROM_EMAIL = u'alma1.net services <r.kamun@gmail.com>'
 
     EMAIL_BACKEND = 'djrill.mail.backends.djrill.DjrillBackend'
     MANDRILL_API_KEY = 'pMC2w0tuVIuYRZiAjbu8mA'
@@ -210,22 +239,37 @@ class BaseConfiguration(SubdomainConfiguration, Configuration):
         'django.contrib.auth.backends.ModelBackend',
         'alm_user.authbackend.MyAuthBackend',)  # for admin
 
-    SITE_NAME = 'Alma.net'
+    SITE_NAME = 'alma.net'
     SITE_DOMAIN = 'http://localhost:8000'
 
     DEFAULT_URL_SCHEME = 'http'
 
 
-class DevConfiguration(BaseConfiguration):
-    PARENT_HOST = 'alma.net:8000'
-    SITE_DOMAIN = PARENT_HOST
+class DevConfiguration(FileSettings('~/.almanet/almanet.conf.py'), BaseConfiguration):
+    #PARENT_HOST = 'alma.net:8000'
+    #SITE_DOMAIN = PARENT_HOST
     DEBUG = True
     TEMPLATE_DEBUG = DEBUG
 
 
-class TestConfiguration(BaseConfiguration):
-    PARENT_HOST = 'alma.net:8000'
-    SITE_DOMAIN = PARENT_HOST
-    SELENIUM_TESTSERVER_HOST = 'http://192.168.233.1'
+class TestConfiguration(FileSettings('~/.almanet/almanet.conf.py'), BaseConfiguration):
+    SELENIUM_TESTSERVER_HOST = 'http://10.8.0.18'
+
+    #PARENT_HOST = 'alma.net:8000'
+    #SITE_DOMAIN = PARENT_HOST
     SELENIUM_TESTSERVER_PORT = '4444'
     SELENIUM_CAPABILITY = 'FIREFOX'
+    DEFAULT_SERVER_PORT = 8000
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': rel('../..', 'test_db.sqlite3'),
+        },
+        # 'test': {
+        #     'ENGINE': 'django.db.backends.sqlite3',
+        #     'NAME': rel('../..', 'test_db.sqlite3'),
+        # },
+    }
+
+    DEBUG = True
+

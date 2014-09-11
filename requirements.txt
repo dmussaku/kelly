@@ -23,3 +23,5 @@ django-timezone-field
 vobject
 #django-vcard
 #-e git+git@github.com:Rustem/django-vcard.git@1402d6c89378c026f2fd45f1ac8ccbfeebc0305f#egg=django_vcard
+mock
+django-nose2
