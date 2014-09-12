@@ -322,7 +322,6 @@ class Contact(models.Model):
         try:
             activities = []
             contacts = []
-            contacts_dict = {}
             contact_activity_map = {}
             user = CRMUser.objects.get(user_id=user_id)
             # user's sales cycles through owned_sales_cycle related_name from Sales Cycle model
@@ -342,11 +341,9 @@ class Contact(models.Model):
                 contact_activity_map[contact].append(activity) 
                 if contact not in contacts:
                     contacts.append(contact)
-            for contact in contacts:
-                contacts_dict[contact] = None
             if include_activities:
                 return (contacts, activities, contact_activity_map)
-            return contacts_dict
+            return contacts
 
         except CRMUser.DoesNotExist:
             return None
