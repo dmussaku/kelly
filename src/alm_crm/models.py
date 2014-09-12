@@ -8,6 +8,7 @@ from django.db.models import signals
 from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
 from django.utils import timezone
+import datetime
 # from dateutil.relativedelta import relativedelta
 
 
@@ -549,7 +550,17 @@ class Activity(models.Model):
         -------
             {'2018-22-05': 12, '2018-22-06': 14, ...}
         """
-
+        try:
+            user=CRMUser.objects.get(id=user_id)
+        except CRMUser.DoesNotExist:
+            return False
+        '''need to implement the conversion to datetime object from input arguments '''
+        if (type(from_dt) and type(to_dt) == datetime.datetime):
+            pass
+        #date_list=[from_dt.date()+datetime.timedelta(days=i) for i in range(0,(to_dt.date()-from_dt.date()).days)]
+        activity_queryset = Activity.objects.filter(when__gte=from_dt, when__lte=to_dt, author=user)
+        date_list=[act.when.date() for act in activity_queryset]
+        return {str(dt):date_list.count() for dt in date_list}
 
 class Mention(models.Model):
     user_id = models.IntegerField()
