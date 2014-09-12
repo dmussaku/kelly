@@ -430,7 +430,7 @@ class SalesCycle(models.Model):
         return self.rel_activities.order_by('-when')[offset:offset+limit]
 
     def add_product(self, product_id, **kw):
-        """TODO Assigns products to salescycle"""
+        """Assigns products to salescycle"""
         try:
             product = Product.objects.get(id=product_id)
             self.products.add(product)
@@ -438,10 +438,10 @@ class SalesCycle(models.Model):
         except Product.DoesNotExist:
             return False
 
-    def add_products(self, product_ids=None, save=False):
-        """TODO Assigns products to salescycle"""
+    def add_products(self, product_ids, save=False):
+        """Assigns products to salescycle"""
         assert isinstance(product_ids, (tuple, list)), "must be a list"
-        return [self.add_products(pid) for pid in product_ids]
+        return [self.add_product(pid) for pid in product_ids]
 
     def set_result(self, value_obj, save=False):
         """TODO Set salescycle.real_value to value_obj. Saves the salescycle
