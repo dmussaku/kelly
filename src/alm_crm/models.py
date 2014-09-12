@@ -9,7 +9,6 @@ from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
 from django.utils import timezone
 # from dateutil.relativedelta import relativedelta
-from itertools import chain
 
 
 STATUSES_CAPS = (
