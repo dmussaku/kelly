@@ -1,0 +1,70 @@
+[
+    {
+        "pk": 1, 
+        "model": "alm_crm.SalesCycle", 
+        "fields": {
+            "products":[],
+            "owner":1,
+            "followers":[],
+            "contact":1,
+            "latest_activity":1,
+            "projected_value":1,
+            "real_value":1,
+            "status":"N",
+            "date_created":1,
+            "from_date":1,
+            "to_date":1
+        }
+    }, 
+    {
+        "pk": 2, 
+        "model": "alm_crm.SalesCycle", 
+        "fields": {
+            "products":[],
+            "owner":1,
+            "followers":[],
+            "contact":1,
+            "latest_activity":5,
+            "projected_value":1,
+            "real_value":1,
+            "status":"N",
+            "date_created":1,
+            "from_date":1,
+            "to_date":1
+        }
+    }, 
+    {
+        "pk": 3, 
+        "model": "alm_crm.SalesCycle", 
+        "fields": {
+            "products":[],
+            "owner":1,
+            "followers":[],
+            "contact":1,
+            "latest_activity":6,
+            "projected_value":1,
+            "real_value":1,
+            "status":"N",
+            "date_created":1,
+            "from_date":1,
+            "to_date":1
+        }
+    }, 
+    {
+        "pk": 4, 
+        "model": "alm_crm.SalesCycle", 
+        "fields": {
+            "products":[],
+            "owner":2,
+            "followers":[],
+            "contact":1,
+            "latest_activity":7,
+            "projected_value":1,
+            "real_value":1,
+            "status":"N",
+            "date_created":1,
+            "from_date":1,
+            "to_date":1
+        }
+    }
+]

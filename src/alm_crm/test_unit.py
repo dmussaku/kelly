@@ -6,7 +6,7 @@ from alm_vcard.models import VCard
 
 
 class ContactTestCase(TestCase):
-    fixtures = ['crmusers.json', 'contacts.json']
+    fixtures = ['crmusers.json', 'contacts.json', 'salescycles.json', 'activities.json']
 
     def setUp(self):
         super(ContactTestCase, self).setUp()
