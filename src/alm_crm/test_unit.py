@@ -49,3 +49,6 @@ class ContactTestCase(TestCase):
         self.assertEqual(contact.__class__, Contact)
         self.assertEqual(contact.vcard.__class__, VCard)
         self.assertNotEqual(contact.name, "Unknown")
+
+    def test_get_contacts_by_last_activity_date(self):
+        struct = Contact.get_contacts_by_last_activity_date(user_id=1)

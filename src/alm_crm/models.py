@@ -312,9 +312,9 @@ class Contact(models.Model):
             TO: Rustem K
             probably better structure:
             if include_activities:
-                {Contact1: [Activity1, Activity2], Contact2: [Activity3]}
+                (Queryset<Contact>, Queryset<Activity>, {Contact1: [Activity1, Activity2], Contact2: [Activity3]})
             else:
-                {Contact1: [], Contact2: []}
+                Queryset<Contact>
             in this case return value is always instance of dict, so it is easier to process it
             at the same time, list of contacts always available through rv.keys()
         """
