@@ -485,6 +485,8 @@ class Activity(models.Model):
     sales_cycle = models.ForeignKey(SalesCycle,
                                     related_name='rel_activities')
     author = models.ForeignKey(CRMUser, related_name='owned_activities')
+    mentions = generic.GenericRelation('Mention')
+    comments = generic.GenericRelation('Comment')
 
     class Meta:
         verbose_name = 'activity'
@@ -525,6 +527,7 @@ class Activity(models.Model):
 
         return Activity.objects.filter(q)
 
+    '''--Done--'''
     @classmethod
     def get_activity_detail(
             cls, activity_id, include_sales_cycle=False,
@@ -541,15 +544,27 @@ class Activity(models.Model):
             mentioned_users (if included)
             {'activity': {'object': ..., 'comments': [], sales_cycle: ..}}
         """
+        try:
+            activity=Activity.objects.get(id=activity_id)
+        except Activity.DoesNotExist:
+            return False
+        activity_detail={'activity':{'object':activity}}
+        if include_sales_cycle:
+            try:
+                sales_cycle=Activity.objects.get(id=activity.sales_cycle_id)
+                activity_detail['activity']['sales_cycle']=sales_cycle
+            except Activity.DoesNotExist:
+                return False
+        if include_mentioned_users:
+            activity_detail['activity']['mentioned_users']=activity.mentions
+        if include_comments:
+            activity_detail['activity']['comments']=activity.comments
+        return activity_detail
 
+    '''---DONE---'''    
     @classmethod
     def get_number_of_activities_by_day(cls, user_id,
                                         from_dt=None, to_dt=None):
-        """TODO
-        Returns
-        -------
-            {'2018-22-05': 12, '2018-22-06': 14, ...}
-        """
         try:
             user=CRMUser.objects.get(id=user_id)
         except CRMUser.DoesNotExist:
@@ -561,6 +576,7 @@ class Activity(models.Model):
         activity_queryset = Activity.objects.filter(when__gte=from_dt, when__lte=to_dt, author=user)
         date_list=[act.when.date() for act in activity_queryset]
         return {str(dt):date_list.count() for dt in date_list}
+
 
 class Mention(models.Model):
     user_id = models.IntegerField()
