@@ -308,7 +308,46 @@ class Contact(models.Model):
                     Queryset<Activity>
                     contact_activity_map {1: [2], 3: [4, 5, 6]}
             example: (contacts, activities, contact_activity_map)
+
+            TO: Rustem K
+            probably better structure:
+            if include_activities:
+                {Contact1: [Activity1, Activity2], Contact2: [Activity3]}
+            else:
+                {Contact1: [], Contact2: []}
+            in this case return value is always instance of dict, so it is easier to process it
+            at the same time, list of contacts always available through rv.keys()
         """
+        # contact_activity_map follows structure suggested by Askhat. 
+        try:
+            activities = []
+            contacts = []
+            contact_activity_map = {}
+            user = CRMUser.objects.get(user_id=user_id)
+            # user's sales cycles through owned_sales_cycle related_name from Sales Cycle model
+            user_sc = user.owned_sales_cycles.objects.all()
+            # contacts = [sc.contact for sc in user_sc]
+            # get every single sales cycle
+            for sc in user_sc:
+                # get every single activity from every sales cycle and put them into the activities list
+                for activity in sc.rel_activities.objects.all():
+                    activities.append(activity) # now we have a list of all acitivities. not sorted though
+            # sort activities by date. latest being first
+            activities = activities.order_by('-when')[offset:offset+limit]
+            # do for all activities. 
+            for activity in activities: 
+                # get contact via activity's sales cycle
+                contact = activity.sales_cycle.contact
+                contact_activity_map[contact].append(activity) 
+                if contact not in contacts:
+                    contacts.append(contact)
+
+            if include_activities:
+                return (contacts, activities, contact_activity_map)
+            return contacts
+
+        except CRMUser.DoesNotExist:
+            return None
 
     @classmethod
     def get_cold_base(cls, limit=20, offset=0):
@@ -576,7 +615,8 @@ class Mention(models.Model):
         ----------
             Queryset<Mention>
         """
-        pass
+        # Alibek
+        return Mention.objects.filter(user_id=user_id)
 
 
 class Comment(models.Model):
