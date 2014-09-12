@@ -9,6 +9,7 @@ from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
 from django.utils import timezone
 # from dateutil.relativedelta import relativedelta
+from itertools import chain
 
 
 STATUSES_CAPS = (
@@ -477,9 +478,9 @@ class SalesCycle(models.Model):
         sales_cycle.save()
 
     @classmethod
-    def get_salescyles_by_last_activity_date(
+    def get_salescycles_by_last_activity_date(
             cls, user_id, limit=20, offset=0):
-        """TODO Returns user salescycles ordered by last activity date.
+        """Returns user sales_cycles ordered by last activity date.
 
             Returns
             -------
@@ -487,12 +488,23 @@ class SalesCycle(models.Model):
                 Queryset<Activity>
                 sales_cycle_activity_map =  {1: [2, 3, 4], 2:[3, 5, 7]}
         """
-        pass
+        crm_user = CRMUser.objects.get(id=user_id)
+        sales_cycles = crm_user.owned_sales_cycles.\
+            order_by('-latest_activity__when')[offset:offset+limit]
+
+        activities = set()
+        sales_cycle_activity_map = {}
+        for sc in sales_cycles:
+            sc_a_list = sc.rel_activities.values_list('id', flat=True)
+            sales_cycle_activity_map[sc.id] = sc_a_list
+            activities.update(sc_a_list)
+        return (sales_cycles, activities, sales_cycle_activity_map)
 
     @classmethod
     def get_salescycles_by_contact(cls, contact_id, limit=20, offset=0):
-        """TODO Returns queryset of sales cycles by contact"""
-        return SalesCycle.objects.filter(contact_id=contact_id)[offset:offset+limit]
+        """Returns queryset of sales cycles by contact"""
+        return SalesCycle.objects.filter(contact_id=contact_id)[
+            offset:offset+limit]
 
 
 class Activity(models.Model):
