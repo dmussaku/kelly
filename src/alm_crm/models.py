@@ -36,6 +36,15 @@ class CRMUser(models.Model):
         user = User.objects.get(pk=self.user_id)
         return user
 
+    def set_supervisor(self, save=False):
+        self.is_supervisor=True
+        if save:
+            self.save()
+
+    def unset_supervisor(self, save=False):
+        self.is_supervisor=False
+        if save:
+            self.save()
 
 class Contact(models.Model):
 
