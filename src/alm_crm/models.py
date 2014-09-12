@@ -502,8 +502,11 @@ class Activity(models.Model):
 
     @classmethod
     def get_activities_by_salescycle(cls, sales_cycle_id, limit=20, offset=0):
-        """TODO Returns list of activities by sales cycle id."""
-        pass
+        try:
+            sales_cycle=SalesCycle.objects.get(id=sales_cycle_id)
+        except SalesCycle.DoesNotExist:
+            return False
+        return cls.objects.filter(sales_cycle=sales_cycle).order_by('when')[offset:offset+limit]
 
     @classmethod
     def get_mentioned_activities_of(cls, user_ids=set([])):
