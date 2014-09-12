@@ -36,6 +36,8 @@ class Migration(SchemaMigration):
                       self.gf('django.db.models.fields.IntegerField')(default=0),
                       keep_default=False)
 
+        # db.alter_column('alma_sales_cycle_followers', 'user_id', self.gf('django.db.models.fields.related.ManyToManyField')(to=orm['alm_crm.CRMUser']))
+
 
     def backwards(self, orm):
         # Adding field 'Product.title'
@@ -57,6 +59,8 @@ class Migration(SchemaMigration):
 
         # Deleting field 'Product.company_id'
         db.delete_column('alma_product', 'company_id')
+
+        # db.alter_column('alma_sales_cycle_followers', 'user_id', self.gf('django.db.models.fields.related.ManyToManyField')(to=orm['alm_user.User']))
 
 
     models = {

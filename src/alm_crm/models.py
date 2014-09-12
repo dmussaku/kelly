@@ -451,12 +451,21 @@ class SalesCycle(models.Model):
             self.save()
 
     def add_follower(self, user_id, **kw):
-        """TODO Set follower to salescycle"""
-        return self.add_followers([user_id], **kw)
+        """Set follower to salescycle"""
+        return self.add_followers([user_id], **kw)[0]
 
     def add_followers(self, user_ids, save=False):
-        """TODO Set followers to salescycle"""
+        """Set followers to salescycle"""
         assert isinstance(user_ids, (tuple, list)), 'must be a list'
+        status = []
+        for uid in user_ids:
+            try:
+                crm_user = CRMUser.objects.get(id=uid)
+                self.followers.add(crm_user)
+                status.append(True)
+            except CRMUser.DoesNotExist:
+                status.append(False)
+        return status
 
     @classmethod
     def upd_lst_activity_on_create(cls, sender,
