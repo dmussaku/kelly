@@ -1,6 +1,8 @@
+import os
 import datetime
 from django.test import TestCase
 from alm_crm.models import Contact, CRMUser
+from alm_vcard.models import VCard
 
 
 class ContactTestCase(TestCase):
@@ -39,3 +41,11 @@ class ContactTestCase(TestCase):
         self.assertEqual(self.contact1.status, 0)
         self.contact1.change_status(1)
         self.assertEqual(self.contact1.status, 1)
+
+    def test_upload_contacts_by_vcard(self):
+        file_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'alm_crm/fixtures/brown.vcf')
+        file_obj = open(file_path, "r").read()
+        contact = Contact._upload_contacts_by_vcard(file_obj)
+        self.assertEqual(contact.__class__, Contact)
+        self.assertEqual(contact.vcard.__class__, VCard)
+        self.assertNotEqual(contact.name, "Unknown")
