@@ -556,9 +556,9 @@ class Activity(models.Model):
             except Activity.DoesNotExist:
                 return False
         if include_mentioned_users:
-            activity_detail['activity']['mentioned_users']=activity.mentions
+            activity_detail['activity']['mentioned_users']=activity.mentions.all()
         if include_comments:
-            activity_detail['activity']['comments']=activity.comments
+            activity_detail['activity']['comments']=activity.comments.all()
         return activity_detail
 
     '''---DONE---'''    
