@@ -8,7 +8,6 @@ from django.db.models import signals
 from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
 from django.utils import timezone
-# from dateutil.relativedelta import relativedelta
 
 
 STATUSES_CAPS = (
@@ -194,7 +193,7 @@ class Contact(models.Model):
     @classmethod
     def get_contacts_for_last_activity_period(
             cls, user_id, from_dt=None, to_dt=None):
-        r"""TODO:
+        r"""
         Retrieves all contacts according to the following criteria:
             - user contacted for that time period (`from_dt`, `to_dt`)
         user contacted means user have activities with at least one
@@ -210,29 +209,11 @@ class Contact(models.Model):
         -------
         Queryset of Contacts with whom `user_id` get contacted for that period.
         """
-        pass
-        # assert periods in ALLOWED_TIME_PERIODS
-        # rv = []
-
-        # if 'year' in periods:
-        #     rv = queryset_contact.filter(
-        #         latest_activity__when__range=(
-        #             timezone.now() + relativedelta(months=-12),
-        #             timezone.now()))
-
-        # elif 'month' in periods:
-        #     rv = queryset_contact.filter(
-        #         latest_activity__when__range=(
-        #             timezone.now() + relativedelta(months=-1),
-        #             timezone.now()))
-
-        # elif 'week' in periods:
-        #     grouped['week'] = queryset_contact.filter(
-        #         latest_activity__when__range=(
-        #             timezone.now() + relativedelta(days=-7),
-        #             timezone.now()))
-
-        # return grouped
+        crm_user = CRMUser.objects.get(id=user_id)
+        activities = crm_user.owned_activities.filter(
+            when__range=(from_dt, to_dt))
+        return Contact.objects.filter(
+            id__in=activities.values_list('sales_cycle__contact', flat=True))
 
     @classmethod
     def filter_contacts_by_vcard(cls, search_text, search_params=None,
@@ -318,7 +299,7 @@ class Contact(models.Model):
             in this case return value is always instance of dict, so it is easier to process it
             at the same time, list of contacts always available through rv.keys()
         """
-        # contact_activity_map follows structure suggested by Askhat. 
+        # contact_activity_map follows structure suggested by Askhat.
         try:
             activities = []
             contacts = []
@@ -334,11 +315,11 @@ class Contact(models.Model):
                     activities.append(activity) # now we have a list of all acitivities. not sorted though
             # sort activities by date. latest being first
             activities = activities.order_by('-when')[offset:offset+limit]
-            # do for all activities. 
-            for activity in activities: 
+            # do for all activities.
+            for activity in activities:
                 # get contact via activity's sales cycle
                 contact = activity.sales_cycle.contact
-                contact_activity_map[contact].append(activity) 
+                contact_activity_map[contact].append(activity)
                 if contact not in contacts:
                     contacts.append(contact)
             if include_activities:
