@@ -444,9 +444,11 @@ class SalesCycle(models.Model):
         return [self.add_product(pid) for pid in product_ids]
 
     def set_result(self, value_obj, save=False):
-        """TODO Set salescycle.real_value to value_obj. Saves the salescycle
+        """Set salescycle.real_value to value_obj. Saves the salescycle
         if `save` is true"""
-        pass
+        self.real_value = value_obj
+        if save:
+            self.save()
 
     def add_follower(self, user_id, **kw):
         """TODO Set follower to salescycle"""
