@@ -20,6 +20,12 @@ STATUSES = (NEW, LEAD, OPPORTUNITY, CLIENT) = range(len(STATUSES_CAPS))
 
 ALLOWED_TIME_PERIODS = ['week', 'month', 'year']
 
+CURRENCY_OPTIONS = (
+    ('USD', 'US Dollar'),
+    ('RUB', 'Rubbles'),
+    ('KZT', 'Tenge'),
+    )
+
 
 class CRMUser(models.Model):
 
@@ -325,11 +331,6 @@ class Value(models.Model):
         ('annualy', 'Annualy'),
         ('instant', 'Instant'),
     )
-    CURRENCY_OPTIONS = (
-        ('USD', 'US Dollar'),
-        ('RUB', 'Rubbles'),
-        ('KZT', 'Tenge'),
-        )
     salary = models.CharField(max_length=7, choices=SALARY_OPTIONS,
                               default='instant')
     amount = models.IntegerField()
@@ -345,15 +346,20 @@ class Value(models.Model):
 
 
 class Product(models.Model):
-    title = models.CharField(_('product title'), max_length=100, blank=False)
+    name = models.CharField(_('product name'), max_length=100, blank=False)
     description = models.TextField(_('product description'))
+    price = models.IntegerField()
+    currency = models.CharField(max_length=3, choices=CURRENCY_OPTIONS,
+                                default='KZT')
+    user_id = models.IntegerField()
+    company_id = models.IntegerField()
 
     class Meta:
         verbose_name = _('product')
         db_table = settings.DB_PREFIX.format('product')
 
     def __unicode__(self):
-        return self.title
+        return self.name
 
 
 class SalesCycle(models.Model):
@@ -420,8 +426,8 @@ class SalesCycle(models.Model):
             return False
 
     def get_activities(self, limit=20, offset=0):
-        """TODO Returns list of activities ordered by date."""
-        return self.rel_activities.order_by('-when')[offset:offset + limit]
+        """Returns list of activities ordered by date."""
+        return self.rel_activities.order_by('-when')[offset:offset+limit]
 
     def add_product(self, product_id, **kw):
         """TODO Assigns products to salescycle"""
