@@ -152,7 +152,7 @@ class Contact(models.Model):
 
     @classmethod
     def assign_user_to_contact(cls, user_id, contact_id):
-        """TODO Assign user with `user_id` to contact with `contact_id`"""
+        """Assign user with `user_id` to contact with `contact_id`"""
         return cls.assign_user_to_contacts(user_id, [contact_id])
 
     @classmethod
@@ -262,7 +262,7 @@ class Contact(models.Model):
     @classmethod
     def get_contact_detail(cls, contact_id, with_vcard=False):
         """TODO Returns contact detail by `contact_id`."""
-        pass
+        return Contact.objects.get(pk=contact_id)
 
     @classmethod
     def upload_contacts(cls, upload_type, file_obj, save=False):
@@ -293,7 +293,9 @@ class Contact(models.Model):
 
     @classmethod
     def _upload_contacts_by_csv(cls, file_obj):
-        """TODO Extracts contacts from csv. Returns Queryset<Contact>."""
+        """TODO Extracts contacts from csv. Returns Queryset<Contact>.
+            What is the structure of csv file ???
+        """
         pass
 
     @classmethod
@@ -310,7 +312,7 @@ class Contact(models.Model):
 
     @classmethod
     def get_cold_base(cls, limit=20, offset=0):
-        """TODO Returns list of contacts that are considered cold.
+        """Returns list of contacts that are considered cold.
         Cold contacts should satisfy two conditions:
             1. no assignee for contact
             2. status is NEW"""
