@@ -410,8 +410,14 @@ class SalesCycle(models.Model):
         self.save()
 
     def assign_user(self, user_id, save=False):
-        """TODO Assign user to salescycle."""
-        pass
+        """Assign user to salescycle."""
+        try:
+            self.owner = CRMUser.objects.get(id=user_id)
+            if save:
+                self.save()
+            return True
+        except CRMUser.DoesNotExist:
+            return False
 
     def get_activities(self, limit=20, offset=0):
         """TODO Returns list of activities ordered by date."""
