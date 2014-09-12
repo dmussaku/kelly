@@ -492,7 +492,7 @@ class SalesCycle(models.Model):
     @classmethod
     def get_salescycles_by_contact(cls, contact_id, limit=20, offset=0):
         """TODO Returns queryset of sales cycles by contact"""
-        pass
+        return SalesCycle.objects.filter(contact_id=contact_id)[offset:offset+limit]
 
 
 class Activity(models.Model):
