@@ -1,0 +1,14 @@
+BEGIN:VCARD
+VERSION:3.0
+ADR;TYPE=WORK:12;222;Dostyk;Almaty;Almalinskii;6000;Kazakhstan
+ADR;TYPE=HOME:12;222;Dostyk;Almaty;Almalinskii;6000;Kazakhstan
+BDAY:2012-03-30
+EMAIL;TYPE=INTERNET:test@test.tt
+FN:Michael Brown
+N:Brown;Michael;;;
+NOTE:test note
+ORG:Apple
+TEL;TYPE=CELL:87772341221
+TEL;TYPE=HOME:+77272348956
+URL:http://google.com
+END:VCARD

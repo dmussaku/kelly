@@ -8,7 +8,6 @@ from django.db.models import signals
 from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
 from django.utils import timezone
-# from dateutil.relativedelta import relativedelta
 
 
 STATUSES_CAPS = (
@@ -152,7 +151,7 @@ class Contact(models.Model):
 
     @classmethod
     def assign_user_to_contact(cls, user_id, contact_id):
-        """TODO Assign user with `user_id` to contact with `contact_id`"""
+        """Assign user with `user_id` to contact with `contact_id`"""
         return cls.assign_user_to_contacts(user_id, [contact_id])
 
     @classmethod
@@ -187,14 +186,9 @@ class Contact(models.Model):
         return Contact.objects.filter(status=status)[offset:offset+limit]
 
     @classmethod
-    def create_contact_with_vcard(cls, contact_attrs, vcard_attrs):
-        """TODO Create contact with vcard. Returns True on success."""
-        pass
-
-    @classmethod
     def get_contacts_for_last_activity_period(
             cls, user_id, from_dt=None, to_dt=None):
-        r"""TODO:
+        r"""
         Retrieves all contacts according to the following criteria:
             - user contacted for that time period (`from_dt`, `to_dt`)
         user contacted means user have activities with at least one
@@ -210,29 +204,11 @@ class Contact(models.Model):
         -------
         Queryset of Contacts with whom `user_id` get contacted for that period.
         """
-        pass
-        # assert periods in ALLOWED_TIME_PERIODS
-        # rv = []
-
-        # if 'year' in periods:
-        #     rv = queryset_contact.filter(
-        #         latest_activity__when__range=(
-        #             timezone.now() + relativedelta(months=-12),
-        #             timezone.now()))
-
-        # elif 'month' in periods:
-        #     rv = queryset_contact.filter(
-        #         latest_activity__when__range=(
-        #             timezone.now() + relativedelta(months=-1),
-        #             timezone.now()))
-
-        # elif 'week' in periods:
-        #     grouped['week'] = queryset_contact.filter(
-        #         latest_activity__when__range=(
-        #             timezone.now() + relativedelta(days=-7),
-        #             timezone.now()))
-
-        # return grouped
+        crm_user = CRMUser.objects.get(id=user_id)
+        activities = crm_user.owned_activities.filter(
+            when__range=(from_dt, to_dt))
+        return Contact.objects.filter(
+            id__in=activities.values_list('sales_cycle__contact', flat=True))
 
     @classmethod
     def filter_contacts_by_vcard(cls, search_text, search_params=None,
@@ -246,8 +222,7 @@ class Contact(models.Model):
         ---------
             search_text - text by which we execute a search
             search_params - list of vcard fields [
-                'fn', 'organization.unit', 'bday']
-
+                ('fn', 'startswith'), ('organization.unit', 'icontains'), 'bday']
             order_by - sort results by fields e.g. ('-pk', '...')
             limit - how much rows must be returned
             offset - from which row to start
@@ -261,12 +236,16 @@ class Contact(models.Model):
 
     @classmethod
     def get_contact_detail(cls, contact_id, with_vcard=False):
-        """TODO Returns contact detail by `contact_id`."""
-        pass
+        """TEST Returns contact detail by `contact_id`."""
+        c = Contact.objects.filter(pk=contact_id)
+        if not with_vcard:
+            return c.first()
+        c.select_related('vcard')
+        return c.first()
 
     @classmethod
     def upload_contacts(cls, upload_type, file_obj, save=False):
-        """TODO Extracts contacts from source: vcard file or csv file or any
+        """TEST Extracts contacts from source: vcard file or csv file or any
         other file objects. Build queryset from them and save if required.
         Parameters
         ----------
@@ -284,34 +263,93 @@ class Contact(models.Model):
     def _upload_contacts_by_vcard(cls, file_obj):
         """Extracts contacts from vcard. Returns Queryset<Contact>."""
         vcard = VCard.importFrom('vCard', file_obj)
-        vcard.save()
+        vcard.commit()
         contact = cls()
         # contact.save()
         contact.vcard = vcard
         contact.save()
         return contact
 
-    @classmethod
-    def _upload_contacts_by_csv(cls, file_obj):
-        """TODO Extracts contacts from csv. Returns Queryset<Contact>."""
-        pass
+    # @classmethod
+    # def _upload_contacts_by_csv(cls, file_obj):
+    #     """Extracts contacts from csv. Returns Queryset<Contact>.
+    #         What is the structure of csv file ???
+    #     """
+    #     pass
 
     @classmethod
     def get_contacts_by_last_activity_date(
             cls, user_id, include_activities=False, limit=20, offset=0):
-        """TODO Returns list of contacts ordered by last activity date.
+        """TEST Returns list of contacts ordered by last activity date.
             Returns:
                 Queryset<Contact>
                 if includes:
                     Queryset<Activity>
                     contact_activity_map {1: [2], 3: [4, 5, 6]}
             example: (contacts, activities, contact_activity_map)
+
+            TO: Rustem K (answered)
+            probably better structure:
+            if include_activities:
+                (Queryset<Contact>, Queryset<Activity>, {Contact1: [Activity1, Activity2], Contact2: [Activity3]})
+            else:
+                Queryset<Contact>
+            in this case return value is always instance of dict, so it is easier to process it
+            at the same time, list of contacts always available through rv.keys()
         """
         pass
+        # SECOND IMPL
+        # contact_activity_map follows structure suggested by Askhat.
+        # contacts = cls.objects.filter(
+        #     user_id=user_id).order_by('-latest_activity__when')
+        # if not include_activities:
+        #     return contacts
+        # contact_activity_map = dict()
+        # sales_cycle_contact_map, sales_cycles_pks = dict(), set([])
+        # for contact in contacts:
+        #     current_scycles_pks = map(lambda sc: sc.pk, contact.sales_cycles.all())
+        #     sales_cycles_pks |= set(current_scycles_pks)
+        #     for current_cycle_pk in current_scycles_pks:
+        #         sales_cycle_contact_map[current_cycle_pk] = contact.pk
+        # activities = Activity.objects.filter(
+        #     sales_cycle__id__in=sales_cycles_pks).order_by('when')
+        # for activity in activities:
+        #     contact_pk = sales_cycle_contact_map[activity.sales_cycle.pk]
+        #     contact_activity_map.setdefault(contact_pk, []).append(activity.pk)
+        # return (contacts, activities, contact_activity_map)
+        # FIRST IMPL
+        # try:
+        #     activities = []
+        #     contacts = []
+        #     contact_activity_map = {}
+        #     user = CRMUser.objects.get(user_id=user_id)
+        #     # user's sales cycles through owned_sales_cycle related_name from Sales Cycle model
+        #     user_sc = user.owned_sales_cycles.objects.all()
+        #     # contacts = [sc.contact for sc in user_sc]
+        #     # get every single sales cycle
+        #     for sc in user_sc:
+        #         # get every single activity from every sales cycle and put them into the activities list
+        #         for activity in sc.rel_activities.objects.all():
+        #             activities.append(activity) # now we have a list of all acitivities. not sorted though
+        #     # sort activities by date. latest being first
+        #     activities = activities.order_by('-when')[offset:offset+limit]
+        #     # do for all activities.
+        #     for activity in activities:
+        #         # get contact via activity's sales cycle
+        #         contact = activity.sales_cycle.contact
+        #         contact_activity_map[contact].append(activity)
+        #         if contact not in contacts:
+        #             contacts.append(contact)
+        #     if include_activities:
+        #         return (contacts, activities, contact_activity_map)
+        #     return contacts
+
+        # except CRMUser.DoesNotExist:
+        #     return None
 
     @classmethod
     def get_cold_base(cls, limit=20, offset=0):
-        """TODO Returns list of contacts that are considered cold.
+        """Returns list of contacts that are considered cold.
         Cold contacts should satisfy two conditions:
             1. no assignee for contact
             2. status is NEW"""
@@ -575,7 +613,8 @@ class Mention(models.Model):
         ----------
             Queryset<Mention>
         """
-        pass
+        # Alibek
+        return Mention.objects.filter(user_id=user_id)
 
 
 class Comment(models.Model):

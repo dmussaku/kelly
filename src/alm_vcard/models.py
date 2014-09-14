@@ -191,7 +191,6 @@ class VCard(models.Model):
 
             # ----------- OPTIONAL MULTIPLE VALUE TABLE PROPERTIES -------
             if property.name.upper() == "TEL":
-
                 t = Tel()
 
                 t.contact = contact
@@ -530,9 +529,8 @@ class VCard(models.Model):
     def commit(self):
 
         self.save()
-
         for m in self.childModels:
-            m.contact = self
+            m.vcard = self
             m.save()
 
     @classmethod

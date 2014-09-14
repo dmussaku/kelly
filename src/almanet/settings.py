@@ -251,6 +251,7 @@ class DevConfiguration(FileSettings('~/.almanet/almanet.conf.py'), BaseConfigura
     DEBUG = True
     TEMPLATE_DEBUG = DEBUG
 
+
 class TestConfiguration(FileSettings('~/.almanet/almanet.conf.py'), BaseConfiguration):
     SELENIUM_TESTSERVER_HOST = 'http://10.8.0.18'
 

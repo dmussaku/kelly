@@ -7,6 +7,7 @@
 	<form name="login-form" action="" method="post">
         {% csrf_token %}
         {{ form.errors }}
+        {{ form.non_field_errors }}
         <li><label for="id_username">Email: </label>
 	        <input id="id_username" type="text" name="username"/>
         </li>

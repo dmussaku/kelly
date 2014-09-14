@@ -1,0 +1,16 @@
+BEGIN:VCARD
+VERSION:3.0
+ADR;TYPE=WORK:050001;Tolebi 1\, 12\, 14;Tole bi;;Almaty;050001;Kazakhstan
+ADR;TYPE=dom:1;1;1;;1;1;1
+BDAY:20140904
+CLASS:manager
+EMAIL;TYPE=INTERNET:aliya.musina@gmail.com
+FN:Aliya
+N:Musina;Aliya;A;Ms;
+ORG:Almacloud;LLC
+ROLE:sales manager
+ROLE:sales supervisor
+TEL;TYPE=cell:87777777777
+TEL;TYPE=WORK:87776666666
+TZ:UTC
+END:VCARD
