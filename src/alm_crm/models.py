@@ -307,6 +307,7 @@ class Contact(models.Model):
                     contact_activity_map {1: [2], 3: [4, 5, 6]}
             example: (contacts, activities, contact_activity_map)
         """
+        pass
 
     @classmethod
     def get_cold_base(cls, limit=20, offset=0):
