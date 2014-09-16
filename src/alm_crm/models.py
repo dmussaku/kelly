@@ -628,16 +628,16 @@ class Activity(models.Model):
             {'2018-22-05': 12, '2018-22-06': 14, ...}
         """
 
+
 class Feedback(models.Model):
     STATUS_OPTIONS = (
-            ('W', 'waiting'),
-            ('$', '1000'),
-            ('1', 'Client is happy'),
-            ('2', 'Client is OK'),
-            ('3', 'Client is neutral'),
-            ('4', 'Client is disappointed'),
-            ('5', 'Client is angry')
-        )
+        ('W', _('waiting')),
+        ('$', _('1000')),
+        ('1', _('Client is happy')),
+        ('2', _('Client is OK')),
+        ('3', _('Client is neutral')),
+        ('4', _('Client is disappointed')),
+        ('5', _('Client is angry')))
     feedback = models.CharField(max_length=300)
     status = models.CharField(max_length=1, choices=STATUS_OPTIONS, default='')
     date_created = models.DateTimeField(blank=True, auto_now_add=True)
@@ -653,6 +653,7 @@ class Feedback(models.Model):
     def save(self, **kwargs):
         self.date_edited = timezone.now()
         super(Feedback, self).save(**kwargs)
+
 
 class Mention(models.Model):
     user_id = models.IntegerField()
