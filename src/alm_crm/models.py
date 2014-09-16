@@ -240,7 +240,7 @@ class Contact(models.Model):
         ---------
             search_text - text by which we execute a search
             search_params - list of vcard fields [
-                ('fn', 'startswith'), ('organization.unit', 'icontains'), 'bday']
+                ('fn', 'startswith'), ('org__organization_unit', 'icontains'), 'bday']
             order_by - sort results by fields e.g. ('-pk', '...')
             limit - how much rows must be returned
             offset - from which row to start
@@ -250,7 +250,25 @@ class Contact(models.Model):
             len(Queryset<Contact>) <= limit
         """
         assert isinstance(search_params, list), "Must be a list"
-        pass
+
+        def build_params(search_text, search_params):
+            POSSIBLE_MODIFIERS = ['startswith', 'icontains']
+
+            rv = {}
+            for param in search_params:
+                if isinstance(param, tuple):
+                    if param[1] not in POSSIBLE_MODIFIERS:
+                        raise Exception, _('incorrect modifier')
+                    rv['%s__%s' % param] = search_text
+                else:
+                    rv[param] = search_text
+            return rv
+
+        params = build_params(search_text, search_params)
+        vcards = VCard.objects.filter(**params)
+        contacts = map(lambda vcard: vcard.contact_set.first(), vcards)[offset:offset+limit]
+
+        return contacts
 
     @classmethod
     def get_contact_detail(cls, contact_id, with_vcard=False):
@@ -263,7 +281,7 @@ class Contact(models.Model):
 
     @classmethod
     def upload_contacts(cls, upload_type, file_obj, save=False):
-        """TEST Extracts contacts from source: vcard file or csv file or any
+        """Extracts contacts from source: vcard file or csv file or any
         other file objects. Build queryset from them and save if required.
         Parameters
         ----------
