@@ -25,7 +25,7 @@ CURRENCY_OPTIONS = (
     ('USD', 'US Dollar'),
     ('RUB', 'Rubbles'),
     ('KZT', 'Tenge'),
-    )
+)
 
 
 class CRMUser(models.Model):
@@ -201,7 +201,7 @@ class Contact(models.Model):
 
     @classmethod
     def get_contacts_by_status(cls, status, limit=10, offset=0):
-        return Contact.objects.filter(status=status)[offset:offset+limit]
+        return Contact.objects.filter(status=status)[offset:offset + limit]
 
     @classmethod
     def get_contacts_for_last_activity_period(
@@ -341,19 +341,19 @@ class Contact(models.Model):
         #     contacts = []
         #     contact_activity_map = {}
         #     user = CRMUser.objects.get(user_id=user_id)
-        #     # user's sales cycles through owned_sales_cycle related_name from Sales Cycle model
+        # user's sales cycles through owned_sales_cycle related_name from Sales Cycle model
         #     user_sc = user.owned_sales_cycles.objects.all()
-        #     # contacts = [sc.contact for sc in user_sc]
-        #     # get every single sales cycle
+        # contacts = [sc.contact for sc in user_sc]
+        # get every single sales cycle
         #     for sc in user_sc:
-        #         # get every single activity from every sales cycle and put them into the activities list
+        # get every single activity from every sales cycle and put them into the activities list
         #         for activity in sc.rel_activities.objects.all():
-        #             activities.append(activity) # now we have a list of all acitivities. not sorted though
-        #     # sort activities by date. latest being first
+        # activities.append(activity) # now we have a list of all acitivities. not sorted though
+        # sort activities by date. latest being first
         #     activities = activities.order_by('-when')[offset:offset+limit]
-        #     # do for all activities.
+        # do for all activities.
         #     for activity in activities:
-        #         # get contact via activity's sales cycle
+        # get contact via activity's sales cycle
         #         contact = activity.sales_cycle.contact
         #         contact_activity_map[contact].append(activity)
         #         if contact not in contacts:
@@ -372,7 +372,7 @@ class Contact(models.Model):
             1. no assignee for contact
             2. status is NEW"""
         return cls.objects.filter(
-            assignees__isnull=True, status=NEW)[offset:offset+limit]
+            assignees__isnull=True, status=NEW)[offset:offset + limit]
 
 
 class Value(models.Model):
@@ -418,7 +418,7 @@ class SalesCycle(models.Model):
         ('P', 'Pending'),
         ('C', 'Completed'),
         ('N', 'New'),
-        )
+    )
     products = models.ManyToManyField(Product,
                                       related_name='sales_cycles')
     owner = models.ForeignKey(CRMUser, related_name='owned_sales_cycles')
@@ -478,7 +478,7 @@ class SalesCycle(models.Model):
 
     def get_activities(self, limit=20, offset=0):
         """TEST Returns list of activities ordered by date."""
-        return self.rel_activities.order_by('-when')[offset:offset+limit]
+        return self.rel_activities.order_by('-when')[offset:offset + limit]
 
     def add_product(self, product_id, **kw):
         """TEST Assigns products to salescycle"""
@@ -541,7 +541,7 @@ class SalesCycle(models.Model):
         """
         crm_user = CRMUser.objects.get(id=user_id)
         sales_cycles = crm_user.owned_sales_cycles.order_by(
-            '-latest_activity__when')[offset:offset+limit]
+            '-latest_activity__when')[offset:offset + limit]
 
         activities = list()
         sales_cycle_activity_map = {}
@@ -556,7 +556,7 @@ class SalesCycle(models.Model):
     def get_salescycles_by_contact(cls, contact_id, limit=20, offset=0):
         """Returns queryset of sales cycles by contact"""
         return SalesCycle.objects.filter(contact_id=contact_id)[
-            offset:offset+limit]
+            offset:offset + limit]
 
 
 class Activity(models.Model):
@@ -589,10 +589,10 @@ class Activity(models.Model):
     @classmethod
     def get_activities_by_salescycle(cls, sales_cycle_id, limit=20, offset=0):
         try:
-            sales_cycle=SalesCycle.objects.get(id=sales_cycle_id)
+            sales_cycle = SalesCycle.objects.get(id=sales_cycle_id)
         except SalesCycle.DoesNotExist:
             return False
-        return cls.objects.filter(sales_cycle=sales_cycle).order_by('when')[offset:offset+limit]
+        return cls.objects.filter(sales_cycle=sales_cycle).order_by('when')[offset:offset + limit]
 
     @classmethod
     def get_mentioned_activities_of(cls, user_ids=set([])):
@@ -628,20 +628,21 @@ class Activity(models.Model):
             {'activity': {'object': ..., 'comments': [], sales_cycle: ..}}
         """
         try:
-            activity=Activity.objects.get(id=activity_id)
+            activity = Activity.objects.get(id=activity_id)
         except Activity.DoesNotExist:
             return False
-        activity_detail={'activity':{'object':activity}}
+        activity_detail = {'activity': {'object': activity}}
         if include_sales_cycle:
             try:
-                sales_cycle=Activity.objects.get(id=activity.sales_cycle_id)
-                activity_detail['activity']['sales_cycle']=sales_cycle
+                sales_cycle = Activity.objects.get(id=activity.sales_cycle_id)
+                activity_detail['activity']['sales_cycle'] = sales_cycle
             except Activity.DoesNotExist:
                 return False
         if include_mentioned_users:
-            activity_detail['activity']['mentioned_users']=activity.mentions.all()
+            activity_detail['activity'][
+                'mentioned_users'] = activity.mentions.all()
         if include_comments:
-            activity_detail['activity']['comments']=activity.comments.all()
+            activity_detail['activity']['comments'] = activity.comments.all()
         return activity_detail
 
     '''---DONE---'''
@@ -649,16 +650,16 @@ class Activity(models.Model):
     def get_number_of_activities_by_day(cls, user_id,
                                         from_dt=None, to_dt=None):
         try:
-            user=CRMUser.objects.get(id=user_id)
+            user = CRMUser.objects.get(id=user_id)
         except CRMUser.DoesNotExist:
             return False
         '''need to implement the conversion to datetime object from input arguments '''
         if (type(from_dt) and type(to_dt) == datetime.datetime):
             pass
-        #date_list=[from_dt.date()+datetime.timedelta(days=i) for i in range(0,(to_dt.date()-from_dt.date()).days)]
-        activity_queryset = Activity.objects.filter(when__gte=from_dt, when__lte=to_dt, author=user)
-        date_list=[act.when.date() for act in activity_queryset]
-        return {str(dt):date_list.count() for dt in date_list}
+        activity_queryset = Activity.objects.filter(
+            when__gte=from_dt, when__lte=to_dt, author=user)
+        date_list = [act.when.date() for act in activity_queryset]
+        return {str(dt): date_list.count() for dt in date_list}
 
 
 class Feedback(models.Model):
