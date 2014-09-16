@@ -8,6 +8,8 @@ from django.db.models import signals
 from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
 from django.utils import timezone
+import datetime
+# from dateutil.relativedelta import relativedelta
 
 
 STATUSES_CAPS = (
@@ -564,6 +566,8 @@ class Activity(models.Model):
     sales_cycle = models.ForeignKey(SalesCycle,
                                     related_name='rel_activities')
     author = models.ForeignKey(CRMUser, related_name='owned_activities')
+    mentions = generic.GenericRelation('Mention')
+    comments = generic.GenericRelation('Comment')
 
     class Meta:
         verbose_name = 'activity'
@@ -584,8 +588,11 @@ class Activity(models.Model):
 
     @classmethod
     def get_activities_by_salescycle(cls, sales_cycle_id, limit=20, offset=0):
-        """TODO Returns list of activities by sales cycle id."""
-        pass
+        try:
+            sales_cycle=SalesCycle.objects.get(id=sales_cycle_id)
+        except SalesCycle.DoesNotExist:
+            return False
+        return cls.objects.filter(sales_cycle=sales_cycle).order_by('when')[offset:offset+limit]
 
     @classmethod
     def get_mentioned_activities_of(cls, user_ids=set([])):
@@ -603,6 +610,7 @@ class Activity(models.Model):
 
         return Activity.objects.filter(q)
 
+    '''--Done--'''
     @classmethod
     def get_activity_detail(
             cls, activity_id, include_sales_cycle=False,
@@ -619,15 +627,38 @@ class Activity(models.Model):
             mentioned_users (if included)
             {'activity': {'object': ..., 'comments': [], sales_cycle: ..}}
         """
+        try:
+            activity=Activity.objects.get(id=activity_id)
+        except Activity.DoesNotExist:
+            return False
+        activity_detail={'activity':{'object':activity}}
+        if include_sales_cycle:
+            try:
+                sales_cycle=Activity.objects.get(id=activity.sales_cycle_id)
+                activity_detail['activity']['sales_cycle']=sales_cycle
+            except Activity.DoesNotExist:
+                return False
+        if include_mentioned_users:
+            activity_detail['activity']['mentioned_users']=activity.mentions.all()
+        if include_comments:
+            activity_detail['activity']['comments']=activity.comments.all()
+        return activity_detail
 
+    '''---DONE---'''
     @classmethod
     def get_number_of_activities_by_day(cls, user_id,
                                         from_dt=None, to_dt=None):
-        """TODO
-        Returns
-        -------
-            {'2018-22-05': 12, '2018-22-06': 14, ...}
-        """
+        try:
+            user=CRMUser.objects.get(id=user_id)
+        except CRMUser.DoesNotExist:
+            return False
+        '''need to implement the conversion to datetime object from input arguments '''
+        if (type(from_dt) and type(to_dt) == datetime.datetime):
+            pass
+        #date_list=[from_dt.date()+datetime.timedelta(days=i) for i in range(0,(to_dt.date()-from_dt.date()).days)]
+        activity_queryset = Activity.objects.filter(when__gte=from_dt, when__lte=to_dt, author=user)
+        date_list=[act.when.date() for act in activity_queryset]
+        return {str(dt):date_list.count() for dt in date_list}
 
 
 class Feedback(models.Model):
