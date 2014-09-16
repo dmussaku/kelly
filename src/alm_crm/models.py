@@ -455,7 +455,7 @@ class SalesCycle(models.Model):
         self.save()
 
     def assign_user(self, user_id, save=False):
-        """Assign user to salescycle."""
+        """TEST Assign user to salescycle."""
         try:
             self.owner = CRMUser.objects.get(id=user_id)
             if save:
@@ -465,36 +465,35 @@ class SalesCycle(models.Model):
             return False
 
     def get_activities(self, limit=20, offset=0):
-        """Returns list of activities ordered by date."""
+        """TEST Returns list of activities ordered by date."""
         return self.rel_activities.order_by('-when')[offset:offset+limit]
 
     def add_product(self, product_id, **kw):
-        """Assigns products to salescycle"""
-        try:
-            product = Product.objects.get(id=product_id)
-            self.products.add(product)
-            return True
-        except Product.DoesNotExist:
-            return False
+        """TEST Assigns products to salescycle"""
+        return self.add_products([product_id], **kw)
 
-    def add_products(self, product_ids, save=False):
-        """Assigns products to salescycle"""
+    def add_products(self, product_ids):
+        """TEST Assigns products to salescycle"""
         assert isinstance(product_ids, (tuple, list)), "must be a list"
-        return [self.add_product(pid) for pid in product_ids]
+        products = Product.objects.filter(pk__in=product_ids)
+        if not products:
+            return False
+        self.products.add(*products)
+        return True
 
     def set_result(self, value_obj, save=False):
-        """Set salescycle.real_value to value_obj. Saves the salescycle
+        """TEST Set salescycle.real_value to value_obj. Saves the salescycle
         if `save` is true"""
         self.real_value = value_obj
         if save:
             self.save()
 
     def add_follower(self, user_id, **kw):
-        """Set follower to salescycle"""
+        """TEST Set follower to salescycle"""
         return self.add_followers([user_id], **kw)[0]
 
     def add_followers(self, user_ids, save=False):
-        """Set followers to salescycle"""
+        """TEST Set followers to salescycle"""
         assert isinstance(user_ids, (tuple, list)), 'must be a list'
         status = []
         for uid in user_ids:
@@ -525,17 +524,20 @@ class SalesCycle(models.Model):
                 Queryset<SalesCycle>
                 Queryset<Activity>
                 sales_cycle_activity_map =  {1: [2, 3, 4], 2:[3, 5, 7]}
+            Raises:
+                User.DoesNotExist
         """
         crm_user = CRMUser.objects.get(id=user_id)
-        sales_cycles = crm_user.owned_sales_cycles.\
-            order_by('-latest_activity__when')[offset:offset+limit]
+        sales_cycles = crm_user.owned_sales_cycles.order_by(
+            '-latest_activity__when')[offset:offset+limit]
 
-        activities = set()
+        activities = list()
         sales_cycle_activity_map = {}
         for sc in sales_cycles:
-            sc_a_list = sc.rel_activities.values_list('id', flat=True)
-            sales_cycle_activity_map[sc.id] = sc_a_list
-            activities.update(sc_a_list)
+            sc_a_list = sc.rel_activities
+            sc_a_list_pks = map(lambda act: act.pk, sc_a_list)
+            sales_cycle_activity_map[sc.id] = sc_a_list_pks
+            activities.extend(sc_a_list)
         return (sales_cycles, activities, sales_cycle_activity_map)
 
     @classmethod
