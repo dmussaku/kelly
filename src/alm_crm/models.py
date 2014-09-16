@@ -707,11 +707,11 @@ class Comment(models.Model):
             comment.save()
         return comment
 
+    '''---done---'''
     @classmethod
     def get_comments_by_context(cls, context_object_id, context_class,
                                 limit=20, offset=0):
-        """TODO Returns list of comments by context."""
-        pass
+        return cls.objects.filter(object_id=context_object_id, content_type=context_class)[offset:limit:offset]
 
 
 signals.post_save.connect(
