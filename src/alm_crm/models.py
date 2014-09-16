@@ -558,20 +558,9 @@ class SalesCycle(models.Model):
 
 
 class Activity(models.Model):
-    STATUS_OPTIONS = (
-        ('W', 'waiting'),
-        ('$', '1000'),
-        ('1', 'Client is happy'),
-        ('2', 'Client is OK'),
-        ('3', 'Client is neutral'),
-        ('4', 'Client is disappointed'),
-        ('5', 'Client is angry')
-    )
     title = models.CharField(max_length=100)
     description = models.CharField(max_length=500)
     when = models.DateTimeField(blank=True, auto_now_add=True)
-    status = models.CharField(max_length=1, choices=STATUS_OPTIONS, default='')
-    feedback = models.CharField(max_length=300)
     sales_cycle = models.ForeignKey(SalesCycle,
                                     related_name='rel_activities')
     author = models.ForeignKey(CRMUser, related_name='owned_activities')
@@ -585,6 +574,7 @@ class Activity(models.Model):
 
     def set_feedback(self, feedback_obj, save=False):
         """Set feedback to activity instance. Saves if `save` is set(True)."""
+        """don't really understand why we need set_feedback here, theres already a OneToOneField to Feedback"""
         pass
 
     @classmethod
@@ -638,6 +628,31 @@ class Activity(models.Model):
             {'2018-22-05': 12, '2018-22-06': 14, ...}
         """
 
+class Feedback(models.Model):
+    STATUS_OPTIONS = (
+            ('W', 'waiting'),
+            ('$', '1000'),
+            ('1', 'Client is happy'),
+            ('2', 'Client is OK'),
+            ('3', 'Client is neutral'),
+            ('4', 'Client is disappointed'),
+            ('5', 'Client is angry')
+        )
+    feedback = models.CharField(max_length=300)
+    status = models.CharField(max_length=1, choices=STATUS_OPTIONS, default='')
+    date_created = models.DateTimeField(blank=True, auto_now_add=True)
+    date_edited = models.DateTimeField(blank=True, auto_now_add=True)
+    activity = models.OneToOneField(Activity, blank=False)
+    value = models.OneToOneField(Value, blank=True, null=True)
+    mentions = generic.GenericRelation('Mention')
+    comments = generic.GenericRelation('Comment')
+
+    def __unicode__(self):
+        return self.feedback
+
+    def save(self, **kwargs):
+        self.date_edited = timezone.now()
+        super(Feedback, self).save(**kwargs)
 
 class Mention(models.Model):
     user_id = models.IntegerField()
