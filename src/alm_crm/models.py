@@ -711,7 +711,10 @@ class Comment(models.Model):
     @classmethod
     def get_comments_by_context(cls, context_object_id, context_class,
                                 limit=20, offset=0):
-        return cls.objects.filter(object_id=context_object_id, content_type=context_class)[offset:limit:offset]
+        cttype = ContentType.objects.get_for_model(context_class)
+        return cls.objects.filter(
+            object_id=context_object_id,
+            content_type=cttype)[offset:limit:offset]
 
 
 signals.post_save.connect(
