@@ -19,6 +19,12 @@ STATUSES = (NEW, LEAD, OPPORTUNITY, CLIENT) = range(len(STATUSES_CAPS))
 
 ALLOWED_TIME_PERIODS = ['week', 'month', 'year']
 
+CURRENCY_OPTIONS = (
+    ('USD', 'US Dollar'),
+    ('RUB', 'Rubbles'),
+    ('KZT', 'Tenge'),
+    )
+
 
 class CRMUser(models.Model):
 
@@ -364,11 +370,6 @@ class Value(models.Model):
         ('annualy', 'Annualy'),
         ('instant', 'Instant'),
     )
-    CURRENCY_OPTIONS = (
-        ('USD', 'US Dollar'),
-        ('RUB', 'Rubbles'),
-        ('KZT', 'Tenge'),
-        )
     salary = models.CharField(max_length=7, choices=SALARY_OPTIONS,
                               default='instant')
     amount = models.IntegerField()
@@ -384,15 +385,20 @@ class Value(models.Model):
 
 
 class Product(models.Model):
-    title = models.CharField(_('product title'), max_length=100, blank=False)
+    name = models.CharField(_('product name'), max_length=100, blank=False)
     description = models.TextField(_('product description'))
+    price = models.IntegerField()
+    currency = models.CharField(max_length=3, choices=CURRENCY_OPTIONS,
+                                default='KZT')
+    user_id = models.IntegerField()
+    company_id = models.IntegerField()
 
     class Meta:
         verbose_name = _('product')
         db_table = settings.DB_PREFIX.format('product')
 
     def __unicode__(self):
-        return self.title
+        return self.name
 
 
 class SalesCycle(models.Model):
@@ -449,33 +455,56 @@ class SalesCycle(models.Model):
         self.save()
 
     def assign_user(self, user_id, save=False):
-        """TODO Assign user to salescycle."""
-        pass
+        """Assign user to salescycle."""
+        try:
+            self.owner = CRMUser.objects.get(id=user_id)
+            if save:
+                self.save()
+            return True
+        except CRMUser.DoesNotExist:
+            return False
 
     def get_activities(self, limit=20, offset=0):
-        """TODO Returns list of activities ordered by date."""
-        pass
+        """Returns list of activities ordered by date."""
+        return self.rel_activities.order_by('-when')[offset:offset+limit]
 
     def add_product(self, product_id, **kw):
-        """TODO Assigns products to salescycle"""
-        return self.add_product([product_id], **kw)
+        """Assigns products to salescycle"""
+        try:
+            product = Product.objects.get(id=product_id)
+            self.products.add(product)
+            return True
+        except Product.DoesNotExist:
+            return False
 
-    def add_products(self, product_ids=None, save=False):
-        """TODO Assigns products to salescycle"""
+    def add_products(self, product_ids, save=False):
+        """Assigns products to salescycle"""
         assert isinstance(product_ids, (tuple, list)), "must be a list"
+        return [self.add_product(pid) for pid in product_ids]
 
     def set_result(self, value_obj, save=False):
-        """TODO Set salescycle.real_value to value_obj. Saves the salescycle
+        """Set salescycle.real_value to value_obj. Saves the salescycle
         if `save` is true"""
-        pass
+        self.real_value = value_obj
+        if save:
+            self.save()
 
     def add_follower(self, user_id, **kw):
-        """TODO Set follower to salescycle"""
-        return self.add_followers([user_id], **kw)
+        """Set follower to salescycle"""
+        return self.add_followers([user_id], **kw)[0]
 
     def add_followers(self, user_ids, save=False):
-        """TODO Set followers to salescycle"""
+        """Set followers to salescycle"""
         assert isinstance(user_ids, (tuple, list)), 'must be a list'
+        status = []
+        for uid in user_ids:
+            try:
+                crm_user = CRMUser.objects.get(id=uid)
+                self.followers.add(crm_user)
+                status.append(True)
+            except CRMUser.DoesNotExist:
+                status.append(False)
+        return status
 
     @classmethod
     def upd_lst_activity_on_create(cls, sender,
@@ -487,9 +516,9 @@ class SalesCycle(models.Model):
         sales_cycle.save()
 
     @classmethod
-    def get_salescyles_by_last_activity_date(
+    def get_salescycles_by_last_activity_date(
             cls, user_id, limit=20, offset=0):
-        """TODO Returns user salescycles ordered by last activity date.
+        """Returns user sales_cycles ordered by last activity date.
 
             Returns
             -------
@@ -497,12 +526,23 @@ class SalesCycle(models.Model):
                 Queryset<Activity>
                 sales_cycle_activity_map =  {1: [2, 3, 4], 2:[3, 5, 7]}
         """
-        pass
+        crm_user = CRMUser.objects.get(id=user_id)
+        sales_cycles = crm_user.owned_sales_cycles.\
+            order_by('-latest_activity__when')[offset:offset+limit]
+
+        activities = set()
+        sales_cycle_activity_map = {}
+        for sc in sales_cycles:
+            sc_a_list = sc.rel_activities.values_list('id', flat=True)
+            sales_cycle_activity_map[sc.id] = sc_a_list
+            activities.update(sc_a_list)
+        return (sales_cycles, activities, sales_cycle_activity_map)
 
     @classmethod
     def get_salescycles_by_contact(cls, contact_id, limit=20, offset=0):
-        """TODO Returns queryset of sales cycles by contact"""
-        pass
+        """Returns queryset of sales cycles by contact"""
+        return SalesCycle.objects.filter(contact_id=contact_id)[
+            offset:offset+limit]
 
 
 class Activity(models.Model):
