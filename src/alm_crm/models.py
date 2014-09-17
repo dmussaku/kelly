@@ -576,11 +576,13 @@ class Activity(models.Model):
     def __unicode__(self):
         return self.title
 
-    def set_feedback(self, feedback_obj):
+    def set_feedback(self, feedback_obj, save=False):
         """Set feedback to activity instance. Saves if `save` is set(True)."""
         """don't really understand why we need set_feedback here
         theres already a OneToOneField to Feedback"""
-        self.feedback_set.add(feedback_obj)
+        feedback_obj.activity=self
+        if save:
+            feedback_obj.save()
 
     @classmethod
     def get_activities_by_contact(cls, contact_id):
