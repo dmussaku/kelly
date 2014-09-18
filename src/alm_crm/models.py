@@ -594,8 +594,12 @@ class Activity(models.Model):
             sales_cycle = SalesCycle.objects.get(id=sales_cycle_id)
         except SalesCycle.DoesNotExist:
             return False
-        return cls.objects.filter(sales_cycle=sales_cycle).order_by('when')[offset:offset + limit]
+        if (limit):
+            return cls.objects.filter(sales_cycle=sales_cycle).order_by('when')[offset:offset + limit]
+        else:
+            return cls.objects.filter(sales_cycle=sales_cycle).order_by('when')
 
+            
     @classmethod
     def get_mentioned_activities_of(cls, user_ids=set([])):
         """

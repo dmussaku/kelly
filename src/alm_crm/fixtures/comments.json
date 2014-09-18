@@ -1,0 +1,55 @@
+
+ [
+    {
+        "pk": 1,
+        "model": "alm_crm.Comment",
+        "fields": {
+			"comment":"Test comment 1", 
+			"author":1, 
+			"date_created":"2014-09-10 00:00:00", 
+			"date_edited":"2014-09-10 00:00:00", 
+			"object_id":"", 
+			"content_type":"", 
+			"content_object":"" 
+        }
+    },
+    {
+        "pk": 2,
+        "model": "alm_crm.Comment",
+        "fields": {
+        	"comment":"Test comment 2", 
+			"author":1, 
+			"date_created":"2014-09-10 00:00:00", 
+			"date_edited":"2014-09-10 00:00:00", 
+			"object_id":"", 
+			"content_type":"", 
+			"content_object":"" 
+        }
+    },
+    {
+        "pk": 3,
+        "model": "alm_crm.Comment",
+        "fields": {
+        	"comment":"Test comment 3", 
+			"author":1, 
+			"date_created":"2014-09-10 00:00:00", 
+			"date_edited":"2014-09-10 00:00:00", 
+			"object_id":"", 
+			"content_type":"", 
+			"content_object":"" 
+        }
+    },
+    {
+        "pk": 4,
+        "model": "alm_crm.Comment",
+        "fields": {
+        	"comment":"Test comment 4", 
+			"author":1, 
+			"date_created":"2014-09-10 00:00:00", 
+			"date_edited":"2014-09-10 00:00:00", 
+			"object_id":"", 
+			"content_type":"", 
+			"content_object":"" 
+        }
+    }
+]

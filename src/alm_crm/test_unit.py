@@ -70,6 +70,7 @@ class ActivityTestCase(TestCase):
     def setUp(self):
         super(ActivityTestCase, self).setUp()
         self.salescycle = SalesCycle.objects.get(id=1)
+        self.activities = Activity.objects.filter(sales_cycle_id=1)
 
     def test_actvities_by_contact(self):
         c = Contact.objects.get(id=1)
@@ -88,9 +89,22 @@ class ActivityTestCase(TestCase):
         self.assertEqual(f, Feedback.objects.get(id=f.id))
         a.set_feedback(f, True)
         self.assertEqual(a,f.activity)
-    
+
+    def test_get_activities_by_salescycle(self):
+        a=Activity()
+        if (len(self.activities)==len(a.get_activities_by_salescycle(1,0,0))):
+            self.assertEqual(len(set(self.activities).intersection(a.get_activities_by_salescycle(1,0,0))), len(self.activities))
+        else:
+            return False
 
 
+    def test_get_mentioned_activites_of(self):
+        pass
 
+    def test_get_activity_details(self):
+        pass
+
+    def test_number_of_activities_by_day(self):
+        pass
 
 
