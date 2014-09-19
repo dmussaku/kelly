@@ -184,7 +184,7 @@ class MentionTestCase(TestCase):
     def test_build_new__without_save(self):
         user_id = 1
         before = Mention.get_all_mentions_of(user_id).count()
-        self.assertEqual(Mention.build_new(user_id, Activity, 1, True).
+        self.assertEqual(Mention.build_new(user_id, Activity, 1).
                          __class__, Mention)
         self.assertEqual(Mention.get_all_mentions_of(user_id).count(), before)
 
@@ -198,29 +198,35 @@ class MentionTestCase(TestCase):
 
 
 class CommentTestCase(TestCase):
-    fixtures = ['mentions.json']
+    fixtures = ['crmusers.json', 'contacts.json', 'salescycles.json',
+                'activities.json', 'mentions.json']
 
     def setUp(self):
         super(CommentTestCase, self).setUp()
 
     def test_build_new__without_save(self):
         user_id = 1
-        before = Comment.get_comments_by_context(1, Mention).count()
-        self.assertEqual(Comment.build_new(user_id, Mention, 1, True).
-                         __class__, Mention)
-        self.assertEqual(Comment.get_comments_by_context(1, Mention).count(),
+        before = Comment.get_comments_by_context(1, Activity).count()
+
+        self.assertEqual(Comment.build_new(user_id, Activity, 1).
+                         __class__, Comment)
+        self.assertEqual(Comment.get_comments_by_context(1, Activity).count(),
                          before)
 
     def test_build_new(self):
         user_id = 1
-        before = Comment.get_comments_by_context(1, Mention).count()
-        self.assertEqual(Comment.build_new(user_id, Mention, 1, True).pk,
-                         Comment.get_comments_by_context(1, Mention).last().pk)
-        self.assertEqual(Comment.get_comments_by_context(1, Mention).count(),
-                         before + 1)
+        before = Comment.get_comments_by_context(1, Activity).count()
+        comment = Comment.build_new(user_id, Activity, 1, True)
+        received_comments = Comment.get_comments_by_context(1, Activity)
+
+        self.assertEqual(received_comments.count(), before + 1)
+        self.assertTrue(comment.id in
+                        received_comments.values_list('pk', flat=True))
 
     def test_get_comments_by_context(self):
-        self.assertEqual(Comment.get_comments_by_context(1, Mention, 1, 0)
-                         .count(), 1)
-        self.assertEqual(Comment.get_comments_by_context(1, Mention, 1, 1)
+        activity1 = Activity.objects.get(pk=1)
+
+        self.assertEqual(Comment.get_comments_by_context(1, Activity, 1, 0)
+                         .count(), activity1.comments.count())
+        self.assertEqual(Comment.get_comments_by_context(1, Activity, 1, 1)
                          .count(), 0)

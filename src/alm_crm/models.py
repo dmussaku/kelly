@@ -716,7 +716,7 @@ class Comment(models.Model):
     comment = models.CharField(max_length=140)
     author = models.ForeignKey(CRMUser, related_name='comment_author')
     date_created = models.DateTimeField(blank=True, auto_now_add=True)
-    date_edited = models.DateTimeField(blank=True)
+    date_edited = models.DateTimeField(blank=True, auto_now_add=True)
     object_id = models.IntegerField(null=True, blank=False)
     content_type = models.ForeignKey(ContentType)
     content_object = generic.GenericForeignKey('content_type', 'object_id')
@@ -743,7 +743,7 @@ class Comment(models.Model):
     @classmethod
     def build_new(cls, user_id, content_class=None,
                   object_id=None, save=False):
-        comment = cls(user_id=user_id)
+        comment = cls(author_id=user_id)
         comment.content_type = ContentType.objects.get_for_model(content_class)
         comment.object_id = object_id
         if save:
@@ -757,7 +757,7 @@ class Comment(models.Model):
         cttype = ContentType.objects.get_for_model(context_class)
         return cls.objects.filter(
             object_id=context_object_id,
-            content_type=cttype)[offset:limit:offset]
+            content_type=cttype)[offset:offset + limit]
 
 
 signals.post_save.connect(
