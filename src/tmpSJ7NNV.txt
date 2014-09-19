@@ -1,5 +1,0 @@
-BEGIN:VCARD
-VERSION:3.0
-FN:Mussakulov Daniyar
-N:Mussakulov;Daniyar;;;
-END:VCARD
