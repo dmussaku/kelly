@@ -5,7 +5,7 @@
         "fields": {
             "title":"a1",
             "description":"d1",
-            "when":"2014-09-11 00:00:00",
+            "when":"2014-09-11 00:00:00+00:00",
             "sales_cycle":1,
             "author":1
         }
@@ -16,7 +16,7 @@
         "fields": {
             "title":"a2",
             "description":"d2",
-            "when":"2014-09-12 00:00:00",
+            "when":"2014-09-12 00:00:00+00:00",
             "sales_cycle":1,
             "author":1
         }
@@ -27,7 +27,7 @@
         "fields": {
             "title":"a3",
             "description":"d3",
-            "when":"2014-09-13 00:00:00",
+            "when":"2014-09-13 00:00:00+00:00",
             "sales_cycle":1,
             "author":1
         }
@@ -38,7 +38,7 @@
         "fields": {
             "title":"a4",
             "description":"d4",
-            "when":"2014-09-14 00:00:00",
+            "when":"2014-09-14 00:00:00+00:00",
             "sales_cycle":1,
             "author":2
         }
@@ -49,7 +49,7 @@
         "fields": {
             "title":"a5",
             "description":"d5",
-            "when":"2014-09-15 00:00:00",
+            "when":"2014-09-15 00:00:00+00:00",
             "sales_cycle":2,
             "author":2
         }
@@ -60,7 +60,7 @@
         "fields": {
             "title":"a6",
             "description":"d6",
-            "when":"2014-09-12 00:00:00",
+            "when":"2014-09-12 00:00:00+00:00",
             "sales_cycle":2,
             "author":1
         }
@@ -71,7 +71,7 @@
         "fields": {
             "title":"a7",
             "description":"d7",
-            "when":"2014-09-16 00:00:00",
+            "when":"2014-09-16 00:00:00+00:00",
             "sales_cycle":3,
             "author":2
         }

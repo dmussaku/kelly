@@ -576,11 +576,13 @@ class Activity(models.Model):
     def __unicode__(self):
         return self.title
 
-    def set_feedback(self, feedback_obj):
+    def set_feedback(self, feedback_obj, save=False):
         """Set feedback to activity instance. Saves if `save` is set(True)."""
         """don't really understand why we need set_feedback here
         theres already a OneToOneField to Feedback"""
-        self.feedback_set.add(feedback_obj)
+        self.feedback = feedback_obj
+        if save:
+            self.save()
 
     @classmethod
     def get_activities_by_contact(cls, contact_id):
@@ -592,27 +594,16 @@ class Activity(models.Model):
             sales_cycle = SalesCycle.objects.get(id=sales_cycle_id)
         except SalesCycle.DoesNotExist:
             return False
-        return cls.objects.filter(sales_cycle=sales_cycle).order_by('when')[offset:offset + limit]
+        return cls.objects.filter(sales_cycle=sales_cycle)\
+            .order_by('when')[offset:offset + limit]
 
     @classmethod
     def get_mentioned_activities_of(cls, user_ids=set([])):
-        """
-        to get filter with OR statements, like below:
-            Activity.objects.filter(
-                Q(sales_cycle__mentions__id=user_ids[0]) |
-                Q(sales_cycle__mentions__id=user_ids[1])
-            )
-        used functional python's reduce
-        """
-
-        q = reduce(lambda q, f: q | models.Q(sales_cycle__mentions__id=f),
-                   user_ids, models.Q())
-
-        return Activity.objects.filter(q)
+        return Activity.objects.filter(mentions__user_id__in=user_ids)
 
     '''--Done--'''
     @classmethod
-    def get_activity_detail(
+    def get_activity_details(
             cls, activity_id, include_sales_cycle=False,
             include_mentioned_users=False, include_comments=True):
         """TODO Returns activity details with comments by default.
@@ -633,11 +624,8 @@ class Activity(models.Model):
             return False
         activity_detail = {'activity': {'object': activity}}
         if include_sales_cycle:
-            try:
-                sales_cycle = Activity.objects.get(id=activity.sales_cycle_id)
-                activity_detail['activity']['sales_cycle'] = sales_cycle
-            except Activity.DoesNotExist:
-                return False
+            activity_detail['activity'][
+                'sales_cycle'] = activity.sales_cycle
         if include_mentioned_users:
             activity_detail['activity'][
                 'mentioned_users'] = activity.mentions.all()
@@ -659,7 +647,7 @@ class Activity(models.Model):
         activity_queryset = Activity.objects.filter(
             when__gte=from_dt, when__lte=to_dt, author=user)
         date_list = [act.when.date() for act in activity_queryset]
-        return {str(dt): date_list.count() for dt in date_list}
+        return {str(dt): len(date_list) for dt in date_list}
 
 
 class Feedback(models.Model):
@@ -724,7 +712,7 @@ class Comment(models.Model):
     date_created = models.DateTimeField(blank=True, auto_now_add=True)
     date_edited = models.DateTimeField(blank=True)
     object_id = models.IntegerField(null=True, blank=False)
-    content_type = models.CharField(max_length=1000, blank=True)
+    content_type = models.ForeignKey(ContentType)
     content_object = generic.GenericForeignKey('content_type', 'object_id')
     mentions = generic.GenericRelation('Mention')
 

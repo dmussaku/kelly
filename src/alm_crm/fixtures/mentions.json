@@ -1,0 +1,11 @@
+[
+    {
+        "pk":1,
+        "model": "alm_crm.Mention",
+        "fields": {
+            "user_id":1,
+            "object_id":1,
+            "content_type":["alm_crm", "activity"]
+        }
+    }
+]
