@@ -4,6 +4,10 @@ from views import *
 
 urlpatterns = patterns(
     '',
+    url(r'^vcards/$', VCardListView.as_view(), name='vcard_list'),
+
+    url(r'^vcards/export/(?P<id>\d+)/$', export_vcard, name='export_vcard'),
+
 	url(r'^vcards/create/$', VCardCreateView.as_view(), name='vcard_create'),
 
 	url(r'^vcards/update/(?P<pk>\d+)/$', VCardUpdateView.as_view(), name='vcard_update'),

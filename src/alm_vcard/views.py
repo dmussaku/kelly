@@ -3,6 +3,35 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from almanet.url_resolvers import reverse_lazy
 from models import *
 from forms import *
+import string
+import os
+import random
+from django.http import HttpResponse
+from django.core.files.temp import NamedTemporaryFile
+from django.core.servers.basehttp import FileWrapper
+
+def filename_generator(size=6, chars=string.ascii_uppercase + string.digits):
+    return ''.join(random.choice(chars) for _ in range(size))
+
+def import_vcard(request):
+    pass
+
+def export_vcard(request, id):
+    try:
+        vcard = VCard.objects.get(id=id)
+    except VCard.DoesNotExist:
+        return HttpResponse("Object doesn't exist")
+    temp = NamedTemporaryFile()
+    response = HttpResponse(FileWrapper(temp), mimetype='application/force-download')
+    response['Content-Disposition'] = 'attachment; filename="%s.txt"' % 'vcard'
+    response.write(vcard.exportTo('vCard'))
+    return response
+
+
+
+class VCardListView(ListView):
+    model = VCard
+    template_name = 'vcard/vcard_list.html'
 
 
 class VCardCreateView(CreateView):
