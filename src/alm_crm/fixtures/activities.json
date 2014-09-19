@@ -1,93 +1,79 @@
 [
     {
-        "pk": 1, 
-        "model": "alm_crm.Activity", 
+        "pk": 1,
+        "model": "alm_crm.Activity",
         "fields": {
-            "title":"t1",
+            "title":"a1",
             "description":"d1",
-            "when":"2014-09-10 00:00:00",
-            "status":"W",
-            "feedback":"2",
-            "sales_cycle":1,
-            "author":1
-        }
-    },
-    {
-        "pk": 2, 
-        "model": "alm_crm.Activity", 
-        "fields": {
-            "title":"t2",
-            "description":"d2",
             "when":"2014-09-11 00:00:00",
-            "status":"W",
-            "feedback":"2",
             "sales_cycle":1,
             "author":1
         }
     },
     {
-        "pk": 3, 
-        "model": "alm_crm.Activity", 
+        "pk": 2,
+        "model": "alm_crm.Activity",
         "fields": {
-            "title":"t3",
-            "description":"d3",
+            "title":"a2",
+            "description":"d2",
             "when":"2014-09-12 00:00:00",
-            "status":"W",
-            "feedback":"2",
             "sales_cycle":1,
             "author":1
         }
     },
     {
-        "pk": 4, 
-        "model": "alm_crm.Activity", 
+        "pk": 3,
+        "model": "alm_crm.Activity",
         "fields": {
-            "title":"t4",
-            "description":"d4",
+            "title":"a3",
+            "description":"d3",
             "when":"2014-09-13 00:00:00",
-            "status":"W",
-            "feedback":"2",
-            "sales_cycle":2,
+            "sales_cycle":1,
             "author":1
         }
     },
     {
-        "pk": 5, 
-        "model": "alm_crm.Activity", 
+        "pk": 4,
+        "model": "alm_crm.Activity",
         "fields": {
-            "title":"t5",
-            "description":"d5",
+            "title":"a4",
+            "description":"d4",
             "when":"2014-09-14 00:00:00",
-            "status":"W",
-            "feedback":"2",
+            "sales_cycle":1,
+            "author":2
+        }
+    },
+    {
+        "pk": 5,
+        "model": "alm_crm.Activity",
+        "fields": {
+            "title":"a5",
+            "description":"d5",
+            "when":"2014-09-15 00:00:00",
+            "sales_cycle":2,
+            "author":2
+        }
+    },
+    {
+        "pk": 6,
+        "model": "alm_crm.Activity",
+        "fields": {
+            "title":"a6",
+            "description":"d6",
+            "when":"2014-09-12 00:00:00",
             "sales_cycle":2,
             "author":1
         }
     },
     {
-        "pk": 6, 
-        "model": "alm_crm.Activity", 
+        "pk": 7,
+        "model": "alm_crm.Activity",
         "fields": {
-            "title":"t6",
-            "description":"d6",
-            "when":"2014-09-15 00:00:00",
-            "status":"W",
-            "feedback":"2",
-            "sales_cycle":3,
-            "author":1
-        }
-    },
-    {
-        "pk": 7, 
-        "model": "alm_crm.Activity", 
-        "fields": {
-            "title":"t7",
+            "title":"a7",
             "description":"d7",
             "when":"2014-09-16 00:00:00",
-            "status":"W",
-            "feedback":"2",
-            "sales_cycle":4,
-            "author":1
+            "sales_cycle":3,
+            "author":2
         }
     }
 ]
