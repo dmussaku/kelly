@@ -166,3 +166,4 @@ class ActivityTestCase(TestCase):
                                                               from_dt,
                                                               to_dt)
         self.assertEqual(sum(owned_data.values()), user_activities.count())
+        self.assertEqual(owned_data.values(), [1, 1, 2])

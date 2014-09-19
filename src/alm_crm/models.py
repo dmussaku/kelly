@@ -646,8 +646,14 @@ class Activity(models.Model):
             pass
         activity_queryset = Activity.objects.filter(
             when__gte=from_dt, when__lte=to_dt, author=user)
-        date_list = [act.when.date() for act in activity_queryset]
-        return {str(dt): len(date_list) for dt in date_list}
+        date_counts = {}
+        for act in activity_queryset:
+            date = str(act.when.date())
+            if date in date_counts:
+                date_counts[date] += 1
+            else:
+                date_counts[date] = 1
+        return date_counts
 
 
 class Feedback(models.Model):
