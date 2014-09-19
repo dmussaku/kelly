@@ -1,7 +1,8 @@
 import os
 from django.test import TestCase
 from django.utils import timezone
-from alm_crm.models import Contact, Activity, SalesCycle, Feedback, Mention
+from alm_crm.models import Contact, Activity, SalesCycle, Feedback, Mention,\
+    Comment
 from alm_vcard.models import VCard
 
 
@@ -183,6 +184,8 @@ class MentionTestCase(TestCase):
     def test_build_new__without_save(self):
         user_id = 1
         before = Mention.get_all_mentions_of(user_id).count()
+        self.assertEqual(Mention.build_new(user_id, Activity, 1, True).
+                         __class__, Mention)
         self.assertEqual(Mention.get_all_mentions_of(user_id).count(), before)
 
     def test_build_new(self):
@@ -192,3 +195,32 @@ class MentionTestCase(TestCase):
                          Mention.objects.last().pk)
         self.assertEqual(Mention.get_all_mentions_of(user_id).count(),
                          before + 1)
+
+
+class CommentTestCase(TestCase):
+    fixtures = ['mentions.json']
+
+    def setUp(self):
+        super(CommentTestCase, self).setUp()
+
+    def test_build_new__without_save(self):
+        user_id = 1
+        before = Comment.get_comments_by_context(1, Mention).count()
+        self.assertEqual(Comment.build_new(user_id, Mention, 1, True).
+                         __class__, Mention)
+        self.assertEqual(Comment.get_comments_by_context(1, Mention).count(),
+                         before)
+
+    def test_build_new(self):
+        user_id = 1
+        before = Comment.get_comments_by_context(1, Mention).count()
+        self.assertEqual(Comment.build_new(user_id, Mention, 1, True).pk,
+                         Comment.get_comments_by_context(1, Mention).last().pk)
+        self.assertEqual(Comment.get_comments_by_context(1, Mention).count(),
+                         before + 1)
+
+    def test_get_comments_by_context(self):
+        self.assertEqual(Comment.get_comments_by_context(1, Mention, 1, 0)
+                         .count(), 1)
+        self.assertEqual(Comment.get_comments_by_context(1, Mention, 1, 1)
+                         .count(), 0)
