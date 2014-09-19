@@ -167,3 +167,28 @@ class ActivityTestCase(TestCase):
                                                               to_dt)
         self.assertEqual(sum(owned_data.values()), user_activities.count())
         self.assertEqual(owned_data.values(), [1, 1, 2])
+
+
+class MentionTestCase(TestCase):
+    fixtures = ['mentions.json']
+
+    def setUp(self):
+        super(MentionTestCase, self).setUp()
+
+    def test_get_all_mentions_of(self):
+        user_id = 1
+        self.assertEqual(list(Mention.get_all_mentions_of(user_id)),
+                         list(Mention.objects.filter(user_id=user_id)))
+
+    def test_build_new__without_save(self):
+        user_id = 1
+        before = Mention.get_all_mentions_of(user_id).count()
+        self.assertEqual(Mention.get_all_mentions_of(user_id).count(), before)
+
+    def test_build_new(self):
+        user_id = 1
+        before = Mention.get_all_mentions_of(user_id).count()
+        self.assertEqual(Mention.build_new(user_id, Activity, 1, True).pk,
+                         Mention.objects.last().pk)
+        self.assertEqual(Mention.get_all_mentions_of(user_id).count(),
+                         before + 1)
