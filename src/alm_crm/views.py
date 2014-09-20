@@ -5,9 +5,10 @@ from almanet.url_resolvers import reverse_lazy
 from alm_user.models import User
 from django.http import HttpResponse
 from django.shortcuts import render
-from almanet.models import Subscription
-from forms import ContactForm, SalesCycleForm, MentionForm, ActivityForm, CommentForm, ValueForm
-from models import Contact, SalesCycle, Activity, Mention, Comment, Value
+from almanet.models import Product, Subscription
+from forms import ContactForm, SalesCycleForm, MentionForm, ActivityForm, CommentForm, ValueForm, ActivityFeedbackForm
+from models import Contact, SalesCycle, Activity, ActivityFeedback,  Mention, Comment, Value
+
 
 
 class UserProductView(ListView):
@@ -196,10 +197,8 @@ class CommentAddMentionView(CreateView):
 
 
 class ValueListView(ListView):
-
     model = Value
     queryset = Value.objects.all()
-
 
     def get_context_data(self, **kwargs):
         ctx = super(ValueListView, self).get_context_data(**kwargs)
@@ -229,3 +228,39 @@ class ValueDeleteView(DeleteView):
     model = Value
     template_name = "value/value_delete.html"
     success_url = reverse_lazy('value_list')
+
+
+class ActivityFeedbackListView(ListView):
+    model = ActivityFeedback
+    queryset = ActivityFeedback.objects.all()
+
+    def get_context_data(self, **kwargs):
+        ctx = super(ActivityFeedbackListView, self).get_context_data(**kwargs)
+        ctx['activity_feedbacks'] = ActivityFeedback.objects.all()
+        ctx['user'] = self.request.user
+        return ctx
+
+
+class ActivityFeedbackCreateView(CreateView):
+    model = ActivityFeedback
+    form_class = ActivityFeedbackForm
+    template_name = "activity_feedback/activity_feedback_create.html"
+    success_url = reverse_lazy('activity_feedback_list')
+
+
+class ActivityFeedbackUpdateView(UpdateView):
+    model = ActivityFeedback
+    form_class = ActivityFeedbackForm
+    template_name = "activity_feedback/activity_feedback_update.html"
+    success_url = reverse_lazy('activity_feedback_list')
+
+
+class ActivityFeedbackDetailView(DetailView):
+    model = ActivityFeedback
+    template_name = "activity_feedback/activity_feedback_detail.html"
+
+
+class ActivityFeedbackDeleteView(DeleteView):
+    model = ActivityFeedback
+    template_name = "activity_feedback/activity_feedback_delete.html"
+    success_url = reverse_lazy('activity_feedback_list')

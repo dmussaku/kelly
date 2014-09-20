@@ -92,6 +92,7 @@ class Contact(models.Model):
         'Activity', on_delete=models.SET_NULL,
         related_name='contact_latest_activity', null=True)
     mentions = generic.GenericRelation('Mention')
+    comments = generic.GenericRelation('Comment')
 
     class Meta:
         verbose_name = _('contact')
@@ -460,13 +461,14 @@ class SalesCycle(models.Model):
     from_date = models.DateTimeField(blank=False, auto_now_add=True)
     to_date = models.DateTimeField(blank=False, auto_now_add=True)
     mentions = generic.GenericRelation('Mention')
+    comments = generic.GenericRelation('Comment')
 
     class Meta:
         verbose_name = 'sales_cycle'
         db_table = settings.DB_PREFIX.format('sales_cycle')
 
     def find_latest_activity(self):
-        return self.rel_activities.order_by('-when').first()
+        return self.rel_activities.order_by('-date_created').first()
 
     def __unicode__(self):
         return '%s %s' % (self.contact, self.status)
@@ -580,10 +582,10 @@ class SalesCycle(models.Model):
 class Activity(models.Model):
     title = models.CharField(max_length=100)
     description = models.CharField(max_length=500)
-    when = models.DateTimeField(blank=True, auto_now_add=True)
-    sales_cycle = models.ForeignKey(SalesCycle,
-                                    related_name='rel_activities')
-    author = models.ForeignKey(CRMUser, related_name='owned_activities')
+    date_created = models.DateTimeField(blank=True, null=True, auto_now_add=True)
+    date_edited = models.DateTimeField(blank=True, null=True, auto_now=True)
+    sales_cycle = models.ForeignKey(SalesCycle, related_name='rel_activities')
+    author = models.ForeignKey(CRMUser, related_name='activity_author')
     mentions = generic.GenericRelation('Mention')
     comments = generic.GenericRelation('Comment')
 
@@ -593,6 +595,10 @@ class Activity(models.Model):
 
     def __unicode__(self):
         return self.title
+
+    def save(self, **kwargs):
+        # self.date_edited = timezone.now()
+        super(Activity, self).save(**kwargs)
 
     def set_feedback(self, feedback_obj):
         """Set feedback to activity instance. Saves if `save` is set(True)."""
@@ -800,3 +806,15 @@ def on_activity_delete(sender, instance=None, **kwargs):
     contact.save()
 
 signals.post_delete.connect(on_activity_delete, sender=Activity)
+
+'''
+Function to get mentions by 3 of optional parameters:
+either for a particular user or for all users
+'''
+
+
+def get_mentions(user_id=None, content_class=None, object_id=None):
+    cttype = ContentType.objects.get_for_model(content_class)
+    return Mention.objects.filter(user_id=user_id,
+                                  content_type=cttype,
+                                  object_id=object_id)
