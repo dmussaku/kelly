@@ -146,7 +146,7 @@ class Contact(models.Model):
     def find_latest_activity(self):
         """Find latest activity among all sales_cycle_contacts."""
         sales_cycle = self.sales_cycles.order_by(
-            'latest_activity__when').first()
+            'latest_activity__date_created').first()
         return sales_cycle and sales_cycle.latest_activity or None
 
     def add_mention(self, user_ids=None):
@@ -225,7 +225,7 @@ class Contact(models.Model):
         """
         crm_user = CRMUser.objects.get(id=user_id)
         activities = crm_user.owned_activities.filter(
-            when__range=(from_dt, to_dt))
+            date_created__range=(from_dt, to_dt))
         return Contact.objects.filter(
             id__in=activities.values_list('sales_cycle__contact', flat=True))
 
@@ -498,7 +498,7 @@ class SalesCycle(models.Model):
 
     def get_activities(self, limit=20, offset=0):
         """TEST Returns list of activities ordered by date."""
-        return self.rel_activities.order_by('-when')[offset:offset + limit]
+        return self.rel_activities.order_by('-date_created')[offset:offset + limit]
 
     def add_product(self, product_id, **kw):
         """TEST Assigns products to salescycle"""
@@ -561,7 +561,7 @@ class SalesCycle(models.Model):
         """
         crm_user = CRMUser.objects.get(id=user_id)
         sales_cycles = crm_user.owned_sales_cycles.order_by(
-            '-latest_activity__when')[offset:offset + limit]
+            '-latest_activity__date_created')[offset:offset + limit]
 
         activities = list()
         sales_cycle_activity_map = {}
@@ -596,15 +596,13 @@ class Activity(models.Model):
     def __unicode__(self):
         return self.title
 
-    def save(self, **kwargs):
-        # self.date_edited = timezone.now()
-        super(Activity, self).save(**kwargs)
-
-    def set_feedback(self, feedback_obj):
+    def set_feedback(self, feedback_obj, save=False):
         """Set feedback to activity instance. Saves if `save` is set(True)."""
         """don't really understand why we need set_feedback here
         theres already a OneToOneField to Feedback"""
-        self.feedback_set.add(feedback_obj)
+        feedback_obj.activity=self
+        if save:
+            feedback_obj.save()
 
     @classmethod
     def get_activities_by_contact(cls, contact_id):
@@ -616,7 +614,11 @@ class Activity(models.Model):
             sales_cycle = SalesCycle.objects.get(id=sales_cycle_id)
         except SalesCycle.DoesNotExist:
             return False
-        return cls.objects.filter(sales_cycle=sales_cycle).order_by('when')[offset:offset + limit]
+        if (limit):
+            return cls.objects.filter(sales_cycle=sales_cycle).order_by('date_created')[offset:offset + limit]
+        else:
+            return cls.objects.filter(sales_cycle=sales_cycle).order_by('date_created')
+
 
     @classmethod
     def get_mentioned_activities_of(cls, user_ids=set([])):
@@ -681,8 +683,8 @@ class Activity(models.Model):
         if (type(from_dt) and type(to_dt) == datetime.datetime):
             pass
         activity_queryset = Activity.objects.filter(
-            when__gte=from_dt, when__lte=to_dt, author=user)
-        date_list = [act.when.date() for act in activity_queryset]
+            date_created__gte=from_dt, date_created__lte=to_dt, author=user)
+        date_list = [act.date_created.date() for act in activity_queryset]
         return {str(dt): date_list.count() for dt in date_list}
 
 

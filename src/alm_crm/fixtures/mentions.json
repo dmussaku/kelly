@@ -1,0 +1,42 @@
+ [
+    {
+        "pk": 1,
+        "model": "alm_crm.Mention",
+        "fields": {
+        	"user_id":1,
+        	"content_type":33,
+        	"object_id":1,
+        	"content_object":1
+        }
+    },
+    {
+        "pk": 2,
+        "model": "alm_crm.Mention",
+        "fields": {
+        	"user_id":1,
+        	"content_type":33,
+        	"object_id":2,
+        	"content_object":1
+        }
+    },
+    {
+        "pk": 3,
+        "model": "alm_crm.Mention",
+        "fields": {
+        	"user_id":1,
+        	"content_type":33,
+        	"object_id":3,
+        	"content_object":1
+        }
+    },
+    {
+        "pk": 4,
+        "model": "alm_crm.Mention",
+        "fields": {
+        	"user_id":1,
+        	"content_type":33,
+        	"object_id":4,
+        	"content_object":1
+        }
+    }
+]

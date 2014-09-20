@@ -4,7 +4,7 @@
 {% block content %}
 <h1> {{ activity.title }} </h1>
 	<li> Status - {{activity.status}}</li>
-	<li> Date Created - {{activity.when }}</li>
-	<a href="{% url 'activity_update' pk=activity.id %}">Update</a>  
-	<a href="{% url 'activity_delete' pk=activity.id %}">Delete</a>  
+	<li> Date Created - {{activity.date_created }}</li>
+	<a href="{% url 'activity_update' pk=activity.id %}">Update</a>
+	<a href="{% url 'activity_delete' pk=activity.id %}">Delete</a>
 {% endblock %}
