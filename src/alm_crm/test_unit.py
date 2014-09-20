@@ -1,12 +1,12 @@
 import os
-import datetime
 from django.test import TestCase
-from alm_crm.models import Contact, CRMUser
+from alm_crm.models import Contact, CRMUser, Activity
 from alm_vcard.models import VCard
 
 
 class ContactTestCase(TestCase):
-    fixtures = ['crmusers.json', 'contacts.json', 'salescycles.json', 'activities.json']
+    fixtures = ['crmusers.json', 'contacts.json', 'salescycles.json',
+                'activities.json', 'feedbacks.json']
 
     def setUp(self):
         super(ContactTestCase, self).setUp()

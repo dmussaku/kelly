@@ -38,7 +38,7 @@ class Migration(SchemaMigration):
 
         # Adding field 'Activity.feedback'
         db.add_column('alma_activity', 'feedback',
-                      self.gf('django.db.models.fields.CharField')(default='1', max_length=300),
+                      self.gf('django.db.models.fields.CharField')(default='', max_length=300),
                       keep_default=False)
 
 
