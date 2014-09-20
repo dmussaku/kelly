@@ -1,0 +1,17 @@
+{% extends "almanet/base.html" %}
+{% load i18n almanet_tags %}
+{% block head_title %} {{ _("VCard List Page") }} {% endblock %}
+{% block content %}
+<ul>
+	{% for vcard in vcard_list %}
+	    <li> 
+	    	{{vcard.fn}}
+	    	<a href="{% url 'vcard_update' pk=vcard.id %}">Update</a>  
+	    	<a href="{% url 'alm_vcard.views.export_vcard' vcard.id %}">Export</a>
+	    </li>
+    {% empty %}
+    	<li>You have no vcards connected.</li>
+	{% endfor %}
+</ul>
+<a href="{% url 'vcard_create'%}">Create a vcard</a>
+{% endblock %}
