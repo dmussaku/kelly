@@ -20,9 +20,15 @@ def import_vcard(request):
     if request.method == 'POST':
         form = VCardUploadForm(request.POST, request.FILES)
         if form.is_valid():
-            vcard=VCard()
-            card = vcard.importFrom('vCard', request.FILES['myfile'].read())
-            card.save()
+            data_list = request.FILES['myfile'].read().split('END:VCARD')
+            for i in range(0,len(data_list)):
+                data_list[i]+='END:VCARD'
+                vcard=VCard()
+                try:
+                    card = vcard.importFrom('vCard', data_list[i])
+                    card.save()
+                except:
+                    pass
             return HttpResponseRedirect(reverse_lazy('vcard_list'))
     else:
         form = VCardUploadForm()
@@ -90,7 +96,7 @@ class InitialUpdateView(UpdateView):
         return reverse_lazy('vcard_detail', kwargs= {'pk':self.kwargs['pk']})
 
 
-class VCardCreateView(InitialCreateView):
+class VCardCreateView(CreateView):
     form_class = VCardForm
     template_name = 'vcard/vcard_create.html'
 
@@ -104,81 +110,122 @@ class TelCreateView(InitialCreateView):
         return super(TelCreateView, self).get_success_url(**kwargs)    
 
 
-class EmailCreateView(CreateView):
+class EmailCreateView(InitialCreateView):
     form_class = EmailForm 
     template_name = 'vcard/email_create.html'
 
     def get_success_url(self, **kwargs):
         return super(EmailCreateView, self).get_success_url(**kwargs)    
 
-class GeoCreateView(CreateView):
+class GeoCreateView(InitialCreateView):
     form_class = GeoForm
     template_name = 'vcard/geo_create.html'
 
+    def get_success_url(self, **kwargs):
+        return super(GeoCreateView, self).get_success_url(**kwargs)
 
-class OrgCreateView(CreateView):
+
+class OrgCreateView(InitialCreateView):
     form_class = OrgForm
     template_name = 'vcard/org_create.html'
 
+    def get_success_url(self, **kwargs):
+        return super(OrgCreateView, self).get_success_url(**kwargs)
 
-class AdrCreateView(CreateView):
+class AdrCreateView(InitialCreateView):
     form_class = AdrForm
     template_name = 'vcard/adr_create.html'
 
+    def get_success_url(self, **kwargs):
+        return super(AdrCreateView, self).get_success_url(**kwargs)
 
-class AgentCreateView(CreateView):
+
+class AgentCreateView(InitialCreateView):
     form_class = AgentForm
     template_name = 'vcard/agent_create.html'
 
+    def get_success_url(self, **kwargs):
+        return super(AgentCreateView, self).get_success_url(**kwargs)
 
-class CategoryCreateView(CreateView):
+
+class CategoryCreateView(InitialCreateView):
     form_class = CategoryForm
     template_name = 'vcard/category_create.html'
 
+    def get_success_url(self, **kwargs):
+        return super(CategoryCreateView, self).get_success_url(**kwargs)
 
-class KeyCreateView(CreateView):
+
+class KeyCreateView(InitialCreateView):
     form_class = KeyForm
     template_name = 'vcard/key_create.html'
 
+    def get_success_url(self, **kwargs):
+        return super(KeyCreateView, self).get_success_url(**kwargs)
 
-class LabelCreateView(CreateView):
+
+class LabelCreateView(InitialCreateView):
     form_class = LabelForm
     template_name = 'vcard/label_create.html'
 
+    def get_success_url(self, **kwargs):
+        return super(LabelCreateView, self).get_success_url(**kwargs)
 
-class MailerCreateView(CreateView):
+
+class MailerCreateView(InitialCreateView):
     form_class = MailerForm
     template_name = 'vcard/mailer_create.html'
 
+    def get_success_url(self, **kwargs):
+        return super(MailerCreateView, self).get_success_url(**kwargs)
 
-class NicknameCreateView(CreateView):
+
+class NicknameCreateView(InitialCreateView):
     form_class = NicknameForm
     template_name = 'vcard/nickname_create.html'
 
+    def get_success_url(self, **kwargs):
+        return super(NicknameCreateView, self).get_success_url(**kwargs)
 
-class NoteCreateView(CreateView):
+
+class NoteCreateView(InitialCreateView):
     form_class = NoteForm
     template_name = 'vcard/note_create.html'
 
+    def get_success_url(self, **kwargs):
+        return super(NoteCreateView, self).get_success_url(**kwargs)
 
-class RoleCreateView(CreateView):
+
+class RoleCreateView(InitialCreateView):
     form_class = RoleForm
     template_name = 'vcard/role_create.html'
 
+    def get_success_url(self, **kwargs):
+        return super(RoleCreateView, self).get_success_url(**kwargs)
 
-class TitleCreateView(CreateView):
+
+class TitleCreateView(InitialCreateView):
     form_class = TitleForm
     template_name = 'vcard/title_create.html'
 
+    def get_success_url(self, **kwargs):
+        return super(TitleCreateView, self).get_success_url(**kwargs)
 
-class TzCreateView(CreateView):
+
+class TzCreateView(InitialCreateView):
     form_class = TzForm
     template_name = 'vcard/tz_create.html'
 
+    def get_success_url(self, **kwargs):
+        return super(TzCreateView, self).get_success_url(**kwargs)
 
-class UrlCreateView(CreateView):
+
+class UrlCreateView(InitialCreateView):
     form_class = UrlForm
     template_name = 'vcard/url_create.html'
+
+    def get_success_url(self, **kwargs):
+        return super(UrlCreateView, self).get_success_url(**kwargs)
 
 
 class VCardUpdateView(UpdateView):
@@ -212,6 +259,7 @@ class EmailUpdateView(InitialUpdateView):
         self.kwargs['pk'] = VCard.objects.get(id=Email.objects.get(id=self.kwargs['id']).vcard_id).id
         return super(EmailUpdateView, self).get_success_url(**kwargs)
 
+
 class GeoUpdateView(UpdateView):
     model = Geo
     form_class = GeoForm
@@ -219,6 +267,10 @@ class GeoUpdateView(UpdateView):
 
     def get_object(self, **kwargs):
         return Geo.objects.get(id=self.kwargs['id'])
+
+    def get_success_url(self, **kwargs):
+        self.kwargs['pk'] = VCard.objects.get(id=Geo.objects.get(id=self.kwargs['id']).vcard_id).id
+        return super(GeoUpdateView, self).get_success_url(**kwargs)
 
 
 class OrgUpdateView(UpdateView):

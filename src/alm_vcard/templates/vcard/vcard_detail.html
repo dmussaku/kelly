@@ -13,7 +13,7 @@
 		    	</li>
 	    {% empty %}
 	    	You have no telephone numbers connected.</br>
-	    	<a href="{% url 'tel_create' pk=vcard.id %}">Add telephone number</a></br></br>  
+	    	</br></br>
 		{% endfor %}
 		<a href="{% url 'tel_create' pk=vcard.id %}">Add telephone number</a></br></br> 
 		</ul>
@@ -27,9 +27,103 @@
 		    	</li>
 	    {% empty %}
 	    	You have no emails connected.</br>
-	    	<a href="{% url 'email_create' pk=vcard.id %}">Add an email</a> 
+	    	
 		{% endfor %}
 		<a href="{% url 'email_create' pk=vcard.id %}">Add an email</a></br></br> 
+		</ul>
+	</h4>
+
+	<h4>Geos
+		<ul>
+		{% for geo in geos %}
+		    	<li>
+			    	{{geo.data}}
+			    	<a href="{% url 'geo_update' id=geo.id %}">Update</a> 
+		    	</li>
+	    {% empty %}
+	    	You have no geographical locations connected.</br>
+	    	
+		{% endfor %}
+		<a href="{% url 'geo_create' pk=vcard.id %}">Add a geographical location</a></br></br> 
+		</ul>
+	</h4>
+	<h4>Orgs
+		<ul>
+		{% for org in orgs %}
+		    	<li>
+			    	{{org.organization_unit}} {{org.organization_name}} 
+			    	<a href="{% url 'org_update' id=org.id %}">Update</a> 
+		    	</li>
+	    {% empty %}
+	    	You have no organizations connected.</br>
+		{% endfor %}
+		<a href="{% url 'org_create' pk=vcard.id %}">Add a organization</a></br></br> 
+		</ul>
+	</h4>
+	<h4>Addresses
+		<ul>
+		{% for adr in adrs %}
+		    	<li>
+			    	{{adr.data}} 
+			    	<a href="{% url 'adr_update' id=adr.id %}">Update</a> 
+		    	</li>
+	    {% empty %}
+	    	You have no adresses connected.</br>
+		{% endfor %}
+		<a href="{% url 'adr_create' pk=vcard.id %}">Add an address</a></br></br> 
+		</ul>
+	</h4>
+	<h4>Agents
+		<ul>
+		{% for agent in agents %}
+		    	<li>
+			    	{{agent.data}} 
+			    	<a href="{% url 'agent_update' id=agent.id %}">Update</a> 
+		    	</li>
+	    {% empty %}
+	    	You have no agentesses connected.</br>
+		{% endfor %}
+		<a href="{% url 'agent_create' pk=vcard.id %}">Add an agent</a></br></br> 
+		</ul>
+	</h4>
+	<h4>Categories
+		<ul>
+		{% for category in categories %}
+		    	<li>
+			    	{{category.data}} 
+			    	<a href="{% url 'category_update' id=category.id %}">Update</a> 
+		    	</li>
+	    {% empty %}
+	    	You have no categories connected.</br>
+		{% endfor %}
+		<a href="{% url 'category_create' pk=vcard.id %}">Add an category</a></br></br> 
+		</ul>
+	</h4>
+	<h4>Keys
+		<ul>
+		{% for key in keys %}
+		    	<li>
+			    	{{key.data}} 
+			    	<a href="{% url 'key_update' id=key.id %}">Update</a> 
+		    	</li>
+	    {% empty %}
+	    	You have no keys connected.</br>
+		{% endfor %}
+		<a href="{% url 'key_create' pk=vcard.id %}">Add a key</a></br></br> 
+		</ul>
+	</h4>
+	
+	<h4>Label
+		<ul>
+		{% for label in labels %}
+		    	<li>
+			    	{{label.data}} 
+			    	<a href="{% url 'label_update' id=label.id %}">Update</a> 
+		    	</li>
+	    {% empty %}
+	    	You have no labels connected.</br>
+		{% endfor %}
+		<a href="{% url 'label_create' pk=vcard.id %}">Add a label</a></br></br> 
 		</ul>
 	</h4>
 </ul>
