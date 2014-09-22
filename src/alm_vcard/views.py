@@ -1,21 +1,35 @@
 from django.views.generic import ListView, DetailView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
-from almanet.url_resolvers import reverse_lazy
+from almanet.url_resolvers import reverse_lazy, reverse
 from models import *
 from forms import *
 import string
 import os
 import random
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
+from django.template import RequestContext
+from django.shortcuts import render_to_response, render
 from django.core.files.temp import NamedTemporaryFile
 from django.core.servers.basehttp import FileWrapper
 
 def filename_generator(size=6, chars=string.ascii_uppercase + string.digits):
     return ''.join(random.choice(chars) for _ in range(size))
 
-def import_vcard(request):
-    pass
 
+def import_vcard(request):
+    if request.method == 'POST':
+        form = VCardUploadForm(request.POST, request.FILES)
+        if form.is_valid():
+            vcard=VCard()
+            card = vcard.importFrom('vCard', request.FILES['myfile'].read())
+            card.save()
+            return HttpResponseRedirect(reverse_lazy('vcard_list'))
+    else:
+        form = VCardUploadForm()
+    return render_to_response('vcard/vcard_upload.html', 
+                                {'form':form},
+                                context_instance=RequestContext(request)
+                                )
 def export_vcard(request, id):
     try:
         vcard = VCard.objects.get(id=id)
@@ -26,7 +40,6 @@ def export_vcard(request, id):
     response['Content-Disposition'] = 'attachment; filename="%s.txt"' % 'vcard'
     response.write(vcard.exportTo('vCard'))
     return response
-
 
 
 class VCardListView(ListView):
