@@ -1,4 +1,4 @@
-from models import Contact, SalesCycle, Mention, Comment, Activity, Value
+from models import Contact, SalesCycle, Mention, Comment, Activity, Value, ActivityFeedback
 from alm_user.models import User
 from django import forms
 from django.forms import ModelForm
@@ -9,6 +9,12 @@ class ActivityForm(ModelForm):
     class Meta:
         model = Activity
         exclude = ['feedback']
+
+class ActivityFeedbackForm(ModelForm):
+
+	class Meta:
+		model = ActivityFeedback
+		exclude = ['date_created', 'date_edited']
 
 
 class ContactForm(ModelForm):

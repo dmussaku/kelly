@@ -1,8 +1,8 @@
 import os
 from django.test import TestCase
 from django.utils import timezone
-from alm_crm.models import Contact, Activity, SalesCycle, Feedback, Mention,\
-    Comment
+from alm_crm.models import Contact, CRMUser, Activity, SalesCycle, Feedback,\
+    Mention, Feedback, Value, Comment
 from alm_vcard.models import VCard
 
 
@@ -44,16 +44,19 @@ class ContactTestCase(TestCase):
         self.contact1.change_status(1)
         self.assertEqual(self.contact1.status, 1)
 
-    def test_upload_contacts_by_vcard(self):
+    def test_upload_contacts(self):
         file_path = os.path.join(os.path.dirname(os.path.dirname(__file__)),
-                                 'alm_crm/fixtures/brown.vcf')
+                                 'alm_crm/fixtures/aliya.vcf')
         file_obj = open(file_path, "r").read()
-        contact = Contact._upload_contacts_by_vcard(file_obj)
+        contact = Contact.upload_contacts(upload_type='vcard',
+                                          file_obj=file_obj)
         self.assertEqual(contact.__class__, Contact)
         self.assertEqual(contact.vcard.__class__, VCard)
+        addr = list(contact.vcard.adr_set.all())
+        self.assertEqual(len(addr), 2)
         self.assertNotEqual(contact.name, "Unknown")
 
-    def test_upload_contacts_by_vcard_2(self):
+    def test_upload_contacts_by_vcard(self):
         file_path = os.path.join(os.path.dirname(os.path.dirname(__file__)),
                                  'alm_crm/fixtures/aliya.vcf')
         file_obj = open(file_path, "r").read()
@@ -64,8 +67,31 @@ class ContactTestCase(TestCase):
         self.assertEqual(len(addr), 2)
         self.assertNotEqual(contact.name, "Unknown")
 
+    def test_filter_contacts_by_vcard(self):
+        file_path = os.path.join(os.path.dirname(os.path.dirname(__file__)),
+                                 'alm_crm/fixtures/aliya.vcf')
+        file_obj = open(file_path, "r").read()
+        contact = Contact._upload_contacts_by_vcard(file_obj)
+        cs = Contact.filter_contacts_by_vcard(search_text='Aliya',
+                                              search_params=[('fn')])
+        self.assertEqual(len(cs), 1)
+        cs = Contact.filter_contacts_by_vcard(search_text='liya',
+                                              search_params=[('fn', 'icontains')])
+        self.assertEqual(len(cs), 1)
+        cs = Contact.filter_contacts_by_vcard(search_text='666',
+                                              search_params=[('tel__value', 'icontains')])
+        self.assertEqual(len(cs), 1)
+        cs = Contact.filter_contacts_by_vcard(search_text='666',
+                                              search_params=[('tel__value', 'icontains'),
+                                                             ('fn')])
+        self.assertEqual(len(cs), 0)
+
+    # def test_get_contacts_by_last_activity_date_without_activities(self):
+    #     contacts = Contact.get_contacts_by_last_activity_date(user_id=1)
+    #     self.assertEqual(len(contacts), 0)
+
     def test_get_contacts_by_last_activity_date(self):
-        pass
+        struct = Contact.get_contacts_by_last_activity_date(user_id=1)
 
 
 class ActivityTestCase(TestCase):
@@ -87,7 +113,7 @@ class ActivityTestCase(TestCase):
     def test_set_feedback(self):
         self.assertNotEqual(0, len(Activity.objects.filter(sales_cycle_id=1)))
         self.assertNotEqual(0, len(Feedback.objects.all()))
-        a = Activity(title='t6', description='d6', when=timezone.now(),
+        a = Activity(title='t6', description='d6', date_created=timezone.now(),
                      sales_cycle_id=1, author_id=1)
         a.save()
         self.assertEqual(a, Activity.objects.get(id=a.id))
@@ -118,7 +144,7 @@ class ActivityTestCase(TestCase):
         user_ids = [1, 2]
         self.assertEqual(len(set(self.activity1.mentions.all())), 1)
         self.assertEqual(
-            len(set(Activity.get_mentioned_activities_of(user_ids))), 1)
+            len(set(Activity.get_mentioned_activities_of(user_ids))), 4)
 
     def test_get_activity_details(self):
         for include_sc in [True, False]:
@@ -159,15 +185,16 @@ class ActivityTestCase(TestCase):
     def test_get_number_of_activities_by_day(self):
         user_id = 1
         user_activities = Activity.objects.filter(author=user_id)\
-            .order_by('when')
-        from_dt = user_activities.first().when
-        to_dt = user_activities.last().when
+            .order_by('date_created')
+        from_dt = user_activities.first().date_created
+        to_dt = user_activities.last().date_created
         self.assertTrue(from_dt < to_dt)
         owned_data = Activity.get_number_of_activities_by_day(user_id,
                                                               from_dt,
                                                               to_dt)
         self.assertEqual(sum(owned_data.values()), user_activities.count())
-        self.assertEqual(owned_data.values(), [1, 1, 2])
+        self.assertEqual(owned_data, {'2014-09-15': 1, '2014-09-11': 1,
+                         '2014-09-13': 1, '2014-09-12': 2})
 
 
 class MentionTestCase(TestCase):

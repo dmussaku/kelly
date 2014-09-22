@@ -3,9 +3,9 @@
         "pk": 1,
         "model": "alm_crm.Activity",
         "fields": {
-            "title":"a1",
+            "title":"t1",
             "description":"d1",
-            "when":"2014-09-11 00:00:00+00:00",
+            "date_created":"2014-09-11 00:00:00+00:00",
             "sales_cycle":1,
             "author":1
         }
@@ -14,9 +14,9 @@
         "pk": 2,
         "model": "alm_crm.Activity",
         "fields": {
-            "title":"a2",
+            "title":"t2",
             "description":"d2",
-            "when":"2014-09-12 00:00:00+00:00",
+            "date_created":"2014-09-12 00:00:00+00:00",
             "sales_cycle":1,
             "author":1
         }
@@ -25,9 +25,9 @@
         "pk": 3,
         "model": "alm_crm.Activity",
         "fields": {
-            "title":"a3",
+            "title":"t3",
             "description":"d3",
-            "when":"2014-09-13 00:00:00+00:00",
+            "date_created":"2014-09-13 00:00:00+00:00",
             "sales_cycle":1,
             "author":1
         }
@@ -36,9 +36,9 @@
         "pk": 4,
         "model": "alm_crm.Activity",
         "fields": {
-            "title":"a4",
+            "title":"t4",
             "description":"d4",
-            "when":"2014-09-14 00:00:00+00:00",
+            "date_created":"2014-09-14 00:00:00+00:00",
             "sales_cycle":1,
             "author":2
         }
@@ -47,20 +47,20 @@
         "pk": 5,
         "model": "alm_crm.Activity",
         "fields": {
-            "title":"a5",
+            "title":"t5",
             "description":"d5",
-            "when":"2014-09-15 00:00:00+00:00",
+            "date_created":"2014-09-15 00:00:00+00:00",
             "sales_cycle":2,
-            "author":2
+            "author":1
         }
     },
     {
         "pk": 6,
         "model": "alm_crm.Activity",
         "fields": {
-            "title":"a6",
+            "title":"t6",
             "description":"d6",
-            "when":"2014-09-12 00:00:00+00:00",
+            "date_created":"2014-09-12 00:00:00+00:00",
             "sales_cycle":2,
             "author":1
         }
@@ -69,9 +69,9 @@
         "pk": 7,
         "model": "alm_crm.Activity",
         "fields": {
-            "title":"a7",
+            "title":"t7",
             "description":"d7",
-            "when":"2014-09-16 00:00:00+00:00",
+            "date_created":"2014-09-16 00:00:00+00:00",
             "sales_cycle":3,
             "author":2
         }

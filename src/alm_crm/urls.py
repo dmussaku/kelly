@@ -27,6 +27,13 @@ from views import (
     ValueDetailView,
     ValueDeleteView,
 
+    ActivityFeedbackListView,
+    ActivityFeedbackCreateView,
+    ActivityFeedbackUpdateView,
+    ActivityFeedbackDetailView,
+    ActivityFeedbackDeleteView,
+
+
     contact_export
     )
 from models import Contact, SalesCycle, Activity, Comment
@@ -104,7 +111,15 @@ urlpatterns = patterns(
     url(r'^values/value_create/$', ValueCreateView.as_view(), name='value_create'),
     url(r'^values/value_update/(?P<pk>\d+)/$', ValueUpdateView.as_view(), name='value_update'),
     url(r'^values/value_detail/(?P<pk>\d+)/$', ValueDetailView.as_view(), name='value_detail'),
-    url(r'^values/value_delete/(?P<pk>\d+)/$', ValueDeleteView.as_view(), name='value_delete')
+    url(r'^values/value_delete/(?P<pk>\d+)/$', ValueDeleteView.as_view(), name='value_delete'),
+
+    url(r'^activity_feedbacks/$', ActivityFeedbackListView.as_view(
+        template_name='activity_feedback/activity_feedback_list.html'),
+        name='activity_feedback_list'),
+    url(r'^activity_feedbacks/activity_feedback_create/$', ActivityFeedbackCreateView.as_view(), name='activity_feedback_create'),
+    url(r'^activity_feedbacks/activity_feedback_update/(?P<pk>\d+)/$', ActivityFeedbackUpdateView.as_view(), name='activity_feedback_update'),
+    url(r'^activity_feedbacks/activity_feedback_detail/(?P<pk>\d+)/$', ActivityFeedbackDetailView.as_view(), name='activity_feedback_detail'),
+    url(r'^activity_feedbacks/activity_feedback_delete/(?P<pk>\d+)/$', ActivityFeedbackDeleteView.as_view(), name='activity_feedback_delete')
 
 
 )

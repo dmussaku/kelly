@@ -92,6 +92,7 @@ class Contact(models.Model):
         'Activity', on_delete=models.SET_NULL,
         related_name='contact_latest_activity', null=True)
     mentions = generic.GenericRelation('Mention')
+    comments = generic.GenericRelation('Comment')
 
     class Meta:
         verbose_name = _('contact')
@@ -145,7 +146,7 @@ class Contact(models.Model):
     def find_latest_activity(self):
         """Find latest activity among all sales_cycle_contacts."""
         sales_cycle = self.sales_cycles.order_by(
-            'latest_activity__when').first()
+            'latest_activity__date_created').first()
         return sales_cycle and sales_cycle.latest_activity or None
 
     def add_mention(self, user_ids=None):
@@ -224,7 +225,7 @@ class Contact(models.Model):
         """
         crm_user = CRMUser.objects.get(id=user_id)
         activities = crm_user.owned_activities.filter(
-            when__range=(from_dt, to_dt))
+            date_created__range=(from_dt, to_dt))
         return Contact.objects.filter(
             id__in=activities.values_list('sales_cycle__contact', flat=True))
 
@@ -240,7 +241,7 @@ class Contact(models.Model):
         ---------
             search_text - text by which we execute a search
             search_params - list of vcard fields [
-                ('fn', 'startswith'), ('organization.unit', 'icontains'), 'bday']
+                ('fn', 'startswith'), ('org__organization_unit', 'icontains'), 'bday']
             order_by - sort results by fields e.g. ('-pk', '...')
             limit - how much rows must be returned
             offset - from which row to start
@@ -250,7 +251,25 @@ class Contact(models.Model):
             len(Queryset<Contact>) <= limit
         """
         assert isinstance(search_params, list), "Must be a list"
-        pass
+
+        def build_params(search_text, search_params):
+            POSSIBLE_MODIFIERS = ['startswith', 'icontains']
+
+            rv = {}
+            for param in search_params:
+                if isinstance(param, tuple):
+                    if param[1] not in POSSIBLE_MODIFIERS:
+                        raise Exception, _('incorrect modifier')
+                    rv['%s__%s' % param] = search_text
+                else:
+                    rv[param] = search_text
+            return rv
+
+        params = build_params(search_text, search_params)
+        vcards = VCard.objects.filter(**params)
+        contacts = map(lambda vcard: vcard.contact_set.first(), vcards)[offset:offset+limit]
+
+        return contacts
 
     @classmethod
     def get_contact_detail(cls, contact_id, with_vcard=False):
@@ -263,7 +282,7 @@ class Contact(models.Model):
 
     @classmethod
     def upload_contacts(cls, upload_type, file_obj, save=False):
-        """TEST Extracts contacts from source: vcard file or csv file or any
+        """Extracts contacts from source: vcard file or csv file or any
         other file objects. Build queryset from them and save if required.
         Parameters
         ----------
@@ -319,7 +338,7 @@ class Contact(models.Model):
         # SECOND IMPL
         # contact_activity_map follows structure suggested by Askhat.
         # contacts = cls.objects.filter(
-        #     user_id=user_id).order_by('-latest_activity__when')
+        #     user_id=user_id).order_by('-latest_activity__date_created')
         # if not include_activities:
         #     return contacts
         # contact_activity_map = dict()
@@ -330,7 +349,7 @@ class Contact(models.Model):
         #     for current_cycle_pk in current_scycles_pks:
         #         sales_cycle_contact_map[current_cycle_pk] = contact.pk
         # activities = Activity.objects.filter(
-        #     sales_cycle__id__in=sales_cycles_pks).order_by('when')
+        #     sales_cycle__id__in=sales_cycles_pks).order_by('date_created')
         # for activity in activities:
         #     contact_pk = sales_cycle_contact_map[activity.sales_cycle.pk]
         #     contact_activity_map.setdefault(contact_pk, []).append(activity.pk)
@@ -350,7 +369,7 @@ class Contact(models.Model):
         #         for activity in sc.rel_activities.objects.all():
         # activities.append(activity) # now we have a list of all acitivities. not sorted though
         # sort activities by date. latest being first
-        #     activities = activities.order_by('-when')[offset:offset+limit]
+        #     activities = activities.order_by('-date_created')[offset:offset+limit]
         # do for all activities.
         #     for activity in activities:
         # get contact via activity's sales cycle
@@ -442,13 +461,14 @@ class SalesCycle(models.Model):
     from_date = models.DateTimeField(blank=False, auto_now_add=True)
     to_date = models.DateTimeField(blank=False, auto_now_add=True)
     mentions = generic.GenericRelation('Mention')
+    comments = generic.GenericRelation('Comment')
 
     class Meta:
         verbose_name = 'sales_cycle'
         db_table = settings.DB_PREFIX.format('sales_cycle')
 
     def find_latest_activity(self):
-        return self.rel_activities.order_by('-when').first()
+        return self.rel_activities.order_by('-date_created').first()
 
     def __unicode__(self):
         return '%s %s' % (self.contact, self.status)
@@ -478,7 +498,8 @@ class SalesCycle(models.Model):
 
     def get_activities(self, limit=20, offset=0):
         """TEST Returns list of activities ordered by date."""
-        return self.rel_activities.order_by('-when')[offset:offset + limit]
+        return self.rel_activities\
+            .order_by('-date_created')[offset:offset + limit]
 
     def add_product(self, product_id, **kw):
         """TEST Assigns products to salescycle"""
@@ -541,7 +562,7 @@ class SalesCycle(models.Model):
         """
         crm_user = CRMUser.objects.get(id=user_id)
         sales_cycles = crm_user.owned_sales_cycles.order_by(
-            '-latest_activity__when')[offset:offset + limit]
+            '-latest_activity__date_created')[offset:offset + limit]
 
         activities = list()
         sales_cycle_activity_map = {}
@@ -562,10 +583,11 @@ class SalesCycle(models.Model):
 class Activity(models.Model):
     title = models.CharField(max_length=100)
     description = models.CharField(max_length=500)
-    when = models.DateTimeField(blank=True, auto_now_add=True)
-    sales_cycle = models.ForeignKey(SalesCycle,
-                                    related_name='rel_activities')
-    author = models.ForeignKey(CRMUser, related_name='owned_activities')
+    date_created = models.DateTimeField(blank=True, null=True,
+                                        auto_now_add=True)
+    date_edited = models.DateTimeField(blank=True, null=True, auto_now=True)
+    sales_cycle = models.ForeignKey(SalesCycle, related_name='rel_activities')
+    author = models.ForeignKey(CRMUser, related_name='activity_author')
     mentions = generic.GenericRelation('Mention')
     comments = generic.GenericRelation('Comment')
 
@@ -578,11 +600,9 @@ class Activity(models.Model):
 
     def set_feedback(self, feedback_obj, save=False):
         """Set feedback to activity instance. Saves if `save` is set(True)."""
-        """don't really understand why we need set_feedback here
-        theres already a OneToOneField to Feedback"""
-        self.feedback = feedback_obj
+        feedback_obj.activity = self
         if save:
-            self.save()
+            feedback_obj.save()
 
     @classmethod
     def get_activities_by_contact(cls, contact_id):
@@ -594,8 +614,12 @@ class Activity(models.Model):
             sales_cycle = SalesCycle.objects.get(id=sales_cycle_id)
         except SalesCycle.DoesNotExist:
             return False
-        return cls.objects.filter(sales_cycle=sales_cycle)\
-            .order_by('when')[offset:offset + limit]
+        if (limit):
+            return cls.objects.filter(sales_cycle=sales_cycle)\
+                .order_by('date_created')[offset:offset + limit]
+        else:
+            return cls.objects.filter(sales_cycle=sales_cycle)\
+                .order_by('date_created')
 
     @classmethod
     def get_mentioned_activities_of(cls, user_ids=set([])):
@@ -641,14 +665,17 @@ class Activity(models.Model):
             user = CRMUser.objects.get(id=user_id)
         except CRMUser.DoesNotExist:
             return False
-        '''need to implement the conversion to datetime object from input arguments '''
+        '''
+        need to implement the conversion to datetime object
+        from input arguments
+        '''
         if (type(from_dt) and type(to_dt) == datetime.datetime):
             pass
         activity_queryset = Activity.objects.filter(
-            when__gte=from_dt, when__lte=to_dt, author=user)
+            date_created__gte=from_dt, date_created__lte=to_dt, author=user)
         date_counts = {}
         for act in activity_queryset:
-            date = str(act.when.date())
+            date = str(act.date_created.date())
             if date in date_counts:
                 date_counts[date] += 1
             else:
@@ -776,3 +803,15 @@ def on_activity_delete(sender, instance=None, **kwargs):
     contact.save()
 
 signals.post_delete.connect(on_activity_delete, sender=Activity)
+
+'''
+Function to get mentions by 3 of optional parameters:
+either for a particular user or for all users
+'''
+
+
+def get_mentions(user_id=None, content_class=None, object_id=None):
+    cttype = ContentType.objects.get_for_model(content_class)
+    return Mention.objects.filter(user_id=user_id,
+                                  content_type=cttype,
+                                  object_id=object_id)
