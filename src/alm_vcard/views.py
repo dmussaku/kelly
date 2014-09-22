@@ -2,6 +2,7 @@ from django.views.generic import ListView, DetailView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from almanet.url_resolvers import reverse_lazy, reverse
 from models import *
+from alm_crm.models import Contact
 from forms import *
 import string
 import os
@@ -17,6 +18,11 @@ def filename_generator(size=6, chars=string.ascii_uppercase + string.digits):
 
 
 def import_vcard(request):
+    '''
+    In this view i prompt the user to upload the vcard which can have either one
+    vcard or multiple vcard information. Then i split the input to data_list list
+    and create vcard objects for every vcard parsed in data_list
+    '''
     if request.method == 'POST':
         form = VCardUploadForm(request.POST, request.FILES)
         if form.is_valid():
@@ -25,8 +31,10 @@ def import_vcard(request):
                 data_list[i]+='END:VCARD'
                 vcard=VCard()
                 try:
-                    card = vcard.importFrom('vCard', data_list[i])
-                    card.save()
+                    vcard = vcard.importFrom('vCard', data_list[i])
+                    vcard.commit()
+                    contact = Contact()
+                    contact._upload_contacts_by_vcard(vcard)
                 except:
                     pass
             return HttpResponseRedirect(reverse_lazy('vcard_list'))
@@ -52,6 +60,7 @@ class VCardListView(ListView):
 
     model = VCard
     template_name = 'vcard/vcard_list.html'
+    paginate_by = 20
 
 
 class VCardDetailView(DetailView):

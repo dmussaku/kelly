@@ -126,6 +126,104 @@
 		<a href="{% url 'label_create' pk=vcard.id %}">Add a label</a></br></br> 
 		</ul>
 	</h4>
+
+	<h4>Mailers
+		<ul>
+		{% for mailer in mailers %}
+		    	<li>
+			    	{{mailer.data}} 
+			    	<a href="{% url 'mailer_update' id=mailer.id %}">Update</a> 
+		    	</li>
+	    {% empty %}
+	    	You have no mailers connected.</br>
+		{% endfor %}
+		<a href="{% url 'mailer_create' pk=vcard.id %}">Add a mailer</a></br></br> 
+		</ul>
+	</h4>
+
+	<h4>Nicknames
+		<ul>
+		{% for nickname in nicknames %}
+		    	<li>
+			    	{{nickname.data}} 
+			    	<a href="{% url 'nickname_update' id=nickname.id %}">Update</a> 
+		    	</li>
+	    {% empty %}
+	    	You have no nicknames connected.</br>
+		{% endfor %}
+		<a href="{% url 'nickname_create' pk=vcard.id %}">Add a nickname</a></br></br> 
+		</ul>
+	</h4>
+
+	<h4>Notes
+		<ul>
+		{% for note in notes %}
+		    	<li>
+			    	{{note.data}} 
+			    	<a href="{% url 'note_update' id=note.id %}">Update</a> 
+		    	</li>
+	    {% empty %}
+	    	You have no notes connected.</br>
+		{% endfor %}
+		<a href="{% url 'note_create' pk=vcard.id %}">Add a note</a></br></br> 
+		</ul>
+	</h4>
+
+	<h4>Roles
+		<ul>
+		{% for role in roles %}
+		    	<li>
+			    	{{role.data}} 
+			    	<a href="{% url 'role_update' id=role.id %}">Update</a> 
+		    	</li>
+	    {% empty %}
+	    	You have no roles connected.</br>
+		{% endfor %}
+		<a href="{% url 'role_create' pk=vcard.id %}">Add a role</a></br></br> 
+		</ul>
+	</h4>
+
+	<h4>Titles
+		<ul>
+		{% for title in titles %}
+		    	<li>
+			    	{{title.data}} 
+			    	<a href="{% url 'title_update' id=title.id %}">Update</a> 
+		    	</li>
+	    {% empty %}
+	    	You have no titles connected.</br>
+		{% endfor %}
+		<a href="{% url 'title_create' pk=vcard.id %}">Add a title</a></br></br> 
+		</ul>
+	</h4>
+
+	<h4>Tzs
+		<ul>
+		{% for tz in tzs %}
+		    	<li>
+			    	{{tz.data}} 
+			    	<a href="{% url 'tz_update' id=tz.id %}">Update</a> 
+		    	</li>
+	    {% empty %}
+	    	You have no tzs connected.</br>
+		{% endfor %}
+		<a href="{% url 'tz_create' pk=vcard.id %}">Add a tz</a></br></br> 
+		</ul>
+	</h4>
+
+	<h4>Urls
+		<ul>
+		{% for url in urls %}
+		    	<li>
+			    	{{url.data}} 
+			    	<a href="{% url 'url_update' id=url.id %}">Update</a> 
+		    	</li>
+	    {% empty %}
+	    	You have no urls connected.</br>
+		{% endfor %}
+		<a href="{% url 'url_create' pk=vcard.id %}">Add a url</a></br></br> 
+		</ul>
+	</h4>
 </ul>
 
 <a href="{% url 'import_vcard' %}">Import vcard</a>

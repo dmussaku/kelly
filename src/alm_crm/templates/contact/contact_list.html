@@ -6,7 +6,7 @@
 	<a href="{% url 'contact_create' %}"> Create a Contact </a>
 	<ul>{% for c in contacts %}
 
-	    <li> {{ c.first_name }} {{ c.last_name }} {{ c.company_name }} Latest activity: <b>{{ c.latest_activity.title }}</b>
+	    <li> {{ c.vcard.fn }} {{c.vcard.email}} Latest activity: <b>{{ c.latest_activity.title }}</b>
 	   		 <a href="{% url 'contact_update' pk=c.id %}">Update</a>
 	   		 <a href="{% url 'contact_detail' pk=c.id %}">Detail</a>
              <a href="{% url 'contact_delete' pk=c.id %}">Delete</a>
