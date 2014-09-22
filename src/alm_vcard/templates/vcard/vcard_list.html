@@ -7,6 +7,7 @@
 	    <li> 
 	    	{{vcard.fn}}
 	    	<a href="{% url 'vcard_update' pk=vcard.id %}">Update</a>  
+	    	<a href="{% url 'vcard_detail' pk=vcard.id %}">Detail</a>  
 	    	<a href="{% url 'alm_vcard.views.export_vcard' vcard.id %}">Export</a>
 	    </li>
     {% empty %}

@@ -1,0 +1,38 @@
+{% extends "almanet/base.html" %}
+{% load i18n almanet_tags %}
+{% block head_title %} {{ _("VCard List Page") }} {% endblock %}
+{% block content %}
+<ul>
+	<h3>{{vcard.honorific_prefix}} {{vcard.fn}} {{vcard.honorific_suffix}} </h3>
+	<a href="{% url 'vcard_update' pk=vcard.id %}">Update</a>
+	<h4>Telephone Number</h4>
+		<ul>
+		{% for tel in tels %}
+		    	<li>
+		    		{{tel.type}} - {{tel.value}} <a href="{% url 'tel_update' id=tel.id %}">Update</a> 
+		    	</li>
+	    {% empty %}
+	    	You have no telephone numbers connected.</br>
+	    	<a href="{% url 'tel_create' pk=vcard.id %}">Add telephone number</a></br></br>  
+		{% endfor %}
+		<a href="{% url 'tel_create' pk=vcard.id %}">Add telephone number</a></br></br> 
+		</ul>
+	<h4>Emails
+		<ul>
+		{% for email in emails %}
+		    	<li>
+			    	{{email.type}}
+			    	{{email.value}}
+			    	<a href="{% url 'email_update' id=email.id %}">Update</a> 
+		    	</li>
+	    {% empty %}
+	    	You have no emails connected.</br>
+	    	<a href="{% url 'email_create' pk=vcard.id %}">Add an email</a> 
+		{% endfor %}
+		<a href="{% url 'email_create' pk=vcard.id %}">Add an email</a></br></br> 
+		</ul>
+	</h4>
+</ul>
+
+<a href="{% url 'import_vcard' %}">Import vcard</a>
+{% endblock %}

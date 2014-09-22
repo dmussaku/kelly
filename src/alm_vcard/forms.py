@@ -19,6 +19,7 @@ class TelForm(forms.ModelForm):
         model = Tel
 
 
+
 class EmailForm(forms.ModelForm):
 
     class Meta():
