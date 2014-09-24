@@ -91,7 +91,19 @@ class ContactTestCase(TestCase):
     #     self.assertEqual(len(contacts), 0)
 
     def test_get_contacts_by_last_activity_date(self):
-        struct = Contact.get_contacts_by_last_activity_date(user_id=1)
+        user_id = 1
+        self.contact1.assign_user(user_id)
+
+        response = Contact.get_contacts_by_last_activity_date(user_id)
+        self.assertEqual(list(response.all()), [self.contact1])
+
+        response = Contact.get_contacts_by_last_activity_date(user_id, True)
+        self.assertIsInstance(response, tuple)
+        self.assertEqual(list(response[0].all()), [self.contact1])
+        self.assertEqual(list(response[1].values_list('pk', flat=True)),
+                         [1, 2, 6, 3, 4, 5, 7])
+        self.assertIsInstance(response[2], dict)
+        self.assertEqual(response[2], {1: [1, 2, 6, 3, 4, 5, 7]})
 
 
 class ActivityTestCase(TestCase):

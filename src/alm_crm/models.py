@@ -337,23 +337,24 @@ class Contact(models.Model):
         pass
         # SECOND IMPL
         # contact_activity_map follows structure suggested by Askhat.
-        # contacts = cls.objects.filter(
-        #     user_id=user_id).order_by('-latest_activity__date_created')
-        # if not include_activities:
-        #     return contacts
-        # contact_activity_map = dict()
-        # sales_cycle_contact_map, sales_cycles_pks = dict(), set([])
-        # for contact in contacts:
-        #     current_scycles_pks = map(lambda sc: sc.pk, contact.sales_cycles.all())
-        #     sales_cycles_pks |= set(current_scycles_pks)
-        #     for current_cycle_pk in current_scycles_pks:
-        #         sales_cycle_contact_map[current_cycle_pk] = contact.pk
-        # activities = Activity.objects.filter(
-        #     sales_cycle__id__in=sales_cycles_pks).order_by('date_created')
-        # for activity in activities:
-        #     contact_pk = sales_cycle_contact_map[activity.sales_cycle.pk]
-        #     contact_activity_map.setdefault(contact_pk, []).append(activity.pk)
-        # return (contacts, activities, contact_activity_map)
+        contacts = cls.objects.filter(assignees__user_id=user_id)\
+            .order_by('-latest_activity__date_created')
+        if not include_activities:
+            return contacts
+        contact_activity_map = dict()
+        sales_cycle_contact_map, sales_cycles_pks = dict(), set([])
+        for contact in contacts:
+            current_scycles_pks = contact.sales_cycles.values_list('pk',
+                                                                   flat=True)
+            sales_cycles_pks |= set(current_scycles_pks)
+            for current_cycle_pk in current_scycles_pks:
+                sales_cycle_contact_map[current_cycle_pk] = contact.pk
+        activities = Activity.objects.filter(
+            sales_cycle__id__in=sales_cycles_pks).order_by('date_created')
+        for activity in activities:
+            contact_pk = sales_cycle_contact_map[activity.sales_cycle.pk]
+            contact_activity_map.setdefault(contact_pk, []).append(activity.pk)
+        return (contacts, activities, contact_activity_map)
         # FIRST IMPL
         # try:
         #     activities = []
