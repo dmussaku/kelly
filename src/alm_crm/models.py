@@ -564,13 +564,12 @@ class SalesCycle(models.Model):
         sales_cycles = crm_user.owned_sales_cycles.order_by(
             '-latest_activity__date_created')[offset:offset + limit]
 
-        activities = list()
+        activities = Activity.objects.filter(sales_cycle_id__in=
+           sales_cycles.values_list('pk', flat=True))
         sales_cycle_activity_map = {}
         for sc in sales_cycles:
-            sc_a_list = sc.rel_activities
-            sc_a_list_pks = map(lambda act: act.pk, sc_a_list)
-            sales_cycle_activity_map[sc.id] = sc_a_list_pks
-            activities.extend(sc_a_list)
+            sales_cycle_activity_map[sc.id] = activities.values_list('pk',
+                                                                     flat=True)
         return (sales_cycles, activities, sales_cycle_activity_map)
 
     @classmethod

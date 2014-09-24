@@ -257,3 +257,69 @@ class CommentTestCase(TestCase):
                          .count(), activity1.comments.count())
         self.assertEqual(Comment.get_comments_by_context(1, Activity, 1, 1)
                          .count(), 0)
+
+
+class SalesCycleTestCase(TestCase):
+    fixtures = ['crmusers.json', 'contacts.json', 'salescycles.json',
+                'activities.json', 'mentions.json', 'products.json',
+                'values.json']
+
+    def setUp(self):
+        super(SalesCycleTestCase, self).setUp()
+        self.sc1 = SalesCycle.objects.get(pk=1)
+
+    def get_sc(self, pk):
+        return SalesCycle.objects.get(pk=pk)
+
+    def test_add_mention(self):
+        self.assertEqual(len(self.sc1.mentions.all()), 0)
+        self.sc1.add_mention([1, 2])
+        self.assertEqual(len(self.get_sc(pk=1).mentions.all()), 2)
+
+    def test_assign_user_without_save(self):
+        prev_owner_id = self.sc1.owner_id
+        self.assertNotEqual(prev_owner_id, 2)
+        self.assertTrue(self.sc1.assign_user(2, False))
+        self.assertEqual(self.get_sc(1).owner_id, prev_owner_id)
+
+    def test_assign_user_with_save(self):
+        self.assertEqual(self.sc1.owner_id, 1)
+        self.assertTrue(self.sc1.assign_user(2, True))
+        self.assertEqual(self.get_sc(1).owner_id, 2)
+
+    def test_get_activities(self):
+        self.assertEqual(
+            list(self.sc1.get_activities().values_list('id', flat=True)),
+            [4, 3, 2, 1])
+
+    def test_add_product(self):
+        self.assertEqual(len(self.sc1.products.all()), 0)
+        self.assertTrue(self.sc1.add_product(1))
+        self.assertEqual(len(self.get_sc(1).products.all()), 1)
+
+    def test_set_result_without_save(self):
+        self.assertEqual(self.sc1.real_value_id, 1)
+        value_obj = Value.objects.get(pk=2)
+        self.assertIsNone(self.sc1.set_result(value_obj))
+        self.assertEqual(self.get_sc(pk=1).real_value_id, 1)
+
+    def test_add_followers(self):
+        self.assertEqual(list(self.sc1.followers.all()), [])
+        self.assertEqual(self.sc1.add_followers([1]), [True])
+        self.assertEqual(self.sc1.followers.first().pk, 1)
+
+    def test_upd_lst_activity_on_create(self):
+        activity = Activity(sales_cycle_id=1, author_id=1)
+        activity.save()
+        self.assertEqual(self.get_sc(pk=1).latest_activity.pk, activity.pk)
+
+    def test_get_salescycles_by_last_activity_date(self):
+        ret = SalesCycle.get_salescycles_by_last_activity_date(1)
+        self.assertEqual(list(ret[0].values_list('pk', flat=True)), [3, 2, 1])
+        self.assertEqual(list(ret[1].values_list('pk', flat=True)),
+                         range(1, 8))
+        self.assertItemsEqual(ret[2], {1: [1, 3], 2: [2], 3: []})
+
+    def test_get_salescycles_by_contact(self):
+        ret = SalesCycle.get_salescycles_by_contact(1)
+        self.assertEqual(list(ret.values_list('pk', flat=True)), [1, 2, 3, 4])
