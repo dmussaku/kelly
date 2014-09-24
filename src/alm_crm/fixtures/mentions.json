@@ -1,12 +1,11 @@
- [
+[
     {
-        "pk": 1,
+        "pk":1,
         "model": "alm_crm.Mention",
         "fields": {
-        	"user_id":1,
-        	"content_type":33,
-        	"object_id":1,
-        	"content_object":1
+            "user_id":1,
+            "content_type":["alm_crm", "activity"],
+            "object_id":1
         }
     },
     {
@@ -14,9 +13,8 @@
         "model": "alm_crm.Mention",
         "fields": {
         	"user_id":1,
-        	"content_type":33,
-        	"object_id":2,
-        	"content_object":1
+            "content_type":["alm_crm", "activity"],
+        	"object_id":2
         }
     },
     {
@@ -24,9 +22,8 @@
         "model": "alm_crm.Mention",
         "fields": {
         	"user_id":1,
-        	"content_type":33,
-        	"object_id":3,
-        	"content_object":1
+            "content_type":["alm_crm", "activity"],
+        	"object_id":3
         }
     },
     {
@@ -34,9 +31,8 @@
         "model": "alm_crm.Mention",
         "fields": {
         	"user_id":1,
-        	"content_type":33,
-        	"object_id":4,
-        	"content_object":1
+            "content_type":["alm_crm", "activity"],
+        	"object_id":4
         }
     }
 ]

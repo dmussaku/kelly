@@ -141,9 +141,9 @@ class Migration(SchemaMigration):
             ('comment', self.gf('django.db.models.fields.CharField')(max_length=140)),
             ('author', self.gf('django.db.models.fields.related.ForeignKey')(related_name='comment_author', to=orm['alm_crm.CRMUser'])),
             ('date_created', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
-            ('date_edited', self.gf('django.db.models.fields.DateTimeField')(blank=True)),
+            ('date_edited', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
             ('object_id', self.gf('django.db.models.fields.IntegerField')(null=True)),
-            ('content_type', self.gf('django.db.models.fields.CharField')(max_length=1000, blank=True)),
+            ('content_type', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['contenttypes.ContentType'])),
         ))
         db.send_create_signal(u'alm_crm', ['Comment'])
 
@@ -204,9 +204,9 @@ class Migration(SchemaMigration):
             'Meta': {'object_name': 'Comment'},
             'author': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'comment_author'", 'to': u"orm['alm_crm.CRMUser']"}),
             'comment': ('django.db.models.fields.CharField', [], {'max_length': '140'}),
-            'content_type': ('django.db.models.fields.CharField', [], {'max_length': '1000', 'blank': 'True'}),
+            'content_type': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['contenttypes.ContentType']"}),
             'date_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            'date_edited': ('django.db.models.fields.DateTimeField', [], {'blank': 'True'}),
+            'date_edited': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'object_id': ('django.db.models.fields.IntegerField', [], {'null': 'True'})
         },

@@ -1,8 +1,8 @@
 import os
-from alm_crm.models import Contact, CRMUser, Activity
-from django.utils import timezone
 from django.test import TestCase
-from alm_crm.models import Contact, CRMUser, Activity, SalesCycle, Feedback, Value
+from django.utils import timezone
+from alm_crm.models import Contact, CRMUser, Activity, SalesCycle, Feedback,\
+    Mention, Feedback, Value, Comment
 from alm_vcard.models import VCard
 
 
@@ -46,9 +46,10 @@ class ContactTestCase(TestCase):
 
     def test_upload_contacts(self):
         file_path = os.path.join(os.path.dirname(os.path.dirname(__file__)),
-                                    'alm_crm/fixtures/aliya.vcf')
+                                 'alm_crm/fixtures/aliya.vcf')
         file_obj = open(file_path, "r").read()
-        contact = Contact.upload_contacts(upload_type='vcard', file_obj=file_obj)
+        contact = Contact.upload_contacts(upload_type='vcard',
+                                          file_obj=file_obj)
         self.assertEqual(contact.__class__, Contact)
         self.assertEqual(contact.vcard.__class__, VCard)
         addr = list(contact.vcard.adr_set.all())
@@ -57,7 +58,7 @@ class ContactTestCase(TestCase):
 
     def test_upload_contacts_by_vcard(self):
         file_path = os.path.join(os.path.dirname(os.path.dirname(__file__)),
-                                    'alm_crm/fixtures/aliya.vcf')
+                                 'alm_crm/fixtures/aliya.vcf')
         file_obj = open(file_path, "r").read()
         contact = Contact._upload_contacts_by_vcard(file_obj)
         self.assertEqual(contact.__class__, Contact)
@@ -68,7 +69,7 @@ class ContactTestCase(TestCase):
 
     def test_filter_contacts_by_vcard(self):
         file_path = os.path.join(os.path.dirname(os.path.dirname(__file__)),
-                                    'alm_crm/fixtures/aliya.vcf')
+                                 'alm_crm/fixtures/aliya.vcf')
         file_obj = open(file_path, "r").read()
         contact = Contact._upload_contacts_by_vcard(file_obj)
         cs = Contact.filter_contacts_by_vcard(search_text='Aliya',
@@ -92,45 +93,167 @@ class ContactTestCase(TestCase):
     def test_get_contacts_by_last_activity_date(self):
         struct = Contact.get_contacts_by_last_activity_date(user_id=1)
 
+
 class ActivityTestCase(TestCase):
-    fixtures = ['crmusers.json', 'contacts.json', 'salescycles.json', 'activities.json', 'feedbacks.json', 'values.json']
+    fixtures = ['crmusers.json', 'contacts.json', 'salescycles.json',
+                'activities.json', 'feedbacks.json', 'mentions.json']
 
     def setUp(self):
         super(ActivityTestCase, self).setUp()
-        self.salescycle = SalesCycle.objects.get(id=1)
-        self.activities = Activity.objects.filter(sales_cycle_id=1)
+        self.activity1 = Activity.objects.get(id=1)
+        self.salescycle1 = SalesCycle.objects.get(id=1)
 
-    def test_actvities_by_contact(self):
+    def test_get_activities_by_contact(self):
         c = Contact.objects.get(id=1)
         a = Activity.objects.get(id=1)
-        self.assertEqual(len(Activity.objects.filter(sales_cycle__contact_id=c.id)), len(a.get_activities_by_contact(c.id)))
+        self.assertEqual(len(Activity.objects.filter(
+                         sales_cycle__contact_id=c.id)),
+                         len(a.get_activities_by_contact(c.id)))
 
     def test_set_feedback(self):
         self.assertNotEqual(0, len(Activity.objects.filter(sales_cycle_id=1)))
         self.assertNotEqual(0, len(Feedback.objects.all()))
-        a = Activity(title='t6', description='d6', sales_cycle_id=1, author_id=1)
+        a = Activity(title='t6', description='d6', date_created=timezone.now(),
+                     sales_cycle_id=1, author_id=1)
         a.save()
-        self.assertEqual(a,Activity.objects.get(id=a.id))
+        self.assertEqual(a, Activity.objects.get(id=a.id))
         self.assertEqual(0, len(Feedback.objects.filter(id=a.id)))
-        f = Feedback(feedback='feedback8', status="W", date_created=timezone.now(), date_edited=timezone.now(), activity=a)
+        f = Feedback(feedback='feedback8', status="W",
+                     date_created=timezone.now(), date_edited=timezone.now(),
+                     activity=a)
         f.save()
         self.assertEqual(f, Feedback.objects.get(id=f.id))
+
+        a.set_feedback(f, False)
+        b = Activity.objects.last()
+        self.assertEqual(b.feedback, f)
         a.set_feedback(f, True)
-        self.assertEqual(a,f.activity)
+        a = Activity.objects.get(pk=a.pk)
+        self.assertEqual(a.feedback, f)
 
     def test_get_activities_by_salescycle(self):
-        a=Activity()
-        if (len(self.activities)==len(a.get_activities_by_salescycle(1,0,0))):
-            self.assertEqual(len(set(self.activities).intersection(a.get_activities_by_salescycle(1,0,0))), len(self.activities))
+        all_activities = self.salescycle1.rel_activities.all()
+        activities = Activity.get_activities_by_salescycle(1, 0, 0)
+        if (len(all_activities) == len(activities)):
+            self.assertEqual(len(set(all_activities).intersection(activities)),
+                             len(activities))
         else:
             return False
 
-
-    def test_get_mentioned_activites_of(self):
-        pass
+    def test_get_mentioned_activities_of(self):
+        user_ids = [1, 2]
+        self.assertEqual(len(set(self.activity1.mentions.all())), 1)
+        self.assertEqual(
+            len(set(Activity.get_mentioned_activities_of(user_ids))), 4)
 
     def test_get_activity_details(self):
-        pass
+        for include_sc in [True, False]:
+            for include_m in [True, False]:
+                for include_c in [True, False]:
+                    activity = Activity.get_activity_details(
+                        self.activity1.id,
+                        include_sales_cycle=True,
+                        include_mentioned_users=True,
+                        include_comments=True)
 
-    def test_number_of_activities_by_day(self):
-        pass
+                    activity = Activity.get_activity_details(
+                        self.activity1.id,
+                        include_sales_cycle=include_sc,
+                        include_mentioned_users=include_m,
+                        include_comments=include_c)
+                    self.assertTrue('activity' in activity)
+                    details = activity['activity']
+                    self.assertEqual(details['object'], self.activity1)
+
+                    self.assertEqual('sales_cycle' in details, include_sc)
+                    if include_sc:
+                        self.assertEqual(details['sales_cycle'].__class__,
+                                         SalesCycle().__class__)
+                        self.assertEqual(details['sales_cycle'],
+                                         self.activity1.sales_cycle)
+
+                    self.assertEqual('mentioned_users' in details, include_m)
+                    if include_m:
+                        self.assertEqual(list(details['mentioned_users']),
+                                         list(self.activity1.mentions.all()))
+
+                    self.assertEqual('comments' in details, include_c)
+                    if include_c:
+                        self.assertQuerysetEqual(details['comments'],
+                                                 self.activity1.comments.all())
+
+    def test_get_number_of_activities_by_day(self):
+        user_id = 1
+        user_activities = Activity.objects.filter(author=user_id)\
+            .order_by('date_created')
+        from_dt = user_activities.first().date_created
+        to_dt = user_activities.last().date_created
+        self.assertTrue(from_dt < to_dt)
+        owned_data = Activity.get_number_of_activities_by_day(user_id,
+                                                              from_dt,
+                                                              to_dt)
+        self.assertEqual(sum(owned_data.values()), user_activities.count())
+        self.assertEqual(owned_data, {'2014-09-15': 1, '2014-09-11': 1,
+                         '2014-09-13': 1, '2014-09-12': 2})
+
+
+class MentionTestCase(TestCase):
+    fixtures = ['mentions.json']
+
+    def setUp(self):
+        super(MentionTestCase, self).setUp()
+
+    def test_get_all_mentions_of(self):
+        user_id = 1
+        self.assertEqual(list(Mention.get_all_mentions_of(user_id)),
+                         list(Mention.objects.filter(user_id=user_id)))
+
+    def test_build_new__without_save(self):
+        user_id = 1
+        before = Mention.get_all_mentions_of(user_id).count()
+        self.assertEqual(Mention.build_new(user_id, Activity, 1).
+                         __class__, Mention)
+        self.assertEqual(Mention.get_all_mentions_of(user_id).count(), before)
+
+    def test_build_new(self):
+        user_id = 1
+        before = Mention.get_all_mentions_of(user_id).count()
+        self.assertEqual(Mention.build_new(user_id, Activity, 1, True).pk,
+                         Mention.objects.last().pk)
+        self.assertEqual(Mention.get_all_mentions_of(user_id).count(),
+                         before + 1)
+
+
+class CommentTestCase(TestCase):
+    fixtures = ['crmusers.json', 'contacts.json', 'salescycles.json',
+                'activities.json', 'mentions.json']
+
+    def setUp(self):
+        super(CommentTestCase, self).setUp()
+
+    def test_build_new__without_save(self):
+        user_id = 1
+        before = Comment.get_comments_by_context(1, Activity).count()
+
+        self.assertEqual(Comment.build_new(user_id, Activity, 1).
+                         __class__, Comment)
+        self.assertEqual(Comment.get_comments_by_context(1, Activity).count(),
+                         before)
+
+    def test_build_new(self):
+        user_id = 1
+        before = Comment.get_comments_by_context(1, Activity).count()
+        comment = Comment.build_new(user_id, Activity, 1, True)
+        received_comments = Comment.get_comments_by_context(1, Activity)
+
+        self.assertEqual(received_comments.count(), before + 1)
+        self.assertTrue(comment.id in
+                        received_comments.values_list('pk', flat=True))
+
+    def test_get_comments_by_context(self):
+        activity1 = Activity.objects.get(pk=1)
+
+        self.assertEqual(Comment.get_comments_by_context(1, Activity, 1, 0)
+                         .count(), activity1.comments.count())
+        self.assertEqual(Comment.get_comments_by_context(1, Activity, 1, 1)
+                         .count(), 0)

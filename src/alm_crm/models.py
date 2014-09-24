@@ -338,7 +338,7 @@ class Contact(models.Model):
         # SECOND IMPL
         # contact_activity_map follows structure suggested by Askhat.
         # contacts = cls.objects.filter(
-        #     user_id=user_id).order_by('-latest_activity__when')
+        #     user_id=user_id).order_by('-latest_activity__date_created')
         # if not include_activities:
         #     return contacts
         # contact_activity_map = dict()
@@ -349,7 +349,7 @@ class Contact(models.Model):
         #     for current_cycle_pk in current_scycles_pks:
         #         sales_cycle_contact_map[current_cycle_pk] = contact.pk
         # activities = Activity.objects.filter(
-        #     sales_cycle__id__in=sales_cycles_pks).order_by('when')
+        #     sales_cycle__id__in=sales_cycles_pks).order_by('date_created')
         # for activity in activities:
         #     contact_pk = sales_cycle_contact_map[activity.sales_cycle.pk]
         #     contact_activity_map.setdefault(contact_pk, []).append(activity.pk)
@@ -369,7 +369,7 @@ class Contact(models.Model):
         #         for activity in sc.rel_activities.objects.all():
         # activities.append(activity) # now we have a list of all acitivities. not sorted though
         # sort activities by date. latest being first
-        #     activities = activities.order_by('-when')[offset:offset+limit]
+        #     activities = activities.order_by('-date_created')[offset:offset+limit]
         # do for all activities.
         #     for activity in activities:
         # get contact via activity's sales cycle
@@ -498,7 +498,8 @@ class SalesCycle(models.Model):
 
     def get_activities(self, limit=20, offset=0):
         """TEST Returns list of activities ordered by date."""
-        return self.rel_activities.order_by('-date_created')[offset:offset + limit]
+        return self.rel_activities.order_by(
+            '-date_created')[offset:offset + limit]
 
     def add_product(self, product_id, **kw):
         """TEST Assigns products to salescycle"""
@@ -582,7 +583,8 @@ class SalesCycle(models.Model):
 class Activity(models.Model):
     title = models.CharField(max_length=100)
     description = models.CharField(max_length=500)
-    date_created = models.DateTimeField(blank=True, null=True, auto_now_add=True)
+    date_created = models.DateTimeField(blank=True, null=True,
+                                        auto_now_add=True)
     date_edited = models.DateTimeField(blank=True, null=True, auto_now=True)
     sales_cycle = models.ForeignKey(SalesCycle, related_name='rel_activities')
     author = models.ForeignKey(CRMUser, related_name='activity_author')
@@ -598,9 +600,7 @@ class Activity(models.Model):
 
     def set_feedback(self, feedback_obj, save=False):
         """Set feedback to activity instance. Saves if `save` is set(True)."""
-        """don't really understand why we need set_feedback here
-        theres already a OneToOneField to Feedback"""
-        feedback_obj.activity=self
+        feedback_obj.activity = self
         if save:
             feedback_obj.save()
 
@@ -615,30 +615,19 @@ class Activity(models.Model):
         except SalesCycle.DoesNotExist:
             return False
         if (limit):
-            return cls.objects.filter(sales_cycle=sales_cycle).order_by('date_created')[offset:offset + limit]
+            return cls.objects.filter(sales_cycle=sales_cycle)\
+                .order_by('date_created')[offset:offset + limit]
         else:
-            return cls.objects.filter(sales_cycle=sales_cycle).order_by('date_created')
-
+            return cls.objects.filter(sales_cycle=sales_cycle)\
+                .order_by('date_created')
 
     @classmethod
     def get_mentioned_activities_of(cls, user_ids=set([])):
-        """
-        to get filter with OR statements, like below:
-            Activity.objects.filter(
-                Q(sales_cycle__mentions__id=user_ids[0]) |
-                Q(sales_cycle__mentions__id=user_ids[1])
-            )
-        used functional python's reduce
-        """
-
-        q = reduce(lambda q, f: q | models.Q(sales_cycle__mentions__id=f),
-                   user_ids, models.Q())
-
-        return Activity.objects.filter(q)
+        return Activity.objects.filter(mentions__user_id__in=user_ids)
 
     '''--Done--'''
     @classmethod
-    def get_activity_detail(
+    def get_activity_details(
             cls, activity_id, include_sales_cycle=False,
             include_mentioned_users=False, include_comments=True):
         """TODO Returns activity details with comments by default.
@@ -659,11 +648,8 @@ class Activity(models.Model):
             return False
         activity_detail = {'activity': {'object': activity}}
         if include_sales_cycle:
-            try:
-                sales_cycle = Activity.objects.get(id=activity.sales_cycle_id)
-                activity_detail['activity']['sales_cycle'] = sales_cycle
-            except Activity.DoesNotExist:
-                return False
+            activity_detail['activity'][
+                'sales_cycle'] = activity.sales_cycle
         if include_mentioned_users:
             activity_detail['activity'][
                 'mentioned_users'] = activity.mentions.all()
@@ -679,13 +665,22 @@ class Activity(models.Model):
             user = CRMUser.objects.get(id=user_id)
         except CRMUser.DoesNotExist:
             return False
-        '''need to implement the conversion to datetime object from input arguments '''
+        '''
+        need to implement the conversion to datetime object
+        from input arguments
+        '''
         if (type(from_dt) and type(to_dt) == datetime.datetime):
             pass
         activity_queryset = Activity.objects.filter(
             date_created__gte=from_dt, date_created__lte=to_dt, author=user)
-        date_list = [act.date_created.date() for act in activity_queryset]
-        return {str(dt): date_list.count() for dt in date_list}
+        date_counts = {}
+        for act in activity_queryset:
+            date = str(act.date_created.date())
+            if date in date_counts:
+                date_counts[date] += 1
+            else:
+                date_counts[date] = 1
+        return date_counts
 
 
 class Feedback(models.Model):
@@ -748,9 +743,9 @@ class Comment(models.Model):
     comment = models.CharField(max_length=140)
     author = models.ForeignKey(CRMUser, related_name='comment_author')
     date_created = models.DateTimeField(blank=True, auto_now_add=True)
-    date_edited = models.DateTimeField(blank=True)
+    date_edited = models.DateTimeField(blank=True, auto_now_add=True)
     object_id = models.IntegerField(null=True, blank=False)
-    content_type = models.CharField(max_length=1000, blank=True)
+    content_type = models.ForeignKey(ContentType)
     content_object = generic.GenericForeignKey('content_type', 'object_id')
     mentions = generic.GenericRelation('Mention')
 
@@ -775,7 +770,7 @@ class Comment(models.Model):
     @classmethod
     def build_new(cls, user_id, content_class=None,
                   object_id=None, save=False):
-        comment = cls(user_id=user_id)
+        comment = cls(author_id=user_id)
         comment.content_type = ContentType.objects.get_for_model(content_class)
         comment.object_id = object_id
         if save:
@@ -789,7 +784,7 @@ class Comment(models.Model):
         cttype = ContentType.objects.get_for_model(context_class)
         return cls.objects.filter(
             object_id=context_object_id,
-            content_type=cttype)[offset:limit:offset]
+            content_type=cttype)[offset:offset + limit]
 
 
 signals.post_save.connect(

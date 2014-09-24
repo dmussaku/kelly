@@ -5,6 +5,7 @@
         "fields": {
             "title":"t1",
             "description":"d1",
+            "date_created":"2014-09-11 00:00:00+00:00",
             "sales_cycle":1,
             "author":1
         }
@@ -15,6 +16,7 @@
         "fields": {
             "title":"t2",
             "description":"d2",
+            "date_created":"2014-09-12 00:00:00+00:00",
             "sales_cycle":1,
             "author":1
         }
@@ -25,6 +27,7 @@
         "fields": {
             "title":"t3",
             "description":"d3",
+            "date_created":"2014-09-13 00:00:00+00:00",
             "sales_cycle":1,
             "author":1
         }
@@ -35,8 +38,9 @@
         "fields": {
             "title":"t4",
             "description":"d4",
-            "sales_cycle":2,
-            "author":1
+            "date_created":"2014-09-14 00:00:00+00:00",
+            "sales_cycle":1,
+            "author":2
         }
     },
     {
@@ -45,6 +49,7 @@
         "fields": {
             "title":"t5",
             "description":"d5",
+            "date_created":"2014-09-15 00:00:00+00:00",
             "sales_cycle":2,
             "author":1
         }
@@ -55,7 +60,8 @@
         "fields": {
             "title":"t6",
             "description":"d6",
-            "sales_cycle":3,
+            "date_created":"2014-09-12 00:00:00+00:00",
+            "sales_cycle":2,
             "author":1
         }
     },
@@ -65,8 +71,9 @@
         "fields": {
             "title":"t7",
             "description":"d7",
-            "sales_cycle":4,
-            "author":1
+            "date_created":"2014-09-16 00:00:00+00:00",
+            "sales_cycle":3,
+            "author":2
         }
     }
 ]
