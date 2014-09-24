@@ -1,0 +1,16 @@
+{% extends "user/base.html" %}
+{% load i18n %}
+<!DOCTYPE html>
+{% block content %}
+        <!-- Upload form. Note enctype attribute! -->
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <p>{{ form.non_field_errors }}</p>
+        <p>{{ form.myfile.label_tag }} {{ form.myfile.help_text }}</p>
+        <p>
+            {{ form.myfile.errors }}
+            {{ form.myfile }}
+        </p>
+        <p><input type="submit" value="Upload" /></p>
+    </form>
+{% endblock %}

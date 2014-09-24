@@ -97,6 +97,7 @@ class VCard(models.Model):
 
         return "name undefined"
 
+
     @classmethod
     def importFrom(cls, type, data):
         """

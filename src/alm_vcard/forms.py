@@ -4,6 +4,9 @@ from models import *
 '''
 "VCard", "Tel", "Email", "Geo", "Org", "Adr", "Agent", "Category", "Key", "Label", "Mailer", "Nickname", "Note", "Role", "Title", "Tz", "Url"
 '''
+class VCardUploadForm(forms.Form):
+    myfile = forms.FileField(label='Select a file')
+
 class VCardForm(forms.ModelForm):
 
     class Meta():
@@ -14,6 +17,7 @@ class TelForm(forms.ModelForm):
 
     class Meta():
         model = Tel
+
 
 
 class EmailForm(forms.ModelForm):

@@ -1,0 +1,230 @@
+{% extends "almanet/base.html" %}
+{% load i18n almanet_tags %}
+{% block head_title %} {{ _("VCard List Page") }} {% endblock %}
+{% block content %}
+<ul>
+	<h3>{{vcard.honorific_prefix}} {{vcard.fn}} {{vcard.honorific_suffix}} </h3>
+	<a href="{% url 'vcard_update' pk=vcard.id %}">Update</a>
+	<h4>Telephone Number</h4>
+		<ul>
+		{% for tel in tels %}
+		    	<li>
+		    		{{tel.type}} - {{tel.value}} <a href="{% url 'tel_update' id=tel.id %}">Update</a> 
+		    	</li>
+	    {% empty %}
+	    	You have no telephone numbers connected.</br>
+	    	</br></br>
+		{% endfor %}
+		<a href="{% url 'tel_create' pk=vcard.id %}">Add telephone number</a></br></br> 
+		</ul>
+	<h4>Emails
+		<ul>
+		{% for email in emails %}
+		    	<li>
+			    	{{email.type}}
+			    	{{email.value}}
+			    	<a href="{% url 'email_update' id=email.id %}">Update</a> 
+		    	</li>
+	    {% empty %}
+	    	You have no emails connected.</br>
+	    	
+		{% endfor %}
+		<a href="{% url 'email_create' pk=vcard.id %}">Add an email</a></br></br> 
+		</ul>
+	</h4>
+
+	<h4>Geos
+		<ul>
+		{% for geo in geos %}
+		    	<li>
+			    	{{geo.data}}
+			    	<a href="{% url 'geo_update' id=geo.id %}">Update</a> 
+		    	</li>
+	    {% empty %}
+	    	You have no geographical locations connected.</br>
+	    	
+		{% endfor %}
+		<a href="{% url 'geo_create' pk=vcard.id %}">Add a geographical location</a></br></br> 
+		</ul>
+	</h4>
+	<h4>Orgs
+		<ul>
+		{% for org in orgs %}
+		    	<li>
+			    	{{org.organization_unit}} {{org.organization_name}} 
+			    	<a href="{% url 'org_update' id=org.id %}">Update</a> 
+		    	</li>
+	    {% empty %}
+	    	You have no organizations connected.</br>
+		{% endfor %}
+		<a href="{% url 'org_create' pk=vcard.id %}">Add a organization</a></br></br> 
+		</ul>
+	</h4>
+	<h4>Addresses
+		<ul>
+		{% for adr in adrs %}
+		    	<li>
+			    	{{adr.data}} 
+			    	<a href="{% url 'adr_update' id=adr.id %}">Update</a> 
+		    	</li>
+	    {% empty %}
+	    	You have no adresses connected.</br>
+		{% endfor %}
+		<a href="{% url 'adr_create' pk=vcard.id %}">Add an address</a></br></br> 
+		</ul>
+	</h4>
+	<h4>Agents
+		<ul>
+		{% for agent in agents %}
+		    	<li>
+			    	{{agent.data}} 
+			    	<a href="{% url 'agent_update' id=agent.id %}">Update</a> 
+		    	</li>
+	    {% empty %}
+	    	You have no agentesses connected.</br>
+		{% endfor %}
+		<a href="{% url 'agent_create' pk=vcard.id %}">Add an agent</a></br></br> 
+		</ul>
+	</h4>
+	<h4>Categories
+		<ul>
+		{% for category in categories %}
+		    	<li>
+			    	{{category.data}} 
+			    	<a href="{% url 'category_update' id=category.id %}">Update</a> 
+		    	</li>
+	    {% empty %}
+	    	You have no categories connected.</br>
+		{% endfor %}
+		<a href="{% url 'category_create' pk=vcard.id %}">Add an category</a></br></br> 
+		</ul>
+	</h4>
+	<h4>Keys
+		<ul>
+		{% for key in keys %}
+		    	<li>
+			    	{{key.data}} 
+			    	<a href="{% url 'key_update' id=key.id %}">Update</a> 
+		    	</li>
+	    {% empty %}
+	    	You have no keys connected.</br>
+		{% endfor %}
+		<a href="{% url 'key_create' pk=vcard.id %}">Add a key</a></br></br> 
+		</ul>
+	</h4>
+	
+	<h4>Label
+		<ul>
+		{% for label in labels %}
+		    	<li>
+			    	{{label.data}} 
+			    	<a href="{% url 'label_update' id=label.id %}">Update</a> 
+		    	</li>
+	    {% empty %}
+	    	You have no labels connected.</br>
+		{% endfor %}
+		<a href="{% url 'label_create' pk=vcard.id %}">Add a label</a></br></br> 
+		</ul>
+	</h4>
+
+	<h4>Mailers
+		<ul>
+		{% for mailer in mailers %}
+		    	<li>
+			    	{{mailer.data}} 
+			    	<a href="{% url 'mailer_update' id=mailer.id %}">Update</a> 
+		    	</li>
+	    {% empty %}
+	    	You have no mailers connected.</br>
+		{% endfor %}
+		<a href="{% url 'mailer_create' pk=vcard.id %}">Add a mailer</a></br></br> 
+		</ul>
+	</h4>
+
+	<h4>Nicknames
+		<ul>
+		{% for nickname in nicknames %}
+		    	<li>
+			    	{{nickname.data}} 
+			    	<a href="{% url 'nickname_update' id=nickname.id %}">Update</a> 
+		    	</li>
+	    {% empty %}
+	    	You have no nicknames connected.</br>
+		{% endfor %}
+		<a href="{% url 'nickname_create' pk=vcard.id %}">Add a nickname</a></br></br> 
+		</ul>
+	</h4>
+
+	<h4>Notes
+		<ul>
+		{% for note in notes %}
+		    	<li>
+			    	{{note.data}} 
+			    	<a href="{% url 'note_update' id=note.id %}">Update</a> 
+		    	</li>
+	    {% empty %}
+	    	You have no notes connected.</br>
+		{% endfor %}
+		<a href="{% url 'note_create' pk=vcard.id %}">Add a note</a></br></br> 
+		</ul>
+	</h4>
+
+	<h4>Roles
+		<ul>
+		{% for role in roles %}
+		    	<li>
+			    	{{role.data}} 
+			    	<a href="{% url 'role_update' id=role.id %}">Update</a> 
+		    	</li>
+	    {% empty %}
+	    	You have no roles connected.</br>
+		{% endfor %}
+		<a href="{% url 'role_create' pk=vcard.id %}">Add a role</a></br></br> 
+		</ul>
+	</h4>
+
+	<h4>Titles
+		<ul>
+		{% for title in titles %}
+		    	<li>
+			    	{{title.data}} 
+			    	<a href="{% url 'title_update' id=title.id %}">Update</a> 
+		    	</li>
+	    {% empty %}
+	    	You have no titles connected.</br>
+		{% endfor %}
+		<a href="{% url 'title_create' pk=vcard.id %}">Add a title</a></br></br> 
+		</ul>
+	</h4>
+
+	<h4>Tzs
+		<ul>
+		{% for tz in tzs %}
+		    	<li>
+			    	{{tz.data}} 
+			    	<a href="{% url 'tz_update' id=tz.id %}">Update</a> 
+		    	</li>
+	    {% empty %}
+	    	You have no tzs connected.</br>
+		{% endfor %}
+		<a href="{% url 'tz_create' pk=vcard.id %}">Add a tz</a></br></br> 
+		</ul>
+	</h4>
+
+	<h4>Urls
+		<ul>
+		{% for url in urls %}
+		    	<li>
+			    	{{url.data}} 
+			    	<a href="{% url 'url_update' id=url.id %}">Update</a> 
+		    	</li>
+	    {% empty %}
+	    	You have no urls connected.</br>
+		{% endfor %}
+		<a href="{% url 'url_create' pk=vcard.id %}">Add a url</a></br></br> 
+		</ul>
+	</h4>
+</ul>
+
+<a href="{% url 'import_vcard' %}">Import vcard</a>
+{% endblock %}

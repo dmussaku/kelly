@@ -5,9 +5,9 @@ from almanet.url_resolvers import reverse_lazy
 from alm_user.models import User
 from django.http import HttpResponse
 from django.shortcuts import render
-from almanet.models import Product, Subscription
+from almanet.models import Subscription
 from forms import ContactForm, SalesCycleForm, MentionForm, ActivityForm, CommentForm, ValueForm, ActivityFeedbackForm
-from models import Contact, SalesCycle, Activity, ActivityFeedback,  Mention, Comment, Value
+from models import Contact, SalesCycle, Activity, Feedback,  Mention, Comment, Value
 
 
 
@@ -231,36 +231,36 @@ class ValueDeleteView(DeleteView):
 
 
 class ActivityFeedbackListView(ListView):
-    model = ActivityFeedback
-    queryset = ActivityFeedback.objects.all()
+    model = Feedback
+    queryset = Feedback.objects.all()
 
     def get_context_data(self, **kwargs):
         ctx = super(ActivityFeedbackListView, self).get_context_data(**kwargs)
-        ctx['activity_feedbacks'] = ActivityFeedback.objects.all()
+        ctx['activity_feedbacks'] = Feedback.objects.all()
         ctx['user'] = self.request.user
         return ctx
 
 
 class ActivityFeedbackCreateView(CreateView):
-    model = ActivityFeedback
+    model = Feedback
     form_class = ActivityFeedbackForm
     template_name = "activity_feedback/activity_feedback_create.html"
     success_url = reverse_lazy('activity_feedback_list')
 
 
 class ActivityFeedbackUpdateView(UpdateView):
-    model = ActivityFeedback
+    model = Feedback
     form_class = ActivityFeedbackForm
     template_name = "activity_feedback/activity_feedback_update.html"
     success_url = reverse_lazy('activity_feedback_list')
 
 
 class ActivityFeedbackDetailView(DetailView):
-    model = ActivityFeedback
+    model = Feedback
     template_name = "activity_feedback/activity_feedback_detail.html"
 
 
 class ActivityFeedbackDeleteView(DeleteView):
-    model = ActivityFeedback
+    model = Feedback
     template_name = "activity_feedback/activity_feedback_delete.html"
     success_url = reverse_lazy('activity_feedback_list')
