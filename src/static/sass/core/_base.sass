@@ -1,0 +1,150 @@
+*,
+*:after,
+*:before
+  box-sizing: border-box
+
+html
+  height: 100%
+  font-size: nth($rootsizes, 3)/16*100%
+  -ms-text-size-adjust: 100%
+  -webkit-text-size-adjust: 100%
+  -webkit-overflow-scrolling: none
+
+body
+  height: 100%
+  margin: 0
+  padding: 0
+  font-family: Tahoma, Verdana, Segoe, sans-serif
+  line-height: 2rem
+  color: $primary
+  -webkit-overflow-scrolling: none
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6
+  padding: 1rem 0 0
+  margin: 0
+  font-style: normal
+  font-weight: normal
+
+ul,ol
+  padding: 0
+  margin: 0 0 2rem
+  li
+    margin-left: 2rem
+
+a
+  color: inherit
+  text-decoration: none
+  background: transparent
+  outline: 0
+  &:hover
+    opacity: .8
+
+a:active,
+a:hover
+  outline: 0
+
+img
+  display: block
+  height: auto
+  max-width: 100%
+  padding: 0
+  margin: 0
+  line-height: 0
+  border: 0
+
+.img--inline
+  display: inline-block
+
+figure
+  padding: 0
+  margin: 0
+
+article,
+aside,
+details,
+figcaption,
+figure,
+footer,
+header,
+hgroup,
+main,
+nav,
+section,
+summary
+  display: block
+
+audio,
+canvas,
+progress,
+video
+  display: inline-block
+  vertical-align: baseline
+
+audio:not([controls])
+  display: none
+  height: 0
+
+[hidden],
+template
+  display: none
+
+abbr[title]
+  border-bottom: 1px dotted $secondary
+
+b,
+strong
+  font-weight: bold
+
+dfn
+  font-style: italic
+
+// mark, TODO: add later
+
+small
+  font-size: 75%
+
+sub,
+sup
+  position: relative
+  font-size: 75%
+  line-height: 0
+  vertical-align: baseline
+
+sub
+  top: -.5em
+
+sup
+  bottom: -.25em
+
+svg:not(:root)
+  overflow: hidden
+
+hr
+  height: 0
+  margin: 1rem 0 1rem
+  border: 0
+  border-bottom: 1px solid
+  box-sizing: content-box
+
+pre
+  overflow: auto
+
+code,
+kbd,
+pre,
+samp
+  font-family: monospace, monospace
+  font-size: $small
+
+table
+  border-collapse: collapse
+  border-spacing: 0
+
+td,
+th
+  padding: 0

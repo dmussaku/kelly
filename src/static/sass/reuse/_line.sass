@@ -1,0 +1,66 @@
+.line
+  @extend %helper-clearfix
+  @extend %helper-accelerate
+  display: block
+  position: relative
+  line-height: 1.5rem
+
+.line-aside
+  display: block
+  float: left
+  width: 1/4*100%
+  padding: .5rem
+  margin-right: -2px
+  text-align: right
+  border-right: 2px solid $neutral
+
+.line-body
+  display: block
+  padding: .5rem
+  overflow: hidden
+  text-align: left
+  border-left: 2px solid $neutral
+
+.hero .line-aside,
+.hero .line-body
+  border-color: hsl(0,0,30)
+
+.line--borderless
+  .line-aside, .line-body
+    border: 0
+  .line-aside
+    margin-right: 0
+
+.line--compact
+  .line-aside,
+  .line-body
+    padding-top: .25rem
+    padding-bottom: 0
+
+.line-aside-label
+  color: $secondary
+
+.line-body-main
+  display: block
+  float: left
+  width: 3/4*100%
+
+.line-body-meta
+  padding-top: .5rem
+  font-size: $caption
+  color: $secondary
+
+.line-body-extra
+  overflow: hidden
+  padding-left: .5rem
+
+//-------------------------------------
+
+.line-title
+  padding-top: 0
+  font-size: $large
+  text-transform: uppercase
+  letter-spacing: 1px
+
+.line-subtitle
+  color: $secondary

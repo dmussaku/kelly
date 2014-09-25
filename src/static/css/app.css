@@ -1,0 +1,438 @@
+/* [sass, static/sass, app.sass] */
+/* line 3, /Users/Vadim/Documents/work-crm/static-crm/static/sass/core/base */
+*, *:after, *:before {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box; }
+
+/* line 6, /Users/Vadim/Documents/work-crm/static-crm/static/sass/core/base */
+html {
+  height: 100%;
+  font-size: 100%;
+  -ms-text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
+  -webkit-overflow-scrolling: none; }
+
+/* line 13, /Users/Vadim/Documents/work-crm/static-crm/static/sass/core/base */
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  font-family: Tahoma, Verdana, Segoe, sans-serif;
+  line-height: 2rem;
+  color: #333333;
+  -webkit-overflow-scrolling: none; }
+
+/* line 27, /Users/Vadim/Documents/work-crm/static-crm/static/sass/core/base */
+h1, h2, h3, h4, h5, h6 {
+  padding: 1rem 0 0;
+  margin: 0;
+  font-style: normal;
+  font-weight: normal; }
+
+/* line 33, /Users/Vadim/Documents/work-crm/static-crm/static/sass/core/base */
+ul, ol {
+  padding: 0;
+  margin: 0 0 2rem; }
+  /* line 36, /Users/Vadim/Documents/work-crm/static-crm/static/sass/core/base */
+  ul li, ol li {
+    margin-left: 2rem; }
+
+/* line 39, /Users/Vadim/Documents/work-crm/static-crm/static/sass/core/base */
+a {
+  color: inherit;
+  text-decoration: none;
+  background: transparent;
+  outline: 0; }
+  /* line 44, /Users/Vadim/Documents/work-crm/static-crm/static/sass/core/base */
+  a:hover {
+    opacity: 0.8; }
+
+/* line 48, /Users/Vadim/Documents/work-crm/static-crm/static/sass/core/base */
+a:active, a:hover {
+  outline: 0; }
+
+/* line 51, /Users/Vadim/Documents/work-crm/static-crm/static/sass/core/base */
+img {
+  display: block;
+  height: auto;
+  max-width: 100%;
+  padding: 0;
+  margin: 0;
+  line-height: 0;
+  border: 0; }
+
+/* line 60, /Users/Vadim/Documents/work-crm/static-crm/static/sass/core/base */
+.img--inline {
+  display: inline-block; }
+
+/* line 63, /Users/Vadim/Documents/work-crm/static-crm/static/sass/core/base */
+figure {
+  padding: 0;
+  margin: 0; }
+
+/* line 78, /Users/Vadim/Documents/work-crm/static-crm/static/sass/core/base */
+article, aside, details, figcaption, figure, footer, header, hgroup, main, nav, section, summary {
+  display: block; }
+
+/* line 84, /Users/Vadim/Documents/work-crm/static-crm/static/sass/core/base */
+audio, canvas, progress, video {
+  display: inline-block;
+  vertical-align: baseline; }
+
+/* line 88, /Users/Vadim/Documents/work-crm/static-crm/static/sass/core/base */
+audio:not([controls]) {
+  display: none;
+  height: 0; }
+
+/* line 93, /Users/Vadim/Documents/work-crm/static-crm/static/sass/core/base */
+[hidden], template {
+  display: none; }
+
+/* line 96, /Users/Vadim/Documents/work-crm/static-crm/static/sass/core/base */
+abbr[title] {
+  border-bottom: 1px dotted #808080; }
+
+/* line 100, /Users/Vadim/Documents/work-crm/static-crm/static/sass/core/base */
+b, strong {
+  font-weight: bold; }
+
+/* line 103, /Users/Vadim/Documents/work-crm/static-crm/static/sass/core/base */
+dfn {
+  font-style: italic; }
+
+/* line 107, /Users/Vadim/Documents/work-crm/static-crm/static/sass/core/base */
+small {
+  font-size: 75%; }
+
+/* line 111, /Users/Vadim/Documents/work-crm/static-crm/static/sass/core/base */
+sub, sup {
+  position: relative;
+  font-size: 75%;
+  line-height: 0;
+  vertical-align: baseline; }
+
+/* line 117, /Users/Vadim/Documents/work-crm/static-crm/static/sass/core/base */
+sub {
+  top: -0.5em; }
+
+/* line 120, /Users/Vadim/Documents/work-crm/static-crm/static/sass/core/base */
+sup {
+  bottom: -0.25em; }
+
+/* line 123, /Users/Vadim/Documents/work-crm/static-crm/static/sass/core/base */
+svg:not(:root) {
+  overflow: hidden; }
+
+/* line 126, /Users/Vadim/Documents/work-crm/static-crm/static/sass/core/base */
+hr {
+  height: 0;
+  margin: 1rem 0 1rem;
+  border: 0;
+  border-bottom: 1px solid;
+  -webkit-box-sizing: content-box;
+  -moz-box-sizing: content-box;
+  box-sizing: content-box; }
+
+/* line 133, /Users/Vadim/Documents/work-crm/static-crm/static/sass/core/base */
+pre {
+  overflow: auto; }
+
+/* line 139, /Users/Vadim/Documents/work-crm/static-crm/static/sass/core/base */
+code, kbd, pre, samp {
+  font-family: monospace, monospace;
+  font-size: 1rem; }
+
+/* line 143, /Users/Vadim/Documents/work-crm/static-crm/static/sass/core/base */
+table {
+  border-collapse: collapse;
+  border-spacing: 0; }
+
+/* line 148, /Users/Vadim/Documents/work-crm/static-crm/static/sass/core/base */
+td, th {
+  padding: 0; }
+
+/* line 1, /Users/Vadim/Documents/work-crm/static-crm/static/sass/core/body */
+.body-header {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: auto;
+  left: 0;
+  z-index: 100;
+  height: 3rem;
+  padding: 0.5rem 1rem;
+  background-color: rgba(255, 255, 255, 0.98);
+  -webkit-box-shadow: 0 0 16px 0 rgba(0, 0, 0, 0.25);
+  box-shadow: 0 0 16px 0 rgba(0, 0, 0, 0.25); }
+
+/* line 13, /Users/Vadim/Documents/work-crm/static-crm/static/sass/core/body */
+.body-container {
+  position: relative;
+  width: 100%;
+  max-width: 1600px;
+  min-width: 960px;
+  min-height: 100%;
+  padding-top: 3rem;
+  margin: auto; }
+
+/* line 22, /Users/Vadim/Documents/work-crm/static-crm/static/sass/core/body */
+.body-column {
+  display: inline-block;
+  width: 50%;
+  text-align: center; }
+
+/* line 27, /Users/Vadim/Documents/work-crm/static-crm/static/sass/core/body */
+.body-column--single {
+  display: block;
+  margin: auto; }
+
+/* line 31, /Users/Vadim/Documents/work-crm/static-crm/static/sass/core/body */
+.body-column-title {
+  font-weight: bold; }
+
+/* line 8, /Users/Vadim/Documents/work-crm/static-crm/static/sass/core/helper */
+.line {
+  zoom: 1; }
+  /* line 11, /Users/Vadim/Documents/work-crm/static-crm/static/sass/core/helper */
+  .line:before, .line:after {
+    content: " ";
+    display: table; }
+  /* line 14, /Users/Vadim/Documents/work-crm/static-crm/static/sass/core/helper */
+  .line:after {
+    clear: both; }
+
+/* line 17, /Users/Vadim/Documents/work-crm/static-crm/static/sass/core/helper */
+.line {
+  -webkit-transform: translate3d(0, 0, 0);
+  transform: translate3d(0, 0, 0);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  -webkit-perspective: 1000;
+  perspective: 1000; }
+
+/* line 22, /Users/Vadim/Documents/work-crm/static-crm/static/sass/core/helper */
+.oneliner {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap; }
+
+/* line 1, /Users/Vadim/Documents/work-crm/static-crm/static/sass/reuse/hero */
+.hero {
+  color: white;
+  text-align: center;
+  background-color: #333333;
+  padding: 2rem; }
+
+/* line 1, /Users/Vadim/Documents/work-crm/static-crm/static/sass/reuse/column */
+.column {
+  vertical-align: top;
+  position: relative;
+  display: inline-block;
+  width: 100%;
+  max-width: 38rem;
+  margin: auto; }
+
+/* line 9, /Users/Vadim/Documents/work-crm/static-crm/static/sass/reuse/column */
+.column-title {
+  padding-top: 1rem;
+  overflow: hidden;
+  text-align: left;
+  font-weight: bold; }
+
+/* line 15, /Users/Vadim/Documents/work-crm/static-crm/static/sass/reuse/column */
+.column-title-span {
+  position: relative;
+  padding-right: 1rem; }
+  /* line 18, /Users/Vadim/Documents/work-crm/static-crm/static/sass/reuse/column */
+  .column-title-span:after {
+    position: absolute;
+    bottom: 0.25rem;
+    display: block;
+    left: 100%;
+    width: 800px;
+    height: 2px;
+    content: '';
+    background-color: #cccccc; }
+
+/* line 28, /Users/Vadim/Documents/work-crm/static-crm/static/sass/reuse/column */
+.column-header {
+  padding: 1rem;
+  line-height: 1.5rem;
+  font-size: 0.875rem;
+  color: white;
+  background-color: #333333; }
+
+/* line 35, /Users/Vadim/Documents/work-crm/static-crm/static/sass/reuse/column */
+.column-header-a {
+  display: inline-block;
+  width: 30%; }
+
+/* line 38, /Users/Vadim/Documents/work-crm/static-crm/static/sass/reuse/column */
+.column-header-b {
+  display: inline-block;
+  width: 40%;
+  text-align: center; }
+
+/* line 42, /Users/Vadim/Documents/work-crm/static-crm/static/sass/reuse/column */
+.column-header-c {
+  display: inline-block;
+  width: 30%;
+  text-align: right; }
+
+/* line 1, /Users/Vadim/Documents/work-crm/static-crm/static/sass/reuse/lineGroup */
+.lineGroup {
+  padding-top: 1rem;
+  border-bottom: 2px solid #f2f2f2; }
+  /* line 4, /Users/Vadim/Documents/work-crm/static-crm/static/sass/reuse/lineGroup */
+  .lineGroup .line {
+    padding-bottom: 1rem; }
+
+/* line 7, /Users/Vadim/Documents/work-crm/static-crm/static/sass/reuse/lineGroup */
+.lineGroup--compact {
+  padding-bottom: 1rem; }
+  /* line 9, /Users/Vadim/Documents/work-crm/static-crm/static/sass/reuse/lineGroup */
+  .lineGroup--compact .line {
+    padding-bottom: 0; }
+  /* line 11, /Users/Vadim/Documents/work-crm/static-crm/static/sass/reuse/lineGroup */
+  .lineGroup--compact .line--compact {
+    padding-bottom: 0; }
+
+/* line 1, /Users/Vadim/Documents/work-crm/static-crm/static/sass/reuse/line */
+.line {
+  display: block;
+  position: relative;
+  line-height: 1.5rem; }
+
+/* line 8, /Users/Vadim/Documents/work-crm/static-crm/static/sass/reuse/line */
+.line-aside {
+  display: block;
+  float: left;
+  width: 25%;
+  padding: 0.5rem;
+  margin-right: -2px;
+  text-align: right;
+  border-right: 2px solid #cccccc; }
+
+/* line 17, /Users/Vadim/Documents/work-crm/static-crm/static/sass/reuse/line */
+.line-body {
+  display: block;
+  padding: 0.5rem;
+  overflow: hidden;
+  text-align: left;
+  border-left: 2px solid #cccccc; }
+
+/* line 25, /Users/Vadim/Documents/work-crm/static-crm/static/sass/reuse/line */
+.hero .line-aside, .hero .line-body {
+  border-color: #4d4d4d; }
+
+/* line 29, /Users/Vadim/Documents/work-crm/static-crm/static/sass/reuse/line */
+.line--borderless .line-aside, .line--borderless .line-body {
+  border: 0; }
+/* line 31, /Users/Vadim/Documents/work-crm/static-crm/static/sass/reuse/line */
+.line--borderless .line-aside {
+  margin-right: 0; }
+
+/* line 36, /Users/Vadim/Documents/work-crm/static-crm/static/sass/reuse/line */
+.line--compact .line-aside, .line--compact .line-body {
+  padding-top: 0.25rem;
+  padding-bottom: 0; }
+
+/* line 40, /Users/Vadim/Documents/work-crm/static-crm/static/sass/reuse/line */
+.line-aside-label {
+  color: #808080; }
+
+/* line 43, /Users/Vadim/Documents/work-crm/static-crm/static/sass/reuse/line */
+.line-body-main {
+  display: block;
+  float: left;
+  width: 75%; }
+
+/* line 48, /Users/Vadim/Documents/work-crm/static-crm/static/sass/reuse/line */
+.line-body-meta {
+  padding-top: 0.5rem;
+  font-size: 0.875rem;
+  color: #808080; }
+
+/* line 53, /Users/Vadim/Documents/work-crm/static-crm/static/sass/reuse/line */
+.line-body-extra {
+  overflow: hidden;
+  padding-left: 0.5rem; }
+
+/* line 58, /Users/Vadim/Documents/work-crm/static-crm/static/sass/reuse/line */
+.line-title {
+  padding-top: 0;
+  font-size: 1.5rem;
+  text-transform: uppercase;
+  letter-spacing: 1px; }
+
+/* line 64, /Users/Vadim/Documents/work-crm/static-crm/static/sass/reuse/line */
+.line-subtitle {
+  color: #808080; }
+
+/* line 1, /Users/Vadim/Documents/work-crm/static-crm/static/sass/reuse/icon */
+.icon {
+  font-size: 0.875rem;
+  color: #808080; }
+
+/* line 1, /Users/Vadim/Documents/work-crm/static-crm/static/sass/reuse/userpic */
+.userpic {
+  display: inline-block;
+  width: 1.5rem;
+  height: 1.5rem;
+  overflow: hidden;
+  vertical-align: top;
+  background-color: #cccccc;
+  border-radius: 50%; }
+
+/* line 10, /Users/Vadim/Documents/work-crm/static-crm/static/sass/reuse/userpic */
+.userpic--large {
+  width: 4.5rem;
+  height: 4.5rem; }
+
+/* line 2, /Users/Vadim/Documents/work-crm/static-crm/static/sass/reuse/lineOfLinks */
+.lineOfLinks .lineOfLinks-link:nth-of-type(1) {
+  padding-left: 0; }
+
+/* line 5, /Users/Vadim/Documents/work-crm/static-crm/static/sass/reuse/lineOfLinks */
+.lineOfLinks-link {
+  display: inline-block;
+  padding: 0 1rem;
+  text-decoration: underline; }
+
+/* line 10, /Users/Vadim/Documents/work-crm/static-crm/static/sass/reuse/lineOfLinks */
+.hero .lineOfLinks-link {
+  color: #808080; }
+
+/* line 1, /Users/Vadim/Documents/work-crm/static-crm/static/sass/reuse/nav */
+.nav-link {
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  text-decoration: none; }
+
+/* line 6, /Users/Vadim/Documents/work-crm/static-crm/static/sass/reuse/nav */
+.nav-aside {
+  float: right; }
+  /* line 8, /Users/Vadim/Documents/work-crm/static-crm/static/sass/reuse/nav */
+  .nav-aside .userpic {
+    position: relative;
+    top: 0.25rem;
+    margin-left: 1rem; }
+
+/* line 1, /Users/Vadim/Documents/work-crm/static-crm/static/sass/reuse/link */
+.link-more {
+  display: inline-block;
+  padding: 0.5rem;
+  font-size: 0.875rem;
+  color: #808080; }
+
+/* line 1, /Users/Vadim/Documents/work-crm/static-crm/static/sass/reuse/btn */
+.btn {
+  display: inline-block;
+  padding: 0 1rem;
+  letter-spacing: 1px;
+  color: white;
+  text-transform: uppercase;
+  background-color: #333333;
+  font-size: 0.875rem; }
+
