@@ -4,7 +4,7 @@ from django.utils.translation import ugettext_lazy as _
 from almanet import settings
 from alm_vcard.models import VCard
 from django.template.loader import render_to_string
-from django.db.models import signals
+from django.db.models import signals, Q
 from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
 from django.utils import timezone
@@ -293,7 +293,7 @@ class Contact(models.Model):
 
         params = build_params(search_text, search_params)
         vcards = VCard.objects.filter(**params)
-        contacts = map(lambda vcard: vcard.contact_set.first(), vcards)[offset:offset+limit]
+        contacts = [vcard.contact for vcard in vcards][offset:offset + limit]
 
         return contacts
 
@@ -574,8 +574,10 @@ class SalesCycle(models.Model):
 
     @classmethod
     def get_salescycles_by_last_activity_date(
-            cls, user_id, limit=20, offset=0):
-        """Returns user sales_cycles ordered by last activity date.
+            cls, user_id, owned=True, mentioned=False, followed=False,
+            limit=20, offset=0):
+        """Returns sales_cycles where user is owner, mentioned or followed
+            ordered by last activity date.
 
             Returns
             -------
@@ -585,16 +587,24 @@ class SalesCycle(models.Model):
             Raises:
                 User.DoesNotExist
         """
-        crm_user = CRMUser.objects.get(id=user_id)
-        sales_cycles = crm_user.owned_sales_cycles.order_by(
-            '-latest_activity__date_created')[offset:offset + limit]
-
-        activities = Activity.objects.filter(sales_cycle_id__in=
-           sales_cycles.values_list('pk', flat=True))
+        q = Q()
+        if owned:
+            q |= Q(owner_id=user_id)
+        if mentioned:
+            q |= Q(mentions__user_id=user_id)
+        if followed:
+            q |= Q(followers__user_id=user_id)
+        if len(q.children) == 0:
+            sales_cycles = SalesCycle.objects.none()
+        else:
+            sales_cycles = SalesCycle.objects.filter(q).order_by(
+                '-latest_activity__date_created')[offset:offset + limit]
+        activities = Activity.objects.filter(
+            sales_cycle_id__in=sales_cycles.values_list('pk', flat=True))
         sales_cycle_activity_map = {}
         for sc in sales_cycles:
-            sales_cycle_activity_map[sc.id] = activities.values_list('pk',
-                                                                     flat=True)
+            sales_cycle_activity_map[sc.id] = \
+                sc.rel_activities.values_list('pk', flat=True)
         return (sales_cycles, activities, sales_cycle_activity_map)
 
     @classmethod
