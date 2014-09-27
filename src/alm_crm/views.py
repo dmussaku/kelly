@@ -14,6 +14,16 @@ class DashboardView(TemplateView):
         pass
 
 
+class FeedView(TemplateView):
+
+    def get_context_data(self, **kwargs):
+        context = super(FeedView, self).get_context_data(**kwargs)
+        user_id = self.request.user.id
+        context['sales_cycles'] = SalesCycle\
+            .get_salescycles_by_last_activity_date(user_id, True, True, True)
+        return context
+
+
 class ContactDetailView(DetailView):
 
     def get_object(self):
