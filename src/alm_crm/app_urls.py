@@ -2,7 +2,7 @@ from django.conf.urls import patterns, url
 from .decorators import crmuser_required
 from .views import DashboardView, ContactDetailView
 from .models import Contact
-from almanet.models import Subscription
+# from almanet.models import Subscription
 
 urlpatterns = patterns(
     '',
