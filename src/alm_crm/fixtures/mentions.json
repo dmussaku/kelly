@@ -34,5 +34,14 @@
             "content_type":["alm_crm", "activity"],
         	"object_id":4
         }
+    },
+    {
+        "pk": 5,
+        "model": "alm_crm.Mention",
+        "fields": {
+            "user_id":1,
+            "content_type":["alm_crm", "salescycle"],
+            "object_id":4
+        }
     }
 ]

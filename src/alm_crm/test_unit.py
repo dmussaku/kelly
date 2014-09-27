@@ -326,11 +326,38 @@ class SalesCycleTestCase(TestCase):
         self.assertEqual(self.get_sc(pk=1).latest_activity.pk, activity.pk)
 
     def test_get_salescycles_by_last_activity_date(self):
-        ret = SalesCycle.get_salescycles_by_last_activity_date(1)
+        user_id = 1
+        ret = SalesCycle.get_salescycles_by_last_activity_date(user_id)
         self.assertEqual(list(ret[0].values_list('pk', flat=True)), [3, 2, 1])
         self.assertEqual(list(ret[1].values_list('pk', flat=True)),
                          range(1, 8))
         self.assertItemsEqual(ret[2], {1: [1, 3], 2: [2], 3: []})
+
+    def test_get_salescycles_by_last_activity_date_with_mentioned(self):
+        user_id = 1
+        ret = SalesCycle.get_salescycles_by_last_activity_date(user_id, True,
+                                                               True)
+        self.assertEqual(list(ret[0].values_list('pk', flat=True)),
+                         [3, 2, 1, 4])
+        self.assertEqual(list(ret[1].values_list('pk', flat=True)),
+                         range(1, 8))
+        self.assertItemsEqual(ret[2], {1: [1, 3], 2: [2], 3: [], 4: []})
+
+    def test_get_salescycles_by_last_activity_date_only_mentioned(self):
+        user_id = 1
+        ret = SalesCycle.get_salescycles_by_last_activity_date(user_id, False,
+                                                               True)
+        self.assertEqual(list(ret[0].values_list('pk', flat=True)), [4])
+        self.assertEqual(list(ret[1].values_list('pk', flat=True)), [])
+        self.assertItemsEqual(ret[2], {4: []})
+
+    def test_get_salescycles_by_last_activity_date_only_followed(self):
+        user_id = 1
+        ret = SalesCycle.get_salescycles_by_last_activity_date(user_id, False,
+                                                               False, True)
+        self.assertEqual(list(ret[0].values_list('pk', flat=True)), [3])
+        self.assertEqual(list(ret[1].values_list('pk', flat=True)), [7])
+        self.assertItemsEqual(ret[2], {3: [7]})
 
     def test_get_salescycles_by_contact(self):
         ret = SalesCycle.get_salescycles_by_contact(1)

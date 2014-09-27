@@ -39,7 +39,7 @@
         "fields": {
             "products":[],
             "owner":1,
-            "followers":[],
+            "followers":[1],
             "contact":1,
             "latest_activity":7,
             "projected_value":3,
