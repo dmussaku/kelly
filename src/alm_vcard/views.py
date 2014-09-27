@@ -26,21 +26,14 @@ def import_vcard(request):
     if request.method == 'POST':
         form = VCardUploadForm(request.POST, request.FILES)
         if form.is_valid():
-            data_list = request.FILES['myfile'].read().split('END:VCARD')
-            for i in range(0,len(data_list)):
-                data_list[i]+='END:VCARD'
-                vcard=VCard()
-                try:
-                    vcard = vcard.importFrom('vCard', data_list[i])
-                    vcard.commit()
-                    contact = Contact()
-                    contact._upload_contacts_by_vcard(vcard)
-                except:
-                    pass
+            data_list = request.FILES['myfile'].read().split('END:VCARD')[:-1]
+            for i in range(0, len(data_list)):
+                data_list[i] += 'END:VCARD'
+                Contact.upload_contacts('vcard', data_list[i], save=True)
             return HttpResponseRedirect(reverse_lazy('vcard_list'))
     else:
         form = VCardUploadForm()
-    return render_to_response('vcard/vcard_upload.html', 
+    return render_to_response('vcard/vcard_upload.html',
                                 {'form':form},
                                 context_instance=RequestContext(request)
                                 )
@@ -116,15 +109,15 @@ class TelCreateView(InitialCreateView):
     template_name = 'vcard/tel_create.html'
 
     def get_success_url(self, **kwargs):
-        return super(TelCreateView, self).get_success_url(**kwargs)    
+        return super(TelCreateView, self).get_success_url(**kwargs)
 
 
 class EmailCreateView(InitialCreateView):
-    form_class = EmailForm 
+    form_class = EmailForm
     template_name = 'vcard/email_create.html'
 
     def get_success_url(self, **kwargs):
-        return super(EmailCreateView, self).get_success_url(**kwargs)    
+        return super(EmailCreateView, self).get_success_url(**kwargs)
 
 class GeoCreateView(InitialCreateView):
     form_class = GeoForm

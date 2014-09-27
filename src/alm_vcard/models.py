@@ -528,7 +528,6 @@ class VCard(models.Model):
         return contact
 
     def commit(self):
-
         self.save()
         for m in self.childModels:
             m.vcard = self
@@ -797,6 +796,10 @@ class Org(models.Model):
     class Meta:
         verbose_name = _("organization")
         verbose_name_plural = _("organizations")
+
+    @property
+    def name(self):
+        return self.organization_name
 
 
 class Adr(models.Model):

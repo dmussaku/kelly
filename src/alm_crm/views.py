@@ -2,21 +2,37 @@ from django.views.generic import ListView, DetailView, TemplateView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.utils import timezone
 from almanet.url_resolvers import reverse_lazy
-from alm_user.models import User
 from django.http import HttpResponse
 from django.shortcuts import render
-from almanet.models import Subscription
 from forms import ContactForm, SalesCycleForm, MentionForm, ActivityForm, CommentForm, ValueForm, ActivityFeedbackForm
 from models import Contact, SalesCycle, Activity, Feedback,  Mention, Comment, Value
 
-class DashBoardTemplateView(TemplateView):
-    template_name = 'crm/dashboard.html'
+
+class DashboardView(TemplateView):
 
     def get_context_data(self, **kwargs):
-        self.request.user
-        context = super(DashBoardTemplateView, self).get_context_data(**kwargs)
-        context['contacts'] = Contact.objects.all()[:10]
-        return context
+        pass
+
+
+class ContactDetailView(DetailView):
+
+    def get_object(self):
+        contact_pk = self.kwargs.get(self.pk_url_kwarg)
+        return self.model.get_contact_detail(contact_pk, with_vcard=True)
+
+    def get_context_data(self, **kwargs):
+        ctx = super(ContactDetailView, self).get_context_data(**kwargs)
+        return ctx
+
+# class DashBoardTemplateView(TemplateView):
+#     template_name = 'crm/dashboard.html'
+
+#     def get_context_data(self, **kwargs):
+#         self.request.user
+#         context = super(DashBoardTemplateView, self).get_context_data(**kwargs)
+#         context['contacts'] = Contact.objects.all()[:10]
+#         return context
+
 
 class UserProductView(ListView):
 

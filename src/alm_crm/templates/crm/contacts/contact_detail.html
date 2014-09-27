@@ -1,0 +1,47 @@
+{% extends "crm/base.html" %}
+{% load i18n %}
+{% block crm_body %}
+<div class="hero">
+  <div class="body-column">
+    <div class="column">
+      <div class="line line--borderless">
+        <div class="line-aside">
+          <figure class="userpic userpic--large"></figure>
+        </div>
+        <div class="line-body">
+          <h1 class="line-title">{{ object.vcard.fn }}</h1>
+          <div class="line-subtitle">{{ object.company.name }}</div>
+        </div>
+      </div>
+      <div class="line line--compact">
+        <div class="line-aside">
+          <div class="line-aside-label">mobile</div>
+        </div>
+        <div class="line-body">
+          {{ object.mobile.value }}
+        </div>
+      </div>
+      <div class="line line--compact">
+        <div class="line-aside">
+          <div class="line-aside-label">work</div>
+        </div>
+        <div class="line-body">
+          {{ object.email_work }}
+        </div>
+      </div>
+      <div class="line">
+        <div class="line-aside"></div>
+        <div class="line-body lineOfLinks">
+          <a class="lineOfLinks-link" href="#">
+            Show more
+          </a><a class="lineOfLinks-link" href="#">
+            Edit
+          </a><a class="lineOfLinks-link" href="#">
+            Share
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

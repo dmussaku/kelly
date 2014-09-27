@@ -1,14 +1,20 @@
 from django.conf.urls import patterns, url
-from almanet.decorators import subdomain_required
-from django.contrib.auth.decorators import login_required
-from alm_crm.views import UserProductView
+from .decorators import crmuser_required
+from .views import DashboardView, ContactDetailView
+from .models import Contact
 from almanet.models import Subscription
 
 urlpatterns = patterns(
     '',
-    url(r'^(?P<slug>[-a-zA-Z0-9_]+)/$', subdomain_required(
-        login_required(UserProductView.as_view(
-            model=Subscription,
-            template_name='crm/dashboard.html'))),
-        name='user_product_view'),
+    url(r'^$', crmuser_required(
+        DashboardView.as_view(
+            # model=Subscription,
+            template_name='crm/dashboard.html')),
+        name='crm-dashboard'),
+    url(r'^contacts/(?P<contact_pk>[\d]+)/$',
+        ContactDetailView.as_view(
+            model=Contact,
+            template_name='crm/contacts/contact_detail.html',
+            pk_url_kwarg='contact_pk'),
+        name='crm-contacts'),
 )

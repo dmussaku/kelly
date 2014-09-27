@@ -39,6 +39,9 @@ class Company(models.Model):
     def get_users(self):
         return self.users.all()
 
+    def get_connected_services(self):
+        return self.subscriptions.filter(is_active=True)
+
     @classmethod
     def verify_company_by_subdomain(cls, company, subdomain):
         lco = company

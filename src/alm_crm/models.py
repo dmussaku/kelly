@@ -69,7 +69,7 @@ class Contact(models.Model):
         max_length=30,
         choices=TYPES_WITH_CAPS, default=USER_TP)
     date_created = models.DateTimeField(blank=True, auto_now_add=True)
-    vcard = models.ForeignKey('alm_vcard.VCard', blank=True, null=True)
+    vcard = models.OneToOneField('alm_vcard.VCard', blank=True, null=True)
     company_contact = models.ForeignKey(
         'Contact', blank=True, null=True, related_name='user_contacts')
     followers = models.ManyToManyField(
@@ -107,22 +107,31 @@ class Contact(models.Model):
             return 'Unknown'
         return self.vcard.fn
 
-
-    def tel(self, type='CELL'):
+    def tel(self, type='cell'):
         if not self.vcard:
             return 'Unknown'
-        tel = self.vcard.tel_set.filter(type=type).first()    
-        if tel:
-            return tel.value
-        return None
+        tel = self.vcard.tel_set.filter(type=type).first()
+        return tel and tel or None
+
+    def mobile(self):
+        return self.tel(type='cell')
 
     def email(self, type='WORK'):
         if not self.vcard:
             return 'Unknown'
-        email = self.vcard.tel_set.filter(type=type).first()    
-        if email:
-            return email.value
-        return None
+        email = self.vcard.email_set.filter(type=type).first()
+        return email and email or None
+
+    def email_work(self):
+        return self.email(type='INTERNET')
+
+    def company(self):
+        if not self.vcard:
+            return _('Unknown organization')
+        org = self.vcard.org_set.first()
+        if not org:
+            return _('Unknown organization')
+        return org
 
     def get_tp(self):
         return dict(self.TYPES_WITH_CAPS).get(self.tp, None)
@@ -294,7 +303,7 @@ class Contact(models.Model):
         c = Contact.objects.filter(pk=contact_id)
         if not with_vcard:
             return c.first()
-        c.select_related('vcard')
+        c = c.select_related('vcard')
         return c.first()
 
     @classmethod
@@ -317,10 +326,9 @@ class Contact(models.Model):
     def _upload_contacts_by_vcard(cls, vcard_obj):
         """Extracts contacts from vcard. Returns Queryset<Contact>."""
         contact = cls()
-        # contact.save()
-        contact.vcard = VCard.importFrom('vCard', vcard_obj)
-        contact.vcard.commit()
-        contact.save()
+        vcard = VCard.importFrom('vCard', vcard_obj)
+        vcard.commit()
+        contact.vcard = vcard
         return contact
 
     # @classmethod

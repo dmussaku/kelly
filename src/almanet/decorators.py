@@ -1,10 +1,10 @@
 import functools
 from alm_company.models import Company
 from almanet.url_resolvers import reverse
+from almanet.models import Service
 from django.contrib import messages
 from django.utils.translation import ugettext_lazy as _
-from django.conf import settings
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, Http404
 
 
 def subdomain_required(fn):
@@ -20,4 +20,19 @@ def subdomain_required(fn):
         # redirect_url = settings.LOGIN_REDIRECT_URL
         return HttpResponseRedirect(reverse('user_profile_url'))
 
+    return inner
+
+
+def service_required(fn):
+
+    @functools.wraps(fn)
+    def inner(request, *a, **kw):
+        service_slug = kw.get('slug', None)
+        try:
+            service = Service.objects.get(slug__iexact=service_slug)
+        except Service.DoesNotExist:
+            raise Http404('Not connected')
+        if not request.user.is_service_connected(service):
+            raise Http404('Not connected')
+        return fn(request, *a, **kw)
     return inner

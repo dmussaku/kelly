@@ -2,7 +2,7 @@ from django.conf.urls import patterns, url
 from django.core.urlresolvers import reverse_lazy
 from django.views.generic import TemplateView
 from views import (
-    DashBoardTemplateView,
+    # DashBoardTemplateView,
     ContactListView,
     ContactCreateView,
     ContactUpdateView,
@@ -42,7 +42,7 @@ from models import Contact, SalesCycle, Activity, Comment
 
 urlpatterns = patterns(
     '',
-    url(r'^$', DashBoardTemplateView.as_view(), name='dashboard'),
+    # url(r'^$', DashBoardTemplateView.as_view(), name='dashboard'),
     url(r'^feed/$', TemplateView.as_view(template_name='crm/feed.html'), name='feed'),
     url(r'^contacts/$', ContactListView.as_view(
             queryset = Contact.objects.all(),
