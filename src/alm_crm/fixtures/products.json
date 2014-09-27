@@ -1,0 +1,14 @@
+[
+    {
+        "pk":1,
+        "model":"alm_crm.Product",
+        "fields": {
+            "name":"p1",
+            "description":"p1_d",
+            "price":143,
+            "currency":"KZT",
+            "user_id": 1,
+            "company_id": 1
+        }
+    }
+]
