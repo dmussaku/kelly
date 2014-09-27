@@ -297,11 +297,12 @@ class Contact(models.Model):
         return contacts
 
     @classmethod
-    def _upload_contacts_by_vcard(cls, vcard):
+    def _upload_contacts_by_vcard(cls, vcard_obj):
         """Extracts contacts from vcard. Returns Queryset<Contact>."""
         contact = cls()
         # contact.save()
-        contact.vcard = vcard
+        contact.vcard = VCard.importFrom('vCard', vcard_obj)
+        contact.vcard.commit()
         contact.save()
         return contact
 

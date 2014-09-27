@@ -60,7 +60,7 @@ class ContactTestCase(TestCase):
         file_path = os.path.join(os.path.dirname(os.path.dirname(__file__)),
                                  'alm_crm/fixtures/aliya.vcf')
         file_obj = open(file_path, "r").read()
-        contact = Contact._upload_contacts_by_vcard(file_obj)
+            contact = Contact._upload_contacts_by_vcard(file_obj)
         self.assertEqual(contact.__class__, Contact)
         self.assertEqual(contact.vcard.__class__, VCard)
         addr = list(contact.vcard.adr_set.all())
@@ -75,7 +75,7 @@ class ContactTestCase(TestCase):
         cs = Contact.filter_contacts_by_vcard(search_text='Aliya',
                                               search_params=[('fn')])
         self.assertEqual(len(cs), 1)
-        cs = Contact.filter_contacts_by_vcard(search_text='liya',
+        cs = Contact.filter_contacts_by_vcard(search_text='Aliya',
                                               search_params=[('fn', 'icontains')])
         self.assertEqual(len(cs), 1)
         cs = Contact.filter_contacts_by_vcard(search_text='666',
