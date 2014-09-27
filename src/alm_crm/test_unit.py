@@ -335,8 +335,8 @@ class SalesCycleTestCase(TestCase):
 
     def test_get_salescycles_by_last_activity_date_with_mentioned(self):
         user_id = 1
-        ret = SalesCycle.get_salescycles_by_last_activity_date(user_id, True,
-                                                               True)
+        ret = SalesCycle.get_salescycles_by_last_activity_date(user_id,
+                                                               mentioned=True)
         self.assertEqual(list(ret[0].values_list('pk', flat=True)),
                          [3, 2, 1, 4])
         self.assertEqual(list(ret[1].values_list('pk', flat=True)),
@@ -345,19 +345,42 @@ class SalesCycleTestCase(TestCase):
 
     def test_get_salescycles_by_last_activity_date_only_mentioned(self):
         user_id = 1
-        ret = SalesCycle.get_salescycles_by_last_activity_date(user_id, False,
-                                                               True)
+        ret = SalesCycle.get_salescycles_by_last_activity_date(user_id,
+                                                               owned=False,
+                                                               mentioned=True)
         self.assertEqual(list(ret[0].values_list('pk', flat=True)), [4])
         self.assertEqual(list(ret[1].values_list('pk', flat=True)), [])
         self.assertItemsEqual(ret[2], {4: []})
 
     def test_get_salescycles_by_last_activity_date_only_followed(self):
         user_id = 1
-        ret = SalesCycle.get_salescycles_by_last_activity_date(user_id, False,
-                                                               False, True)
+        ret = SalesCycle.get_salescycles_by_last_activity_date(user_id,
+                                                               owned=False,
+                                                               mentioned=False,
+                                                               followed=True)
         self.assertEqual(list(ret[0].values_list('pk', flat=True)), [3])
         self.assertEqual(list(ret[1].values_list('pk', flat=True)), [7])
         self.assertItemsEqual(ret[2], {3: [7]})
+
+    def test_get_salescycles_by_last_activity_date_without_user_id(self):
+        user_id = 5
+        try:
+            CRMUser.objects.get(pk=user_id)
+        except CRMUser.DoesNotExist:
+            raised = True
+        else:
+            raised = False
+        finally:
+            self.assertTrue(raised)
+
+        try:
+            SalesCycle.get_salescycles_by_last_activity_date(user_id)
+        except CRMUser.DoesNotExist:
+            raised = True
+        else:
+            raised = False
+        finally:
+            self.assertTrue(raised)
 
     def test_get_salescycles_by_contact(self):
         ret = SalesCycle.get_salescycles_by_contact(1)

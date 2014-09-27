@@ -587,6 +587,7 @@ class SalesCycle(models.Model):
             Raises:
                 User.DoesNotExist
         """
+        user = CRMUser.objects.get(id=user_id)
         q = Q()
         if owned:
             q |= Q(owner_id=user_id)
