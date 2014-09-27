@@ -107,6 +107,23 @@ class Contact(models.Model):
             return 'Unknown'
         return self.vcard.fn
 
+
+    def tel(self, type='CELL'):
+        if not self.vcard:
+            return 'Unknown'
+        tel = self.vcard.tel_set.filter(type=type).first()    
+        if tel:
+            return tel.value
+        return None
+
+    def email(self, type='WORK'):
+        if not self.vcard:
+            return 'Unknown'
+        email = self.vcard.tel_set.filter(type=type).first()    
+        if email:
+            return email.value
+        return None
+
     def get_tp(self):
         return dict(self.TYPES_WITH_CAPS).get(self.tp, None)
 

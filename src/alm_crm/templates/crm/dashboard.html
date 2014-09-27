@@ -1,10 +1,250 @@
 {% extends "user/base.html" %}
 {% load i18n %}
 {% block head_title %} {{ _("User List Page") }} {% endblock %}
+{% block title %} Dashboard {% endblock %}
 {% block content %}
-    <ul>
-    {% for subscr in object_list %}
-    <li class="js-product-item">{{ subscr.product.title }}</li>
-    {% endfor %}
-    </ul>
+  <nav class="body-header nav">
+    <div class="lineOfLinks">
+      <a class="lineOfLinks-link nav-link" href="/dashboard">
+        dashboard
+      </a><a class="lineOfLinks-link nav-link" href="/contacts">
+        contacts
+      </a><a class="lineOfLinks-link nav-link" href="/feed">
+        feed
+      </a>
+
+      <div class="nav-aside">
+        <a class="btn" href="#">add contact</a>
+        <a href="">
+          <figure class="userpic"></figure>
+        </a>
+      </div>
+
+    </div>
+  </nav>
+
+  <div class="body-container">
+    
+  <pre>
+    NOTE: скорей всего не будем показывать две колонки - черезчур много информации.
+    Вместо dashboard - my contacts
+    А inbox можно в feed запихать
+  </pre>
+  <div class="body-column">
+    <h2 class="body-column-title">Contacts</h2>
+    <div class="column">
+      <div class="column-title"><span class="column-title-span">Work on next (4)</span></div>
+      {% for contact in contacts %}
+      <div class="lineGroup lineGroup--compact">
+        <div class="line line--compact">
+          <div class="line-aside">
+            <figure class="icon">{{contact.status}}</figure>
+            <figure class="icon">[avg. feedback]</figure>
+          </div>
+          <div class="line-body">
+            <h1 class="line-title"><a href="/index">{{contact.name}}</a></h1>
+            <div class="line-subtitle">{{contact.company_contact.name}}</div>
+          </div>
+        </div>
+        <div class="line line--compact">
+          <div class="line-aside">
+            <div class="line-aside-label">mobile</div>
+          </div>
+          <div class="line-body">
+            {{contact.tel}}
+          </div>
+        </div>
+        <div class="line line--compact">
+          <div class="line-aside">
+            <div class="line-aside-label">work</div>
+          </div>
+          <div class="line-body">
+            {{contact.email}}
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+
+      <a href="#" class="link-more">3 more</a>
+
+      <div class="column-title"><span class="column-title-span">Contacted last week (120)</span></div>
+
+      <div class="lineGroup lineGroup--compact">
+        <div class="line line--compact">
+          <div class="line-aside">
+            <figure class="icon">[status]</figure>
+            <figure class="icon">[avg. feedback]</figure>
+          </div>
+          <div class="line-body">
+            <h1 class="line-title"><a href="/index">Sean Nelson</a></h1>
+            <div class="line-subtitle">Orange</div>
+          </div>
+        </div>
+        <div class="line line--compact">
+          <div class="line-aside">
+            <div class="line-aside-label">mobile</div>
+          </div>
+          <div class="line-body">
+            +1-(625)449-9723
+          </div>
+        </div>
+        <div class="line line--compact">
+          <div class="line-aside">
+            <div class="line-aside-label">work</div>
+          </div>
+          <div class="line-body">
+            jlee@meezzy.info
+          </div>
+        </div>
+      </div>
+
+      <div class="lineGroup lineGroup--compact">
+        <div class="line line--compact">
+          <div class="line-aside">
+            <figure class="icon">[status]</figure>
+            <figure class="icon">[avg. feedback]</figure>
+          </div>
+          <div class="line-body">
+            <h1 class="line-title"><a href="/index">Michael Schmidt</a></h1>
+            <div class="line-subtitle">Orange</div>
+          </div>
+        </div>
+        <div class="line line--compact">
+          <div class="line-aside">
+            <div class="line-aside-label">mobile</div>
+          </div>
+          <div class="line-body">
+            +1-(625)449-9723
+          </div>
+        </div>
+        <div class="line line--compact">
+          <div class="line-aside">
+            <div class="line-aside-label">work</div>
+          </div>
+          <div class="line-body">
+            jlee@meezzy.info
+          </div>
+        </div>
+      </div>
+
+      <div class="lineGroup lineGroup--compact">
+        <div class="line line--compact">
+          <div class="line-aside">
+            <figure class="icon">[status]</figure>
+            <figure class="icon">[avg. feedback]</figure>
+          </div>
+          <div class="line-body">
+            <h1 class="line-title"><a href="/index">Joseph Aguilar</a></h1>
+            <div class="line-subtitle">Orange</div>
+          </div>
+        </div>
+        <div class="line line--compact">
+          <div class="line-aside">
+            <div class="line-aside-label">mobile</div>
+          </div>
+          <div class="line-body">
+            +1-(625)449-9723
+          </div>
+        </div>
+        <div class="line line--compact">
+          <div class="line-aside">
+            <div class="line-aside-label">work</div>
+          </div>
+          <div class="line-body">
+            jlee@meezzy.info
+          </div>
+        </div>
+      </div>
+
+      <a href="#" class="link-more">117 more</a>
+
+    </div>
+  </div><div class="body-column">
+    <h2 class="body-column-title">Inbox</h2>
+
+    <div class="column">
+      <div class="column-title">
+        <span class="column-title-span"><a href="/index">Bienaimé Jean-Pierre</a> &raquo; <a href="/index">Sales cycle</a></span>
+      </div>
+
+      <div class="lineGroup">
+        <div class="line">
+          <div class="line-aside">
+            <figure class="icon">[status]</figure>
+          </div>
+          <div class="line-body">
+            <div class="line-body-main">
+              Lorem ipsum dolor sit amet, consectetur adipisicing elit. Optio ratione nulla porro consectetur illo.
+              <div class="line-body-meta">
+                <a href="#">
+                  <figure class="userpic"></figure>
+                  Ren
+                </a> at April 24, 13:45
+              </div>
+            </div>
+            <div class="line-body-extra">
+              <figure class="icon">[comments]</figure>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="lineGroup">
+        <div class="line">
+          <div class="line-aside">
+            <figure class="icon">[status]</figure>
+          </div>
+          <div class="line-body">
+            <div class="line-body-main">
+              Lorem ipsum dolor sit amet, consectetur adipisicing elit. Optio ratione nulla porro consectetur illo.
+              <div class="line-body-meta">
+                <a href="#">
+                  <figure class="userpic"></figure>
+                  Ren
+                </a> at April 24, 13:45
+              </div>
+            </div>
+            <div class="line-body-extra">
+              <figure class="icon">[comments]</figure>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="column-title">
+        <span class="column-title-span"><a href="/index">Sean Nelson</a> &raquo; <a href="/index">Sales cycle</a></span>
+      </div>
+
+      <div class="lineGroup">
+        <div class="line">
+          <div class="line-aside">
+            <figure class="icon">[status]</figure>
+          </div>
+          <div class="line-body">
+            <div class="line-body-main">
+              Lorem ipsum dolor sit amet, consectetur adipisicing elit. Optio ratione nulla porro consectetur illo.
+              <div class="line-body-meta">
+                <a href="#">
+                  <figure class="userpic"></figure>
+                  Ren
+                </a> at April 24, 13:45
+              </div>
+            </div>
+            <div class="line-body-extra">
+              <figure class="icon">[comments]</figure>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+
+
+
+  </div>
+
+
+
 {% endblock %}

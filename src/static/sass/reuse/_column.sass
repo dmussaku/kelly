@@ -1,0 +1,46 @@
+.column
+  vertical-align: top
+  position: relative
+  display: inline-block
+  width: 100%
+  max-width: 38rem
+  margin: auto
+
+.column-title
+  padding-top: 1rem
+  overflow: hidden
+  text-align: left
+  font-weight: bold
+
+.column-title-span
+  position: relative
+  padding-right: 1rem
+  &:after
+    position: absolute
+    bottom: .25rem
+    display: block
+    left: 100%
+    width: .5px*$break-2
+    // height: $caption
+    height: 2px
+    content: ''
+    background-color: $neutral
+
+.column-header
+  padding: 1rem
+  line-height: 1.5rem
+  font-size: $caption
+  color: $white
+  background-color: $primary
+
+.column-header-a
+  display: inline-block
+  width: 30%
+.column-header-b
+  display: inline-block
+  width: 40%
+  text-align: center
+.column-header-c
+  display: inline-block
+  width: 30%
+  text-align: right

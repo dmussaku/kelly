@@ -1,4 +1,4 @@
-from django.views.generic import ListView, DetailView
+from django.views.generic import ListView, DetailView, TemplateView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.utils import timezone
 from almanet.url_resolvers import reverse_lazy
@@ -9,7 +9,14 @@ from almanet.models import Subscription
 from forms import ContactForm, SalesCycleForm, MentionForm, ActivityForm, CommentForm, ValueForm, ActivityFeedbackForm
 from models import Contact, SalesCycle, Activity, Feedback,  Mention, Comment, Value
 
+class DashBoardTemplateView(TemplateView):
+    template_name = 'crm/dashboard.html'
 
+    def get_context_data(self, **kwargs):
+        self.request.user
+        context = super(DashBoardTemplateView, self).get_context_data(**kwargs)
+        context['contacts'] = Contact.objects.all()[:10]
+        return context
 
 class UserProductView(ListView):
 
