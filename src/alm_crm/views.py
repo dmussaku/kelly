@@ -19,8 +19,12 @@ class FeedView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super(FeedView, self).get_context_data(**kwargs)
         user_id = self.request.user.id
-        context['sales_cycles'] = SalesCycle\
+        sales_cycles_data = SalesCycle\
             .get_salescycles_by_last_activity_date(user_id, True, True, True)
+
+        context['sales_cycles'] = sales_cycles_data[0]
+        context['sales_cycle_activities'] = sales_cycles_data[1]
+        context['sales_cycle_activity_map'] = sales_cycles_data[2]
         return context
 
 

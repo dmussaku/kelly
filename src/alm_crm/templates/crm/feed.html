@@ -28,79 +28,36 @@
   <div class="body-column body-column--single">
 
   <div class="column">
-    <div class="column-title">
-      <span class="column-title-span"><a href="/index">Bienaimé Jean-Pierre</a> &raquo; <a href="/index">Sales cycle</a></span>
-    </div>
+    {% for sc in sales_cycles %}
+      <div class="column-title">
+        <span class="column-title-span"><a href="/index">{{sc.contact.name}}</a> &raquo; <a href="/index">Sales cycle</a></span>
+      </div>
 
-    <div class="lineGroup">
-      <div class="line">
-        <div class="line-aside">
-          <figure class="icon">[status]</figure>
-        </div>
-        <div class="line-body">
-          <div class="line-body-main">
-            Lorem ipsum dolor sit amet, consectetur adipisicing elit. Optio ratione nulla porro consectetur illo.
-            <div class="line-body-meta">
-              <a href="/index">
-                <figure class="userpic"></figure>
-                Ren
-              </a> at April 24, 13:45
+      {% for sc_a in sales_cycle_activities %}
+        <div class="lineGroup">
+          <div class="line">
+            <div class="line-aside">
+              <figure class="icon">{{sc_a.feedback.get_status_display}}</figure>
+            </div>
+            <div class="line-body">
+              <div class="line-body-main">
+                {{sc_a.feedback.feedback}}
+                <div class="line-body-meta">
+                  <a href="/index">
+                    <figure class="userpic"></figure>
+                    {{sc_a.author.get_billing_user.get_short_name}}
+                  </a> at {{sc_a.date_created}}
+                </div>
+              </div>
+              <div class="line-body-extra">
+                <figure class="icon">[comments]</figure>
+              </div>
             </div>
           </div>
-          <div class="line-body-extra">
-            <figure class="icon">[comments]</figure>
-          </div>
         </div>
-      </div>
-    </div>
+      {% endfor %}
 
-    <div class="lineGroup">
-      <div class="line">
-        <div class="line-aside">
-          <figure class="icon">[status]</figure>
-        </div>
-        <div class="line-body">
-          <div class="line-body-main">
-            Lorem ipsum dolor sit amet, consectetur adipisicing elit. Optio ratione nulla porro consectetur illo.
-            <div class="line-body-meta">
-              <a href="/index">
-                <figure class="userpic"></figure>
-                Ren
-              </a> at April 24, 13:45
-            </div>
-          </div>
-          <div class="line-body-extra">
-            <figure class="icon">[comments]</figure>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="column-title">
-      <span class="column-title-span"><a href="/index">Sean Nelson</a> &raquo; <a href="/index">Sales cycle</a></span>
-    </div>
-
-    <div class="lineGroup">
-      <div class="line">
-        <div class="line-aside">
-          <figure class="icon">[status]</figure>
-        </div>
-        <div class="line-body">
-          <div class="line-body-main">
-            Lorem ipsum dolor sit amet, consectetur adipisicing elit. Optio ratione nulla porro consectetur illo.
-            <div class="line-body-meta">
-              <a href="/index">
-                <figure class="userpic"></figure>
-                Ren
-              </a> at April 24, 13:45
-            </div>
-          </div>
-          <div class="line-body-extra">
-            <figure class="icon">[comments]</figure>
-          </div>
-        </div>
-      </div>
-    </div>
+    {% endfor %}
 
   </div>
 </div>

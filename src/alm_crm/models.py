@@ -3,6 +3,7 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from almanet import settings
 from alm_vcard.models import VCard
+from alm_user.models import User
 from django.template.loader import render_to_string
 from django.db.models import signals, Q
 from django.contrib.contenttypes import generic
@@ -39,9 +40,7 @@ class CRMUser(models.Model):
         """Returns a original user.
         Raises:
            User.DoesNotExist exception if no such relation exist"""
-        from user.models import User
-        user = User.objects.get(pk=self.user_id)
-        return user
+        return User.objects.get(pk=self.user_id)
 
     def set_supervisor(self, save=False):
         self.is_supervisor = True
