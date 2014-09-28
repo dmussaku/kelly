@@ -1,1 +1,31 @@
 {% extends 'layout.crm.html' %}
+
+{% block content %}
+
+<nav class="body-header nav">
+  <div class="lineOfLinks">
+    <a class="lineOfLinks-link nav-link" href="/dashboard">
+      dashboard
+    </a><a class="lineOfLinks-link nav-link" href="/contacts">
+      contacts
+    </a><a class="lineOfLinks-link nav-link" href="/feed">
+      feed
+    </a>
+
+    <div class="nav-aside">
+      <a class="btn" href="#">add contact</a>
+      <a href="">
+        <figure class="userpic"></figure>
+      </a>
+    </div>
+
+  </div>
+</nav>
+
+
+<div class="body-container">
+{% block crm_body_container %}
+{% endblock crm_body_container %}
+</div>
+
+{% endblock content %}

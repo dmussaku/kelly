@@ -1,28 +1,8 @@
 {% extends "crm/base.html" %}
 {% load i18n %}
 {% block head_title %} {{ _("Dashboard") }} {% endblock %}
-{% block content %}
-  <nav class="body-header nav">
-    <div class="lineOfLinks">
-      <a class="lineOfLinks-link nav-link" href="/dashboard">
-        dashboard
-      </a><a class="lineOfLinks-link nav-link" href="/contacts">
-        contacts
-      </a><a class="lineOfLinks-link nav-link" href="/feed">
-        feed
-      </a>
 
-      <div class="nav-aside">
-        <a class="btn" href="#">add contact</a>
-        <a href="">
-          <figure class="userpic"></figure>
-        </a>
-      </div>
-
-    </div>
-  </nav>
-
-  <div class="body-container">
+{% block crm_body_container %}
 
   <pre>
     NOTE: скорей всего не будем показывать две колонки - черезчур много информации.
@@ -158,7 +138,8 @@
       <a href="#" class="link-more">117 more</a>
 
     </div>
-  </div><div class="body-column">
+  </div>
+  <div class="body-column">
     <h2 class="body-column-title">Inbox</h2>
 
     <div class="column">
@@ -240,10 +221,4 @@
   </div>
 
 
-
-
-  </div>
-
-
-
-{% endblock %}
+{% endblock crm_body_container %}
