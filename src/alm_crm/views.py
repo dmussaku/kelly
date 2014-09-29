@@ -1,11 +1,13 @@
 from django.views.generic import ListView, DetailView, TemplateView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.utils import timezone
+from datetime import timedelta
 from almanet.url_resolvers import reverse_lazy
 from django.http import HttpResponse
 from django.shortcuts import render
-from forms import ContactForm, SalesCycleForm, MentionForm, ActivityForm, CommentForm, ValueForm, ActivityFeedbackForm
-from models import Contact, SalesCycle, Activity, Feedback,  Mention, Comment, Value
+from forms import ContactForm, SalesCycleForm, MentionForm, ActivityForm,\
+    CommentForm, ValueForm, ActivityFeedbackForm
+from models import Contact, SalesCycle, Activity, Feedback, Comment, Value
 
 
 class DashboardView(TemplateView):
@@ -38,6 +40,23 @@ class ContactDetailView(DetailView):
         ctx = super(ContactDetailView, self).get_context_data(**kwargs)
         return ctx
 
+
+class ContactListView(ListView):
+
+    def get_context_data(self, **kwargs):
+        context = super(self.__class__, self).get_context_data(**kwargs)
+
+        user_id = self.request.user.id or 1
+
+        context['contacts_cold_base'] = self.model.get_cold_base()
+        context['contacts_contacted_last_week'] = \
+            self.model.get_contacts_for_last_activity_period(
+                user_id, from_dt=timezone.now()-timedelta(days=7),
+                to_dt=timezone.now())
+
+        return context
+
+
 # class DashBoardTemplateView(TemplateView):
 #     template_name = 'crm/dashboard.html'
 
@@ -57,10 +76,6 @@ class UserProductView(ListView):
         return subscrs
 
 
-class ContactListView(ListView):
-
-    model = Contact
-    paginate_by = 10
 
 
 class ContactCreateView(CreateView):

@@ -1,0 +1,49 @@
+{% extends "crm/base.html" %}
+{% load i18n %}
+{% block head_title %} {{ _("Contacts") }} {% endblock %}
+{% load crm_tags %}
+
+{% block crm_body_container %}
+
+  <div class="body-column body-column--single">
+    <div class="column">
+      <div class="column-title"><span class="column-title-span">Work on next ({{contacts_cold_base.count}})</span></div>
+
+      {% show_contact contacts_cold_base|first %}
+
+      {% if contacts_cold_base.count > 1 %}
+        <a href="#" class="link-more"
+          data-js-togle-more="contacts_cold_base"
+          >{{contacts_cold_base.count|add:'-1'}} more</a>
+      {% endif %}
+
+      <div data-js-more="contacts_cold_base" style="display:none;">
+      {% for contact in contacts_cold_base|slice:"1:" %}
+        {% show_contact contact %}
+      {% endfor %}
+      </div>
+
+
+
+      <div class="column-title"><span class="column-title-span">Contacted last week ({{contacts_contacted_last_week.count}})</span></div>
+      {% for contact in contacts_contacted_last_week|slice:":3" %}
+        {% show_contact contact %}
+      {% endfor %}
+
+      {% if contacts_contacted_last_week.count > 3 %}
+      <a href="#" class="link-more"
+        data-js-togle-more="contacts_contacted_last_week"
+        >{{contacts_contacted_last_week.count|add:'-3'}}</a>
+      {% endif %}
+
+      <div data-js-more="contacts_contacted_last_week" style="display:none;">
+      {% for contact in contacts_contacted_last_week|slice:"3:" %}
+        {% show_contact contact %}
+      {% endfor %}
+      </div>
+
+
+    </div>
+  </div>
+
+{% endblock crm_body_container %}

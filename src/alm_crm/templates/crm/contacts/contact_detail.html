@@ -1,6 +1,8 @@
 {% extends "crm/base.html" %}
 {% load i18n %}
-{% block crm_body %}
+{% block head_title %} {{ _("Contact Detail") }} {% endblock %}
+
+{% block crm_body_container %}
 <div class="hero">
   <div class="body-column">
     <div class="column">
@@ -44,4 +46,4 @@
     </div>
   </div>
 </div>
-{% endblock %}
+{% endblock crm_body_container %}

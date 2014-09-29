@@ -249,7 +249,7 @@ class Contact(models.Model):
         Queryset of Contacts with whom `user_id` get contacted for that period.
         """
         crm_user = CRMUser.objects.get(id=user_id)
-        activities = crm_user.owned_activities.filter(
+        activities = crm_user.activity_author.filter(
             date_created__range=(from_dt, to_dt))
         return Contact.objects.filter(
             id__in=activities.values_list('sales_cycle__contact', flat=True))
