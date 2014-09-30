@@ -37,23 +37,23 @@ class ContactDetailView(DetailView):
         return self.model.get_contact_detail(contact_pk, with_vcard=True)
 
     def get_context_data(self, **kwargs):
-        ctx = super(ContactDetailView, self).get_context_data(**kwargs)
-        return ctx
+        contact_pk = self.kwargs.get(self.pk_url_kwarg)
+        context = super(ContactDetailView, self).get_context_data(**kwargs)
+        context['activities'] = Activity.get_activities_by_contact(contact_pk)
+        return context
 
 
 class ContactListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super(self.__class__, self).get_context_data(**kwargs)
-
         user_id = self.request.user.id
-
         context['contacts_cold_base'] = self.model.get_cold_base()
         context['contacts_contacted_last_week'] = \
             self.model.get_contacts_for_last_activity_period(
-                user_id, from_dt=timezone.now()-timedelta(days=7),
+                user_id,
+                from_dt=timezone.now()-timedelta(days=7),
                 to_dt=timezone.now())
-
         return context
 
 
@@ -103,11 +103,6 @@ class ContactAddMentionView(UpdateView):
     def post(self, request, *args, **kwargs):
         self.model.objects.get(id=self.kwargs['pk']).add_mention(list(request.POST['user_id']))
         return super(ContactAddMentionView, self).post(request, *args, **kwargs)
-
-
-class ContactDetailView(DetailView):
-    model = Contact
-    template_name = "contact/contact_detail.html"
 
 
 class ContactDeleteView(DeleteView):

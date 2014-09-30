@@ -1,6 +1,7 @@
 {% extends "crm/base.html" %}
 {% load i18n %}
 {% block head_title %} {{ _("Contact Detail") }} {% endblock %}
+{% load crm_tags %}
 
 {% block crm_body_container %}
 <div class="hero">
@@ -46,4 +47,30 @@
     </div>
   </div>
 </div>
+
+<div class="column-header">
+  <div class="column-header-a">
+    <a href="#">
+      <figure class="userpic"></figure>
+      Ren
+    </a>
+    started at April 24, 13:45
+  </div><div class="column-header-b">
+    Thread codename (dropdown wants to be here)
+  </div><div class="column-header-c">
+    <a href="#"><figure class="userpic"></figure></a>
+    <a href="#"><figure class="userpic"></figure></a>
+    <a href="#"><figure class="userpic"></figure></a>
+  </div>
+</div>
+
+<div class="body-column body-column--single">
+  <div class="column">
+    {% for activity in activities %}
+      {% show_activity activity %}
+    {% endfor %}
+  </div>
+</div>
+
+
 {% endblock crm_body_container %}
