@@ -46,7 +46,7 @@ class ContactListView(ListView):
     def get_context_data(self, **kwargs):
         context = super(self.__class__, self).get_context_data(**kwargs)
 
-        user_id = self.request.user.id or 1
+        user_id = self.request.user.id
 
         context['contacts_cold_base'] = self.model.get_cold_base()
         context['contacts_contacted_last_week'] = \

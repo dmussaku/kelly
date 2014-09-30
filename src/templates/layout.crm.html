@@ -30,5 +30,8 @@
 {% endblock %}
 
 {% block js_content %}
-<script src="{% static 'js/scripts.min.js' %}"></script>
+  <script src="{% static 'js/scripts.min.js' %}"></script>
+  <script src="{% static 'js/jquery-1.11.1.min.js' %}"></script>
+
+  {% block crm_js_content %}{% endblock %}
 {% endblock %}

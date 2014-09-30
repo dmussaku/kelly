@@ -15,35 +15,49 @@
         <a href="#" class="link-more"
           data-js-togle-more="contacts_cold_base"
           >{{contacts_cold_base.count|add:'-1'}} more</a>
+
+        <div data-js-more="contacts_cold_base" style="display:none;">
+          {% for contact in contacts_cold_base|slice:"1:" %}
+            {% show_contact contact %}
+          {% endfor %}
+        </div>
       {% endif %}
-
-      <div data-js-more="contacts_cold_base" style="display:none;">
-      {% for contact in contacts_cold_base|slice:"1:" %}
-        {% show_contact contact %}
-      {% endfor %}
-      </div>
-
 
 
       <div class="column-title"><span class="column-title-span">Contacted last week ({{contacts_contacted_last_week.count}})</span></div>
+
       {% for contact in contacts_contacted_last_week|slice:":3" %}
         {% show_contact contact %}
       {% endfor %}
 
       {% if contacts_contacted_last_week.count > 3 %}
-      <a href="#" class="link-more"
-        data-js-togle-more="contacts_contacted_last_week"
-        >{{contacts_contacted_last_week.count|add:'-3'}}</a>
-      {% endif %}
+        <a href="#" class="link-more"
+          data-js-togle-more="contacts_contacted_last_week"
+          >{{contacts_contacted_last_week.count|add:'-3'}}</a>
 
-      <div data-js-more="contacts_contacted_last_week" style="display:none;">
-      {% for contact in contacts_contacted_last_week|slice:"3:" %}
-        {% show_contact contact %}
-      {% endfor %}
-      </div>
+        <div data-js-more="contacts_contacted_last_week" style="display:none;">
+          {% for contact in contacts_contacted_last_week|slice:"3:" %}
+            {% show_contact contact %}
+          {% endfor %}
+        </div>
+      {% endif %}
 
 
     </div>
   </div>
 
 {% endblock crm_body_container %}
+
+
+{% block crm_js_content %}
+  <script>
+    $(document).on('click', '[data-js-togle-more]', function (event) {
+      event.preventDefault();
+      var t = $(this).data('js-togle-more'),
+          $more = $('[data-js-more="'+t+'"]');
+
+      $more.show();
+      $(this).hide();
+    })
+  </script>
+{% endblock crm_js_content %}
