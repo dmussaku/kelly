@@ -79,7 +79,7 @@ class User(AbstractBaseUser):
         return self.subscriptions.all()
 
     def get_active_subscriptions(self):
-        return self.company.get_connected_services()
+        return self.get_company().get_connected_services()
 
     def connected_services(self):
         rv = []
@@ -100,7 +100,7 @@ class User(AbstractBaseUser):
             # create user in corresponding service
             # eg.: CRMUser in CRM service, CRM's slug = crm
             create_user = getattr(self, 'create_{}user'.format(product.slug))
-            create_user(s, self.company)
+            create_user(s.pk, self.company.pk)
             s.is_active = True
         s.save()
 
@@ -110,16 +110,21 @@ class User(AbstractBaseUser):
             s.is_active = False
             s.save()
 
-    def create_crmuser(self, subscription, organization):
+    def create_crmuser(self, subscription_pk, organization_pk):
         from alm_crm.models import CRMUser
         # this should be further resolved when multiple database will be configured
         # and DecoupledModel applied to connect User and CRMUser
         # if not self.crmuser and self.is_active:
         crmuser = CRMUser(user_id=self.pk,
                           is_supervisor=True,
-                          subscription_id=subscription.pk,
-                          organization_id=organization.pk)
+                          subscription_id=subscription_pk,
+                          organization_id=organization_pk)
         crmuser.save()
         # self.crmuser = crmuser
         self.save()
         return self.crmuser
+
+    def get_crmuser(self):
+        from alm_crm.models import CRMUser
+        return CRMUser.objects.get(user_id=self.pk)
+

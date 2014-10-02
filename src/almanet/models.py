@@ -42,3 +42,4 @@ class Subscription(models.Model):
         db_table = settings.DB_PREFIX.format('subscription')
 
 
+
