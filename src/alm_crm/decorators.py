@@ -19,3 +19,4 @@ def crmuser_required(fn):
         except:
             raise Http404("CRMUser required")
         return fn(request, *a, **kw)
+    return inner

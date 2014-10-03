@@ -46,11 +46,12 @@ urlpatterns = patterns(
     # url(r'^$', DashBoardTemplateView.as_view(), name='dashboard'),
     url(r'^feed/$', FeedView.as_view(template_name='crm/feed.html'),
         name='feed'),
-    url(r'^contacts/$',
-        ContactListView.as_view(
-            model=Contact,
-            template_name='crm/contacts/contact_list.html',
-        ), name='contact_list'),
+    ## moved to app_urls
+    # url(r'^contacts/$',
+    #     ContactListView.as_view(
+    #         model=Contact,
+    #         template_name='crm/contacts/contact_list.html',
+    #     ), name='contact_list'),
     url(r'^contacts/excerpt/$', ContactListView.as_view(
             queryset = Contact.objects.all(),
             context_object_name="contacts",
