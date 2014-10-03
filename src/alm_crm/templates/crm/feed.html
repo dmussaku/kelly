@@ -4,18 +4,48 @@
 {% load crm_tags %}
 
 
+{% block crm_aside_tabs %}
+  <a href="#" class="tabs-link" data-tip="[Cycles I follow]">
+    <figure class="icon">
+      <svg version="1.1">
+        <use class="icon--home" xlink:href="#home"></use>
+      </svg>
+    </figure>
+  </a>
+  <a href="#" class="tabs-link" data-tip="[Mentions]">
+    <figure class="icon">
+      <svg version="1.1">
+        <use class="icon--mentions" xlink:href="#mentions"></use>
+      </svg>
+    </figure>
+  </a>
+  <a href="#" class="tabs-link" data-tip="[Company]">
+    <figure class="icon">
+      <svg version="1.1">
+        <use class="icon--company" xlink:href="#company"></use>
+      </svg>
+    </figure>
+  </a>
+{% endblock crm_aside_tabs %}
+
+
 {% block crm_body %}
   <div class="body-column body-column--single">
     <div class="column">
       {% for sc in sales_cycles %}
-        <div class="column-title">
-          <span class="column-title-span"><a href="/index">{{sc.contact.name}}</a> &raquo; <a href="/index">Sales cycle</a></span>
+        <div class="column-block">
+          <div class="column-title">
+            <a href="{#% url 'contacts' pk=sc.contact.id %#}">
+              {{ sc.contact.name }}</a> &raquo;
+            <a href="index.html">Sales cycle</a>
+          </div>
+
+          {% for sc_activity in sales_cycle_activities %}
+            {% show_activity sc_activity %}
+          {% endfor %}
+
+          <div class="column-block-footer"></div>
         </div>
-
-        {% for sc_activity in sales_cycle_activities %}
-          {% show_activity sc_activity %}
-        {% endfor %}
-
       {% endfor %}
     </div>
   </div>

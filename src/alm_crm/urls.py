@@ -44,8 +44,9 @@ from models import Contact, SalesCycle, Activity, Comment
 urlpatterns = patterns(
     '',
     # url(r'^$', DashBoardTemplateView.as_view(), name='dashboard'),
-    url(r'^feed/$', FeedView.as_view(template_name='crm/feed.html'),
-        name='feed'),
+    ## moved to app_urls
+    # url(r'^feed/$', FeedView.as_view(template_name='crm/feed.html'),
+    #     name='feed'),
     ## moved to app_urls
     # url(r'^contacts/$',
     #     ContactListView.as_view(
