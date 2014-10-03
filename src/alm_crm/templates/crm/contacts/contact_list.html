@@ -3,61 +3,91 @@
 {% block head_title %} {{ _("Contacts") }} {% endblock %}
 {% load crm_tags %}
 
-{% block crm_body_container %}
 
+{% block crm_aside_tabs %}
+  <a href="#" class="tabs-link" data-tip="Work on next">
+    <figure class="icon">
+      <svg version="1.1">
+        <use class="icon--next" xlink:href="#next"></use>
+      </svg>
+    </figure>
+  </a>
+  <a href="#" class="tabs-link" data-tip="Contacted in last 7 days">
+    <figure class="icon">
+      <svg version="1.1">
+        <use class="icon--week" xlink:href="#week"></use>
+      </svg>
+    </figure>
+  </a>
+  <a href="#" class="tabs-link" data-tip="All contacted">
+    <figure class="icon">
+      <svg version="1.1">
+        <use class="icon--alltime" xlink:href="#alltime"></use>
+      </svg>
+    </figure>
+  </a>
+  <a href="#" class="tabs-link" data-tip="Search">
+    <figure class="icon">
+      <svg version="1.1">
+        <use class="icon--search" xlink:href="#search"></use>
+      </svg>
+    </figure>
+  </a>
+{% endblock crm_aside_tabs %}
+
+
+{% block crm_body %}
   <div class="body-column body-column--single">
     <div class="column">
-      <div class="column-title"><span class="column-title-span">Work on next ({{contacts_cold_base.count}})</span></div>
 
-      {% show_contact contacts_cold_base|first %}
+      <div class="column-block">
+        <div class="column-title">
+          Work on next ({{contacts_cold_base.count}})</div>
 
-      {% if contacts_cold_base.count > 1 %}
-        <a href="#" class="link-more"
-          data-js-togle-more="contacts_cold_base"
-          >{{contacts_cold_base.count|add:'-1'}} more</a>
+        {% show_contact contacts_cold_base|first %}
 
-        <div data-js-more="contacts_cold_base" style="display:none;">
-          {% for contact in contacts_cold_base|slice:"1:" %}
-            {% show_contact contact %}
-          {% endfor %}
-        </div>
-      {% endif %}
+        {% if contacts_cold_base.count > 1 %}
+          <div class='showmore'>
+            <div class='showmore-body'>
+              {% for contact in contacts_cold_base|slice:"1:" %}
+                {% show_contact contact %}
+              {% endfor %}
+            </div>
+
+            <div class="column-block-footer">
+              <a href="#" class="link-extra"
+                data-toggle='showmore'
+                data-text='less'
+              >{{ contacts_cold_base.count|add:'-1' }} more</a>
+            </div>
+          </div>
+        {% endif %}
+      </div>
 
 
-      <div class="column-title"><span class="column-title-span">Contacted last week ({{contacts_contacted_last_week.count}})</span></div>
+      <div class="column-block">
+        <div class="column-title">
+          Contacted last week ({{contacts_contacted_last_week.count}})</div>
 
-      {% for contact in contacts_contacted_last_week|slice:":3" %}
-        {% show_contact contact %}
-      {% endfor %}
+        {% for contact in contacts_contacted_last_week|slice:":3" %}
+          {% show_contact contact %}
+        {% endfor %}
 
-      {% if contacts_contacted_last_week.count > 3 %}
-        <a href="#" class="link-more"
-          data-js-togle-more="contacts_contacted_last_week"
-          >{{contacts_contacted_last_week.count|add:'-3'}}</a>
+        {% if contacts_contacted_last_week.count > 3 %}
+          <div data-js-more="contacts_contacted_last_week" style="display:none;">
+            {% for contact in contacts_contacted_last_week|slice:"3:" %}
+              {% show_contact contact %}
+            {% endfor %}
+          </div>
 
-        <div data-js-more="contacts_contacted_last_week" style="display:none;">
-          {% for contact in contacts_contacted_last_week|slice:"3:" %}
-            {% show_contact contact %}
-          {% endfor %}
-        </div>
-      {% endif %}
-
+          <div class="column-block-footer">
+            <a href="#" class="link-extra"
+              data-js-togle-more="contacts_contacted_last_week"
+              >{{contacts_contacted_last_week.count|add:'-3'}} more</a>
+          </div>
+        {% endif %}
+      </div>
 
     </div>
   </div>
-
-{% endblock crm_body_container %}
-
-
-{% block crm_js_content %}
-  <script>
-    $(document).on('click', '[data-js-togle-more]', function (event) {
-      event.preventDefault();
-      var t = $(this).data('js-togle-more'),
-          $more = $('[data-js-more="'+t+'"]');
-
-      $more.show();
-      $(this).hide();
-    })
-  </script>
-{% endblock crm_js_content %}
+{% endblock crm_body %}

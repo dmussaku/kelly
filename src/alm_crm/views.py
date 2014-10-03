@@ -76,6 +76,8 @@ class UserProductView(ListView):
         return subscrs
 
 
+
+
 class ContactCreateView(CreateView):
     form_class = ContactForm
     template_name = "contact/contact_create.html"
@@ -94,7 +96,7 @@ class ContactUpdateView(UpdateView):
 
 class ContactAddMentionView(UpdateView):
     model = Contact
-    form_class = MentionForm  # context_type, context_id
+    form_class = MentionForm #context_type, context_id
     success_url = reverse_lazy('contact_list')
     template_name = "contact/contact_add_mention.html"
 
@@ -107,6 +109,7 @@ class ContactDeleteView(DeleteView):
     model = Contact
     success_url = reverse_lazy('contact_list')
     template_name = 'contact/contact_delete.html'
+
 
 def contact_export(request, pk, format="html", locale='ru_RU', *args, **kwargs):
     c = Contact.objects.get(pk=pk)

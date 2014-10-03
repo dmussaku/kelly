@@ -3,24 +3,20 @@
 {% block head_title %} {{ _("Feed") }} {% endblock %}
 {% load crm_tags %}
 
-{% block crm_body_container %}
 
+{% block crm_body %}
   <div class="body-column body-column--single">
+    <div class="column">
+      {% for sc in sales_cycles %}
+        <div class="column-title">
+          <span class="column-title-span"><a href="/index">{{sc.contact.name}}</a> &raquo; <a href="/index">Sales cycle</a></span>
+        </div>
 
-  <div class="column">
-    {% for sc in sales_cycles %}
-      <div class="column-title">
-        <span class="column-title-span"><a href="/index">{{sc.contact.name}}</a> &raquo; <a href="/index">Sales cycle</a></span>
-      </div>
+        {% for sc_activity in sales_cycle_activities %}
+          {% show_activity sc_activity %}
+        {% endfor %}
 
-      {% for sc_activity in sales_cycle_activities %}
-        {% show_activity sc_activity %}
       {% endfor %}
-
-    {% endfor %}
-
+    </div>
   </div>
-
-  </div>
-
-{% endblock crm_body_container %}
+{% endblock crm_body %}
