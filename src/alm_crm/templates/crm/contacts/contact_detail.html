@@ -9,6 +9,7 @@
 <div class="hero">
   <div class="body-column">
     <div class="column">
+
       <div class="line line--borderless">
         <div class="line-aside">
           <figure class="userpic userpic--large"></figure>
@@ -18,6 +19,7 @@
           <div class="line-subtitle">{{ object.company.name }}</div>
         </div>
       </div>
+
       <div class="line line--compact">
         <div class="line-aside">
           <div class="line-aside-label">mobile</div>
@@ -34,18 +36,40 @@
           {{ object.email_work }}
         </div>
       </div>
-      <div class="line">
-        <div class="line-aside"></div>
-        <div class="line-body lineOfLinks">
-          <a class="lineOfLinks-link" href="#">
-            Show more
-          </a><a class="lineOfLinks-link" href="#">
-            Edit
-          </a><a class="lineOfLinks-link" href="#">
-            Share
-          </a>
+
+      <div class="showmore">
+        <div class="showmore-body">
+
+          <div class="line line--compact">
+            <div class="line-aside">
+              <div class="line-aside-label">another email</div>
+            </div>
+            <div class="line-body">
+              {{ object.email }}
+            </div>
+          </div>
+          <div class="line line--compact">
+            <div class="line-aside">
+              <div class="line-aside-label">something else</div>
+            </div>
+            <div class="line-body">
+
+            </div>
+          </div>
+
+        </div>
+        <div class="line">
+          <div class="line-aside"></div>
+          <div class="line-body lineOfLinks">
+            <a class="lineOfLinks-link" href="#"
+              data-toggle='showmore'
+              data-text='Show less'> Show more </a>
+            <a class="lineOfLinks-link" href="#"> Edit </a>
+            <a class="lineOfLinks-link" href="#"> Share </a>
+          </div>
         </div>
       </div>
+
     </div>
   </div>
 </div>
@@ -58,7 +82,58 @@
     </a>
     started at April 24, 13:45
   </div><div class="column-header-b">
-    Thread codename (dropdown wants to be here)
+    <div class="dropdown">
+      <button type="button" data-toggle="dropdown">Thread codename (dropdown wants to be here)</button>
+      <div class="dropdown-menu dropdown-menu--cycles">
+        <div class="dropdown-triangle"></div>
+        <div class="dropdown-menu-body">
+          <ul class="dropdown-menu-list">
+            <li class="dropdown-menu-item dropdown-menu-item--newCycle">
+              <a class="dropdown-menu-item-link" href="#">Create a new cycle</a>
+            </li>
+            <li class="dropdown-menu-item">
+              <a class="dropdown-menu-item-link" href="#">
+                <div class="column-header-a">
+                  <figure class="userpic"></figure>
+                  Ren
+                </div><div class="column-header-b">
+                  Cycle name 1
+                </div><div class="column-header-c">
+                  <figure class="userpic"></figure>
+                  <figure class="userpic"></figure>
+                </div>
+              </a>
+            </li>
+            <li class="dropdown-menu-item">
+              <a class="dropdown-menu-item-link dropdown-menu-item-link--active" href="#">
+                <div class="column-header-a">
+                  <figure class="userpic"></figure>
+                  Ren
+                </div><div class="column-header-b">
+                  Cycle name 2
+                </div><div class="column-header-c">
+                  <figure class="userpic"></figure>
+                  <figure class="userpic"></figure>
+                  <figure class="userpic"></figure>
+                </div>
+              </a>
+            </li>
+            <li class="dropdown-menu-item">
+              <a class="dropdown-menu-item-link" href="#">
+                <div class="column-header-a">
+                  <figure class="userpic"></figure>
+                  Ren
+                </div><div class="column-header-b">
+                  Cycle name 3
+                </div><div class="column-header-c">
+                  <figure class="userpic"></figure>
+                </div>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
   </div><div class="column-header-c">
     <a href="#"><figure class="userpic"></figure></a>
     <a href="#"><figure class="userpic"></figure></a>
@@ -68,6 +143,35 @@
 
 <div class="body-column body-column--single">
   <div class="column">
+    <form action="" class="statusForm">
+      <div class="line line--borderless">
+        <div class="line-aside"></div>
+        <div class="line-body line-body--spaceless lineOfLinks line-body--tabs">
+          <button type="button" class="lineOfLinks-link active">
+            Add activity
+          </button><button type="button" class="lineOfLinks-link">
+            Edit product list
+          </button><button type="button" class="lineOfLinks-link">
+            Add anticipated value
+          </button>
+        </div>
+      </div>
+      <div class="line line--borderless">
+        <div class="line-aside line-aside--statusForm">
+          <figure class="icon">[status switcher]</figure>
+        </div>
+        <div class="line-body line-body--spaceless">
+          <div class="line-body-main">
+            <textarea class="input-text" rows="3" placeholder="Log your activity..."></textarea>
+            <div class="inputLine inputLine--right">
+              <figure class="userpic"></figure>
+              <button type="submit" class="btn">Post</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+
     {% for activity in activities %}
       {% show_activity activity %}
     {% endfor %}

@@ -43,16 +43,6 @@ from models import Contact, SalesCycle, Activity, Comment
 
 urlpatterns = patterns(
     '',
-    # url(r'^$', DashBoardTemplateView.as_view(), name='dashboard'),
-    ## moved to app_urls
-    # url(r'^feed/$', FeedView.as_view(template_name='crm/feed.html'),
-    #     name='feed'),
-    ## moved to app_urls
-    # url(r'^contacts/$',
-    #     ContactListView.as_view(
-    #         model=Contact,
-    #         template_name='crm/contacts/contact_list.html',
-    #     ), name='contact_list'),
     url(r'^contacts/excerpt/$', ContactListView.as_view(
             queryset = Contact.objects.all(),
             context_object_name="contacts",
@@ -75,12 +65,6 @@ urlpatterns = patterns(
     url(r'^contacts/update/(?P<pk>\d+)/$', ContactUpdateView.as_view(), name='contact_update'),
     url(r'^vcard/(?P<pk>\d+)/$', contact_export, name='contact_export'),
     url(r'^vcard/(?P<pk>\d+)/(?P<format>(vcf|web)?)/$', contact_export, name='contact_export'),
-    url(r'^contacts/(?P<contact_pk>[\d]+)/$',
-        ContactDetailView.as_view(
-            model=Contact,
-            template_name='crm/contacts/contact_detail.html',
-            pk_url_kwarg='contact_pk'),
-        name='crm-contacts'),
     url(r'^contacts/delete/(?P<pk>\d+)/$', ContactDeleteView.as_view(), name='contact_delete'),
     url(r'^contacts/add_mention/(?P<pk>\d+)/$', ContactAddMentionView.as_view(), name='contact_add_mention'),
 
