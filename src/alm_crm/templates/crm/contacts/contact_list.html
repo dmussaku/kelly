@@ -74,16 +74,19 @@
         {% endfor %}
 
         {% if contacts_contacted_last_week.count > 3 %}
-          <div data-js-more="contacts_contacted_last_week" style="display:none;">
-            {% for contact in contacts_contacted_last_week|slice:"3:" %}
-              {% show_contact contact %}
-            {% endfor %}
-          </div>
+          <div class='showmore'>
+            <div class='showmore-body'>
+              {% for contact in contacts_contacted_last_week|slice:"3:" %}
+                {% show_contact contact %}
+              {% endfor %}
+            </div>
 
-          <div class="column-block-footer">
-            <a href="#" class="link-extra"
-              data-js-togle-more="contacts_contacted_last_week"
-              >{{contacts_contacted_last_week.count|add:'-3'}} more</a>
+            <div class="column-block-footer">
+              <a href="#" class="link-extra"
+                data-toggle='showmore'
+                data-text='less'
+                >{{contacts_contacted_last_week.count|add:'-3'}} more</a>
+            </div>
           </div>
         {% endif %}
       </div>
