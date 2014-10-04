@@ -233,6 +233,16 @@ class Contact(SubscriptionObject):
         c.save()
 
     @classmethod
+    def upd_status_when_first_activity_created(cls, sender, created=False,
+                                               instance=None, **kwargs):
+        if not created:
+            return
+        c = instance.sales_cycle.contact
+        if c.status == NEW:
+            c.status = LEAD
+            c.save()
+
+    @classmethod
     def get_contacts_by_status(cls, status, limit=10, offset=0):
         return Contact.objects.filter(status=status)[offset:offset + limit]
 
@@ -838,6 +848,8 @@ class Comment(SubscriptionObject):
 
 signals.post_save.connect(
     Contact.upd_lst_activity_on_create, sender=Activity)
+signals.post_save.connect(
+    Contact.upd_status_when_first_activity_created, sender=Activity)
 signals.post_save.connect(
     SalesCycle.upd_lst_activity_on_create, sender=Activity)
 
