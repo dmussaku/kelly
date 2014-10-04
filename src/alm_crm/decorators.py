@@ -1,6 +1,4 @@
 import functools
-from .models import CRMUser
-from alm_company.models import Company
 from almanet.decorators import subdomain_required, service_required
 
 from django.contrib.auth.decorators import login_required
@@ -14,12 +12,12 @@ def crmuser_required(fn):
     @subdomain_required
     @service_required
     def inner(request, *a, **kw):
-        try:
-            CRMUser.objects.get(
-                user_id=request.user.pk,
-                organization_id=Company.objects.get(subdomain=
-                                                    request.subdomain).pk)
-        except CRMUser.DoesNotExist:
+        user_id = None
+        for subscr_id in request.user_env['subscriptions']:
+            subscr_ctx = request.user_env['subscription_%s' % subscr_id]
+            if subscr_ctx['slug'] == kw.get('slug', None):
+                user_id = subscr_ctx['user_id']
+        if user_id is None:
             raise Http404("CRMUser required")
         return fn(request, *a, **kw)
     return inner

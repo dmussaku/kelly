@@ -2,6 +2,7 @@ import functools
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from almanet import settings
+from almanet.models import SubscriptionObject
 from alm_vcard.models import VCard
 from alm_user.models import User
 from django.template.loader import render_to_string
@@ -29,12 +30,15 @@ CURRENCY_OPTIONS = (
 )
 
 
-class CRMUser(models.Model):
+class CRMUser(SubscriptionObject):
 
     user_id = models.IntegerField(_('user id'))
     organization_id = models.IntegerField(_('organization id'))
-    subscription_id = models.IntegerField(_('subscription id'))
     is_supervisor = models.BooleanField(_('is supervisor'), default=False)
+
+    def __unicode__(self):
+        u = self.get_billing_user()
+        return u and u.get_username() or None
 
     def get_billing_user(self):
         """Returns a original user.
@@ -53,7 +57,7 @@ class CRMUser(models.Model):
             self.save()
 
 
-class Contact(models.Model):
+class Contact(SubscriptionObject):
 
     STATUS_CODES = zip(STATUSES, STATUSES_CAPS)
     TYPES = (COMPANY_TP, USER_TP) = ('co', 'user')
@@ -71,6 +75,9 @@ class Contact(models.Model):
     vcard = models.OneToOneField('alm_vcard.VCard', blank=True, null=True)
     company_contact = models.ForeignKey(
         'Contact', blank=True, null=True, related_name='user_contacts')
+    owner = models.ForeignKey(
+        CRMUser, related_name='owned_contacts',
+        null=True, blank=True)
     followers = models.ManyToManyField(
         CRMUser, related_name='following_contacts',
         null=True, blank=True)
@@ -414,11 +421,10 @@ class Contact(models.Model):
         Cold contacts should satisfy two conditions:
             1. no assignee for contact
             2. status is NEW"""
-        return cls.objects.filter(
-            assignees__isnull=True, status=NEW)[offset:offset + limit]
+        return cls.objects.filter(status=NEW)[offset:offset + limit]
 
 
-class Value(models.Model):
+class Value(SubscriptionObject):
     # Type of payment
     SALARY_OPTIONS = (
         ('monthly', 'Monthly'),
@@ -430,6 +436,8 @@ class Value(models.Model):
     amount = models.IntegerField()
     currency = models.CharField(max_length=3, choices=CURRENCY_OPTIONS,
                                 default='KZT')
+    owner = models.ForeignKey('CRMUser', null=True, blank=True,
+                              related_name='owned_values')
 
     class Meta:
         verbose_name = 'value'
@@ -439,14 +447,14 @@ class Value(models.Model):
         return "%s %s %s" % (self.amount, self.currency, self.salary)
 
 
-class Product(models.Model):
+class Product(SubscriptionObject):
     name = models.CharField(_('product name'), max_length=100, blank=False)
     description = models.TextField(_('product description'))
     price = models.IntegerField()
     currency = models.CharField(max_length=3, choices=CURRENCY_OPTIONS,
                                 default='KZT')
-    user_id = models.IntegerField()
-    company_id = models.IntegerField()
+    owner = models.ForeignKey('CRMUser', related_name='crm_products',
+                              null=True, blank=True)
 
     class Meta:
         verbose_name = _('product')
@@ -456,7 +464,7 @@ class Product(models.Model):
         return self.name
 
 
-class SalesCycle(models.Model):
+class SalesCycle(SubscriptionObject):
     STATUS_OPTIONS = (
         ('P', 'Pending'),
         ('C', 'Completed'),
@@ -586,7 +594,6 @@ class SalesCycle(models.Model):
             Raises:
                 User.DoesNotExist
         """
-        user = CRMUser.objects.get(id=user_id)
         q = Q()
         if owned:
             q |= Q(owner_id=user_id)
@@ -614,7 +621,7 @@ class SalesCycle(models.Model):
             offset:offset + limit]
 
 
-class Activity(models.Model):
+class Activity(SubscriptionObject):
     title = models.CharField(max_length=100)
     description = models.CharField(max_length=500)
     date_created = models.DateTimeField(blank=True, null=True,
@@ -631,6 +638,10 @@ class Activity(models.Model):
 
     def __unicode__(self):
         return self.title
+
+    @property
+    def owner(self):
+        return self.author
 
     def set_feedback(self, feedback_obj, save=False):
         """Set feedback to activity instance. Saves if `save` is set(True)."""
@@ -717,7 +728,7 @@ class Activity(models.Model):
         return date_counts
 
 
-class Feedback(models.Model):
+class Feedback(SubscriptionObject):
     STATUS_OPTIONS = (
         ('W', _('waiting')),
         ('$', _('1000')),
@@ -743,7 +754,7 @@ class Feedback(models.Model):
         super(Feedback, self).save(**kwargs)
 
 
-class Mention(models.Model):
+class Mention(SubscriptionObject):
     user_id = models.IntegerField()
     content_type = models.ForeignKey(ContentType)
     object_id = models.IntegerField()
@@ -773,7 +784,7 @@ class Mention(models.Model):
         return Mention.objects.filter(user_id=user_id)
 
 
-class Comment(models.Model):
+class Comment(SubscriptionObject):
     comment = models.CharField(max_length=140)
     author = models.ForeignKey(CRMUser, related_name='comment_author')
     date_created = models.DateTimeField(blank=True, auto_now_add=True)
@@ -785,6 +796,10 @@ class Comment(models.Model):
 
     def __unicode__(self):
         return "%s's comment" % (self.author)
+
+    @property
+    def owner(self):
+        return self.author
 
     def save(self, **kwargs):
         if self.date_created:
