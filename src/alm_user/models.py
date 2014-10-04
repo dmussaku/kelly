@@ -122,7 +122,11 @@ class User(AbstractBaseUser):
         crmuser.save()
         # self.crmuser = crmuser
         self.save()
-        return crmuser #self.crmuser
+        return crmuser  # self.crmuser
+
+    def get_subscr_user(self, subscr_id):
+        from alm_crm.models import CRMUser
+        return CRMUser.objects.get(user_id=self.pk, subscription_id=subscr_id)
 
     def get_crmuser(self):
         from alm_crm.models import CRMUser

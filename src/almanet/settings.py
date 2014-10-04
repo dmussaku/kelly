@@ -122,6 +122,7 @@ class BaseConfiguration(SubdomainConfiguration, Configuration):
         # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
         'django_hosts.middleware.HostsMiddleware',
         'almanet.middleware.GetSubdomainMiddleware',
+        'almanet.middleware.UserEnvMiddleware'
     )
 
     SESSION_COOKIE_DOMAIN = '.alma.net'

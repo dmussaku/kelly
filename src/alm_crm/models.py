@@ -422,8 +422,7 @@ class Contact(SubscriptionObject):
         Cold contacts should satisfy two conditions:
             1. no assignee for contact
             2. status is NEW"""
-        return cls.objects.filter(
-            assignees__isnull=True, status=NEW)[offset:offset + limit]
+        return cls.objects.filter(status=NEW)[offset:offset + limit]
 
 
 class Value(SubscriptionObject):
