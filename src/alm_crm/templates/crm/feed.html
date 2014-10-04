@@ -1,8 +1,6 @@
 {% extends "crm/base.html" %}
-{% load i18n %}
+{% load i18n crm_tags %}
 {% block head_title %} {{ _("Feed") }} {% endblock %}
-{% load crm_tags %}
-
 
 {% block crm_aside_tabs %}
   <a href="#" class="tabs-link" data-tip="[Cycles I follow]">
@@ -35,9 +33,9 @@
       {% for sc in sales_cycles %}
         <div class="column-block">
           <div class="column-title">
-            <a href="{#% url 'contacts' pk=sc.contact.id %#}">
+            <a href="{% url 'contact_detail' slug='crm' contact_pk=sc.contact.id %}">
               {{ sc.contact.name }}</a> &raquo;
-            <a href="index.html">Sales cycle</a>
+            <a href="#">{{ _("Sales cycle") }}</a>
           </div>
 
           {% for sc_activity in sales_cycle_activities %}

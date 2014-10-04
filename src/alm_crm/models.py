@@ -438,6 +438,8 @@ class Value(SubscriptionObject):
     amount = models.IntegerField()
     currency = models.CharField(max_length=3, choices=CURRENCY_OPTIONS,
                                 default='KZT')
+    owner = models.ForeignKey('CRMUser', null=True, blank=True,
+                              related_name='owned_values')
 
     class Meta:
         verbose_name = 'value'
