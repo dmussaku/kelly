@@ -20,9 +20,10 @@ class FeedView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(FeedView, self).get_context_data(**kwargs)
-        user_id = self.request.user.id
+        crmuser_id = self.request.user.get_crmuser().id
         sales_cycles_data = SalesCycle\
-            .get_salescycles_by_last_activity_date(user_id, True, True, True)
+            .get_salescycles_by_last_activity_date(crmuser_id, True, True,
+                                                   True)
 
         context['sales_cycles'] = sales_cycles_data[0]
         context['sales_cycle_activities'] = sales_cycles_data[1]
@@ -47,11 +48,11 @@ class ContactListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super(self.__class__, self).get_context_data(**kwargs)
-        user_id = self.request.user.id
+        crmuser_id = self.request.user.get_crmuser().id
         context['contacts_cold_base'] = self.model.get_cold_base()
         context['contacts_contacted_last_week'] = \
             self.model.get_contacts_for_last_activity_period(
-                user_id,
+                crmuser_id,
                 from_dt=timezone.now()-timedelta(days=7),
                 to_dt=timezone.now())
         return context

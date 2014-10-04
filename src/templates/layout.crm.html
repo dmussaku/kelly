@@ -1,6 +1,6 @@
 {% extends 'layout.base.html' %}
 {% load static from staticfiles %}
-{% load i18n %}
+{% load i18n almanet_tags crm_tags %}
 
 {% block css %}
 <link rel="shortcut icon" type="image/ico" href="{% static 'img/favicon.ico' %}" />
@@ -35,8 +35,10 @@
 
 <nav class="body-header nav">
   <div class="lineOfLinks">
-    <a class="lineOfLinks-link nav-link" href="#"> {{ _('contacts') }} </a>
-    <a class="lineOfLinks-link nav-link" href="#"> {{ _('feed') }} </a>
+    <a class="lineOfLinks-link nav-link"
+      href="{% crm_url 'contacts_list' %}"> {{ _('contacts') }} </a>
+    <a class="lineOfLinks-link nav-link"
+      href="{% crm_url 'feed' %}"> {{ _('feed') }} </a>
 
     <div class="nav-aside">
       <div class="dropdown dropdown--inline dropdown--right">
@@ -53,20 +55,21 @@
       <div class="dropdown dropdown--inline dropdown--right">
         <a class="dropdown-toggle nav-aside-username" href="#" data-toggle="dropdown" role="menu">
           <figure class="userpic"></figure>
-          Somename
+          {{ request.user }}
         </a>
         <div class="dropdown-menu">
           <div class="dropdown-triangle"></div>
           <div class="dropdown-menu-body">
             <ul class="dropdown-menu-list">
               <li class="dropdown-menu-item">
-                <a class="dropdown-menu-item-link" href="profile.html">Profile</a>
+                <a class="dropdown-menu-item-link" href="{% subdomain_url 'user_profile_url' subdomain=MY_SD %}">Profile</a>
               </li>
               <li class="dropdown-menu-item">
                 <a class="dropdown-menu-item-link" href="#">Administration</a>
               </li>
               <li class="dropdown-menu-item">
-                <a class="dropdown-menu-item-link" href="#">Exit</a>
+                <a class="dropdown-menu-item-link"
+                  href="{% subdomain_url 'user_logout' subdomain=None %}">Exit</a>
               </li>
             </ul>
           </div>

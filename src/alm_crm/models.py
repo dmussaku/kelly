@@ -248,8 +248,7 @@ class Contact(models.Model):
         -------
         Queryset of Contacts with whom `user_id` get contacted for that period.
         """
-        print user_id
-        crm_user = CRMUser.objects.get(user_id=user_id)
+        crm_user = CRMUser.objects.get(id=user_id)
         activities = crm_user.activity_author.filter(
             date_created__range=(from_dt, to_dt))
         return Contact.objects.filter(
