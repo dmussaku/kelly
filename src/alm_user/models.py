@@ -127,4 +127,3 @@ class User(AbstractBaseUser):
     def get_crmuser(self):
         from alm_crm.models import CRMUser
         return CRMUser.objects.get(user_id=self.pk)
-

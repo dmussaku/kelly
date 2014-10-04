@@ -9,9 +9,9 @@ from django.http import Http404
 def crmuser_required(fn):
 
     @functools.wraps(fn)
-    @service_required
-    @subdomain_required
     @login_required
+    @subdomain_required
+    @service_required
     def inner(request, *a, **kw):
         try:
             CRMUser.objects.get(user_id=request.user.pk,

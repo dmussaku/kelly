@@ -11,7 +11,8 @@ urlpatterns = patterns(
             # model=Subscription,
             template_name='crm/dashboard.html')),
         name='crm-dashboard'),
-    url(r'^feed/$', FeedView.as_view(template_name='crm/feed.html'),
+    url(r'^feed/$', crmuser_required(
+        FeedView.as_view(template_name='crm/feed.html')),
         name='feed'),
 
     url(r'^contacts/$',

@@ -91,7 +91,7 @@ class BaseConfiguration(SubdomainConfiguration, Configuration):
 
     TEMPLATE_DEBUG = True
 
-    ALLOWED_HOSTS = []
+    ALLOWED_HOSTS = ['*']
 
     # Application definition
     INSTALLED_APPS = (
@@ -124,7 +124,7 @@ class BaseConfiguration(SubdomainConfiguration, Configuration):
         'almanet.middleware.GetSubdomainMiddleware',
     )
 
-    SESSION_COOKIE_DOMAIN = '.alma1.net'
+    SESSION_COOKIE_DOMAIN = '.alma.net'
 
     ROOT_URLCONF = 'almanet.urls'
 
