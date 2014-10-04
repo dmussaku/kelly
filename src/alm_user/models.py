@@ -99,8 +99,8 @@ class User(AbstractBaseUser):
         else:
             # create user in corresponding service
             # eg.: CRMUser in CRM service, CRM's slug = crm
-            create_user = getattr(self, 'create_{}user'.format(product.slug))
-            create_user(s.pk, self.company.pk)
+            create_user = getattr(self, 'create_{}user'.format(service.slug))
+            create_user(s.pk, self.get_company().pk)
             s.is_active = True
         s.save()
 
@@ -122,7 +122,7 @@ class User(AbstractBaseUser):
         crmuser.save()
         # self.crmuser = crmuser
         self.save()
-        return self.crmuser
+        return crmuser #self.crmuser
 
     def get_crmuser(self):
         from alm_crm.models import CRMUser
