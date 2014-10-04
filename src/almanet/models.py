@@ -42,4 +42,9 @@ class Subscription(models.Model):
         db_table = settings.DB_PREFIX.format('subscription')
 
 
+class SubscriptionObject(models.Model):
+    subscription_id = models.IntegerField(_('subscription id'),
+                                          null=True, blank=True)
 
+    class Meta:
+        abstract = True
