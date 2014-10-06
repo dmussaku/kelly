@@ -5,9 +5,12 @@ from django.utils.translation import ugettext as _
 
 from alm_user.models import User, UserManager
 from alm_company.models import Company
+from almanet.models import Service, Subscription
 
 class Command(BaseCommand):
-    help = 'Create user with email b.wayne@batman.bat and password 123, also creates associated company with subdomain bwayne'
+    help = 'Create user with email b.wayne@batman.bat and password 123, also creates \
+    associated company with subdomain bwayne. Also creates a Service object called AlmCRM\
+    and a subscription object thus connecting bwayne to almacrm service'
 
     def handle(self, *args, **options):
         first_name = 'Bruce'
@@ -17,9 +20,16 @@ class Command(BaseCommand):
 
         subdomain = 'bwayne'
         name = 'Wayne Enterprise'
-
         try:
-            User.objects.get(email=email,)
+            service = Service.objects.get(slug='almcrm')
+        except:
+            service = Service()
+            service.title = u'AlmCRM'
+            service.save()
+        subscription = Subscription()
+        subscription.service = service
+        try:
+            u = User.objects.get(email=email,)
         except (User.DoesNotExist, KeyError):
             try:
                 Company.objects.get(subdomain=subdomain)
@@ -34,3 +44,7 @@ class Command(BaseCommand):
                 sys.stderr.write("Error: bwayne subdomain is already taken. Did not created anything.\n")
         else:
             sys.stderr.write("Error: bwayne@batman.bat email is already taken.\n")
+        subscription.user = u
+        subscription.organization = u.get_company()
+        subscription.is_active = True
+        subscription.save() 

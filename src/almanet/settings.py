@@ -223,6 +223,10 @@ class BaseConfiguration(SubdomainConfiguration, Configuration):
                                            subdomain=self.MY_SD)
 
     @property
+    def LOGIN_REDIRECT_CRM_URL(self):
+        return self.__class__.reverse_lazy('feed', subdomain=self.MY_SD)
+
+    @property
     def LOGIN_URL(self):
         return self.__class__.reverse_lazy('user_login', subdomain=None)
 
