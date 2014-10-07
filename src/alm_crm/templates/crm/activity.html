@@ -1,0 +1,28 @@
+{% extends "crm/base.html" %}
+{% load i18n crm_tags %}
+{% block head_title %} {{ _("Activity") }} {% endblock %}
+
+{% block crm_body_container %}
+<h1>Asdasdasd</h1>
+<div class="lineGroup">
+  <div class="line">
+    <div class="line-aside">
+      <figure class="icon">{{ activity.feedback.get_status_display }}</figure>
+    </div>
+    <div class="line-body">
+      <div class="line-body-main">
+        {{ activity.feedback.feedback }}
+        <div class="line-body-meta">
+          <a href="/index">
+            <figure class="userpic"></figure>
+            {{ activity.author.get_billing_user.get_short_name }}
+          </a> at {{ activity.date_created }}
+        </div>
+      </div>
+      <div class="line-body-extra">
+        <figure class="icon">[comments]</figure>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock crm_body_container %}
