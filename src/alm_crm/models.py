@@ -729,6 +729,7 @@ class Activity(SubscriptionObject):
         return date_counts
 
 
+
 class Feedback(SubscriptionObject):
     STATUS_OPTIONS = (
         ('W', _('waiting')),

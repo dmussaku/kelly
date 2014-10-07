@@ -1,6 +1,6 @@
 from django.conf.urls import patterns, url
 from .decorators import crmuser_required
-from .views import DashboardView, ContactDetailView, ContactListView, FeedView
+from .views import DashboardView, ContactDetailView, ContactListView, FeedView, ActivityDetailView
 from .models import Contact
 # from almanet.models import Subscription
 
@@ -26,4 +26,8 @@ urlpatterns = patterns(
             template_name='crm/contacts/contact_detail.html',
             pk_url_kwarg='contact_pk')),
         name='contact_detail'),
+    url(r'^activities/(?P<pk>[\d]+)/$', 
+            ActivityDetailView.as_view(),
+            name = 'activity_detail'
+        ),
 )
