@@ -64,7 +64,8 @@
             <a class="lineOfLinks-link" href="#"
               data-toggle='showmore'
               data-text='Show less'> Show more </a>
-            <a class="lineOfLinks-link" href="#"> Edit </a>
+            <a class="lineOfLinks-link"
+              href="{% crm_url 'contact_update' pk=object.pk %}"> Edit </a>
             <a class="lineOfLinks-link" href="#"> Share </a>
           </div>
         </div>

@@ -2,7 +2,7 @@ from django.conf.urls import patterns, url
 from almanet.url_resolvers import reverse_lazy
 from .decorators import crmuser_required
 from .views import DashboardView, FeedView, ContactDetailView, \
-    ContactListView, ContactCreateView, ActivityCreateView
+    ContactListView, ContactCreateView, ContactUpdateView, ActivityCreateView
 from .models import Contact, Activity
 from .forms import ContactForm, ActivityForm
 # from almanet.models import Subscription
@@ -36,6 +36,13 @@ urlpatterns = patterns(
             template_name="contact/contact_create.html",
             success_url=reverse_lazy('contacts_list'))),
         name='contact_create'),
+    url(r'^contacts/update/(?P<pk>\d+)/$',
+        crmuser_required(ContactUpdateView.as_view(
+            model=Contact,
+            form_clas=ContactForm,
+            template_name="contact/contact_update.html",
+            success_url=reverse_lazy('contact_list'))),
+        name='contact_update'),
 
     url(r'^activities/create/$',
         crmuser_required(ActivityCreateView.as_view(
