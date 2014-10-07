@@ -79,9 +79,9 @@
   <div class="column-header-a">
     <a href="#">
       <figure class="userpic"></figure>
-      Ren
+      {{ object.owner.get_billing_user }}
     </a>
-    started at April 24, 13:45
+    started at {{ first_activity_date|date:'F j, H:i' }}
   </div><div class="column-header-b">
     <div class="dropdown">
       <button type="button" data-toggle="dropdown">Thread codename (dropdown wants to be here)</button>

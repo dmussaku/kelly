@@ -10,7 +10,7 @@
           <a href="/index">
             <figure class="userpic"></figure>
             {{ activity.author.get_billing_user.get_short_name }}
-          </a> at {{ activity.date_created }}
+          </a> at {{ activity.date_created|date:'F j, H:i' }}
         </div>
       </div>
       <div class="line-body-extra">

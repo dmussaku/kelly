@@ -51,6 +51,9 @@ class ContactDetailView(DetailView):
         context['activity_form'] = ActivityForm(
             initial={'author': crmuser_id,
                      'sales_cycle': sales_cycle.id})
+        context['first_activity_date'] = \
+            Activity.get_activities_by_contact(context['object'].pk).first()\
+            .date_created
         return context
 
 
