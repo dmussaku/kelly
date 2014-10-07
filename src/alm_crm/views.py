@@ -8,6 +8,7 @@ from django.shortcuts import render
 from forms import ContactForm, SalesCycleForm, MentionForm, ActivityForm,\
     CommentForm, ValueForm, ActivityFeedbackForm
 from models import Contact, SalesCycle, Activity, Feedback, Comment, Value
+import json
 
 
 class DashboardView(TemplateView):
@@ -48,8 +49,8 @@ class ContactDetailView(DetailView):
 
         context['sales_cycle'] = sales_cycle
         context['activity_form'] = ActivityForm(
-            initial={'author_id': crmuser_id,
-                     'sales_cycle_id': sales_cycle.id})
+            initial={'author': crmuser_id,
+                     'sales_cycle': sales_cycle.id})
         return context
 
 
@@ -86,12 +87,7 @@ class UserProductView(ListView):
         return subscrs
 
 
-
-
 class ContactCreateView(CreateView):
-    form_class = ContactForm
-    template_name = "contact/contact_create.html"
-    success_url = reverse_lazy('contact_list')
 
     def form_valid(self, form):
         return super(ContactCreateView, self).form_valid(form)
@@ -178,6 +174,7 @@ class SalesCycleDetailView(DetailView):
         context['sales_cycle'] = SalesCycle.objects.get(id=self.kwargs['pk'])
         return context
 
+
 class SalesCycleDeleteView(DeleteView):
     model = SalesCycle
     success_url = reverse_lazy('sales_cycle_list')
@@ -185,11 +182,16 @@ class SalesCycleDeleteView(DeleteView):
 
 
 class ActivityCreateView(CreateView):
-    model = Activity
-    form_class = ActivityForm
-    template_name = 'activity/activity_create.html'
-    success_url = reverse_lazy('activity_list')
 
+    def form_valid(self, form):
+        response = super(self.__class__, self).form_valid(form)
+        if self.request.is_ajax():
+            data = {
+                'pk': self.object.pk,
+            }
+            return HttpResponse(json.dumps(data), mimetype="application/json")
+        else:
+            return response
 
 
 class ActivityListView(ListView):

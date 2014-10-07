@@ -125,7 +125,8 @@
 <div class="body-column body-column--single"
   data-js-data='body'>
   <div class="column">
-    <form action="" class="statusForm">
+    <form action="{% crm_url 'activity_create' %}" method="POST" class="statusForm"
+      data-js-data='form'> {% csrf_token %}
       <div class="line line--borderless">
         <div class="line-aside"></div>
         <div class="line-body line-body--spaceless lineOfLinks line-body--tabs">
@@ -144,8 +145,16 @@
         </div>
         <div class="line-body line-body--spaceless">
           <div class="line-body-main">
-            {{ activity_form.description }}
-            <textarea class="input-text" rows="3" placeholder="Log your activity..."></textarea>
+
+            <textarea class="input-text" rows="3"
+              name='{{ activity_form.title.html_name }}'
+              placeholder="Log your activity..."></textarea>
+            {{ activity_form.description.as_hidden }}
+            {{ activity_form.author.as_hidden }}
+            {{ activity_form.sales_cycle.as_hidden }}
+
+            <input type="hidden" name="next" value="{{ request.get_full_path }}" />
+
             <div class="inputLine inputLine--right">
               <figure class="userpic"></figure>
               <button type="submit" class="btn">Post</button>
@@ -174,12 +183,36 @@
     var sel = {
         link: '[data-js-data-id]',
         body: '[data-js-data="body"]',
+        form: '[data-js-data="form"]',
         active: '.dropdown-menu-item-link--active'
       },
       $links = $('[data-js-data="links"]'),
       $container = $('[data-js-data="container"]'),
-      url = $(location).attr('href').split('?')[0],//without search
-      reload_data = function (event) {
+      reload_url = $(location).attr('href').split('?')[0],//without search
+
+      submit_activity = function(event) {
+        var $form = $(event.target);
+
+        $form.find('[name="description"]')
+          .val( $form.find('[name="title"]').val() );
+
+        //submit
+        $.post($form.prop('action'), $form.serialize())
+          .done(function (event) {
+            $links.find(sel.active).click(); //to reload_data
+          })
+          .fail(function (event, jqxhr, settings, thrownError) {
+            console.log(event)
+            console.log(jqxhr)
+            console.log(settings)
+            console.log(thrownError)
+          });
+
+
+        event.preventDefault();
+      },
+
+      reload_data = function(event) {
         var data_id = $(this).data('jsDataId'),
             active_class = sel.active.slice(1);
 
@@ -188,7 +221,7 @@
         $(this).addClass(active_class);
 
         // change body
-        $.get(url, {'sales_cycle_id': data_id}, function(data) {
+        $.get(reload_url, {'sales_cycle_id': data_id}, function(data) {
           $(document)
             .find(sel.body)
               .replaceWith($(data).find(sel.body));
@@ -196,8 +229,10 @@
 
         event.preventDefault();
       },
+
       init = function() {
         $links.on('click', sel.link, reload_data);
+        $(document).on('submit', sel.form, submit_activity);
       };
 
     init();

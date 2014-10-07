@@ -1,7 +1,10 @@
 from django.conf.urls import patterns, url
+from almanet.url_resolvers import reverse_lazy
 from .decorators import crmuser_required
-from .views import DashboardView, ContactDetailView, ContactListView, FeedView
-from .models import Contact
+from .views import DashboardView, FeedView, ContactDetailView, \
+    ContactListView, ContactCreateView, ActivityCreateView
+from .models import Contact, Activity
+from .forms import ContactForm, ActivityForm
 # from almanet.models import Subscription
 
 urlpatterns = patterns(
@@ -26,4 +29,19 @@ urlpatterns = patterns(
             template_name='crm/contacts/contact_detail.html',
             pk_url_kwarg='contact_pk')),
         name='contact_detail'),
+    url(r'^contacts/create/$',
+        crmuser_required(ContactCreateView.as_view(
+            model=Contact,
+            form_class=ContactForm,
+            template_name="contact/contact_create.html",
+            success_url=reverse_lazy('contacts_list'))),
+        name='contact_create'),
+
+    url(r'^activities/create/$',
+        crmuser_required(ActivityCreateView.as_view(
+            model=Activity,
+            form_class=ActivityForm,
+            template_name='activity/activity_create.html',
+            success_url=reverse_lazy('activity_list'))),
+        name='activity_create'),
 )
