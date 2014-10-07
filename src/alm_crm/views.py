@@ -36,9 +36,20 @@ class ContactDetailView(DetailView):
         return self.model.get_contact_detail(contact_pk, with_vcard=True)
 
     def get_context_data(self, **kwargs):
-        contact_pk = self.kwargs.get(self.pk_url_kwarg)
         context = super(ContactDetailView, self).get_context_data(**kwargs)
-        context['activities'] = Activity.get_activities_by_contact(contact_pk)
+
+        crmuser_id = self.request.user.get_crmuser().id
+
+        sales_cycle_id = self.request.GET.get('sales_cycle_id', False)
+        if sales_cycle_id:
+            sales_cycle = context['object'].sales_cycles.get(id=sales_cycle_id)
+        else:
+            sales_cycle = context['object'].sales_cycles.last()
+
+        context['sales_cycle'] = sales_cycle
+        context['activity_form'] = ActivityForm(
+            initial={'author_id': crmuser_id,
+                     'sales_cycle_id': sales_cycle.id})
         return context
 
 

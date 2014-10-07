@@ -91,45 +91,25 @@
             <li class="dropdown-menu-item dropdown-menu-item--newCycle">
               <a class="dropdown-menu-item-link" href="#">Create a new cycle</a>
             </li>
-            <li class="dropdown-menu-item">
-              <a class="dropdown-menu-item-link" href="#">
-                <div class="column-header-a">
-                  <figure class="userpic"></figure>
-                  Ren
-                </div><div class="column-header-b">
-                  Cycle name 1
-                </div><div class="column-header-c">
-                  <figure class="userpic"></figure>
-                  <figure class="userpic"></figure>
-                </div>
-              </a>
-            </li>
-            <li class="dropdown-menu-item">
-              <a class="dropdown-menu-item-link dropdown-menu-item-link--active" href="#">
-                <div class="column-header-a">
-                  <figure class="userpic"></figure>
-                  Ren
-                </div><div class="column-header-b">
-                  Cycle name 2
-                </div><div class="column-header-c">
-                  <figure class="userpic"></figure>
-                  <figure class="userpic"></figure>
-                  <figure class="userpic"></figure>
-                </div>
-              </a>
-            </li>
-            <li class="dropdown-menu-item">
-              <a class="dropdown-menu-item-link" href="#">
-                <div class="column-header-a">
-                  <figure class="userpic"></figure>
-                  Ren
-                </div><div class="column-header-b">
-                  Cycle name 3
-                </div><div class="column-header-c">
-                  <figure class="userpic"></figure>
-                </div>
-              </a>
-            </li>
+
+            {% for sc in object.sales_cycles.all %}
+              <li class="dropdown-menu-item"
+                data-js-data='links'>
+                <a class="dropdown-menu-item-link {% if sc == sales_cycle %} dropdown-menu-item-link--active {% endif %}" href="#"
+                  data-js-data-id='{{ sc.id }}'>
+                  <div class="column-header-a">
+                    <figure class="userpic"></figure>
+                    {{ sc.owner }}
+                  </div><div class="column-header-b">
+                    {{ sc }}
+                  </div><div class="column-header-c">
+                    <figure class="userpic"></figure>
+                    <figure class="userpic"></figure>
+                  </div>
+                </a>
+              </li>
+            {% endfor %}
+
           </ul>
         </div>
       </div>
@@ -141,7 +121,9 @@
   </div>
 </div>
 
-<div class="body-column body-column--single">
+
+<div class="body-column body-column--single"
+  data-js-data='body'>
   <div class="column">
     <form action="" class="statusForm">
       <div class="line line--borderless">
@@ -162,6 +144,7 @@
         </div>
         <div class="line-body line-body--spaceless">
           <div class="line-body-main">
+            {{ activity_form.description }}
             <textarea class="input-text" rows="3" placeholder="Log your activity..."></textarea>
             <div class="inputLine inputLine--right">
               <figure class="userpic"></figure>
@@ -170,12 +153,54 @@
           </div>
         </div>
       </div>
+
     </form>
 
-    {% for activity in activities %}
+
+    {% for activity in sales_cycle.rel_activities.all %}
       {% show_activity activity %}
     {% endfor %}
   </div>
 </div>
 
+
+
 {% endblock crm_body %}
+
+
+{% block crm_js_content %}
+<script>
+  var sc_data = (function($) {
+    var sel = {
+        link: '[data-js-data-id]',
+        body: '[data-js-data="body"]',
+        active: '.dropdown-menu-item-link--active'
+      },
+      $links = $('[data-js-data="links"]'),
+      $container = $('[data-js-data="container"]'),
+      url = $(location).attr('href').split('?')[0],//without search
+      reload_data = function (event) {
+        var data_id = $(this).data('jsDataId'),
+            active_class = sel.active.slice(1);
+
+        // change links
+        $links.find(sel.active).removeClass(active_class);
+        $(this).addClass(active_class);
+
+        // change body
+        $.get(url, {'sales_cycle_id': data_id}, function(data) {
+          $(document)
+            .find(sel.body)
+              .replaceWith($(data).find(sel.body));
+        });
+
+        event.preventDefault();
+      },
+      init = function() {
+        $links.on('click', sel.link, reload_data);
+      };
+
+    init();
+  })(jQuery);
+</script>
+{% endblock crm_js_content %}
