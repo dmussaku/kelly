@@ -53,7 +53,9 @@ def login(request, template_name='registration/login.html',
                     return HttpResponse('AlmaCRM service is not created, make sure to create a service with slug almacrm')
                 if request.user.get_subscriptions().filter(service__slug='almcrm'):
                     # do not know how to redirect to the needed page to be honest
-                    #return HttpResponseRedirect(almanet_reverse('feed', subdomain=MY_SD))
+                    request.subdomain = request.user.get_company().subdomain
+                    #return HttpResponseRedirect('bwayne.alma.net:8000/almcrm/')
+                    return HttpResponseRedirect(almanet_reverse('feed', subdomain=request.subdomain, args=['almcrm']))
                     pass
             return HttpResponseRedirect(redirect_to)
     else:

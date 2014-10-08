@@ -8,6 +8,7 @@ from django.shortcuts import render
 from forms import ContactForm, SalesCycleForm, MentionForm, ActivityForm,\
     CommentForm, ValueForm, ActivityFeedbackForm
 from models import Contact, SalesCycle, Activity, Feedback, Comment, Value
+from almanet.url_resolvers import reverse as almanet_reverse
 
 
 class DashboardView(TemplateView):
