@@ -1,6 +1,7 @@
 from django.conf.urls import patterns, url
 from .decorators import crmuser_required
 from .views import DashboardView, ContactDetailView, ContactListView, FeedView
+from alm_vcard.views import import_vcard
 from .models import Contact
 # from almanet.models import Subscription
 
@@ -11,6 +12,7 @@ urlpatterns = patterns(
             # model=Subscription,
             template_name='crm/dashboard.html')),
         name='crm-dashboard'),
+    url(r'^import_vcard/$', import_vcard, name='crm_import_vcard'),
     url(r'^feed/$', crmuser_required(
         FeedView.as_view(template_name='crm/feed.html')),
         name='feed'),

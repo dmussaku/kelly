@@ -7,13 +7,16 @@ from django.http import HttpResponse
 from django.shortcuts import render
 from forms import ContactForm, SalesCycleForm, MentionForm, ActivityForm,\
     CommentForm, ValueForm, ActivityFeedbackForm
+from alm_vcard.forms import VCardUploadForm
 from models import Contact, SalesCycle, Activity, Feedback, Comment, Value
 
 
 class DashboardView(TemplateView):
 
     def get_context_data(self, **kwargs):
-        pass
+        context = super(DashboardView, self).get_context_data(**kwargs)
+        context['form'] = VCardUploadForm
+        return context
 
 
 class FeedView(TemplateView):

@@ -1,6 +1,6 @@
 {% extends 'layout.base.html' %}
 {% load static from staticfiles %}
-{% load i18n %}
+{% load i18n almanet_tags %}
 
 {% block css %}
 <link rel="shortcut icon" type="image/ico" href="{% static 'img/favicon.ico' %}" />
@@ -40,20 +40,30 @@
 
     <div class="nav-aside">
       <div class="dropdown dropdown--inline dropdown--right">
+
         <a class="btn dropdown-toggle" href="#" data-toggle="dropdown" role="menu">
           Add contact
         </a>
         <div class="dropdown-menu">
           <div class="dropdown-triangle"></div>
           <div class="dropdown-menu-body">
-            Here fast add form
+            <form action='{% subdomain_url "crm_import_vcard" subdomain={{subdomain}} args="almcrm"%}' id='file_upload_form' method="post" enctype="multipart/form-data">
+              {% csrf_token %}
+              <p>{{ form.non_field_errors }}</p>
+              <p>{{ form.myfile.label_tag }} {{ form.myfile.help_text }}</p>
+              <p>
+                  {{ form.myfile.errors }}
+                  {{ form.myfile }}
+              </p>
+              <p><input type="submit" value="Upload" id='upload-btn' /></p>
+          </form>
           </div>
         </div>
       </div>
       <div class="dropdown dropdown--inline dropdown--right">
         <a class="dropdown-toggle nav-aside-username" href="#" data-toggle="dropdown" role="menu">
           <figure class="userpic"></figure>
-          Somename
+          {{user}}
         </a>
         <div class="dropdown-menu">
           <div class="dropdown-triangle"></div>
@@ -89,5 +99,28 @@
 {% block js_content %}
   <script src="{% static 'js/jquery-2.1.1.min.js' %}"></script>
   <script src="{% static 'js/scripts.min.js' %}"></script>
+  <script>
+    function upload(event) {
+      event.preventDefault();
+      var data = new FormData($('form').get(0));
+
+      $.ajax({
+          url: $(this).attr('action'),
+          type: $(this).attr('method'),
+          data: data,
+          cache: false,
+          processData: false,
+          contentType: false,
+          success: function(data) {
+              alert('success');
+          }
+      });
+      return false;
+      }
+
+      $(function() {
+          $('form').submit(upload);
+      });
+  </script>
   {% block crm_js_content %}{% endblock %}
 {% endblock %}
