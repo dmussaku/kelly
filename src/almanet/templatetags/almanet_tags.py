@@ -278,3 +278,11 @@ def connect_disconnect_button(user, service):
         'service': service,
         'connected': user.is_service_connected(service)
     }
+
+@register.simple_tag
+def crm_url(view, url='', *args, **kwargs):
+    """Like url but add 'crm' parameter to works"""
+    if url is '':
+        url = None
+    kwargs.update({'slug': 'crm'})
+    return reverse(view, args=args, kwargs=kwargs)
