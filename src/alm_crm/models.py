@@ -755,6 +755,7 @@ class Activity(SubscriptionObject):
         super(Activity, self).save(**kwargs)
 
 
+
 class Feedback(SubscriptionObject):
     STATUS_OPTIONS = (
         ('W', _('waiting')),

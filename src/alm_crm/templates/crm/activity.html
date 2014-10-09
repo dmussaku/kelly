@@ -1,3 +1,9 @@
+{% extends "crm/base.html" %}
+{% load i18n crm_tags %}
+{% block head_title %} {{ _("Activity") }} {% endblock %}
+
+{% block crm_body %}
+
 <div class="lineGroup">
   <div class="line">
     <div class="line-aside">
@@ -19,3 +25,17 @@
     </div>
   </div>
 </div>
+<div class="lineGroup">
+  <div class="line">
+    {% for comment in comments %}
+      <div class="line">
+        {{comment.comment}} - {{comment.date_created}} - {{comment.author}}
+      </div>
+    {% endfor %}
+    <form action="{% url 'activity_create' %}" method="post">{% csrf_token %}
+        {{comment_form.as_p}}
+      <input type="submit" value="Create" />
+    </form>
+  </div>
+</div>
+{% endblock %}

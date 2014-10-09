@@ -197,9 +197,13 @@ class ActivityListView(ListView):
 
 
 class ActivityDetailView(DetailView):
-    model = Activity
-    template_name = 'activity/activity_detail.html'
 
+    def get_context_data(self, **kwargs):
+        context = super(ActivityDetailView, self).get_context_data(**kwargs)
+        context['activity'] = Activity.objects.get(id=self.kwargs['pk'])
+        context['comments'] = Activity.objects.get(id=self.kwargs['pk']).comments.all()
+        context['comment_form'] = CommentForm
+        return context
 
 class ActivityUpdateView(UpdateView):
     model = Activity
