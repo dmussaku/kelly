@@ -40,14 +40,13 @@
 
     <div class="nav-aside">
       <div class="dropdown dropdown--inline dropdown--right">
-
         <a class="btn dropdown-toggle" href="#" data-toggle="dropdown" role="menu">
-          Add contact
+          Import Contacts
         </a>
         <div class="dropdown-menu">
           <div class="dropdown-triangle"></div>
           <div class="dropdown-menu-body">
-            <form action='{% subdomain_url "crm_import_vcard" subdomain={{subdomain}} args="almcrm"%}' id='file_upload_form' method="post" enctype="multipart/form-data">
+            <form action='import_vcard/' id='file_upload_form' method="post" enctype="multipart/form-data">
               {% csrf_token %}
               <p>{{ form.non_field_errors }}</p>
               <p>{{ form.myfile.label_tag }} {{ form.myfile.help_text }}</p>
@@ -55,7 +54,7 @@
                   {{ form.myfile.errors }}
                   {{ form.myfile }}
               </p>
-              <p><input type="submit" value="Upload" id='upload-btn' /></p>
+              <p><button type="submit" class="btn btn-primary" id='upload-btn'>Upload</button></p>
           </form>
           </div>
         </div>
@@ -88,6 +87,10 @@
 </nav>
 
 <div class="body-container">
+  <div id='gif-loader' style="display:none;">
+    <img src='../static/img/ajax-loader.gif' style="display: block; margin-top:40px; margin-left: auto; margin-right: auto">
+    <p style='text-align:center;'>Please wait while we upload your vcard</p>
+  </div>
   <aside class="tabs">
     {% block crm_aside_tabs %}{% endblock %}
   </aside>
@@ -101,9 +104,9 @@
   <script src="{% static 'js/scripts.min.js' %}"></script>
   <script>
     function upload(event) {
+      $('#gif-loader').show()
       event.preventDefault();
       var data = new FormData($('form').get(0));
-
       $.ajax({
           url: $(this).attr('action'),
           type: $(this).attr('method'),
@@ -112,7 +115,8 @@
           processData: false,
           contentType: false,
           success: function(data) {
-              alert('success');
+              alert('successfuly added new contacts');
+              $('#gif-loader').hide();
           }
       });
       return false;

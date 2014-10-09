@@ -16,6 +16,7 @@ class DashboardView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super(DashboardView, self).get_context_data(**kwargs)
         context['form'] = VCardUploadForm
+        context['subdomain'] = self.request.subdomain
         return context
 
 

@@ -17,7 +17,7 @@ def filename_generator(size=6, chars=string.ascii_uppercase + string.digits):
     return ''.join(random.choice(chars) for _ in range(size))
 
 
-def import_vcard(request):
+def import_vcard(request, **kwargs):
     '''
     In this view i prompt the user to upload the vcard which can have either one
     vcard or multiple vcard information. Then i split the input to data_list list
@@ -30,7 +30,7 @@ def import_vcard(request):
             for i in range(0, len(data_list)):
                 data_list[i] += 'END:VCARD'
                 Contact.upload_contacts('vcard', data_list[i], save=True)
-            return HttpResponseRedirect(reverse_lazy('vcard_list'))
+            return HttpResponseRedirect('/almcrm/')
     else:
         form = VCardUploadForm()
     return render_to_response('vcard/vcard_upload.html',
