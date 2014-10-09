@@ -7,6 +7,6 @@ def show_contact(contact):
     return {'contact': contact}
 
 
-@register.inclusion_tag('crm/_activity.html')
+@register.inclusion_tag('crm/activity.html')
 def show_activity(activity):
     return {'activity': activity}
