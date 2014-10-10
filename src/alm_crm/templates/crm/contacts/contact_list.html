@@ -42,9 +42,10 @@
 
       <div class="column-block">
         <div class="column-title">
-          Work on next ({{contacts_cold_base.count}})</div>
-
-        {% show_contact contacts_cold_base|first %}
+          Work on next ({{ contacts_cold_base.count }})</div>
+        {% if contacts_cold_base %}
+            {% show_contact contacts_cold_base|first %}
+        {% endif %}
 
         {% if contacts_cold_base.count > 1 %}
           <div class='showmore'>
