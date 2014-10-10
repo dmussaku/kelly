@@ -107,6 +107,12 @@ class Contact(SubscriptionObject):
     def __unicode__(self):
         return "%s %s" % (self.vcard, self.tp)
 
+    def save(self, **kwargs):
+        if not self.subscription_id and self.owner:
+            self.subscription_id = self.owner.subscription_id
+        super(Contact, self).save(**kwargs)
+
+
     @property
     def name(self):
         if not self.vcard:
@@ -456,6 +462,11 @@ class Value(SubscriptionObject):
     def __unicode__(self):
         return "%s %s %s" % (self.amount, self.currency, self.salary)
 
+    def save(self, **kwargs):
+        if not self.subscription_id and self.owner:
+            self.subscription_id = self.owner.subscription_id
+        super(Value, self).save(**kwargs)
+
 
 class Product(SubscriptionObject):
     name = models.CharField(_('product name'), max_length=100, blank=False)
@@ -472,6 +483,11 @@ class Product(SubscriptionObject):
 
     def __unicode__(self):
         return self.name
+
+    def save(self, **kwargs):
+        if not self.subscription_id and self.owner:
+            self.subscription_id = self.owner.subscription_id
+        super(Product, self).save(**kwargs)
 
 
 class SalesCycle(SubscriptionObject):
@@ -630,6 +646,11 @@ class SalesCycle(SubscriptionObject):
         return SalesCycle.objects.filter(contact_id=contact_id)[
             offset:offset + limit]
 
+    def save(self, **kwargs):
+        if not self.subscription_id and self.owner:
+            self.subscription_id = self.owner.subscription_id
+        super(SalesCycle, self).save(**kwargs)
+
 
 class Activity(SubscriptionObject):
     title = models.CharField(max_length=100)
@@ -737,6 +758,11 @@ class Activity(SubscriptionObject):
                 date_counts[date] = 1
         return date_counts
 
+    def save(self, **kwargs):
+        if not self.subscription_id and self.owner:
+            self.subscription_id = self.owner.subscription_id
+        super(Activity, self).save(**kwargs)
+
 
 class Feedback(SubscriptionObject):
     STATUS_OPTIONS = (
@@ -761,6 +787,8 @@ class Feedback(SubscriptionObject):
 
     def save(self, **kwargs):
         self.date_edited = timezone.now()
+        if not self.subscription_id and self.owner:
+            self.subscription_id = self.owner.subscription_id
         super(Feedback, self).save(**kwargs)
 
 
@@ -793,6 +821,11 @@ class Mention(SubscriptionObject):
         # Alibek
         return Mention.objects.filter(user_id=user_id)
 
+    def save(self, **kwargs):
+        if not self.subscription_id and self.owner:
+            self.subscription_id = self.owner.subscription_id
+        super(Mention, self).save(**kwargs)
+
 
 class Comment(SubscriptionObject):
     comment = models.CharField(max_length=140)
@@ -814,6 +847,8 @@ class Comment(SubscriptionObject):
     def save(self, **kwargs):
         if self.date_created:
             self.date_edited = timezone.now()
+        if not self.subscription_id and self.owner:
+            self.subscription_id = self.owner.subscription_id
         super(Comment, self).save(**kwargs)
 
     def add_mention(self, user_ids=None):

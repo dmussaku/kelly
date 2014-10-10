@@ -1,3 +1,4 @@
+import json
 from django.views.generic import ListView, DetailView, TemplateView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.utils import timezone
@@ -7,14 +8,17 @@ from django.http import HttpResponse
 from django.shortcuts import render
 from forms import ContactForm, SalesCycleForm, MentionForm, ActivityForm,\
     CommentForm, ValueForm, ActivityFeedbackForm
+from alm_vcard.forms import VCardUploadForm
 from models import Contact, SalesCycle, Activity, Feedback, Comment, Value
-import json
 
 
 class DashboardView(TemplateView):
 
     def get_context_data(self, **kwargs):
-        pass
+        context = super(DashboardView, self).get_context_data(**kwargs)
+        context['form'] = VCardUploadForm
+        context['subdomain'] = self.request.subdomain
+        return context
 
 
 class FeedView(TemplateView):
@@ -155,9 +159,10 @@ class SalesCycleUpdateView(UpdateView):
     success_url = reverse_lazy('sales_cycle_list')
     template_name = "sales_cycle/sales_cycle_update.html"
 
+
 class SalesCycleAddMentionView(UpdateView):
     model = SalesCycle
-    form_class = MentionForm #context_type, context_id
+    form_class = MentionForm  # context_type, context_id
     success_url = reverse_lazy('sales_cycle_list')
     template_name = "sales_cycle/sales_cycle_add_mention.html"
 

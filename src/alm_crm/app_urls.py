@@ -5,6 +5,9 @@ from .views import DashboardView, FeedView, ContactDetailView, \
     ContactListView, ContactCreateView, ContactUpdateView, ActivityCreateView
 from .models import Contact, Activity
 from .forms import ContactForm, ActivityForm
+from alm_vcard.views import import_vcard
+
+
 # from almanet.models import Subscription
 
 urlpatterns = patterns(
@@ -14,6 +17,7 @@ urlpatterns = patterns(
             # model=Subscription,
             template_name='crm/dashboard.html')),
         name='crm-dashboard'),
+    url(r'^import_vcard/$', import_vcard, name='crm_import_vcard'),
     url(r'^feed/$', crmuser_required(
         FeedView.as_view(template_name='crm/feed.html')),
         name='feed'),
