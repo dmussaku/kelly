@@ -1,7 +1,7 @@
 {% extends "crm/base.html" %}
-{% load i18n %}
+{% load i18n crm_tags %}
+{% load static from staticfiles %}
 {% block head_title %} {{ _("Contact Detail") }} {% endblock %}
-{% load crm_tags %}
 
 
 {% block crm_body %}
@@ -147,9 +147,16 @@
         <div class="line-body line-body--spaceless">
           <div class="line-body-main">
 
-            <textarea class="input-text" rows="3"
+            <textarea class="input-text2" rows="3"
               name='{{ activity_form.title.html_name }}'
-              placeholder="Log your activity..."></textarea>
+              placeholder="Log your activity..."
+              data-js-addmention='textarea'
+              {# '[{"id":1, "name":"Sattar"}, {"id":2, "name":"Daniyar"}]' #}
+              data-js-addmention-mentions="{{ mentions }}"
+              >
+              </textarea>
+            {{ activity_form.mentioned_user_ids_json.as_hidden }}
+
             {{ activity_form.description.as_hidden }}
             {{ activity_form.author.as_hidden }}
             {{ activity_form.sales_cycle.as_hidden }}
@@ -160,6 +167,7 @@
               <figure class="userpic"></figure>
               <button type="submit" class="btn">Post</button>
             </div>
+
           </div>
         </div>
       </div>
@@ -178,13 +186,34 @@
 {% endblock crm_body %}
 
 
+{% block crm_css_content %}
+<link rel="stylesheet" href="{% static 'css/jquery.mentionsInput.css' %}">
+<style>
+  .mentions-input-box {
+    font-size: 14px;
+  }
+  .mentions-input-box textarea {
+    font-size: 14px;
+    font-family: Tahoma, Verdana, Segoe, sans-serif;
+  }
+</style>
+{% endblock crm_css_content %}
+
 {% block crm_js_content %}
+<script src='{% static "js/underscore.min.js" %}'></script>
+<script src='{% static "js/jquery.elastic.js" %}'></script>
+<script src='{% static "js/jquery.mentionsInput.js" %}'></script>
 <script>
   var sc_data = (function($) {
     var sel = {
         link: '[data-js-data-id]',
         body: '[data-js-data="body"]',
         form: '[data-js-data="form"]',
+        field: {
+          mention_user_ids: '[name="mentioned_user_ids_json"]',
+          description: '[name="description"]',
+          title: '[name="title"]'
+        },
         active: '.dropdown-menu-item-link--active'
       },
       $links = $('[data-js-data="links"]'),
@@ -192,23 +221,30 @@
       reload_url = $(location).attr('href').split('?')[0],//without search
 
       submit_activity = function(event) {
-        var $form = $(event.target);
+        var $form = $(event.target),
+            submit = function(mentions) {
+              var m_user_ids = $.map(mentions, function (m) { return m.id });
 
-        $form.find('[name="description"]')
-          .val( $form.find('[name="title"]').val() );
+              $form.find(sel.field.mention_user_ids)
+                .val( JSON.stringify(m_user_ids) );
 
-        //submit
-        $.post($form.prop('action'), $form.serialize())
-          .done(function (event) {
-            $links.find(sel.active).click(); //to reload_data
-          })
-          .fail(function (event, jqxhr, settings, thrownError) {
-            console.log(event)
-            console.log(jqxhr)
-            console.log(settings)
-            console.log(thrownError)
-          });
+              $form.find(sel.field.description)
+                .val( $form.find(sel.field.title).val() );
 
+              $.post($form.prop('action'), $form.serialize())
+                .done(function (event) {
+                  $links.find(sel.active).click(); //to reload_data
+                })
+                .fail(function (event, jqxhr, settings, thrownError) {
+                  console.log(event)
+                  console.log(jqxhr)
+                  console.log(settings)
+                  console.log(thrownError)
+                });
+            };
+
+        add_mentions.get_added()
+          .done( submit );
 
         event.preventDefault();
       },
@@ -231,9 +267,43 @@
         event.preventDefault();
       },
 
+      add_mentions = {
+        o: {
+          $textarea: $('[data-js-addmention="textarea"]'),
+          mentions: $('[data-js-addmention-mentions]').data('jsAddmentionMentions')
+        },
+        get_added: function() {
+          var $def = $.Deferred();
+
+          this.o.$textarea
+            .mentionsInput('getMentions', function (data) {
+              $def.resolve( data );
+            });
+
+          return $def.promise();
+        },
+        init: function() {
+          var this_o_mentions = this.o.mentions;
+
+          this.o.$textarea
+            .mentionsInput({
+              onDataRequest:function (mode, query, callback) {
+                var data = this_o_mentions;
+
+                data = _.filter(data, function (item) { return item.name.toLowerCase().indexOf(query.toLowerCase()) > -1 });
+
+                callback.call(this, data);
+              },
+              showAvatars: false
+            });
+        }
+      },
+
       init = function() {
         $links.on('click', sel.link, reload_data);
         $(document).on('submit', sel.form, submit_activity);
+
+        add_mentions.init();
       };
 
     init();

@@ -50,9 +50,15 @@ class ContactDetailView(DetailView):
         context['sales_cycle'] = sales_cycle
         context['activity_form'] = ActivityForm(
             initial={'author': crmuser_id,
-                     'sales_cycle': sales_cycle.id})
+                     'sales_cycle': sales_cycle.id,
+                     'mentioned_user_ids_json': None})
+
         d = Activity.get_activities_by_contact(context['object'].pk).first()
         context['first_activity_date'] = d and d.date_created
+
+        mentions = [{'id': 2, 'name': 'Sattar', 'type': 'crmuser'}]
+        context['mentions'] = json.dumps(mentions)
+
         return context
 
 
