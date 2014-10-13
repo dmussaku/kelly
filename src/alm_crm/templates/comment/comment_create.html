@@ -1,9 +1,15 @@
-{% extends "user/base.html" %}
-{% load i18n %}
-{% block content %}
-	<h2>Comment Form </h2>
-	<form action="" method="post">{% csrf_token %}
-		{{form.as_p}}
-		<input type="submit" value="create"/>
-	</form>
-{% endblock %}
+<div id='comments'>
+	{% block content %}
+		{% for comment in comments %}
+		<p>{{comment.author}}</p>
+		<p>{{comment.comment}}</p>
+		<p>{{comment.date_created}}</p>
+
+		{% endfor %}	
+		<form action="" method="post">{% csrf_token %}
+			{{form.as_p}}
+			<input id='submit_button' type="submit" value="add comment"/>
+		</form>
+	{% endblock %}
+</div>
+

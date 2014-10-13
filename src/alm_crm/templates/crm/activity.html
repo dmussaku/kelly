@@ -1,3 +1,4 @@
+{% load i18n crm_tags almanet_tags %}
 <div class="lineGroup">
   <div class="line">
     <div class="line-aside">
@@ -13,9 +14,19 @@
           </a> at {{ activity.date_created }}
         </div>
       </div>
-      <div class="line-body-extra">
-        <figure class="icon">[comments]</figure>
+      <a onclick='click_event("{% subdomain_url "comments" slug="almcrm" subdomain="bwayne" content_type="activity" object_id=activity.id %}")' href="#" >
+        <div class="line-body-extra" >
+          <figure class="icon">[comments]</figure>
+        </div>
+      </a>
+      
+    </div>
+    <div class="line-body">
+      <div class="line-body-main">
+        <div id="comment-div">
+        </div>
       </div>
     </div>
   </div>
 </div>
+

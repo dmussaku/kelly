@@ -47,7 +47,7 @@
         <div class="dropdown-menu">
           <div class="dropdown-triangle"></div>
           <div class="dropdown-menu-body">
-            <form action='import_vcard/' id='file_upload_form' method="post" enctype="multipart/form-data">
+            <form action="{% subdomain_url 'crm_import_vcard' slug='almcrm' subdomain=request.subdomain %}" id='file_upload_form' method="post" enctype="multipart/form-data">
               {% csrf_token %}
               <p>{{ form.non_field_errors }}</p>
               <p>{{ form.myfile.label_tag }} {{ form.myfile.help_text }}</p>
@@ -126,6 +126,22 @@
       $(function() {
           $('form').submit(upload);
       });
+  </script>
+  <script>
+    function click_event(my_url){
+      $.ajax({
+        url:my_url,
+        dataType: 'html',
+        success: function(data){
+          $('#comment_div').show();
+          console.log($('#comment-div'));
+          $('#comment_div').html(data);
+        }
+      });
+      // console.log(myurl);
+      // $('#test_div').load(myurl);
+      return false;
+    }
   </script>
   {% block crm_js_content %}{% endblock %}
 {% endblock %}

@@ -1,7 +1,17 @@
 from django.conf.urls import patterns, url
+from .models import Comment
+from .forms import CommentForm
+from almanet.url_resolvers import reverse as almanet_reverse
 from .decorators import crmuser_required
 from alm_vcard.views import import_vcard
-from .views import DashboardView, ContactDetailView, ContactListView, FeedView, ActivityDetailView
+from .views import (
+    DashboardView, 
+    ContactDetailView, 
+    ContactListView, 
+    FeedView, 
+    ActivityDetailView,
+    CommentCreateView
+    )
 from .models import Contact, Activity
 
 # from almanet.models import Subscription
@@ -17,7 +27,12 @@ urlpatterns = patterns(
     url(r'^feed/$', crmuser_required(
         FeedView.as_view(template_name='crm/feed.html')),
         name='feed'),
-
+    url(r'^comments/(?P<content_type>[\w]+)/(?P<object_id>[\d]+)/$', 
+        crmuser_required(CommentCreateView.as_view(
+            model = Comment,
+            form_class = CommentForm,
+            template_name = 'comment/comment_create.html')),
+        name='comments'), 
     url(r'^contacts/$',
         crmuser_required(ContactListView.as_view(
             model=Contact,

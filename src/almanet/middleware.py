@@ -24,7 +24,10 @@ def set_user_env(user):
         }
     return env
 
-
+'''
+{% with subscr = request.user_env|get_current_subscription:"id"
+  subscr.
+'''
 class UserEnvMiddleware(object):
     def process_request(self, request):
         if not request.user.is_authenticated():

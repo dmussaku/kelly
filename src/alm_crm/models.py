@@ -867,7 +867,10 @@ class Comment(SubscriptionObject):
     @classmethod
     def get_comments_by_context(cls, context_object_id, context_class,
                                 limit=20, offset=0):
-        cttype = ContentType.objects.get_for_model(context_class)
+        try:
+            cttype = ContentType.objects.get(model=str(context_class))
+        except ContentType.DoesNotExist:
+            return False
         return cls.objects.filter(
             object_id=context_object_id,
             content_type=cttype)[offset:offset + limit]
