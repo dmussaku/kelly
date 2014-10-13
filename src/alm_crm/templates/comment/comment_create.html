@@ -10,9 +10,9 @@
 			</div>
 		</div>
 		{% endfor %}
-		<form action="{% subdomain_url 'comments' slug='almcrm' subdomain=request.subdomain content_type=context_type object_id=object_id %}" id='comment_submit_form' method="post" enctype="multipart/form-data">{% csrf_token %}
+		<form action="{% subdomain_url 'comments' slug='almcrm' subdomain=request.subdomain content_type=context_type object_id=object_id %}" id='comment_submit_form' activity-id="{{object.id}}" method="post" enctype="multipart/form-data">{% csrf_token %}
 			{{form.as_p}}
-			<button id='submit_button' class="btn btn-primary" type="submit" >
+			<button id='submit_button' class="btn btn-primary"  type="submit" >
 				add comment
 			</button>
 		</form>

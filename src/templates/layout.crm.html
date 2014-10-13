@@ -128,35 +128,31 @@
       });
   </script>
   <script>
-    function click_event(my_url, activity_id){
+    function click_event(my_url, activity_id, sales_cycle_id){
       console.log(my_url);
       var myurl = my_url;
-      $.ajax({
-        url:myurl,
-        dataType: 'html',
-        success: function(data){
-          var div_id = '#activity-'+activity_id+'--comments';
-          $(div_id).html('<h3>Comments</h3>'+data);
-        }
+      $.get(myurl, function(data){
+        var div_id = '#sales_cycle-'+sales_cycle_id+'--activity-'+activity_id+'--comments';
+        $(div_id).html('<h3>Comments</h3>'+data);
+        return false;
       });
       return false;
     }
+
     function add_comment(event){
       event.preventDefault();
       var data = new FormData($('form').get(0));
-      $.ajax({
-        url: this.attr('action'),
-        type: this.attr('method'),
-        data: data,
-        cache: false,
-        processData: false,
-        contentType: false,
-        success: function(data) {
-            console.log('cool');
-          }
-      });
-      return false;
+      $.post(this.attr('action'),
+        {
+          data: data
+        },
+        function(data){
+          return click_event(this.attr('action'),this.attr('activity-id'))    
+        }
+      );
     }
+
+    
     $(function() {
           $('form').submit(add_comment);
       });
