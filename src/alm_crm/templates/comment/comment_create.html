@@ -1,14 +1,20 @@
+{% load i18n crm_tags almanet_tags %}
 <div id='comments'>
 	{% block content %}
 		{% for comment in comments %}
-		<p>{{comment.author}}</p>
-		<p>{{comment.comment}}</p>
-		<p>{{comment.date_created}}</p>
-
-		{% endfor %}	
-		<form action="" method="post">{% csrf_token %}
+		<div id='{{comment.content_type}}-{{comment.object_id}}--comment-{{comment.id}}'>
+			<div class="line">
+				<p>{{comment.author}}</p>
+				<p>{{comment.comment}}</p>
+				<p>{{comment.date_created}}</p>
+			</div>
+		</div>
+		{% endfor %}
+		<form action="{% subdomain_url 'comments' slug='almcrm' subdomain=request.subdomain content_type=context_type object_id=object_id %}" id='comment_submit_form' method="post" enctype="multipart/form-data">{% csrf_token %}
 			{{form.as_p}}
-			<input id='submit_button' type="submit" value="add comment"/>
+			<button id='submit_button' class="btn btn-primary" type="submit" >
+				add comment
+			</button>
 		</form>
 	{% endblock %}
 </div>

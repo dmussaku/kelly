@@ -128,20 +128,38 @@
       });
   </script>
   <script>
-    function click_event(my_url){
+    function click_event(my_url, activity_id){
+      console.log(my_url);
+      var myurl = my_url;
       $.ajax({
-        url:my_url,
+        url:myurl,
         dataType: 'html',
         success: function(data){
-          $('#comment_div').show();
-          console.log($('#comment-div'));
-          $('#comment_div').html(data);
+          var div_id = '#activity-'+activity_id+'--comments';
+          $(div_id).html('<h3>Comments</h3>'+data);
         }
       });
-      // console.log(myurl);
-      // $('#test_div').load(myurl);
       return false;
     }
+    function add_comment(event){
+      event.preventDefault();
+      var data = new FormData($('form').get(0));
+      $.ajax({
+        url: this.attr('action'),
+        type: this.attr('method'),
+        data: data,
+        cache: false,
+        processData: false,
+        contentType: false,
+        success: function(data) {
+            console.log('cool');
+          }
+      });
+      return false;
+    }
+    $(function() {
+          $('form').submit(add_comment);
+      });
   </script>
   {% block crm_js_content %}{% endblock %}
 {% endblock %}

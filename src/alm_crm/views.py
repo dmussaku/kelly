@@ -3,6 +3,7 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.utils import timezone
 from datetime import timedelta
 from almanet.url_resolvers import reverse_lazy
+from django.contrib.contenttypes.models import ContentType
 from django.http import HttpResponse
 from django.shortcuts import render
 from forms import ContactForm, SalesCycleForm, MentionForm, ActivityForm,\
@@ -235,55 +236,26 @@ def comments_by_activity(self, activity_id):
         pass
         
 
-class AjaxableResponseMixin(object):
-    """
-    Mixin to add AJAX support to a form.
-    Must be used with an object-based FormView (e.g. CreateView)
-    """
-    def render_to_json_response(self, context, **response_kwargs):
-        data = json.dumps(context)
-        response_kwargs['content_type'] = 'application/json'
-        return HttpResponse(data, **response_kwargs)
-
-    def form_invalid(self, form):
-        response = super(AjaxableResponseMixin, self).form_invalid(form)
-        if self.request.is_ajax():
-            return self.render_to_json_response(form.errors, status=400)
-        else:
-            return response
-
-    def form_valid(self, form):
-        # We make sure to call the parent's form_valid() method because
-        # it might do some processing (in the case of CreateView, it will
-        # call form.save() for example).
-        response = super(AjaxableResponseMixin, self).form_valid(form)
-        if self.request.is_ajax():
-            data = {
-                'pk': self.object.pk,
-            }
-            return self.render_to_json_response(data)
-        else:
-            return response
-
-class CommentCreateView(AjaxableResponseMixin,CreateView):
+class CommentCreateView(CreateView):
     '''
     def get_initial(self):
        return {'author' : self.request.user}
     '''
-
     def form_valid(self, form):
-        form.instance.author = self.request.user
-        form.instance.date_edited = timezone.now()
+        form.instance.author = self.request.user.get_crmuser()
+        form.instance.content_type_id = ContentType.objects.get(model=self.kwargs['content_type']).id
+        form.instance.object_id = self.kwargs['object_id']
         return super(CommentCreateView, self).form_valid(form)
 
     def get_success_url(self, **kwargs):
         if not self.success_url:
-            return almanet_reverse('feed', subdomain=self.request.env['subdomain'], slug='almcrm')
+            return almanet_reverse('feed', subdomain=self.request.subdomain, args=['almcrm'])
         return False
-
 
     def get_context_data(self, **kwargs):
         context = super(CommentCreateView, self).get_context_data(**kwargs)
+        context['context_type'] = self.kwargs['content_type']
+        context['object_id'] = self.kwargs['object_id']
         context['comments'] = Comment().get_comments_by_context(self.kwargs['object_id'], self.kwargs['content_type'])
         return context
 
