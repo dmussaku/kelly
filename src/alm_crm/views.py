@@ -7,7 +7,8 @@ from django.http import HttpResponse
 from django.shortcuts import render
 from forms import ContactForm, SalesCycleForm, MentionForm, ActivityForm,\
     CommentForm, ValueForm, ActivityFeedbackForm
-from models import Contact, SalesCycle, Activity, Feedback, Comment, Value
+from models import Contact, SalesCycle, Activity, Feedback, Comment, Value,\
+    CRMUser
 import json
 
 
@@ -56,8 +57,12 @@ class ContactDetailView(DetailView):
         d = Activity.get_activities_by_contact(context['object'].pk).first()
         context['first_activity_date'] = d and d.date_created
 
-        mentions = [{'id': 2, 'name': 'Sattar', 'type': 'crmuser'}]
-        context['mentions'] = json.dumps(mentions)
+        def gen_mentions(crmuser):
+            return {'id': crmuser.id,
+                    'name': users.get(id=crmuser.user_id).get_full_name(),
+                    'type': 'crmuser'}
+        crmusers, users = CRMUser.get_crmusers(with_users=True)
+        context['mentions'] = json.dumps(map(gen_mentions, crmusers))
 
         return context
 
