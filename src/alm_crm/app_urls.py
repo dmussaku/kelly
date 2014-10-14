@@ -10,7 +10,8 @@ from .views import (
     ContactListView, 
     FeedView, 
     ActivityDetailView,
-    CommentCreateView
+    CommentCreateView,
+    comment_delete_view
     )
 from .models import Contact, Activity
 
@@ -33,6 +34,10 @@ urlpatterns = patterns(
             form_class = CommentForm,
             template_name = 'comment/comment_create.html')),
         name='comments'), 
+    url(r'^comments/delete/(?P<pk>[\d]+)/$',
+        crmuser_required(comment_delete_view),
+        name='comment_delete'
+        ),
     url(r'^contacts/$',
         crmuser_required(ContactListView.as_view(
             model=Contact,

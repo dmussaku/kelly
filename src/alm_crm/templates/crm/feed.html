@@ -30,6 +30,12 @@
 {% block crm_body %}
   <div class="body-column body-column--single">
     <div class="column">
+      <div class="column-block">
+        <div id="comments">
+        </div>
+      </div>
+    </div>
+    <div class="column">
       {% for sc in sales_cycles %}
         <div class="column-block">
           <div class="column-title">
@@ -47,11 +53,6 @@
       {% endfor %}
     </div>
   </div>
-  <div class="body-column body-column--single">
-    <div class="column">
-      <div id='test_div'>
-      </div>
-    </div>
-  </div>
+  
 {% endblock crm_body %}
 

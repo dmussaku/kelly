@@ -14,17 +14,14 @@
           </a> at {{ activity.date_created }}
         </div>
       </div>
-      <a id='show_comments-{{activity.id}}' onclick='click_event("{% subdomain_url "comments" slug="almcrm" subdomain="bwayne" content_type="activity" object_id=activity.id %}","{{activity.id}}")' activity-id='{{activity.id}}'>
+      <a id='show_comments-{{activity.id}}' onclick='click_event("{% subdomain_url "comments" slug="almcrm" subdomain="bwayne" content_type="activity" object_id=activity.id %}")' activity-id='{{activity.id}}'>
         <div class="line-body-extra" >
           <figure class="icon">[comments]</figure>
         </div>
       </a>
     </div>
   </div>
-  <div class="line">
-    <div id='activity-{{activity.id}}--comments'>
-    </div>
-  </div>
+  
 
 </div>
 

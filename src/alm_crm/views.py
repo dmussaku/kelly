@@ -11,7 +11,8 @@ from forms import ContactForm, SalesCycleForm, MentionForm, ActivityForm,\
 from alm_vcard.forms import VCardUploadForm
 from models import Contact, SalesCycle, Activity, Feedback, Comment, Value
 from almanet.url_resolvers import reverse as almanet_reverse
-
+from .decorators import crmuser_required
+import json as simplejson
 
 class DashboardView(TemplateView):
 
@@ -269,6 +270,14 @@ class CommentAddMentionView(CreateView):
     def post(self, request, *args, **kwargs):
         self.model.objects.get(id=self.kwargs['pk']).add_mention(list(request.POST['user_id']))
         return super(CommentAddMentionView, self).post(request, *args, **kwargs)
+
+
+def comment_delete_view(request, comment_id):
+    comment = get_object_or_404(Comment, pk=comment_id)
+    comment.delete()
+    json = simplejson.dumps({'success':True})
+    return HttpResponse(json, mimetype='application/json')
+
 
 
 class ValueListView(ListView):

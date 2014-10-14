@@ -103,6 +103,9 @@
 {% block js_content %}
   <script src="{% static 'js/jquery-2.1.1.min.js' %}"></script>
   <script src="{% static 'js/scripts.min.js' %}"></script>
+  <!-- 
+  Jquery script for vcard upload
+  -->
   <script>
     function upload(event) {
       $('#gif-loader').show()
@@ -127,18 +130,23 @@
           $('form').submit(upload);
       });
   </script>
+  <!-- 
+  Jquery Script for ajax get of comment list
+  -->
   <script>
-    function click_event(my_url, activity_id, sales_cycle_id){
+    function click_event(my_url){
       console.log(my_url);
       var myurl = my_url;
       $.get(myurl, function(data){
-        var div_id = '#sales_cycle-'+sales_cycle_id+'--activity-'+activity_id+'--comments';
+        var div_id = '#comments';
         $(div_id).html('<h3>Comments</h3>'+data);
         return false;
       });
       return false;
     }
-
+    /*
+    Script for ajax post of a comment
+    */
     function add_comment(event){
       event.preventDefault();
       var data = new FormData($('form').get(0));
@@ -147,15 +155,26 @@
           data: data
         },
         function(data){
-          return click_event(this.attr('action'),this.attr('activity-id'))    
+          return click_event(this.attr('action'), this.attr('activity-id'))    
         }
       );
     }
 
-    
     $(function() {
           $('form').submit(add_comment);
       });
+  </script>
+  <script>
+    function delete_comment(obj, id) {
+        //row = $(obj).parents(".row");
+ 
+        if (confirm('Are you sure you want to delete this comment')) {
+          //console.log($(this));
+            $.getJSON($(obj).attr('link'), function(data) {
+                    $('#comment-'+id).animate({ opacity: 'hide' }, "slow");
+            });
+        }
+    }
   </script>
   {% block crm_js_content %}{% endblock %}
 {% endblock %}
