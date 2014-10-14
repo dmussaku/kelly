@@ -106,75 +106,10 @@
   <!-- 
   Jquery script for vcard upload
   -->
-  <script>
-    function upload(event) {
-      $('#gif-loader').show()
-      event.preventDefault();
-      var data = new FormData($('form').get(0));
-      $.ajax({
-          url: $(this).attr('action'),
-          type: $(this).attr('method'),
-          data: data,
-          cache: false,
-          processData: false,
-          contentType: false,
-          success: function(data) {
-              alert('successfuly added new contacts');
-              $('#gif-loader').hide();
-          }
-      });
-      return false;
-      }
-
-      $(function() {
-          $('form').submit(upload);
-      });
-  </script>
   <!-- 
   Jquery Script for ajax get of comment list
   -->
-  <script>
-    function click_event(my_url){
-      console.log(my_url);
-      var myurl = my_url;
-      $.get(myurl, function(data){
-        var div_id = '#comments';
-        $(div_id).html('<h3>Comments</h3>'+data);
-        return false;
-      });
-      return false;
-    }
-    /*
-    Script for ajax post of a comment
-    */
-    function add_comment(event){
-      event.preventDefault();
-      var data = new FormData($('form').get(0));
-      $.post(this.attr('action'),
-        {
-          data: data
-        },
-        function(data){
-          return click_event(this.attr('action'), this.attr('activity-id'))    
-        }
-      );
-    }
-
-    $(function() {
-          $('form').submit(add_comment);
-      });
-  </script>
-  <script>
-    function delete_comment(obj, id) {
-        //row = $(obj).parents(".row");
- 
-        if (confirm('Are you sure you want to delete this comment')) {
-          //console.log($(this));
-            $.getJSON($(obj).attr('link'), function(data) {
-                    $('#comment-'+id).animate({ opacity: 'hide' }, "slow");
-            });
-        }
-    }
-  </script>
+  <script src="{% static 'js/vcard_upload.js' %}"></script>
+  <script src="{% static 'js/comments.js' %}"></script>
   {% block crm_js_content %}{% endblock %}
 {% endblock %}

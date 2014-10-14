@@ -34,10 +34,12 @@ urlpatterns = patterns(
             form_class = CommentForm,
             template_name = 'comment/comment_create.html')),
         name='comments'), 
-    url(r'^comments/delete/(?P<pk>[\d]+)/$',
-        crmuser_required(comment_delete_view),
+
+    url(r'^comments/delete/(?P<comment_id>[\d]+)/$',
+        comment_delete_view,
         name='comment_delete'
         ),
+    
     url(r'^contacts/$',
         crmuser_required(ContactListView.as_view(
             model=Contact,

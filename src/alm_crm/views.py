@@ -12,7 +12,7 @@ from alm_vcard.forms import VCardUploadForm
 from models import Contact, SalesCycle, Activity, Feedback, Comment, Value
 from almanet.url_resolvers import reverse as almanet_reverse
 from .decorators import crmuser_required
-import json as simplejson
+import json
 
 class DashboardView(TemplateView):
 
@@ -63,6 +63,57 @@ class ContactListView(ListView):
         return context
 
 
+class CommentCreateView(CreateView):
+    '''
+    def get_initial(self):
+       return {'author' : self.request.user}
+    '''
+
+    def form_valid(self, form):
+        form.instance.author = self.request.user.get_crmuser()
+        form.instance.content_type_id = ContentType.objects.get(model=self.kwargs['content_type']).id
+        form.instance.object_id = self.kwargs['object_id']
+        try:
+            comment = form.save()
+            data=json.dumps(
+                {'author':comment.author.id,
+                'name':comment.author.get_billing_user().get_full_name(), 
+                'date_created':comment.date_created.strftime('%Y-%m-%dT%H:%M:%S'), 
+                'object_id':comment.object_id,
+                'id':comment.id,
+                'comment':comment.comment
+                })
+            print data
+            return HttpResponse(data, content_type="application/json")
+        except:
+            return super(CommentCreateView, self).form_valid(form)
+
+    def get_success_url(self, **kwargs):
+        if not self.success_url:
+            return almanet_reverse('feed', subdomain=self.request.subdomain, args=['almcrm'])
+        return False
+
+    def get_context_data(self, **kwargs):
+        context = super(CommentCreateView, self).get_context_data(**kwargs)
+        context['context_type'] = self.kwargs['content_type']
+        context['object_id'] = self.kwargs['object_id']
+        context['comments'] = Comment().get_comments_by_context(self.kwargs['object_id'], self.kwargs['content_type'])
+        return context
+
+
+
+def comment_delete_view(request, comment_id):
+    if request.method == 'GET':
+        try:
+            comment = Comment.objects.get(id=comment_id)  
+            print comment  
+            json_response = json.dumps({'success':'True', 'id':comment.id})
+            print json_response
+            comment.delete()
+            return HttpResponse(json_response, mimetype='application/json')
+        except:
+            return HttpResponse(json.dumps({'success':'False'}), mimetype='application/json')
+
 # class DashBoardTemplateView(TemplateView):
 #     template_name = 'crm/dashboard.html'
 
@@ -71,6 +122,17 @@ class ContactListView(ListView):
 #         context = super(DashBoardTemplateView, self).get_context_data(**kwargs)
 #         context['contacts'] = Contact.objects.all()[:10]
 #         return context
+
+
+class CommentAddMentionView(CreateView):
+    model = Comment
+    form_class = MentionForm #context_type, context_id
+    success_url = reverse_lazy('comment_list')
+    template_name = "comment/comment_add_mention.html"
+
+    def post(self, request, *args, **kwargs):
+        self.model.objects.get(id=self.kwargs['pk']).add_mention(list(request.POST['user_id']))
+        return super(CommentAddMentionView, self).post(request, *args, **kwargs)
 
 
 class UserProductView(ListView):
@@ -237,46 +299,9 @@ def comments_by_activity(self, activity_id):
         pass
         
 
-class CommentCreateView(CreateView):
-    '''
-    def get_initial(self):
-       return {'author' : self.request.user}
-    '''
-    def form_valid(self, form):
-        form.instance.author = self.request.user.get_crmuser()
-        form.instance.content_type_id = ContentType.objects.get(model=self.kwargs['content_type']).id
-        form.instance.object_id = self.kwargs['object_id']
-        return super(CommentCreateView, self).form_valid(form)
-
-    def get_success_url(self, **kwargs):
-        if not self.success_url:
-            return almanet_reverse('feed', subdomain=self.request.subdomain, args=['almcrm'])
-        return False
-
-    def get_context_data(self, **kwargs):
-        context = super(CommentCreateView, self).get_context_data(**kwargs)
-        context['context_type'] = self.kwargs['content_type']
-        context['object_id'] = self.kwargs['object_id']
-        context['comments'] = Comment().get_comments_by_context(self.kwargs['object_id'], self.kwargs['content_type'])
-        return context
 
 
-class CommentAddMentionView(CreateView):
-    model = Comment
-    form_class = MentionForm #context_type, context_id
-    success_url = reverse_lazy('comment_list')
-    template_name = "comment/comment_add_mention.html"
 
-    def post(self, request, *args, **kwargs):
-        self.model.objects.get(id=self.kwargs['pk']).add_mention(list(request.POST['user_id']))
-        return super(CommentAddMentionView, self).post(request, *args, **kwargs)
-
-
-def comment_delete_view(request, comment_id):
-    comment = get_object_or_404(Comment, pk=comment_id)
-    comment.delete()
-    json = simplejson.dumps({'success':True})
-    return HttpResponse(json, mimetype='application/json')
 
 
 
