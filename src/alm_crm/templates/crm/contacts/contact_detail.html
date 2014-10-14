@@ -118,12 +118,32 @@
   </div><div class="column-header-b">
     <div class="dropdown">
       <button type="button" data-toggle="dropdown">Thread codename (dropdown wants to be here)</button>
-      <div class="dropdown-menu dropdown-menu--cycles">
+      <div class="dropdown-menu dropdown-menu--cycles"
+        data-js-create-salescycle='dropdown-menu'>
         <div class="dropdown-triangle"></div>
         <div class="dropdown-menu-body">
           <ul class="dropdown-menu-list">
+
             <li class="dropdown-menu-item dropdown-menu-item--newCycle">
               <a class="dropdown-menu-item-link" href="#">Create a new cycle</a>
+
+
+              <form action="{% crm_url 'sales_cycle_create' %}" method="POST"
+                data-js-create-salescycle='form'> {% csrf_token %}
+
+                {{ sales_cycle_form.title.label }}
+                {{ sales_cycle_form.title }}
+
+                {{ sales_cycle_form.products.as_hidden }}
+                {{ sales_cycle_form.owner.as_hidden }}
+                {{ sales_cycle_form.contact.as_hidden }}
+                {{ sales_cycle_form.projected_value.as_hidden }}
+                {{ sales_cycle_form.real_value.as_hidden }}
+
+                <button type="submit" class="btn">Create</button>
+              </form>
+
+
             </li>
 
             {% for sc in object.sales_cycles.all %}
@@ -151,9 +171,16 @@
       </div>
     </div>
   </div><div class="column-header-c">
-    <a href="#"><figure class="userpic"></figure></a>
-    <a href="#"><figure class="userpic"></figure></a>
-    <a href="#"><figure class="userpic"></figure></a>
+    <a href="#" class="link-user"><figure class="userpic">
+      <img src="{% static 'img/example/userpic1.png' %}" alt="" />
+    </figure></a>
+    <a href="#" class="link-user"><figure class="userpic">
+      <img src="{% static 'img/example/userpic2.png' %}" alt="" />
+    </figure></a>
+    <a href="#" class="link-user"><figure class="userpic">
+      <img src="{% static 'img/example/userpic3.png' %}" alt="" />
+    </figure></a>
+    <a href="#" class="link-user">&hellip; 3 more</a>
   </div>
 </div>
 
@@ -221,6 +248,17 @@
 {% endblock crm_body %}
 
 
+
+{% block crm_footer %}
+
+<div class="help">
+  Help about sales cycles (threads)
+</div>
+
+{% endblock crm_footer %}
+
+
+
 {% block crm_css_content %}
 <link rel="stylesheet" href="{% static 'css/jquery.mentionsInput.css' %}">
 <style>
@@ -234,10 +272,12 @@
 </style>
 {% endblock crm_css_content %}
 
+
 {% block crm_js_content %}
 <script src='{% static "js/underscore.min.js" %}'></script>
 <script src='{% static "js/jquery.elastic.js" %}'></script>
 <script src='{% static "js/jquery.mentionsInput.js" %}'></script>
+{# Sattar's code #}
 <script>
   var sc_data = (function($) {
     var sel = {
@@ -254,6 +294,7 @@
       $links = $('[data-js-data="links"]'),
       $container = $('[data-js-data="container"]'),
       reload_url = $(location).attr('href').split('?')[0],//without search
+
 
       submit_activity = function(event) {
         var $form = $(event.target),
@@ -334,14 +375,57 @@
         }
       },
 
+      create_sales_cycle = {
+        sel: {
+          form: '[data-js-create-salescycle="form"]',
+          dropdown_menu: '[data-js-create-salescycle="dropdown-menu"]',
+        },
+        reload_page: function(response_data) {
+          var sel_dropdown_menu = this.sel.dropdown_menu;
+
+          console.log(this);
+
+          $.get(reload_url, {'sales_cycle_id': response_data.pk})
+            .done(function (data) {
+              $(document)
+                .find(sel.body)
+                  .replaceWith( $(data).find(sel.body) )
+                  .end()
+                .find(sel_dropdown_menu)
+                  .replaceWith( $(data).find(sel_dropdown_menu) )
+                  .end()
+            });
+        },
+        submit: function(event) {
+          var $form = $(event.target);
+
+          $.post($form.prop('action'), $form.serialize())
+            .done( $.proxy(this.reload_page, this) )
+            .fail(function (event, jqxhr, settings, thrownError) {
+              console.log(event)
+              console.log(jqxhr)
+              console.log(settings)
+              console.log(thrownError)
+            });
+
+          event.preventDefault();
+        },
+        init: function(event) {
+          $(document).on('submit', this.sel.form, $.proxy(this.submit, this));
+        }
+      },
+
       init = function() {
         $links.on('click', sel.link, reload_data);
         $(document).on('submit', sel.form, submit_activity);
 
         add_mentions.init();
+        create_sales_cycle.init();
       };
 
     init();
   })(jQuery);
 </script>
+
+
 {% endblock crm_js_content %}

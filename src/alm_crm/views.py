@@ -40,29 +40,38 @@ class ContactDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super(ContactDetailView, self).get_context_data(**kwargs)
 
-        crmuser_id = self.request.user.get_crmuser().id
+        current_crmuser = self.request.user.get_crmuser()
 
+        # show sales_cycle
         sales_cycle_id = self.request.GET.get('sales_cycle_id', False)
         if sales_cycle_id:
             sales_cycle = context['object'].sales_cycles.get(id=sales_cycle_id)
         else:
             sales_cycle = context['object'].sales_cycles.last()
-
         context['sales_cycle'] = sales_cycle
-        context['activity_form'] = ActivityForm(
-            initial={'author': crmuser_id,
-                     'sales_cycle': sales_cycle.id,
-                     'mentioned_user_ids_json': None})
 
+        # date when first activity was added to the sales_cycle
         d = Activity.get_activities_by_contact(context['object'].pk).first()
         context['first_activity_date'] = d and d.date_created
 
+        # add new activity
+        context['activity_form'] = ActivityForm(
+            initial={'author': current_crmuser.id,
+                     'sales_cycle': sales_cycle.id,
+                     'mentioned_user_ids_json': None})
+
+        # add mentions to new activity
         def gen_mentions(crmuser):
             return {'id': crmuser.id,
                     'name': users.get(id=crmuser.user_id).get_username(),
                     'type': 'crmuser'}
         crmusers, users = CRMUser.get_crmusers(with_users=True)
         context['mentions'] = json.dumps(map(gen_mentions, crmusers))
+
+        # create new sales_cycle
+        context['sales_cycle_form'] = SalesCycleForm(
+            initial={'owner': current_crmuser,
+                     'contact': context['object']})
 
         return context
 
@@ -130,7 +139,8 @@ class ContactDeleteView(DeleteView):
     template_name = 'contact/contact_delete.html'
 
 
-def contact_export(request, pk, format="html", locale='ru_RU', *args, **kwargs):
+def contact_export(request, pk, format="html", locale='ru_RU',
+                   *args, **kwargs):
     c = Contact.objects.get(pk=pk)
     exported_vcard = c.export_to(format, locale=locale)
     if format == 'vcf':
@@ -155,9 +165,16 @@ class SalesCycleListView(ListView):
 
 
 class SalesCycleCreateView(CreateView):
-    form_class = SalesCycleForm
-    template_name = "sales_cycle/sales_cycle_create.html"
-    success_url = reverse_lazy('sales_cycle_list')
+
+    def form_valid(self, form):
+        response = super(self.__class__, self).form_valid(form)
+        if self.request.is_ajax():
+            data = {
+                'pk': self.object.pk,
+            }
+            return HttpResponse(json.dumps(data), mimetype="application/json")
+        else:
+            return response
 
 
 class SalesCycleUpdateView(UpdateView):
@@ -165,6 +182,7 @@ class SalesCycleUpdateView(UpdateView):
     form_class = SalesCycleForm
     success_url = reverse_lazy('sales_cycle_list')
     template_name = "sales_cycle/sales_cycle_update.html"
+
 
 class SalesCycleAddMentionView(UpdateView):
     model = SalesCycle

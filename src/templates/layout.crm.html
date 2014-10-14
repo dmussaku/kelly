@@ -81,12 +81,19 @@
   </div>
 </nav>
 
+
 <div class="body-container">
   <aside class="tabs">
     {% block crm_aside_tabs %}{% endblock %}
   </aside>
   {% block crm_body %}{% endblock %}
 </div>
+
+<div class="body-footer">
+  {% block crm_footer %}{% endblock %}
+</div>
+
+
 {% endblock %}
 
 

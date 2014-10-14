@@ -497,8 +497,9 @@ class SalesCycle(SubscriptionObject):
         ('C', 'Completed'),
         ('N', 'New'),
     )
-    products = models.ManyToManyField(Product,
-                                      related_name='sales_cycles')
+    title = models.CharField(max_length=100)
+    products = models.ManyToManyField(Product, related_name='sales_cycles',
+                                      null=True, blank=True)
     owner = models.ForeignKey(CRMUser, related_name='owned_sales_cycles')
     followers = models.ManyToManyField(
         CRMUser, related_name='follow_sales_cycles',
@@ -510,7 +511,7 @@ class SalesCycle(SubscriptionObject):
                                            blank=True, null=True,
                                            on_delete=models.SET_NULL)
     projected_value = models.OneToOneField(
-        Value, related_name='_unused_1_sales_cycle', null=True)
+        Value, related_name='_unused_1_sales_cycle', null=True, blank=True,)
     real_value = models.OneToOneField(
         Value, related_name='_unused_2_sales_cycle',
         null=True, blank=True,)
@@ -530,7 +531,7 @@ class SalesCycle(SubscriptionObject):
         return self.rel_activities.order_by('-date_created').first()
 
     def __unicode__(self):
-        return '%s %s' % (self.contact, self.status)
+        return '%s [%s %s]' % (self.title, self.contact, self.status)
 
     # Adds mentions to a current class, takes a lsit of user_ids as an input
     # and then runs through the list and calls the function build_new which
