@@ -59,7 +59,7 @@ class ContactDetailView(DetailView):
 
         def gen_mentions(crmuser):
             return {'id': crmuser.id,
-                    'name': users.get(id=crmuser.user_id).get_full_name(),
+                    'name': users.get(id=crmuser.user_id).get_username(),
                     'type': 'crmuser'}
         crmusers, users = CRMUser.get_crmusers(with_users=True)
         context['mentions'] = json.dumps(map(gen_mentions, crmusers))
