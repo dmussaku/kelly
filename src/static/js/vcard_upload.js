@@ -10,7 +10,7 @@ function upload(event) {
           processData: false,
           contentType: false,
           success: function(data) {
-              alert('successfuly added new contacts');
+              alert('successfuly added'+data.length+' new contacts');
               $('#gif-loader').hide();
           }
       });

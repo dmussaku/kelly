@@ -30,6 +30,7 @@ class FeedView(TemplateView):
         user_id = self.request.user.id
         sales_cycles_data = SalesCycle.get_salescycles_by_last_activity_date(
             user_id, owned=True, mentioned=True, followed=True)
+        context['form'] = VCardUploadForm
         context['sales_cycles'] = sales_cycles_data[0]
         context['sales_cycle_activities'] = sales_cycles_data[1]
         context['sales_cycle_activity_map'] = sales_cycles_data[2]
@@ -45,6 +46,7 @@ class ContactDetailView(DetailView):
     def get_context_data(self, **kwargs):
         contact_pk = self.kwargs.get(self.pk_url_kwarg)
         context = super(ContactDetailView, self).get_context_data(**kwargs)
+        context['form'] = VCardUploadForm
         context['activities'] = Activity.get_activities_by_contact(contact_pk)
         return context
 

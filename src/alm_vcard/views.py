@@ -12,6 +12,7 @@ from django.template import RequestContext
 from django.shortcuts import render_to_response, render
 from django.core.files.temp import NamedTemporaryFile
 from django.core.servers.basehttp import FileWrapper
+import json
 
 
 def filename_generator(size=6, chars=string.ascii_uppercase + string.digits):
@@ -31,8 +32,10 @@ def import_vcard(request, **kwargs):
             contact_ids=[]
             for i in range(0, len(data_list)):
                 data_list[i] += 'END:VCARD'
-                contact_ids.append(Contact.upload_contacts('vcard', data_list[i], save=True).id)
-            return HttpResponseRedirect('/almcrm/')
+                c = Contact.upload_contacts('vcard', data_list[i], save=True)
+                contact_ids.append({'contact_id':c.id, 'name':c.name})
+                #contact_ids.append(Contact.upload_contacts('vcard', data_list[i], save=True).id)
+            return HttpResponse(json.dumps(contact_ids), content_type='application/json')
     else:
         form = VCardUploadForm()
     return render_to_response('vcard/vcard_upload.html',
