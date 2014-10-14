@@ -59,14 +59,45 @@
 
         </div>
         <div class="line">
-          <div class="line-aside"></div>
+          <div class="line-aside">
+            <a class="lineOfLinks-link lineOfLinks-link--showmore" href="#" data-toggle="showmore" data-text="Show less">
+              Show more
+            </a>
+          </div>
           <div class="line-body lineOfLinks">
-            <a class="lineOfLinks-link" href="#"
-              data-toggle='showmore'
-              data-text='Show less'> Show more </a>
-            <a class="lineOfLinks-link"
-              href="{% crm_url 'contact_update' pk=object.pk %}"> Edit </a>
-            <a class="lineOfLinks-link" href="#"> Share </a>
+
+            <a class="lineOfLinks-link" href="#"> Edit
+            </a>
+
+            <div class="dropdown dropdown--inline">
+              <a href="#" class="lineOfLinks-link" data-toggle="dropdown">Share</a>
+              <div class="dropdown-menu dropdown-menu--share">
+                <div class="dropdown-menu-body">
+                  <ul class="dropdown-menu-list">
+
+                    <li class="dropdown-menu-item">
+                      <a href="#" class="dropdown-menu-item-link">
+                        <figure class="userpic">
+                          <img src="{% static 'img/example/userpic6.png' %}" alt="" />
+                        </figure>
+                        Ren (you)
+                      </a>
+                    </li>
+
+                    <li class="dropdown-menu-item">
+                      <a href="#" class="dropdown-menu-item-link">
+                        <figure class="userpic">
+                          <img src="{% static 'img/example/userpic2.png' %}" alt="" />
+                        </figure>
+                        Crimson Doll
+                      </a>
+                    </li>
+
+                  </ul>
+                </div>
+              </div>
+            </div>
+
           </div>
         </div>
       </div>
@@ -78,8 +109,10 @@
 <div class="column-header">
   <div class="column-header-a">
     <a href="#">
-      <figure class="userpic"></figure>
-      {{ object.owner.get_billing_user }}
+      <figure class="userpic">
+        <img src="{% static 'img/example/userpic6.png' %}" alt="" />
+      </figure>
+      {{ object.owner.get_billing_user.get_short_name }}
     </a>
     started at {{ first_activity_date|date:'F j, H:i' }}
   </div><div class="column-header-b">
@@ -99,7 +132,9 @@
                 <a class="dropdown-menu-item-link {% if sc == sales_cycle %} dropdown-menu-item-link--active {% endif %}" href="#"
                   data-js-data-id='{{ sc.id }}'>
                   <div class="column-header-a">
-                    <figure class="userpic"></figure>
+                    <figure class="userpic">
+                      <img src="{% static 'img/example/userpic6.png' %}" alt="" />
+                    </figure>
                     {{ sc.owner }}
                   </div><div class="column-header-b">
                     {{ sc }}
@@ -142,7 +177,7 @@
       </div>
       <div class="line line--borderless">
         <div class="line-aside line-aside--statusForm">
-          <figure class="icon">[status switcher]</figure>
+          <figure class="icon">[s]</figure>
         </div>
         <div class="line-body line-body--spaceless">
           <div class="line-body-main">
