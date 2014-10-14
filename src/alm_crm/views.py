@@ -100,9 +100,7 @@ class CommentCreateView(CreateView):
         context['comments'] = Comment().get_comments_by_context(self.kwargs['object_id'], self.kwargs['content_type'])
         return context
 
-
-
-def comment_delete_view(request, comment_id):
+def comment_delete_view(request, slug, comment_id):
     if request.method == 'GET':
         try:
             comment = Comment.objects.get(id=comment_id)  

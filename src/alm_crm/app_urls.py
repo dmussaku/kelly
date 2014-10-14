@@ -28,6 +28,12 @@ urlpatterns = patterns(
     url(r'^feed/$', crmuser_required(
         FeedView.as_view(template_name='crm/feed.html')),
         name='feed'),
+
+    url(r'^comments/delete/(?P<comment_id>[\d]+)/$',
+        crmuser_required(comment_delete_view),
+        name='comment_delete'
+        ),
+
     url(r'^comments/(?P<content_type>[\w]+)/(?P<object_id>[\d]+)/$', 
         crmuser_required(CommentCreateView.as_view(
             model = Comment,
@@ -35,11 +41,8 @@ urlpatterns = patterns(
             template_name = 'comment/comment_create.html')),
         name='comments'), 
 
-    url(r'^comments/delete/(?P<comment_id>[\d]+)/$',
-        comment_delete_view,
-        name='comment_delete'
-        ),
     
+
     url(r'^contacts/$',
         crmuser_required(ContactListView.as_view(
             model=Contact,
