@@ -34,30 +34,26 @@ urlpatterns = patterns(
         crmuser_required(ContactCreateView.as_view(
             model=Contact,
             form_class=ContactForm,
-            template_name="contact/contact_create.html",
-            success_url=reverse_lazy('contacts_list'))),
+            template_name="contact/contact_create.html")),
         name='contact_create'),
     url(r'^contacts/update/(?P<pk>\d+)/$',
         crmuser_required(ContactUpdateView.as_view(
             model=Contact,
-            form_clas=ContactForm,
-            template_name="contact/contact_update.html",
-            success_url=reverse_lazy('contact_list'))),
+            form_class=ContactForm,
+            template_name="contact/contact_update.html")),
         name='contact_update'),
 
     url(r'^activities/create/$',
         crmuser_required(ActivityCreateView.as_view(
             model=Activity,
             form_class=ActivityForm,
-            template_name='activity/activity_create.html',
-            success_url=reverse_lazy('activity_list'))),
+            template_name='activity/activity_create.html')),
         name='activity_create'),
 
     url(r'^sales_cycles/create/$',
         crmuser_required(SalesCycleCreateView.as_view(
             form_class=SalesCycleForm,
-            template_name='sales_cycle/sales_cycle_create.html',
-            success_url=reverse_lazy('sales_cycle_list'))),
+            template_name='sales_cycle/sales_cycle_create.html')),
         name='sales_cycle_create'),
 
     url(r'^share/create/$',

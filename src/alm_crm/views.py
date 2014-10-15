@@ -146,17 +146,23 @@ class ContactCreateView(CreateView):
     def form_valid(self, form):
         return super(ContactCreateView, self).form_valid(form)
 
+    def get_success_url(self):
+        return reverse_lazy('contacts_list',
+                            subdomain=self.request.user_env['subdomain'],
+                            kwargs={'slug': 'crm'})
+
 
 class ContactUpdateView(UpdateView):
-    model = Contact
-    form_clas = ContactForm
-    success_url = reverse_lazy('contact_list')
-    template_name = "contact/contact_update.html"
+
+    def get_success_url(self):
+        return reverse_lazy('contact_list',
+                            subdomain=self.request.user_env['subdomain'],
+                            kwargs={'slug': 'crm'})
 
 
 class ContactAddMentionView(UpdateView):
     model = Contact
-    form_class = MentionForm #context_type, context_id
+    form_class = MentionForm  # context_type, context_id
     success_url = reverse_lazy('contact_list')
     template_name = "contact/contact_add_mention.html"
 
@@ -194,6 +200,11 @@ class SalesCycleListView(ListView):
         context = super(SalesCycleListView, self).get_context_data(**kwargs)
         context['form'] = MentionForm
         return context
+
+    def get_success_url(self):
+        return reverse_lazy('sales_cycle_list',
+                            subdomain=self.request.user_env['subdomain'],
+                            kwargs={'slug': 'crm'})
 
 
 class SalesCycleCreateView(CreateView):
@@ -255,6 +266,11 @@ class ActivityCreateView(CreateView):
             return HttpResponse(json.dumps(data), mimetype="application/json")
         else:
             return response
+
+    def get_success_url(self):
+        return reverse_lazy('activity_list',
+                            subdomain=self.request.user_env['subdomain'],
+                            kwargs={'slug': 'crm'})
 
 
 class ActivityListView(ListView):
