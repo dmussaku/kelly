@@ -8,9 +8,11 @@ def show_contact(contact):
     return {'contact': contact}
 
 
-@register.inclusion_tag('crm/_activity.html')
-def show_activity(activity):
-    return {'activity': activity}
+@register.inclusion_tag('crm/activity.html')
+def show_activity(activity, **kwargs):
+    kwargs.update({'activity': activity})
+    print kwargs
+    return kwargs
 
 
 @register.simple_tag

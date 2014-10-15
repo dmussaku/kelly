@@ -270,6 +270,7 @@ def subdomain_url(view, subdomain='', *args, **kwargs):
     return reverse(view, subdomain=subdomain, args=args, kwargs=kwargs)
 
 
+
 @register.inclusion_tag('almanet/tags/con_discon_button.html')
 def connect_disconnect_button(user, service):
     """ Show connect or disconnect links according to user - service relation """
@@ -279,10 +280,3 @@ def connect_disconnect_button(user, service):
         'connected': user.is_service_connected(service)
     }
 
-@register.simple_tag
-def crm_url(view, url='', *args, **kwargs):
-    """Like url but add 'crm' parameter to works"""
-    if url is '':
-        url = None
-    kwargs.update({'slug': 'crm'})
-    return reverse(view, args=args, kwargs=kwargs)

@@ -49,7 +49,6 @@ class Subscription(models.Model):
 
     def get_home_url(self):
         url_key = '{}_home'.format(settings.DEFAULT_SERVICE)
-        print self.service.slug
         return almanet_reverse(
             url_key,
             subdomain=self.organization.subdomain,

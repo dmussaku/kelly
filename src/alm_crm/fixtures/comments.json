@@ -8,9 +8,8 @@
 			"author":1, 
 			"date_created":"2014-09-10 00:00:00", 
 			"date_edited":"2014-09-10 00:00:00", 
-			"object_id":"", 
-			"content_type":"", 
-			"content_object":"" 
+			"object_id":1, 
+			"content_type":33 
         }
     },
     {
@@ -21,9 +20,8 @@
 			"author":1, 
 			"date_created":"2014-09-10 00:00:00", 
 			"date_edited":"2014-09-10 00:00:00", 
-			"object_id":"", 
-			"content_type":"", 
-			"content_object":"" 
+			"object_id":1, 
+			"content_type":33 
         }
     },
     {
@@ -34,9 +32,8 @@
 			"author":1, 
 			"date_created":"2014-09-10 00:00:00", 
 			"date_edited":"2014-09-10 00:00:00", 
-			"object_id":"", 
-			"content_type":"", 
-			"content_object":"" 
+			"object_id":1, 
+			"content_type":33 
         }
     },
     {
@@ -47,9 +44,8 @@
 			"author":1, 
 			"date_created":"2014-09-10 00:00:00", 
 			"date_edited":"2014-09-10 00:00:00", 
-			"object_id":"", 
-			"content_type":"", 
-			"content_object":"" 
+			"object_id":1, 
+			"content_type":33 
         }
     }
 ]
