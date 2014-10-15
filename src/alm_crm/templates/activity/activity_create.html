@@ -1,8 +1,8 @@
 {% extends "user/base.html" %}
-{% load i18n %}
+{% load i18n crm_tags %}
 {% block head_title %} {{ _("Activity Feedback List Page") }} {% endblock %}
 {% block content %}
-<form action="{% url 'activity_create' %}" method="post">{% csrf_token %}
+<form action="{% crm_url 'activity_create' %}" method="post">{% csrf_token %}
 	{{ form.as_p }}
 	<input type="submit" value="Create" />
 </form>

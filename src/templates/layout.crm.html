@@ -1,11 +1,12 @@
 {% extends 'layout.base.html' %}
 {% load static from staticfiles %}
-{% load i18n almanet_tags %}
+{% load i18n almanet_tags crm_tags %}
 
 {% block css %}
 <link rel="shortcut icon" type="image/ico" href="{% static 'img/favicon.ico' %}" />
 <link rel="stylesheet" href="{% static 'css/autocomplete.css' %}">
 <link rel="stylesheet" href="{% static 'css/app.css' %}">
+{% block crm_css_content %}{% endblock %}
 <style>
   #scrollable-dropdown-menu .tt-dropdown-menu {
     max-height: 500px;
@@ -42,11 +43,12 @@
 
 <nav class="body-header nav">
   <div class="lineOfLinks">
-  <a class="lineOfLinks-link nav-link" href="{% subdomain_url 'crm-dashboard' slug='almcrm' subdomain=request.subdomain %}"> {{ _('dashboard') }} </a>
-    <a class="lineOfLinks-link nav-link" href="{% subdomain_url 'contacts_list' slug='almcrm' subdomain=request.subdomain %}"> {{ _('contacts') }} </a>
-    <a class="lineOfLinks-link nav-link" href="{% subdomain_url 'feed' slug='almcrm' subdomain=request.subdomain %}"> {{ _('feed') }} </a>
-    
-    
+  <a class="lineOfLinks-link nav-link" href="{% subdomain_url 'crm_home' slug=DEFAULT_SERVICE subdomain=request.user_env.subdomain %}"> {{ _('dashboard') }} </a>
+    <a class="lineOfLinks-link nav-link" href="{% subdomain_url 'contacts_list' slug=DEFAULT_SERVICE subdomain=request.user_env.subdomain %}"> {{ _('contacts') }} </a>
+    <a class="lineOfLinks-link nav-link" href="{% subdomain_url 'feed' slug=DEFAULT_SERVICE subdomain=request.user_env.subdomain %}"> {{ _('feed') }} </a>
+    <div id="scrollable-dropdown-menu" style='float:right;'>
+      <input class="typeahead" type="text" placeholder="Search Contacts" >
+    </div>
 
     <div class="nav-aside">
       <div class="dropdown dropdown--inline dropdown--right">
@@ -72,20 +74,21 @@
       <div class="dropdown dropdown--inline dropdown--right">
         <a class="dropdown-toggle nav-aside-username" href="#" data-toggle="dropdown" role="menu">
           <figure class="userpic"></figure>
-          {{user}}
+          {{ request.user }}
         </a>
         <div class="dropdown-menu">
           <div class="dropdown-triangle"></div>
           <div class="dropdown-menu-body">
             <ul class="dropdown-menu-list">
               <li class="dropdown-menu-item">
-                <a class="dropdown-menu-item-link" href="#">Profile</a>
+                <a class="dropdown-menu-item-link" href="{% subdomain_url 'user_profile_url' subdomain=MY_SD %}">Profile</a>
               </li>
               <li class="dropdown-menu-item">
                 <a class="dropdown-menu-item-link" href="#">Administration</a>
               </li>
               <li class="dropdown-menu-item">
-                <a class="dropdown-menu-item-link" href="#">Exit</a>
+                <a class="dropdown-menu-item-link"
+                  href="{% subdomain_url 'user_logout' subdomain=None %}">Exit</a>
               </li>
             </ul>
           </div>
@@ -95,6 +98,7 @@
 
   </div>
 </nav>
+
 
 <div class="body-container">
   <div id='gif-loader' style="display:none;">
@@ -106,6 +110,12 @@
   </aside>
   {% block crm_body %}{% endblock %}
 </div>
+
+<div class="body-footer">
+  {% block crm_footer %}{% endblock %}
+</div>
+
+
 {% endblock %}
 
 
@@ -115,11 +125,11 @@
   <script src="http://twitter.github.io/typeahead.js/releases/latest/bloodhound.js"></script>
   <script src="http://twitter.github.io/typeahead.js/releases/latest/typeahead.jquery.js"></script>
   <script src="https://twitter.github.io/typeahead.js/releases/latest/typeahead.bundle.js"></script>
-  
-  <!-- 
+
+  <!--
   Jquery script for vcard upload
   -->
-  <!-- 
+  <!--
   Jquery Script for ajax get of comment list
   -->
   <script src="{% static 'js/vcard_upload.js' %}"></script>

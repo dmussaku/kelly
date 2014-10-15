@@ -17,6 +17,7 @@ $(document).ready(function(){
     name: 'states',
     displayKey: 'name',
     source: function(query, process){
+      var url = $(this.$el).closest('div.js-search-block').data('url');
       return $.ajax({
         type:'GET',
         url:'http://bwayne.alma.net:8000/almcrm/contacts/search/'+query+'/',

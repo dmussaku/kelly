@@ -45,7 +45,7 @@
           </div>
 
           {% for sc_activity in sales_cycle_activities %}
-            {% show_activity sc_activity %}
+            {% show_activity sc_activity request=request DEFAULT_SERVICE=DEFAULT_SERVICE %}
           {% endfor %}
 
           <div class="column-block-footer"></div>
@@ -53,6 +53,15 @@
       {% endfor %}
     </div>
   </div>
-  
+
 {% endblock crm_body %}
 
+
+{% block js_content %}
+{{ block.super }}
+<script type="text/javascript">
+  $(function() {
+    $('.js-show-comments-link').click($.comments.click_event);
+  });
+</script>
+{% endblock %}

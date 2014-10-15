@@ -61,8 +61,6 @@ urlpatterns = patterns(
             template_name = "contact/contact_list_excerpt.html",
         ), name='contact_list_by_date_created_excerpt'
     ),
-    url(r'^contacts/create/$', ContactCreateView.as_view(), name='contact_create'),
-    url(r'^contacts/update/(?P<pk>\d+)/$', ContactUpdateView.as_view(), name='contact_update'),
     url(r'^vcard/(?P<pk>\d+)/$', contact_export, name='contact_export'),
     url(r'^vcard/(?P<pk>\d+)/(?P<format>(vcf|web)?)/$', contact_export, name='contact_export'),
     url(r'^contacts/delete/(?P<pk>\d+)/$', ContactDeleteView.as_view(), name='contact_delete'),

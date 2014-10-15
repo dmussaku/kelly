@@ -57,6 +57,23 @@ class CRMUser(SubscriptionObject):
         if save:
             self.save()
 
+    @classmethod
+    def get_crmusers(cls, with_users=False):
+        """TEST Returns list of crmusers on with
+            Returns:
+                Queryset<CRMUser>
+                if with_users:
+                    Queryset<User>
+            example: (crmusers, users)
+        """
+        crmusers = cls.objects.all()
+        if with_users:
+            users = User.objects.filter(
+                id__in=crmusers.values_list('user_id', flat=True))
+            return (crmusers, users)
+        else:
+            return crmusers
+
 
 class Contact(SubscriptionObject):
 
@@ -251,6 +268,16 @@ class Contact(SubscriptionObject):
         c.save()
 
     @classmethod
+    def upd_status_when_first_activity_created(cls, sender, created=False,
+                                               instance=None, **kwargs):
+        if not created:
+            return
+        c = instance.sales_cycle.contact
+        if c.status == NEW:
+            c.status = LEAD
+            c.save()
+
+    @classmethod
     def get_contacts_by_status(cls, status, limit=10, offset=0):
         return Contact.objects.filter(status=status)[offset:offset + limit]
 
@@ -273,8 +300,7 @@ class Contact(SubscriptionObject):
         -------
         Queryset of Contacts with whom `user_id` get contacted for that period.
         """
-        print user_id
-        crm_user = CRMUser.objects.get(user_id=user_id)
+        crm_user = CRMUser.objects.get(id=user_id)
         activities = crm_user.activity_author.filter(
             date_created__range=(from_dt, to_dt))
         return Contact.objects.filter(
@@ -499,8 +525,9 @@ class SalesCycle(SubscriptionObject):
         ('C', 'Completed'),
         ('N', 'New'),
     )
-    products = models.ManyToManyField(Product,
-                                      related_name='sales_cycles')
+    title = models.CharField(max_length=100)
+    products = models.ManyToManyField(Product, related_name='sales_cycles',
+                                      null=True, blank=True)
     owner = models.ForeignKey(CRMUser, related_name='owned_sales_cycles')
     followers = models.ManyToManyField(
         CRMUser, related_name='follow_sales_cycles',
@@ -512,7 +539,7 @@ class SalesCycle(SubscriptionObject):
                                            blank=True, null=True,
                                            on_delete=models.SET_NULL)
     projected_value = models.OneToOneField(
-        Value, related_name='_unused_1_sales_cycle', null=True)
+        Value, related_name='_unused_1_sales_cycle', null=True, blank=True,)
     real_value = models.OneToOneField(
         Value, related_name='_unused_2_sales_cycle',
         null=True, blank=True,)
@@ -532,7 +559,7 @@ class SalesCycle(SubscriptionObject):
         return self.rel_activities.order_by('-date_created').first()
 
     def __unicode__(self):
-        return '%s %s' % (self.contact, self.status)
+        return '%s [%s %s]' % (self.title, self.contact, self.status)
 
     # Adds mentions to a current class, takes a lsit of user_ids as an input
     # and then runs through the list and calls the function build_new which
@@ -888,8 +915,31 @@ class Comment(SubscriptionObject):
             content_type=cttype)[offset:offset + limit]
 
 
+class Share(SubscriptionObject):
+    contact = models.ForeignKey(
+        Contact, related_name='shares',
+        on_delete=models.SET_DEFAULT, default=None)
+    share_to = models.ForeignKey(CRMUser, related_name='in_shares')
+    share_from = models.ForeignKey(CRMUser, related_name='owned_shares')
+    date_created = models.DateTimeField(blank=True, auto_now_add=True)
+    comments = generic.GenericRelation('Comment')
+
+    class Meta:
+        verbose_name = 'share'
+        db_table = settings.DB_PREFIX.format('share')
+
+    @classmethod
+    def get_shares(cls, limit=20, offset=0):
+        return cls.objects.order_by('-date_created')[offset:offset + limit]
+
+    def __unicode__(self):
+        return '%s : %s -> %s' % (self.contact, self.share_from, self.share_to)
+
+
 signals.post_save.connect(
     Contact.upd_lst_activity_on_create, sender=Activity)
+signals.post_save.connect(
+    Contact.upd_status_when_first_activity_created, sender=Activity)
 signals.post_save.connect(
     SalesCycle.upd_lst_activity_on_create, sender=Activity)
 

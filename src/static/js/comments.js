@@ -45,3 +45,6 @@ function delete_comment(obj, id) {
         });
     }
 }
+$.comments = {
+  'click_event': click_event,
+}

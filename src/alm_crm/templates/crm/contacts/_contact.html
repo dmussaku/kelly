@@ -1,3 +1,5 @@
+{% load crm_tags %}
+
 <div class="lineGroup lineGroup--compact">
   <div class="line line--compact">
     <div class="line-aside">
@@ -5,7 +7,8 @@
       <figure class="icon">[avg. feedback]</figure>
     </div>
     <div class="line-body">
-      <h1 class="line-title"><a href="index.html">{{ contact.name }}</a></h1>
+      <h1 class="line-title">
+        <a href="{% crm_url 'contact_detail' contact_pk=contact.pk %}">{{ contact.name }}</a></h1>
       <div class="line-subtitle">{{ contact.company.name }}</div>
     </div>
   </div>
