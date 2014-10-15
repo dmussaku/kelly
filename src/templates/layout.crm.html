@@ -43,9 +43,13 @@
 
 <nav class="body-header nav">
   <div class="lineOfLinks">
-  <a class="lineOfLinks-link nav-link" href="{% subdomain_url 'crm_home' slug=DEFAULT_SERVICE subdomain=request.user_env.subdomain %}"> {{ _('dashboard') }} </a>
-    <a class="lineOfLinks-link nav-link" href="{% subdomain_url 'contacts_list' slug=DEFAULT_SERVICE subdomain=request.user_env.subdomain %}"> {{ _('contacts') }} </a>
-    <a class="lineOfLinks-link nav-link" href="{% subdomain_url 'feed' slug=DEFAULT_SERVICE subdomain=request.user_env.subdomain %}"> {{ _('feed') }} </a>
+    <a class="lineOfLinks-link nav-link"
+      href="{% subdomain_url 'crm_home' service_slug=DEFAULT_SERVICE subdomain=request.user_env.subdomain %}"> {{ _('dashboard') }} </a>
+    <a class="lineOfLinks-link nav-link"
+      href="{% subdomain_url 'contacts_list' service_slug=DEFAULT_SERVICE subdomain=request.user_env.subdomain %}"> {{ _('contacts') }} </a>
+    <a class="lineOfLinks-link nav-link"
+      href="{% subdomain_url 'feed' service_slug=DEFAULT_SERVICE subdomain=request.user_env.subdomain %}"> {{ _('feed') }} </a>
+
     <div id="scrollable-dropdown-menu" style='float:right;'>
       <input class="typeahead" type="text" placeholder="Search Contacts" >
     </div>
@@ -58,7 +62,10 @@
         <div class="dropdown-menu">
           <div class="dropdown-triangle"></div>
           <div class="dropdown-menu-body">
-            <form action="{% subdomain_url 'crm_import_vcard' slug='almcrm' subdomain=request.subdomain %}" id='file_upload_form' method="post" enctype="multipart/form-data">
+
+            <form
+              action="{% subdomain_url 'crm_import_vcard' service_slug=DEFAULT_SERVICE subdomain=request.subdomain %}" id='file_upload_form' method="post" enctype="multipart/form-data"
+              data-js-upload-vcard='form'>
               {% csrf_token %}
               <p>{{ form.non_field_errors }}</p>
               <p>{{ form.myfile.label_tag }} {{ form.myfile.help_text }}</p>
@@ -67,7 +74,8 @@
                   {{ form.myfile }}
               </p>
               <p><button type="submit" class="btn btn-primary" id='upload-btn'>Upload</button></p>
-          </form>
+            </form>
+
           </div>
         </div>
       </div>
@@ -81,10 +89,12 @@
           <div class="dropdown-menu-body">
             <ul class="dropdown-menu-list">
               <li class="dropdown-menu-item">
-                <a class="dropdown-menu-item-link" href="{% subdomain_url 'user_profile_url' subdomain=MY_SD %}">Profile</a>
+                <a class="dropdown-menu-item-link"
+                  href="{% subdomain_url 'user_profile_url' subdomain=MY_SD %}">Profile</a>
               </li>
               <li class="dropdown-menu-item">
-                <a class="dropdown-menu-item-link" href="#">Administration</a>
+                <a class="dropdown-menu-item-link"
+                  href="#">Administration</a>
               </li>
               <li class="dropdown-menu-item">
                 <a class="dropdown-menu-item-link"
@@ -101,10 +111,14 @@
 
 
 <div class="body-container">
-  <div id='gif-loader' style="display:none;">
-    <img src='../static/img/ajax-loader.gif' style="display: block; margin-top:40px; margin-left: auto; margin-right: auto">
+
+  <div id='gif-loader' style="display:none;"
+    data-js-upload-vcard='gif_loader'>
+    <img src='{% static "img/ajax-loader.gif" %}'
+      style="display: block; margin-top:40px; margin-left: auto; margin-right: auto">
     <p style='text-align:center;'>Please wait while we upload your vcard</p>
   </div>
+
   <aside class="tabs">
     {% block crm_aside_tabs %}{% endblock %}
   </aside>
@@ -126,15 +140,8 @@
   <script src="http://twitter.github.io/typeahead.js/releases/latest/typeahead.jquery.js"></script>
   <script src="https://twitter.github.io/typeahead.js/releases/latest/typeahead.bundle.js"></script>
 
-  <!--
-  Jquery script for vcard upload
-  -->
-  <!--
-  Jquery Script for ajax get of comment list
-  -->
   <script src="{% static 'js/vcard_upload.js' %}"></script>
   <script src="{% static 'js/comments.js' %}"></script>
   <script src="{% static 'js/contact_search.js' %}"></script>
-  <!--<script src="{% static 'js/contact_search.js' %}"></script>-->
   {% block crm_js_content %}{% endblock %}
 {% endblock %}

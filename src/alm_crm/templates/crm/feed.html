@@ -1,5 +1,5 @@
 {% extends "crm/base.html" %}
-{% load i18n crm_tags almanet_tags %}
+{% load i18n crm_tags %}
 {% block head_title %} {{ _("Feed") }} {% endblock %}
 
 {% block crm_aside_tabs %}
@@ -45,7 +45,7 @@
           </div>
 
           {% for sc_activity in sales_cycle_activities %}
-            {% show_activity sc_activity request=request DEFAULT_SERVICE=DEFAULT_SERVICE %}
+            {% show_activity sc_activity %}
           {% endfor %}
 
           <div class="column-block-footer"></div>

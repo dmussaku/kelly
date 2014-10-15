@@ -1,24 +1,35 @@
 import json
+from django.http import HttpResponseRedirect, HttpResponse
+from django.contrib.contenttypes.models import ContentType
+from django.shortcuts import render
+from django.db.models import Q
+from django.utils import timezone
+from datetime import timedelta
 from django.views.generic import ListView, DetailView, TemplateView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
-from django.utils import timezone
-from django.http import HttpResponseRedirect
-from datetime import timedelta
-from almanet.url_resolvers import reverse_lazy, reverse as almanet_reverse
-from django.contrib.contenttypes.models import ContentType
-from django.http import HttpResponse
-from django.shortcuts import render
-from forms import ContactForm, SalesCycleForm, MentionForm, ActivityForm,\
-    CommentForm, ValueForm, ActivityFeedbackForm, ShareForm
-from models import Contact, SalesCycle, Activity, Feedback, Comment, Value,\
-    CRMUser
-from alm_vcard.forms import VCardUploadForm
 from django.views.generic.base import View
-from models import Contact, SalesCycle, Activity, Feedback, Comment, Value
-from almanet.url_resolvers import reverse as almanet_reverse
-from .decorators import crmuser_required
-import json
-from django.db.models import Q
+from almanet.url_resolvers import reverse_lazy, reverse as almanet_reverse
+from models import (
+    Contact,
+    SalesCycle,
+    Activity,
+    Feedback,
+    Comment,
+    Value,
+    CRMUser
+    )
+from forms import (
+    ContactForm,
+    SalesCycleForm,
+    MentionForm,
+    ActivityForm,
+    CommentForm,
+    ValueForm,
+    ActivityFeedbackForm,
+    ShareForm
+    )
+from alm_vcard.forms import VCardUploadForm
+
 
 class DashboardView(View):
 
