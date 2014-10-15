@@ -5,6 +5,7 @@
 {% block css %}
 <link rel="shortcut icon" type="image/ico" href="{% static 'img/favicon.ico' %}" />
 <link rel="stylesheet" href="{% static 'css/app.css' %}">
+{% block crm_css_content %}{% endblock %}
 {% endblock %}
 
 
@@ -89,6 +90,7 @@
   </div>
 </nav>
 
+
 <div class="body-container">
   <div id='gif-loader' style="display:none;">
     <img src='../static/img/ajax-loader.gif' style="display: block; margin-top:40px; margin-left: auto; margin-right: auto">
@@ -99,6 +101,12 @@
   </aside>
   {% block crm_body %}{% endblock %}
 </div>
+
+<div class="body-footer">
+  {% block crm_footer %}{% endblock %}
+</div>
+
+
 {% endblock %}
 
 

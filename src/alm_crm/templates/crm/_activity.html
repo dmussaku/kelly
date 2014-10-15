@@ -1,21 +1,57 @@
+{% load static from staticfiles %}
+
 <div class="lineGroup">
+
   <div class="line">
     <div class="line-aside">
-      <figure class="icon">{{ activity.feedback.get_status_display }}</figure>
+      <figure class="icon">
+        {{ activity.feedback.get_status_display }}
+      </figure>
     </div>
     <div class="line-body">
       <div class="line-body-main">
+        <div class="caption secondary">
+          <a href="index.html">{{ activity.sales_cycle.contact }}</a> |
+          <a href="index.html">{{ activity.sales_cycle }}</a>
+        </div>
         {{ activity.title }}
+
+        <a href="#" class="link-tag">#phonecall</a>
+
         <div class="line-body-meta">
-          <a href="/index">
-            <figure class="userpic"></figure>
-            {{ activity.author.get_billing_user.get_short_name }}
+          <a href="profile.html" class="link-user">
+
+            <figure class="userpic">
+              <img src="{% static 'img/example/userpic6.png' %}" alt="" />
+            </figure>
+            {{ activity.author.get_billing_user }}
           </a> at {{ activity.date_created|date:'F j, H:i' }}
         </div>
       </div>
-      <div class="line-body-extra">
-        <figure class="icon">[comments]</figure>
+    </div>
+  </div>
+
+  <div class="lineGroup-extra">
+    <div class="comments">
+      <button type="button" class="comment--toggle" data-toggle="comments">
+        <figure class="icon">[c]</figure>
+      </button>
+      <div class="comments-body">
+        <div class="comment comment--form">
+          <div class="js-commentForm-trigger">
+              <div class="comment-meta">
+                <figure class="userpic">
+                  <img src="{% static 'img/example/userpic6.png' %}" alt="" />
+                </figure>
+              </div>
+              <div class="comment-body">
+                <button type="button" data-toggle="comment-reply">Leave a note</button>
+              </div>
+          </div>
+          <div class="js-commentForm"></div>
+        </div>
       </div>
     </div>
   </div>
+
 </div>

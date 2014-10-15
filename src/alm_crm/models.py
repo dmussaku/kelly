@@ -56,6 +56,23 @@ class CRMUser(SubscriptionObject):
         if save:
             self.save()
 
+    @classmethod
+    def get_crmusers(cls, with_users=False):
+        """TEST Returns list of crmusers on with
+            Returns:
+                Queryset<CRMUser>
+                if with_users:
+                    Queryset<User>
+            example: (crmusers, users)
+        """
+        crmusers = cls.objects.all()
+        if with_users:
+            users = User.objects.filter(
+                id__in=crmusers.values_list('user_id', flat=True))
+            return (crmusers, users)
+        else:
+            return crmusers
+
 
 class Contact(SubscriptionObject):
 
@@ -496,8 +513,9 @@ class SalesCycle(SubscriptionObject):
         ('C', 'Completed'),
         ('N', 'New'),
     )
-    products = models.ManyToManyField(Product,
-                                      related_name='sales_cycles')
+    title = models.CharField(max_length=100)
+    products = models.ManyToManyField(Product, related_name='sales_cycles',
+                                      null=True, blank=True)
     owner = models.ForeignKey(CRMUser, related_name='owned_sales_cycles')
     followers = models.ManyToManyField(
         CRMUser, related_name='follow_sales_cycles',
@@ -509,7 +527,7 @@ class SalesCycle(SubscriptionObject):
                                            blank=True, null=True,
                                            on_delete=models.SET_NULL)
     projected_value = models.OneToOneField(
-        Value, related_name='_unused_1_sales_cycle', null=True)
+        Value, related_name='_unused_1_sales_cycle', null=True, blank=True,)
     real_value = models.OneToOneField(
         Value, related_name='_unused_2_sales_cycle',
         null=True, blank=True,)
@@ -529,7 +547,7 @@ class SalesCycle(SubscriptionObject):
         return self.rel_activities.order_by('-date_created').first()
 
     def __unicode__(self):
-        return '%s %s' % (self.contact, self.status)
+        return '%s [%s %s]' % (self.title, self.contact, self.status)
 
     # Adds mentions to a current class, takes a lsit of user_ids as an input
     # and then runs through the list and calls the function build_new which
@@ -879,6 +897,27 @@ class Comment(SubscriptionObject):
         return cls.objects.filter(
             object_id=context_object_id,
             content_type=cttype)[offset:offset + limit]
+
+
+class Share(SubscriptionObject):
+    contact = models.ForeignKey(
+        Contact, related_name='shares',
+        on_delete=models.SET_DEFAULT, default=None)
+    share_to = models.ForeignKey(CRMUser, related_name='in_shares')
+    share_from = models.ForeignKey(CRMUser, related_name='owned_shares')
+    date_created = models.DateTimeField(blank=True, auto_now_add=True)
+    comments = generic.GenericRelation('Comment')
+
+    class Meta:
+        verbose_name = 'share'
+        db_table = settings.DB_PREFIX.format('share')
+
+    @classmethod
+    def get_shares(cls, limit=20, offset=0):
+        return cls.objects.order_by('-date_created')[offset:offset + limit]
+
+    def __unicode__(self):
+        return '%s : %s -> %s' % (self.contact, self.share_from, self.share_to)
 
 
 signals.post_save.connect(

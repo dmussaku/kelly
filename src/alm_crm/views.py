@@ -2,23 +2,31 @@ import json
 from django.views.generic import ListView, DetailView, TemplateView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.utils import timezone
+from django.http import HttpResponseRedirect
 from datetime import timedelta
-from almanet.url_resolvers import reverse_lazy
+from almanet.url_resolvers import reverse_lazy, reverse as almanet_reverse
 from django.http import HttpResponse
 from django.shortcuts import render
 from forms import ContactForm, SalesCycleForm, MentionForm, ActivityForm,\
-    CommentForm, ValueForm, ActivityFeedbackForm
+    CommentForm, ValueForm, ActivityFeedbackForm, ShareForm
+from models import Contact, SalesCycle, Activity, Feedback, Comment, Value,\
+    CRMUser
 from alm_vcard.forms import VCardUploadForm
-from models import Contact, SalesCycle, Activity, Feedback, Comment, Value
+from django.views.generic.base import View
 
 
-class DashboardView(TemplateView):
+class DashboardView(View):
 
     def get_context_data(self, **kwargs):
         context = super(DashboardView, self).get_context_data(**kwargs)
         context['form'] = VCardUploadForm
         context['subdomain'] = self.request.subdomain
         return context
+
+    def get(self, request, *a, **kw):
+        url = almanet_reverse('feed', kwargs={'slug': self.kwargs.get('slug')},
+                              subdomain=request.user_env['subdomain'])
+        return HttpResponseRedirect(url)
 
 
 class FeedView(TemplateView):
@@ -34,6 +42,31 @@ class FeedView(TemplateView):
         return context
 
 
+class ShareCreateView(CreateView):
+
+    def form_valid(self, form):
+        response = super(self.__class__, self).form_valid(form)
+        if self.request.is_ajax():
+            data = {
+                'pk': self.object.pk,
+            }
+            return HttpResponse(json.dumps(data), mimetype="application/json")
+        else:
+            return response
+
+    def get_success_url(self):
+        return reverse_lazy('share_list',
+                            subdomain=self.request.user_env['subdomain'],
+                            kwargs={'slug': 'crm'})
+
+
+class ShareListView(ListView):
+
+    def get_queryset(self):
+        crmuser = self.request.user.get_crmuser()
+        return crmuser.in_shares.all()
+
+
 class ContactDetailView(DetailView):
 
     def get_object(self):
@@ -43,20 +76,46 @@ class ContactDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super(ContactDetailView, self).get_context_data(**kwargs)
 
-        crmuser_id = self.request.user.get_crmuser().id
+        current_crmuser = self.request.user.get_crmuser()
+        crmusers, users = CRMUser.get_crmusers(with_users=True)
 
+        # show sales_cycle
         sales_cycle_id = self.request.GET.get('sales_cycle_id', False)
         if sales_cycle_id:
             sales_cycle = context['object'].sales_cycles.get(id=sales_cycle_id)
         else:
             sales_cycle = context['object'].sales_cycles.last()
-
         context['sales_cycle'] = sales_cycle
-        context['activity_form'] = ActivityForm(
-            initial={'author': crmuser_id,
-                     'sales_cycle': sales_cycle.id})
+
+        # date when first activity was added to the sales_cycle
         d = Activity.get_activities_by_contact(context['object'].pk).first()
         context['first_activity_date'] = d and d.date_created
+
+        # add new activity
+        context['activity_form'] = ActivityForm(
+            initial={'author': current_crmuser.id,
+                     'sales_cycle': sales_cycle.id,
+                     'mentioned_user_ids_json': None})
+
+        # add mentions to new activity
+        def gen_mentions(crmuser):
+            return {'id': crmuser.id,
+                    'name': users.get(id=crmuser.user_id).get_username(),
+                    'type': 'crmuser'}
+        context['mentions'] = json.dumps(map(gen_mentions, crmusers))
+
+        # create new sales_cycle
+        context['sales_cycle_form'] = SalesCycleForm(
+            initial={'owner': current_crmuser,
+                     'contact': context['object']})
+
+        # share contact to
+        context['share_form'] = ShareForm(
+            initial={'share_from': current_crmuser,
+                     'contact': context['object']})
+        context['crmusers'] = crmusers.exclude(id=current_crmuser.id)
+        context['current_crmuser'] = current_crmuser
+
         return context
 
 
@@ -108,7 +167,7 @@ class ContactUpdateView(UpdateView):
 
 class ContactAddMentionView(UpdateView):
     model = Contact
-    form_class = MentionForm #context_type, context_id
+    form_class = MentionForm  # context_type, context_id
     success_url = reverse_lazy('contact_list')
     template_name = "contact/contact_add_mention.html"
 
@@ -123,7 +182,8 @@ class ContactDeleteView(DeleteView):
     template_name = 'contact/contact_delete.html'
 
 
-def contact_export(request, pk, format="html", locale='ru_RU', *args, **kwargs):
+def contact_export(request, pk, format="html", locale='ru_RU',
+                   *args, **kwargs):
     c = Contact.objects.get(pk=pk)
     exported_vcard = c.export_to(format, locale=locale)
     if format == 'vcf':
@@ -148,9 +208,16 @@ class SalesCycleListView(ListView):
 
 
 class SalesCycleCreateView(CreateView):
-    form_class = SalesCycleForm
-    template_name = "sales_cycle/sales_cycle_create.html"
-    success_url = reverse_lazy('sales_cycle_list')
+
+    def form_valid(self, form):
+        response = super(self.__class__, self).form_valid(form)
+        if self.request.is_ajax():
+            data = {
+                'pk': self.object.pk,
+            }
+            return HttpResponse(json.dumps(data), mimetype="application/json")
+        else:
+            return response
 
 
 class SalesCycleUpdateView(UpdateView):

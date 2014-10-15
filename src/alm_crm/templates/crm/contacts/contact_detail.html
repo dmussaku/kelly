@@ -1,7 +1,7 @@
 {% extends "crm/base.html" %}
-{% load i18n %}
+{% load i18n crm_tags %}
+{% load static from staticfiles %}
 {% block head_title %} {{ _("Contact Detail") }} {% endblock %}
-{% load crm_tags %}
 
 
 {% block crm_body %}
@@ -59,14 +59,68 @@
 
         </div>
         <div class="line">
-          <div class="line-aside"></div>
+          <div class="line-aside">
+            <a class="lineOfLinks-link lineOfLinks-link--showmore" href="#" data-toggle="showmore" data-text="Show less">
+              Show more
+            </a>
+          </div>
           <div class="line-body lineOfLinks">
-            <a class="lineOfLinks-link" href="#"
-              data-toggle='showmore'
-              data-text='Show less'> Show more </a>
-            <a class="lineOfLinks-link"
-              href="{% crm_url 'contact_update' pk=object.pk %}"> Edit </a>
-            <a class="lineOfLinks-link" href="#"> Share </a>
+
+            <a class="lineOfLinks-link" href="#"> Edit
+            </a>
+
+            <div class="dropdown dropdown--inline">
+              <a href="#" class="lineOfLinks-link" data-toggle="dropdown">Share</a>
+
+
+              <form action="{% crm_url 'share_create' %}" method="POST"
+                data-js-create-share='form'> {% csrf_token %}
+                {{ share_form.share_to.as_hidden }}
+                {{ share_form.share_from.as_hidden }}
+                {{ share_form.contact.as_hidden }}
+              </form>
+
+
+              <div class="dropdown-menu dropdown-menu--share">
+                <div class="dropdown-menu-body">
+                  <ul class="dropdown-menu-list">
+
+
+                    <li class="dropdown-menu-item">
+                      <a href="#" class="dropdown-menu-item-link"
+                        data-js-create-share-to="{{ current_crmuser.pk }}">
+                        <figure class="userpic">
+                          <img src="{% static 'img/example/userpic6.png' %}" alt="" />
+                        </figure>
+                        {{ current_crmuser.get_billing_user.get_username }} (you)
+                      </a>
+                    </li>
+
+                    {% for crmuser in crmusers %}
+                      <li class="dropdown-menu-item">
+                        <a href="#" class="dropdown-menu-item-link"
+                          data-js-create-share-to="{{ crmuser.pk }}">
+                          <figure class="userpic">
+                            <img src="{% static 'img/example/userpic2.png' %}" alt="" />
+                          </figure>
+                          {{ crmuser.get_billing_user.get_username }}
+                        </a>
+                      </li>
+                    {% endfor %}
+
+
+                    <li class="dropdown-menu-item">
+                      <a href="{% crm_url 'share_list' %}"
+                        class="dropdown-menu-item-link"
+                        > see shares  </a>
+                    </li>
+
+
+                  </ul>
+                </div>
+              </div>
+            </div>
+
           </div>
         </div>
       </div>
@@ -78,19 +132,41 @@
 <div class="column-header">
   <div class="column-header-a">
     <a href="#">
-      <figure class="userpic"></figure>
-      {{ object.owner.get_billing_user }}
+      <figure class="userpic">
+        <img src="{% static 'img/example/userpic6.png' %}" alt="" />
+      </figure>
+      {{ object.owner.get_billing_user.get_short_name }}
     </a>
     started at {{ first_activity_date|date:'F j, H:i' }}
   </div><div class="column-header-b">
     <div class="dropdown">
       <button type="button" data-toggle="dropdown">Thread codename (dropdown wants to be here)</button>
-      <div class="dropdown-menu dropdown-menu--cycles">
+      <div class="dropdown-menu dropdown-menu--cycles"
+        data-js-create-salescycle='dropdown-menu'>
         <div class="dropdown-triangle"></div>
         <div class="dropdown-menu-body">
           <ul class="dropdown-menu-list">
+
             <li class="dropdown-menu-item dropdown-menu-item--newCycle">
               <a class="dropdown-menu-item-link" href="#">Create a new cycle</a>
+
+
+              <form action="{% crm_url 'sales_cycle_create' %}" method="POST"
+                data-js-create-salescycle='form'> {% csrf_token %}
+
+                {{ sales_cycle_form.title.label }}
+                {{ sales_cycle_form.title }}
+
+                {{ sales_cycle_form.products.as_hidden }}
+                {{ sales_cycle_form.owner.as_hidden }}
+                {{ sales_cycle_form.contact.as_hidden }}
+                {{ sales_cycle_form.projected_value.as_hidden }}
+                {{ sales_cycle_form.real_value.as_hidden }}
+
+                <button type="submit" class="btn">Create</button>
+              </form>
+
+
             </li>
 
             {% for sc in object.sales_cycles.all %}
@@ -99,7 +175,9 @@
                 <a class="dropdown-menu-item-link {% if sc == sales_cycle %} dropdown-menu-item-link--active {% endif %}" href="#"
                   data-js-data-id='{{ sc.id }}'>
                   <div class="column-header-a">
-                    <figure class="userpic"></figure>
+                    <figure class="userpic">
+                      <img src="{% static 'img/example/userpic6.png' %}" alt="" />
+                    </figure>
                     {{ sc.owner }}
                   </div><div class="column-header-b">
                     {{ sc }}
@@ -116,9 +194,16 @@
       </div>
     </div>
   </div><div class="column-header-c">
-    <a href="#"><figure class="userpic"></figure></a>
-    <a href="#"><figure class="userpic"></figure></a>
-    <a href="#"><figure class="userpic"></figure></a>
+    <a href="#" class="link-user"><figure class="userpic">
+      <img src="{% static 'img/example/userpic1.png' %}" alt="" />
+    </figure></a>
+    <a href="#" class="link-user"><figure class="userpic">
+      <img src="{% static 'img/example/userpic2.png' %}" alt="" />
+    </figure></a>
+    <a href="#" class="link-user"><figure class="userpic">
+      <img src="{% static 'img/example/userpic3.png' %}" alt="" />
+    </figure></a>
+    <a href="#" class="link-user">&hellip; 3 more</a>
   </div>
 </div>
 
@@ -142,14 +227,21 @@
       </div>
       <div class="line line--borderless">
         <div class="line-aside line-aside--statusForm">
-          <figure class="icon">[status switcher]</figure>
+          <figure class="icon">[s]</figure>
         </div>
         <div class="line-body line-body--spaceless">
           <div class="line-body-main">
 
-            <textarea class="input-text" rows="3"
+            <textarea class="input-text2" rows="3"
               name='{{ activity_form.title.html_name }}'
-              placeholder="Log your activity..."></textarea>
+              placeholder="Log your activity..."
+              data-js-addmention='textarea'
+              {# '[{"id":1, "name":"Sattar"}, {"id":2, "name":"Daniyar"}]' #}
+              data-js-addmention-mentions="{{ mentions }}"
+              >
+              </textarea>
+            {{ activity_form.mentioned_user_ids_json.as_hidden }}
+
             {{ activity_form.description.as_hidden }}
             {{ activity_form.author.as_hidden }}
             {{ activity_form.sales_cycle.as_hidden }}
@@ -160,6 +252,7 @@
               <figure class="userpic"></figure>
               <button type="submit" class="btn">Post</button>
             </div>
+
           </div>
         </div>
       </div>
@@ -178,37 +271,79 @@
 {% endblock crm_body %}
 
 
+
+{% block crm_footer %}
+
+<div class="help">
+  Help about sales cycles (threads)
+</div>
+
+{% endblock crm_footer %}
+
+
+
+{% block crm_css_content %}
+<link rel="stylesheet" href="{% static 'css/jquery.mentionsInput.css' %}">
+<style>
+  .mentions-input-box {
+    font-size: 14px;
+  }
+  .mentions-input-box textarea {
+    font-size: 14px;
+    font-family: Tahoma, Verdana, Segoe, sans-serif;
+  }
+</style>
+{% endblock crm_css_content %}
+
+
 {% block crm_js_content %}
+<script src='{% static "js/underscore.min.js" %}'></script>
+<script src='{% static "js/jquery.elastic.js" %}'></script>
+<script src='{% static "js/jquery.mentionsInput.js" %}'></script>
+{# Sattar's code #}
 <script>
   var sc_data = (function($) {
     var sel = {
         link: '[data-js-data-id]',
         body: '[data-js-data="body"]',
         form: '[data-js-data="form"]',
+        field: {
+          mention_user_ids: '[name="mentioned_user_ids_json"]',
+          description: '[name="description"]',
+          title: '[name="title"]'
+        },
         active: '.dropdown-menu-item-link--active'
       },
       $links = $('[data-js-data="links"]'),
       $container = $('[data-js-data="container"]'),
       reload_url = $(location).attr('href').split('?')[0],//without search
 
+
       submit_activity = function(event) {
-        var $form = $(event.target);
+        var $form = $(event.target),
+            submit = function(mentions) {
+              var m_user_ids = $.map(mentions, function (m) { return m.id });
 
-        $form.find('[name="description"]')
-          .val( $form.find('[name="title"]').val() );
+              $form.find(sel.field.mention_user_ids)
+                .val( JSON.stringify(m_user_ids) );
 
-        //submit
-        $.post($form.prop('action'), $form.serialize())
-          .done(function (event) {
-            $links.find(sel.active).click(); //to reload_data
-          })
-          .fail(function (event, jqxhr, settings, thrownError) {
-            console.log(event)
-            console.log(jqxhr)
-            console.log(settings)
-            console.log(thrownError)
-          });
+              $form.find(sel.field.description)
+                .val( $form.find(sel.field.title).val() );
 
+              $.post($form.prop('action'), $form.serialize())
+                .done(function (event) {
+                  $links.find(sel.active).click(); //to reload_data
+                })
+                .fail(function (event, jqxhr, settings, thrownError) {
+                  console.log(event)
+                  console.log(jqxhr)
+                  console.log(settings)
+                  alert(thrownError);
+                });
+            };
+
+        add_mentions.get_added()
+          .done( submit );
 
         event.preventDefault();
       },
@@ -231,12 +366,126 @@
         event.preventDefault();
       },
 
+      add_mentions = {
+        o: {
+          $textarea: $('[data-js-addmention="textarea"]'),
+          mentions: $('[data-js-addmention-mentions]').data('jsAddmentionMentions')
+        },
+        get_added: function() {
+          var $def = $.Deferred();
+
+          this.o.$textarea
+            .mentionsInput('getMentions', function (data) {
+              $def.resolve( data );
+            });
+
+          return $def.promise();
+        },
+        init: function() {
+          var this_o_mentions = this.o.mentions;
+
+          this.o.$textarea
+            .mentionsInput({
+              onDataRequest:function (mode, query, callback) {
+                var data = this_o_mentions;
+
+                data = _.filter(data, function (item) { return item.name.toLowerCase().indexOf(query.toLowerCase()) > -1 });
+
+                callback.call(this, data);
+              },
+              showAvatars: false
+            });
+        }
+      },
+
+      create_sales_cycle = {
+        sel: {
+          form: '[data-js-create-salescycle="form"]',
+          dropdown_menu: '[data-js-create-salescycle="dropdown-menu"]',
+        },
+        reload_page: function(response_data) {
+          var sel_dropdown_menu = this.sel.dropdown_menu;
+
+          console.log(this);
+
+          $.get(reload_url, {'sales_cycle_id': response_data.pk})
+            .done(function (data) {
+              $(document)
+                .find(sel.body)
+                  .replaceWith( $(data).find(sel.body) )
+                  .end()
+                .find(sel_dropdown_menu)
+                  .replaceWith( $(data).find(sel_dropdown_menu) )
+                  .end()
+            });
+        },
+        submit: function(event) {
+          var $form = $(event.target);
+
+          $.post($form.prop('action'), $form.serialize())
+            .done( $.proxy(this.reload_page, this) )
+            .fail(function (event, jqxhr, settings, thrownError) {
+              console.log(event)
+              console.log(jqxhr)
+              console.log(settings)
+              alert(thrownError);
+            });
+
+          event.preventDefault();
+        },
+        init: function(event) {
+          $(document).on('submit', this.sel.form, $.proxy(this.submit, this));
+        }
+      },
+
+      share = {
+        sel: {
+          form: '[data-js-create-share="form"]',
+          link: '[data-js-create-share-to]',
+          share_to: '[name="share_to"]',
+          data: {
+            link_id: 'jsCreateShareTo',
+          },
+        },
+        create_share: function(event) {
+          var $link = $(event.target),
+              $form = $(this.sel.form),
+              id = $link.data(this.sel.data.link_id),
+
+              _done = function(response_data) {
+                console.log('share created: ', response_data.pk);
+              };
+
+          $form.find(this.sel.share_to).val( id );
+
+          $.post($form.prop('action'), $form.serialize())
+            .done( _done )
+            .fail(function (event, jqxhr, settings, thrownError) {
+              console.log(event)
+              console.log(jqxhr)
+              console.log(settings)
+              alert(thrownError);
+            });
+
+          event.preventDefault();
+        },
+        init: function(event) {
+          $(document).on('click', this.sel.link, $.proxy(this.create_share, this));
+        }
+      },
+
       init = function() {
         $links.on('click', sel.link, reload_data);
         $(document).on('submit', sel.form, submit_activity);
+
+        add_mentions.init();
+        create_sales_cycle.init();
+        share.init();
       };
 
     init();
   })(jQuery);
 </script>
+
+
 {% endblock crm_js_content %}

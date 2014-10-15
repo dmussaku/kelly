@@ -249,6 +249,8 @@ class BaseConfiguration(SubdomainConfiguration, Configuration):
 
     DEFAULT_URL_SCHEME = 'http'
 
+    DEFAULT_SERVICE = 'crm'
+
 
 class DevConfiguration(FileSettings('~/.almanet/almanet.conf.py'), BaseConfiguration):
     #PARENT_HOST = 'alma.net:8000'

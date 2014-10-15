@@ -21,38 +21,39 @@ body {
   font-family: Tahoma, Verdana, Segoe, sans-serif;
   line-height: 2rem;
   color: #333333;
+  background-color: #f2f2f2;
   -webkit-overflow-scrolling: none; }
 
-/* line 27, /Users/Vadim/Documents/work-crm/alma.net/static/sass/core/base */
+/* line 28, /Users/Vadim/Documents/work-crm/alma.net/static/sass/core/base */
 h1, h2, h3, h4, h5, h6 {
   padding: 1rem 0 0;
   margin: 0;
   font-style: normal;
   font-weight: normal; }
 
-/* line 33, /Users/Vadim/Documents/work-crm/alma.net/static/sass/core/base */
+/* line 34, /Users/Vadim/Documents/work-crm/alma.net/static/sass/core/base */
 ul, ol {
   padding: 0;
   margin: 0 0 2rem; }
-  /* line 36, /Users/Vadim/Documents/work-crm/alma.net/static/sass/core/base */
+  /* line 37, /Users/Vadim/Documents/work-crm/alma.net/static/sass/core/base */
   ul li, ol li {
     margin-left: 2rem; }
 
-/* line 39, /Users/Vadim/Documents/work-crm/alma.net/static/sass/core/base */
+/* line 40, /Users/Vadim/Documents/work-crm/alma.net/static/sass/core/base */
 a {
   color: inherit;
   text-decoration: none;
   background: transparent;
   outline: 0; }
-  /* line 44, /Users/Vadim/Documents/work-crm/alma.net/static/sass/core/base */
+  /* line 45, /Users/Vadim/Documents/work-crm/alma.net/static/sass/core/base */
   a:hover {
     opacity: 0.8; }
 
-/* line 48, /Users/Vadim/Documents/work-crm/alma.net/static/sass/core/base */
+/* line 49, /Users/Vadim/Documents/work-crm/alma.net/static/sass/core/base */
 a:active, a:hover {
   outline: 0; }
 
-/* line 51, /Users/Vadim/Documents/work-crm/alma.net/static/sass/core/base */
+/* line 52, /Users/Vadim/Documents/work-crm/alma.net/static/sass/core/base */
 img {
   display: block;
   height: auto;
@@ -62,69 +63,69 @@ img {
   line-height: 0;
   border: 0; }
 
-/* line 60, /Users/Vadim/Documents/work-crm/alma.net/static/sass/core/base */
+/* line 61, /Users/Vadim/Documents/work-crm/alma.net/static/sass/core/base */
 .img--inline {
   display: inline-block; }
 
-/* line 63, /Users/Vadim/Documents/work-crm/alma.net/static/sass/core/base */
+/* line 64, /Users/Vadim/Documents/work-crm/alma.net/static/sass/core/base */
 figure {
   padding: 0;
   margin: 0; }
 
-/* line 78, /Users/Vadim/Documents/work-crm/alma.net/static/sass/core/base */
+/* line 79, /Users/Vadim/Documents/work-crm/alma.net/static/sass/core/base */
 article, aside, details, figcaption, figure, footer, header, hgroup, main, nav, section, summary {
   display: block; }
 
-/* line 84, /Users/Vadim/Documents/work-crm/alma.net/static/sass/core/base */
+/* line 85, /Users/Vadim/Documents/work-crm/alma.net/static/sass/core/base */
 audio, canvas, progress, video {
   display: inline-block;
   vertical-align: baseline; }
 
-/* line 88, /Users/Vadim/Documents/work-crm/alma.net/static/sass/core/base */
+/* line 89, /Users/Vadim/Documents/work-crm/alma.net/static/sass/core/base */
 audio:not([controls]) {
   display: none;
   height: 0; }
 
-/* line 93, /Users/Vadim/Documents/work-crm/alma.net/static/sass/core/base */
+/* line 94, /Users/Vadim/Documents/work-crm/alma.net/static/sass/core/base */
 [hidden], template {
   display: none; }
 
-/* line 96, /Users/Vadim/Documents/work-crm/alma.net/static/sass/core/base */
+/* line 97, /Users/Vadim/Documents/work-crm/alma.net/static/sass/core/base */
 abbr[title] {
-  border-bottom: 1px dotted #808080; }
+  border-bottom: 1px dotted #999999; }
 
-/* line 100, /Users/Vadim/Documents/work-crm/alma.net/static/sass/core/base */
+/* line 101, /Users/Vadim/Documents/work-crm/alma.net/static/sass/core/base */
 b, strong {
   font-weight: bold; }
 
-/* line 103, /Users/Vadim/Documents/work-crm/alma.net/static/sass/core/base */
+/* line 104, /Users/Vadim/Documents/work-crm/alma.net/static/sass/core/base */
 dfn {
   font-style: italic; }
 
-/* line 107, /Users/Vadim/Documents/work-crm/alma.net/static/sass/core/base */
+/* line 108, /Users/Vadim/Documents/work-crm/alma.net/static/sass/core/base */
 small {
   font-size: 75%; }
 
-/* line 111, /Users/Vadim/Documents/work-crm/alma.net/static/sass/core/base */
+/* line 112, /Users/Vadim/Documents/work-crm/alma.net/static/sass/core/base */
 sub, sup {
   position: relative;
   font-size: 75%;
   line-height: 0;
   vertical-align: baseline; }
 
-/* line 117, /Users/Vadim/Documents/work-crm/alma.net/static/sass/core/base */
+/* line 118, /Users/Vadim/Documents/work-crm/alma.net/static/sass/core/base */
 sub {
   top: -0.5em; }
 
-/* line 120, /Users/Vadim/Documents/work-crm/alma.net/static/sass/core/base */
+/* line 121, /Users/Vadim/Documents/work-crm/alma.net/static/sass/core/base */
 sup {
   bottom: -0.25em; }
 
-/* line 123, /Users/Vadim/Documents/work-crm/alma.net/static/sass/core/base */
+/* line 124, /Users/Vadim/Documents/work-crm/alma.net/static/sass/core/base */
 svg:not(:root) {
   overflow: hidden; }
 
-/* line 126, /Users/Vadim/Documents/work-crm/alma.net/static/sass/core/base */
+/* line 127, /Users/Vadim/Documents/work-crm/alma.net/static/sass/core/base */
 hr {
   height: 0;
   margin: 1rem 0 1rem;
@@ -134,21 +135,21 @@ hr {
   -moz-box-sizing: content-box;
   box-sizing: content-box; }
 
-/* line 133, /Users/Vadim/Documents/work-crm/alma.net/static/sass/core/base */
+/* line 134, /Users/Vadim/Documents/work-crm/alma.net/static/sass/core/base */
 pre {
   overflow: auto; }
 
-/* line 139, /Users/Vadim/Documents/work-crm/alma.net/static/sass/core/base */
+/* line 140, /Users/Vadim/Documents/work-crm/alma.net/static/sass/core/base */
 code, kbd, pre, samp {
   font-family: monospace, monospace;
   font-size: 1rem; }
 
-/* line 143, /Users/Vadim/Documents/work-crm/alma.net/static/sass/core/base */
+/* line 144, /Users/Vadim/Documents/work-crm/alma.net/static/sass/core/base */
 table {
   border-collapse: collapse;
   border-spacing: 0; }
 
-/* line 148, /Users/Vadim/Documents/work-crm/alma.net/static/sass/core/base */
+/* line 149, /Users/Vadim/Documents/work-crm/alma.net/static/sass/core/base */
 td, th {
   padding: 0; }
 
@@ -159,7 +160,7 @@ td, th {
   right: 0;
   bottom: auto;
   left: 0;
-  z-index: 100;
+  z-index: 201;
   height: 3rem;
   padding: 0.5rem 1rem;
   background-color: rgba(255, 255, 255, 0.98);
@@ -174,25 +175,36 @@ td, th {
   min-width: 960px;
   min-height: 100%;
   padding-top: 3rem;
-  margin: auto; }
+  margin: 0 auto -6rem; }
+  /* line 21, /Users/Vadim/Documents/work-crm/alma.net/static/sass/core/body */
+  .body-container:after {
+    display: block;
+    content: '';
+    height: 6rem; }
 
-/* line 22, /Users/Vadim/Documents/work-crm/alma.net/static/sass/core/body */
+/* line 26, /Users/Vadim/Documents/work-crm/alma.net/static/sass/core/body */
+.body-footer {
+  position: relative;
+  height: 6rem;
+  color: #999999; }
+
+/* line 32, /Users/Vadim/Documents/work-crm/alma.net/static/sass/core/body */
 .body-column {
-  display: inline-block;
-  width: 50%;
+  display: block;
+  margin: auto;
   text-align: center; }
 
-/* line 27, /Users/Vadim/Documents/work-crm/alma.net/static/sass/core/body */
-.body-column--single {
-  display: block;
-  margin: auto; }
+/* line 37, /Users/Vadim/Documents/work-crm/alma.net/static/sass/core/body */
+.body-column--withTabs {
+  padding-left: 4rem;
+  padding-right: 4rem; }
 
-/* line 31, /Users/Vadim/Documents/work-crm/alma.net/static/sass/core/body */
+/* line 41, /Users/Vadim/Documents/work-crm/alma.net/static/sass/core/body */
 .body-column-title {
   font-weight: bold; }
 
 /* line 1, /Users/Vadim/Documents/work-crm/alma.net/static/sass/core/helper */
-.dropdown-triangle {
+.tabs-link-extra {
   position: absolute;
   top: 0;
   right: 0;
@@ -211,7 +223,7 @@ td, th {
     clear: both; }
 
 /* line 17, /Users/Vadim/Documents/work-crm/alma.net/static/sass/core/helper */
-.line, button {
+.line, .tabs-link-extra, button {
   -webkit-transform: translate3d(0, 0, 0);
   transform: translate3d(0, 0, 0);
   -webkit-backface-visibility: hidden;
@@ -220,7 +232,7 @@ td, th {
   perspective: 1000; }
 
 /* line 22, /Users/Vadim/Documents/work-crm/alma.net/static/sass/core/helper */
-.oneliner {
+.oneliner, .tabs-link-extra, .comment--toggle {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap; }
@@ -261,25 +273,27 @@ td, th {
 
 /* line 1, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/hero */
 .hero {
+  position: relative;
   color: white;
   text-align: center;
   background-color: #333333;
-  padding: 2rem; }
+  padding: 2rem;
+  z-index: 1; }
 
 /* line 1, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/column */
 .column {
-  vertical-align: top;
   position: relative;
-  display: inline-block;
-  width: 100%;
+  display: block;
+  width: 50%;
   max-width: 38rem;
-  margin: auto; }
+  margin: 1rem auto 0;
+  vertical-align: top; }
 
 /* line 9, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/column */
 .column-header {
   padding: 1rem;
-  line-height: 1.5rem;
   font-size: 0.875rem;
+  line-height: 1.5rem;
   color: white;
   background-color: #333333; }
 
@@ -304,14 +318,14 @@ td, th {
 .column-block {
   margin: 1rem 0;
   border-radius: 8px;
-  overflow: hidden;
-  background-color: #f2f2f2; }
+  overflow: hidden; }
 
-/* line 35, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/column */
+/* line 34, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/column */
 .column-title {
-  background-color: #333333;
-  color: white;
-  padding: 0.5rem;
+  font-size: 0.875rem;
+  background-color: #cccccc;
+  color: #333333;
+  padding: 0 0.5rem;
   border-radius: 8px 8px 0 0; }
 
 /* line 41, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/column */
@@ -320,21 +334,47 @@ td, th {
 
 /* line 1, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/lineGroup */
 .lineGroup {
+  position: relative;
   padding-top: 1rem;
-  border-bottom: 2px solid #cccccc; }
-  /* line 4, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/lineGroup */
+  border-bottom: 1px solid #cccccc;
+  background-color: white; }
+  /* line 6, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/lineGroup */
   .lineGroup .line {
     padding-bottom: 1rem; }
 
-/* line 8, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/lineGroup */
+/* line 9, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/lineGroup */
+.lineGroup--simple {
+  padding: 0;
+  border-bottom: 0;
+  background-color: transparent; }
+
+/* line 15, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/lineGroup */
 .lineGroup--compact {
   padding-bottom: 1rem; }
-  /* line 10, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/lineGroup */
+  /* line 17, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/lineGroup */
   .lineGroup--compact .line {
     padding-bottom: 0; }
-  /* line 12, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/lineGroup */
+  /* line 19, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/lineGroup */
   .lineGroup--compact .line--compact {
     padding-bottom: 0; }
+
+/* line 22, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/lineGroup */
+.lineGroup-extra {
+  position: absolute;
+  top: 0;
+  left: 100%;
+  width: 50%;
+  padding: 1rem;
+  text-align: left; }
+
+/* line 30, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/lineGroup */
+.lineGroup-label {
+  font-size: 0.875rem;
+  color: #999999;
+  line-height: 1em;
+  padding: 0.5rem;
+  text-align: left;
+  margin-top: -1rem; }
 
 /* line 1, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/line */
 .line {
@@ -348,7 +388,7 @@ td, th {
   float: left;
   width: 25%;
   padding: 0.5rem;
-  margin-right: -2px;
+  margin-left: 2px;
   text-align: right;
   border-right: 2px solid #cccccc; }
 
@@ -360,73 +400,77 @@ td, th {
 /* line 21, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/line */
 .line-body {
   display: block;
+  float: right;
+  width: 75%;
+  margin-left: -2px;
   padding: 0.5rem;
-  overflow: hidden;
   text-align: left;
   border-left: 2px solid #cccccc; }
 
-/* line 28, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/line */
+/* line 30, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/line */
 .line-body--spaceless {
   padding-left: 0;
   position: relative;
   left: -2px; }
 
-/* line 33, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/line */
+/* line 35, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/line */
 .line-body--tabs {
   padding-bottom: 0; }
 
-/* line 37, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/line */
+/* line 39, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/line */
 .hero .line-aside, .hero .line-body {
   border-color: #4d4d4d; }
 
-/* line 41, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/line */
+/* line 43, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/line */
 .line--borderless .line-aside, .line--borderless .line-body {
   border: 0; }
-/* line 43, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/line */
+/* line 45, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/line */
 .line--borderless .line-aside {
   margin-right: 0; }
 
-/* line 48, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/line */
+/* line 50, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/line */
 .line--compact .line-aside, .line--compact .line-body {
   padding-top: 0.25rem;
   padding-bottom: 0; }
 
-/* line 52, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/line */
+/* line 54, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/line */
 .line-aside-label {
-  color: #808080; }
+  font-size: 0.875rem;
+  color: #999999; }
 
-/* line 55, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/line */
+/* line 58, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/line */
 .line-body-main {
   display: block;
   float: left;
-  width: 75%; }
+  width: 100%;
+  padding-right: 0.5rem; }
 
-/* line 60, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/line */
+/* line 64, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/line */
 .line-body-meta {
   padding-top: 0.5rem;
   font-size: 0.875rem;
-  color: #808080; }
+  color: #999999; }
 
-/* line 65, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/line */
+/* line 69, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/line */
 .line-body-extra {
   overflow: hidden;
   padding-left: 0.5rem; }
 
-/* line 70, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/line */
+/* line 74, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/line */
 .line-title {
   padding-top: 0;
   font-size: 1.5rem;
   text-transform: uppercase;
   letter-spacing: 1px; }
 
-/* line 76, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/line */
+/* line 80, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/line */
 .line-subtitle {
-  color: #808080; }
+  color: #999999; }
 
 /* line 1, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/icon */
 .icon {
   font-size: 0.875rem;
-  color: #808080; }
+  color: #999999; }
 
 /* line 1, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/userpic */
 .userpic {
@@ -443,6 +487,10 @@ td, th {
   width: 4.5rem;
   height: 4.5rem; }
 
+/* line 14, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/userpic */
+.userpic--middle {
+  vertical-align: text-bottom; }
+
 /* line 2, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/lineOfLinks */
 .lineOfLinks .lineOfLinks-link:nth-of-type(1) {
   padding-left: 0; }
@@ -455,7 +503,7 @@ td, th {
 
 /* line 10, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/lineOfLinks */
 .hero .lineOfLinks-link {
-  color: #808080; }
+  color: #999999; }
 
 /* line 13, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/lineOfLinks */
 .lineOfLinks-link--showmore {
@@ -464,7 +512,7 @@ td, th {
 
 /* line 17, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/lineOfLinks */
 .line-body--tabs .lineOfLinks-link {
-  color: #808080;
+  color: #999999;
   text-decoration: none; }
   /* line 20, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/lineOfLinks */
   .line-body--tabs .lineOfLinks-link.active {
@@ -490,11 +538,46 @@ td, th {
     top: 0.25rem; }
 
 /* line 1, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/link */
+.link {
+  color: #379BFF; }
+
+/* line 4, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/link */
 .link-extra {
   display: inline-block;
   padding: 0.5rem;
   font-size: 0.875rem;
-  color: #808080; }
+  color: #999999; }
+
+/* line 10, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/link */
+.link-user {
+  display: inline-block; }
+
+/* line 13, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/link */
+.link-user--title {
+  display: block;
+  font-weight: bold; }
+
+/* line 17, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/link */
+.link-tag {
+  display: inline-block;
+  color: #379BFF; }
+
+/* line 21, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/link */
+.link-product {
+  position: relative;
+  display: block;
+  padding: 0.25rem 0.5rem;
+  margin-bottom: 0.5rem;
+  background-color: white;
+  border-radius: 4px; }
+  /* line 28, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/link */
+  .link-product:hover:after {
+    position: absolute;
+    top: 0;
+    padding: 0.25rem 0.5rem;
+    left: 100%;
+    display: block;
+    content: '\2573'; }
 
 /* line 1, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/dropdown */
 .dropdown {
@@ -508,104 +591,96 @@ td, th {
 .dropdown-toggle {
   display: block; }
 
-/* line 11, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/dropdown */
-.dropdown-triangle {
-  top: -16px;
-  right: auto;
-  bottom: auto;
-  left: 50%;
-  width: 0;
-  height: 0;
-  margin-left: -8px;
-  border: 8px solid transparent;
-  border-bottom-color: white; }
-
-/* line 23, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/dropdown */
+/* line 12, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/dropdown */
 .dropdown-menu {
+  color: #333333;
   position: absolute;
   top: 100%;
-  z-index: 1000;
   display: none;
   min-width: 10rem;
   padding: 0;
   text-align: left;
   background-color: white;
-  border-radius: 8px;
+  border-radius: 4px;
   opacity: 0;
   -webkit-box-shadow: 0 0 12px 0 rgba(51, 51, 51, 0.5);
   box-shadow: 0 0 12px 0 rgba(51, 51, 51, 0.5);
   -webkit-background-clip: padding-box;
   background-clip: padding-box; }
-  /* line 36, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/dropdown */
-  .open .dropdown-menu {
+  /* line 25, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/dropdown */
+  .dropdown.open .dropdown-menu {
     display: block;
     opacity: 1;
-    -webkit-transform: translateY(8px);
-    -ms-transform: translateY(8px);
-    transform: translateY(8px);
     -webkit-animation: dropdownSlidesIn 0.1s ease-in-out;
-    animation: dropdownSlidesIn 0.1s ease-in-out; }
+    animation: dropdownSlidesIn 0.1s ease-in-out;
+    z-index: 1000; }
 
-/* line 41, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/dropdown */
+/* line 30, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/dropdown */
 .dropdown-menu-body {
-  border-radius: 8px;
+  border-radius: 4px;
   overflow: hidden; }
 
-/* line 46, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/dropdown */
+/* line 35, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/dropdown */
 .dropdown--right .dropdown-menu {
   right: 0; }
 
-/* line 54, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/dropdown */
+/* line 43, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/dropdown */
 .dropdown-menu-item-link {
   display: block;
   padding: 0 0.5rem;
-  color: #808080; }
-  /* line 58, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/dropdown */
+  color: #999999; }
+  /* line 47, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/dropdown */
   .dropdown-menu-item-link:hover {
     background-color: #f2f2f2; }
 
 @-webkit-keyframes dropdownSlidesIn {
-  /* line 62, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/dropdown */
+  /* line 51, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/dropdown */
   0% {
     opacity: 0;
     -webkit-transform: translateY(-8px);
     transform: translateY(-8px); }
 
-  /* line 65, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/dropdown */
+  /* line 54, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/dropdown */
   100% {
     opacity: 1;
-    -webkit-transform: translateY(8px);
-    transform: translateY(8px); } }
+    -webkit-transform: translateY(0);
+    transform: translateY(0); } }
 
 @keyframes dropdownSlidesIn {
-  /* line 62, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/dropdown */
+  /* line 51, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/dropdown */
   0% {
     opacity: 0;
     -webkit-transform: translateY(-8px);
     transform: translateY(-8px); }
 
-  /* line 65, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/dropdown */
+  /* line 54, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/dropdown */
   100% {
     opacity: 1;
-    -webkit-transform: translateY(8px);
-    transform: translateY(8px); } }
+    -webkit-transform: translateY(0);
+    transform: translateY(0); } }
 
-/* line 69, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/dropdown */
-.dropdown-menu--cycles {
+/* line 58, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/dropdown */
+.dropdown-menu--cycles, .dropdown-menu--share {
   width: 100%;
   font-size: 1rem;
   line-height: 1.5rem; }
-  /* line 73, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/dropdown */
-  .dropdown-menu--cycles .dropdown-menu-item-link {
+  /* line 62, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/dropdown */
+  .dropdown-menu--cycles .dropdown-menu-item-link, .dropdown-menu--share .dropdown-menu-item-link {
     padding: 0.5rem; }
 
-/* line 77, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/dropdown */
+/* line 65, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/dropdown */
+.dropdown-menu--share {
+  min-width: 16rem;
+  top: 0;
+  left: 100%; }
+
+/* line 71, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/dropdown */
 .dropdown-menu-item--newCycle .dropdown-menu-item-link {
   padding: 1rem;
   text-align: center;
   border-bottom: 1px solid #cccccc; }
 
-/* line 82, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/dropdown */
+/* line 76, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/dropdown */
 .dropdown-menu-item-link--active {
   color: #333333; }
 
@@ -622,39 +697,266 @@ td, th {
   top: 3rem;
   left: 0;
   height: 100%;
-  background-color: #cccccc; }
+  background-color: #2C2E30; }
 
 /* line 8, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/tabs */
 .tabs-link {
+  color: #5A5E63;
   position: relative;
   display: block;
   width: 4rem;
   height: 4rem;
   padding: 1rem; }
-  /* line 14, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/tabs */
-  .tabs-link:after {
-    position: absolute;
-    top: 50%;
-    left: 100%;
-    margin-left: 0.5rem;
-    display: none;
-    font-size: 0.875rem;
-    padding: 0 1rem;
-    color: white;
-    white-space: nowrap;
-    background-color: #cccccc;
-    content: attr(data-tip);
-    -webkit-transform: translateY(-50%);
-    -ms-transform: translateY(-50%);
-    transform: translateY(-50%);
-    border-radius: 9999em; }
-  /* line 28, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/tabs */
-  .tabs-link:hover:after {
-    display: block; }
-  /* line 30, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/tabs */
+  /* line 15, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/tabs */
+  .tabs-link:hover {
+    opacity: 1; }
+  /* line 17, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/tabs */
   .tabs-link .icon {
+    display: block;
+    color: inherit;
     width: 100%;
     height: 100%; }
+  /* line 22, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/tabs */
+  .tabs-link.active {
+    color: #379BFF; }
+
+/* line 25, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/tabs */
+.tabs-link:hover .icon {
+  opacity: 0.8; }
+
+/* line 28, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/tabs */
+.tabs-link-extra {
+  top: 50%;
+  right: auto;
+  bottom: auto;
+  left: 100%;
+  padding: 0.5rem;
+  margin-left: 0.5rem;
+  font-size: 0.875rem;
+  line-height: 1em;
+  color: #999999;
+  background-color: white;
+  border: 2px solid white;
+  border-radius: 4px;
+  -webkit-transform: translate3d(0, -50%, 0);
+  transform: translate3d(0, -50%, 0);
+  display: none; }
+
+/* line 47, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/tabs */
+.tabs-link:hover .tabs-link-extra {
+  display: block;
+  -webkit-animation: tabs-link-extra-appearance 200ms ease-in-out;
+  animation: tabs-link-extra-appearance 200ms ease-in-out; }
+
+@-webkit-keyframes tabs-link-extra-appearance {
+  /* line 52, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/tabs */
+  from {
+    opacity: 0;
+    -webkit-transform: translate3d(-8px, -50%, 0);
+    transform: translate3d(-8px, -50%, 0); }
+
+  /* line 55, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/tabs */
+  to {
+    opacity: 1;
+    -webkit-transform: translate3d(0, -50%, 0);
+    transform: translate3d(0, -50%, 0); } }
+
+@keyframes tabs-link-extra-appearance {
+  /* line 52, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/tabs */
+  from {
+    opacity: 0;
+    -webkit-transform: translate3d(-8px, -50%, 0);
+    transform: translate3d(-8px, -50%, 0); }
+
+  /* line 55, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/tabs */
+  to {
+    opacity: 1;
+    -webkit-transform: translate3d(0, -50%, 0);
+    transform: translate3d(0, -50%, 0); } }
+
+/* line 1, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/help */
+.help {
+  line-height: 1.5rem;
+  font-size: 0.875rem;
+  text-align: center;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  -webkit-transform: translate3d(-50%, -50%, 0);
+  transform: translate3d(-50%, -50%, 0);
+  width: 50%;
+  max-width: 38rem; }
+
+/* line 1, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/comments */
+.comments-body {
+  position: relative;
+  z-index: 1;
+  display: none;
+  opacity: 0; }
+
+/* line 7, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/comments */
+.showComments .lineGroup .lineGroup-extra {
+  opacity: 0; }
+
+/* line 9, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/comments */
+.showComments .lineGroup.active .lineGroup-extra {
+  opacity: 1; }
+
+/* line 11, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/comments */
+.showComments .lineGroup.active {
+  z-index: 1; }
+
+/* line 15, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/comments */
+.showComments .column {
+  z-index: 101; }
+/* line 19, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/comments */
+.showComments .column, .showComments .body-footer {
+  -webkit-transform: translate3d(-10rem, 0, 0);
+  transform: translate3d(-10rem, 0, 0);
+  -webkit-animation: comments-slide-in 100ms ease-in-out;
+  animation: comments-slide-in 100ms ease-in-out; }
+/* line 22, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/comments */
+.showComments .comments-body {
+  display: block;
+  width: 25rem;
+  opacity: 1;
+  -webkit-animation: comments-appear 200ms ease-in-out;
+  animation: comments-appear 200ms ease-in-out; }
+
+/* line 30, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/comments */
+.hideComments .column, .hideComments .body-footer {
+  -webkit-animation: comments-slide-in 100ms ease-in-out;
+  animation: comments-slide-in 100ms ease-in-out;
+  -webkit-animation-direction: reverse;
+  animation-direction: reverse; }
+/* line 34, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/comments */
+.hideComments .comments-body {
+  -webkit-animation: comments-appear 100ms ease-in-out;
+  animation: comments-appear 100ms ease-in-out;
+  -webkit-animation-direction: reverse;
+  animation-direction: reverse; }
+
+/* line 38, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/comments */
+.hero .column {
+  -webkit-transform: translate3d(0, 0, 0);
+  transform: translate3d(0, 0, 0);
+  -webkit-animation: none;
+  animation: none; }
+
+@-webkit-keyframes comments-slide-in {
+  /* line 43, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/comments */
+  from {
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0); }
+
+  /* line 45, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/comments */
+  to {
+    -webkit-transform: translate3d(-10rem, 0, 0);
+    transform: translate3d(-10rem, 0, 0); } }
+
+@keyframes comments-slide-in {
+  /* line 43, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/comments */
+  from {
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0); }
+
+  /* line 45, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/comments */
+  to {
+    -webkit-transform: translate3d(-10rem, 0, 0);
+    transform: translate3d(-10rem, 0, 0); } }
+
+@-webkit-keyframes comments-appear {
+  /* line 49, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/comments */
+  from {
+    opacity: 0; }
+
+  /* line 51, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/comments */
+  to {
+    opacity: 1; } }
+
+@keyframes comments-appear {
+  /* line 49, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/comments */
+  from {
+    opacity: 0; }
+
+  /* line 51, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/comments */
+  to {
+    opacity: 1; } }
+
+/* line 1, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/comment */
+.comment {
+  position: relative;
+  font-size: 0.875rem;
+  line-height: 1.5rem;
+  margin-bottom: 1rem; }
+
+/* line 8, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/comment */
+.comment--toggle {
+  font-size: 1rem;
+  color: #999999;
+  width: 100%;
+  text-align: left; }
+
+/* line 16, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/comment */
+.comment-meta {
+  float: left; }
+
+/* line 19, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/comment */
+.comment-body {
+  padding-left: 0.5rem;
+  overflow: hidden; }
+
+/* line 23, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/comment */
+.comment-body-meta .link {
+  color: #999999;
+  text-decoration: underline; }
+
+/* line 29, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/comment */
+.comment--form .userpic {
+  margin-top: 0.25rem; }
+
+/* line 4, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/commentForm */
+.commentForm-userpic {
+  float: left;
+  margin-top: 0.5rem; }
+
+/* line 8, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/commentForm */
+.commentForm-body {
+  overflow: hidden;
+  padding-left: 0.5rem; }
+
+/* line 1, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/counterGroup */
+.counterGroup {
+  display: block;
+  text-align: center;
+  border-left: 1px solid #cccccc; }
+
+/* line 6, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/counterGroup */
+.counterGroup-container {
+  text-align: center; }
+
+/* line 1, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/counter */
+.counter {
+  display: inline-block;
+  min-width: 33.33333%;
+  padding: 0.5rem 1rem;
+  font-size: 1.5rem;
+  text-align: center;
+  border: 1px solid #cccccc;
+  border-left: 0; }
+
+/* line 10, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/counter */
+.counter-label {
+  font-size: 0.875rem;
+  line-height: 1em;
+  color: #999999; }
+
+/* line 1, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/calendarChart */
+.calendarChart {
+  width: 100%;
+  height: 10rem;
+  border: 1px solid #cccccc;
+  border-bottom: 0; }
 
 /* line 1, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/btn */
 button {
@@ -687,52 +989,68 @@ button::-moz-focus-inner {
   letter-spacing: 1px;
   color: white;
   text-transform: uppercase;
-  background-color: #333333;
-  font-size: 0.875rem; }
+  background-color: #379BFF;
+  font-size: 0.875rem;
+  border-radius: 4px; }
 
 /* line 1, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/input */
 .input-text {
   display: block;
   width: 100%;
-  padding: 0 0.5rem;
+  padding: 0.25rem 0.5rem;
   margin: 0;
   font: inherit;
   vertical-align: middle;
   background-color: white;
   border: 2px solid #cccccc;
+  border-radius: 4px;
   outline: 0;
   -webkit-appearance: none; }
-  /* line 12, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/input */
+  /* line 13, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/input */
   .input-text:focus {
     outline: 0;
-    border-color: #808080; }
+    border-color: #999999; }
 
-/* line 16, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/input */
+/* line 17, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/input */
 textarea.input-text {
   resize: vertical;
   padding: 0.5rem; }
 
-/* line 20, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/input */
+/* line 21, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/input */
 .input-text--w1-2 {
   width: 50%; }
 
-/* line 23, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/input */
+/* line 24, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/input */
 .input-text::-webkit-input-placeholder {
-  color: #808080; }
+  color: #999999; }
 
-/* line 25, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/input */
+/* line 26, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/input */
 .input-text:-moz-placeholder {
-  color: #808080;
+  color: #999999;
   opacity: 1; }
 
-/* line 28, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/input */
+/* line 29, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/input */
 .input-text::-moz-placeholder {
-  color: #808080;
+  color: #999999;
   opacity: 1; }
 
-/* line 31, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/input */
+/* line 32, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/input */
 .input-text:-ms-input-placeholder {
-  color: #808080; }
+  color: #999999; }
+
+/* line 35, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/input */
+.input-text--hero {
+  font-size: 1.5rem;
+  padding: 1rem;
+  margin-bottom: 2rem; }
+
+/* line 40, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/input */
+textarea.input-text--subtle {
+  padding: 0.5rem 0;
+  background-color: transparent;
+  border: 0;
+  border-bottom: 1px solid #cccccc;
+  border-radius: 0; }
 
 /* line 1, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/inputLine */
 .inputLine {
@@ -745,4 +1063,44 @@ textarea.input-text {
 .inputLine--right {
   text-align: right; }
 
+/* line 8, /Users/Vadim/Documents/work-crm/alma.net/static/sass/reuse/inputLine */
+.inputLine-caption {
+  font-size: 0.875rem;
+  color: #999999;
+  line-height: 1.5rem; }
+
+/* line 1, /Users/Vadim/Documents/work-crm/alma.net/static/sass/shame */
+.caption {
+  font-size: 0.875rem;
+  line-height: 1.5rem; }
+
+/* line 5, /Users/Vadim/Documents/work-crm/alma.net/static/sass/shame */
+.search {
+  position: relative; }
+  /* line 7, /Users/Vadim/Documents/work-crm/alma.net/static/sass/shame */
+  .search:after {
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 1;
+    display: block;
+    width: 3rem;
+    height: 100%;
+    background-image: url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIwIiBoZWlnaHQ9IjMyMCIgdmlld0JveD0iMCAwIDMyMCAzMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6c2tldGNoPSJodHRwOi8vd3d3LmJvaGVtaWFuY29kaW5nLmNvbS9za2V0Y2gvbnMiPjx0aXRsZT5tYWduaWZ5aW5nR2xhc3M8L3RpdGxlPjxkZXNjPkNyZWF0ZWQgd2l0aCBTa2V0Y2guPC9kZXNjPjxwYXRoIGQ9Ik0xNjQuNSAxNzYuNWMtNi4wMzYgNC45NTgtMTMuOTcxIDcuNS0yMi41IDcuNS0yMy4xOTYgMC00Mi0xOC44MDQtNDItNDJzMTguODA0LTQyIDQyLTQyIDQyIDE4LjgwNCA0MiA0MmMwIDguNTI5LTIuNTQyIDE2LjQ2NC03LjUgMjIuNWw0My41IDQzLjUtMTIgMTItNDMuNS00My41em0tMjIuNS0xMC41YzEzLjI1NSAwIDI0LTEwLjc0NSAyNC0yNHMtMTAuNzQ1LTI0LTI0LTI0LTI0IDEwLjc0NS0yNCAyNCAxMC43NDUgMjQgMjQgMjR6IiBza2V0Y2g6dHlwZT0iTVNTaGFwZUdyb3VwIiBmaWxsPSIjN0Y3RjdGIi8+PC9zdmc+);
+    background-position: center center;
+    background-repeat: no-repeat;
+    -webkit-background-size: contain;
+    background-size: contain;
+    content: ''; }
+  /* line 20, /Users/Vadim/Documents/work-crm/alma.net/static/sass/shame */
+  .search .input-text {
+    padding-right: 3rem; }
+
+/* line 23, /Users/Vadim/Documents/work-crm/alma.net/static/sass/shame */
+.round {
+  border-radius: 4px; }
+
+/* line 26, /Users/Vadim/Documents/work-crm/alma.net/static/sass/shame */
+.secondary {
+  color: #999999; }
 

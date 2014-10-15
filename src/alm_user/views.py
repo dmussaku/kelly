@@ -43,20 +43,13 @@ def login(request, template_name='registration/login.html',
             # Ensure the user-originating redirection url is safe.
             if not is_safe_url(url=redirect_to, host=request.get_host()):
                 redirect_to = resolve_url(settings.LOGIN_REDIRECT_URL)
-
             # Okay, security check complete. Log the user in.
             auth_login(request, form.get_user())
             if request.user:
-                try:
-                    s = Service.objects.get(slug='almcrm')
-                except ObjectDoesNotExist:
-                    return HttpResponse('AlmaCRM service is not created, make sure to create a service with slug almacrm')
-                if request.user.get_subscriptions().filter(service__slug='almcrm'):
-                    # do not know how to redirect to the needed page to be honest
-                    request.subdomain = request.user.get_company().subdomain
-                    #return HttpResponseRedirect('bwayne.alma.net:8000/almcrm/')
-                    return HttpResponseRedirect(almanet_reverse('feed', subdomain=request.subdomain, args=['almcrm']))
-                    pass
+                subscr = request.user.get_subscriptions().first()
+                if not subscr:
+                    HttpResponseRedirect(redirect_to)
+                return HttpResponseRedirect(subscr.backend.get_home_url())
             return HttpResponseRedirect(redirect_to)
     else:
         form = authentication_form(request)
