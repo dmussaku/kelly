@@ -1,21 +1,37 @@
+import json
 from django.views.generic import ListView, DetailView, TemplateView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.utils import timezone
+from django.http import HttpResponseRedirect
 from datetime import timedelta
-from almanet.url_resolvers import reverse_lazy
+from almanet.url_resolvers import reverse_lazy, reverse as almanet_reverse
+from django.contrib.contenttypes.models import ContentType
 from django.http import HttpResponse
 from django.shortcuts import render
 from forms import ContactForm, SalesCycleForm, MentionForm, ActivityForm,\
     CommentForm, ValueForm, ActivityFeedbackForm, ShareForm
 from models import Contact, SalesCycle, Activity, Feedback, Comment, Value,\
     CRMUser
+from alm_vcard.forms import VCardUploadForm
+from django.views.generic.base import View
+from models import Contact, SalesCycle, Activity, Feedback, Comment, Value
+from almanet.url_resolvers import reverse as almanet_reverse
+from .decorators import crmuser_required
 import json
+from django.db.models import Q
 
-
-class DashboardView(TemplateView):
+class DashboardView(View):
 
     def get_context_data(self, **kwargs):
-        pass
+        context = super(DashboardView, self).get_context_data(**kwargs)
+        context['form'] = VCardUploadForm
+        context['subdomain'] = self.request.subdomain
+        return context
+
+    def get(self, request, *a, **kw):
+        url = almanet_reverse('feed', kwargs={'slug': self.kwargs.get('slug')},
+                              subdomain=request.user_env['subdomain'])
+        return HttpResponseRedirect(url)
 
 
 class FeedView(TemplateView):
@@ -25,6 +41,7 @@ class FeedView(TemplateView):
         crmuser_id = self.request.user.get_crmuser().id
         sales_cycles_data = SalesCycle.get_salescycles_by_last_activity_date(
             crmuser_id, owned=True, mentioned=True, followed=True)
+        context['form'] = VCardUploadForm
         context['sales_cycles'] = sales_cycles_data[0]
         context['sales_cycle_activities'] = sales_cycles_data[1]
         context['sales_cycle_activity_map'] = sales_cycles_data[2]
@@ -64,7 +81,6 @@ class ContactDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(ContactDetailView, self).get_context_data(**kwargs)
-
         current_crmuser = self.request.user.get_crmuser()
         crmusers, users = CRMUser.get_crmusers(with_users=True)
 
@@ -105,6 +121,10 @@ class ContactDetailView(DetailView):
         context['crmusers'] = crmusers.exclude(id=current_crmuser.id)
         context['current_crmuser'] = current_crmuser
 
+# =======
+#         context['form'] = VCardUploadForm
+#         context['activities'] = Activity.get_activities_by_contact(contact_pk)
+# >>>>>>> origin/feature/dmussaku
         return context
 
 
@@ -122,6 +142,55 @@ class ContactListView(ListView):
         return context
 
 
+class CommentCreateView(CreateView):
+    '''
+    def get_initial(self):
+       return {'author' : self.request.user}
+    '''
+
+    def form_valid(self, form):
+        form.instance.author = self.request.user.get_crmuser()
+        form.instance.content_type_id = ContentType.objects.get(model=self.kwargs['content_type']).id
+        form.instance.object_id = self.kwargs['object_id']
+        try:
+            comment = form.save()
+            data=json.dumps(
+                {'author':comment.author.id,
+                'name':comment.author.get_billing_user().get_full_name(),
+                'date_created':comment.date_created.strftime('%Y-%m-%dT%H:%M:%S'),
+                'object_id':comment.object_id,
+                'id':comment.id,
+                'comment':comment.comment
+                })
+            print data
+            return HttpResponse(data, content_type="application/json")
+        except:
+            return super(CommentCreateView, self).form_valid(form)
+
+    def get_success_url(self, **kwargs):
+        if not self.success_url:
+            return almanet_reverse('feed', subdomain=self.request.subdomain, args=['almcrm'])
+        return False
+
+    def get_context_data(self, **kwargs):
+        context = super(CommentCreateView, self).get_context_data(**kwargs)
+        context['context_type'] = self.kwargs['content_type']
+        context['object_id'] = self.kwargs['object_id']
+        context['comments'] = Comment().get_comments_by_context(self.kwargs['object_id'], self.kwargs['content_type'])
+        return context
+
+def comment_delete_view(request, slug, comment_id):
+    if request.method == 'GET':
+        try:
+            comment = Comment.objects.get(id=comment_id)
+            print comment
+            json_response = json.dumps({'success':'True', 'id':comment.id})
+            print json_response
+            comment.delete()
+            return HttpResponse(json_response, mimetype='application/json')
+        except:
+            return HttpResponse(json.dumps({'success':'False'}), mimetype='application/json')
+
 # class DashBoardTemplateView(TemplateView):
 #     template_name = 'crm/dashboard.html'
 
@@ -130,6 +199,27 @@ class ContactListView(ListView):
 #         context = super(DashBoardTemplateView, self).get_context_data(**kwargs)
 #         context['contacts'] = Contact.objects.all()[:10]
 #         return context
+
+def contact_search(request, slug, query_string):
+    if request.method == 'GET':
+        queryset = Contact.objects.filter(Q(vcard__given_name__startswith=query_string) |
+            Q(vcard__family_name__startswith=query_string) |
+            Q(vcard__tel__value__contains=query_string) |
+            Q(vcard__email__value__startswith=query_string) |
+            Q(vcard__org__organization_name__startswith=query_string)
+            )
+        json_list=[contact.json_serialize() for contact in queryset]
+        return HttpResponse(json.dumps(json_list), content_type='application/json')
+
+class CommentAddMentionView(CreateView):
+    model = Comment
+    form_class = MentionForm #context_type, context_id
+    success_url = reverse_lazy('comment_list')
+    template_name = "comment/comment_add_mention.html"
+
+    def post(self, request, *args, **kwargs):
+        self.model.objects.get(id=self.kwargs['pk']).add_mention(list(request.POST['user_id']))
+        return super(CommentAddMentionView, self).post(request, *args, **kwargs)
 
 
 class UserProductView(ListView):
@@ -226,7 +316,7 @@ class SalesCycleUpdateView(UpdateView):
 
 class SalesCycleAddMentionView(UpdateView):
     model = SalesCycle
-    form_class = MentionForm #context_type, context_id
+    form_class = MentionForm  # context_type, context_id
     success_url = reverse_lazy('sales_cycle_list')
     template_name = "sales_cycle/sales_cycle_add_mention.html"
 
@@ -278,9 +368,13 @@ class ActivityListView(ListView):
 
 
 class ActivityDetailView(DetailView):
-    model = Activity
-    template_name = 'activity/activity_detail.html'
 
+    def get_context_data(self, **kwargs):
+        context = super(ActivityDetailView, self).get_context_data(**kwargs)
+        context['activity'] = Activity.objects.get(id=self.kwargs['pk'])
+        context['comments'] = Activity.objects.get(id=self.kwargs['pk']).comments.all()
+        context['comment_form'] = CommentForm
+        return context
 
 class ActivityUpdateView(UpdateView):
     model = Activity
@@ -301,31 +395,21 @@ class CommentListView(ListView):
     template_name = 'comment/comment_list.html'
 
 
-class CommentCreateView(CreateView):
-    model = Comment
-    form_class = CommentForm
-    success_url = reverse_lazy('comment_list')
-    template_name = 'comment/comment_create.html'
-    '''
-    def get_initial(self):
-       return {'author' : self.request.user}
-    '''
-
-    def form_valid(self, form):
-        form.instance.author = self.request.user
-        form.instance.date_edited = timezone.now()
-        return super(CommentCreateView, self).form_valid(form)
+def comments_by_activity(self, activity_id):
+    try:
+        activity = Activity.objects.get(id=activity_id)
+    except ObjectDoesNotExist:
+        return False
+    else:
+        comments = Comment().get_comments_by_context(activity.id, Activity)
+    if request.method == 'POST':
+        pass
 
 
-class CommentAddMentionView(CreateView):
-    model = Comment
-    form_class = MentionForm #context_type, context_id
-    success_url = reverse_lazy('comment_list')
-    template_name = "comment/comment_add_mention.html"
 
-    def post(self, request, *args, **kwargs):
-        self.model.objects.get(id=self.kwargs['pk']).add_mention(list(request.POST['user_id']))
-        return super(CommentAddMentionView, self).post(request, *args, **kwargs)
+
+
+
 
 
 class ValueListView(ListView):

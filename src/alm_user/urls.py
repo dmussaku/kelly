@@ -2,10 +2,10 @@ from django.conf.urls import patterns, url
 from django.core.urlresolvers import reverse_lazy
 from alm_user.forms import PasswordResetForm
 from alm_user.views import UserListView, UserRegistrationView
-from alm_user.views import password_reset_confirm
+from alm_user.views import login, password_reset_confirm
 from alm_user.models import User
 from django.contrib.auth.views import (
-    login as django_login,
+    #login as django_login,
     logout as django_logout,
     password_reset as django_password_reset,
     password_reset_done as django_password_reset_done,)
@@ -21,7 +21,7 @@ urlpatterns = patterns(
     url(r'^signup/$', UserRegistrationView.as_view(),
         name='user_registration'),
     url(r'^signin/$',
-        django_login, {'template_name': 'user/user_login.html'},
+        login, {'template_name': 'user/user_login.html'},
         name='user_login'),
     url(r'^password-reset/$', django_password_reset, {
         'template_name': 'user/password_reset.html',

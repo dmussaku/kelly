@@ -4,8 +4,15 @@
 
 {% block css %}
 <link rel="shortcut icon" type="image/ico" href="{% static 'img/favicon.ico' %}" />
+<link rel="stylesheet" href="{% static 'css/autocomplete.css' %}">
 <link rel="stylesheet" href="{% static 'css/app.css' %}">
 {% block crm_css_content %}{% endblock %}
+<style>
+  #scrollable-dropdown-menu .tt-dropdown-menu {
+    max-height: 500px;
+    overflow-y: auto;
+  }
+</style>
 {% endblock %}
 
 
@@ -36,20 +43,31 @@
 
 <nav class="body-header nav">
   <div class="lineOfLinks">
-    <a class="lineOfLinks-link nav-link"
-      href="{% crm_url 'contacts_list' %}"> {{ _('contacts') }} </a>
-    <a class="lineOfLinks-link nav-link"
-      href="{% crm_url 'feed' %}"> {{ _('feed') }} </a>
+  <a class="lineOfLinks-link nav-link" href="{% subdomain_url 'crm_home' slug=DEFAULT_SERVICE subdomain=request.user_env.subdomain %}"> {{ _('dashboard') }} </a>
+    <a class="lineOfLinks-link nav-link" href="{% subdomain_url 'contacts_list' slug=DEFAULT_SERVICE subdomain=request.user_env.subdomain %}"> {{ _('contacts') }} </a>
+    <a class="lineOfLinks-link nav-link" href="{% subdomain_url 'feed' slug=DEFAULT_SERVICE subdomain=request.user_env.subdomain %}"> {{ _('feed') }} </a>
+    <div id="scrollable-dropdown-menu" style='float:right;'>
+      <input class="typeahead" type="text" placeholder="Search Contacts" >
+    </div>
 
     <div class="nav-aside">
       <div class="dropdown dropdown--inline dropdown--right">
         <a class="btn dropdown-toggle" href="#" data-toggle="dropdown" role="menu">
-          Add contact
+          Import Contacts
         </a>
         <div class="dropdown-menu">
           <div class="dropdown-triangle"></div>
           <div class="dropdown-menu-body">
-            Here fast add form
+            <form action="{% subdomain_url 'crm_import_vcard' slug='almcrm' subdomain=request.subdomain %}" id='file_upload_form' method="post" enctype="multipart/form-data">
+              {% csrf_token %}
+              <p>{{ form.non_field_errors }}</p>
+              <p>{{ form.myfile.label_tag }} {{ form.myfile.help_text }}</p>
+              <p>
+                  {{ form.myfile.errors }}
+                  {{ form.myfile }}
+              </p>
+              <p><button type="submit" class="btn btn-primary" id='upload-btn'>Upload</button></p>
+          </form>
           </div>
         </div>
       </div>
@@ -83,6 +101,10 @@
 
 
 <div class="body-container">
+  <div id='gif-loader' style="display:none;">
+    <img src='../static/img/ajax-loader.gif' style="display: block; margin-top:40px; margin-left: auto; margin-right: auto">
+    <p style='text-align:center;'>Please wait while we upload your vcard</p>
+  </div>
   <aside class="tabs">
     {% block crm_aside_tabs %}{% endblock %}
   </aside>
@@ -100,5 +122,19 @@
 {% block js_content %}
   <script src="{% static 'js/jquery-2.1.1.min.js' %}"></script>
   <script src="{% static 'js/scripts.min.js' %}"></script>
+  <script src="http://twitter.github.io/typeahead.js/releases/latest/bloodhound.js"></script>
+  <script src="http://twitter.github.io/typeahead.js/releases/latest/typeahead.jquery.js"></script>
+  <script src="https://twitter.github.io/typeahead.js/releases/latest/typeahead.bundle.js"></script>
+
+  <!--
+  Jquery script for vcard upload
+  -->
+  <!--
+  Jquery Script for ajax get of comment list
+  -->
+  <script src="{% static 'js/vcard_upload.js' %}"></script>
+  <script src="{% static 'js/comments.js' %}"></script>
+  <script src="{% static 'js/contact_search.js' %}"></script>
+  <!--<script src="{% static 'js/contact_search.js' %}"></script>-->
   {% block crm_js_content %}{% endblock %}
 {% endblock %}

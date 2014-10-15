@@ -11,6 +11,7 @@ from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
 from django.utils import timezone
 import datetime
+import json
 # from dateutil.relativedelta import relativedelta
 
 
@@ -124,6 +125,12 @@ class Contact(SubscriptionObject):
     def __unicode__(self):
         return "%s %s" % (self.vcard, self.tp)
 
+    def save(self, **kwargs):
+        if not self.subscription_id and self.owner:
+            self.subscription_id = self.owner.subscription_id
+        super(Contact, self).save(**kwargs)
+
+
     @property
     def name(self):
         if not self.vcard:
@@ -137,6 +144,8 @@ class Contact(SubscriptionObject):
         return tel and tel or None
 
     def mobile(self):
+        if not self.tel(type='cell'):
+            return "Unknown"
         return self.tel(type='cell')
 
     def email(self, type='WORK'):
@@ -216,6 +225,15 @@ class Contact(SubscriptionObject):
             return True
         except CRMUser.DoesNotExist:
             return False
+   
+    def json_serialize(self):
+        return {'pk':self.pk, 
+        'name':self.name,
+        #'tel':self.tel() 
+        #'mobile':self.mobile(), 
+        #'email':self.email(),
+        #'company':self.company()
+        }
 
     @classmethod
     def assign_user_to_contact(cls, user_id, contact_id):
@@ -473,6 +491,11 @@ class Value(SubscriptionObject):
     def __unicode__(self):
         return "%s %s %s" % (self.amount, self.currency, self.salary)
 
+    def save(self, **kwargs):
+        if not self.subscription_id and self.owner:
+            self.subscription_id = self.owner.subscription_id
+        super(Value, self).save(**kwargs)
+
 
 class Product(SubscriptionObject):
     name = models.CharField(_('product name'), max_length=100, blank=False)
@@ -489,6 +512,11 @@ class Product(SubscriptionObject):
 
     def __unicode__(self):
         return self.name
+
+    def save(self, **kwargs):
+        if not self.subscription_id and self.owner:
+            self.subscription_id = self.owner.subscription_id
+        super(Product, self).save(**kwargs)
 
 
 class SalesCycle(SubscriptionObject):
@@ -648,6 +676,11 @@ class SalesCycle(SubscriptionObject):
         return SalesCycle.objects.filter(contact_id=contact_id)[
             offset:offset + limit]
 
+    def save(self, **kwargs):
+        if not self.subscription_id and self.owner:
+            self.subscription_id = self.owner.subscription_id
+        super(SalesCycle, self).save(**kwargs)
+
 
 class Activity(SubscriptionObject):
     title = models.CharField(max_length=100)
@@ -755,6 +788,12 @@ class Activity(SubscriptionObject):
                 date_counts[date] = 1
         return date_counts
 
+    def save(self, **kwargs):
+        if not self.subscription_id and self.owner:
+            self.subscription_id = self.owner.subscription_id
+        super(Activity, self).save(**kwargs)
+
+
 
 class Feedback(SubscriptionObject):
     STATUS_OPTIONS = (
@@ -779,6 +818,8 @@ class Feedback(SubscriptionObject):
 
     def save(self, **kwargs):
         self.date_edited = timezone.now()
+        if not self.subscription_id and self.owner:
+            self.subscription_id = self.owner.subscription_id
         super(Feedback, self).save(**kwargs)
 
 
@@ -811,6 +852,11 @@ class Mention(SubscriptionObject):
         # Alibek
         return Mention.objects.filter(user_id=user_id)
 
+    def save(self, **kwargs):
+        if not self.subscription_id and self.owner:
+            self.subscription_id = self.owner.subscription_id
+        super(Mention, self).save(**kwargs)
+
 
 class Comment(SubscriptionObject):
     comment = models.CharField(max_length=140)
@@ -832,6 +878,8 @@ class Comment(SubscriptionObject):
     def save(self, **kwargs):
         if self.date_created:
             self.date_edited = timezone.now()
+        if not self.subscription_id and self.owner:
+            self.subscription_id = self.owner.subscription_id
         super(Comment, self).save(**kwargs)
 
     def add_mention(self, user_ids=None):
@@ -858,7 +906,10 @@ class Comment(SubscriptionObject):
     @classmethod
     def get_comments_by_context(cls, context_object_id, context_class,
                                 limit=20, offset=0):
-        cttype = ContentType.objects.get_for_model(context_class)
+        try:
+            cttype = ContentType.objects.get(model=str(context_class))
+        except ContentType.DoesNotExist:
+            return False
         return cls.objects.filter(
             object_id=context_object_id,
             content_type=cttype)[offset:offset + limit]

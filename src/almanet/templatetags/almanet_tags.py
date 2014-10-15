@@ -270,6 +270,7 @@ def subdomain_url(view, subdomain='', *args, **kwargs):
     return reverse(view, subdomain=subdomain, args=args, kwargs=kwargs)
 
 
+
 @register.inclusion_tag('almanet/tags/con_discon_button.html')
 def connect_disconnect_button(user, service):
     """ Show connect or disconnect links according to user - service relation """
@@ -278,3 +279,4 @@ def connect_disconnect_button(user, service):
         'service': service,
         'connected': user.is_service_connected(service)
     }
+

@@ -2,6 +2,7 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from django.utils.text import slugify
+from almanet.url_resolvers import reverse as almanet_reverse
 
 
 class Service(models.Model):
@@ -40,6 +41,18 @@ class Subscription(models.Model):
     class Meta:
         verbose_name = _('subscription')
         db_table = settings.DB_PREFIX.format('subscription')
+
+    @property
+    def backend(self):
+        # TODO backend pattern
+        return self
+
+    def get_home_url(self):
+        url_key = '{}_home'.format(settings.DEFAULT_SERVICE)
+        return almanet_reverse(
+            url_key,
+            subdomain=self.organization.subdomain,
+            kwargs={'slug': self.service.slug.lower()})
 
 
 class SubscriptionObject(models.Model):

@@ -185,6 +185,7 @@ class BaseConfiguration(SubdomainConfiguration, Configuration):
         'django.contrib.messages.context_processors.messages',
         "django.contrib.auth.context_processors.auth",
         'almanet.context_processors.available_subdomains',
+        'almanet.context_processors.misc'
         # 'launch.context_processors.launch',
     )
 
@@ -223,6 +224,10 @@ class BaseConfiguration(SubdomainConfiguration, Configuration):
                                            subdomain=self.MY_SD)
 
     @property
+    def LOGIN_REDIRECT_CRM_URL(self):
+        return self.__class__.reverse_lazy('feed', subdomain='bwayne')
+
+    @property
     def LOGIN_URL(self):
         return self.__class__.reverse_lazy('user_login', subdomain=None)
 
@@ -244,6 +249,8 @@ class BaseConfiguration(SubdomainConfiguration, Configuration):
     SITE_DOMAIN = 'http://localhost:8000'
 
     DEFAULT_URL_SCHEME = 'http'
+
+    DEFAULT_SERVICE = 'crm'
 
 
 class DevConfiguration(FileSettings('~/.almanet/almanet.conf.py'), BaseConfiguration):

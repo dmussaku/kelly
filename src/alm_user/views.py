@@ -2,12 +2,13 @@ from django.views.generic import ListView
 from django.views.generic.base import TemplateView, TemplateResponse
 from django.views.generic.edit import CreateView, UpdateView
 # from django.core.urlresolvers import reverse_lazy
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth.forms import SetPasswordForm
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.cache import never_cache
 from django.conf import settings
+from almanet.settings import MY_SD
 
 from alm_user.models import User
 from alm_user.forms import RegistrationForm, UserBaseSettingsForm, UserPasswordSettingsForm
@@ -16,6 +17,55 @@ from almanet.url_resolvers import reverse_lazy
 
 # for testing, need to be deleted
 from datetime import datetime
+from django.views.decorators.csrf import csrf_protect
+from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.sites.models import get_current_site
+from django.utils.http import is_safe_url
+from django.shortcuts import resolve_url
+from django.contrib.auth import REDIRECT_FIELD_NAME, login as auth_login, logout as auth_logout, get_user_model
+from almanet.url_resolvers import reverse as almanet_reverse
+
+@sensitive_post_parameters()
+@csrf_protect
+@never_cache
+def login(request, template_name='registration/login.html',
+          redirect_field_name=REDIRECT_FIELD_NAME,
+          authentication_form=AuthenticationForm,
+          current_app=None, extra_context=None):
+    """
+    Displays the login form and handles the login action.
+    """
+    redirect_to = request.REQUEST.get(redirect_field_name, '')
+    if request.method == "POST":
+        form = authentication_form(request, data=request.POST)
+        if form.is_valid():
+
+            # Ensure the user-originating redirection url is safe.
+            if not is_safe_url(url=redirect_to, host=request.get_host()):
+                redirect_to = resolve_url(settings.LOGIN_REDIRECT_URL)
+            # Okay, security check complete. Log the user in.
+            auth_login(request, form.get_user())
+            if request.user:
+                subscr = request.user.get_subscriptions().first()
+                if not subscr:
+                    HttpResponseRedirect(redirect_to)
+                return HttpResponseRedirect(subscr.backend.get_home_url())
+            return HttpResponseRedirect(redirect_to)
+    else:
+        form = authentication_form(request)
+
+    current_site = get_current_site(request)
+
+    context = {
+        'form': form,
+        redirect_field_name: redirect_to,
+        'site': current_site,
+        'site_name': current_site.name,
+    }
+    if extra_context is not None:
+        context.update(extra_context)
+    return TemplateResponse(request, template_name, context,
+                            current_app=current_app)
 
 
 class UserListView(ListView):

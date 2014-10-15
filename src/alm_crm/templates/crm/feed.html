@@ -1,5 +1,5 @@
 {% extends "crm/base.html" %}
-{% load i18n crm_tags %}
+{% load i18n crm_tags almanet_tags %}
 {% block head_title %} {{ _("Feed") }} {% endblock %}
 
 {% block crm_aside_tabs %}
@@ -30,6 +30,12 @@
 {% block crm_body %}
   <div class="body-column body-column--single">
     <div class="column">
+      <div class="column-block">
+        <div id="comments">
+        </div>
+      </div>
+    </div>
+    <div class="column">
       {% for sc in sales_cycles %}
         <div class="column-block">
           <div class="column-title">
@@ -39,7 +45,7 @@
           </div>
 
           {% for sc_activity in sales_cycle_activities %}
-            {% show_activity sc_activity %}
+            {% show_activity sc_activity request=request DEFAULT_SERVICE=DEFAULT_SERVICE %}
           {% endfor %}
 
           <div class="column-block-footer"></div>
@@ -47,4 +53,15 @@
       {% endfor %}
     </div>
   </div>
+
 {% endblock crm_body %}
+
+
+{% block js_content %}
+{{ block.super }}
+<script type="text/javascript">
+  $(function() {
+    $('.js-show-comments-link').click($.comments.click_event);
+  });
+</script>
+{% endblock %}
