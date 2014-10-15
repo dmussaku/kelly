@@ -6,7 +6,7 @@ from almanet.url_resolvers import reverse_lazy
 from django.http import HttpResponse
 from django.shortcuts import render
 from forms import ContactForm, SalesCycleForm, MentionForm, ActivityForm,\
-    CommentForm, ValueForm, ActivityFeedbackForm
+    CommentForm, ValueForm, ActivityFeedbackForm, ShareForm
 from models import Contact, SalesCycle, Activity, Feedback, Comment, Value,\
     CRMUser
 import json
@@ -31,6 +31,31 @@ class FeedView(TemplateView):
         return context
 
 
+class ShareCreateView(CreateView):
+
+    def form_valid(self, form):
+        response = super(self.__class__, self).form_valid(form)
+        if self.request.is_ajax():
+            data = {
+                'pk': self.object.pk,
+            }
+            return HttpResponse(json.dumps(data), mimetype="application/json")
+        else:
+            return response
+
+    def get_success_url(self):
+        return reverse_lazy('share_list',
+                            subdomain=self.request.user_env['subdomain'],
+                            kwargs={'slug': 'crm'})
+
+
+class ShareListView(ListView):
+
+    def get_queryset(self):
+        crmuser = self.request.user.get_crmuser()
+        return crmuser.in_shares.all()
+
+
 class ContactDetailView(DetailView):
 
     def get_object(self):
@@ -41,6 +66,7 @@ class ContactDetailView(DetailView):
         context = super(ContactDetailView, self).get_context_data(**kwargs)
 
         current_crmuser = self.request.user.get_crmuser()
+        crmusers, users = CRMUser.get_crmusers(with_users=True)
 
         # show sales_cycle
         sales_cycle_id = self.request.GET.get('sales_cycle_id', False)
@@ -65,13 +91,19 @@ class ContactDetailView(DetailView):
             return {'id': crmuser.id,
                     'name': users.get(id=crmuser.user_id).get_username(),
                     'type': 'crmuser'}
-        crmusers, users = CRMUser.get_crmusers(with_users=True)
         context['mentions'] = json.dumps(map(gen_mentions, crmusers))
 
         # create new sales_cycle
         context['sales_cycle_form'] = SalesCycleForm(
             initial={'owner': current_crmuser,
                      'contact': context['object']})
+
+        # share contact to
+        context['share_form'] = ShareForm(
+            initial={'share_from': current_crmuser,
+                     'contact': context['object']})
+        context['crmusers'] = crmusers.exclude(id=current_crmuser.id)
+        context['current_crmuser'] = current_crmuser
 
         return context
 

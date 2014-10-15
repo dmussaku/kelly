@@ -864,6 +864,27 @@ class Comment(SubscriptionObject):
             content_type=cttype)[offset:offset + limit]
 
 
+class Share(SubscriptionObject):
+    contact = models.ForeignKey(
+        Contact, related_name='shares',
+        on_delete=models.SET_DEFAULT, default=None)
+    share_to = models.ForeignKey(CRMUser, related_name='in_shares')
+    share_from = models.ForeignKey(CRMUser, related_name='owned_shares')
+    date_created = models.DateTimeField(blank=True, auto_now_add=True)
+    comments = generic.GenericRelation('Comment')
+
+    class Meta:
+        verbose_name = 'share'
+        db_table = settings.DB_PREFIX.format('share')
+
+    @classmethod
+    def get_shares(cls, limit=20, offset=0):
+        return cls.objects.order_by('-date_created')[offset:offset + limit]
+
+    def __unicode__(self):
+        return '%s : %s -> %s' % (self.contact, self.share_from, self.share_to)
+
+
 signals.post_save.connect(
     Contact.upd_lst_activity_on_create, sender=Activity)
 signals.post_save.connect(

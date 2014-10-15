@@ -3,9 +3,9 @@ from almanet.url_resolvers import reverse_lazy
 from .decorators import crmuser_required
 from .views import DashboardView, FeedView, ContactDetailView, \
     ContactListView, ContactCreateView, ContactUpdateView, ActivityCreateView,\
-    SalesCycleCreateView
-from .models import Contact, Activity
-from .forms import ContactForm, ActivityForm, SalesCycleForm
+    SalesCycleCreateView, ShareCreateView, ShareListView
+from .models import Contact, Activity, Share
+from .forms import ContactForm, ActivityForm, SalesCycleForm, ShareForm
 # from almanet.models import Subscription
 
 urlpatterns = patterns(
@@ -58,5 +58,16 @@ urlpatterns = patterns(
             form_class=SalesCycleForm,
             template_name='sales_cycle/sales_cycle_create.html',
             success_url=reverse_lazy('sales_cycle_list'))),
-        name='sales_cycle_create')
+        name='sales_cycle_create'),
+
+    url(r'^share/create/$',
+        crmuser_required(ShareCreateView.as_view(
+            form_class=ShareForm,
+            template_name='crm/share/share_create.html')),
+        name='share_create'),
+    url(r'^share/$',
+        crmuser_required(ShareListView.as_view(
+            model=Share,
+            template_name='crm/share/share_list.html')),
+        name='share_list')
 )

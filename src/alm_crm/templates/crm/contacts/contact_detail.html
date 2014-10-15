@@ -71,27 +71,50 @@
 
             <div class="dropdown dropdown--inline">
               <a href="#" class="lineOfLinks-link" data-toggle="dropdown">Share</a>
+
+
+              <form action="{% crm_url 'share_create' %}" method="POST"
+                data-js-create-share='form'> {% csrf_token %}
+                {{ share_form.share_to.as_hidden }}
+                {{ share_form.share_from.as_hidden }}
+                {{ share_form.contact.as_hidden }}
+              </form>
+
+
               <div class="dropdown-menu dropdown-menu--share">
                 <div class="dropdown-menu-body">
                   <ul class="dropdown-menu-list">
 
+
                     <li class="dropdown-menu-item">
-                      <a href="#" class="dropdown-menu-item-link">
+                      <a href="#" class="dropdown-menu-item-link"
+                        data-js-create-share-to="{{ current_crmuser.pk }}">
                         <figure class="userpic">
                           <img src="{% static 'img/example/userpic6.png' %}" alt="" />
                         </figure>
-                        Ren (you)
+                        {{ current_crmuser.get_billing_user.get_username }} (you)
                       </a>
                     </li>
 
+                    {% for crmuser in crmusers %}
+                      <li class="dropdown-menu-item">
+                        <a href="#" class="dropdown-menu-item-link"
+                          data-js-create-share-to="{{ crmuser.pk }}">
+                          <figure class="userpic">
+                            <img src="{% static 'img/example/userpic2.png' %}" alt="" />
+                          </figure>
+                          {{ crmuser.get_billing_user.get_username }}
+                        </a>
+                      </li>
+                    {% endfor %}
+
+
                     <li class="dropdown-menu-item">
-                      <a href="#" class="dropdown-menu-item-link">
-                        <figure class="userpic">
-                          <img src="{% static 'img/example/userpic2.png' %}" alt="" />
-                        </figure>
-                        Crimson Doll
-                      </a>
+                      <a href="{% crm_url 'share_list' %}"
+                        class="dropdown-menu-item-link"
+                        > see shares  </a>
                     </li>
+
 
                   </ul>
                 </div>
@@ -315,7 +338,7 @@
                   console.log(event)
                   console.log(jqxhr)
                   console.log(settings)
-                  console.log(thrownError)
+                  alert(thrownError);
                 });
             };
 
@@ -405,7 +428,7 @@
               console.log(event)
               console.log(jqxhr)
               console.log(settings)
-              console.log(thrownError)
+              alert(thrownError);
             });
 
           event.preventDefault();
@@ -415,12 +438,49 @@
         }
       },
 
+      share = {
+        sel: {
+          form: '[data-js-create-share="form"]',
+          link: '[data-js-create-share-to]',
+          share_to: '[name="share_to"]',
+          data: {
+            link_id: 'jsCreateShareTo',
+          },
+        },
+        create_share: function(event) {
+          var $link = $(event.target),
+              $form = $(this.sel.form),
+              id = $link.data(this.sel.data.link_id),
+
+              _done = function(response_data) {
+                console.log('share created: ', response_data.pk);
+              };
+
+          $form.find(this.sel.share_to).val( id );
+
+          $.post($form.prop('action'), $form.serialize())
+            .done( _done )
+            .fail(function (event, jqxhr, settings, thrownError) {
+              console.log(event)
+              console.log(jqxhr)
+              console.log(settings)
+              alert(thrownError);
+            });
+
+          event.preventDefault();
+        },
+        init: function(event) {
+          $(document).on('click', this.sel.link, $.proxy(this.create_share, this));
+        }
+      },
+
       init = function() {
         $links.on('click', sel.link, reload_data);
         $(document).on('submit', sel.form, submit_activity);
 
         add_mentions.init();
         create_sales_cycle.init();
+        share.init();
       };
 
     init();

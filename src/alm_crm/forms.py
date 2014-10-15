@@ -1,4 +1,5 @@
-from models import Contact, SalesCycle, Mention, Comment, Activity, Value, Feedback
+from models import Contact, SalesCycle, Mention, Comment, Activity, Value, \
+    Feedback, Share
 from alm_user.models import User
 from django import forms
 from django.forms import ModelForm
@@ -47,6 +48,13 @@ class SalesCycleForm(ModelForm):
     class Meta:
         model = SalesCycle
         exclude = ['status', 'date_created', 'latest_activity']
+
+
+class ShareForm(ModelForm):
+
+    class Meta:
+        model = Share
+        exclude = ['date_created']
 
 
 def get_user_choices():
