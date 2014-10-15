@@ -11,6 +11,7 @@ from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
 from django.utils import timezone
 import datetime
+import json
 # from dateutil.relativedelta import relativedelta
 
 
@@ -126,6 +127,8 @@ class Contact(SubscriptionObject):
         return tel and tel or None
 
     def mobile(self):
+        if not self.tel(type='cell'):
+            return "Unknown"
         return self.tel(type='cell')
 
     def email(self, type='WORK'):
@@ -205,6 +208,15 @@ class Contact(SubscriptionObject):
             return True
         except CRMUser.DoesNotExist:
             return False
+   
+    def json_serialize(self):
+        return {'pk':self.pk, 
+        'name':self.name,
+        #'tel':self.tel() 
+        #'mobile':self.mobile(), 
+        #'email':self.email(),
+        #'company':self.company()
+        }
 
     @classmethod
     def assign_user_to_contact(cls, user_id, contact_id):

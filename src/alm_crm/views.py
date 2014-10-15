@@ -13,6 +13,7 @@ from models import Contact, SalesCycle, Activity, Feedback, Comment, Value
 from almanet.url_resolvers import reverse as almanet_reverse
 from .decorators import crmuser_required
 import json
+from django.db.models import Q
 
 class DashboardView(TemplateView):
 
@@ -123,6 +124,16 @@ def comment_delete_view(request, slug, comment_id):
 #         context['contacts'] = Contact.objects.all()[:10]
 #         return context
 
+def contact_search(request, slug, query_string):
+    if request.method == 'GET':
+        queryset = Contact.objects.filter(Q(vcard__given_name__startswith=query_string) |
+            Q(vcard__family_name__startswith=query_string) |
+            Q(vcard__tel__value__contains=query_string) |
+            Q(vcard__email__value__startswith=query_string) |
+            Q(vcard__org__organization_name__startswith=query_string)
+            )
+        json_list=[contact.json_serialize() for contact in queryset]
+        return HttpResponse(json.dumps(json_list), content_type='application/json')
 
 class CommentAddMentionView(CreateView):
     model = Comment

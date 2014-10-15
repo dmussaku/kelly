@@ -11,7 +11,8 @@ from .views import (
     FeedView, 
     ActivityDetailView,
     CommentCreateView,
-    comment_delete_view
+    comment_delete_view,
+    contact_search,
     )
 from .models import Contact, Activity
 
@@ -41,13 +42,16 @@ urlpatterns = patterns(
             template_name = 'comment/comment_create.html')),
         name='comments'), 
 
-    
+    url(r'^contacts/search/(?P<query_string>[-a-zA-Z0-9_]+)/$',
+        contact_search,
+        name='contact-search'),
 
     url(r'^contacts/$',
         crmuser_required(ContactListView.as_view(
             model=Contact,
             template_name='crm/contacts/contact_list.html',
         )), name='contacts_list'),
+
     url(r'^contacts/(?P<contact_pk>[\d]+)/$',
         crmuser_required(ContactDetailView.as_view(
             model=Contact,
