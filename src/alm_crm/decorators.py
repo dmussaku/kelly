@@ -15,7 +15,7 @@ def crmuser_required(fn):
         user_id = None
         for subscr_id in request.user_env['subscriptions']:
             subscr_ctx = request.user_env['subscription_%s' % subscr_id]
-            if subscr_ctx['slug'] == kw.get('slug', None):
+            if subscr_ctx['slug'] == kw.get('service_slug', None):
                 user_id = subscr_ctx['user_id']
         if user_id is None:
             raise Http404("CRMUser required")

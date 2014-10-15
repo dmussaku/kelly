@@ -29,7 +29,7 @@ def service_required(fn):
 
     @functools.wraps(fn)
     def inner(request, *a, **kw):
-        service_slug = kw.get('slug', None)
+        service_slug = kw.get('service_slug', None)
         try:
             service = Service.objects.get(slug__iexact=service_slug)
         except Service.DoesNotExist:

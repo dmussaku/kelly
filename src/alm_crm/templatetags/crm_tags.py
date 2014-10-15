@@ -15,8 +15,9 @@ def show_activity(activity):
 
 @register.simple_tag
 def crm_url(view, url='', *args, **kwargs):
-    """Like url but add 'crm' parameter to works"""
+    """Like url but add service_slug = 'crm' kwarg,
+    to work with urls in crm/app_urls.py"""
     if url is '':
         url = None
-    kwargs.update({'slug': 'crm'})
+    kwargs.update({'service_slug': 'crm'})
     return reverse(view, args=args, kwargs=kwargs)

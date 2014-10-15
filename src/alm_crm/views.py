@@ -46,7 +46,7 @@ class ShareCreateView(CreateView):
     def get_success_url(self):
         return reverse_lazy('share_list',
                             subdomain=self.request.user_env['subdomain'],
-                            kwargs={'slug': 'crm'})
+                            kwargs={'service_slug': 'crm'})
 
 
 class ShareListView(ListView):
@@ -137,7 +137,7 @@ class UserProductView(ListView):
     def get_queryset(self):
         u = self.request.user
         subscrs = u.get_active_subscriptions().filter(
-            service__slug=self.kwargs['slug'])
+            service__slug=self.kwargs['service_slug'])
         return subscrs
 
 
@@ -149,7 +149,7 @@ class ContactCreateView(CreateView):
     def get_success_url(self):
         return reverse_lazy('contacts_list',
                             subdomain=self.request.user_env['subdomain'],
-                            kwargs={'slug': 'crm'})
+                            kwargs={'service_slug': 'crm'})
 
 
 class ContactUpdateView(UpdateView):
@@ -157,7 +157,7 @@ class ContactUpdateView(UpdateView):
     def get_success_url(self):
         return reverse_lazy('contact_list',
                             subdomain=self.request.user_env['subdomain'],
-                            kwargs={'slug': 'crm'})
+                            kwargs={'service_slug': 'crm'})
 
 
 class ContactAddMentionView(UpdateView):
@@ -201,13 +201,10 @@ class SalesCycleListView(ListView):
         context['form'] = MentionForm
         return context
 
-    def get_success_url(self):
-        return reverse_lazy('sales_cycle_list',
-                            subdomain=self.request.user_env['subdomain'],
-                            kwargs={'slug': 'crm'})
-
 
 class SalesCycleCreateView(CreateView):
+
+    success_url = reverse_lazy('sales_cycle_list')
 
     def form_valid(self, form):
         response = super(self.__class__, self).form_valid(form)
@@ -257,6 +254,8 @@ class SalesCycleDeleteView(DeleteView):
 
 class ActivityCreateView(CreateView):
 
+    success_url = reverse_lazy('activity_list')
+
     def form_valid(self, form):
         response = super(self.__class__, self).form_valid(form)
         if self.request.is_ajax():
@@ -266,11 +265,6 @@ class ActivityCreateView(CreateView):
             return HttpResponse(json.dumps(data), mimetype="application/json")
         else:
             return response
-
-    def get_success_url(self):
-        return reverse_lazy('activity_list',
-                            subdomain=self.request.user_env['subdomain'],
-                            kwargs={'slug': 'crm'})
 
 
 class ActivityListView(ListView):
