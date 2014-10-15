@@ -1,5 +1,6 @@
 from django import template
 from django.core.urlresolvers import reverse
+from almanet import settings
 register = template.Library()
 
 
@@ -21,5 +22,5 @@ def crm_url(view, url='', *args, **kwargs):
     to work with urls in crm/app_urls.py"""
     if url is '':
         url = None
-    kwargs.update({'service_slug': 'crm'})
+    kwargs.update({'service_slug': settings.DEFAULT_SERVICE})
     return reverse(view, args=args, kwargs=kwargs)

@@ -1,4 +1,4 @@
-{% load i18n crm_tags almanet_tags  %}
+{% load i18n crm_tags %}
 {% load static from staticfiles %}
 <div class="lineGroup" id='activity-{{activity.id}}'>
   <div class="line">
@@ -27,7 +27,7 @@
           </a> at {{ activity.date_created|date:'F j, H:i' }}
         </div>
       </div>
-      <a class="js-show-comments-link" id='show_comments-{{ activity.id }}' data-url="{% subdomain_url 'comments' slug=DEFAULT_SERVICE content_type='activity' object_id=activity.id subdomain=request.user_env.subdomain %}" onclick='click_event("")' activity-id='{{activity.id}}'>
+      <a class="js-show-comments-link" id='show_comments-{{ activity.id }}' data-url="{% crm_url 'comments' content_type='activity' object_id=activity.id %}" onclick='click_event("")' activity-id='{{activity.id}}'>
         <div class="line-body-extra" >
           <figure class="icon">[comments]</figure>
         </div>

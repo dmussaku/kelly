@@ -1,22 +1,37 @@
-function upload(event) {
-      $('#gif-loader').show()
-      event.preventDefault();
-      var data = new FormData($('form').get(0));
-      $.ajax({
-          url: $(this).attr('action'),
-          type: $(this).attr('method'),
+var upload_vcard = (function($) {
+    var sel = {
+        form: '[data-js-upload-vcard="form"]',
+        gif_loader: '[data-js-upload-vcard="gif_loader"]',
+      },
+      o = {
+        $form: $(sel.form),
+        $gif_loader: $(sel.gif_loader),
+      },
+
+      upload = function(event) {
+        var data = new FormData(o.$form);
+
+        o.$gif_loader.show();
+
+        $.ajax({
+          url: o.$form.attr('action'),
+          type: o.$form.attr('method'),
           data: data,
           cache: false,
           processData: false,
-          contentType: false,
-          success: function(data) {
-              alert('successfuly added'+data.length+' new contacts');
-              $('#gif-loader').hide();
-          }
-      });
-      return false;
-      }
+          contentType: false
+        })
+          .done(function (data) {
+            alert('successfuly added'+data.length+' new contacts');
+            o.$gif_loader.show();
+          });
 
-      $(function() {
-          $('form').submit(upload);
-      });
+        event.preventDefault();
+      },
+      init = function() {
+        $(document).on('submit', sel.form, upload);
+      };
+
+  init();
+
+})(jQuery);
