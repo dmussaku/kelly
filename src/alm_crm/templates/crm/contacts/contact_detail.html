@@ -238,8 +238,7 @@
               data-js-addmention='textarea'
               {# '[{"id":1, "name":"Sattar"}, {"id":2, "name":"Daniyar"}]' #}
               data-js-addmention-mentions="{{ mentions }}"
-              >
-              </textarea>
+              ></textarea>
             {{ activity_form.mentioned_user_ids_json.as_hidden }}
 
             {{ activity_form.description.as_hidden }}
@@ -361,20 +360,26 @@
           $(document)
             .find(sel.body)
               .replaceWith($(data).find(sel.body));
+
+          // reinit add_mentions
+          add_mentions.init();
         });
 
         event.preventDefault();
       },
 
       add_mentions = {
-        o: {
-          $textarea: $('[data-js-addmention="textarea"]'),
-          mentions: $('[data-js-addmention-mentions]').data('jsAddmentionMentions')
+        sel: {
+          textarea: '[data-js-addmention="textarea"]',
+          mentions: '[data-js-addmention-mentions]',
+          data: {
+            mentions: 'jsAddmentionMentions',
+          },
         },
         get_added: function() {
           var $def = $.Deferred();
 
-          this.o.$textarea
+          $(this.sel.textarea)
             .mentionsInput('getMentions', function (data) {
               $def.resolve( data );
             });
@@ -382,15 +387,14 @@
           return $def.promise();
         },
         init: function() {
-          var this_o_mentions = this.o.mentions;
+          var _mentions = $(this.sel.mentions).data(this.sel.data.mentions);
 
-          this.o.$textarea
+          $(this.sel.textarea)
             .mentionsInput({
               onDataRequest:function (mode, query, callback) {
-                var data = this_o_mentions;
+                var data = _mentions;
 
                 data = _.filter(data, function (item) { return item.name.toLowerCase().indexOf(query.toLowerCase()) > -1 });
-
                 callback.call(this, data);
               },
               showAvatars: false
