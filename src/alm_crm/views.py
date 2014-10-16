@@ -155,6 +155,28 @@ class ContactListView(ListView):
                 to_dt=timezone.now())
         return context
 
+class ContactSearchListView(ListView):
+
+    def get_context_data(self, **kwargs):
+        context = super(self.__class__, self).get_context_data(**kwargs)
+        try:
+            context['contacts'] = Contact().filter_contacts_by_vcard(
+                self.request.GET['query'],
+                [('given_name','startswith'),
+                ('family_name','startswith'),
+                ('email__value','icontains'),
+                ('tel__value','icontains'),
+                ('org__organization_name','startswith')
+                ]
+                ).order_by('vcard__given_name')
+        except:
+            context['contacts'] = Contact.objects.all().order_by('vcard__given_name')
+        return context
+
+class CommentSearchListView(ListView):
+
+    def get_queryset(self, **kwargs):
+        pass
 
 class CommentCreateView(CreateView):
     '''
@@ -176,7 +198,6 @@ class CommentCreateView(CreateView):
                 'id': comment.id,
                 'comment': comment.comment
                 })
-            print data
             return HttpResponse(data, content_type="application/json")
         except:
             return super(CommentCreateView, self).form_valid(form)

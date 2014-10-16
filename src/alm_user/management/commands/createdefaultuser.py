@@ -21,10 +21,10 @@ class Command(BaseCommand):
         subdomain = 'bwayne'
         name = 'Wayne Enterprise'
         try:
-            service = Service.objects.get(slug='almcrm')
+            service = Service.objects.get(slug='crm')
         except:
             service = Service()
-            service.title = u'AlmCRM'
+            service.title = u'CRM'
             service.save()
         subscription = Subscription()
         subscription.service = service

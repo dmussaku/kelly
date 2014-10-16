@@ -13,12 +13,13 @@ from django.shortcuts import render_to_response, render
 from django.core.files.temp import NamedTemporaryFile
 from django.core.servers.basehttp import FileWrapper
 import json
-
+from django.views.decorators.csrf import csrf_exempt
 
 def filename_generator(size=6, chars=string.ascii_uppercase + string.digits):
     return ''.join(random.choice(chars) for _ in range(size))
 
 
+@csrf_exempt
 def import_vcard(request, **kwargs):
     '''
     In this view i prompt the user to upload the vcard which can have either one

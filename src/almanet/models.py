@@ -52,7 +52,7 @@ class Subscription(models.Model):
         return almanet_reverse(
             url_key,
             subdomain=self.organization.subdomain,
-            kwargs={'slug': self.service.slug.lower()})
+            kwargs={'service_slug': self.service.slug.lower()})
 
 
 class SubscriptionObject(models.Model):

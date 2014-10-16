@@ -5,34 +5,38 @@
 
 
 {% block crm_aside_tabs %}
-  <a href="#" class="tabs-link" data-tip="Work on next">
-    <figure class="icon">
-      <svg version="1.1">
-        <use class="icon--next" xlink:href="#next"></use>
-      </svg>
-    </figure>
-  </a>
-  <a href="#" class="tabs-link" data-tip="Contacted in last 7 days">
-    <figure class="icon">
-      <svg version="1.1">
-        <use class="icon--week" xlink:href="#week"></use>
-      </svg>
-    </figure>
-  </a>
-  <a href="#" class="tabs-link" data-tip="All contacted">
-    <figure class="icon">
-      <svg version="1.1">
-        <use class="icon--alltime" xlink:href="#alltime"></use>
-      </svg>
-    </figure>
-  </a>
-  <a href="#" class="tabs-link" data-tip="Search">
-    <figure class="icon">
-      <svg version="1.1">
-        <use class="icon--search" xlink:href="#search"></use>
-      </svg>
-    </figure>
-  </a>
+  <a href="contacts.html" class="tabs-link" data-tip="Shared contacts">
+      <figure class="icon">
+  <svg version="1.1">
+    <use class="icon--next" xlink:href="#next"></use>
+  </svg>
+</figure>
+
+    </a>
+    <a href="contacts-last.html" class="tabs-link" data-tip="Contacted in last 7 days">
+      <figure class="icon">
+  <svg version="1.1">
+    <use class="icon--week" xlink:href="#week"></use>
+  </svg>
+</figure>
+
+    </a>
+    <a href="contacts-all.html" class="tabs-link" data-tip="All contacted">
+      <figure class="icon">
+  <svg version="1.1">
+    <use class="icon--alltime" xlink:href="#alltime"></use>
+  </svg>
+</figure>
+
+    </a>
+  <a href="contacts-search.html" class="tabs-link active" data-tip="Search">
+      <figure class="icon">
+  <svg version="1.1">
+    <use class="icon--search" xlink:href="#search"></use>
+  </svg>
+</figure>
+
+    </a>
 {% endblock crm_aside_tabs %}
 
 

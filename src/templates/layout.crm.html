@@ -50,9 +50,7 @@
     <a class="lineOfLinks-link nav-link"
       href="{% subdomain_url 'feed' service_slug=DEFAULT_SERVICE subdomain=request.user_env.subdomain %}"> {{ _('feed') }} </a>
 
-    <div id="scrollable-dropdown-menu" style='float:right;'>
-      <input class="typeahead" type="text" placeholder="Search Contacts" >
-    </div>
+    
 
     <div class="nav-aside">
       <div class="dropdown dropdown--inline dropdown--right">
@@ -142,6 +140,23 @@
 
   <script src="{% static 'js/vcard_upload.js' %}"></script>
   <script src="{% static 'js/comments.js' %}"></script>
-  <script src="{% static 'js/contact_search.js' %}"></script>
+  <script>
+    $(document).ready(function(){
+      $('#data-js-search').keyup(function(event){
+        var self = this;
+        console.log($(self).val())
+        $.ajax({
+          type:'GET',
+          data:{'query':$(self).val()},
+          url:$(this).attr('action'),
+          success: function(data, status, xhr){
+            var contacts_html=$(data).find('#contacts').html();
+            $('#contacts').html(contacts_html);
+
+          }
+        });
+      });
+    })
+  </script>
   {% block crm_js_content %}{% endblock %}
 {% endblock %}

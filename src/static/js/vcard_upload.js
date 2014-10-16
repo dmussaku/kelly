@@ -1,6 +1,6 @@
 var upload_vcard = (function($) {
     var sel = {
-        form: '[data-js-upload-vcard="form"]',
+        form: '#file_upload_form',
         gif_loader: '[data-js-upload-vcard="gif_loader"]',
       },
       o = {
@@ -9,10 +9,9 @@ var upload_vcard = (function($) {
       },
 
       upload = function(event) {
-        var data = new FormData(o.$form);
 
+        var data = new FormData(o.$form[0]);
         o.$gif_loader.show();
-
         $.ajax({
           url: o.$form.attr('action'),
           type: o.$form.attr('method'),

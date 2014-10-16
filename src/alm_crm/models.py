@@ -331,7 +331,6 @@ class Contact(SubscriptionObject):
 
         def build_params(search_text, search_params):
             POSSIBLE_MODIFIERS = ['startswith', 'icontains']
-
             rv = {}
             for param in search_params:
                 if isinstance(param, tuple):
@@ -343,10 +342,17 @@ class Contact(SubscriptionObject):
             return rv
 
         params = build_params(search_text, search_params)
-        vcards = VCard.objects.filter(**params)
-        contacts = [vcard.contact for vcard in vcards][offset:offset + limit]
-
+        contacts=Contact.objects.none()
+        for key,value in params.viewitems():
+            query_dict = {'vcard__'+str(key):str(value)}
+            contacts = contacts|Contact.objects.filter(**query_dict)
+        #vcards = VCard.objects.filter(**params)
+        #contacts = [vcard.contact for vcard in vcards][offset:offset + limit]
         return contacts
+
+        '''
+        
+        '''
 
     @classmethod
     def get_contact_detail(cls, contact_id, with_vcard=False):
