@@ -1,37 +1,51 @@
 import json
+from django.http import HttpResponseRedirect, HttpResponse
+from django.contrib.contenttypes.models import ContentType
+from django.shortcuts import render
+from django.db.models import Q
+from django.utils import timezone
+from datetime import timedelta
 from django.views.generic import ListView, DetailView, TemplateView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
-from django.utils import timezone
-from django.http import HttpResponseRedirect
-from datetime import timedelta
-from almanet.url_resolvers import reverse_lazy, reverse as almanet_reverse
-from django.contrib.contenttypes.models import ContentType
-from django.http import HttpResponse
-from django.shortcuts import render
-from forms import ContactForm, SalesCycleForm, MentionForm, ActivityForm,\
-    CommentForm, ValueForm, ActivityFeedbackForm, ShareForm
-from models import Contact, SalesCycle, Activity, Feedback, Comment, Value,\
-    CRMUser
-from alm_vcard.forms import VCardUploadForm
 from django.views.generic.base import View
-from models import Contact, SalesCycle, Activity, Feedback, Comment, Value
-from almanet.url_resolvers import reverse as almanet_reverse
-from .decorators import crmuser_required
-import json
-from django.db.models import Q
+from almanet.url_resolvers import reverse_lazy, reverse as almanet_reverse
+from almanet import settings
+from models import (
+    Contact,
+    SalesCycle,
+    Activity,
+    Feedback,
+    Comment,
+    Value,
+    CRMUser
+    )
+from forms import (
+    ContactForm,
+    SalesCycleForm,
+    MentionForm,
+    ActivityForm,
+    CommentForm,
+    ValueForm,
+    ActivityFeedbackForm,
+    ShareForm
+    )
+from alm_vcard.forms import VCardUploadForm
+
 
 class DashboardView(View):
 
     def get_context_data(self, **kwargs):
         context = super(DashboardView, self).get_context_data(**kwargs)
         context['form'] = VCardUploadForm
-        context['subdomain'] = self.request.subdomain
+        context['subdomain'] = self.request.user_env['subdomain']
         return context
 
     def get(self, request, *a, **kw):
-        url = almanet_reverse('feed', kwargs={'slug': self.kwargs.get('slug')},
-                              subdomain=request.user_env['subdomain'])
-        return HttpResponseRedirect(url)
+        return HttpResponseRedirect(almanet_reverse(
+            'feed',
+            kwargs={'service_slug': settings.DEFAULT_SERVICE},
+            subdomain=request.user_env['subdomain'])
+        )
 
 
 class FeedView(TemplateView):
@@ -63,7 +77,7 @@ class ShareCreateView(CreateView):
     def get_success_url(self):
         return reverse_lazy('share_list',
                             subdomain=self.request.user_env['subdomain'],
-                            kwargs={'slug': 'crm'})
+                            kwargs={'service_slug': settings.DEFAULT_SERVICE})
 
 
 class ShareListView(ListView):
@@ -154,13 +168,13 @@ class CommentCreateView(CreateView):
         form.instance.object_id = self.kwargs['object_id']
         try:
             comment = form.save()
-            data=json.dumps(
-                {'author':comment.author.id,
-                'name':comment.author.get_billing_user().get_full_name(),
-                'date_created':comment.date_created.strftime('%Y-%m-%dT%H:%M:%S'),
-                'object_id':comment.object_id,
-                'id':comment.id,
-                'comment':comment.comment
+            data = json.dumps({
+                'author': comment.author.id,
+                'name': comment.author.get_billing_user().get_full_name(),
+                'date_created': comment.date_created.strftime('%Y-%m-%dT%H:%M:%S'),
+                'object_id': comment.object_id,
+                'id': comment.id,
+                'comment': comment.comment
                 })
             print data
             return HttpResponse(data, content_type="application/json")
@@ -168,9 +182,11 @@ class CommentCreateView(CreateView):
             return super(CommentCreateView, self).form_valid(form)
 
     def get_success_url(self, **kwargs):
-        if not self.success_url:
-            return almanet_reverse('feed', subdomain=self.request.subdomain, args=['almcrm'])
-        return False
+        return almanet_reverse(
+            'feed',
+            kwargs={'service_slug': settings.DEFAULT_SERVICE},
+            subdomain=self.request.user_env['subdomain']
+            )
 
     def get_context_data(self, **kwargs):
         context = super(CommentCreateView, self).get_context_data(**kwargs)
@@ -178,6 +194,7 @@ class CommentCreateView(CreateView):
         context['object_id'] = self.kwargs['object_id']
         context['comments'] = Comment().get_comments_by_context(self.kwargs['object_id'], self.kwargs['content_type'])
         return context
+
 
 def comment_delete_view(request, slug, comment_id):
     if request.method == 'GET':
@@ -191,14 +208,6 @@ def comment_delete_view(request, slug, comment_id):
         except:
             return HttpResponse(json.dumps({'success':'False'}), mimetype='application/json')
 
-# class DashBoardTemplateView(TemplateView):
-#     template_name = 'crm/dashboard.html'
-
-#     def get_context_data(self, **kwargs):
-#         self.request.user
-#         context = super(DashBoardTemplateView, self).get_context_data(**kwargs)
-#         context['contacts'] = Contact.objects.all()[:10]
-#         return context
 
 def contact_search(request, slug, query_string):
     if request.method == 'GET':
@@ -211,9 +220,10 @@ def contact_search(request, slug, query_string):
         json_list=[contact.json_serialize() for contact in queryset]
         return HttpResponse(json.dumps(json_list), content_type='application/json')
 
+
 class CommentAddMentionView(CreateView):
     model = Comment
-    form_class = MentionForm #context_type, context_id
+    form_class = MentionForm  # context_type, context_id
     success_url = reverse_lazy('comment_list')
     template_name = "comment/comment_add_mention.html"
 
@@ -227,7 +237,7 @@ class UserProductView(ListView):
     def get_queryset(self):
         u = self.request.user
         subscrs = u.get_active_subscriptions().filter(
-            service__slug=self.kwargs['slug'])
+            service__slug=self.kwargs['service_slug'])
         return subscrs
 
 
@@ -236,12 +246,18 @@ class ContactCreateView(CreateView):
     def form_valid(self, form):
         return super(ContactCreateView, self).form_valid(form)
 
+    def get_success_url(self):
+        return reverse_lazy('contacts_list',
+                            subdomain=self.request.user_env['subdomain'],
+                            kwargs={'service_slug': settings.DEFAULT_SERVICE})
+
 
 class ContactUpdateView(UpdateView):
-    model = Contact
-    form_clas = ContactForm
-    success_url = reverse_lazy('contact_list')
-    template_name = "contact/contact_update.html"
+
+    def get_success_url(self):
+        return reverse_lazy('contact_list',
+                            subdomain=self.request.user_env['subdomain'],
+                            kwargs={'service_slug': settings.DEFAULT_SERVICE})
 
 
 class ContactAddMentionView(UpdateView):
@@ -288,6 +304,8 @@ class SalesCycleListView(ListView):
 
 class SalesCycleCreateView(CreateView):
 
+    success_url = reverse_lazy('sales_cycle_list')
+
     def form_valid(self, form):
         response = super(self.__class__, self).form_valid(form)
         if self.request.is_ajax():
@@ -323,7 +341,6 @@ class SalesCycleDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(SalesCycleDetailView, self).get_context_data(**kwargs)
-        print SalesCycle.objects.get(id=self.kwargs['pk'])
         context['sales_cycle'] = SalesCycle.objects.get(id=self.kwargs['pk'])
         return context
 
@@ -335,6 +352,8 @@ class SalesCycleDeleteView(DeleteView):
 
 
 class ActivityCreateView(CreateView):
+
+    success_url = reverse_lazy('activity_list')
 
     def form_valid(self, form):
         response = super(self.__class__, self).form_valid(form)

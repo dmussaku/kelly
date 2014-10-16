@@ -1,5 +1,6 @@
 from django import template
 from django.core.urlresolvers import reverse
+from almanet import settings
 register = template.Library()
 
 
@@ -17,8 +18,9 @@ def show_activity(activity, **kwargs):
 
 @register.simple_tag
 def crm_url(view, url='', *args, **kwargs):
-    """Like url but add 'crm' parameter to works"""
+    """Like url but add service_slug = 'crm' kwarg,
+    to work with urls in crm/app_urls.py"""
     if url is '':
         url = None
-    kwargs.update({'slug': 'crm'})
+    kwargs.update({'service_slug': settings.DEFAULT_SERVICE})
     return reverse(view, args=args, kwargs=kwargs)

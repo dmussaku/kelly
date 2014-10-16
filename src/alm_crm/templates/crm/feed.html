@@ -1,5 +1,5 @@
 {% extends "crm/base.html" %}
-{% load i18n crm_tags almanet_tags %}
+{% load i18n crm_tags %}
 {% block head_title %} {{ _("Feed") }} {% endblock %}
 
 {% block crm_aside_tabs %}
@@ -39,13 +39,13 @@
       {% for sc in sales_cycles %}
         <div class="column-block">
           <div class="column-title">
-            <a href="{% url 'contact_detail' slug='crm' contact_pk=sc.contact.id %}">
+            <a href="{% crm_url 'contact_detail' contact_pk=sc.contact.id %}">
               {{ sc.contact.name }}</a> &raquo;
             <a href="#">{{ _("Sales cycle") }}</a>
           </div>
 
           {% for sc_activity in sales_cycle_activities %}
-            {% show_activity sc_activity request=request DEFAULT_SERVICE=DEFAULT_SERVICE %}
+            {% show_activity sc_activity %}
           {% endfor %}
 
           <div class="column-block-footer"></div>

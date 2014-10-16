@@ -225,12 +225,12 @@ class Contact(SubscriptionObject):
             return True
         except CRMUser.DoesNotExist:
             return False
-   
+
     def json_serialize(self):
-        return {'pk':self.pk, 
+        return {'pk':self.pk,
         'name':self.name,
-        #'tel':self.tel() 
-        #'mobile':self.mobile(), 
+        #'tel':self.tel()
+        #'mobile':self.mobile(),
         #'email':self.email(),
         #'company':self.company()
         }
@@ -824,13 +824,18 @@ class Feedback(SubscriptionObject):
 
 
 class Mention(SubscriptionObject):
-    user_id = models.IntegerField()
+    user = models.ForeignKey(CRMUser, related_name='mentions', null=True)
+    author = models.ForeignKey(CRMUser, related_name='owned_mentions', null=True)
     content_type = models.ForeignKey(ContentType)
     object_id = models.IntegerField()
     content_object = generic.GenericForeignKey('content_type', 'object_id')
 
     def __unicode__(self):
-        return "%s %s" % (self.user_id, self.content_object)
+        return "%s %s" % (self.user, self.content_object)
+
+    @property
+    def owner(self):
+        return self.author
 
     @classmethod
     def build_new(cls, user_id, content_class=None,
@@ -927,6 +932,10 @@ class Share(SubscriptionObject):
     class Meta:
         verbose_name = 'share'
         db_table = settings.DB_PREFIX.format('share')
+
+    @property
+    def owner(self):
+        return self.share_from
 
     @classmethod
     def get_shares(cls, limit=20, offset=0):
