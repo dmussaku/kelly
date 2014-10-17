@@ -5,6 +5,7 @@ import urlparse
 from django.utils.safestring import mark_safe
 from django.template.defaulttags import URLNode, url
 from django.core.serializers.json import DjangoJSONEncoder
+from almanet import settings
 import json as json_ser
 
 register = template.Library()
@@ -269,6 +270,11 @@ def subdomain_url(view, subdomain='', *args, **kwargs):
         subdomain = None
     return reverse(view, subdomain=subdomain, args=args, kwargs=kwargs)
 
+
+@register.simple_tag
+def my_url(view, subdomain='', *args, **kwargs):
+    """Like url but accepts subdomain parameter"""
+    return reverse(view, subdomain=settings.MY_SD, args=args, kwargs=kwargs)
 
 
 @register.inclusion_tag('almanet/tags/con_discon_button.html')

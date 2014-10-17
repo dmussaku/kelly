@@ -8,19 +8,19 @@ urlpatterns = patterns(
 
     url(r'^vcards/(?P<pk>\d+)/$', VCardDetailView.as_view(), name='vcard_detail'),
 
-    url(r'^vcards/export/(?P<id>\d+)/$', export_vcard, name='export_vcard'),
+    # url(r'^vcards/export/(?P<id>\d+)/$', export_vcard, name='export_vcard'),
     
-    url(r'^vcards/import/$', import_vcard, name='import_vcard'),
+    # url(r'^vcards/import/$', import_vcard, name='import_vcard'),
 
 	url(r'^vcards/create/$', VCardCreateView.as_view(), name='vcard_create'),
 
 	url(r'^vcards/update/(?P<pk>\d+)/$', VCardUpdateView.as_view(), name='vcard_update'),
 
-	url(r'^tels/create/(?P<pk>\d+)/$', TelCreateView.as_view(), name='tel_create'),
+	url(r'^tels/create/$', TelCreateView.as_view(), name='tel_create'),
 
 	url(r'^tels/update/(?P<id>\d+)/$', TelUpdateView.as_view(), name='tel_update'),
 
-	url(r'^emails/create/(?P<pk>\d+)/$', EmailCreateView.as_view(), name='email_create'),
+	url(r'^emails/create/$', EmailCreateView.as_view(), name='email_create'),
 
 	url(r'^emails/update/(?P<id>\d+)/$', EmailUpdateView.as_view(), name='email_update'),
 
@@ -28,7 +28,7 @@ urlpatterns = patterns(
 
 	url(r'^geos/update/(?P<id>\d+)/$', GeoUpdateView.as_view(), name='geo_update'),
 
-	url(r'^orgs/create/(?P<pk>\d+)/$', OrgCreateView.as_view(), name='org_create'),
+	url(r'^orgs/create/$', OrgCreateView.as_view(), name='org_create'),
 
 	url(r'^orgs/update/(?P<id>\d+)/$', OrgUpdateView.as_view(), name='org_update'),
 

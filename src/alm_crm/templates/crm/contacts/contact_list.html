@@ -1,5 +1,5 @@
 {% extends "crm/base.html" %}
-{% load i18n %}
+{% load i18n almanet_tags %}
 {% block head_title %} {{ _("Contacts") }} {% endblock %}
 {% load crm_tags %}
 
@@ -29,7 +29,7 @@
 </figure>
 
     </a>
-  <a href="contacts-search.html" class="tabs-link active" data-tip="Search">
+  <a href="{% subdomain_url 'contact-search' service_slug=DEFAULT_SERVICE subdomain=request.user_env.subdomain %}" class="tabs-link active" data-tip="Search">
       <figure class="icon">
   <svg version="1.1">
     <use class="icon--search" xlink:href="#search"></use>
@@ -42,9 +42,7 @@
 
 {% block crm_body %}
   <div class="body-column body-column--single">
-  <div id="scrollable-dropdown-menu" style='margin-top:30px;'>
-      <input class="typeahead" type="text" placeholder="Search Contacts" >
-    </div>
+  
     <div class="column">
 
       <div class="column-block">

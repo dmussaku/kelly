@@ -24,3 +24,6 @@ def crm_url(view, url='', *args, **kwargs):
         url = None
     kwargs.update({'service_slug': settings.DEFAULT_SERVICE})
     return reverse(view, args=args, kwargs=kwargs)
+
+
+

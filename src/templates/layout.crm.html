@@ -6,6 +6,7 @@
 <link rel="shortcut icon" type="image/ico" href="{% static 'img/favicon.ico' %}" />
 <link rel="stylesheet" href="{% static 'css/autocomplete.css' %}">
 <link rel="stylesheet" href="{% static 'css/app.css' %}">
+<script src="{% static 'js/jquery-2.1.1.min.js' %}"></script>
 {% block crm_css_content %}{% endblock %}
 <style>
   #scrollable-dropdown-menu .tt-dropdown-menu {
@@ -44,11 +45,11 @@
 <nav class="body-header nav">
   <div class="lineOfLinks">
     <a class="lineOfLinks-link nav-link"
-      href="{% subdomain_url 'crm_home' service_slug=DEFAULT_SERVICE subdomain=request.user_env.subdomain %}"> {{ _('dashboard') }} </a>
+      href="{% crm_url 'crm_home'  %}"> {{ _('dashboard') }} </a>
     <a class="lineOfLinks-link nav-link"
-      href="{% subdomain_url 'contacts_list' service_slug=DEFAULT_SERVICE subdomain=request.user_env.subdomain %}"> {{ _('contacts') }} </a>
+      href="{% crm_url 'contacts_list'  %}"> {{ _('contacts') }} </a>
     <a class="lineOfLinks-link nav-link"
-      href="{% subdomain_url 'feed' service_slug=DEFAULT_SERVICE subdomain=request.user_env.subdomain %}"> {{ _('feed') }} </a>
+      href="{% crm_url 'feed'  %}"> {{ _('feed') }} </a>
 
     
 
@@ -62,7 +63,7 @@
           <div class="dropdown-menu-body">
 
             <form
-              action="{% subdomain_url 'crm_import_vcard' service_slug=DEFAULT_SERVICE subdomain=request.subdomain %}" id='file_upload_form' method="post" enctype="multipart/form-data"
+              action="{% crm_url 'crm_import_vcard'  %}" id='file_upload_form' method="post" enctype="multipart/form-data"
               data-js-upload-vcard='form'>
               {% csrf_token %}
               <p>{{ form.non_field_errors }}</p>
@@ -88,7 +89,7 @@
             <ul class="dropdown-menu-list">
               <li class="dropdown-menu-item">
                 <a class="dropdown-menu-item-link"
-                  href="{% subdomain_url 'user_profile_url' subdomain=MY_SD %}">Profile</a>
+                  href="{% my_url 'user_profile_url' subdomain=None %}">Profile</a>
               </li>
               <li class="dropdown-menu-item">
                 <a class="dropdown-menu-item-link"
@@ -109,7 +110,6 @@
 
 
 <div class="body-container">
-
   <div id='gif-loader' style="display:none;"
     data-js-upload-vcard='gif_loader'>
     <img src='{% static "img/ajax-loader.gif" %}'
@@ -132,7 +132,7 @@
 
 
 {% block js_content %}
-  <script src="{% static 'js/jquery-2.1.1.min.js' %}"></script>
+  
   <script src="{% static 'js/scripts.min.js' %}"></script>
   <script src="http://twitter.github.io/typeahead.js/releases/latest/bloodhound.js"></script>
   <script src="http://twitter.github.io/typeahead.js/releases/latest/typeahead.jquery.js"></script>
@@ -140,6 +140,11 @@
 
   <script src="{% static 'js/vcard_upload.js' %}"></script>
   <script src="{% static 'js/comments.js' %}"></script>
+  <script src="{% static 'js/d3.min.js' %}"></script>
+  <script src="{% static 'js/doT.min.js' %}"></script>
+  <script src="{% static 'js/_calendarChart.js' %}"></script>
+  <script src="{% static 'js/_dropdown.js' %}"></script>
+  <script src="{% static 'js/_showmore.js' %}"></script>
   <script>
     $(document).ready(function(){
       $('#data-js-search').keyup(function(event){
@@ -152,11 +157,247 @@
           success: function(data, status, xhr){
             var contacts_html=$(data).find('#contacts').html();
             $('#contacts').html(contacts_html);
-
           }
         });
       });
     })
   </script>
+  <script type="text/javascript">
+  $(function() {
+    $('.js-show-comments-link').click($.comments.click_event);
+  });
+</script>
+
+  <script>
+    (function(doT) {
+      'use strict';
+      doT.templateSettings = {
+        evaluate:    /\<\<([\s\S]+?)\>\>/g,
+        interpolate: /\<\<=([\s\S]+?)\>\>/g,
+        encode:      /\<\<!([\s\S]+?)\>\>/g,
+        use:         /\<\<#([\s\S]+?)\>\>/g,
+        define:      /\<\<##\s*([\w\.$]+)\s*(\:|=)([\s\S]+?)#\>\>/g,
+        conditional: /\<\<\?(\?)?\s*([\s\S]*?)\s*\>\>/g,
+        iterate:     /\<\<~\s*(?:\>\>|([\s\S]+?)\s*\:\s*([\w$]+)\s*(?:\:\s*([\w$]+))?\s*\>\>)/g,
+        varname: 'context',
+        strip: true,
+        append: true,
+        selfcontained: false
+      };
+    })(doT);
+  </script>
+  
+  <script type="text/x-dot-template" id="comment">
+    <div class="comment" data-reply="<<= context.reply >>">
+      <div class="comment-meta">
+        <a href="index.html" class="link-user">
+          <figure class="userpic">
+            <img src="static/img/example/userpic6.png" alt="" />
+          </figure>
+        </a>
+      </div>
+      <div class="comment-body">
+        <a href="#" class="link-user link-user--title">Ren (you)</a>
+        <<= context.comment >>
+        <div class="comment-body-meta js-commentForm-trigger">
+          <button type="button" class="link" data-toggle="comment-reply">Reply</button>
+        </div>
+      </div>
+      <div class="js-commentForm"></div>
+    </div>
+  </script>
+
+  <script type="text/x-dot-template" id="commentForm">
+    <figure class="userpic commentForm-userpic">
+      <img src="static/img/example/userpic6.png" alt="" />
+    </figure>
+    <div class="commentForm-body">
+      <textarea data-author="Ren" placeholder="Keep calm and write a note" class="input-text input-text--subtle" rows="1"><<= context.reply >></textarea>
+      <button type="button" data-action="comment-submit.html">Post</button>
+      •
+      <button type="button" data-action="comment-dismiss.html">Cancel</button>
+    </div>
+  </script>
+
+  <script>
+    (function($, document, window, undefined) {
+      'use strict';
+
+      // COMMENTS, turns on and off
+      var Comments = function() {
+      }
+
+      Comments.prototype.hide = function(e) {
+        var $target = $(e.currentTarget);
+        var $animatedTarget = $target.find('.comments-body');
+
+        $animatedTarget.one('webkitAnimationEnd oanimationend msAnimationEnd animationend', function(e) {
+          $('body').removeClass('hideComments showComments');
+          $animatedTarget.removeClass('active');
+          $target.parents('.lineGroup').removeClass('active');
+        });
+
+        $('body').addClass('hideComments');
+        $target.find('.comment').trigger('hide.commentForm');
+      }
+
+      Comments.prototype.show = function(e) {
+        var $target = $(e.currentTarget);
+        $target.parents('.lineGroup').addClass('active');
+        $('body').addClass('showComments');
+      }
+
+      Comments.prototype.toggle = function(e) {
+        var $target = $(e.currentTarget);
+        var $body = $('body');
+        if ($body.hasClass('showComments')) {
+          $target.trigger('hide.comments');
+        } else {
+          $target.trigger('show.comments');
+        }
+      }
+
+      function hideComments(e) {
+        var $body = $('body');
+
+        if (!$body.hasClass('showComments')) {
+          return;
+        }
+
+        var $target = $(e.target);
+        var $container = $target.parents('.comments');
+
+        if ($container.length !== 0) {
+          return;
+        }
+
+        var comments = document.querySelectorAll('.comments');
+        for (var i = 0; i < comments.length; i++) {
+          if (comments[i] !== $container[0]) {
+            $(comments[i]).trigger('hide.comments');
+          }
+        }
+      }
+
+      $(document).on('click.comments', '[data-toggle="comments"]', function(e) {
+                   $(e.currentTarget).closest('.comments').trigger('toggle.comments');
+                 })
+                 .on('click.comments', hideComments)
+                 .on('show.comments', '.comments', Comments.prototype.show)
+                 .on('hide.comments', '.comments', Comments.prototype.hide)
+                 .on('toggle.comments', '.comments', Comments.prototype.toggle);
+
+    })(jQuery, document, window);
+  </script>
+
+  <script>
+    (function($, doT, document, window, undefined) {
+      'use strict';
+
+      var commentFormTpl = doT.template( $('#commentForm').html() );
+      var commentTpl = doT.template( $('#comment').html() );
+
+      var Comment = function() {};
+
+      Comment.prototype.addReply = function(e) {
+        var $target = $(e.currentTarget);
+        var $textarea = $target.find('textarea');
+
+        var commentString = $textarea.val();
+
+        commentString = commentString.split(' ');
+        for (var i = 0; i < commentString.length; i++) {
+          var commentBit = commentString[i];
+          if (commentBit[0] == '@') {
+            commentString[i] = '<a href="#" class="link-tag">'+ commentBit +'</a>';
+          }
+        }
+        commentString = commentString.join(' ');
+
+        var author = $textarea.data('author');
+
+        if (_isValidComment(commentString)) {
+          var commentBuf = commentTpl({ reply: author, comment: commentString });
+          var $comment = $(commentBuf);
+          if ($target.hasClass('comment--form')) {
+            $comment.insertBefore($target);
+          } else {
+            $comment.insertAfter($target);
+          }
+
+          $target.trigger('hide.commentForm');
+        }
+
+      }
+      Comment.prototype.showForm = function(e) {
+        var $target = $(e.currentTarget);
+        var $trigger = $target.find('.js-commentForm-trigger');
+        $trigger.hide();
+
+        var replyTo = $target.data('reply');
+
+        var buf = '';
+        if (replyTo) {
+          replyTo = '@' + replyTo;
+          buf = commentFormTpl( { reply: replyTo } );
+        } else {
+          buf = commentFormTpl( { reply: '' });
+        }
+
+        var $textarea = $target.find('.js-commentForm').html(buf).show().find('textarea');
+        var val = $textarea.val();
+        if (val) {
+          $textarea.focus().val(val + ' ');
+        } else {
+          $textarea.focus();
+        }
+
+
+
+        var comments = document.querySelectorAll('.comment');
+        for (var i = 0; i < comments.length; i++) {
+          if (comments[i] !== $target[0]) {
+            $(comments[i]).trigger('hide.commentForm');
+          }
+        }
+      }
+      Comment.prototype.hideForm = function(e) {
+        var $target = $(e.currentTarget);
+        var $trigger = $target.find('.js-commentForm-trigger');
+        $trigger.show();
+        $target.find('.js-commentForm').hide();
+      }
+
+      function _triggerEvent(e, eventName) {
+        var $target = $(e.currentTarget);
+        var $container = $target.parents('.comment');
+        $container.trigger(eventName);
+      }
+
+      function _isValidComment(commentString) {
+        if (!commentString) {
+          return false
+        }
+        return true
+      }
+
+
+      $(document).on('click.commentForm', '[data-toggle="comment-reply"]', function(e) {
+                   _triggerEvent(e, 'show.commentForm');
+                 })
+                 .on('click.commentForm', '[data-action="comment-dismiss.html"]', function(e) {
+                   _triggerEvent(e, 'hide.commentForm');
+                 })
+                 .on('click.commentForm', '[data-action="comment-submit.html"]', function(e) {
+                   _triggerEvent(e, 'add.commentForm');
+                 })
+                 .on('show.commentForm', '.comment', Comment.prototype.showForm)
+                 .on('hide.commentForm', '.comment', Comment.prototype.hideForm)
+                 .on('add.commentForm', '.comment', Comment.prototype.addReply);
+
+    })(jQuery, doT, document, window);
+
+  </script>
+  
   {% block crm_js_content %}{% endblock %}
 {% endblock %}

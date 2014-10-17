@@ -1,4 +1,4 @@
-from django.conf.urls import patterns, url
+from django.conf.urls import patterns, url, include
 from alm_vcard.views import import_vcard
 
 from .decorators import crmuser_required
@@ -29,6 +29,7 @@ from .views import (
     CommentCreateView,
     comment_delete_view,
     ContactSearchListView,
+    contact_create_view,
     )
 
 urlpatterns = patterns(
@@ -70,11 +71,9 @@ urlpatterns = patterns(
             pk_url_kwarg='contact_pk')),
         name='contact_detail'),
     url(r'^contacts/create/$',
-        crmuser_required(ContactCreateView.as_view(
-            model=Contact,
-            form_class=ContactForm,
-            template_name="contact/contact_create.html")),
+        crmuser_required(contact_create_view),
         name='contact_create'),
+    url(r'^vcards/', include('alm_vcard.urls')),
     url(r'^contacts/update/(?P<pk>\d+)/$',
         crmuser_required(ContactUpdateView.as_view(
             model=Contact,

@@ -110,7 +110,7 @@ class VCardCreateView(CreateView):
 
 
 
-class TelCreateView(InitialCreateView):
+class TelCreateView(CreateView):
     form_class = TelForm
     template_name = 'vcard/tel_create.html'
 
@@ -118,14 +118,14 @@ class TelCreateView(InitialCreateView):
         return super(TelCreateView, self).get_success_url(**kwargs)
 
 
-class EmailCreateView(InitialCreateView):
+class EmailCreateView(CreateView):
     form_class = EmailForm
     template_name = 'vcard/email_create.html'
 
     def get_success_url(self, **kwargs):
         return super(EmailCreateView, self).get_success_url(**kwargs)
 
-class GeoCreateView(InitialCreateView):
+class GeoCreateView(CreateView):
     form_class = GeoForm
     template_name = 'vcard/geo_create.html'
 
@@ -133,14 +133,14 @@ class GeoCreateView(InitialCreateView):
         return super(GeoCreateView, self).get_success_url(**kwargs)
 
 
-class OrgCreateView(InitialCreateView):
+class OrgCreateView(CreateView):
     form_class = OrgForm
     template_name = 'vcard/org_create.html'
 
     def get_success_url(self, **kwargs):
         return super(OrgCreateView, self).get_success_url(**kwargs)
 
-class AdrCreateView(InitialCreateView):
+class AdrCreateView(CreateView):
     form_class = AdrForm
     template_name = 'vcard/adr_create.html'
 
@@ -148,7 +148,7 @@ class AdrCreateView(InitialCreateView):
         return super(AdrCreateView, self).get_success_url(**kwargs)
 
 
-class AgentCreateView(InitialCreateView):
+class AgentCreateView(CreateView):
     form_class = AgentForm
     template_name = 'vcard/agent_create.html'
 
@@ -156,7 +156,7 @@ class AgentCreateView(InitialCreateView):
         return super(AgentCreateView, self).get_success_url(**kwargs)
 
 
-class CategoryCreateView(InitialCreateView):
+class CategoryCreateView(CreateView):
     form_class = CategoryForm
     template_name = 'vcard/category_create.html'
 
@@ -164,7 +164,7 @@ class CategoryCreateView(InitialCreateView):
         return super(CategoryCreateView, self).get_success_url(**kwargs)
 
 
-class KeyCreateView(InitialCreateView):
+class KeyCreateView(CreateView):
     form_class = KeyForm
     template_name = 'vcard/key_create.html'
 
@@ -172,7 +172,7 @@ class KeyCreateView(InitialCreateView):
         return super(KeyCreateView, self).get_success_url(**kwargs)
 
 
-class LabelCreateView(InitialCreateView):
+class LabelCreateView(CreateView):
     form_class = LabelForm
     template_name = 'vcard/label_create.html'
 
@@ -180,7 +180,7 @@ class LabelCreateView(InitialCreateView):
         return super(LabelCreateView, self).get_success_url(**kwargs)
 
 
-class MailerCreateView(InitialCreateView):
+class MailerCreateView(CreateView):
     form_class = MailerForm
     template_name = 'vcard/mailer_create.html'
 
@@ -188,7 +188,7 @@ class MailerCreateView(InitialCreateView):
         return super(MailerCreateView, self).get_success_url(**kwargs)
 
 
-class NicknameCreateView(InitialCreateView):
+class NicknameCreateView(CreateView):
     form_class = NicknameForm
     template_name = 'vcard/nickname_create.html'
 
@@ -196,7 +196,7 @@ class NicknameCreateView(InitialCreateView):
         return super(NicknameCreateView, self).get_success_url(**kwargs)
 
 
-class NoteCreateView(InitialCreateView):
+class NoteCreateView(CreateView):
     form_class = NoteForm
     template_name = 'vcard/note_create.html'
 
@@ -204,7 +204,7 @@ class NoteCreateView(InitialCreateView):
         return super(NoteCreateView, self).get_success_url(**kwargs)
 
 
-class RoleCreateView(InitialCreateView):
+class RoleCreateView(CreateView):
     form_class = RoleForm
     template_name = 'vcard/role_create.html'
 
@@ -212,7 +212,7 @@ class RoleCreateView(InitialCreateView):
         return super(RoleCreateView, self).get_success_url(**kwargs)
 
 
-class TitleCreateView(InitialCreateView):
+class TitleCreateView(CreateView):
     form_class = TitleForm
     template_name = 'vcard/title_create.html'
 
@@ -220,7 +220,7 @@ class TitleCreateView(InitialCreateView):
         return super(TitleCreateView, self).get_success_url(**kwargs)
 
 
-class TzCreateView(InitialCreateView):
+class TzCreateView(CreateView):
     form_class = TzForm
     template_name = 'vcard/tz_create.html'
 
@@ -228,7 +228,7 @@ class TzCreateView(InitialCreateView):
         return super(TzCreateView, self).get_success_url(**kwargs)
 
 
-class UrlCreateView(InitialCreateView):
+class UrlCreateView(CreateView):
     form_class = UrlForm
     template_name = 'vcard/url_create.html'
 

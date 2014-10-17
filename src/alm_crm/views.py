@@ -30,6 +30,9 @@ from forms import (
     ShareForm
     )
 from alm_vcard.forms import VCardUploadForm
+from django.shortcuts import render_to_response
+from alm_vcard.models import VCard
+from alm_vcard.forms import VCardForm
 
 
 class DashboardView(View):
@@ -97,7 +100,6 @@ class ContactDetailView(DetailView):
         context = super(ContactDetailView, self).get_context_data(**kwargs)
         current_crmuser = self.request.user.get_crmuser()
         crmusers, users = CRMUser.get_crmusers(with_users=True)
-
         # show sales_cycle
         sales_cycle_id = self.request.GET.get('sales_cycle_id', False)
         if sales_cycle_id:
@@ -105,6 +107,10 @@ class ContactDetailView(DetailView):
         else:
             sales_cycle = context['object'].sales_cycles.last()
         context['sales_cycle'] = sales_cycle
+        if sales_cycle:
+            sales_cycle_id = sales_cycle.id
+        else:
+            sales_cycle_id = False
 
         # date when first activity was added to the sales_cycle
         d = Activity.get_activities_by_contact(context['object'].pk).first()
@@ -113,7 +119,7 @@ class ContactDetailView(DetailView):
         # add new activity
         context['activity_form'] = ActivityForm(
             initial={'author': current_crmuser.id,
-                     'sales_cycle': sales_cycle.id,
+                     'sales_cycle': sales_cycle_id,
                      'mentioned_user_ids_json': None})
 
         # add mentions to new activity
@@ -158,6 +164,7 @@ class ContactListView(ListView):
 class ContactSearchListView(ListView):
 
     def get_context_data(self, **kwargs):
+        print self.kwargs
         context = super(self.__class__, self).get_context_data(**kwargs)
         try:
             context['contacts'] = Contact().filter_contacts_by_vcard(
@@ -172,6 +179,29 @@ class ContactSearchListView(ListView):
         except:
             context['contacts'] = Contact.objects.all().order_by('vcard__given_name')
         return context
+
+
+def contact_create_view(request, service_slug):
+    if request.method == 'GET':
+        return render_to_response('crm/contacts/contact_create.html',{'vcard_form':VCardForm, 'csrf_token':request.META['CSRF_COOKIE']})
+    if request.method == 'POST':
+        vcard_form = VCardForm(request.POST, instance=VCard())
+        print request.POST
+        '''
+        <QueryDict: {u'family_name': [u''], u'csrfmiddlewaretoken': [u'KG8ukzT4AvoGQBHSPvQCA2UbO8kdDDPn'], u'type': [u'HOME', u'x400'], u'given_name': [u''], u'value': [u'asdasdasdasd', u'a@gmail.com']}>
+
+        '''
+        if vcard_form.is_valid():
+            v = vcard_form.save()
+            c = Contact(owner=request.user.get_crmuser(), vcard=v)
+            c.save()
+            return HttpResponseRedirect(
+                almanet_reverse(
+                    'contact_detail',
+                    kwargs={'service_slug': settings.DEFAULT_SERVICE, 'contact_pk':c.pk},
+                    subdomain=request.user_env['subdomain']
+                    )
+                )
 
 class CommentSearchListView(ListView):
 
@@ -232,6 +262,7 @@ def comment_delete_view(request, slug, comment_id):
 
 def contact_search(request, slug, query_string):
     if request.method == 'GET':
+       
         queryset = Contact.objects.filter(Q(vcard__given_name__startswith=query_string) |
             Q(vcard__family_name__startswith=query_string) |
             Q(vcard__tel__value__contains=query_string) |
@@ -240,6 +271,8 @@ def contact_search(request, slug, query_string):
             )
         json_list=[contact.json_serialize() for contact in queryset]
         return HttpResponse(json.dumps(json_list), content_type='application/json')
+
+
 
 
 class CommentAddMentionView(CreateView):

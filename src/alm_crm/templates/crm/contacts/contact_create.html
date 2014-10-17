@@ -1,0 +1,113 @@
+{% extends "crm/base.html" %}
+{% load i18n crm_tags almanet_tags %}
+{% load static from staticfiles %}
+{% block head_title %} {{ _("Contact Create Form") }} {% endblock %}
+
+
+{% block crm_aside_tabs %}
+  <a href="contacts.html" class="tabs-link" data-tip="Shared contacts">
+      <figure class="icon">
+  <svg version="1.1">
+    <use class="icon--next" xlink:href="#next"></use>
+  </svg>
+</figure>
+
+    </a>
+    <a href="contacts-last.html" class="tabs-link" data-tip="Contacted in last 7 days">
+      <figure class="icon">
+  <svg version="1.1">
+    <use class="icon--week" xlink:href="#week"></use>
+  </svg>
+</figure>
+
+    </a>
+    <a href="contacts-all.html" class="tabs-link" data-tip="All contacted">
+      <figure class="icon">
+  <svg version="1.1">
+    <use class="icon--alltime" xlink:href="#alltime"></use>
+  </svg>
+</figure>
+
+    </a>
+  <a href="{% crm_url 'contact-search' %}" class="tabs-link" data-tip="Search">
+      <figure class="icon">
+  <svg version="1.1">
+    <use class="icon--search" xlink:href="#search"></use>
+  </svg>
+</figure>
+
+    </a>
+{% endblock crm_aside_tabs %}
+
+
+{% block crm_body %}
+  <div class="body-column body-column--withTabs">
+    <div class="column">
+      <h2>Create a contact</h2>
+      <form action="" method="post">
+        <input type="hidden" name="csrfmiddlewaretoken" value="{{csrf_token}}">
+        {{vcard_form.as_p}}
+        <div id='data-js-vcard-objects'>
+
+        </div>
+        <p>
+          <a href="#" id='data-js-email-form' class="btn btn-primary" value='add' url="{% crm_url 'email_create' %}">
+          + Add an email
+          </a>
+          <a href="#" id='data-js-tel-form' class="btn btn-primary" value='add' url="{% crm_url 'tel_create' %}">
+          + Add a phone #
+          </a>
+          <a href="#" id='data-js-org-form' class="btn btn-primary" value='add' url="{% crm_url 'org_create' %}">
+          + Add an organization #
+          </a>
+        </p>
+        <p><button type="submit" class="btn btn-primary" value="create">
+          Create
+        </button></p>
+      </form>
+      
+    </div>
+  </div>
+{% endblock crm_body %}
+
+{% block js_content %}
+  <script>
+      $('#data-js-email-form').on('click', function(event){
+        var my_url = $('#data-js-email-form').attr('url');
+        $.ajax({
+          type:'GET',
+          url: my_url,
+          success: function(data){
+            var form_html = $(data).find('#add-email-form');
+            $('#data-js-vcard-objects').append(form_html);
+          }
+        });
+        return false;
+      });
+      $('#data-js-tel-form').on('click', function(event){
+        var my_url = $('#data-js-tel-form').attr('url');
+        $.ajax({
+          type:'GET',
+          url: my_url,
+          success: function(data){
+            var form_html = $(data).find('#add-tel-form');
+            $('#data-js-vcard-objects').append(form_html);
+          }
+        });
+        return false;
+      });
+      $('#data-js-org-form').on('click', function(event){
+        var my_url = $('#data-js-org-form').attr('url');
+        $.ajax({
+          type:'GET',
+          url: my_url,
+          success: function(data){
+            var form_html = $(data).find('#add-org-form');
+            $('#data-js-vcard-objects').append(form_html);
+          }
+        });
+        return false;
+      });
+  </script>
+
+{% endblock %}

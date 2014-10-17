@@ -11,12 +11,14 @@ class VCardForm(forms.ModelForm):
 
     class Meta():
         model = VCard
+        fields=['given_name','family_name']
 
 
 class TelForm(forms.ModelForm):
 
     class Meta():
         model = Tel
+        exclude=['vcard']
 
 
 
@@ -24,6 +26,7 @@ class EmailForm(forms.ModelForm):
 
     class Meta():
         model = Email
+        exclude=['vcard']
 
 
 class GeoForm(forms.ModelForm):
@@ -36,7 +39,7 @@ class OrgForm(forms.ModelForm):
 
     class Meta():
         model = Org
-
+        exclude=['vcard']
 
 class AdrForm(forms.ModelForm):
 
