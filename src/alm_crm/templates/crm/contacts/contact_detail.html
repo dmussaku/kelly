@@ -145,7 +145,9 @@
         data-js-create-salescycle='dropdown-menu'>
         <div class="dropdown-triangle"></div>
         <div class="dropdown-menu-body">
-          <ul class="dropdown-menu-list">
+          <ul class="dropdown-menu-list"
+            data-js-salescycle-load='links_container'
+          >
 
             <li class="dropdown-menu-item dropdown-menu-item--newCycle">
               <a class="dropdown-menu-item-link" href="#">Create a new cycle</a>
@@ -170,10 +172,9 @@
             </li>
 
             {% for sc in object.sales_cycles.all %}
-              <li class="dropdown-menu-item"
-                data-js-data='links'>
+              <li class="dropdown-menu-item">
                 <a class="dropdown-menu-item-link {% if sc == sales_cycle %} dropdown-menu-item-link--active {% endif %}" href="#"
-                  data-js-data-id='{{ sc.id }}'>
+                  data-js-salescycle-load-link='{{ sc.id }}'>
                   <div class="column-header-a">
                     <figure class="userpic">
                       <img src="{% static 'img/example/userpic6.png' %}" alt="" />
@@ -209,54 +210,110 @@
 
 
 <div class="body-column body-column--single"
-  data-js-data='body'>
+  data-js-salescycle='body'
+>
   <div class="column">
-    <form action="{% crm_url 'activity_create' %}" method="POST" class="statusForm"
-      data-js-data='form'> {% csrf_token %}
-      <div class="line line--borderless">
-        <div class="line-aside"></div>
-        <div class="line-body line-body--spaceless lineOfLinks line-body--tabs">
-          <button type="button" class="lineOfLinks-link active">
-            Add activity
-          </button><button type="button" class="lineOfLinks-link">
-            Edit product list
-          </button><button type="button" class="lineOfLinks-link">
-            Add anticipated value
-          </button>
+    <div class="line line--borderless">
+      <div class="line-aside"></div>
+      <div class="line-body line-body--spaceless lineOfLinks line-body--tabs">
+        <a href="#" class="lineOfLinks-link active"
+          data-js-salescycle-tab-link='addactivity'
+        >
+          Add activity</a>
+        <a href="#" class="lineOfLinks-link"
+          data-js-salescycle-tab-link='addproduct'
+        >
+          Edit product list</a>
+        <a href="#" class="lineOfLinks-link"
+          data-js-salescycle-tab-link='addvalue'
+        >
+          Add anticipated value</a>
+        <div class="inputLine-caption"
+          data-js-salescycle-tab='caption'>
         </div>
       </div>
-      <div class="line line--borderless">
-        <div class="line-aside line-aside--statusForm">
-          <figure class="icon">[s]</figure>
-        </div>
-        <div class="line-body line-body--spaceless">
-          <div class="line-body-main">
+    </div>
+    <div class="line line--borderless">
+      <div class="line-aside line-aside--statusForm">
+        <figure class="icon">[s]</figure>
+      </div>
+      <div class="line-body line-body--spaceless">
+        <div class="line-body-main">
 
-            <textarea class="input-text2" rows="3"
-              name='{{ activity_form.title.html_name }}'
-              placeholder="Log your activity..."
-              data-js-addmention='textarea'
-              {# '[{"id":1, "name":"Sattar"}, {"id":2, "name":"Daniyar"}]' #}
-              data-js-addmention-mentions="{{ mentions }}"
-              ></textarea>
-            {{ activity_form.mentioned_user_ids_json.as_hidden }}
+          <div data-js-salescycle-tab-body='addactivity'
+            data-js-salescycle-caption=''>
+            <form action="{% crm_url 'activity_create' %}" method="POST"
+              class="statusForm"
+              data-js-addactivity='form'
+            > {% csrf_token %}
 
-            {{ activity_form.description.as_hidden }}
-            {{ activity_form.author.as_hidden }}
-            {{ activity_form.sales_cycle.as_hidden }}
+              <textarea class="input-text2" rows="3"
+                name='{{ activity_form.title.html_name }}'
+                placeholder="Log your activity..."
+                data-js-addmention='textarea'
+                data-js-addmention-mentions="{{ mentions }}"
+                ></textarea>
+              {{ activity_form.mentioned_user_ids_json.as_hidden }}
 
-            <input type="hidden" name="next" value="{{ request.get_full_path }}" />
+              {{ activity_form.description.as_hidden }}
+              {{ activity_form.author.as_hidden }}
+              {{ activity_form.sales_cycle.as_hidden }}
 
-            <div class="inputLine inputLine--right">
-              <figure class="userpic"></figure>
-              <button type="submit" class="btn">Post</button>
-            </div>
-
+              <div class="inputLine inputLine--right">
+                <figure class="userpic"></figure>
+                <button type="submit" class="btn">Post</button>
+              </div>
+            </form>
           </div>
+
+          <div data-js-salescycle-tab-body='addproduct'
+            data-js-salescycle-caption='You can use hashtags to add products from "Add activity" tab.'
+            style='display:none;'>
+            <form action="{% crm_url 'activity_create' %}" method="POST"
+              class="statusForm"
+              data-js-addproduct='form'
+            > {% csrf_token %}
+
+              <div class="inputLine">
+                <strong>Current products:</strong>
+              </div>
+              <a href="#" class="link-product">#Product_1</a>
+              <a href="#" class="link-product">#Product_2</a>
+
+              <div class="inputLine">
+                <input class="input-text" type="text" placeholder="Enter product" />
+              </div>
+
+              <div class="inputLine inputLine--right">
+                <button type="submit" class="btn">Update</button>
+              </div>
+            </form>
+          </div>
+
+          <div data-js-salescycle-tab-body='addvalue'
+            data-js-salescycle-caption='What is the value of deal?'
+            style='display:none;'>
+            <form action="{% crm_url 'activity_create' %}" method="POST"
+              class="statusForm"
+              data-js-addvalue='form'
+            > {% csrf_token %}
+
+              <div class="inputLine">
+                <strong>Current value:</strong> 150300
+              </div>
+              <div class="inputLine">
+                <input class="input-text" type="text" placeholder="Update value" />
+              </div>
+
+              <div class="inputLine inputLine--right">
+                <button type="submit" class="btn">Update</button>
+              </div>
+            </form>
+          </div>
+
         </div>
       </div>
-
-    </form>
+    </div>
 
 
     {% for activity in sales_cycle.rel_activities.all %}
@@ -301,71 +358,145 @@
 <script src='{% static "js/jquery.mentionsInput.js" %}'></script>
 {# Sattar's code #}
 <script>
-  var sc_data = (function($) {
-    var sel = {
-        link: '[data-js-data-id]',
-        body: '[data-js-data="body"]',
-        form: '[data-js-data="form"]',
-        field: {
-          mention_user_ids: '[name="mentioned_user_ids_json"]',
-          description: '[name="description"]',
-          title: '[name="title"]'
+  var contact_detail_js = (function($) {
+    var observer = {
+        $o: $({}),
+        init: function() {
+          this.$o
+            .on('reload.sales_cycle', function() {
+              sales_cycle.reload();
+            })
+            .on('reinit.add_mentions', function() {
+              add_mentions.init();
+            })
+        }
+      },
+
+      sales_cycle = {
+        o: {
+          class_load_active: 'dropdown-menu-item-link--active',
+          class_tab_link_active: 'active',
+          load_fetch_url: $(location).attr('href').split('?')[0],
         },
-        active: '.dropdown-menu-item-link--active'
-      },
-      $links = $('[data-js-data="links"]'),
-      $container = $('[data-js-data="container"]'),
-      reload_url = $(location).attr('href').split('?')[0],//without search
+        sel: {
+          body: '[data-js-salescycle="body"]',
 
+          load_links: '[data-js-salescycle-load="links_container"]',
+          load_link: '[data-js-salescycle-load-link]',
 
-      submit_activity = function(event) {
-        var $form = $(event.target),
-            submit = function(mentions) {
-              var m_user_ids = $.map(mentions, function (m) { return m.id });
+          tab_link: '[data-js-salescycle-tab-link]',
+          tab_body: '[data-js-salescycle-tab-body]',
+          tab_body_valued:
+            function(value) {
+              return '[data-js-salescycle-tab-body="'+value+'"]';
+            },
+          tab_caption_body: '[data-js-salescycle-tab="caption"]',
+          data: {
+            load_id: 'jsSalescycleLoadLink',
+            tab_id: 'jsSalescycleTabLink',
+            tab_caption: 'jsSalescycleCaption',
+          }
+        },
+        change_tab: function(event) {
+          var $tab_link = $(event.target).closest(this.sel.tab_link),
+              tab_id = $tab_link.data(this.sel.data.tab_id),
+              $tab_body = $(this.sel.tab_body_valued( tab_id )),
+              tab_caption = $tab_body.data(this.sel.data.tab_caption);
 
-              $form.find(sel.field.mention_user_ids)
-                .val( JSON.stringify(m_user_ids) );
+          //hide another tabBodies, show selected tabBody
+          $(this.sel.tab_body)
+            .hide();
+          $tab_body
+            .show();
 
-              $form.find(sel.field.description)
-                .val( $form.find(sel.field.title).val() );
+          //remove activeClass from links, add to selected link
+          $(this.sel.tab_link)
+            .removeClass(this.o.class_tab_link_active);
+          $tab_link
+            .addClass(this.o.class_tab_link_active);
 
-              $.post($form.prop('action'), $form.serialize())
-                .done(function (event) {
-                  $links.find(sel.active).click(); //to reload_data
-                })
-                .fail(function (event, jqxhr, settings, thrownError) {
-                  console.log(event)
-                  console.log(jqxhr)
-                  console.log(settings)
-                  alert(thrownError);
-                });
-            };
+          //set caption
+          $(this.sel.tab_caption_body)
+            .text( tab_caption );
 
-        add_mentions.get_added()
-          .done( submit );
+          event.preventDefault();
+        },
+        load: function(event) {
+          var $this = $(event.target).closest(this.sel.load_link),
+              _id = $this.data(this.sel.data.load_id),
+              _done = function (data) {
+                $(this.sel.body)
+                  .replaceWith( $(data).find(this.sel.body) );
 
-        event.preventDefault();
-      },
+                // reinit add_mentions for addactivity
+                observer.$o.trigger('reinit.add_mentions');
+              };
 
-      reload_data = function(event) {
-        var data_id = $(this).data('jsDataId'),
-            active_class = sel.active.slice(1);
+          // add active class to link
+          $(this.sel.load_links)
+            .find(this.sel.load_link)
+              .removeClass(this.o.class_load_active);
+          $this.addClass(this.o.class_load_active);
 
-        // change links
-        $links.find(sel.active).removeClass(active_class);
-        $(this).addClass(active_class);
+          // update sales_cycle body
+          $.get(this.o.load_fetch_url, {'sales_cycle_id': _id},
+                $.proxy(_done, this));
 
-        // change body
-        $.get(reload_url, {'sales_cycle_id': data_id}, function(data) {
+          event.preventDefault();
+        },
+        reload: function() {
+          $(this.sel.load_links)
+            .find('.'+sales_cycle.o.class_load_active)
+              .trigger('click');
+        },
+        init: function() {
           $(document)
-            .find(sel.body)
-              .replaceWith($(data).find(sel.body));
+            .on('click', this.sel.load_link, $.proxy(this.load, this))
+            .on('click', this.sel.tab_link, $.proxy(this.change_tab, this));
+        }
+      },
 
-          // reinit add_mentions
-          add_mentions.init();
-        });
+      add_activity = {
+        sel: {
+          form: '[data-js-addactivity="form"]',
+          field: {
+            mention_user_ids: '[name="mentioned_user_ids_json"]',
+            description: '[name="description"]',
+            title: '[name="title"]'
+          },
+        },
+        submit: function(event) {
+          var $form = $(event.target),
+              submit = function(mentions) {
+                var m_user_ids = $.map(mentions, function (m) { return m.id });
 
-        event.preventDefault();
+                $form.find(this.sel.field.mention_user_ids)
+                  .val( JSON.stringify(m_user_ids) );
+
+                $form.find(this.sel.field.description)
+                  .val( $form.find(this.sel.field.title).val() );
+
+                $.post($form.prop('action'), $form.serialize())
+                  .done(function (event) {
+                    observer.$o.trigger('reload.sales_cycle'); //to reload_data
+                  })
+                  .fail(function (event, jqxhr, settings, thrownError) {
+                    console.log(event)
+                    console.log(jqxhr)
+                    console.log(settings)
+                    alert(thrownError);
+                  });
+              };
+
+          add_mentions.get_added()
+            .done( $.proxy(submit, this) );
+
+          event.preventDefault();
+        },
+        init: function() {
+          $(document)
+            .on('submit', this.sel.form, $.proxy(this.submit, this));
+        }
       },
 
       add_mentions = {
@@ -479,9 +610,9 @@
       },
 
       init = function() {
-        $links.on('click', sel.link, reload_data);
-        $(document).on('submit', sel.form, submit_activity);
-
+        observer.init();
+        sales_cycle.init();
+        add_activity.init();
         add_mentions.init();
         create_sales_cycle.init();
         share.init();
