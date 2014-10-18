@@ -122,24 +122,39 @@
       });
       $('#form').submit(function() {
         var $inputs = $('#form :input');
-        console.log($inputs.length);
-        var values = new Object();
+        var values = {'vcard':{}, 'emails':[], 'tels':[], 'orgs':[]};
+        values[$inputs[0].name]=[$inputs[0].value];
         $inputs.each(function(index, value) {
             var parent_node = $(this).parent().parent();
             var node = $(this);
-            console.log(parent_node);
-            try{
-              if (parent_node.attr('id') == 'form'){
-                values.push
-              }
+            if (parent_node.attr('id') == 'form'){
+              values['vcard'][node.attr('id')]= node.val();
             }
-            catch(err){
-              var 
+            else if (parent_node.attr('class') == 'add-email-form'){
+              var temp = new Object();
+              temp[node.attr('id')] = node.val();
+              values['emails'].push(temp);
             }
-            //console.log(this.name+ " "+$(this).val());
-            //console.log(this.parent().parent());
+            else if (parent_node.attr('class') == 'add-tel-form'){
+              var temp = new Object();
+              temp[node.attr('id')] = node.val();
+              values['tels'].push(temp);
+            }
+            else if (parent_node.attr('class') == 'add-org-form'){
+              var temp = new Object();
+              temp[node.attr('id')] = node.val();
+              values['orgs'].push(temp);
+            } 
+            
         });
-        console.log(values);
+        $.ajax({
+          type:'POST',
+          data: values.serialize(),
+          url: $('#form').attr('url'),
+          success: function(){
+            alert('success')
+          }
+        });
 
 return false;
 });
