@@ -2,8 +2,8 @@ function click_event(my_url){
   console.log(my_url);
   var myurl = my_url;
   $.get(myurl, function(data){
-    var div_id = '#comments';
-    $(div_id).html('<h3>Comments</h3>'+data);
+    var div_class = '.comments';
+    $(div_class).html('<h3>Comments</h3>'+data);
     return false;
   });
   return false;
