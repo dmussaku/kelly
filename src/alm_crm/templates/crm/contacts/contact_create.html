@@ -44,7 +44,7 @@
   <div class="body-column body-column--withTabs">
     <div class="column">
       <h2>Create a contact</h2>
-      <form action="" method="post">
+      <form action="" method="post" id='form'>
         <input type="hidden" name="csrfmiddlewaretoken" value="{{csrf_token}}">
         {{vcard_form.as_p}}
         <div id='data-js-vcard-objects'>
@@ -61,9 +61,10 @@
           + Add an organization #
           </a>
         </p>
-        <p><button type="submit" class="btn btn-primary" value="create">
+        <p><button type="submit" class="btn btn-primary" value="create" id='data-js-form-submit' url="{% crm_url 'contact_create' %}">
           Create
         </button></p>
+        <a id='test'>s</a>
       </form>
       
     </div>
@@ -78,7 +79,7 @@
           type:'GET',
           url: my_url,
           success: function(data){
-            var form_html = $(data).find('#add-email-form');
+            var form_html = $(data).find('.add-email-form');
             $('#data-js-vcard-objects').append(form_html);
           }
         });
@@ -90,7 +91,7 @@
           type:'GET',
           url: my_url,
           success: function(data){
-            var form_html = $(data).find('#add-tel-form');
+            var form_html = $(data).find('.add-tel-form');
             $('#data-js-vcard-objects').append(form_html);
           }
         });
@@ -102,12 +103,46 @@
           type:'GET',
           url: my_url,
           success: function(data){
-            var form_html = $(data).find('#add-org-form');
+            var form_html = $(data).find('.add-org-form');
             $('#data-js-vcard-objects').append(form_html);
           }
         });
         return false;
       });
+      $('#test').on('click', function(event){
+        var my_url = $('#data-js-form-submit').attr('url');
+        var form = $('#form');
+        console.log(form.serializeArray());
+        $.each(form, function(index, value) {
+            console.log($(value).val());
+        });
+        
+        //console.log(sm);
+        return false;
+      });
+      $('#form').submit(function() {
+        var $inputs = $('#form :input');
+        console.log($inputs.length);
+        var values = new Object();
+        $inputs.each(function(index, value) {
+            var parent_node = $(this).parent().parent();
+            var node = $(this);
+            console.log(parent_node);
+            try{
+              if (parent_node.attr('id') == 'form'){
+                values.push
+              }
+            }
+            catch(err){
+              var 
+            }
+            //console.log(this.name+ " "+$(this).val());
+            //console.log(this.parent().parent());
+        });
+        console.log(values);
+
+return false;
+});
   </script>
 
 {% endblock %}
