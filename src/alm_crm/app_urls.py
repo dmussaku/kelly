@@ -24,6 +24,7 @@ from .views import (
 
     SalesCycleCreateView,
     sales_cycle_value_update,
+    sales_cycle_add_mention,
 
     ShareCreateView,
     ShareListView,
@@ -102,6 +103,10 @@ urlpatterns = patterns(
     url(r'^sales_cycle/(?P<sales_cycle_pk>[\d]+)/value/update/$',
         crmuser_required(sales_cycle_value_update),
         name='sales_cycle_value_update'),
+    url(r'^sales_cycle/(?P<sales_cycle_pk>[\d]+)/mentions/add/$',
+        crmuser_required(sales_cycle_add_mention),
+        name='sales_cycle_add_mention'),
+
 
     url(r'^share/create/$',
         crmuser_required(ShareCreateView.as_view(

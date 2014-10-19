@@ -129,7 +129,9 @@
   </div>
 </div>
 
-<div class="column-header">
+<div class="column-header"
+  data-js-salescycle='body'>
+
   <div class="column-header-a">
     <a href="#">
       <figure class="userpic">
@@ -195,23 +197,70 @@
       </div>
     </div>
   </div><div class="column-header-c">
-    <a href="#" class="link-user"><figure class="userpic">
-      <img src="{% static 'img/example/userpic1.png' %}" alt="" />
-    </figure></a>
-    <a href="#" class="link-user"><figure class="userpic">
-      <img src="{% static 'img/example/userpic2.png' %}" alt="" />
-    </figure></a>
-    <a href="#" class="link-user"><figure class="userpic">
-      <img src="{% static 'img/example/userpic3.png' %}" alt="" />
-    </figure></a>
-    <a href="#" class="link-user">&hellip; 3 more</a>
+
+
+    <div data-js-addmention='visualData'>
+      {% for m in mentioned|slice:':3' %}
+        <a href="#" class="link-user"><figure class="userpic">
+          <img src="{% static 'img/example/userpic1.png' %}" alt=''/>
+        </figure></a>
+      {% endfor %}
+    </div>
+
+
+    <div class="dropdown">
+      <a href="#" class="link-user" data-toggle="dropdown">&hellip; {% if mentioned|length > 3 %} more {{mentioned|length|add:'-3'}} / {% endif %}add</a>
+
+      <form action="{% crm_url 'sales_cycle_add_mention' sales_cycle_pk=sales_cycle.pk %}" method="POST"
+        data-js-addmention='form'> {% csrf_token %}
+        <input type="hidden" name='id'/>
+      </form>
+
+      <div class="dropdown-menu" style="left:50%;">
+        <div class="dropdown-menu-body">
+          <ul class="dropdown-menu-list">
+
+            {% if mentioned|length > 3 %}
+              <li class="dropdown-menu-item">other {{mentioned|length|add:'-3'}}: </li>
+            {% endif %}
+            {% for m in mentioned|slice:'3:' %}
+              <li class="dropdown-menu-item">
+                <a href="#" class="dropdown-menu-item-link">
+                  <figure class="userpic">
+                    <img src="{% static 'img/example/userpic6.png' %}" alt="" />
+                  </figure>
+                  {{ m.get_billing_user.get_username }}
+                </a>
+              </li>
+            {% endfor %}
+
+            {% for crmuser in crmusers %}
+              {% if not crmuser in mentioned %}
+                <li class="dropdown-menu-item">
+                  <a href="#" class="dropdown-menu-item-link"
+                    data-js-addmention-id="{{ crmuser.pk }}">
+                    <figure class="userpic">
+                      <img src="{% static 'img/example/userpic2.png' %}" alt="" />
+                    </figure>
+                    {{ crmuser.get_billing_user.get_username }}
+                  </a>
+                </li>
+              {% endif %}
+            {% empty %}
+              <li class="dropdown-menu-item">There is no user to mentioning</li>
+            {% endfor %}
+
+          </ul>
+        </div>
+      </div>
+    </div>
+
+
   </div>
 </div>
 
 
-<div class="body-column body-column--single"
-  data-js-salescycle='body'
->
+<div class="body-column body-column--single">
   <div class="column">
     <div class="line line--borderless">
       <div class="line-aside"></div>
@@ -250,8 +299,8 @@
               <textarea class="input-text2" rows="3"
                 name='{{ activity_form.title.html_name }}'
                 placeholder="Log your activity..."
-                data-js-addmention='textarea'
-                data-js-addmention-mentions="{{ mentions }}"
+                data-js-addactivity-mention='textarea'
+                data-js-addactivity-mention-data="{{ activity_mentions_json }}"
                 ></textarea>
               {{ activity_form.mentioned_user_ids_json.as_hidden }}
 
@@ -373,7 +422,7 @@
               sales_cycle.reload();
             })
             .on('reinit.add_mentions', function() {
-              add_mentions.init();
+              add_activity_mentions.init();
             })
         }
       },
@@ -505,12 +554,12 @@
         }
       },
 
-      add_mentions = {
+      add_activity_mentions = {
         sel: {
-          textarea: '[data-js-addmention="textarea"]',
-          mentions: '[data-js-addmention-mentions]',
+          textarea: '[data-js-addactivity-mention="textarea"]',
+          mentions: '[data-js-addactivity-mention-data]',
           data: {
-            mentions: 'jsAddmentionMentions',
+            mentions: 'jsAddactivityMentionData',
           },
         },
         get_added: function() {
@@ -581,13 +630,7 @@
 
           $.get(reload_url, {'sales_cycle_id': response_data.pk})
             .done(function (data) {
-              $(document)
-                .find(sel.body)
-                  .replaceWith( $(data).find(sel.body) )
-                  .end()
-                .find(sel_dropdown_menu)
-                  .replaceWith( $(data).find(sel_dropdown_menu) )
-                  .end()
+              observer.$o.trigger('reload.sales_cycle', [response_data.pk]);
             });
         },
         submit: function(event) {
@@ -645,14 +688,56 @@
         }
       },
 
+      add_mention = {
+        sel: {
+          form: '[data-js-addmention="form"]',
+          link: '[data-js-addmention-id]',
+          form_field: {
+            id: '[name="id"]',
+          },
+          data: {
+            link_id: 'jsAddmentionId',
+          }
+        },
+        add: function(event) {
+          var $link = $(event.target).closest(this.sel.link),
+              _id = $link.data(this.sel.data.link_id),
+              $form = $(this.sel.form),
+              _done = function(data) {
+                console.log(data);
+                observer.$o.trigger('reload.sales_cycle');
+              };
+
+          $form
+            .find(this.sel.form_field.id)
+              .val( _id );
+
+          $.post($form.prop('action'), $form.serialize())
+            .done($.proxy(_done, this))
+            .fail(function (event, jqxhr, settings, thrownError) {
+              console.log(event)
+              console.log(jqxhr)
+              console.log(settings)
+              alert(thrownError);
+            });
+
+          event.preventDefault();
+        },
+        init: function() {
+          $(document)
+            .on('click', this.sel.link, $.proxy(this.add, this));
+        }
+      },
+
       init = function() {
         observer.init();
         sales_cycle.init();
         add_activity.init();
-        add_mentions.init();
+        add_activity_mentions.init();
         add_value.init();
         create_sales_cycle.init();
         share.init();
+        add_mention.init();
       };
 
     init();

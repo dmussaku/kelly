@@ -571,7 +571,8 @@ class SalesCycle(SubscriptionObject):
                                                  content_class=self.__class__,
                                                  object_id=self.pk,
                                                  save=True)
-        self.mentions = map(build_single_mention, user_ids)
+
+        map(self.mentions.add, map(build_single_mention, user_ids))
         self.save()
 
     def assign_user(self, user_id, save=False):
@@ -588,6 +589,11 @@ class SalesCycle(SubscriptionObject):
         """TEST Returns list of activities ordered by date."""
         return self.rel_activities.order_by(
             '-date_created')[offset:offset + limit]
+
+    def get_mentioned_users(self, limit=20, offset=0):
+        user_ids = self.mentions.all()[offset:offset + limit]\
+            .values_list('user_id', flat=True)
+        return CRMUser.objects.filter(pk__in=user_ids)
 
     def add_product(self, product_id, **kw):
         """TEST Assigns products to salescycle"""

@@ -116,6 +116,14 @@ class ContactDetailView(DetailView):
                      'sales_cycle': sales_cycle,
                      'mentioned_user_ids_json': None})
 
+        # add mentions to new activity
+        def gen_mentions(crmuser):
+            return {'id': crmuser.id,
+                    'name': users.get(id=crmuser.user_id).get_username(),
+                    'type': 'crmuser'}
+        context['activity_mentions_json'] = \
+            json.dumps(map(gen_mentions, crmusers))
+
         # add new value to current salescycle
         if sales_cycle is None:
             context['value_form'] = None
@@ -126,13 +134,6 @@ class ContactDetailView(DetailView):
             context['value_form'] = ValueForm(
                 initial={'owner': current_crmuser,
                          'amount': 0})
-
-        # add mentions to new activity
-        def gen_mentions(crmuser):
-            return {'id': crmuser.id,
-                    'name': users.get(id=crmuser.user_id).get_username(),
-                    'type': 'crmuser'}
-        context['mentions'] = json.dumps(map(gen_mentions, crmusers))
 
         # create new sales_cycle to contact
         context['new_sales_cycle_form'] = SalesCycleForm(
@@ -145,6 +146,9 @@ class ContactDetailView(DetailView):
                      'contact': context['object']})
         context['crmusers'] = crmusers.exclude(id=current_crmuser.id)
         context['current_crmuser'] = current_crmuser
+
+        # mentions, add mentions:
+        context['mentioned'] = sales_cycle.get_mentioned_users()
 
         return context
 
@@ -376,6 +380,20 @@ def sales_cycle_value_update(request, service_slug=None, sales_cycle_pk=None):
                 'sales_cycle_pk': sales_cycle.pk
             }
             return HttpResponse(json.dumps(data), mimetype="application/json")
+
+
+def sales_cycle_add_mention(request, service_slug=None, sales_cycle_pk=None):
+    sales_cycle = get_object_or_404(SalesCycle, pk=sales_cycle_pk)
+
+    if request.method == 'POST':
+        crmuser_id = request.POST.get('id', None)
+        if not crmuser_id is None:
+            sales_cycle.add_mention(crmuser_id)
+        data = {
+            'pk': crmuser_id,
+            'sales_cycle_pk': sales_cycle.pk
+        }
+        return HttpResponse(json.dumps(data), mimetype="application/json")
 
 
 class ActivityCreateView(CreateView):
