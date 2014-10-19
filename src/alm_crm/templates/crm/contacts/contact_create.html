@@ -64,7 +64,6 @@
         <p><button type="submit" class="btn btn-primary" value="create" id='data-js-form-submit' url="{% crm_url 'contact_create' %}">
           Create
         </button></p>
-        <a id='test'>s</a>
       </form>
       
     </div>
@@ -147,8 +146,11 @@
             } 
             
         });
+        console.log(JSON.stringify(values))
+        // return false;
         $.ajax({
           type:'POST',
+          //contentType: 'application/json',
           data: values.serialize(),
           url: $('#form').attr('url'),
           success: function(){

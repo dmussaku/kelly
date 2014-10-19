@@ -10,8 +10,8 @@
     <div class="line-body">
       <div class="line-body-main">
         <div class="caption secondary">
-          <a href="index.html">{{ activity.sales_cycle.contact }}</a> |
-          <a href="index.html">{{ activity.sales_cycle }}</a>
+          <a href="{% crm_url 'contact_detail' contact_pk=activity.sales_cycle.contact.id %}">{{ activity.sales_cycle.contact }}</a> |
+          <!-- <a href="index.html">{{ activity.sales_cycle }}</a> -->
         </div>
         {{ activity.title }}
         <a href="#" class="link-tag">#meeting</a>
@@ -28,7 +28,7 @@
   </div>
   <div class="lineGroup-extra">
     <div class="comments">
-      <button type="button" class="comment--toggle" data-toggle="comments">
+      <button type="button" class="comment--toggle" data-toggle="comments" onclick='click_event("{% crm_url "comments" content_type="activity" object_id=activity.id %}")' url="">
         <figure class="icon">[c]</figure>
       </button>
       <div class="comments-body">

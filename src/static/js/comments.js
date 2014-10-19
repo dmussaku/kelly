@@ -1,9 +1,9 @@
 function click_event(my_url){
-  console.log(my_url);
+  console.log('click_event');
   var myurl = my_url;
   $.get(myurl, function(data){
     var div_class = '.comments';
-    $(div_class).html('<h3>Comments</h3>'+data);
+    $(div_class).html(data);
     return false;
   });
   return false;
@@ -11,26 +11,30 @@ function click_event(my_url){
 /*
 Script for ajax post of a comment
 */
-function add_comment(){
-  $('#comment_submit_form').submit(function(e){
-      e.preventDefault();
-      var postData = $(this).serialize();
-      $.ajax({
-        type: "POST",
-        url: $(this).attr('action'),
-        data: postData,
-        success: function(data){
-          console.log(data);
-          $('#new-comment').append("<p>"+data['name']+"</p>");
-          $('#new-comment').append("<p>"+data['comment']+"</p>");
-          $('#new-comment').append("<p>"+data['date_created']+"</p>");
-          return false;
-        }
-      });
-      return false;
-  });
+function comment_submit(){
+  console.log($(this));
 }
 
+
+$(document).on('submit', '#comment-form', function() {
+  var postData = $(this).serialize();
+  var my_url = $(this).attr('url');
+  console.log(postData);
+  $.ajax({
+    type:'POST',
+    url: my_url,
+    data: postData,
+    success: function(data){
+      $.get(my_url, function(data){
+        var div_class = '.comments';
+        $(div_class).html(data);
+        return false;
+      });
+      console.log('asdas');
+    }
+  });
+  return false;
+});
 
 
 function delete_comment(obj, id) {

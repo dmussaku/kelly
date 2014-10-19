@@ -27,6 +27,7 @@ from .views import (
     ShareListView,
 
     CommentCreateView,
+    comment_create_view,
     comment_delete_view,
     ContactSearchListView,
     contact_create_view,
@@ -47,10 +48,7 @@ urlpatterns = patterns(
         name='comment_delete'
         ),
     url(r'^comments/(?P<content_type>[\w]+)/(?P<object_id>[\d]+)/$',
-        crmuser_required(CommentCreateView.as_view(
-            model=Comment,
-            form_class=CommentForm,
-            template_name='comment/comment_create.html')),
+        crmuser_required(comment_create_view),
         name='comments'),
 
     url(r'^contacts/search/$',

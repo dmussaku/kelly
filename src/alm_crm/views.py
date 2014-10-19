@@ -164,7 +164,6 @@ class ContactListView(ListView):
 class ContactSearchListView(ListView):
 
     def get_context_data(self, **kwargs):
-        print self.kwargs
         context = super(self.__class__, self).get_context_data(**kwargs)
         try:
             context['contacts'] = Contact().filter_contacts_by_vcard(
@@ -186,7 +185,6 @@ def contact_create_view(request, service_slug):
         return render_to_response('crm/contacts/contact_create.html',{'vcard_form':VCardForm, 'csrf_token':request.META['CSRF_COOKIE']})
     if request.method == 'POST':
         vcard_form = VCardForm(request.POST, instance=VCard())
-        print request.POST
         '''
         <QueryDict: {u'family_name': [u''], u'csrfmiddlewaretoken': [u'KG8ukzT4AvoGQBHSPvQCA2UbO8kdDDPn'], u'type': [u'HOME', u'x400'], u'given_name': [u''], u'value': [u'asdasdasdasd', u'a@gmail.com']}>
 
@@ -202,6 +200,27 @@ def contact_create_view(request, service_slug):
                     subdomain=request.user_env['subdomain']
                     )
                 )
+
+def comment_create_view(request, service_slug, content_type, object_id):
+    if request.method == 'GET':
+        return render_to_response('crm/comments/comment_list.html',
+                {'comments':Comment().get_comments_by_context(object_id, content_type),
+                 'activity_id':object_id, 
+                'csrf_token':request.META['CSRF_COOKIE']}
+            )
+    if request.method == 'POST':
+        print request.POST
+        comment = Comment(
+            comment=request.POST['comment'],
+            author=request.user.get_crmuser(),
+            content_type_id=ContentType.objects.get(model=content_type).id,
+            object_id=object_id
+            )
+        try:
+            comment.save()
+            return HttpResponse('Success')
+        except:
+            return HttpResponse('No Success')
 
 class CommentSearchListView(ListView):
 
@@ -247,13 +266,12 @@ class CommentCreateView(CreateView):
         return context
 
 
+
 def comment_delete_view(request, slug, comment_id):
     if request.method == 'GET':
         try:
             comment = Comment.objects.get(id=comment_id)
-            print comment
             json_response = json.dumps({'success':'True', 'id':comment.id})
-            print json_response
             comment.delete()
             return HttpResponse(json_response, mimetype='application/json')
         except:
