@@ -1,7 +1,7 @@
 import json
 from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.contenttypes.models import ContentType
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.db.models import Q
 from django.utils import timezone
 from datetime import timedelta
@@ -25,9 +25,9 @@ from forms import (
     MentionForm,
     ActivityForm,
     CommentForm,
-    ValueForm,
     ActivityFeedbackForm,
-    ShareForm
+    ShareForm,
+    ValueForm,
     )
 from alm_vcard.forms import VCardUploadForm
 
@@ -110,11 +110,22 @@ class ContactDetailView(DetailView):
         d = Activity.get_activities_by_contact(context['object'].pk).first()
         context['first_activity_date'] = d and d.date_created
 
-        # add new activity
+        # add new activity to current salescycle
         context['activity_form'] = ActivityForm(
-            initial={'author': current_crmuser.id,
-                     'sales_cycle': sales_cycle.id,
+            initial={'author': current_crmuser,
+                     'sales_cycle': sales_cycle,
                      'mentioned_user_ids_json': None})
+
+        # add new value to current salescycle
+        if sales_cycle is None:
+            context['value_form'] = None
+        elif sales_cycle.real_value is not None:
+            context['value_form'] = \
+                ValueForm(instance=sales_cycle.real_value)
+        else:
+            context['value_form'] = ValueForm(
+                initial={'owner': current_crmuser,
+                         'amount': 0})
 
         # add mentions to new activity
         def gen_mentions(crmuser):
@@ -123,22 +134,18 @@ class ContactDetailView(DetailView):
                     'type': 'crmuser'}
         context['mentions'] = json.dumps(map(gen_mentions, crmusers))
 
-        # create new sales_cycle
-        context['sales_cycle_form'] = SalesCycleForm(
+        # create new sales_cycle to contact
+        context['new_sales_cycle_form'] = SalesCycleForm(
             initial={'owner': current_crmuser,
                      'contact': context['object']})
 
-        # share contact to
+        # share contact
         context['share_form'] = ShareForm(
             initial={'share_from': current_crmuser,
                      'contact': context['object']})
         context['crmusers'] = crmusers.exclude(id=current_crmuser.id)
         context['current_crmuser'] = current_crmuser
 
-# =======
-#         context['form'] = VCardUploadForm
-#         context['activities'] = Activity.get_activities_by_contact(contact_pk)
-# >>>>>>> origin/feature/dmussaku
         return context
 
 
@@ -349,6 +356,26 @@ class SalesCycleDeleteView(DeleteView):
     model = SalesCycle
     success_url = reverse_lazy('sales_cycle_list')
     template_name = 'sales_cycle/sales_cycle_delete.html'
+
+
+def sales_cycle_value_update(request, service_slug=None, sales_cycle_pk=None):
+    sales_cycle = get_object_or_404(SalesCycle, pk=sales_cycle_pk)
+
+    if request.method == 'POST':
+        value_form = ValueForm(request.POST)
+        if value_form.is_valid():
+            value_form.save()
+
+            if not sales_cycle.real_value is None:
+                sales_cycle.real_value.delete()
+            sales_cycle.real_value = value_form.instance
+            sales_cycle.save()
+
+            data = {
+                'pk': value_form.instance.pk,
+                'sales_cycle_pk': sales_cycle.pk
+            }
+            return HttpResponse(json.dumps(data), mimetype="application/json")
 
 
 class ActivityCreateView(CreateView):

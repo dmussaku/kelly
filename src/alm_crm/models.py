@@ -539,9 +539,9 @@ class SalesCycle(SubscriptionObject):
                                            blank=True, null=True,
                                            on_delete=models.SET_NULL)
     projected_value = models.OneToOneField(
-        Value, related_name='_unused_1_sales_cycle', null=True, blank=True,)
+        Value, related_name='sales_cycle_as_projected', null=True, blank=True,)
     real_value = models.OneToOneField(
-        Value, related_name='_unused_2_sales_cycle',
+        Value, related_name='sales_cycle_as_real',
         null=True, blank=True,)
     status = models.CharField(max_length=2,
                               choices=STATUS_OPTIONS, default='N')

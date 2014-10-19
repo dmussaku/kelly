@@ -156,14 +156,14 @@
               <form action="{% crm_url 'sales_cycle_create' %}" method="POST"
                 data-js-create-salescycle='form'> {% csrf_token %}
 
-                {{ sales_cycle_form.title.label }}
-                {{ sales_cycle_form.title }}
+                {{ new_sales_cycle_form.title.label }}
+                {{ new_sales_cycle_form.title }}
 
-                {{ sales_cycle_form.products.as_hidden }}
-                {{ sales_cycle_form.owner.as_hidden }}
-                {{ sales_cycle_form.contact.as_hidden }}
-                {{ sales_cycle_form.projected_value.as_hidden }}
-                {{ sales_cycle_form.real_value.as_hidden }}
+                {{ new_sales_cycle_form.products.as_hidden }}
+                {{ new_sales_cycle_form.owner.as_hidden }}
+                {{ new_sales_cycle_form.contact.as_hidden }}
+                {{ new_sales_cycle_form.projected_value.as_hidden }}
+                {{ new_sales_cycle_form.real_value.as_hidden }}
 
                 <button type="submit" class="btn">Create</button>
               </form>
@@ -293,16 +293,22 @@
           <div data-js-salescycle-tab-body='addvalue'
             data-js-salescycle-caption='What is the value of deal?'
             style='display:none;'>
-            <form action="{% crm_url 'activity_create' %}" method="POST"
-              class="statusForm"
+            <form action="{% crm_url 'sales_cycle_value_update' sales_cycle_pk=sales_cycle.pk %}" method="POST" class="statusForm"
               data-js-addvalue='form'
             > {% csrf_token %}
 
               <div class="inputLine">
-                <strong>Current value:</strong> 150300
+                <strong>Current value:</strong>
+                <span
+                  data-js-addvalue="show-value"
+                >{{ value_form.instance.amount|default:'0' }}</span>
               </div>
               <div class="inputLine">
-                <input class="input-text" type="text" placeholder="Update value" />
+                <input class="input-text" type="text" placeholder="Update value" name="{{ value_form.amount.html_name }}"
+                  data-js-addvalue="input"/>
+                {{ value_form.salary.as_hidden }}
+                {{ value_form.currency.as_hidden }}
+                {{ value_form.owner.as_hidden }}
               </div>
 
               <div class="inputLine inputLine--right">
@@ -533,6 +539,36 @@
         }
       },
 
+      add_value = {
+        sel: {
+          form: '[data-js-addvalue="form"]',
+          input: '[data-js-addvalue="input"]',
+          showValue: '[data-js-addvalue="show-value"]',
+        },
+        submit: function(event) {
+          var $form = $(event.target).closest(this.sel.form),
+              _done = function() {
+                $input = $(this.sel.input);
+                $(this.sel.showValue).text($input.val());
+                $input.val('');
+              };
+
+          $.post($form.attr('action'), $form.serialize())
+            .done( $.proxy(_done, this) )
+            .fail(function (event, jqxhr, settings, thrownError) {
+              console.log(event)
+              console.log(jqxhr)
+              console.log(settings)
+              alert(thrownError);
+            });
+          event.preventDefault();
+        },
+        init: function() {
+          $(document)
+            .on('submit', this.sel.form, $.proxy(this.submit, this));
+        }
+      },
+
       create_sales_cycle = {
         sel: {
           form: '[data-js-create-salescycle="form"]',
@@ -614,6 +650,7 @@
         sales_cycle.init();
         add_activity.init();
         add_mentions.init();
+        add_value.init();
         create_sales_cycle.init();
         share.init();
       };

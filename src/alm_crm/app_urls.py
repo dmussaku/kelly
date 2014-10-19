@@ -23,6 +23,8 @@ from .views import (
     ActivityDetailView,
 
     SalesCycleCreateView,
+    sales_cycle_value_update,
+
     ShareCreateView,
     ShareListView,
 
@@ -97,6 +99,9 @@ urlpatterns = patterns(
             form_class=SalesCycleForm,
             template_name='sales_cycle/sales_cycle_create.html')),
         name='sales_cycle_create'),
+    url(r'^sales_cycle/(?P<sales_cycle_pk>[\d]+)/value/update/$',
+        crmuser_required(sales_cycle_value_update),
+        name='sales_cycle_value_update'),
 
     url(r'^share/create/$',
         crmuser_required(ShareCreateView.as_view(

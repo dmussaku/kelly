@@ -82,4 +82,3 @@ class ValueForm(ModelForm):
 
     class Meta:
         model = Value
-        field = ['salary', 'amount', 'currency']
