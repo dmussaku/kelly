@@ -222,6 +222,17 @@ def comment_create_view(request, service_slug, content_type, object_id):
         except:
             return HttpResponse('No Success')
 
+
+def comment_delete_view(request, service_slug):
+    if request.method == 'POST':
+        print request.POST
+        try:
+            comment = Comment.objects.get(id=request.POST['id'])
+            comment.delete()
+            return HttpResponse('success')
+        except:
+            return HttpResponse('no success')
+
 class CommentSearchListView(ListView):
 
     def get_queryset(self, **kwargs):
@@ -267,15 +278,7 @@ class CommentCreateView(CreateView):
 
 
 
-def comment_delete_view(request, slug, comment_id):
-    if request.method == 'GET':
-        try:
-            comment = Comment.objects.get(id=comment_id)
-            json_response = json.dumps({'success':'True', 'id':comment.id})
-            comment.delete()
-            return HttpResponse(json_response, mimetype='application/json')
-        except:
-            return HttpResponse(json.dumps({'success':'False'}), mimetype='application/json')
+
 
 
 def contact_search(request, slug, query_string):

@@ -43,13 +43,15 @@ urlpatterns = patterns(
         name='feed'),
     url(r'^import_vcard/$', import_vcard, name='crm_import_vcard'),
 
-    url(r'^comments/delete/(?P<comment_id>[\d]+)/$',
-        crmuser_required(comment_delete_view),
-        name='comment_delete'
-        ),
+    
     url(r'^comments/(?P<content_type>[\w]+)/(?P<object_id>[\d]+)/$',
         crmuser_required(comment_create_view),
         name='comments'),
+
+    url(r'^comments/delete/$',
+        crmuser_required(comment_delete_view),
+        name='comment_delete'
+        ),
 
     url(r'^contacts/search/$',
         ContactSearchListView.as_view(
