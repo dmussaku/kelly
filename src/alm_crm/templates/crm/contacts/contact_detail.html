@@ -344,12 +344,16 @@
                     data-js-addproduct='input',
                     data-js-addproduct-products-datum='{{ product_datums }}'/>
                 </div>
+                <br>
+                <br>
 
                 <input type="hidden" name='product_id'/>
 
+                <!--
                 <div class="inputLine inputLine--right">
                   <button type="submit" class="btn">Update</button>
                 </div>
+                -->
               </form>
             </div>
 
@@ -459,9 +463,13 @@
           load_link: '[data-js-salescycle-load-link]',
 
           tab_link: '[data-js-salescycle-tab-link]',
+          tab_link_valued:
+            function (value) {
+              return '[data-js-salescycle-tab-link="'+value+'"]';
+            },
           tab_body: '[data-js-salescycle-tab-body]',
           tab_body_valued:
-            function(value) {
+            function (value) {
               return '[data-js-salescycle-tab-body="'+value+'"]';
             },
           tab_caption_body: '[data-js-salescycle-tab="caption"]',
@@ -471,9 +479,17 @@
             tab_caption: 'jsSalescycleCaption',
           }
         },
+        openTab: null,
         change_tab: function(event) {
           var $tab_link = $(event.target).closest(this.sel.tab_link),
-              tab_id = $tab_link.data(this.sel.data.tab_id),
+              tab_id = $tab_link.data(this.sel.data.tab_id);
+
+          this.open_tab( tab_id );
+
+          event.preventDefault();
+        },
+        open_tab: function(tab_id) {
+          var $tab_link = $(this.sel.tab_link_valued( tab_id )),
               $tab_body = $(this.sel.tab_body_valued( tab_id )),
               tab_caption = $tab_body.data(this.sel.data.tab_caption);
 
@@ -493,9 +509,9 @@
           $(this.sel.tab_caption_body)
             .text( tab_caption );
 
-          event.preventDefault();
+          this.openTab = tab_id;
         },
-        load: function(event) {
+        load: function(event, callback) {
           var $this = $(event.target).closest(this.sel.load_link),
               _id = $this.data(this.sel.data.load_id),
               _done = function (data) {
@@ -504,6 +520,8 @@
                 // reinit add_mentions for addactivity
                 observer.$o.trigger('reinit.add_mentions');
                 observer.$o.trigger('reinit.add_product');
+
+                callback && callback(); // see reload func
               };
 
           // add active class to link
@@ -519,9 +537,13 @@
           event.preventDefault();
         },
         reload: function() {
+          var _callback = function() {
+                this.openTab && this.open_tab( this.openTab );
+              };
+
           $(this.sel.load_links)
             .find('.'+sales_cycle.o.class_load_active)
-              .trigger('click');
+              .trigger('click', [$.proxy(_callback, this)]);
         },
         init: function() {
           $(document)
@@ -540,7 +562,7 @@
           },
         },
         submit: function(event) {
-          var $form = $(event.target),
+          var $form = $(event.target).closest(this.sel.form),
               submit = function(mentions) {
                 var m_user_ids = $.map(mentions, function (m) { return m.id });
 
@@ -562,7 +584,7 @@
                   });
               };
 
-          add_mentions.get_added()
+          add_activity_mentions.get_added()
             .done( $.proxy(submit, this) );
 
           event.preventDefault();
@@ -659,7 +681,6 @@
               $form = $(this.sel.removeForm),
               _done = function(data) {
                 observer.$o.trigger('reload.sales_cycle');
-                console.log(data);
               };
 
           $form.find(this.sel.removeFormInput).val( id );
@@ -670,7 +691,6 @@
           var $form = $(this.sel.form),
               _done = function(data) {
                 observer.$o.trigger('reload.sales_cycle');
-                console.log(data);
               };
 
           $form

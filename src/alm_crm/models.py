@@ -616,7 +616,6 @@ class SalesCycle(SubscriptionObject):
 
     def remove_products(self, product_ids):
         """TEST UnAssigns products to salescycle"""
-        print product_ids.__class__
         if not isinstance(product_ids, (tuple, list)):
             product_ids = [product_ids]
         products = Product.objects.filter(pk__in=product_ids)
