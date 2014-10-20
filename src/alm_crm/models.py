@@ -518,6 +518,10 @@ class Product(SubscriptionObject):
             self.subscription_id = self.owner.subscription_id
         super(Product, self).save(**kwargs)
 
+    @classmethod
+    def get_products(cls):
+        return cls.objects.all()
+
 
 class SalesCycle(SubscriptionObject):
     STATUS_OPTIONS = (

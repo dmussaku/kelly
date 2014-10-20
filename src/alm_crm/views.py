@@ -17,7 +17,8 @@ from models import (
     Feedback,
     Comment,
     Value,
-    CRMUser
+    CRMUser,
+    Product
     )
 from forms import (
     ContactForm,
@@ -135,6 +136,11 @@ class ContactDetailView(DetailView):
                 initial={'owner': current_crmuser,
                          'amount': 0})
 
+        # add products to current salescycle
+        context['product_datums'] = json.dumps([Product.get_products()
+                                               .values('pk', 'name')[1]])
+        context['sales_cycle_products'] = sales_cycle.products.all()
+
         # create new sales_cycle to contact
         context['new_sales_cycle_form'] = SalesCycleForm(
             initial={'owner': current_crmuser,
@@ -147,7 +153,7 @@ class ContactDetailView(DetailView):
         context['crmusers'] = crmusers.exclude(id=current_crmuser.id)
         context['current_crmuser'] = current_crmuser
 
-        # mentions, add mentions:
+        # mentions, add mentions(followers) to sales_cycle:
         context['mentioned'] = sales_cycle.get_mentioned_users()
 
         return context
@@ -391,6 +397,20 @@ def sales_cycle_add_mention(request, service_slug=None, sales_cycle_pk=None):
             sales_cycle.add_mention(crmuser_id)
         data = {
             'pk': crmuser_id,
+            'sales_cycle_pk': sales_cycle.pk
+        }
+        return HttpResponse(json.dumps(data), mimetype="application/json")
+
+
+def sales_cycle_add_product(request, service_slug=None, sales_cycle_pk=None):
+    sales_cycle = get_object_or_404(SalesCycle, pk=sales_cycle_pk)
+
+    if request.method == 'POST':
+        product_id = request.POST.get('product_id', None)
+        if not product_id is None:
+            sales_cycle.add_product(product_id)
+        data = {
+            'pk': product_id,
             'sales_cycle_pk': sales_cycle.pk
         }
         return HttpResponse(json.dumps(data), mimetype="application/json")

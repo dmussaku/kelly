@@ -318,7 +318,7 @@
           <div data-js-salescycle-tab-body='addproduct'
             data-js-salescycle-caption='You can use hashtags to add products from "Add activity" tab.'
             style='display:none;'>
-            <form action="{% crm_url 'activity_create' %}" method="POST"
+            <form action="{% crm_url 'sales_cycle_add_product' sales_cycle_pk=sales_cycle.pk %}" method="POST"
               class="statusForm"
               data-js-addproduct='form'
             > {% csrf_token %}
@@ -326,12 +326,19 @@
               <div class="inputLine">
                 <strong>Current products:</strong>
               </div>
-              <a href="#" class="link-product">#Product_1</a>
-              <a href="#" class="link-product">#Product_2</a>
+              <div data-js-addproduct='visualContainer'>
+                {% for sc_product in sales_cycle_products %}
+                  <a href="#{{ sc_product.pk }}" class="link-product">{{ sc_product.name }}</a>
+                {% endfor %}
+              </div>
 
               <div class="inputLine">
-                <input class="input-text" type="text" placeholder="Enter product" />
+                <input class="input-text" type="text" placeholder="Enter product"
+                  data-js-addproduct='input',
+                  data-js-addproduct-products-datum='{{ product_datums }}'/>
               </div>
+
+              <input type="hidden" name='product_id'/>
 
               <div class="inputLine inputLine--right">
                 <button type="submit" class="btn">Update</button>
@@ -411,6 +418,7 @@
 <script src='{% static "js/underscore.min.js" %}'></script>
 <script src='{% static "js/jquery.elastic.js" %}'></script>
 <script src='{% static "js/jquery.mentionsInput.js" %}'></script>
+<script src='{% static "js/typeahead.bundle.min.js" %}'></script>
 {# Sattar's code #}
 <script>
   var contact_detail_js = (function($) {
@@ -618,6 +626,69 @@
         }
       },
 
+      add_product = {
+        sel: {
+          form: '[data-js-addproduct="form"]',
+          form_input: '[name="product_id"]',
+          visualInput: '[data-js-addproduct="input"]',
+          visualContainer: '[data-js-addproduct="visualContainer"]',
+          data: {
+            productsDatum: 'jsAddproductProductsDatum',
+          }
+        },
+        init: function() {
+          var $typeaheadInput = $(this.sel.visualInput),
+              _datums = $typeaheadInput.data(this.sel.data.productsDatum),
+              _engine = new Bloodhound({
+                name: 'products',
+                local: _datums,
+                datumTokenizer: function(datum) {
+                  return Bloodhound.tokenizers.whitespace(datum.name);
+                },
+                queryTokenizer: Bloodhound.tokenizers.whitespace
+              }),
+              _selected = function(event, datum, dataset_name) {
+                var $form = $(this.sel.form),
+                    _done = function(data) {
+                      observer.$o.trigger('reload.sales_cycle');
+                      console.log(data);
+                    };
+
+                console.log(datum);
+
+                $form
+                  .find(this.sel.form_input)
+                    .val( datum.pk );
+                $.post($form.prop('action'), $form.serialize())
+                  .done( $.proxy(_done, this) )
+                  .fail(function (event, jqxhr, settings, thrownError) {
+                    console.log(event)
+                    console.log(jqxhr)
+                    console.log(settings)
+                    alert(thrownError);
+                  });
+              };
+
+          _engine.initialize();
+
+          $typeaheadInput
+            .typeahead({
+              hint: true,
+              highlight: true,
+              minLength: 1
+            },
+            {
+              displayKey: 'name',
+              // `ttAdapter` wraps the suggestion engine in an adapter that
+              // is compatible with the typeahead jQuery plugin
+              source: _engine.ttAdapter()
+            })
+            .on('typeahead:selected', $.proxy(_selected, this))
+            .on('typeahead:autocompleted', $.proxy(_selected, this));
+
+        }
+      },
+
       create_sales_cycle = {
         sel: {
           form: '[data-js-create-salescycle="form"]',
@@ -735,6 +806,7 @@
         add_activity.init();
         add_activity_mentions.init();
         add_value.init();
+        add_product.init();
         create_sales_cycle.init();
         share.init();
         add_mention.init();
