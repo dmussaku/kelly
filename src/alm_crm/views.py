@@ -137,8 +137,8 @@ class ContactDetailView(DetailView):
                          'amount': 0})
 
         # add products to current salescycle
-        context['product_datums'] = json.dumps([Product.get_products()
-                                               .values('pk', 'name')[1]])
+        context['product_datums'] = json.dumps(list(Product.get_products()
+                                               .values('pk', 'name')))
         context['sales_cycle_products'] = sales_cycle.products.all()
 
         # create new sales_cycle to contact
@@ -410,6 +410,24 @@ def sales_cycle_add_product(request, service_slug=None, sales_cycle_pk=None):
         if not product_id is None:
             sales_cycle.add_product(product_id)
         data = {
+            'pk': product_id,
+            'sales_cycle_pk': sales_cycle.pk
+        }
+        return HttpResponse(json.dumps(data), mimetype="application/json")
+
+
+def sales_cycle_remove_product(request, service_slug=None,
+                               sales_cycle_pk=None):
+    sales_cycle = get_object_or_404(SalesCycle, pk=sales_cycle_pk)
+
+    if request.method == 'POST':
+        product_id = request.POST.get('product_id', None)
+        status = False
+        if not product_id is None:
+            status = sales_cycle.remove_products(product_id)
+
+        data = {
+            'status': status,
             'pk': product_id,
             'sales_cycle_pk': sales_cycle.pk
         }

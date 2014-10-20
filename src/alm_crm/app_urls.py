@@ -26,6 +26,7 @@ from .views import (
     sales_cycle_value_update,
     sales_cycle_add_mention,
     sales_cycle_add_product,
+    sales_cycle_remove_product,
 
     ShareCreateView,
     ShareListView,
@@ -110,6 +111,9 @@ urlpatterns = patterns(
     url(r'^sales_cycle/(?P<sales_cycle_pk>[\d]+)/products/add/$',
         crmuser_required(sales_cycle_add_product),
         name='sales_cycle_add_product'),
+    url(r'^sales_cycle/(?P<sales_cycle_pk>[\d]+)/products/remove/$',
+        crmuser_required(sales_cycle_remove_product),
+        name='sales_cycle_remove_product'),
 
     url(r'^share/create/$',
         crmuser_required(ShareCreateView.as_view(

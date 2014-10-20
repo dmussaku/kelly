@@ -605,11 +605,24 @@ class SalesCycle(SubscriptionObject):
 
     def add_products(self, product_ids):
         """TEST Assigns products to salescycle"""
+        if isinstance(product_ids, int):
+            product_ids = [product_ids]
         assert isinstance(product_ids, (tuple, list)), "must be a list"
         products = Product.objects.filter(pk__in=product_ids)
         if not products:
             return False
         self.products.add(*products)
+        return True
+
+    def remove_products(self, product_ids):
+        """TEST UnAssigns products to salescycle"""
+        print product_ids.__class__
+        if not isinstance(product_ids, (tuple, list)):
+            product_ids = [product_ids]
+        products = Product.objects.filter(pk__in=product_ids)
+        if not products:
+            return False
+        self.products.remove(*products)
         return True
 
     def set_result(self, value_obj, save=False):
