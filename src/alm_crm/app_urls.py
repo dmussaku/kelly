@@ -13,6 +13,7 @@ from .forms import (
 from .views import (
     DashboardView,
     FeedView,
+    ProfileView,
 
     ContactDetailView,
     ContactListView,
@@ -44,6 +45,9 @@ urlpatterns = patterns(
     url(r'^feed/$', crmuser_required(
         FeedView.as_view(template_name='crm/feed.html')),
         name='feed'),
+    url(r'^profile/$', crmuser_required(
+        ProfileView.as_view(template_name='crm/profile.html')),
+        name='profile'),
     url(r'^import_vcard/$', import_vcard, name='crm_import_vcard'),
 
     url(r'^comments/delete/(?P<comment_id>[\d]+)/$',

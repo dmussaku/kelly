@@ -44,8 +44,6 @@
 <nav class="body-header nav">
   <div class="lineOfLinks">
     <a class="lineOfLinks-link nav-link"
-      href="{% subdomain_url 'crm_home' service_slug=DEFAULT_SERVICE subdomain=request.user_env.subdomain %}"> {{ _('dashboard') }} </a>
-    <a class="lineOfLinks-link nav-link"
       href="{% subdomain_url 'contacts_list' service_slug=DEFAULT_SERVICE subdomain=request.user_env.subdomain %}"> {{ _('contacts') }} </a>
     <a class="lineOfLinks-link nav-link"
       href="{% subdomain_url 'feed' service_slug=DEFAULT_SERVICE subdomain=request.user_env.subdomain %}"> {{ _('feed') }} </a>
@@ -90,7 +88,7 @@
             <ul class="dropdown-menu-list">
               <li class="dropdown-menu-item">
                 <a class="dropdown-menu-item-link"
-                  href="{% subdomain_url 'user_profile_url' subdomain=MY_SD %}">Profile</a>
+                  href="{% crm_url 'profile' %}">Profile</a>
               </li>
               <li class="dropdown-menu-item">
                 <a class="dropdown-menu-item-link"

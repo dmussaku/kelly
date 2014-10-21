@@ -63,6 +63,23 @@ class FeedView(TemplateView):
         return context
 
 
+class ProfileView(TemplateView):
+
+    def get_context_data(self, **kwargs):
+        context = super(self.__class__, self).get_context_data(**kwargs)
+
+        crmuser = self.request.user.get_crmuser()
+        crmuser_user = crmuser.get_billing_user()
+        context['profile_info'] = {
+            'fn': crmuser_user.get_full_name(),
+            'company': crmuser_user.get_company(),
+            'email_work': crmuser_user.email,
+            'mobile': ''
+        }
+
+        return context
+
+
 class ShareCreateView(CreateView):
 
     def form_valid(self, form):
