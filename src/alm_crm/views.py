@@ -203,11 +203,18 @@ def contact_create_view(request, service_slug):
 
 def comment_create_view(request, service_slug, content_type, object_id):
     if request.method == 'GET':
-        return render_to_response('crm/comments/comment_list.html',
-                {'comments':Comment().get_comments_by_context(object_id, content_type),
-                 'activity_id':object_id, 
-                'csrf_token':request.META['CSRF_COOKIE']}
-            )
+        if (content_type == 'activity'):
+            return render_to_response('crm/comments/comment_list.html',
+                    {'comments':Comment().get_comments_by_context(object_id, content_type),
+                     'activity_id':object_id, 
+                    'csrf_token':request.META['CSRF_COOKIE']}
+                )
+        elif (content_type == 'share'):
+            return render_to_response('crm/share/comment/comment_list.html',
+                    {'comments':Comment().get_comments_by_context(object_id, content_type),
+                     'share_id':object_id, 
+                    'csrf_token':request.META['CSRF_COOKIE']}
+                )
     if request.method == 'POST':
         print request.POST
         comment = Comment(
