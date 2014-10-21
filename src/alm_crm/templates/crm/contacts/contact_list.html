@@ -5,7 +5,7 @@
 
 
 {% block crm_aside_tabs %}
-  <a href="contacts.html" class="tabs-link" data-tip="Shared contacts">
+  <a href="{% crm_url 'share_list' %}" class="tabs-link" data-tip="Shared contacts">
       <figure class="icon">
   <svg version="1.1">
     <use class="icon--next" xlink:href="#next"></use>
@@ -21,7 +21,7 @@
 </figure>
 
     </a>
-    <a href="contacts-all.html" class="tabs-link" data-tip="All contacted">
+    <a href="{% crm_url 'contacts_list' %}" class="tabs-link active" data-tip="All contacted">
       <figure class="icon">
   <svg version="1.1">
     <use class="icon--alltime" xlink:href="#alltime"></use>
@@ -29,7 +29,7 @@
 </figure>
 
     </a>
-  <a href="{% subdomain_url 'contact-search' service_slug=DEFAULT_SERVICE subdomain=request.user_env.subdomain %}" class="tabs-link active" data-tip="Search">
+  <a href="{% subdomain_url 'contact-search' service_slug=DEFAULT_SERVICE subdomain=request.user_env.subdomain %}" class="tabs-link" data-tip="Search">
       <figure class="icon">
   <svg version="1.1">
     <use class="icon--search" xlink:href="#search"></use>

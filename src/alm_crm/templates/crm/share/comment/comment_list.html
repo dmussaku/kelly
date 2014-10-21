@@ -15,18 +15,16 @@
         <div class="comment-body"> 
             <div id="comment">
                 <a href="#" class="link-user link-user--title">{{comment.author}}</a>
-
+                <span id='comment-text'>
                     {{comment.comment}}
-
+                </span>
                 <div class="comment-body-meta js-commentForm-trigger"> 
                     <button type="button" class="link" data-toggle="comment-reply">Reply</button> 
-                    <!-- <form action="" method="post" id='comment-delete-form' url="{% crm_url 'comment_delete' %}" > --> 
                         <input id="csrf" type="hidden" name="csrfmiddlewaretoken" value="{{csrf_token}}">
                         <input id="comment-id" type="hidden" name="comment-id" value="{{comment.id}}">
-                        <!-- <button type="submit" value="create" class="link" >Delete</button>  -->
-                        <button type="button" class="link" onclick="edit_form({{comment.id}})">Edit</button>
+                        <button type="button" id="edit-button" class="link" onclick="edit_form({{comment.id}})" url="{% crm_url 'comment_edit' %}" return-url="{% crm_url 'comments' content_type=comment.content_type.name object_id=comment.object_id  %}">Edit</button>
                         <button type="button" class="link" onclick="delete_comment('{% crm_url 'comment_delete' %}',{{comment.id}})">Delete</button>
-                    <!-- </form> -->
+
                 </div> 
             </div>
         </div> 
@@ -41,42 +39,17 @@
                 <img src="{% static 'img/example/userpic6.png' %}" alt=""> 
             </figure> 
             <div class="commentForm-body"> 
-                 <form action="" method="post" id='comment-form' url="{% crm_url 'comments' content_type='share' object_id=share_id %}" > 
+                 <form action="" method="post" id='comment-form' url="{% crm_url 'comments' content_type='share' object_id=share_id %}" edit-url="{% crm_url 'comment_edit' %}"> 
                     <input id="csrf" type="hidden" name="csrfmiddlewaretoken" value="{{csrf_token}}">
                     <textarea name='comment' data-author="{{request.user}}" placeholder="Keep calm and write a note" class="input-text input-text--subtle" rows="1" id='textArea' url="{% crm_url 'comments' content_type='share' object_id=share_id %}"></textarea>
                     <button type="submit" value="create" >Post</button>
                     <button class='cancel-button' style='display: none'>Cancel</button>
-                    <!-- <p><button type="submit" class="btn btn-primary" value="create" id='data-js-comment-form' >
-                  Create
-                </button></p> -->
+
                 </form> 
             </div>
         </div>
     </div>
-    <!-- <div class="comment comment--form">
-          <div class="js-commentForm-trigger" style="display: block;">
-              <div class="comment-meta">
-                <figure class="userpic">
-                  <img src="{% static 'img/example/userpic6.png' %}" alt="">
-                </figure>
-              </div>
-              <div class="comment-body">
-                <button type="button" data-toggle="comment-reply">Leave a note</button>
-              </div>
-          </div>
-          <div class="js-commentForm" style="display: none;"> 
-            <figure class="userpic commentForm-userpic"> 
-                <img src="{% static 'img/example/userpic6.png' %}" alt=""> 
-            </figure> 
-            <div class="commentForm-body"> 
-                <input id='comment-input'>
-                    <textarea data-author="Ren" placeholder="Keep calm and write a note" class="input-text input-text--subtle" rows="1"></textarea>
-                <input>
-                <button type="button" data-action="comment-submit.html">Post</button> • 
-                <button type="button" data-action="comment-dismiss.html">Cancel</button> 
-            </div> 
-           </div>
-    </div> -->
+
 </div>
 
 {% endblock %}
