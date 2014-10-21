@@ -88,7 +88,7 @@ class ShareListView(ListView):
     def get_queryset(self):
         crmuser = self.request.user.get_crmuser()
         return crmuser.in_shares.all()
-
+    
 
 class ContactDetailView(DetailView):
 
@@ -233,10 +233,19 @@ def comment_delete_view(request, service_slug):
         except:
             return HttpResponse('no success')
 
-class CommentSearchListView(ListView):
+def comment_edit_view(request, service_slug):
+    if request.method == 'GET':
+        return HttpResponse('GET')
+    if request.method == 'POST':
+        print request.POST
+        try:
+            comment = Comment.objects.get(id=request.POST['id'])
+            comment.comment = request.POST['comment']
+            comment.save()
+            return HttpResponse('success')
+        except:
+            return HttpResponse('no success')
 
-    def get_queryset(self, **kwargs):
-        pass
 
 class CommentCreateView(CreateView):
     '''

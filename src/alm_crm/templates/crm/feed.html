@@ -3,14 +3,14 @@
 {% block head_title %} {{ _("Feed") }} {% endblock %}
 
 {% block crm_aside_tabs %}
-  <a href="#" class="tabs-link" data-tip="[Cycles I follow]">
+  <a href="{% crm_url 'feed' %}" class="tabs-link active" data-tip="[Cycles I follow]">
     <figure class="icon">
       <svg version="1.1">
         <use class="icon--home" xlink:href="#home"></use>
       </svg>
     </figure>
   </a>
-  <a href="#" class="tabs-link" data-tip="[Mentions]">
+  <a href="{% crm_url 'share_list' %}" class="tabs-link" data-tip="[Mentions]">
     <figure class="icon">
       <svg version="1.1">
         <use class="icon--mentions" xlink:href="#mentions"></use>

@@ -27,7 +27,7 @@ $(document).on('submit', '#comment-form', function() {
     success: function(data){
       $.get(my_url, function(data){
         var div_class = '.comments';
-        $(div_class).html(data);
+        $(div_class).html(data).animate({opacity:'show'}, "slow");
         return false;
       });
       console.log('asdas');
@@ -36,22 +36,6 @@ $(document).on('submit', '#comment-form', function() {
   return false;
 });
 
-$(document).on('submit', '#comment-delete-form', function() {
-  var postData = $(this).serialize();
-  var my_url = $(this).attr('url');
-  console.log(postData);
-  $.ajax({
-    type:'POST',
-    url: my_url,
-    data: postData,
-    success: function(data){
-      var comment_div = '.comment-'+$('#comment-id').val()
-      alert(comment_div);
-      $(comment_div).animate({ opacity: 'hide' }, "slow");
-    }
-  });
-  return false;
-});
 
 function delete_comment(url,id){
   if (confirm("Are you sure you want to delete that comment?")){
@@ -68,8 +52,16 @@ function delete_comment(url,id){
   }
 }
 
+function edit_form(id){
+  var comment_form = $('#add-comment-form');
+  $('#add-comment-form').remove();
+  var comment_div = '.comment-'+id;
+  $(comment_div).html(comment_form.html());
+}
+
 
 $.comments = {
   'click_event': click_event,
   'delete_comment': delete_comment,
+  'edit_form': edit_form,
 }

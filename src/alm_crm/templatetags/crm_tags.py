@@ -15,6 +15,12 @@ def show_activity(activity, **kwargs):
     print kwargs
     return kwargs
 
+@register.inclusion_tag('crm/share/contact/contact.html')
+def show_share(share, **kwargs):
+    kwargs.update({'share': share})
+    print kwargs
+    return kwargs
+
 
 @register.simple_tag
 def crm_url(view, url='', *args, **kwargs):

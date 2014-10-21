@@ -710,6 +710,10 @@ class Activity(SubscriptionObject):
     def owner(self):
         return self.author
 
+    @property
+    def contact(self):
+        return self.sales_cycle.contact.id
+    
     def set_feedback(self, feedback_obj, save=False):
         """Set feedback to activity instance. Saves if `save` is set(True)."""
         feedback_obj.activity = self
@@ -949,6 +953,7 @@ class Share(SubscriptionObject):
 
     def __unicode__(self):
         return '%s : %s -> %s' % (self.contact, self.share_from, self.share_to)
+
 
 
 signals.post_save.connect(

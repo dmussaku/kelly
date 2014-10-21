@@ -1,0 +1,58 @@
+{% load i18n crm_tags %}
+{% load static from staticfiles %}
+<div class="lineGroup lineGroup--compact">
+    <div class="line line--compact">
+      <div class="line-aside">
+        <figure class="icon">[s]</figure>
+        <figure class="icon">[f]</figure>
+      </div>
+      <div class="line-body">
+        <h1 class="line-title"><a href="{% crm_url 'contact_detail' contact_pk=share.contact.id %}">{{ share.contact.name }}</a></h1>
+        <div class="line-subtitle">{{ share.contact.company.name }}</div>
+      </div>
+    </div>
+    <div class="line line--compact">
+      <div class="line-aside">
+        <div class="line-aside-label">mobile</div>
+      </div>
+      <div class="line-body">
+        {{ share.contact.mobile.value }}
+      </div>
+    </div>
+    <div class="line line--compact">
+      <div class="line-aside">
+        <div class="line-aside-label">work</div>
+      </div>
+      <div class="line-body">
+        {{ share.contact.email_work }}
+      </div>
+    </div>
+    <div class="line line--compact">
+      <div class="line-aside"></div>
+      <div class="line-body">
+        <div class="line-subtitle">Last contacted: never</div>
+      </div>
+    </div>
+  <div class="lineGroup-extra">
+    <div class="comments">
+      <button type="button" class="comment--toggle" data-toggle="comments" onclick='click_event("{% crm_url "comments" content_type="share" object_id=share.id %}")' url="">
+        <figure class="icon">[c]</figure>
+      </button>
+      <div class="comments-body">
+        <div class="comment comment--form">
+          <div class="js-commentForm-trigger">
+              <div class="comment-meta">
+                <figure class="userpic">
+                  <img src="{% static 'img/example/userpic6.png' %}" alt="" />
+                </figure>
+              </div>
+              <div class="comment-body">
+                <button type="button" data-toggle="comment-reply">Leave a note</button>
+              </div>
+          </div>
+          <div class="js-commentForm"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> 

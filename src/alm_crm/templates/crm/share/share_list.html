@@ -1,20 +1,41 @@
 {% extends "crm/base.html" %}
-{% load i18n %}
+{% load i18n almanet_tags%}
 {% block head_title %} {{ _("Shares") }} {% endblock %}
 {% load crm_tags %}
 
+{% block crm_aside_tabs %}
+  <a href="{% crm_url 'feed' %}" class="tabs-link" data-tip="[Cycles I follow]">
+    <figure class="icon">
+      <svg version="1.1">
+        <use class="icon--home" xlink:href="#home"></use>
+      </svg>
+    </figure>
+  </a>
+  <a href="{% crm_url 'share_list' %}" class="tabs-link active" data-tip="[Mentions]">
+    <figure class="icon">
+      <svg version="1.1">
+        <use class="icon--mentions" xlink:href="#mentions"></use>
+      </svg>
+    </figure>
+  </a>
+  <a href="#" class="tabs-link" data-tip="[Company]">
+    <figure class="icon">
+      <svg version="1.1">
+        <use class="icon--company" xlink:href="#company"></use>
+      </svg>
+    </figure>
+  </a>
+{% endblock crm_aside_tabs %}
+
 {% block crm_body %}
 
-  <legend> Shares of current loged crmuser </legend>
-  <br>
-
-  {% for share in object_list %}
-    <div>
-      contact: {{ share.contact }} <br>
-      share_to: {{ share.share_to }} <br>
-      share_from: {{ share.share_from }} <br>
-      date_created: {{ share.date_created }} <br>
-    </div> <br>
-  {% endfor %}
+  <div class="body-column body-column--single">
+    <div class="column">
+      <div class="column-title">
+        Shared Contacts
+        {% for share in object_list %}
+          {% show_share share  %}
+        {% endfor %}
+      </div>
 
 {% endblock crm_body %}

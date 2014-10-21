@@ -29,6 +29,7 @@ from .views import (
     CommentCreateView,
     comment_create_view,
     comment_delete_view,
+    comment_edit_view,
     ContactSearchListView,
     contact_create_view,
     )
@@ -51,6 +52,10 @@ urlpatterns = patterns(
     url(r'^comments/delete/$',
         crmuser_required(comment_delete_view),
         name='comment_delete'
+        ),
+    url(r'^comments/edit/$',
+        crmuser_required(comment_edit_view),
+        name='comment_edit'
         ),
 
     url(r'^contacts/search/$',
@@ -80,7 +85,16 @@ urlpatterns = patterns(
             form_class=ContactForm,
             template_name="contact/contact_update.html")),
         name='contact_update'),
-
+    url(r'^share/create/$',
+        crmuser_required(ShareCreateView.as_view(
+            form_class=ShareForm,
+            template_name='crm/share/share_create.html')),
+        name='share_create'),
+    url(r'^share/$',
+        crmuser_required(ShareListView.as_view(
+            model=Share,
+            template_name='crm/share/share_list.html')),
+        name='share_list'),
     url(r'^activities/create/$',
         crmuser_required(ActivityCreateView.as_view(
             model=Activity,
@@ -100,14 +114,5 @@ urlpatterns = patterns(
             template_name='sales_cycle/sales_cycle_create.html')),
         name='sales_cycle_create'),
 
-    url(r'^share/create/$',
-        crmuser_required(ShareCreateView.as_view(
-            form_class=ShareForm,
-            template_name='crm/share/share_create.html')),
-        name='share_create'),
-    url(r'^share/$',
-        crmuser_required(ShareListView.as_view(
-            model=Share,
-            template_name='crm/share/share_list.html')),
-        name='share_list'),
+    
 )
