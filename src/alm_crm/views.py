@@ -106,7 +106,7 @@ class ShareListView(ListView):
     def get_queryset(self):
         crmuser = self.request.user.get_crmuser()
         return crmuser.in_shares.all()
-    
+
 
 class ContactDetailView(DetailView):
 
@@ -116,56 +116,14 @@ class ContactDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(ContactDetailView, self).get_context_data(**kwargs)
+
         current_crmuser = self.request.user.get_crmuser()
-        crmusers, users = CRMUser.get_crmusers(with_users=True)
-        # show sales_cycle
-        sales_cycle_id = self.request.GET.get('sales_cycle_id', False)
-        if sales_cycle_id:
-            sales_cycle = context['object'].sales_cycles.get(id=sales_cycle_id)
-        else:
-            sales_cycle = context['object'].sales_cycles.last()
-        context['sales_cycle'] = sales_cycle
-        if sales_cycle:
-            sales_cycle_id = sales_cycle.id
-        else:
-            sales_cycle_id = False
 
-        # date when first activity was added to the sales_cycle
-        d = Activity.get_activities_by_contact(context['object'].pk).first()
-        context['first_activity_date'] = d and d.date_created
-
-        # add new activity to current salescycle
-        context['activity_form'] = ActivityForm(
-            initial={'author': current_crmuser.id,
-                     'sales_cycle': sales_cycle_id,
-                     'mentioned_user_ids_json': None})
-
-        # add mentions to new activity
-        def gen_mentions(crmuser):
-            return {'id': crmuser.id,
-                    'name': users.get(id=crmuser.user_id).get_username(),
-                    'type': 'crmuser'}
-        context['activity_mentions_json'] = \
-            json.dumps(map(gen_mentions, crmusers))
-
-        # add new value to current salescycle
-        if sales_cycle is None:
-            context['value_form'] = None
-        elif sales_cycle.real_value is not None:
-            context['value_form'] = \
-                ValueForm(instance=sales_cycle.real_value)
-        else:
-            context['value_form'] = ValueForm(
-                initial={'owner': current_crmuser,
-                         'amount': 0})
-
-        # add products to current salescycle
-        context['product_datums'] = json.dumps(list(Product.get_products()
-                                               .values('pk', 'name')))
-        if sales_cycle is None:
-            context['sales_cycle_products'] = None
-        else:
-            context['sales_cycle_products'] = sales_cycle.products.all()
+        # last sales_cycle
+        context['sales_cycle'] = \
+            SalesCycle.get_salescycles_by_last_activity_date(
+                context['object'].id, owned=True, mentioned=False,
+                followed=False)[0].first()
 
         # create new sales_cycle to contact
         context['new_sales_cycle_form'] = SalesCycleForm(
@@ -176,15 +134,9 @@ class ContactDetailView(DetailView):
         context['share_form'] = ShareForm(
             initial={'share_from': current_crmuser,
                      'contact': context['object']})
+        crmusers = CRMUser.get_crmusers()
         context['crmusers'] = crmusers.exclude(id=current_crmuser.id)
         context['current_crmuser'] = current_crmuser
-
-        # mentions, add mentions(followers) to sales_cycle:
-        if sales_cycle is None:
-            context['mentioned'] = None
-        else:
-            context['mentioned'] = sales_cycle.get_mentioned_users()
-
 
         return context
 
@@ -247,13 +199,13 @@ def comment_create_view(request, service_slug, content_type, object_id):
         if (content_type == 'activity'):
             return render_to_response('crm/comments/comment_list.html',
                     {'comments':Comment().get_comments_by_context(object_id, content_type),
-                     'activity_id':object_id, 
+                     'activity_id':object_id,
                     'csrf_token':request.META['CSRF_COOKIE']}
                 )
         elif (content_type == 'share'):
             return render_to_response('crm/share/comment/comment_list.html',
                     {'comments':Comment().get_comments_by_context(object_id, content_type),
-                     'share_id':object_id, 
+                     'share_id':object_id,
                     'csrf_token':request.META['CSRF_COOKIE']}
                 )
     if request.method == 'POST':
@@ -340,7 +292,7 @@ class CommentCreateView(CreateView):
 
 def contact_search(request, slug, query_string):
     if request.method == 'GET':
-       
+
         queryset = Contact.objects.filter(Q(vcard__given_name__startswith=query_string) |
             Q(vcard__family_name__startswith=query_string) |
             Q(vcard__tel__value__contains=query_string) |
@@ -468,12 +420,68 @@ class SalesCycleAddMentionView(UpdateView):
 
 
 class SalesCycleDetailView(DetailView):
-    model = SalesCycle
-    template_name = "sales_cycle/sales_cycle_detail.html"
+
+    def get_object(self):
+        sales_cycle_pk = self.request.GET.get('sales_cycle_id', None)
+        return self.model.objects.get(pk=sales_cycle_pk)
 
     def get_context_data(self, **kwargs):
-        context = super(SalesCycleDetailView, self).get_context_data(**kwargs)
-        context['sales_cycle'] = SalesCycle.objects.get(id=self.kwargs['pk'])
+        context = super(self.__class__, self).get_context_data(**kwargs)
+
+        current_crmuser = self.request.user.get_crmuser()
+        sales_cycle = context['object']
+        contact = sales_cycle.contact
+
+        # list of contact sales_cycles
+        context['sales_cycles'] = \
+            SalesCycle.get_salescycles_by_last_activity_date(
+                contact.id, owned=True, mentioned=False, followed=False)[0]
+
+        # create new sales_cycle to contact
+        context['new_sales_cycle_form'] = SalesCycleForm(
+            initial={'owner': current_crmuser,
+                     'contact': contact})
+
+        # date when first activity was added to the sales_cycle
+        context['first_activity_date'] = sales_cycle.get_first_activity_date()
+
+        # activities of the sales_cycle
+        context['activities'] = sales_cycle.get_activities(limit=100)
+
+        # add new activity to current salescycle
+        context['activity_form'] = ActivityForm(
+            initial={'author': current_crmuser,
+                     'sales_cycle': sales_cycle.pk,
+                     'mentioned_user_ids_json': None})
+
+        # add mentions to new activity
+        crmusers, users = CRMUser.get_crmusers(with_users=True)
+
+        def gen_mentions(crmuser):
+            return {'id': crmuser.id,
+                    'name': users.get(id=crmuser.user_id).get_username(),
+                    'type': 'crmuser'}
+        context['activity_mentions_json'] = \
+            json.dumps(map(gen_mentions, crmusers))
+
+        # add new value to current salescycle
+        if sales_cycle.real_value is None:
+            context['value_form'] = ValueForm(
+                initial={'owner': current_crmuser, 'amount': 0})
+        else:
+            context['value_form'] = ValueForm(instance=sales_cycle.real_value)
+
+        # add products to current salescycle
+        context['product_datums'] = json.dumps(list(Product.get_products()
+                                               .values('pk', 'name')))
+        context['sales_cycle_products'] = sales_cycle.products.all()
+
+        # mentions, add mentions(followers) to sales_cycle:
+        if sales_cycle is None:
+            context['mentioned'] = None
+        else:
+            context['mentioned'] = sales_cycle.get_mentioned_users()
+
         return context
 
 

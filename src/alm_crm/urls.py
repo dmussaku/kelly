@@ -81,7 +81,6 @@ urlpatterns = patterns(
     url(r'^sales_cycles/create/$', SalesCycleCreateView.as_view(), name='sales_cycle_create'),
     url(r'^sales_cycles/update/(?P<pk>\d+)/$', SalesCycleUpdateView.as_view(), name='sales_cycle_update'),
     url(r'^sales_cycles/add_mention/(?P<pk>\d+)/$', SalesCycleAddMentionView.as_view(), name='sales_cycle_add_mention'),
-    url(r'^sales_cycles/(?P<pk>\d+)/$', SalesCycleDetailView.as_view(), name='sales_cycle_detail'),
     url(r'^sales_cycles/delete/(?P<pk>\d+)/$', SalesCycleDeleteView.as_view(), name='sales_cycle_delete'),
 
     url(r'^activities/create/$', ActivityCreateView.as_view(), name='activity_create'),
