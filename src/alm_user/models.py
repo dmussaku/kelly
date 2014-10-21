@@ -4,6 +4,7 @@ from django.contrib.auth.models import (
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from timezone_field import TimeZoneField
+from almanet.models import Subscription
 
 
 class UserManager(contrib_user_manager):
@@ -94,24 +95,28 @@ class User(AbstractBaseUser):
         return service in self.connected_services()
 
     def connect_service(self, service):
-        from almanet.models import Subscription
         try:
             s = Subscription.objects.get(service=service, user=self)
         except Subscription.DoesNotExist:
             s = Subscription(service=service, user=self)
-        else:
-            # create user in corresponding service
-            # eg.: CRMUser in CRM service, CRM's slug = crm
-            create_user = getattr(self, 'create_{}user'.format(service.slug))
-            create_user(s.pk, self.get_company().pk)
+        finally:
             s.is_active = True
-        s.save()
+            s.save()
+            if self.get_subscr_user(s.pk) is None:
+                # create user in corresponding service
+                # eg.: CRMUser in CRM service, CRM's slug = crm
+                create_user = getattr(self,
+                                      'create_{}user'.format(service.slug))
+                create_user(s.pk, self.get_company().pk)
 
     def disconnect_service(self, service):
         s = self.subscriptions.filter(is_active=True, service=service).first()
         if s:
             s.is_active = False
             s.save()
+
+    def get_subscr_by_service(self, service):
+        return Subscription.objects.get(service=service, user=self)
 
     def create_crmuser(self, subscription_pk, organization_pk):
         from alm_crm.models import CRMUser
@@ -129,7 +134,11 @@ class User(AbstractBaseUser):
 
     def get_subscr_user(self, subscr_id):
         from alm_crm.models import CRMUser
-        return CRMUser.objects.get(user_id=self.pk, subscription_id=subscr_id)
+        try:
+            return CRMUser.objects.get(user_id=self.pk,
+                                       subscription_id=subscr_id)
+        except CRMUser.DoesNotExist:
+            return None
 
     def get_crmuser(self):
         from alm_crm.models import CRMUser

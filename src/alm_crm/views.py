@@ -1,7 +1,7 @@
 import json
 from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.contenttypes.models import ContentType
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.db.models import Q
 from django.utils import timezone
 from datetime import timedelta
@@ -17,7 +17,8 @@ from models import (
     Feedback,
     Comment,
     Value,
-    CRMUser
+    CRMUser,
+    Product
     )
 from forms import (
     ContactForm,
@@ -25,9 +26,9 @@ from forms import (
     MentionForm,
     ActivityForm,
     CommentForm,
-    ValueForm,
     ActivityFeedbackForm,
-    ShareForm
+    ShareForm,
+    ValueForm,
     )
 from alm_vcard.forms import VCardUploadForm
 from django.shortcuts import render_to_response
@@ -62,6 +63,23 @@ class FeedView(TemplateView):
         context['sales_cycles'] = sales_cycles_data[0]
         context['sales_cycle_activities'] = sales_cycles_data[1]
         context['sales_cycle_activity_map'] = sales_cycles_data[2]
+        return context
+
+
+class ProfileView(TemplateView):
+
+    def get_context_data(self, **kwargs):
+        context = super(self.__class__, self).get_context_data(**kwargs)
+
+        crmuser = self.request.user.get_crmuser()
+        crmuser_user = crmuser.get_billing_user()
+        context['profile_info'] = {
+            'fn': crmuser_user.get_full_name(),
+            'company': crmuser_user.get_company(),
+            'email_work': crmuser_user.email,
+            'mobile': ''
+        }
+
         return context
 
 
@@ -116,7 +134,7 @@ class ContactDetailView(DetailView):
         d = Activity.get_activities_by_contact(context['object'].pk).first()
         context['first_activity_date'] = d and d.date_created
 
-        # add new activity
+        # add new activity to current salescycle
         context['activity_form'] = ActivityForm(
             initial={'author': current_crmuser.id,
                      'sales_cycle': sales_cycle_id,
@@ -127,24 +145,47 @@ class ContactDetailView(DetailView):
             return {'id': crmuser.id,
                     'name': users.get(id=crmuser.user_id).get_username(),
                     'type': 'crmuser'}
-        context['mentions'] = json.dumps(map(gen_mentions, crmusers))
+        context['activity_mentions_json'] = \
+            json.dumps(map(gen_mentions, crmusers))
 
-        # create new sales_cycle
-        context['sales_cycle_form'] = SalesCycleForm(
+        # add new value to current salescycle
+        if sales_cycle is None:
+            context['value_form'] = None
+        elif sales_cycle.real_value is not None:
+            context['value_form'] = \
+                ValueForm(instance=sales_cycle.real_value)
+        else:
+            context['value_form'] = ValueForm(
+                initial={'owner': current_crmuser,
+                         'amount': 0})
+
+        # add products to current salescycle
+        context['product_datums'] = json.dumps(list(Product.get_products()
+                                               .values('pk', 'name')))
+        if sales_cycle is None:
+            context['sales_cycle_products'] = None
+        else:
+            context['sales_cycle_products'] = sales_cycle.products.all()
+
+        # create new sales_cycle to contact
+        context['new_sales_cycle_form'] = SalesCycleForm(
             initial={'owner': current_crmuser,
                      'contact': context['object']})
 
-        # share contact to
+        # share contact
         context['share_form'] = ShareForm(
             initial={'share_from': current_crmuser,
                      'contact': context['object']})
         context['crmusers'] = crmusers.exclude(id=current_crmuser.id)
         context['current_crmuser'] = current_crmuser
 
-# =======
-#         context['form'] = VCardUploadForm
-#         context['activities'] = Activity.get_activities_by_contact(contact_pk)
-# >>>>>>> origin/feature/dmussaku
+        # mentions, add mentions(followers) to sales_cycle:
+        if sales_cycle is None:
+            context['mentioned'] = None
+        else:
+            context['mentioned'] = sales_cycle.get_mentioned_users()
+
+
         return context
 
 
@@ -442,6 +483,72 @@ class SalesCycleDeleteView(DeleteView):
     template_name = 'sales_cycle/sales_cycle_delete.html'
 
 
+def sales_cycle_value_update(request, service_slug=None, sales_cycle_pk=None):
+    sales_cycle = get_object_or_404(SalesCycle, pk=sales_cycle_pk)
+
+    if request.method == 'POST':
+        value_form = ValueForm(request.POST)
+        if value_form.is_valid():
+            value_form.save()
+
+            if not sales_cycle.real_value is None:
+                sales_cycle.real_value.delete()
+            sales_cycle.real_value = value_form.instance
+            sales_cycle.save()
+
+            data = {
+                'pk': value_form.instance.pk,
+                'sales_cycle_pk': sales_cycle.pk
+            }
+            return HttpResponse(json.dumps(data), mimetype="application/json")
+
+
+def sales_cycle_add_mention(request, service_slug=None, sales_cycle_pk=None):
+    sales_cycle = get_object_or_404(SalesCycle, pk=sales_cycle_pk)
+
+    if request.method == 'POST':
+        crmuser_id = request.POST.get('id', None)
+        if not crmuser_id is None:
+            sales_cycle.add_mention(crmuser_id)
+        data = {
+            'pk': crmuser_id,
+            'sales_cycle_pk': sales_cycle.pk
+        }
+        return HttpResponse(json.dumps(data), mimetype="application/json")
+
+
+def sales_cycle_add_product(request, service_slug=None, sales_cycle_pk=None):
+    sales_cycle = get_object_or_404(SalesCycle, pk=sales_cycle_pk)
+
+    if request.method == 'POST':
+        product_id = request.POST.get('product_id', None)
+        if not product_id is None:
+            sales_cycle.add_product(product_id)
+        data = {
+            'pk': product_id,
+            'sales_cycle_pk': sales_cycle.pk
+        }
+        return HttpResponse(json.dumps(data), mimetype="application/json")
+
+
+def sales_cycle_remove_product(request, service_slug=None,
+                               sales_cycle_pk=None):
+    sales_cycle = get_object_or_404(SalesCycle, pk=sales_cycle_pk)
+
+    if request.method == 'POST':
+        product_id = request.POST.get('product_id', None)
+        status = False
+        if not product_id is None:
+            status = sales_cycle.remove_products(product_id)
+
+        data = {
+            'status': status,
+            'pk': product_id,
+            'sales_cycle_pk': sales_cycle.pk
+        }
+        return HttpResponse(json.dumps(data), mimetype="application/json")
+
+
 class ActivityCreateView(CreateView):
 
     success_url = reverse_lazy('activity_list')
@@ -504,13 +611,6 @@ def comments_by_activity(self, activity_id):
         comments = Comment().get_comments_by_context(activity.id, Activity)
     if request.method == 'POST':
         pass
-
-
-
-
-
-
-
 
 class ValueListView(ListView):
     model = Value

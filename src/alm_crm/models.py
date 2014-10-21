@@ -524,6 +524,10 @@ class Product(SubscriptionObject):
             self.subscription_id = self.owner.subscription_id
         super(Product, self).save(**kwargs)
 
+    @classmethod
+    def get_products(cls):
+        return cls.objects.all()
+
 
 class SalesCycle(SubscriptionObject):
     STATUS_OPTIONS = (
@@ -545,9 +549,9 @@ class SalesCycle(SubscriptionObject):
                                            blank=True, null=True,
                                            on_delete=models.SET_NULL)
     projected_value = models.OneToOneField(
-        Value, related_name='_unused_1_sales_cycle', null=True, blank=True,)
+        Value, related_name='sales_cycle_as_projected', null=True, blank=True,)
     real_value = models.OneToOneField(
-        Value, related_name='_unused_2_sales_cycle',
+        Value, related_name='sales_cycle_as_real',
         null=True, blank=True,)
     status = models.CharField(max_length=2,
                               choices=STATUS_OPTIONS, default='N')
@@ -577,7 +581,8 @@ class SalesCycle(SubscriptionObject):
                                                  content_class=self.__class__,
                                                  object_id=self.pk,
                                                  save=True)
-        self.mentions = map(build_single_mention, user_ids)
+
+        map(self.mentions.add, map(build_single_mention, user_ids))
         self.save()
 
     def assign_user(self, user_id, save=False):
@@ -595,17 +600,34 @@ class SalesCycle(SubscriptionObject):
         return self.rel_activities.order_by(
             '-date_created')[offset:offset + limit]
 
+    def get_mentioned_users(self, limit=20, offset=0):
+        user_ids = self.mentions.all()[offset:offset + limit]\
+            .values_list('user_id', flat=True)
+        return CRMUser.objects.filter(pk__in=user_ids)
+
     def add_product(self, product_id, **kw):
         """TEST Assigns products to salescycle"""
         return self.add_products([product_id], **kw)
 
     def add_products(self, product_ids):
         """TEST Assigns products to salescycle"""
+        if isinstance(product_ids, int):
+            product_ids = [product_ids]
         assert isinstance(product_ids, (tuple, list)), "must be a list"
         products = Product.objects.filter(pk__in=product_ids)
         if not products:
             return False
         self.products.add(*products)
+        return True
+
+    def remove_products(self, product_ids):
+        """TEST UnAssigns products to salescycle"""
+        if not isinstance(product_ids, (tuple, list)):
+            product_ids = [product_ids]
+        products = Product.objects.filter(pk__in=product_ids)
+        if not products:
+            return False
+        self.products.remove(*products)
         return True
 
     def set_result(self, value_obj, save=False):

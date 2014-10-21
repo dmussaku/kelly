@@ -13,6 +13,7 @@ from .forms import (
 from .views import (
     DashboardView,
     FeedView,
+    ProfileView,
 
     ContactDetailView,
     ContactListView,
@@ -23,6 +24,11 @@ from .views import (
     ActivityDetailView,
 
     SalesCycleCreateView,
+    sales_cycle_value_update,
+    sales_cycle_add_mention,
+    sales_cycle_add_product,
+    sales_cycle_remove_product,
+
     ShareCreateView,
     ShareListView,
 
@@ -42,6 +48,9 @@ urlpatterns = patterns(
     url(r'^feed/$', crmuser_required(
         FeedView.as_view(template_name='crm/feed.html')),
         name='feed'),
+    url(r'^profile/$', crmuser_required(
+        ProfileView.as_view(template_name='crm/profile.html')),
+        name='profile'),
     url(r'^import_vcard/$', import_vcard, name='crm_import_vcard'),
 
     
@@ -113,6 +122,18 @@ urlpatterns = patterns(
             form_class=SalesCycleForm,
             template_name='sales_cycle/sales_cycle_create.html')),
         name='sales_cycle_create'),
+    url(r'^sales_cycle/(?P<sales_cycle_pk>[\d]+)/value/update/$',
+        crmuser_required(sales_cycle_value_update),
+        name='sales_cycle_value_update'),
+    url(r'^sales_cycle/(?P<sales_cycle_pk>[\d]+)/mentions/add/$',
+        crmuser_required(sales_cycle_add_mention),
+        name='sales_cycle_add_mention'),
+    url(r'^sales_cycle/(?P<sales_cycle_pk>[\d]+)/products/add/$',
+        crmuser_required(sales_cycle_add_product),
+        name='sales_cycle_add_product'),
+    url(r'^sales_cycle/(?P<sales_cycle_pk>[\d]+)/products/remove/$',
+        crmuser_required(sales_cycle_remove_product),
+        name='sales_cycle_remove_product'),
 
     
 )

@@ -2,11 +2,11 @@ from django.views.generic import TemplateView, ListView, DetailView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.http import Http404, HttpResponseRedirect
 from django.core.urlresolvers import reverse_lazy
+from almanet.url_resolvers import reverse_lazy as almanet_reverse_lazy
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from alm_company.models import Company
 from .models import Service
-from alm_crm.models import Value
 from .forms import ServiceCreateForm
 
 # TODO: this needs to be deleted
@@ -38,7 +38,6 @@ class ServiceList(ListView):
     model = Service
     queryset = Service.objects.all()
 
-
     def get_context_data(self, **kwargs):
         ctx = super(ServiceList, self).get_context_data(**kwargs)
         ctx['user'] = self.request.user
@@ -69,7 +68,6 @@ class ServiceDeleteView(DeleteView):
     success_url = reverse_lazy('service_list')
 
 
-
 @login_required
 def connect_service(request, slug, *args, **kwargs):
     try:
@@ -78,7 +76,11 @@ def connect_service(request, slug, *args, **kwargs):
         raise Http404
     else:
         request.user.connect_service(service)
-        return HttpResponseRedirect(request.META['HTTP_REFERER'])
+        if 'HTTP_REFERER' in request.META:
+            return HttpResponseRedirect(request.META['HTTP_REFERER'])
+        else:
+            subscr = request.user.get_subscr_by_service(service)
+            return HttpResponseRedirect(subscr.backend.get_home_url())
 
 
 @login_required
@@ -89,7 +91,12 @@ def disconnect_service(request, slug, *args, **kwargs):
         raise Http404
     else:
         request.user.disconnect_service(service)
-        return HttpResponseRedirect(request.META['HTTP_REFERER'])
+        if 'HTTP_REFERER' in request.META:
+            return HttpResponseRedirect(request.META['HTTP_REFERER'])
+        else:
+            return HttpResponseRedirect(
+                almanet_reverse_lazy('user_profile_url',
+                                     subdomain=settings.MY_SD))
 
 
 

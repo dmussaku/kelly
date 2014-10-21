@@ -45,9 +45,8 @@
 <nav class="body-header nav">
   <div class="lineOfLinks">
     <a class="lineOfLinks-link nav-link"
-      href="{% crm_url 'crm_home'  %}"> {{ _('dashboard') }} </a>
-    <a class="lineOfLinks-link nav-link"
       href="{% crm_url 'contacts_list'  %}"> {{ _('contacts') }} </a>
+
     <a class="lineOfLinks-link nav-link"
       href="{% crm_url 'feed'  %}"> {{ _('feed') }} </a>
 
@@ -89,7 +88,9 @@
             <ul class="dropdown-menu-list">
               <li class="dropdown-menu-item">
                 <a class="dropdown-menu-item-link"
-                  href="{% my_url 'user_profile_url' subdomain=None %}">Profile</a>
+
+                  href="{% crm_url 'profile' %}">Profile</a>
+
               </li>
               <li class="dropdown-menu-item">
                 <a class="dropdown-menu-item-link"
@@ -132,19 +133,12 @@
 
 
 {% block js_content %}
-  
   <script src="{% static 'js/scripts.min.js' %}"></script>
-  <script src="http://twitter.github.io/typeahead.js/releases/latest/bloodhound.js"></script>
-  <script src="http://twitter.github.io/typeahead.js/releases/latest/typeahead.jquery.js"></script>
-  <script src="https://twitter.github.io/typeahead.js/releases/latest/typeahead.bundle.js"></script>
-
   <script src="{% static 'js/vcard_upload.js' %}"></script>
   <script src="{% static 'js/comments.js' %}"></script>
   <script src="{% static 'js/d3.min.js' %}"></script>
   <script src="{% static 'js/doT.min.js' %}"></script>
   <script src="{% static 'js/_calendarChart.js' %}"></script>
-  <script src="{% static 'js/_dropdown.js' %}"></script>
-  <script src="{% static 'js/_showmore.js' %}"></script>
   <script>
     $(document).ready(function(){
       $('#data-js-search').keyup(function(event){
