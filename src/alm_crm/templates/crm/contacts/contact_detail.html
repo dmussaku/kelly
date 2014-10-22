@@ -179,40 +179,35 @@
     var observer = {
         $o: $({}),
         init: function() {
-          var sales_cycle_was_init = false,
-              was_init = false;
+          var was_inited = false;
 
           $(document)
-            .on('init.sales_cycle_detail', function() {
-              observer.$o.trigger('init');
-            })
-            .on('create_sales_cycle.init.sales_cycle_detail', function() {
-              observer.$o.trigger('create_sales_cycle.init');
+            .on('pre_init.sales_cycle_detail', function() {
+              observer.$o.trigger('pre_init');
             })
             .on('load.sales_cycle.sales_cycle_detail', function (event, id) {
-              var _callback = function() {
-                observer.$o.trigger('init');
-              };
-
-              if( !sales_cycle_was_init ) {
-                observer.$o.trigger('init.sales_cycle');
-                sales_cycle_was_init = true;
-              }
-              observer.$o.trigger('load.sales_cycle', [id, _callback]);
+              observer.$o.trigger('load.sales_cycle', [id]);
             });
 
 
           this.$o
+            .on('pre_init', function() {
+              pre_init();
+            })
             .on('init', function() {
               init();
             })
-            .on('init.sales_cycle', function() {
-              sales_cycle.init();
+            .on('post_init', function() {
+              post_init();
             })
             .on('reload.sales_cycle', function() {
               sales_cycle.reload();
             })
             .on('load.sales_cycle', function (event, id, callback) {
+              if( !was_inited ) {
+                observer.$o.trigger('init');
+                was_inited = true;
+              }
               sales_cycle.load( id, callback );
             })
             .on('reinit.add_activity_mentions', function() {
@@ -298,9 +293,8 @@
 
                 $(this.sel.body)
                   .replaceWith( $(data).closest(this.sel.body) );
-                // reinit add_activity_mentions for addactivity
-                observer.$o.trigger('reinit.add_activity_mentions');
-                observer.$o.trigger('reinit.add_product');
+                // reinit some methods with new loaded html
+                observer.$o.trigger('post_init');
 
                 callback && callback(); // see reload func
 
@@ -545,18 +539,13 @@
       create_sales_cycle = {
         sel: {
           form: '[data-js-create-salescycle="form"]',
-          dropdown_menu: '[data-js-create-salescycle="dropdown-menu"]',
+          showTrigger: '[data-js-create-salescycle="show_trigger"]',
         },
         reload_page: function(response_data) {
-          var sel_dropdown_menu = this.sel.dropdown_menu;
-
-          $.get(reload_url, {'sales_cycle_id': response_data.pk})
-            .done(function (data) {
-              observer.$o.trigger('reload.sales_cycle', [response_data.pk]);
-            });
+          observer.$o.trigger('load.sales_cycle', [response_data.pk])
         },
         submit: function(event) {
-          var $form = $(event.target);
+          var $form = $(event.target).closest(this.sel.form);
 
           $.post($form.prop('action'), $form.serialize())
             .done( $.proxy(this.reload_page, this) )
@@ -569,18 +558,38 @@
 
           event.preventDefault();
         },
+        showVisual: function(event) {
+          $(this.sel.form)
+            .show();
+
+          event.preventDefault();
+        },
         init: function(event) {
-          $(document).on('submit', this.sel.form, $.proxy(this.submit, this));
+          $(document)
+            .on('click', this.sel.showTrigger, $.proxy(this.showVisual, this))
+            .on('submit', this.sel.form, $.proxy(this.submit, this));
         }
       },
 
-      init = function() {
-        add_activity.init();
-        add_activity_mentions.init();
-        add_value.init();
-        //add_product.init();
+      pre_init = function() { // runs before first sales_cycle load
+        console.log('[pre-init]');
+
+        sales_cycle.init();
         create_sales_cycle.init();
+      },
+      init = function() {
+        console.log('[init]');
+
+        add_activity.init();
+        add_value.init();
+      },
+      post_init = function() {
+        console.log('[post-init]');
+
+        add_activity_mentions.init();
+        add_product.init();
       };
+
 
     observer.init();
     return observer.$o;
@@ -637,13 +646,14 @@
         observer.init();
         share.init();
 
+        $(document)
+            .trigger('pre_init.sales_cycle_detail');
+
         if( _sc_load_id ) {
           console.log(_sc_load_id)
           $(document).trigger('load.sales_cycle.sales_cycle_detail',
                               [_sc_load_id]);
         }
-
-        $(document).trigger('create_sales_cycle.init.sales_cycle_detail');
       };
 
     init();

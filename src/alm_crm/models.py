@@ -709,8 +709,7 @@ class SalesCycle(SubscriptionObject):
     @classmethod
     def get_salescycles_by_contact(cls, contact_id, limit=20, offset=0):
         """Returns queryset of sales cycles by contact"""
-        return SalesCycle.objects.filter(contact_id=contact_id)[
-            offset:offset + limit]
+        return SalesCycle.objects.filter(contact_id=contact_id)
 
     def save(self, **kwargs):
         if not self.subscription_id and self.owner:

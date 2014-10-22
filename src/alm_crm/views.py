@@ -121,9 +121,7 @@ class ContactDetailView(DetailView):
 
         # last sales_cycle
         context['sales_cycle'] = \
-            SalesCycle.get_salescycles_by_last_activity_date(
-                context['object'].id, owned=True, mentioned=False,
-                followed=False)[0].first()
+            SalesCycle.get_salescycles_by_contact(context['object'].id, 1).first()
 
         # create new sales_cycle to contact
         context['new_sales_cycle_form'] = SalesCycleForm(
@@ -434,8 +432,7 @@ class SalesCycleDetailView(DetailView):
 
         # list of contact sales_cycles
         context['sales_cycles'] = \
-            SalesCycle.get_salescycles_by_last_activity_date(
-                contact.id, owned=True, mentioned=False, followed=False)[0]
+            SalesCycle.get_salescycles_by_contact(contact.id, 100)
 
         # create new sales_cycle to contact
         context['new_sales_cycle_form'] = SalesCycleForm(

@@ -15,7 +15,7 @@
           </figure>
           {{ object.owner.get_billing_user.get_short_name }}
         </a>
-        started at {{ first_activity_date|date:'F j, H:i' }}
+        started at {{ first_activity_date|date:'F j, H:i'|default:'Never' }}
       {% endif %}
 
     </div><div class="column-header-b">
@@ -30,11 +30,14 @@
             >
 
               <li class="dropdown-menu-item dropdown-menu-item--newCycle">
-                <a class="dropdown-menu-item-link" href="#">Create a new cycle</a>
+                <a class="dropdown-menu-item-link" href="#"
+                  data-js-create-salescycle='show_trigger'
+                >Create a new cycle</a>
 
 
                 <form action="{% crm_url 'sales_cycle_create' %}" method="POST"
-                  data-js-create-salescycle='form'> {% csrf_token %}
+                  data-js-create-salescycle='form'
+                  style='display:none;'> {% csrf_token %}
 
                   {{ new_sales_cycle_form.title.label }}
                   {{ new_sales_cycle_form.title }}
