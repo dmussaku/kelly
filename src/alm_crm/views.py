@@ -206,6 +206,7 @@ class ContactSearchListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super(self.__class__, self).get_context_data(**kwargs)
+        print self.request.GET
         try:
             context['contacts'] = Contact().filter_contacts_by_vcard(
                 self.request.GET['query'],

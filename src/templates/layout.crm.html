@@ -139,23 +139,7 @@
   <script src="{% static 'js/d3.min.js' %}"></script>
   <script src="{% static 'js/doT.min.js' %}"></script>
   <script src="{% static 'js/_calendarChart.js' %}"></script>
-  <script>
-    $(document).ready(function(){
-      $('#data-js-search').keyup(function(event){
-        var self = this;
-        console.log($(self).val())
-        $.ajax({
-          type:'GET',
-          data:{'query':$(self).val()},
-          url:$(this).attr('action'),
-          success: function(data, status, xhr){
-            var contacts_html=$(data).find('#contacts').html();
-            $('#contacts').html(contacts_html);
-          }
-        });
-      });
-    })
-  </script>
+  
   <script type="text/javascript">
   $(function() {
     $('.js-show-comments-link').click($.comments.click_event);
