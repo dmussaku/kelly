@@ -536,6 +536,45 @@
         }
       },
 
+      add_mention = {
+        sel: {
+          form: '[data-js-addmention="form"]',
+          link: '[data-js-addmention-id]',
+          form_field: {
+            id: '[name="id"]',
+          },
+          data: {
+            link_id: 'jsAddmentionId',
+          }
+        },
+        add: function(event) {
+          var $link = $(event.target).closest(this.sel.link),
+              _id = $link.data(this.sel.data.link_id),
+              $form = $(this.sel.form),
+              _done = function(data) {
+                console.log(data);
+                observer.$o.trigger('reload.sales_cycle');
+              };
+
+          $form.find(this.sel.form_field.id).val( _id );
+
+          $.post($form.prop('action'), $form.serialize())
+            .done($.proxy(_done, this))
+            .fail(function (event, jqxhr, settings, thrownError) {
+              console.log(event)
+              console.log(jqxhr)
+              console.log(settings)
+              alert(thrownError);
+            });
+
+          event.preventDefault();
+        },
+        init: function() {
+          $(document)
+            .on('click', this.sel.link, $.proxy(this.add, this));
+        }
+      },
+
       create_sales_cycle = {
         sel: {
           form: '[data-js-create-salescycle="form"]',
@@ -582,6 +621,7 @@
 
         add_activity.init();
         add_value.init();
+        add_mention.init();
       },
       post_init = function() {
         console.log('[post-init]');

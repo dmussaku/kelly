@@ -115,17 +115,15 @@
                 {% endfor %}
 
                 {% for crmuser in crmusers %}
-                  {% if not crmuser in mentioned %}
-                    <li class="dropdown-menu-item">
-                      <a href="#" class="dropdown-menu-item-link"
-                        data-js-addmention-id="{{ crmuser.pk }}">
-                        <figure class="userpic">
-                          <img src="{% static 'img/example/userpic2.png' %}" alt="" />
-                        </figure>
-                        {{ crmuser.get_billing_user.get_username }}
-                      </a>
-                    </li>
-                  {% endif %}
+                  <li class="dropdown-menu-item">
+                    <a href="#" class="dropdown-menu-item-link"
+                      data-js-addmention-id="{{ crmuser.pk }}">
+                      <figure class="userpic">
+                        <img src="{% static 'img/example/userpic2.png' %}" alt="" />
+                      </figure>
+                      {{ crmuser.get_billing_user.get_username }}
+                    </a>
+                  </li>
                 {% empty %}
                   <li class="dropdown-menu-item">There is no user to mentioning</li>
                 {% endfor %}

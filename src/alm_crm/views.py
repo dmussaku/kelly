@@ -502,6 +502,9 @@ class SalesCycleDetailView(DetailView):
         else:
             context['mentioned'] = sales_cycle.get_mentioned_users()
 
+        # crmusers to mention sales_cycle
+        context['crmusers'] = crmusers
+
         return context
 
 
