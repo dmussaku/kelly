@@ -5,7 +5,7 @@
 
 
 {% block crm_aside_tabs %}
-  <a href="contacts.html" class="tabs-link" data-tip="Shared contacts">
+  <a href="{% crm_url 'share_list' %}" class="tabs-link" data-tip="Shared contacts">
       <figure class="icon">
   <svg version="1.1">
     <use class="icon--next" xlink:href="#next"></use>
@@ -21,7 +21,7 @@
 </figure>
 
     </a>
-    <a href="contacts-all.html" class="tabs-link" data-tip="All contacted">
+    <a href="{% crm_url 'contacts_list' %}" class="tabs-link" data-tip="All contacted">
       <figure class="icon">
   <svg version="1.1">
     <use class="icon--alltime" xlink:href="#alltime"></use>
@@ -39,14 +39,16 @@
     </a>
 {% endblock crm_aside_tabs %}
 
-
 {% block crm_body %}
   <div class="body-column body-column--withTabs">
     <div class="column">
       <h2>Create a contact</h2>
-      <form action="" method="post" id='form'>
-        <input type="hidden" name="csrfmiddlewaretoken" value="{{csrf_token}}">
+      <form action="" method="post" id='contact-submit-form' post-url="{% crm_url 'contact_create' %}">
+        <input type="hidden" id="data-js-csrfmiddlewaretoken" name="csrfmiddlewaretoken" value="{{csrf_token}}">
         {{vcard_form.as_p}}
+        <div id='data-js-vcard-completed-objects'>
+
+        </div>
         <div id='data-js-vcard-objects'>
 
         </div>
@@ -72,61 +74,87 @@
 
 {% block js_content %}
   <script>
+    var vcard_id = 0;
+      function name_fields_added(){
+        if ($('#id_given_name').val()!="" && $('#id_family_name').val()!=""){
+          $.post(
+              $('#contact-submit-form').attr('post-url'),
+              {
+                data_type: 'vcard',
+                csrfmiddlewaretoken: $('#data-js-csrfmiddlewaretoken').val(),
+                given_name: $('#id_given_name').val(),
+                family_name: $('#id_family_name').val(),
+              },
+              function(data){
+                vcard_id = data['vcard_id'];
+              }
+            );
+          return vcard_id;
+        }
+        else{
+          return -1;
+        }
+      }
+
       $('#data-js-email-form').on('click', function(event){
-        var my_url = $('#data-js-email-form').attr('url');
-        $.ajax({
-          type:'GET',
-          url: my_url,
-          success: function(data){
-            var form_html = $(data).find('.add-email-form');
-            $('#data-js-vcard-objects').append(form_html);
+          if ($('#id_given_name').val()=="" && $('#id_family_name').val()==""){
+            alert('fill given and family names fields');
+            return false;
           }
-        });
+          else{
+            var vcard_id = $(document).ajaxStop(name_fields_added());
+            var my_url = $('#data-js-email-form').attr('url');
+            $.ajax({
+              type:'GET',
+              url: my_url,
+              success: function(data){
+                var form_html = $(data).find('.add-email-form');
+                $('#data-js-vcard-objects').append(form_html);
+              }
+            });
+          }
         return false;
       });
+
       $('#data-js-tel-form').on('click', function(event){
-        var my_url = $('#data-js-tel-form').attr('url');
-        $.ajax({
-          type:'GET',
-          url: my_url,
-          success: function(data){
-            var form_html = $(data).find('.add-tel-form');
-            $('#data-js-vcard-objects').append(form_html);
+          vcard_id = name_fields_added();
+          var my_url = $('#data-js-tel-form').attr('url');
+          $.ajax({
+            type:'GET',
+            url: my_url,
+            success: function(data){
+              var form_html = $(data).find('.add-tel-form');
+              $('#data-js-vcard-objects').append(form_html);
+            }
+          });
+        return false;
+      });
+      
+      $('#email-form').submit(function(){
+        var data_type='email'
+        $.post(
+          $('#data-js-org-form').attr('url'),
+          {
+            data_type: data_type,
+            csrfmiddlewaretoken: $('#data-js-csrfmiddlewaretoken').val(),
+            type: $('#id_type').val(),
+            value: $('#id_value').val(),
+          },
+          function(data){
+            $('#data-js-vcard-completed-objects').append(data);
           }
-        });
+          );
         return false;
       });
-      $('#data-js-org-form').on('click', function(event){
-        var my_url = $('#data-js-org-form').attr('url');
-        $.ajax({
-          type:'GET',
-          url: my_url,
-          success: function(data){
-            var form_html = $(data).find('.add-org-form');
-            $('#data-js-vcard-objects').append(form_html);
-          }
-        });
-        return false;
-      });
-      $('#test').on('click', function(event){
-        var my_url = $('#data-js-form-submit').attr('url');
-        var form = $('#form');
-        console.log(form.serializeArray());
-        $.each(form, function(index, value) {
-            console.log($(value).val());
-        });
-        
-        //console.log(sm);
-        return false;
-      });
-      $('#form').submit(function() {
-        var $inputs = $('#form :input');
+
+      $('#contact-submit-form').submit(function() {
+        var $inputs = $('#contact-submit-form :input');
         var values = {'vcard':{}, 'emails':[], 'tels':[], 'orgs':[]};
         values[$inputs[0].name]=[$inputs[0].value];
         $inputs.each(function(index, value) {
             var parent_node = $(this).parent().parent();
             var node = $(this);
-            if (parent_node.attr('id') == 'form'){
+            if (parent_node.attr('id') == 'contact-submit-form'){
               values['vcard'][node.attr('id')]= node.val();
             }
             else if (parent_node.attr('class') == 'add-email-form'){
@@ -146,20 +174,23 @@
             } 
             
         });
-        console.log(JSON.stringify(values))
-        // return false;
-        $.ajax({
-          type:'POST',
-          //contentType: 'application/json',
-          data: values.serialize(),
-          url: $('#form').attr('url'),
-          success: function(){
-            alert('success')
-          }
-        });
+        var new_values = JSON.stringify(values);
+        alert($('#data-js-csrfmiddlewaretoken').val());
+        $.post(
+          $('#form').attr('url'),
+            {
+              csrfmiddlewaretoken:$('#data-js-csrfmiddlewaretoken').val(),
+              vcard:values['vcard'],
+              emails:values['emails'],
+              tels:values['tels'],
+              orgs:values['orgs'],
+            },
+            function(){
+              alert('success');
+          });
 
-return false;
-});
+      return false;
+      });
   </script>
 
 {% endblock %}

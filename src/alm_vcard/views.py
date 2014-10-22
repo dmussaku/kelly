@@ -122,8 +122,18 @@ class EmailCreateView(CreateView):
     form_class = EmailForm
     template_name = 'vcard/email_create.html'
 
+    def get_form(self, form_class):
+        form = super(CustomCreateView, self).get_form(form_class)
+        form.instance.vcard = self.kwargs['pk']
+        return form
+
     def get_success_url(self, **kwargs):
         return super(EmailCreateView, self).get_success_url(**kwargs)
+
+def email_create_view(request, service_slug):
+    if request.method=='POST':
+        email_type = request.POST['type']
+        email_value = request.POST['email']
 
 class GeoCreateView(CreateView):
     form_class = GeoForm

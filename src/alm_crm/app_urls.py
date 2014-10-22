@@ -84,6 +84,12 @@ urlpatterns = patterns(
             template_name='crm/contacts/contact_detail.html',
             pk_url_kwarg='contact_pk')),
         name='contact_detail'),
+    url(r'^contacts/update/(?P<contact_pk>[\d]+)/$',
+        crmuser_required(ContactUpdateView.as_view(
+            model=Contact,
+            template_name='crm/contacts/contact_update.html',
+            pk_url_kwarg='contact_pk')),
+        name='contact_update'),
     url(r'^contacts/create/$',
         crmuser_required(contact_create_view),
         name='contact_create'),

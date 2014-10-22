@@ -204,7 +204,6 @@ class ContactSearchListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super(self.__class__, self).get_context_data(**kwargs)
-        print self.request.GET
         try:
             context['contacts'] = Contact().filter_contacts_by_vcard(
                 self.request.GET['query'],
@@ -224,22 +223,32 @@ def contact_create_view(request, service_slug):
     if request.method == 'GET':
         return render_to_response('crm/contacts/contact_create.html',{'vcard_form':VCardForm, 'csrf_token':request.META['CSRF_COOKIE']})
     if request.method == 'POST':
+        print request.POST
         vcard_form = VCardForm(request.POST, instance=VCard())
-        '''
-        <QueryDict: {u'family_name': [u''], u'csrfmiddlewaretoken': [u'KG8ukzT4AvoGQBHSPvQCA2UbO8kdDDPn'], u'type': [u'HOME', u'x400'], u'given_name': [u''], u'value': [u'asdasdasdasd', u'a@gmail.com']}>
-
-        '''
         if vcard_form.is_valid():
             v = vcard_form.save()
             c = Contact(owner=request.user.get_crmuser(), vcard=v)
             c.save()
-            return HttpResponseRedirect(
-                almanet_reverse(
-                    'contact_detail',
-                    kwargs={'service_slug': settings.DEFAULT_SERVICE, 'contact_pk':c.pk},
-                    subdomain=request.user_env['subdomain']
-                    )
-                )
+            return HttpResponse(json.dumps({'vcard_id':v.id}), mimetype='application/json')
+        return HttpResponse('no success')
+        # if vcard_form.is_valid():
+        #     v = vcard_form.save()
+        #     c = Contact(owner=request.user.get_crmuser(), vcard=v)
+        #     c.save()
+        #     return HttpResponseRedirect(
+        #         almanet_reverse(
+        #             'contact_detail',
+        #             kwargs={'service_slug': settings.DEFAULT_SERVICE, 'contact_pk':c.pk},
+        #             subdomain=request.user_env['subdomain']
+        #             )
+        #         )
+
+class ContactUpdateView(UpdateView):
+
+    def get_success_url(self):
+        return reverse_lazy('contact_list',
+                            subdomain=self.request.user_env['subdomain'],
+                            kwargs={'service_slug': settings.DEFAULT_SERVICE})
 
 def comment_create_view(request, service_slug, content_type, object_id):
     if request.method == 'GET':
@@ -262,7 +271,6 @@ def comment_create_view(request, service_slug, content_type, object_id):
                     'csrf_token':request.META['CSRF_COOKIE']}
                 )
     if request.method == 'POST':
-        print request.POST
         comment = Comment(
             comment=request.POST['comment'],
             author=request.user.get_crmuser(),
@@ -278,7 +286,6 @@ def comment_create_view(request, service_slug, content_type, object_id):
 
 def comment_delete_view(request, service_slug):
     if request.method == 'POST':
-        print request.POST
         try:
             comment = Comment.objects.get(id=request.POST['id'])
             comment.delete()
@@ -290,7 +297,6 @@ def comment_edit_view(request, service_slug):
     if request.method == 'GET':
         return HttpResponse('GET')
     if request.method == 'POST':
-        print request.POST
         try:
             comment = Comment.objects.get(id=request.POST['id'])
             comment.comment = request.POST['comment']

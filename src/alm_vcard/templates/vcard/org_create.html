@@ -2,9 +2,11 @@
 {% load i18n %}
 {% block content %}
 <div>
-	<div class="add-org-form">
-		<h2>Add an organization </h2>
-			{{form.as_p}}
-	</div>
+	<form id="org-form" action="" method="post">{% csrf_token %}
+		<div class="add-org-form">
+			<h2>Add an organization </h2>
+				{{form.as_p}}
+				<input type="submit" value="create"/>
+		</div>
 	</div>
 {% endblock %}

@@ -3,8 +3,10 @@
 {% block content %}
 <div>
 	<div class="add-tel-form">
+		<form id="tel-form" action="" method="post">{% csrf_token %}
 		<h2>Add a telephone </h2>
 			{{form.as_p}}
+			<input type="submit" value="create"/>
 	</div>
 	</div>
 {% endblock %}
