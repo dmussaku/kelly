@@ -711,6 +711,12 @@ class SalesCycle(SubscriptionObject):
         """Returns queryset of sales cycles by contact"""
         return SalesCycle.objects.filter(contact_id=contact_id)
 
+    @classmethod
+    def get_salescycles_of_contact_by_last_activity_date(cls, contact_id):
+        sales_cycles = cls.objects.filter(contact_id=contact_id)\
+            .order_by('-latest_activity__date_created')
+        return sales_cycles
+
     def save(self, **kwargs):
         if not self.subscription_id and self.owner:
             self.subscription_id = self.owner.subscription_id

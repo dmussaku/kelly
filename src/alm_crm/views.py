@@ -130,7 +130,8 @@ class ContactDetailView(DetailView):
 
         # last sales_cycle
         context['sales_cycle'] = \
-            SalesCycle.get_salescycles_by_contact(context['object'].id, 1).first()
+            SalesCycle.get_salescycles_of_contact_by_last_activity_date(
+                context['object'].id).first()
 
         # create new sales_cycle to contact
         context['new_sales_cycle_form'] = SalesCycleForm(
@@ -184,7 +185,6 @@ def contact_create_view(request, service_slug):
     if request.method == 'GET':
         return render_to_response('crm/contacts/contact_create.html',{'vcard_form':VCardForm, 'csrf_token':request.META['CSRF_COOKIE']})
     if request.method == 'POST':
-        print request.POST
         vcard_form = VCardForm(request.POST, instance=VCard())
         if vcard_form.is_valid():
             v = vcard_form.save()
@@ -228,7 +228,7 @@ def comment_create_view(request, service_slug, content_type, object_id):
         elif (content_type == 'contact'):
             return render_to_response('crm/share/comment/comment_list.html',
                     {'comments':Comment().get_comments_by_context(object_id, content_type),
-                     'share_id':object_id, 
+                     'share_id':object_id,
                     'csrf_token':request.META['CSRF_COOKIE']}
                 )
     if request.method == 'POST':
@@ -454,7 +454,8 @@ class SalesCycleDetailView(DetailView):
 
         # list of contact sales_cycles
         context['sales_cycles'] = \
-            SalesCycle.get_salescycles_by_contact(contact.id, 100)
+            SalesCycle.get_salescycles_of_contact_by_last_activity_date(
+                contact.id)
 
         # create new sales_cycle to contact
         context['new_sales_cycle_form'] = SalesCycleForm(
@@ -514,14 +515,12 @@ def sales_cycle_value_update(request, service_slug=None, sales_cycle_pk=None):
     sales_cycle = get_object_or_404(SalesCycle, pk=sales_cycle_pk)
 
     if request.method == 'POST':
-        value_form = ValueForm(request.POST)
+        value_form = ValueForm(request.POST, instance=sales_cycle.real_value)
         if value_form.is_valid():
             value_form.save()
-
-            if not sales_cycle.real_value is None:
-                sales_cycle.real_value.delete()
-            sales_cycle.real_value = value_form.instance
-            sales_cycle.save()
+            if sales_cycle.real_value is None:
+                sales_cycle.real_value = value_form.instance
+                sales_cycle.save()
 
             data = {
                 'pk': value_form.instance.pk,
