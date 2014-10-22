@@ -179,6 +179,8 @@
     var observer = {
         $o: $({}),
         init: function() {
+          var sales_cycle_was_init = false,
+              was_init = false;
 
           $(document)
             .on('init.sales_cycle_detail', function() {
@@ -188,16 +190,30 @@
               observer.$o.trigger('create_sales_cycle.init');
             })
             .on('load.sales_cycle.sales_cycle_detail', function (event, id) {
-              observer.$o.trigger('load.sales_cycle', [id]);
+              var _callback = function() {
+                observer.$o.trigger('init');
+              };
+
+              if( !sales_cycle_was_init ) {
+                observer.$o.trigger('init.sales_cycle');
+                sales_cycle_was_init = true;
+              }
+              observer.$o.trigger('load.sales_cycle', [id, _callback]);
             });
 
 
           this.$o
+            .on('init', function() {
+              init();
+            })
+            .on('init.sales_cycle', function() {
+              sales_cycle.init();
+            })
             .on('reload.sales_cycle', function() {
               sales_cycle.reload();
             })
-            .on('load.sales_cycle', function (event, id) {
-              sales_cycle.load( id );
+            .on('load.sales_cycle', function (event, id, callback) {
+              sales_cycle.load( id, callback );
             })
             .on('reinit.add_activity_mentions', function() {
               add_activity_mentions.init();
@@ -534,8 +550,6 @@
         reload_page: function(response_data) {
           var sel_dropdown_menu = this.sel.dropdown_menu;
 
-          console.log(this);
-
           $.get(reload_url, {'sales_cycle_id': response_data.pk})
             .done(function (data) {
               observer.$o.trigger('reload.sales_cycle', [response_data.pk]);
@@ -569,7 +583,6 @@
       };
 
     observer.init();
-    sales_cycle.init();
     return observer.$o;
   })(jQuery);
 
