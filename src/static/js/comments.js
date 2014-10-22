@@ -17,35 +17,43 @@ function comment_submit(){
 
 
 $(document).on('submit', '#comment-form', function() {
-  var postData = $(this).serialize();
   var my_url = $(this).attr('url');
-  console.log(postData);
-  $.ajax({
-    type:'POST',
-    url: my_url,
-    data: postData,
-    success: function(data){
-      $.get(my_url, function(data){
-        var div_class = '.comments';
-        $(div_class).html(data).animate({opacity:'show'}, "slow");
-        return false;
-      });
-      console.log('asdas');
-    }
-  });
+  var set_added_mentions = function (mentions) {
+
+    $(this).find('[name="mention_ids"]')
+      .val( JSON.stringify($.map(mentions, function (m) {return m.id;})) );
+
+    console.log('mention_ids:')
+    console.log(mentions);
+
+    $.ajax({
+      type:'POST',
+      url: my_url,
+      data: $(this).serialize(),
+      success: function(data){
+        $.get(my_url, function(data){
+          var div_class = '.comments';
+          $(div_class).html(data).animate({opacity:'show'}, "slow");
+          return false;
+        });
+        console.log('asdas');
+      }
+    });
+  };
+
+  $(this).find('#textArea')
+    .mentionsInput('getMentions', $.proxy(set_added_mentions, this));
+
   return false;
 });
 
-$(document).on('submit', '#edit-comment-form', function() {
+$(document).on('submit', '#edit-comment-form', function (event) {
   var get_url = $(this).attr('url');
   var my_url = $(this).attr('edit-url');
+
   $.post(
     my_url,
-    {
-      'csrfmiddlewaretoken':$(this).find('#csrf').attr('value'),
-      'comment':$(this).find('#textArea').val(),
-      'id':$(this).attr('comment_id'),
-    },
+    $(this).serialize() + '&id=' + $(this).attr('comment_id'),
     function(){
       $.get(get_url, function(data){
         var div_class = '.comments';
@@ -53,6 +61,7 @@ $(document).on('submit', '#edit-comment-form', function() {
         return false;
       });
     });
+
   return false;
 });
 
@@ -76,7 +85,7 @@ function edit_form(id){
   /*catching the add comment form at the end of comment list
   remove form at the end and paste it into the place where the edit happens
   then it selects the div and hides all the buttons in comments
-  but then returns buttons for edit form 
+  but then returns buttons for edit form
   */
   var comment_div = '.comment-'+id;
   side_list = $('.showComments .lineGroup .lineGroup-extra');

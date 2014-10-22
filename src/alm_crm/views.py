@@ -211,25 +211,37 @@ class ContactUpdateView(UpdateView):
                             subdomain=self.request.user_env['subdomain'],
                             kwargs={'service_slug': settings.DEFAULT_SERVICE})
 
+
 def comment_create_view(request, service_slug, content_type, object_id):
+    from django.template import RequestContext
+
     if request.method == 'GET':
+        crmusers, users = CRMUser.get_crmusers(with_users=True)
+        gen_mentions = lambda crmuser: {
+            'id': crmuser.id,
+            'name': users.get(id=crmuser.user_id).get_username(),
+            'type': 'crmuser'
+        }
+        mentions_json = json.dumps(map(gen_mentions, crmusers))
+
         if (content_type == 'activity'):
             return render_to_response('crm/comments/comment_list.html',
-                    {'comments':Comment().get_comments_by_context(object_id, content_type),
-                     'activity_id':object_id,
-                    'csrf_token':request.META['CSRF_COOKIE']}
+                    {'comments': Comment().get_comments_by_context(object_id, content_type),
+                     'activity_id': object_id,
+                     'mentions_json': mentions_json},
+                    context_instance=RequestContext(request)
                 )
         elif (content_type == 'share'):
             return render_to_response('crm/share/comment/comment_list.html',
                     {'comments':Comment().get_comments_by_context(object_id, content_type),
-                     'share_id':object_id,
-                    'csrf_token':request.META['CSRF_COOKIE']}
+                     'share_id':object_id},
+                    context_instance=RequestContext(request)
                 )
         elif (content_type == 'contact'):
             return render_to_response('crm/share/comment/comment_list.html',
                     {'comments':Comment().get_comments_by_context(object_id, content_type),
-                     'share_id':object_id,
-                    'csrf_token':request.META['CSRF_COOKIE']}
+                     'share_id':object_id},
+                    context_instance=RequestContext(request)
                 )
     if request.method == 'POST':
         comment = Comment(
@@ -240,6 +252,13 @@ def comment_create_view(request, service_slug, content_type, object_id):
             )
         try:
             comment.save()
+
+            try:
+                mentions_ids = json.loads(request.POST['mention_ids'])
+            except:
+                mentions_ids = []
+            comment.add_mention(mentions_ids)
+
             return HttpResponse('Success')
         except:
             return HttpResponse('No Success')
@@ -253,6 +272,7 @@ def comment_delete_view(request, service_slug):
             return HttpResponse('success')
         except:
             return HttpResponse('no success')
+
 
 def comment_edit_view(request, service_slug):
     if request.method == 'GET':

@@ -3,55 +3,90 @@
 {% load static from staticfiles %}
 {% block content %}
 <div class="comments-body">
-    {% for comment in comments %}
-    <div class="comment-{{comment.id}}" data-reply="Ren"> 
-        <div class="comment-meta"> 
-            <a href="index.html" class="link-user"> 
-                <figure class="userpic"> 
-                    <img src="{% static 'img/example/userpic6.png' %}" alt=""> 
-                </figure> 
-            </a> 
-        </div> 
-        <div class="comment-body"> 
-            <div id="comment">
-                <a href="#" class="link-user link-user--title">{{comment.author}}</a>
-                <span id='comment-text'>
-                    {{comment.comment}}
-                </span>
-                <div class="comment-body-meta js-commentForm-trigger"> 
-                    <button type="button" class="link" data-toggle="comment-reply">Reply</button> 
-                        <input id="csrf" type="hidden" name="csrfmiddlewaretoken" value="{{csrf_token}}">
-                        <input id="comment-id" type="hidden" name="comment-id" value="{{comment.id}}">
-                        <button type="button" id="edit-button" class="link" onclick="edit_form({{comment.id}})" url="{% crm_url 'comment_edit' %}" return-url="{% crm_url 'comments' content_type=comment.content_type.name object_id=comment.object_id  %}">Edit</button>
-                        <button type="button" class="link" onclick="delete_comment('{% crm_url 'comment_delete' %}',{{comment.id}})">Delete</button>
-
-                </div> 
-            </div>
-        </div> 
-        <div class="js-commentForm">
-            
-        </div> 
+  {% for comment in comments %}
+  <div class="comment-{{comment.id}}" data-reply="Ren">
+    <div class="comment-meta">
+      <a href="index.html" class="link-user">
+        <figure class="userpic">
+          <img src="{% static 'img/example/userpic6.png' %}" alt="">
+        </figure>
+      </a>
     </div>
-    {% endfor %}
-    <div id="add-comment-form">
-        <div class="js-commentForm"> 
-            <figure class="userpic commentForm-userpic"> 
-                <img src="{% static 'img/example/userpic6.png' %}" alt=""> 
-            </figure> 
-            <div class="commentForm-body"> 
-                 <form action="" method="post" id='comment-form' url="{% crm_url 'comments' content_type='activity' object_id=activity_id %}" edit-url="{% crm_url 'comment_edit' %}"> 
-                    <input id="csrf" type="hidden" name="csrfmiddlewaretoken" value="{{csrf_token}}">
-                    <textarea name='comment' data-author="{{request.user}}" placeholder="Keep calm and write a note" class="input-text input-text--subtle" rows="1" id='textArea' url="{% crm_url 'comments' content_type='activity' object_id=activity_id %}"></textarea>
-                    <button type="submit" value="create" >Post</button>
-                    <button id='cancel-button' class='cancel-button' style='display: none'>Cancel</button>
+    <div class="comment-body">
+      <div id="comment">
+        <a href="#" class="link-user link-user--title">{{comment.author}}</a>
+        <span id='comment-text'>
+          {{comment.comment}}
+        </span>
+        <div class="comment-body-meta js-commentForm-trigger">
+          <button type="button" class="link" data-toggle="comment-reply">Reply</button>
+            <input id="csrf" type="hidden" name="csrfmiddlewaretoken" value="{{csrf_token}}">
+            <input id="comment-id" type="hidden" name="comment-id" value="{{comment.id}}">
+            <button type="button" id="edit-button" class="link" onclick="edit_form({{comment.id}})" url="{% crm_url 'comment_edit' %}" return-url="{% crm_url 'comments' content_type=comment.content_type.name object_id=comment.object_id  %}">Edit</button>
+            <button type="button" class="link" onclick="delete_comment('{% crm_url 'comment_delete' %}',{{comment.id}})">Delete</button>
 
-                </form> 
-            </div>
         </div>
+      </div>
     </div>
+    <div class="js-commentForm">
+
+    </div>
+  </div>
+  {% endfor %}
+  <div id="add-comment-form">
+    <div class="js-commentForm">
+      <figure class="userpic commentForm-userpic">
+        <img src="{% static 'img/example/userpic6.png' %}" alt="">
+      </figure>
+      <div class="commentForm-body">
+        <form action="" method="post" id='comment-form' url="{% crm_url 'comments' content_type='activity' object_id=activity_id %}" edit-url="{% crm_url 'comment_edit' %}">{% csrf_token %}
+
+          <textarea name='comment' data-author="{{request.user}}"
+            placeholder="Keep calm and write a note" class="input-text input-text--subtle" rows="1" id='textArea'
+            url="{% crm_url 'comments' content_type='activity' object_id=activity_id %}"
+            data-js-addcomment-mention="textarea"
+            data-js-addcomment-mention-data="{{mentions_json}}"></textarea>
+          <input type="hidden" name="mention_ids">
+
+          <button type="submit" value="create" >Post</button>
+          <button id='cancel-button' class='cancel-button' style='display: none'>Cancel</button>
+
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function add_comment_mentions($) {
+      var sel = {
+            textarea: '[data-js-addcomment-mention="textarea"]',
+            mentions: '[data-js-addcomment-mention-data]',
+            data: {
+              mentions: 'jsAddcommentMentionData',
+            },
+          },
+          init = function() {
+            var _mentions = $(sel.mentions).data(sel.data.mentions),
+                $textarea = $(sel.textarea);
+
+            $textarea.mentionsInput({
+              onDataRequest:function (mode, query, callback) {
+                var data = _mentions;
+
+                data = _.filter(data, function (item) { return item.name.toLowerCase().indexOf(query.toLowerCase()) > -1 });
+                callback.call(this, data);
+              },
+              showAvatars: false
+            });
+          };
+
+      init();
+
+    })(jQuery);
+  </script>
 
 </div>
 
 {% endblock %}
-<script src="{% static 'js/doT.min.js' %}"></script>
+
 
