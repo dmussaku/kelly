@@ -3,14 +3,14 @@
 {% block head_title %} {{ _("Feed") }} {% endblock %}
 
 {% block crm_aside_tabs %}
-  <a href="{% crm_url 'feed' %}" class="tabs-link active" data-tip="[Cycles I follow]">
+  <a href="{% crm_url 'feed' %}" class="tabs-link" data-tip="[Cycles I follow]">
     <figure class="icon">
       <svg version="1.1">
         <use class="icon--home" xlink:href="#home"></use>
       </svg>
     </figure>
   </a>
-  <a href="{% crm_url 'shared_feed' %}" class="tabs-link" data-tip="[Mentions]">
+  <a href="{% crm_url 'shared_feed' %}" class="tabs-link active" data-tip="[Mentions]">
     <figure class="icon">
       <svg version="1.1">
         <use class="icon--mentions" xlink:href="#mentions"></use>
@@ -30,6 +30,7 @@
 {% block crm_body %}
   <div class="body-column body-column--single">
     <div class="column">
+    {% if sales_cycle_activities %}
       {% for sc in sales_cycles %}
         <div class="column-title">
           <a href="{% crm_url 'contact_detail' contact_pk=sc.contact.id %}">
@@ -37,12 +38,14 @@
           <a href="#">{{ _("Sales cycle") }}</a>
         </div>
         
-        {% for sc_activity in sales_cycle_activities %}
-          {% show_activity sc_activity %}
-        {% endfor %}
-        
+          {% for sc_activity in sales_cycle_activities %}
+            {% show_activity sc_activity %}
+          {% endfor %}
         <div class="column-block-footer"></div>
       {% endfor %}
+    {% else %}
+          <p>No one shared sales cycles with you yet</p> 
+    {% endif %}
     </div>
   </div>
 

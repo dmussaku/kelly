@@ -63,6 +63,17 @@ class FeedView(TemplateView):
         context['sales_cycle_activity_map'] = sales_cycles_data[2]
         return context
 
+class SharedFeedView(TemplateView):
+
+    def get_context_data(self, **kwargs):
+        context = super(SharedFeedView, self).get_context_data(**kwargs)
+        crmuser_id = self.request.user.get_crmuser().id
+        sales_cycles_data = SalesCycle.get_salescycles_by_last_activity_date(
+            crmuser_id, owned=False, mentioned=True, followed=False)
+        context['sales_cycles'] = sales_cycles_data[0]
+        context['sales_cycle_activities'] = sales_cycles_data[1]
+        context['sales_cycle_activity_map'] = sales_cycles_data[2]
+        return context
 
 class ProfileView(TemplateView):
 

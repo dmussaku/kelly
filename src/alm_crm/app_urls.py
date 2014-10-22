@@ -13,6 +13,7 @@ from .forms import (
 from .views import (
     DashboardView,
     FeedView,
+    SharedFeedView,
     ProfileView,
 
     ContactDetailView,
@@ -48,6 +49,9 @@ urlpatterns = patterns(
     url(r'^feed/$', crmuser_required(
         FeedView.as_view(template_name='crm/feed.html')),
         name='feed'),
+    url(r'^feed/shared/$', crmuser_required(
+        SharedFeedView.as_view(template_name='crm/shared_feed.html')),
+        name='shared_feed'),
     url(r'^profile/$', crmuser_required(
         ProfileView.as_view(template_name='crm/profile.html')),
         name='profile'),
@@ -78,6 +82,11 @@ urlpatterns = patterns(
             model=Contact,
             template_name='crm/contacts/contact_list.html',
         )), name='contacts_list'),
+    url(r'^contacts/mentioned/$',
+        crmuser_required(ContactListView.as_view(
+            model=Contact,
+            template_name='crm/contacts/contact_list.html',
+        )), name='mentioned_contacts_list'),
     url(r'^contacts/(?P<contact_pk>[\d]+)/$',
         crmuser_required(ContactDetailView.as_view(
             model=Contact,
