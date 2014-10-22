@@ -40,7 +40,6 @@ class DashboardView(View):
 
     def get_context_data(self, **kwargs):
         context = super(DashboardView, self).get_context_data(**kwargs)
-        context['form'] = VCardUploadForm
         context['subdomain'] = self.request.user_env['subdomain']
         return context
 
@@ -59,7 +58,6 @@ class FeedView(TemplateView):
         crmuser_id = self.request.user.get_crmuser().id
         sales_cycles_data = SalesCycle.get_salescycles_by_last_activity_date(
             crmuser_id, owned=True, mentioned=True, followed=True)
-        context['form'] = VCardUploadForm
         context['sales_cycles'] = sales_cycles_data[0]
         context['sales_cycle_activities'] = sales_cycles_data[1]
         context['sales_cycle_activity_map'] = sales_cycles_data[2]
@@ -252,6 +250,12 @@ def comment_create_view(request, service_slug, content_type, object_id):
                     'csrf_token':request.META['CSRF_COOKIE']}
                 )
         elif (content_type == 'share'):
+            return render_to_response('crm/share/comment/comment_list.html',
+                    {'comments':Comment().get_comments_by_context(object_id, content_type),
+                     'share_id':object_id, 
+                    'csrf_token':request.META['CSRF_COOKIE']}
+                )
+        elif (content_type == 'contact'):
             return render_to_response('crm/share/comment/comment_list.html',
                     {'comments':Comment().get_comments_by_context(object_id, content_type),
                      'share_id':object_id, 

@@ -21,10 +21,10 @@ var upload_vcard = (function($) {
           contentType: false
         })
           .done(function (data) {
-            alert('successfuly added'+data.length+' new contacts');
-            o.$gif_loader.show();
+            alert('successfuly added '+data.length+' new contacts');
+            o.$gif_loader.remove();
           });
-
+        
         event.preventDefault();
       },
       init = function() {

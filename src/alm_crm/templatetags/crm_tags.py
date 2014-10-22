@@ -21,7 +21,6 @@ def show_share(share, **kwargs):
     print kwargs
     return kwargs
 
-
 @register.simple_tag
 def crm_url(view, url='', *args, **kwargs):
     """Like url but add service_slug = 'crm' kwarg,

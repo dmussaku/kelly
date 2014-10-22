@@ -65,11 +65,11 @@
               action="{% crm_url 'crm_import_vcard'  %}" id='file_upload_form' method="post" enctype="multipart/form-data"
               data-js-upload-vcard='form'>
               {% csrf_token %}
-              <p>{{ form.non_field_errors }}</p>
-              <p>{{ form.myfile.label_tag }} {{ form.myfile.help_text }}</p>
+              <p>{{ vcard_upload_form.non_field_errors }}</p>
+              <p>{{ vcard_upload_form.myfile.label_tag }} {{ vcard_upload_form.myfile.help_text }}</p>
               <p>
-                  {{ form.myfile.errors }}
-                  {{ form.myfile }}
+                  {{ vcard_upload_form.myfile.errors }}
+                  {{ vcard_upload_form.myfile }}
               </p>
               <p><button type="submit" class="btn btn-primary" id='upload-btn'>Upload</button></p>
             </form>
