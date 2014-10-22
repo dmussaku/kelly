@@ -8,7 +8,8 @@ from .forms import (
     SalesCycleForm,
     ActivityForm,
     ShareForm,
-    CommentForm
+    CommentForm,
+    SalesCycle,
     )
 from .views import (
     DashboardView,
@@ -25,6 +26,7 @@ from .views import (
     ActivityDetailView,
 
     SalesCycleCreateView,
+    SalesCycleDetailView,
     sales_cycle_value_update,
     sales_cycle_add_mention,
     sales_cycle_add_product,
@@ -57,7 +59,7 @@ urlpatterns = patterns(
         name='profile'),
     url(r'^import_vcard/$', import_vcard, name='crm_import_vcard'),
 
-    
+
     url(r'^comments/(?P<content_type>[\w]+)/(?P<object_id>[\d]+)/$',
         crmuser_required(comment_create_view),
         name='comments'),
@@ -137,18 +139,23 @@ urlpatterns = patterns(
             form_class=SalesCycleForm,
             template_name='sales_cycle/sales_cycle_create.html')),
         name='sales_cycle_create'),
-    url(r'^sales_cycle/(?P<sales_cycle_pk>[\d]+)/value/update/$',
+    url(r'^sales_cycles/sales_cycle_get_detail/$',
+        crmuser_required(SalesCycleDetailView.as_view(
+            model=SalesCycle,
+            template_name="crm/sales_cycles/sales_cycle_detail.html")),
+        name='sales_cycle_get_detail'),
+    url(r'^sales_cycles/(?P<sales_cycle_pk>[\d]+)/value/update/$',
         crmuser_required(sales_cycle_value_update),
         name='sales_cycle_value_update'),
-    url(r'^sales_cycle/(?P<sales_cycle_pk>[\d]+)/mentions/add/$',
+    url(r'^sales_cycles/(?P<sales_cycle_pk>[\d]+)/mentions/add/$',
         crmuser_required(sales_cycle_add_mention),
         name='sales_cycle_add_mention'),
-    url(r'^sales_cycle/(?P<sales_cycle_pk>[\d]+)/products/add/$',
+    url(r'^sales_cycles/(?P<sales_cycle_pk>[\d]+)/products/add/$',
         crmuser_required(sales_cycle_add_product),
         name='sales_cycle_add_product'),
-    url(r'^sales_cycle/(?P<sales_cycle_pk>[\d]+)/products/remove/$',
+    url(r'^sales_cycles/(?P<sales_cycle_pk>[\d]+)/products/remove/$',
         crmuser_required(sales_cycle_remove_product),
         name='sales_cycle_remove_product'),
 
-    
+
 )

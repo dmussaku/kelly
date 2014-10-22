@@ -351,7 +351,7 @@ class Contact(SubscriptionObject):
         return contacts
 
         '''
-        
+
         '''
 
     @classmethod
@@ -605,6 +605,14 @@ class SalesCycle(SubscriptionObject):
             .values_list('user_id', flat=True)
         return CRMUser.objects.filter(pk__in=user_ids)
 
+    def get_first_activity_date(self):
+        a = self.rel_activities.order_by('date_created').first()
+        return a and a.date_created
+
+    def get_last_activity_date(self):
+        a = self.rel_activities.order_by('-date_created').first()
+        return a and a.date_created
+
     def add_product(self, product_id, **kw):
         """TEST Assigns products to salescycle"""
         return self.add_products([product_id], **kw)
@@ -701,8 +709,7 @@ class SalesCycle(SubscriptionObject):
     @classmethod
     def get_salescycles_by_contact(cls, contact_id, limit=20, offset=0):
         """Returns queryset of sales cycles by contact"""
-        return SalesCycle.objects.filter(contact_id=contact_id)[
-            offset:offset + limit]
+        return SalesCycle.objects.filter(contact_id=contact_id)
 
     def save(self, **kwargs):
         if not self.subscription_id and self.owner:
@@ -735,7 +742,7 @@ class Activity(SubscriptionObject):
     @property
     def contact(self):
         return self.sales_cycle.contact.id
-    
+
     def set_feedback(self, feedback_obj, save=False):
         """Set feedback to activity instance. Saves if `save` is set(True)."""
         feedback_obj.activity = self
