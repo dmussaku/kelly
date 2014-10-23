@@ -1,6 +1,6 @@
 from django.views.generic import ListView, DetailView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
-from almanet.url_resolvers import reverse_lazy, reverse
+from almanet.url_resolvers import reverse_lazy, reverse as almanet_reverse
 from models import *
 from alm_crm.models import Contact
 from forms import *
@@ -122,18 +122,46 @@ class EmailCreateView(CreateView):
     form_class = EmailForm
     template_name = 'vcard/email_create.html'
 
-    def get_form(self, form_class):
-        form = super(CustomCreateView, self).get_form(form_class)
-        form.instance.vcard = self.kwargs['pk']
-        return form
+    def form_valid(self, form):
+        form.instance.vcard_id = self.request.POST['id_vcard']
+        self.object = form.save()
+        return HttpResponse(json.dumps({'email_id':self.object.pk}), mimetype='application/json')
 
     def get_success_url(self, **kwargs):
-        return super(EmailCreateView, self).get_success_url(**kwargs)
+        return almanet_reverse(
+            'email_detail',
+            kwargs={'service_slug': settings.DEFAULT_SERVICE, 'pk':self.object.pk},
+            subdomain=self.request.user_env['subdomain']
+            )
+
+class EmailDetailView(DetailView):
+    template_name = 'vcard/email.html'
+    queryset = Email.objects.all()
+
+    def get_context_data(self, **kwargs):
+        context = super(self.__class__, self).get_context_data(**kwargs)
+        context['email'] = Email.objects.get(pk=self.kwargs['pk'])
+        return context
+
+
+class EmailUpdateView(InitialUpdateView):
+    model = Email
+    form_class = EmailForm
+    template_name = 'vcard/email_create.html'
+
+    def get_object(self, **kwargs):
+        return Email.objects.get(id=self.kwargs['id'])
+
+    def get_success_url(self, **kwargs):
+        self.kwargs['pk'] = VCard.objects.get(id=Email.objects.get(id=self.kwargs['id']).vcard_id).id
+        return super(EmailUpdateView, self).get_success_url(**kwargs)
+
 
 def email_create_view(request, service_slug):
     if request.method=='POST':
         email_type = request.POST['type']
         email_value = request.POST['email']
+
 
 class GeoCreateView(CreateView):
     form_class = GeoForm
@@ -264,18 +292,6 @@ class TelUpdateView(InitialUpdateView):
         self.kwargs['pk'] = VCard.objects.get(id=Tel.objects.get(id=self.kwargs['id']).vcard_id).id
         return super(TelUpdateView, self).get_success_url(**kwargs)
 
-
-class EmailUpdateView(InitialUpdateView):
-    model = Email
-    form_class = EmailForm
-    template_name = 'vcard/email_create.html'
-
-    def get_object(self, **kwargs):
-        return Email.objects.get(id=self.kwargs['id'])
-
-    def get_success_url(self, **kwargs):
-        self.kwargs['pk'] = VCard.objects.get(id=Email.objects.get(id=self.kwargs['id']).vcard_id).id
-        return super(EmailUpdateView, self).get_success_url(**kwargs)
 
 
 class GeoUpdateView(UpdateView):

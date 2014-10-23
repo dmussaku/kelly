@@ -1,0 +1,14 @@
+{% extends "user/base.html" %}
+{% load i18n crm_tags%}
+{% block content %}
+<div>
+	<div id="email-{{email.pk}}" email-pk="{{email.pk}}" update-url="{% crm_url 'email_update' id=email.pk %}">
+		type - {{email.type}}
+		email - {{email.value}}
+		<button class="btn btn-primary" onclick="edit_email('email-{{email.pk}}',{{email.pk}})" >
+	          edit
+	        </button>
+
+	</div>
+</div>
+{% endblock %}

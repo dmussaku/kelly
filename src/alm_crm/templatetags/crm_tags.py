@@ -2,6 +2,7 @@ from django import template
 from django.core.urlresolvers import reverse
 from almanet import settings
 register = template.Library()
+from alm_vcard.models import Email
 
 
 @register.inclusion_tag('crm/contacts/_contact.html')

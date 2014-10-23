@@ -49,11 +49,12 @@
         <div id='data-js-vcard-completed-objects'>
 
         </div>
+
         <div id='data-js-vcard-objects'>
 
         </div>
         <p>
-          <a href="#" id='data-js-email-form' class="btn btn-primary" value='add' url="{% crm_url 'email_create' %}">
+          <a href="#" id='data-js-email-form-toggle' class="btn btn-primary" value='add' url="{% crm_url 'email_create' %}">
           + Add an email
           </a>
           <a href="#" id='data-js-tel-form' class="btn btn-primary" value='add' url="{% crm_url 'tel_create' %}">
@@ -80,39 +81,43 @@
           $.post(
               $('#contact-submit-form').attr('post-url'),
               {
-                data_type: 'vcard',
                 csrfmiddlewaretoken: $('#data-js-csrfmiddlewaretoken').val(),
                 given_name: $('#id_given_name').val(),
                 family_name: $('#id_family_name').val(),
               },
               function(data){
                 vcard_id = data['vcard_id'];
+                return vcard_id;
               }
-            );
-          return vcard_id;
+            )
+;          return vcard_id;
         }
         else{
           return -1;
         }
       }
 
-      $('#data-js-email-form').on('click', function(event){
+      $('#data-js-email-form-toggle').on('click', function(event){
           if ($('#id_given_name').val()=="" && $('#id_family_name').val()==""){
             alert('fill given and family names fields');
             return false;
           }
-          else{
+          else if (document.getElementById('email-form')==null){
             var vcard_id = $(document).ajaxStop(name_fields_added());
-            var my_url = $('#data-js-email-form').attr('url');
+            var my_url = $('#data-js-email-form-toggle').attr('url');
             $.ajax({
               type:'GET',
               url: my_url,
               success: function(data){
-                var form_html = $(data).find('.add-email-form');
-                $('#data-js-vcard-objects').append(form_html);
-                $()
+                var form_html = $(data).find('#email-form');
+                form_html.attr("onsubmit","return add_email()");
+                $('#data-js-vcard-objects').html(form_html);
               }
             });
+          }
+          else{
+            alert('Finish the email form first');
+            return false;
           }
         return false;
       });
@@ -130,68 +135,104 @@
           });
         return false;
       });
-      
-      $('#email-form').submit(function(){
-        var data_type='email'
-        $.post(
-          $('#data-js-org-form').attr('url'),
-          {
-            data_type: data_type,
-            csrfmiddlewaretoken: $('#data-js-csrfmiddlewaretoken').val(),
-            type: $('#id_type').val(),
-            value: $('#id_value').val(),
-          },
-          function(data){
-            $('#data-js-vcard-completed-objects').append(data);
-          }
-          );
-        return false;
-      });
 
-      $('#contact-submit-form').submit(function() {
-        var $inputs = $('#contact-submit-form :input');
-        var values = {'vcard':{}, 'emails':[], 'tels':[], 'orgs':[]};
-        values[$inputs[0].name]=[$inputs[0].value];
-        $inputs.each(function(index, value) {
-            var parent_node = $(this).parent().parent();
-            var node = $(this);
-            if (parent_node.attr('id') == 'contact-submit-form'){
-              values['vcard'][node.attr('id')]= node.val();
-            }
-            else if (parent_node.attr('class') == 'add-email-form'){
-              var temp = new Object();
-              temp[node.attr('id')] = node.val();
-              values['emails'].push(temp);
-            }
-            else if (parent_node.attr('class') == 'add-tel-form'){
-              var temp = new Object();
-              temp[node.attr('id')] = node.val();
-              values['tels'].push(temp);
-            }
-            else if (parent_node.attr('class') == 'add-org-form'){
-              var temp = new Object();
-              temp[node.attr('id')] = node.val();
-              values['orgs'].push(temp);
-            } 
-            
+      function add_email(){
+        var form_id = 'email-form';
+        $.ajax({
+          type:'POST',
+          url:$('#'+form_id).attr('url'),
+          data:$('#'+form_id).serialize() + '&id_vcard=' + JSON.stringify(vcard_id),
+          dataType:'json',
+          success: function(data){
+            var pk = data['email_id']
+            $.ajax({
+              type:'GET',
+              url:"{% crm_url 'email_list' %}"+pk+"/",
+              success: function(data){
+                $('#'+form_id).remove();
+                $('#data-js-vcard-completed-objects').append(data);
+                return false;
+              }
+            });
+            return false;
+          } 
         });
-        var new_values = JSON.stringify(values);
-        alert($('#data-js-csrfmiddlewaretoken').val());
-        $.post(
-          $('#form').attr('url'),
-            {
-              csrfmiddlewaretoken:$('#data-js-csrfmiddlewaretoken').val(),
-              vcard:values['vcard'],
-              emails:values['emails'],
-              tels:values['tels'],
-              orgs:values['orgs'],
-            },
-            function(){
-              alert('success');
-          });
+        return false;
+      }
 
-      return false;
-      });
+      function edit_email(div_id,pk){
+        var update_url = $('#'+div_id).attr('update-url');
+        $.ajax({
+          type:'GET',
+          url:update_url,
+          success: function(data){
+            $('#'+div_id).replaceWith(data);
+            return false;
+          }
+        });
+        return false;
+      }
+      // $('#email-form').submit(function(){
+      //   var data_type='email'
+      //   $.post(
+      //     $('#data-js-org-form').attr('url'),
+      //     {
+      //       data_type: data_type,
+      //       csrfmiddlewaretoken: $('#data-js-csrfmiddlewaretoken').val(),
+      //       type: $('#id_type').val(),
+      //       value: $('#id_value').val(),
+      //     },
+      //     function(data){
+      //       $('#data-js-vcard-completed-objects').append(data);
+      //     }
+      //     );
+      //   return false;
+      // });
+
+      // $('#contact-submit-form').submit(function() {
+      //   var $inputs = $('#contact-submit-form :input');
+      //   var values = {'vcard':{}, 'emails':[], 'tels':[], 'orgs':[]};
+      //   values[$inputs[0].name]=[$inputs[0].value];
+      //   $inputs.each(function(index, value) {
+      //       var parent_node = $(this).parent().parent();
+      //       var node = $(this);
+      //       if (parent_node.attr('id') == 'contact-submit-form'){
+      //         values['vcard'][node.attr('id')]= node.val();
+      //       }
+      //       else if (parent_node.attr('class') == 'add-email-form'){
+      //         var temp = new Object();
+      //         temp[node.attr('id')] = node.val();
+      //         values['emails'].push(temp);
+      //       }
+      //       else if (parent_node.attr('class') == 'add-tel-form'){
+      //         var temp = new Object();
+      //         temp[node.attr('id')] = node.val();
+      //         values['tels'].push(temp);
+      //       }
+      //       else if (parent_node.attr('class') == 'add-org-form'){
+      //         var temp = new Object();
+      //         temp[node.attr('id')] = node.val();
+      //         values['orgs'].push(temp);
+      //       } 
+            
+      //   });
+      //   var new_values = JSON.stringify(values);
+      //   alert($('#data-js-csrfmiddlewaretoken').val());
+      //   $.post(
+      //     $('#form').attr('url'),
+      //       {
+      //         csrfmiddlewaretoken:$('#data-js-csrfmiddlewaretoken').val(),
+      //         vcard:values['vcard'],
+      //         emails:values['emails'],
+      //         tels:values['tels'],
+      //         orgs:values['orgs'],
+      //       },
+      //       function(){
+      //         alert('success');
+      //     });
+
+      // return false;
+      // });
   </script>
 
 {% endblock %}

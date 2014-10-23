@@ -22,6 +22,10 @@ urlpatterns = patterns(
 
 	url(r'^emails/create/$', EmailCreateView.as_view(), name='email_create'),
 
+	url(r'^emails/$', VCardListView.as_view(), name='email_list'),
+
+	url(r'^emails/(?P<pk>\d+)/$', EmailDetailView.as_view(), name='email_detail'),
+
 	url(r'^emails/update/(?P<id>\d+)/$', EmailUpdateView.as_view(), name='email_update'),
 
 	url(r'^geos/create/(?P<pk>\d+)/$', GeoCreateView.as_view(), name='geo_create'),

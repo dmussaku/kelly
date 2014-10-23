@@ -32,7 +32,9 @@
     <div class="line line--compact">
       <div class="line-aside"></div>
       <div class="line-body">
-        <div class="line-subtitle">Last contacted: never</div>
+        {% if contact.last_activity %}
+        <div class="line-subtitle">Last contacted: {{contact.last_activity.date_created}}</div>
+        {% endif %}
       </div>
     </div>
     <div class="lineGroup-extra">
