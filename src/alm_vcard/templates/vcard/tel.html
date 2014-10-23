@@ -1,0 +1,14 @@
+{% extends "user/base.html" %}
+{% load i18n crm_tags%}
+{% block content %}
+<div>
+	<div id="tel-{{tel.pk}}" tel-pk="{{tel.pk}}" update-url="{% crm_url 'tel_update' id=tel.pk %}">
+		type - {{tel.type}}
+		tel - {{tel.value}}
+		<button class="btn btn-primary" onclick="edit_tel('tel-{{tel.pk}}',{{tel.pk}})" >
+	          edit
+	        </button>
+
+	</div>
+</div>
+{% endblock %}

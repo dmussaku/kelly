@@ -114,8 +114,66 @@ class TelCreateView(CreateView):
     form_class = TelForm
     template_name = 'vcard/tel_create.html'
 
+    def form_valid(self, form):
+        form.instance.vcard_id = self.request.POST['id_vcard']
+        self.object = form.save()
+        return HttpResponse(json.dumps({'tel_id':self.object.pk}), mimetype='application/json')
+
     def get_success_url(self, **kwargs):
-        return super(TelCreateView, self).get_success_url(**kwargs)
+        return almanet_reverse(
+            'tel_detail',
+            kwargs={'service_slug': settings.DEFAULT_SERVICE, 'pk':self.object.pk},
+            subdomain=self.request.user_env['subdomain']
+            )
+
+
+class TelDetailView(DetailView):
+    template_name = 'vcard/tel.html'
+    queryset = Tel.objects.all()
+
+    def get_context_data(self, **kwargs):
+        context = super(self.__class__, self).get_context_data(**kwargs)
+        context['tel'] = Tel.objects.get(pk=self.kwargs['pk'])
+        return context
+
+class OrgCreateView(CreateView):
+    form_class = TelForm
+    template_name = 'vcard/org_create.html'
+
+    def form_valid(self, form):
+        form.instance.vcard_id = self.request.POST['id_vcard']
+        self.object = form.save()
+        return HttpResponse(json.dumps({'org_id':self.object.pk}), mimetype='application/json')
+
+    def get_success_url(self, **kwargs):
+        return almanet_reverse(
+            'org_detail',
+            kwargs={'service_slug': settings.DEFAULT_SERVICE, 'pk':self.object.pk},
+            subdomain=self.request.user_env['subdomain']
+            )
+
+
+class OrgDetailView(DetailView):
+    template_name = 'vcard/org.html'
+    queryset = Org.objects.all()
+
+    def get_context_data(self, **kwargs):
+        context = super(self.__class__, self).get_context_data(**kwargs)
+        context['org'] = Tel.objects.get(pk=self.kwargs['pk'])
+        return context
+
+
+class OrgUpdateView(InitialUpdateView):
+    model = Org
+    form_class = OrgForm
+    template_name = 'vcard/org_create.html'
+
+    def get_object(self, **kwargs):
+        return Org.objects.get(id=self.kwargs['id'])
+
+    def get_success_url(self, **kwargs):
+        self.kwargs['pk'] = VCard.objects.get(id=Org.objects.get(id=self.kwargs['id']).vcard_id).id
+        return super(self.__class__, self).get_success_url(**kwargs)
 
 
 class EmailCreateView(CreateView):
@@ -171,12 +229,7 @@ class GeoCreateView(CreateView):
         return super(GeoCreateView, self).get_success_url(**kwargs)
 
 
-class OrgCreateView(CreateView):
-    form_class = OrgForm
-    template_name = 'vcard/org_create.html'
 
-    def get_success_url(self, **kwargs):
-        return super(OrgCreateView, self).get_success_url(**kwargs)
 
 class AdrCreateView(CreateView):
     form_class = AdrForm

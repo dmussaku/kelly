@@ -1,12 +1,14 @@
 {% extends "user/base.html" %}
-{% load i18n %}
+{% load i18n crm_tags%}
 {% block content %}
 <div>
-	<div class="add-tel-form">
-		<form id="tel-form" action="" method="post">{% csrf_token %}
-		<h2>Add a telephone </h2>
+	<div class="add-tel-form" url="{% crm_url 'contact_create' %}">
+		<form id="tel-form" action="" onsubmit="" url="{% crm_url 'tel_create' %}" method="post">{% csrf_token %}
+		<h2>Add an tel </h2>
 			{{form.as_p}}
-			<input type="submit" value="create"/>
+			<p><button type="submit" class="btn btn-primary" value="create" id='data-js-form-submit' >
+	          Create
+	        </button></p>
 	</div>
-	</div>
+</div>
 {% endblock %}

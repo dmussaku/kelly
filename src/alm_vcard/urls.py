@@ -18,6 +18,10 @@ urlpatterns = patterns(
 
 	url(r'^tels/create/$', TelCreateView.as_view(), name='tel_create'),
 
+	url(r'^tels/$', VCardListView.as_view(), name='tel_list'),
+
+	url(r'^tels/(?P<pk>\d+)/$', TelDetailView.as_view(), name='tel_detail'),
+
 	url(r'^tels/update/(?P<id>\d+)/$', TelUpdateView.as_view(), name='tel_update'),
 
 	url(r'^emails/create/$', EmailCreateView.as_view(), name='email_create'),
@@ -28,11 +32,19 @@ urlpatterns = patterns(
 
 	url(r'^emails/update/(?P<id>\d+)/$', EmailUpdateView.as_view(), name='email_update'),
 
+	url(r'^orgs/create/$', OrgCreateView.as_view(), name='org_create'),
+
+	url(r'^orgs/$', VCardListView.as_view(), name='org_list'),
+
+	url(r'^orgs/(?P<pk>\d+)/$', OrgDetailView.as_view(), name='org_detail'),
+
+	url(r'^orgs/update/(?P<id>\d+)/$', OrgUpdateView.as_view(), name='org_update'),
+
 	url(r'^geos/create/(?P<pk>\d+)/$', GeoCreateView.as_view(), name='geo_create'),
 
 	url(r'^geos/update/(?P<id>\d+)/$', GeoUpdateView.as_view(), name='geo_update'),
 
-	url(r'^orgs/create/$', OrgCreateView.as_view(), name='org_create'),
+
 
 	url(r'^orgs/update/(?P<id>\d+)/$', OrgUpdateView.as_view(), name='org_update'),
 
