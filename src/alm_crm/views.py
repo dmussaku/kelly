@@ -55,25 +55,42 @@ class FeedView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(FeedView, self).get_context_data(**kwargs)
+
         crmuser_id = self.request.user.get_crmuser().id
         sales_cycles_data = SalesCycle.get_salescycles_by_last_activity_date(
-            crmuser_id, owned=True, mentioned=True, followed=True)
-        context['sales_cycles'] = sales_cycles_data[0]
-        context['sales_cycle_activities'] = sales_cycles_data[1]
-        context['sales_cycle_activity_map'] = sales_cycles_data[2]
+            crmuser_id, owned=False, mentioned=True, followed=True)
+        context['feed_activities'] = sales_cycles_data[1]
+
         return context
 
-class SharedFeedView(TemplateView):
+
+class FeedMentionsView(TemplateView):
 
     def get_context_data(self, **kwargs):
-        context = super(SharedFeedView, self).get_context_data(**kwargs)
-        crmuser_id = self.request.user.get_crmuser().id
-        sales_cycles_data = SalesCycle.get_salescycles_by_last_activity_date(
-            crmuser_id, owned=False, mentioned=True, followed=False)
-        context['sales_cycles'] = sales_cycles_data[0]
-        context['sales_cycle_activities'] = sales_cycles_data[1]
-        context['sales_cycle_activity_map'] = sales_cycles_data[2]
+        context = super(self.__class__, self).get_context_data(**kwargs)
+
+        crmuser = self.request.user.get_crmuser()
+        context['mentioned_activities'] = \
+            Activity.get_mentioned_activities_of(crmuser.id)
         return context
+
+
+class FeedCompanyView(TemplateView):
+
+    def get_context_data(self, **kwargs):
+        context = super(self.__class__, self).get_context_data(**kwargs)
+
+        env = self.request.user_env
+
+        def find_pk(pk):
+            if (env['subscription_{}'.format(pk)]['slug'] == kwargs['service_slug']):
+                return pk
+        subscription_id = map(find_pk, env['subscriptions'])[0]
+
+        context['company_activities'] = \
+            Activity.get_activities_by_subscription(subscription_id)
+        return context
+
 
 class ProfileView(TemplateView):
 
@@ -151,16 +168,10 @@ class ContactDetailView(DetailView):
 
 class ContactListView(ListView):
 
-    def get_context_data(self, **kwargs):
-        context = super(self.__class__, self).get_context_data(**kwargs)
-        crmuser_id = self.request.user.get_crmuser().id
-        context['contacts_cold_base'] = self.model.get_cold_base()
-        context['contacts_contacted_last_week'] = \
-            self.model.get_contacts_for_last_activity_period(
-                crmuser_id,
-                from_dt=timezone.now()-timedelta(days=7),
-                to_dt=timezone.now())
-        return context
+    def get_queryset(self):
+        contacts = self.model.objects.all()
+        return contacts
+
 
 class ContactSearchListView(ListView):
 

@@ -767,13 +767,20 @@ class Activity(SubscriptionObject):
             return False
         if (limit):
             return cls.objects.filter(sales_cycle=sales_cycle)\
-                .order_by('date_created')[offset:offset + limit]
+                .order_by('-date_created')[offset:offset + limit]
         else:
             return cls.objects.filter(sales_cycle=sales_cycle)\
-                .order_by('date_created')
+                .order_by('-date_created')
 
     @classmethod
-    def get_mentioned_activities_of(cls, user_ids=set([])):
+    def get_activities_by_subscription(cls, subscription_id):
+        return cls.objects.filter(subscription_id=subscription_id)\
+            .order_by('date_created')
+
+    @classmethod
+    def get_mentioned_activities_of(cls, user_ids):
+        if not user_ids is isinstance(tuple, list):
+            user_ids = [user_ids]
         return Activity.objects.filter(mentions__user_id__in=user_ids)
 
     '''--Done--'''
@@ -837,7 +844,6 @@ class Activity(SubscriptionObject):
         if not self.subscription_id and self.owner:
             self.subscription_id = self.owner.subscription_id
         super(Activity, self).save(**kwargs)
-
 
 
 class Feedback(SubscriptionObject):

@@ -1,51 +1,31 @@
 {% extends "crm/base.html" %}
-{% load i18n almanet_tags%}
+{% load i18n almanet_tags crm_tags %}
 {% block head_title %} {{ _("Shares") }} {% endblock %}
-{% load crm_tags %}
+
 
 {% block crm_aside_tabs %}
-  <a href="{% crm_url 'share_list' %}" class="tabs-link active" data-tip="Shared contacts">
-      <figure class="icon">
-  <svg version="1.1">
-    <use class="icon--next" xlink:href="#next"></use>
-  </svg>
-</figure>
-
-    </a>
-    <a href="contacts-last.html" class="tabs-link" data-tip="Contacted in last 7 days">
-      <figure class="icon">
-  <svg version="1.1">
-    <use class="icon--week" xlink:href="#week"></use>
-  </svg>
-</figure>
-
-    </a>
-    <a href="{% crm_url 'contacts_list' %}" class="tabs-link" data-tip="All contacted">
-      <figure class="icon">
-  <svg version="1.1">
-    <use class="icon--alltime" xlink:href="#alltime"></use>
-  </svg>
-</figure>
-
-    </a>
-  <a href="{% subdomain_url 'contact-search' service_slug=DEFAULT_SERVICE subdomain=request.user_env.subdomain %}" class="tabs-link" data-tip="Search">
-    <figure class="icon">
-      <svg version="1.1">
-        <use class="icon--search" xlink:href="#search"></use>
-      </svg>
-    </figure>
-  </a>
+  {% crm_aside_tabs_contacts 'share_list' %}
 {% endblock crm_aside_tabs %}
+
 
 {% block crm_body %}
 
-  <div class="body-column body-column--single">
+  <div class="body-column body-column--withTabs">
     <div class="column">
-      <div class="column-title">
-        Shared Contacts
-        {% for share in object_list %}
-          {% show_share share  %}
-        {% endfor %}
-      </div>
+
+      {% for share in object_list %}
+        {% show_share share  %}
+
+      {% endfor %}
+    </div>
+  </div>
 
 {% endblock crm_body %}
+
+
+{% block crm_footer %}
+  <div class="help">
+    This page contains contacts, that were ever shared with you.<br>
+    You can also share any contact with yourself.
+  </div>
+{% endblock crm_footer %}
