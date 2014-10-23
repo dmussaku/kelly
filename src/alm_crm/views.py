@@ -18,7 +18,8 @@ from models import (
     Comment,
     Value,
     CRMUser,
-    Product
+    Product,
+    Share
     )
 from forms import (
     ContactForm,
@@ -131,7 +132,7 @@ class ShareListView(ListView):
 
     def get_queryset(self):
         crmuser = self.request.user.get_crmuser()
-        return crmuser.in_shares.all()
+        return Share.get_shares_in_for(crmuser.pk)
 
 
 class ContactDetailView(DetailView):
