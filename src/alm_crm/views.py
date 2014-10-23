@@ -145,10 +145,15 @@ class ContactDetailView(DetailView):
 
         current_crmuser = self.request.user.get_crmuser()
 
-        # last sales_cycle
-        context['sales_cycle'] = \
-            SalesCycle.get_salescycles_of_contact_by_last_activity_date(
-                context['object'].id).first()
+        # get first sales_cycle on open
+        sales_cycle_id = self.request.GET.get('sales_cycle_id', None)
+        if not sales_cycle_id is None:
+            context['sales_cycle'] = SalesCycle.objects.get(pk=sales_cycle_id)
+        else:
+            # last sales_cycle
+            context['sales_cycle'] = \
+                SalesCycle.get_salescycles_of_contact_by_last_activity_date(
+                    context['object'].id).first()
 
         # create new sales_cycle to contact
         context['new_sales_cycle_form'] = SalesCycleForm(
