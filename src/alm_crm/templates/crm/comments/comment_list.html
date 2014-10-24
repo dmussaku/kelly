@@ -46,7 +46,7 @@
             url="{% crm_url 'comments' content_type='activity' object_id=activity_id %}"
             data-js-addcomment-mention="textarea"
             data-js-addcomment-mention-data="{{mentions_json}}"></textarea>
-          <input type="hidden" name="mention_ids">
+          <input type="hidden" name="mention_ids"/>
 
           <button type="submit" value="create" >Post</button>
           <button id='cancel-button' class='cancel-button' style='display: none'>Cancel</button>
