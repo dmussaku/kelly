@@ -1,0 +1,32 @@
+{% extends "crm/base.html" %}
+{% load i18n crm_tags almanet_tags%}
+{% block head_title %} {{ _("Feed: Mentions") }} {% endblock %}
+
+{% block crm_aside_tabs %}
+  {% crm_aside_tabs_feeds 'feed_mentions' %}
+{% endblock crm_aside_tabs %}
+
+
+{% block crm_body %}
+  <div class="body-column body-column--single">
+    <div class="column">
+    {% for activity in mentioned_activities %}
+      {% show_activity activity %}
+    {% empty %}
+      <p>No one mentioned activity with you yet</p>
+    {% endfor %}
+    </div>
+  </div>
+
+{% endblock crm_body %}
+
+
+{% block crm_footer %}
+  <div class="help">
+    This page contains activities with mentions of you.
+  </div>
+{% endblock crm_footer %}
+
+{% block js_content %}
+  {{ block.super }}
+{% endblock %}

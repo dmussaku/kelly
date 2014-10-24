@@ -9,7 +9,7 @@
       </div>
       <div class="line-body">
         <h1 class="line-title"><a href="{% crm_url 'contact_detail' contact_pk=contact.id %}">{{ contact.name }}</a></h1>
-        
+
         <div class="line-subtitle">{{ contact.company.name }}</div>
       </div>
     </div>
@@ -32,9 +32,7 @@
     <div class="line line--compact">
       <div class="line-aside"></div>
       <div class="line-body">
-        {% if contact.last_activity %}
-        <div class="line-subtitle">Last contacted: {{contact.last_activity.date_created}}</div>
-        {% endif %}
+        <div class="line-subtitle">Last contacted: {{ contact.last_contacted|date:'F j, H:i'|default:'never' }}</div>
       </div>
     </div>
     <div class="lineGroup-extra">

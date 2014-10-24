@@ -1,102 +1,28 @@
 {% extends "crm/base.html" %}
-{% load i18n almanet_tags %}
+{% load i18n almanet_tags crm_tags %}
 {% block head_title %} {{ _("Contacts") }} {% endblock %}
-{% load crm_tags %}
 
 
 {% block crm_aside_tabs %}
-  <a href="{% crm_url 'share_list' %}" class="tabs-link" data-tip="Shared contacts">
-      <figure class="icon">
-  <svg version="1.1">
-    <use class="icon--next" xlink:href="#next"></use>
-  </svg>
-</figure>
-
-    </a>
-    <a href="contacts-last.html" class="tabs-link" data-tip="Contacted in last 7 days">
-      <figure class="icon">
-  <svg version="1.1">
-    <use class="icon--week" xlink:href="#week"></use>
-  </svg>
-</figure>
-
-    </a>
-    <a href="{% crm_url 'contacts_list' %}" class="tabs-link active" data-tip="All contacted">
-      <figure class="icon">
-  <svg version="1.1">
-    <use class="icon--alltime" xlink:href="#alltime"></use>
-  </svg>
-</figure>
-
-    </a>
-  <a href="{% subdomain_url 'contact-search' service_slug=DEFAULT_SERVICE subdomain=request.user_env.subdomain %}" class="tabs-link" data-tip="Search">
-      <figure class="icon">
-  <svg version="1.1">
-    <use class="icon--search" xlink:href="#search"></use>
-  </svg>
-</figure>
-
-    </a>
+  {% crm_aside_tabs_contacts 'contacts_list' %}
 {% endblock crm_aside_tabs %}
 
 
 {% block crm_body %}
-  <div class="body-column body-column--single">
-  
+  <div class="body-column body-column--withTabs">
     <div class="column">
 
-      <div class="column-block">
-        <div class="column-title">
-          Work on next ({{ contacts_cold_base.count }})</div>
-        {% if contacts_cold_base %}
-            {% show_contact contacts_cold_base|first %}
-        {% endif %}
-
-        {% if contacts_cold_base.count > 1 %}
-          <div class='showmore'>
-            <div class='showmore-body'>
-              {% for contact in contacts_cold_base|slice:"1:" %}
-                {% show_contact contact %}
-              {% endfor %}
-            </div>
-
-            <div class="column-block-footer">
-              <a href="#" class="link-extra"
-                data-toggle='showmore'
-                data-text='less'
-              >{{ contacts_cold_base.count|add:'-1' }} more</a>
-            </div>
-          </div>
-        {% endif %}
-      </div>
-
-
-      <div class="column-block">
-        <div class="column-title">
-          Contacted last week ({{contacts_contacted_last_week.count}})</div>
-
-        {% for contact in contacts_contacted_last_week|slice:":3" %}
-          {% show_contact contact %}
-        {% endfor %}
-
-        {% if contacts_contacted_last_week.count > 3 %}
-          <div class='showmore'>
-            <div class='showmore-body'>
-              {% for contact in contacts_contacted_last_week|slice:"3:" %}
-                {% show_contact contact %}
-              {% endfor %}
-            </div>
-
-            <div class="column-block-footer">
-              <a href="#" class="link-extra"
-                data-toggle='showmore'
-                data-text='less'
-                >{{contacts_contacted_last_week.count|add:'-3'}} more</a>
-            </div>
-          </div>
-        {% endif %}
-      </div>
+      {% for contact in object_list %}
+        {% show_contact contact %}
+      {% endfor %}
 
     </div>
   </div>
 {% endblock crm_body %}
+
+
+{% block crm_footer %}
+  <div class="help">
+    This page contains contacts, that were ever contacted by you.
+  </div>
+{% endblock crm_footer %}

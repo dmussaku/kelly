@@ -5,6 +5,8 @@ from views import *
 urlpatterns = patterns(
     '',
     url(r'^vcards/$', VCardListView.as_view(), name='vcard_list'),
+    
+    url(r'^$', VCardListView.as_view(), name='vcard_list_view'),
 
     url(r'^vcards/(?P<pk>\d+)/$', VCardDetailView.as_view(), name='vcard_detail'),
 

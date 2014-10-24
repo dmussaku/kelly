@@ -130,6 +130,9 @@ class Contact(SubscriptionObject):
             self.subscription_id = self.owner.subscription_id
         super(Contact, self).save(**kwargs)
 
+    @property
+    def last_contacted(self):
+        return self.latest_activity and self.latest_activity.date_created
 
     @property
     def name(self):
@@ -767,13 +770,20 @@ class Activity(SubscriptionObject):
             return False
         if (limit):
             return cls.objects.filter(sales_cycle=sales_cycle)\
-                .order_by('date_created')[offset:offset + limit]
+                .order_by('-date_created')[offset:offset + limit]
         else:
             return cls.objects.filter(sales_cycle=sales_cycle)\
-                .order_by('date_created')
+                .order_by('-date_created')
 
     @classmethod
-    def get_mentioned_activities_of(cls, user_ids=set([])):
+    def get_activities_by_subscription(cls, subscription_id):
+        return cls.objects.filter(subscription_id=subscription_id)\
+            .order_by('date_created')
+
+    @classmethod
+    def get_mentioned_activities_of(cls, user_ids):
+        if not user_ids is isinstance(tuple, list):
+            user_ids = [user_ids]
         return Activity.objects.filter(mentions__user_id__in=user_ids)
 
     '''--Done--'''
@@ -837,7 +847,6 @@ class Activity(SubscriptionObject):
         if not self.subscription_id and self.owner:
             self.subscription_id = self.owner.subscription_id
         super(Activity, self).save(**kwargs)
-
 
 
 class Feedback(SubscriptionObject):
@@ -985,6 +994,16 @@ class Share(SubscriptionObject):
     @classmethod
     def get_shares(cls, limit=20, offset=0):
         return cls.objects.order_by('-date_created')[offset:offset + limit]
+
+    @classmethod
+    def get_shares_in_for(cls, user_id):
+        return cls.objects.filter(share_to__pk=user_id)\
+            .order_by('-date_created')
+
+    @classmethod
+    def get_shares_owned_for(cls, user_id):
+        return cls.objects.filter(share_from__pk=user_id)\
+            .order_by('-date_created')
 
     def __unicode__(self):
         return '%s : %s -> %s' % (self.contact, self.share_from, self.share_to)

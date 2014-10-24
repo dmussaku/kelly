@@ -67,15 +67,18 @@
         <p><button type="submit" class="btn btn-primary" value="create" id='data-js-form-submit' url="{% crm_url 'contact_create' %}">
           Create
         </button></p>
+        
       </form>
-      
+      <p><button class="btn btn-primary" id='redirect_to_contact' onclick="return redirect_to_contact()" style="display:none;">
+          Create
+        </button></p>
     </div>
   </div>
 {% endblock crm_body %}
 
 {% block js_content %}
   <script>
-    var vcard_id = 0;
+    window.vcard_contact;
       function name_fields_added(){
         if ($('#id_given_name').val()!="" && $('#id_family_name').val()!=""){
           $.post(
@@ -86,11 +89,14 @@
                 family_name: $('#id_family_name').val(),
               },
               function(data){
-                vcard_id = data['vcard_id'];
-                return vcard_id;
+                vcard_contact = data;
+                vcard_contact['vcard_id'] = data['vcard_id'];
+                vcard_contact['contact_id'] = data['contact_id'];
+                return window.vcard_contact;
+
               }
             )
-;          return vcard_id;
+          return window.vcard_contact;
         }
         else{
           return -1;
@@ -103,16 +109,18 @@
             return false;
           }
           else if (document.getElementById('email-form')==null){
-            if (vcard_id == 0){
-              var vcard_id = $(document).ajaxStop(name_fields_added());
+            if (! window.vcard_contact){
+              vcard_contact = $(document).ajaxStop(name_fields_added());
+              alert(vcard_contact['vcard_id']);
             }
             var my_url = $('#data-js-email-form-toggle').attr('url');
             $.ajax({
               type:'GET',
               url: my_url,
               success: function(data){
+
                 var form_html = $(data).find('#email-form');
-                form_html.attr("onsubmit","return add_email()");
+                form_html.attr("onsubmit","return add_object('email')");
                 $('#data-js-vcard-objects').html(form_html);
               }
             });
@@ -130,8 +138,8 @@
             return false;
           }
           else if (document.getElementById('tel-form')==null){
-            if (vcard_id == 0){
-              var vcard_id = $(document).ajaxStop(name_fields_added());
+            if (! vcard_contact){
+              vcard_contact = $(document).ajaxStop(name_fields_added());
             }
             var my_url = $('#data-js-tel-form-toggle').attr('url');
             $.ajax({
@@ -139,7 +147,7 @@
               url: my_url,
               success: function(data){
                 var form_html = $(data).find('#tel-form');
-                form_html.attr("onsubmit","return add_tel()");
+                form_html.attr("onsubmit","return add_object('tel')");
                 $('#data-js-vcard-objects').html(form_html);
               }
             });
@@ -157,8 +165,8 @@
             return false;
           }
           else if (document.getElementById('org-form')==null){
-            if (vcard_id == 0){
-              var vcard_id = $(document).ajaxStop(name_fields_added());
+            if (! vcard_contact){
+              vcard_contact = $(document).ajaxStop(name_fields_added());
             }
             var my_url = $('#data-js-org-form-toggle').attr('url');
             $.ajax({
@@ -166,7 +174,7 @@
               url: my_url,
               success: function(data){
                 var form_html = $(data).find('#org-form');
-                form_html.attr("onsubmit","return add_org()");
+                form_html.attr("onsubmit","return add_object('org')");
                 $('#data-js-vcard-objects').html(form_html);
               }
             });
@@ -178,69 +186,25 @@
         return false;
       });
 
-      function add_email(){
-        var form_id = 'email-form';
+      function add_object(obj_str){
+        var form_id = obj_str+'-form';
+        
         $.ajax({
           type:'POST',
           url:$('#'+form_id).attr('url'),
-          data:$('#'+form_id).serialize() + '&id_vcard=' + JSON.stringify(vcard_id),
+          data:$('#'+form_id).serialize() + '&id_vcard=' + JSON.stringify(vcard_contact['vcard_id']),
           dataType:'json',
           success: function(data){
-            var pk = data['email_id']
+            var pk = data[obj_str+'_id']
             $.ajax({
               type:'GET',
-              url:"{% crm_url 'email_list' %}"+pk+"/",
+              url:"{% crm_url 'vcard_list_view' %}"+obj_str+"s/"+pk+"/",
               success: function(data){
                 $('#'+form_id).remove();
                 $('#data-js-vcard-completed-objects').append(data);
-                return false;
-              }
-            });
-            return false;
-          } 
-        });
-        return false;
-      }
+                $("#data-js-form-submit").hide();
+                $("#redirect_to_contact").show();
 
-      function add_tel(){
-        var form_id = 'tel-form';
-        $.ajax({
-          type:'POST',
-          url:$('#'+form_id).attr('url'),
-          data:$('#'+form_id).serialize() + '&id_vcard=' + JSON.stringify(vcard_id),
-          dataType:'json',
-          success: function(data){
-            var pk = data['tel_id']
-            $.ajax({
-              type:'GET',
-              url:"{% crm_url 'tel_list' %}"+pk+"/",
-              success: function(data){
-                $('#'+form_id).remove();
-                $('#data-js-vcard-completed-objects').append(data);
-                return false;
-              }
-            });
-            return false;
-          } 
-        });
-        return false;
-      }
-
-      function add_org(){
-        var form_id = 'org-form';
-        $.ajax({
-          type:'POST',
-          url:$('#'+form_id).attr('url'),
-          data:$('#'+form_id).serialize() + '&id_vcard=' + JSON.stringify(vcard_id),
-          dataType:'json',
-          success: function(data){
-            var pk = data['org_id']
-            $.ajax({
-              type:'GET',
-              url:"{% crm_url 'org_list' %}"+pk+"/",
-              success: function(data){
-                $('#'+form_id).remove();
-                $('#data-js-vcard-completed-objects').append(data);
                 return false;
               }
             });
@@ -262,6 +226,17 @@
         });
         return false;
       }
+
+      function redirect_to_contact(){
+        var contact_id = vcard_contact['contact_id'];
+        var url= "{% crm_url 'contacts_list' %}"+contact_id+"/";
+        location.assign(url);     
+        }
+
+      $('#contact-submit-form').onsubmit(function(){
+        alert('asda');
+        return false;
+      });
   </script>
 
 {% endblock %}

@@ -11,7 +11,7 @@
       <div class="line-body-main">
         <div class="caption secondary">
           <a href="{% crm_url 'contact_detail' contact_pk=activity.sales_cycle.contact.id %}">{{ activity.sales_cycle.contact }}</a> |
-          <a href="index.html">{{ activity.sales_cycle }}</a>
+          <a href="{% crm_url 'contact_detail' contact_pk=activity.sales_cycle.contact.id %}?sales_cycle_id={{ activity.sales_cycle.pk }}">{{ activity.sales_cycle }}</a>
         </div>
         {{ activity.title }}
         <a href="#" class="link-tag">#meeting</a>

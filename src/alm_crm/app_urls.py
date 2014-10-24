@@ -14,7 +14,8 @@ from .forms import (
 from .views import (
     DashboardView,
     FeedView,
-    SharedFeedView,
+    FeedMentionsView,
+    FeedCompanyView,
     ProfileView,
 
     ContactDetailView,
@@ -49,11 +50,14 @@ urlpatterns = patterns(
         DashboardView.as_view()),
         name='crm_home'),
     url(r'^feed/$', crmuser_required(
-        FeedView.as_view(template_name='crm/feed.html')),
+        FeedView.as_view(template_name='crm/feeds/feed.html')),
         name='feed'),
-    url(r'^feed/shared/$', crmuser_required(
-        SharedFeedView.as_view(template_name='crm/shared_feed.html')),
-        name='shared_feed'),
+    url(r'^feed/mentions/$', crmuser_required(FeedMentionsView.as_view(
+        template_name='crm/feeds/feed_mentions.html')),
+        name='feed_mentions'),
+    url(r'^feed/company/$', crmuser_required(FeedCompanyView.as_view(
+        template_name='crm/feeds/feed_company.html')),
+        name='feed_company'),
     url(r'^profile/$', crmuser_required(
         ProfileView.as_view(template_name='crm/profile.html')),
         name='profile'),

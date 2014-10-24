@@ -30,9 +30,15 @@
     <div class="line line--compact">
       <div class="line-aside"></div>
       <div class="line-body">
-        {% if share.contact.last_activity %}
-        <div class="line-subtitle">Last contacted: {{share.contact.last_activity.date_created}}</div>
-        {% endif %}
+
+        <div class="line-subtitle">Last contacted: {{ share.contact.last_contacted|date:'F j, H:i'|default:'never' }}</div>
+      </div>
+    </div>
+    <div class="line line--compact">
+      <div class="line-aside"></div>
+      <div class="line-body">
+        <div class="line-subtitle">Shared at: {{ share.date_created|date:'F j, H:i' }}</div>
+
       </div>
     </div>
   <div class="lineGroup-extra">
@@ -57,4 +63,4 @@
       </div>
     </div>
   </div>
-</div> 
+</div>
