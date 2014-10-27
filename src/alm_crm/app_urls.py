@@ -43,10 +43,17 @@ from .views import (
     comment_edit_view,
     ContactSearchListView,
     contact_create_view,
+
+    BankProductsPage,
     )
 
 urlpatterns = patterns(
     '',
+
+    url(r'^products/info/$', crmuser_required(BankProductsPage.as_view(
+        template_name="crm/bank_products_list.html")),
+        name='bank_products_list'),
+
     url(r'^$', crmuser_required(
         DashboardView.as_view()),
         name='crm_home'),

@@ -701,6 +701,10 @@ def feedback_by_activity(request, service_slug=None, pk=None):
             return HttpResponse(json.dumps(data), mimetype="application/json")
 
 
+class BankProductsPage(TemplateView):
+    pass
+
+
 class ValueListView(ListView):
     model = Value
     queryset = Value.objects.all()
