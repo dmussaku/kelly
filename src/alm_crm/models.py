@@ -864,6 +864,8 @@ class Feedback(SubscriptionObject):
     date_edited = models.DateTimeField(blank=True, auto_now_add=True)
     activity = models.OneToOneField(Activity, blank=False)
     value = models.OneToOneField(Value, blank=True, null=True)
+    author = models.ForeignKey(CRMUser, related_name='owned_feedbacks',
+                               null=True)
     mentions = generic.GenericRelation('Mention')
     comments = generic.GenericRelation('Comment')
 
@@ -875,6 +877,10 @@ class Feedback(SubscriptionObject):
         if not self.subscription_id and self.owner:
             self.subscription_id = self.owner.subscription_id
         super(Feedback, self).save(**kwargs)
+
+    @property
+    def owner(self):
+        return self.author
 
 
 class Mention(SubscriptionObject):

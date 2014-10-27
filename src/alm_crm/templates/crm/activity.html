@@ -6,6 +6,10 @@
       <figure class="icon">
         {{ activity.feedback.get_status_display }}
       </figure>
+
+      <a href="{% crm_url 'feedback_by_activity' pk=activity.pk %}"
+        data-js-activity-feedback-visual='show'>[s]</a>
+
     </div>
     <div class="line-body">
       <div class="line-body-main">
@@ -26,6 +30,13 @@
       </div>
     </div>
   </div>
+
+
+  <div style='display:none;'
+    data-js-activity-feedback-visual='body'>
+  </div>
+
+
   <div class="lineGroup-extra">
     <div class="comments">
       <button type="button" class="comment--toggle" data-toggle="comments" onclick='click_event("{% crm_url "comments" content_type="activity" object_id=activity.id %}")' url="">

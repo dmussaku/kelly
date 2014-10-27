@@ -25,6 +25,7 @@ from .views import (
 
     ActivityCreateView,
     ActivityDetailView,
+    feedback_by_activity,
 
     SalesCycleCreateView,
     SalesCycleDetailView,
@@ -137,6 +138,9 @@ urlpatterns = patterns(
             template_name='crm/activity.html'
             ),
         name='activity_detail'),
+    url(r'^activities/(?P<pk>[\d]+)/feedback/$',
+        crmuser_required(feedback_by_activity),
+        name='feedback_by_activity'),
 
     url(r'^sales_cycles/create/$',
         crmuser_required(SalesCycleCreateView.as_view(
