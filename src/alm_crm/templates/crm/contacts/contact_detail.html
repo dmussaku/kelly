@@ -153,27 +153,10 @@
 {% endblock crm_footer %}
 
 
-
-{% block crm_css_content %}
-<link rel="stylesheet" href="{% static 'css/jquery.mentionsInput.css' %}">
-<style>
-  .mentions-input-box {
-    font-size: 14px;
-  }
-  .mentions-input-box textarea {
-    font-size: 14px;
-    font-family: Tahoma, Verdana, Segoe, sans-serif;
-  }
-</style>
-{% endblock crm_css_content %}
-
-
 {% block crm_js_content %}
-<script src='{% static "js/underscore.min.js" %}'></script>
-<script src='{% static "js/jquery.elastic.js" %}'></script>
-<script src='{% static "js/jquery.mentionsInput.js" %}'></script>
+
 <script src='{% static "js/typeahead.bundle.min.js" %}'></script>
-{# Sattar's code #}
+
 <script>
   var sales_cycle_detail_js = (function($) {
     var observer = {

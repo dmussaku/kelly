@@ -270,13 +270,15 @@ def comment_create_view(request, service_slug, content_type, object_id):
         elif (content_type == 'share'):
             return render_to_response('crm/share/comment/comment_list.html',
                     {'comments':Comment().get_comments_by_context(object_id, content_type),
-                     'share_id':object_id},
+                     'share_id':object_id,
+                     'mentions_json': mentions_json},
                     context_instance=RequestContext(request)
                 )
         elif (content_type == 'contact'):
             return render_to_response('crm/share/comment/comment_list.html',
                     {'comments':Comment().get_comments_by_context(object_id, content_type),
-                     'share_id':object_id},
+                     'share_id':object_id,
+                     'mentions_json': mentions_json},
                     context_instance=RequestContext(request)
                 )
     if request.method == 'POST':

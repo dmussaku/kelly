@@ -3,17 +3,31 @@
 {% load i18n almanet_tags crm_tags %}
 
 {% block css %}
-<link rel="shortcut icon" type="image/ico" href="{% static 'img/favicon.ico' %}" />
-<link rel="stylesheet" href="{% static 'css/autocomplete.css' %}">
-<link rel="stylesheet" href="{% static 'css/app.css' %}">
-<script src="{% static 'js/jquery-2.1.1.min.js' %}"></script>
-{% block crm_css_content %}{% endblock %}
-<style>
-  #scrollable-dropdown-menu .tt-dropdown-menu {
-    max-height: 500px;
-    overflow-y: auto;
-  }
-</style>
+  <script src="{% static 'js/jquery-2.1.1.min.js' %}"></script>
+
+  <link rel="shortcut icon" type="image/ico" href="{% static 'img/favicon.ico' %}" />
+  <link rel="stylesheet" href="{% static 'css/autocomplete.css' %}">
+  <link rel="stylesheet" href="{% static 'css/app.css' %}">
+  <style>
+    #scrollable-dropdown-menu .tt-dropdown-menu {
+      max-height: 500px;
+      overflow-y: auto;
+    }
+  </style>
+
+  <link rel="stylesheet" href="{% static 'css/jquery.mentionsInput.css' %}">
+  <style>
+    .mentions-input-box {
+      font-size: 14px;
+    }
+    .mentions-input-box textarea {
+      font-size: 14px;
+      font-family: Tahoma, Verdana, Segoe, sans-serif;
+    }
+  </style>
+
+  {% block crm_css_content %}{% endblock %}
+
 {% endblock %}
 
 
@@ -139,6 +153,10 @@
 
 
 {% block js_content %}
+  <script src='{% static "js/underscore.min.js" %}'></script>
+  <script src='{% static "js/jquery.elastic.js" %}'></script>
+  <script src='{% static "js/jquery.mentionsInput.js" %}'></script>
+
   <script src="{% static 'js/scripts.min.js' %}"></script>
   <script src="{% static 'js/vcard_upload.js' %}"></script>
   <script src="{% static 'js/comments.js' %}"></script>
@@ -147,10 +165,10 @@
   <script src="{% static 'js/_calendarChart.js' %}"></script>
 
   <script type="text/javascript">
-  $(function() {
-    $('.js-show-comments-link').click($.comments.click_event);
-  });
-</script>
+    $(function() {
+      $('.js-show-comments-link').click($.comments.click_event);
+    });
+  </script>
 
   <script>
     (function(doT) {
