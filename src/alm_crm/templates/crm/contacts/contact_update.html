@@ -1,0 +1,103 @@
+{% extends "crm/base.html" %}
+{% load i18n crm_tags almanet_tags %}
+{% load static from staticfiles %}
+{% block head_title %} {{ _("Contact Edit Form") }} {% endblock %}
+
+
+{% block crm_aside_tabs %}
+  <a href="{% crm_url 'share_list' %}" class="tabs-link" data-tip="Shared contacts">
+      <figure class="icon">
+  <svg version="1.1">
+    <use class="icon--next" xlink:href="#next"></use>
+  </svg>
+</figure>
+
+    </a>
+    <a href="contacts-last.html" class="tabs-link" data-tip="Contacted in last 7 days">
+      <figure class="icon">
+  <svg version="1.1">
+    <use class="icon--week" xlink:href="#week"></use>
+  </svg>
+</figure>
+
+    </a>
+    <a href="{% crm_url 'contacts_list' %}" class="tabs-link" data-tip="All contacted">
+      <figure class="icon">
+  <svg version="1.1">
+    <use class="icon--alltime" xlink:href="#alltime"></use>
+  </svg>
+</figure>
+
+    </a>
+  <a href="{% crm_url 'contact-search' %}" class="tabs-link" data-tip="Search">
+      <figure class="icon">
+  <svg version="1.1">
+    <use class="icon--search" xlink:href="#search"></use>
+  </svg>
+</figure>
+
+    </a>
+{% endblock crm_aside_tabs %}
+
+{% block crm_body %}
+  <div class="body-column body-column--withTabs">
+    <div class="column">
+      <h2>Create a contact</h2>
+      <form action="" method="post" id='contact-submit-form' post-url="{% crm_url 'contact_create' %}">
+      {% csrf_token %}
+      {{form.as_p}}
+      <div id='emails'>
+        {% for email in emails %}
+          <div id="email-{{email.pk}}">
+            {{email.type}}
+            {{email.value}}
+            <button class="btn btn-primary">
+              Edit
+            </button>
+          </div>
+        {% endfor %}
+      </div>
+      <div id='tels'>
+        {% for tel in tels %}
+          <dv id="tel-{{tel.pk}}">
+            {{tel.type}}
+            {{tel.value}}
+            <button class="btn btn-primary">
+              Edit
+            </button>
+          </dv>
+        {% endfor %}
+      </div>
+      <div id='orgs'>
+        {% for org in orgs %}
+            {{org.organization_name}}
+            {{org.organization_unit}}
+            <button class="btn btn-primary">
+              Edit
+            </button>
+        {% endfor %}
+      </div>
+
+      <button class="btn btn-primary" value="submit">
+              Confirm
+            </button>
+      </form>
+
+    </div>
+  </div>
+{% endblock crm_body %}
+
+{% block js_content %}
+<script>
+  function edit_object(content_type,id){
+    var url = {% crm_url 'vcard_list_view' %} + content_type + 's' + "/" +id+"/";
+    $.ajax({
+      type:'GET',
+      url: url,
+      success: function(data){
+        $('#'+content_type+"-"+id).replaceWith(data)
+      }
+    });
+  }
+</script>
+{% endblock %}

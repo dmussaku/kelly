@@ -222,6 +222,25 @@ def contact_create_view(request, service_slug):
         #         )
 
 class ContactUpdateView(UpdateView):
+    model = VCard
+    form_class = VCardForm
+    template_name = 'crm/contacts/contact_update.html'
+    pk_url_kwarg = 'contact_pk'
+
+    def get_queryset(self):
+        return VCard.objects.all()
+
+    def get_object(self, **kwargs):
+        return Contact.objects.get(id=self.kwargs['contact_pk']).vcard
+
+    def get_context_data(self, **kwargs):
+        context = super(self.__class__, self).get_context_data(**kwargs)
+        v = Contact.objects.get(id=self.kwargs['contact_pk']).vcard
+        context['emails'] = v.email_set.all()
+        context['tels'] = v.tel_set.all()
+        context['orgs'] = v.org_set.all()
+        print context
+        return context
 
     def get_success_url(self):
         return reverse_lazy('contact_list',
@@ -360,8 +379,6 @@ def contact_search(request, slug, query_string):
         return HttpResponse(json.dumps(json_list), content_type='application/json')
 
 
-
-
 class CommentAddMentionView(CreateView):
     model = Comment
     form_class = MentionForm  # context_type, context_id
@@ -392,13 +409,6 @@ class ContactCreateView(CreateView):
                             subdomain=self.request.user_env['subdomain'],
                             kwargs={'service_slug': settings.DEFAULT_SERVICE})
 
-
-class ContactUpdateView(UpdateView):
-
-    def get_success_url(self):
-        return reverse_lazy('contact_list',
-                            subdomain=self.request.user_env['subdomain'],
-                            kwargs={'service_slug': settings.DEFAULT_SERVICE})
 
 
 class ContactAddMentionView(UpdateView):
