@@ -1,0 +1,66 @@
+[
+    {
+        "pk": 1,
+        "model": "alm_vcard.Rnn",
+        "fields": {
+            "vcard":1,
+            "value":"600345987321"
+        }
+    },
+    {
+        "pk": 2,
+        "model": "alm_vcard.Rnn",
+        "fields": {
+            "vcard":2,
+            "value":"600345987321"
+        }
+    },
+    {
+        "pk": 3,
+        "model": "alm_vcard.Rnn",
+        "fields": {
+            "vcard":3,
+            "value":"600345987321"
+        }
+    },
+    {
+        "pk": 4,
+        "model": "alm_vcard.Rnn",
+        "fields": {
+            "vcard":4,
+            "value":"60034598735"
+        }
+    },
+    {
+        "pk": 5,
+        "model": "alm_vcard.Rnn",
+        "fields": {
+            "vcard":5,
+            "value":"600345438821"
+        }
+    },
+    {
+        "pk": 6,
+        "model": "alm_vcard.Rnn",
+        "fields": {
+            "vcard":6,
+            "value":"600343457999"
+        }
+    },
+    {
+        "pk": 7,
+        "model": "alm_vcard.Rnn",
+        "fields": {
+            "vcard":7,
+            "value":"600347657678"
+        }
+    },
+    {
+        "pk": 8,
+        "model": "alm_vcard.Rnn",
+        "fields": {
+            "vcard":8,
+            "value":"600345987386"
+        }
+    }
+]

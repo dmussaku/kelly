@@ -71,8 +71,18 @@ class FeedMentionsView(TemplateView):
         context = super(self.__class__, self).get_context_data(**kwargs)
 
         crmuser = self.request.user.get_crmuser()
-        context['mentioned_activities'] = \
-            Activity.get_mentioned_activities_of(crmuser.id)
+        dups = []
+        obj_list = Activity.get_mentioned_activities_of(crmuser.id)
+        for obj in obj_list:
+            if obj in dups:
+                list(obj_list).remove(obj)
+            else:
+                dups.append(obj)
+        # context['mentioned_activities'] = \
+        #     Activity.get_mentioned_activities_of(crmuser.id)
+        for obj in obj_list:
+            print obj.id
+        context['mentioned_activities'] = obj_list
         return context
 
 
@@ -185,12 +195,15 @@ class ContactSearchListView(ListView):
         context = super(self.__class__, self).get_context_data(**kwargs)
         try:
             context['contacts'] = Contact().filter_contacts_by_vcard(
-                self.request.GET['query'],
+                self.request.GET['query'].encode('utf-8'),
                 [('given_name','startswith'),
                 ('family_name','startswith'),
                 ('email__value','icontains'),
                 ('tel__value','icontains'),
-                ('org__organization_name','startswith')
+                ('org__organization_name','startswith'),
+                ('rnn__value','startswith'),
+                ('iban__value','startswith'),
+                ('card__number','startswith')
                 ]
                 ).order_by('vcard__given_name')
         except:

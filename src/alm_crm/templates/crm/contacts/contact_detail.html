@@ -3,6 +3,64 @@
 {% load static from staticfiles %}
 {% block head_title %} {{ _("Contact Detail") }} {% endblock %}
 
+{% block crm_css_content %}
+<style>
+  .modalDialog {
+    position:absolute;
+    font-family: Arial, Helvetica, sans-serif;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background: rgba(0,0,0,0.8);
+    z-index: 99999;
+    opacity:0;
+    -webkit-transition: opacity 400ms ease-in;
+    -moz-transition: opacity 400ms ease-in;
+    transition: opacity 400ms ease-in;
+    pointer-events: none;
+  }
+
+  .modalDialog:target {
+    opacity:1;
+    pointer-events: auto;
+  }
+
+  .modalDialog > div {
+    width: 80%;
+    position: relative;
+    margin: 10% auto;
+    padding: 5px 20px 13px 20px;
+    border-radius: 10px;
+    background: #fff;
+    background: -moz-linear-gradient(#fff, #999);
+    background: -webkit-linear-gradient(#fff, #999);
+    background: -o-linear-gradient(#fff, #999);
+  }
+
+  .close {
+    background: #606061;
+    color: #FFFFFF;
+    line-height: 25px;
+    position: absolute;
+    right: -12px;
+    text-align: center;
+    top: -10px;
+    width: 24px;
+    text-decoration: none;
+    font-weight: bold;
+    -webkit-border-radius: 12px;
+    -moz-border-radius: 12px;
+    border-radius: 12px;
+    -moz-box-shadow: 1px 1px 3px #000;
+    -webkit-box-shadow: 1px 1px 3px #000;
+    box-shadow: 1px 1px 3px #000;
+  }
+
+  .close:hover { background: #00d9ff; }
+  </style>
+  <link rel="stylesheet" href="{% static 'css/purecss.css' %}">
+{% endblock %}
 
 {% block crm_body %}
 
@@ -22,7 +80,7 @@
 
       <div class="line line--compact">
         <div class="line-aside">
-          <div class="line-aside-label">mobile</div>
+          <div class="line-aside-label">мобильный</div>
         </div>
         <div class="line-body">
           {{ object.mobile.value }}
@@ -30,10 +88,26 @@
       </div>
       <div class="line line--compact">
         <div class="line-aside">
-          <div class="line-aside-label">work</div>
+          <div class="line-aside-label">имэйл</div>
         </div>
         <div class="line-body">
           {{ object.email_work }}
+        </div>
+      </div>
+      <div class="line line--compact">
+        <div class="line-aside">
+          <div class="line-aside-label">РНН</div>
+        </div>
+        <div class="line-body">
+          {{ contact.rnn.value }}
+        </div>
+      </div>
+      <div class="line line--compact">
+        <div class="line-aside">
+          <div class="line-aside-label">IBAN</div>
+        </div>
+        <div class="line-body">
+          {{ contact.iban.value }}
         </div>
       </div>
 
@@ -58,20 +132,22 @@
           </div>
 
         </div>
+
         <div class="line">
           <div class="line-aside">
             <a class="lineOfLinks-link lineOfLinks-link--showmore" href="#" data-toggle="showmore" data-text="Show less">
-              Show more
+              Показать больше
             </a>
           </div>
           <div class="line-body lineOfLinks">
 
-            <a class="lineOfLinks-link" href="#"> Edit
+            <a class="lineOfLinks-link" href="#"> Редактировать
             </a>
 
             <div class="dropdown dropdown--inline">
-              <a href="#" class="lineOfLinks-link" data-toggle="dropdown">Share</a>
+              <a href="#" class="lineOfLinks-link" data-toggle="dropdown">Поделиться</a>
 
+              <a href="#openModal" class="lineOfLinks-link">Информация Клиента</a>  
 
               <form action="{% crm_url 'share_create' %}" method="POST"
                 data-js-create-share='form'> {% csrf_token %}
@@ -79,10 +155,11 @@
                 {{ share_form.share_from.as_hidden }}
                 {{ share_form.contact.as_hidden }}
               </form>
-
-
+              
+              
               <div class="dropdown-menu dropdown-menu--share">
                 <div class="dropdown-menu-body">
+
                   <ul class="dropdown-menu-list">
 
 
@@ -112,12 +189,14 @@
                     <li class="dropdown-menu-item">
                       <a href="{% crm_url 'share_list' %}"
                         class="dropdown-menu-item-link"
-                        > see shares  </a>
+                        > показать shares  </a>
                     </li>
 
 
                   </ul>
+
                 </div>
+
               </div>
             </div>
 
@@ -129,7 +208,10 @@
   </div>
 </div>
 
-
+<div id="openModal" class="modalDialog">
+    <a href="#close" title="Close" class="close">x</a>
+    
+</div>
 {% if sales_cycle %}
   <div data-js-salescycle='body'
     data-js-salescycle-load-url='{% crm_url "sales_cycle_get_detail" %}'
@@ -138,7 +220,94 @@
 {% else %}
   {% show_empty_sales_cycle_detail new_sales_cycle_form %}
 {% endif %}
+<div style="text-align:center;padding-top:10px; padding-bottom:10px;">
+<div class="pure-g" style="margin:50px 40px 50px 40px;">
+      <div class="pure-u-1-3" style="margin:20px;">
+        {% if contact.ballance %}
+          <p> Номер счета клиента </p>
+          {{contact.ballance.number}}
+          <p> Доступные Средства на счету </p>
+          {{contact.ballance.ballance}} - {{contact.ballance.currency}}
+          <p> Информация по платежным картам </p>
+          {% if contact.cards %}
+            {% for card in contact.cards %}
+              <p> 4112********{{card.number}} </p>
+              <table class="pure-table" id="table-{{card.id}}">
+              {% for payment in card.get_history_dict %}
+                <tr>
+                  <td>{{payment.amount}}</td>
+                  <td>{{payment.date}}</td>
+                  <td>{{payment.location}}</td>
+                </tr>
+              {% endfor %}
+              </table>
+            {% endfor %}
+          {% endif %}
+        {% endif %}
+      </div>
+      <div class="pure-u-1-3" style="margin:20px;">
+        {% if contact.loans %}
+        <p> ИНФОРМАЦИЯ ПО КРЕДИТАМ </p>
+          {% for loan in contact.loans %}
+            <p> Потребительский Кредит </p>
+            <p> кредитная ставка {{loan.apr}} % </p>
+            <table class="pure-table" id="table-{{card.id}}">
+            {% for payment in loan.get_history_dict %}
+              {% if payment.type == 'late' %}
+                <tr style="background-color: rgb(200, 61, 61);">
+                  <td>{{payment.amount}}</td>
+                  <td>{{payment.type}}</td>
+                  <td>{{payment.date}}</td>
+                  <td>{{payment.left}}</td>
+                </tr>
+              {% else %}
+                <tr style="background-color: green;">
+                  <td>{{payment.amount}}</td>
+                  <td>{{payment.type}}</td>
+                  <td>{{payment.date}}</td>
+                  <td>{{payment.left}}</td>
+                </tr>
+              {% endif %}
+            {% endfor %}
+            </table>
+          {% endfor %}
+        {% endif %}
+      </div>
+      <div class="pure-u-1-3" style="margin:20px;">
+        {% if contact.deposits %}
+        <p> ИНФОРМАЦИЯ ПО ДЕПОЗИТАМ </p>
+          {% for deposit in contact.deposits %}
+            
+          {% endfor %}
+        {% endif %}
+      </div>
+  </div>
+</div>
+<!-- <div class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true" >
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
 
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span class="sr-only"></span></button>
+          <h4 class="modal-title" id="myLargeModalLabel">Large modal</h4>
+        </div>
+        <div class="modal-body">
+          <div class="row">
+            <div class="col-md-6">
+              Your first column here
+            </div>
+            <div class="col-md-6">
+              Your second column here
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary">Save changes</button>
+        </div>
+      </div> 
+    </div>
+  </div> -->
 
 {% endblock crm_body %}
 
@@ -154,8 +323,10 @@
 
 
 {% block crm_js_content %}
-
+<!-- <script src="{% static 'js/bootstrap-modal.js' %}"></script>
+<script src="{% static 'js/bootstrap-transition.js' %}"></script> -->
 <script src='{% static "js/typeahead.bundle.min.js" %}'></script>
+
 
 <script>
   var sales_cycle_detail_js = (function($) {

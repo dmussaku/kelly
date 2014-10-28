@@ -1,0 +1,114 @@
+[
+	{
+        "pk": 1,
+        "model": "alm_vcard.Loan",
+        "fields": {
+            "vcard":1,
+            "apr":12.5,
+            "date_created":"2014-09-11 00:00:00+00:00",
+            "loan_sum":10000,
+            "left_sum":20000,
+            "number":"12346789",
+            "currency":"TG",
+            "payment_history":"[{'amount':100000, 'type':'late', 'date':'2014-09-11 00:00:00+00:00', 'left':10000},    {'amount':100000, 'type':'ok', 'date':'2014-09-11 00:00:00+00:00', 'left':10000},    {'amount':100000, 'type':'ok', 'date':'2014-09-11 00:00:00+00:00', 'left':10000},    {'amount':100000, 'type':'ok', 'date':'2014-09-11 00:00:00+00:00', 'left':10000},    {'amount':100000, 'type':'ok', 'date':'2014-09-11 00:00:00+00:00', 'left':10000},    {'amount':100000, 'type':'ok', 'date':'2014-09-11 00:00:00+00:00', 'left':10000},]"
+        }
+    },
+    {
+        "pk": 2,
+        "model": "alm_vcard.Loan",
+        "fields": {
+            "vcard":1,
+            "apr":12.5,
+            "date_created":"2014-09-11 00:00:00+00:00",
+            "loan_sum":10000,
+            "left_sum":20000,
+            "number":"12346789",
+            "currency":"TG",
+            "payment_history":"[{'amount':100000, 'type':'late', 'date':'2014-09-11 00:00:00+00:00', 'left':10000},    {'amount':100000, 'type':'ok', 'date':'2014-09-11 00:00:00+00:00', 'left':10000},    {'amount':100000, 'type':'ok', 'date':'2014-09-11 00:00:00+00:00', 'left':10000},    {'amount':100000, 'type':'ok', 'date':'2014-09-11 00:00:00+00:00', 'left':10000},    {'amount':100000, 'type':'ok', 'date':'2014-09-11 00:00:00+00:00', 'left':10000},    {'amount':100000, 'type':'ok', 'date':'2014-09-11 00:00:00+00:00', 'left':10000},]"
+        }
+    },
+    {
+        "pk": 3,
+        "model": "alm_vcard.Loan",
+        "fields": {
+            "vcard":3,
+            "apr":12.5,
+            "date_created":"2014-09-11 00:00:00+00:00",
+            "loan_sum":10000,
+            "left_sum":20000,
+            "number":"12346789",
+            "currency":"TG",
+            "payment_history":"[{'amount':100000, 'type':'ok', 'date':'2014-09-11 00:00:00+00:00', 'left':10000},    {'amount':100000, 'type':'ok', 'date':'2014-09-11 00:00:00+00:00', 'left':10000},    {'amount':100000, 'type':'ok', 'date':'2014-09-11 00:00:00+00:00', 'left':10000},    {'amount':100000, 'type':'ok', 'date':'2014-09-11 00:00:00+00:00', 'left':10000},    {'amount':100000, 'type':'ok', 'date':'2014-09-11 00:00:00+00:00', 'left':10000},    {'amount':100000, 'type':'ok', 'date':'2014-09-11 00:00:00+00:00', 'left':10000},]"
+        }
+    },
+    {
+        "pk": 4,
+        "model": "alm_vcard.Loan",
+        "fields": {
+            "vcard":4,
+            "apr":12.5,
+            "date_created":"2014-09-11 00:00:00+00:00",
+            "loan_sum":10000,
+            "left_sum":20000,
+            "number":"12346789",
+            "currency":"TG",
+            "payment_history":"[{'amount':100000, 'type':'ok', 'date':'2014-09-11 00:00:00+00:00', 'left':10000},    {'amount':100000, 'type':'ok', 'date':'2014-09-11 00:00:00+00:00', 'left':10000},    {'amount':100000, 'type':'ok', 'date':'2014-09-11 00:00:00+00:00', 'left':10000},    {'amount':100000, 'type':'ok', 'date':'2014-09-11 00:00:00+00:00', 'left':10000},    {'amount':100000, 'type':'ok', 'date':'2014-09-11 00:00:00+00:00', 'left':10000},    {'amount':100000, 'type':'ok', 'date':'2014-09-11 00:00:00+00:00', 'left':10000},]"
+        }
+    },
+    {
+        "pk": 5,
+        "model": "alm_vcard.Loan",
+        "fields": {
+            "vcard":4,
+            "apr":12.5,
+            "date_created":"2014-09-11 00:00:00+00:00",
+            "loan_sum":10000,
+            "left_sum":20000,
+            "number":"12346789",
+            "currency":"TG",
+            "payment_history":"[{'amount':100000, 'type':'ok', 'date':'2014-09-11 00:00:00+00:00', 'left':10000},    {'amount':100000, 'type':'ok', 'date':'2014-09-11 00:00:00+00:00', 'left':10000},    {'amount':100000, 'type':'ok', 'date':'2014-09-11 00:00:00+00:00', 'left':10000},    {'amount':100000, 'type':'ok', 'date':'2014-09-11 00:00:00+00:00', 'left':10000},    {'amount':100000, 'type':'ok', 'date':'2014-09-11 00:00:00+00:00', 'left':10000},    {'amount':100000, 'type':'ok', 'date':'2014-09-11 00:00:00+00:00', 'left':10000},]"
+        }
+    },
+    {
+        "pk": 6,
+        "model": "alm_vcard.Loan",
+        "fields": {
+            "vcard":2,
+            "apr":12.5,
+            "date_created":"2014-09-11 00:00:00+00:00",
+            "loan_sum":10000,
+            "left_sum":20000,
+            "number":"12346789",
+            "currency":"TG",
+            "payment_history":"[{'amount':100000, 'type':'ok', 'date':'2014-09-11 00:00:00+00:00', 'left':10000},    {'amount':100000, 'type':'ok', 'date':'2014-09-11 00:00:00+00:00', 'left':10000},    {'amount':100000, 'type':'ok', 'date':'2014-09-11 00:00:00+00:00', 'left':10000},    {'amount':100000, 'type':'ok', 'date':'2014-09-11 00:00:00+00:00', 'left':10000},    {'amount':100000, 'type':'ok', 'date':'2014-09-11 00:00:00+00:00', 'left':10000},    {'amount':100000, 'type':'ok', 'date':'2014-09-11 00:00:00+00:00', 'left':10000},]"
+        }
+    },
+    {
+        "pk": 7,
+        "model": "alm_vcard.Loan",
+        "fields": {
+            "vcard":5,
+            "apr":12.5,
+            "date_created":"2014-09-11 00:00:00+00:00",
+            "loan_sum":10000,
+            "left_sum":20000,
+            "number":"12346789",
+            "currency":"TG",
+            "payment_history":"[{'amount':100000, 'type':'ok', 'date':'2014-09-11 00:00:00+00:00', 'left':10000},    {'amount':100000, 'type':'ok', 'date':'2014-09-11 00:00:00+00:00', 'left':10000},    {'amount':100000, 'type':'ok', 'date':'2014-09-11 00:00:00+00:00', 'left':10000},    {'amount':100000, 'type':'ok', 'date':'2014-09-11 00:00:00+00:00', 'left':10000},    {'amount':100000, 'type':'ok', 'date':'2014-09-11 00:00:00+00:00', 'left':10000},    {'amount':100000, 'type':'ok', 'date':'2014-09-11 00:00:00+00:00', 'left':10000},]"
+        }
+    },
+    {
+        "pk": 8,
+        "model": "alm_vcard.Loan",
+        "fields": {
+            "vcard":7,
+            "apr":12.5,
+            "date_created":"2014-09-11 00:00:00+00:00",
+            "loan_sum":10000,
+            "left_sum":20000,
+            "number":"12346789",
+            "currency":"TG",
+            "payment_history":"[{'amount':100000, 'type':'ok', 'date':'2014-09-11 00:00:00+00:00', 'left':10000},    {'amount':100000, 'type':'ok', 'date':'2014-09-11 00:00:00+00:00', 'left':10000},    {'amount':100000, 'type':'ok', 'date':'2014-09-11 00:00:00+00:00', 'left':10000},    {'amount':100000, 'type':'ok', 'date':'2014-09-11 00:00:00+00:00', 'left':10000},    {'amount':100000, 'type':'ok', 'date':'2014-09-11 00:00:00+00:00', 'left':10000},    {'amount':100000, 'type':'ok', 'date':'2014-09-11 00:00:00+00:00', 'left':10000},]"
+        }
+    }
+]

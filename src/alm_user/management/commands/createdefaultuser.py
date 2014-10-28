@@ -6,6 +6,7 @@ from django.utils.translation import ugettext as _
 from alm_user.models import User, UserManager
 from alm_company.models import Company
 from almanet.models import Service, Subscription
+from alm_crm.models import CRMUser
 
 class Command(BaseCommand):
     help = 'Create user with email b.wayne@batman.bat and password 123, also creates \

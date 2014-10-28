@@ -8,6 +8,7 @@
   <link rel="shortcut icon" type="image/ico" href="{% static 'img/favicon.ico' %}" />
   <link rel="stylesheet" href="{% static 'css/autocomplete.css' %}">
   <link rel="stylesheet" href="{% static 'css/app.css' %}">
+
   <style>
     #scrollable-dropdown-menu .tt-dropdown-menu {
       max-height: 500px;
@@ -25,7 +26,30 @@
       font-family: Tahoma, Verdana, Segoe, sans-serif;
     }
   </style>
-
+  
+  
+  <style>
+      .divDemoBody  {
+        width: 60%;
+        margin-left: auto;
+        margin-right: auto;
+        margin-top: 100px;
+        }
+      .divDemoBody p {
+        font-size: 18px;
+        line-height: 140%;
+        padding-top: 12px;
+        }
+      .divDialogElements input {
+        font-size: 18px;
+        padding: 3px; 
+        height: 32px; 
+        width: 500px; 
+        }
+      .divButton {
+        padding-top: 12px;
+        }
+      </style>
   {% block crm_css_content %}{% endblock %}
 
 {% endblock %}

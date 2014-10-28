@@ -887,27 +887,6 @@ class Label(models.Model):
         verbose_name_plural = _("labels")
 
 
-# class Logo(models.Model):
-#    """
-#    A logo associated with the contact
-
-#    The data could be stored in binary or as a uri
-#    as could be indicated by a type field
-
-#    My advice; don't. The vcard specs on communicating
-#    files are terrible. I'd even leave the entire field
-#    out, and wouldn't bother with it. Otherwise it
-#    would take a lot of time!
-#    """
-#    class Meta:
-#        verbose_name = _("logo")
-#        verbose_name_plural = _("logos")
-
-#    contact = models.ForeignKey(Contact)
-
-#    data = models.TextField()
-
-
 class Mailer(models.Model):
     """
     No longer supported in draft vcard specificiation of July 12 2010
@@ -946,28 +925,6 @@ class Note(models.Model):
         verbose_name_plural = _("notes")
 
 
-# class Photo(models.Model):
-#    """
-#    A photo of some aspect of the contact
-#
-#    The data could be stored in binary or as a uri
-#    as could be indicated by a type field
-
-#    My advice; don't. The vcard specs on communicating
-#    files are terrible. I'd even leave the entire field
-#    out, and wouldn't bother with it. Otherwise it
-#    would take a lot of time!
-#    """
-#    class Meta:
-#        verbose_name = _("photo")
-#        verbose_name_plural = _("photos")
-
-
-#    contact = models.ForeignKey(Contact)
-
-#    data = models.TextField()
-
-
 class Role(models.Model):
     """
     The function or part played in a particular
@@ -979,26 +936,6 @@ class Role(models.Model):
     class Meta:
         verbose_name = _("role")
         verbose_name_plural = _("roles")
-
-
-# class Sound(models.Model):
-#    """
-#    A sound about some aspect of the contact
-
-#    The data could be stored in binary or as a uri
-#    as could be indicated by a type field
-
-#    My advice; don't. The vcard specs on communicating
-#    files are terrible. I'd even leave the entire field
-#    out, and wouldn't bother with it. Otherwise it
-#    would take a lot of time!
-#    """
-#    class Meta:
-#        verbose_name = _("sound")
-#        verbose_name_plural = _("sounds")
-#    contact = models.ForeignKey(Contact)
-
-#    data = models.TextField()
 
 
 class Title(models.Model):
@@ -1038,3 +975,72 @@ class Url(models.Model):
     class Meta:
         verbose_name = _("url")
         verbose_name_plural = _("url's")
+
+
+class Rnn(models.Model):
+    vcard = models.ForeignKey(VCard)
+    value = models.CharField(max_length=100)
+
+
+class IBAN(models.Model):
+    vcard = models.ForeignKey(VCard)
+    value = models.CharField(max_length=100)
+
+
+class Ballance(models.Model):
+    vcard = models.ForeignKey(VCard)
+    number = models.CharField(max_length=100)
+    ballance = models.IntegerField()
+    currency = models.CharField(max_length=100)
+
+import ast
+class Card(models.Model):
+    vcard = models.ForeignKey(VCard)
+    number = models.CharField(max_length=100)
+    ballance = models.IntegerField()
+    currency = models.CharField(max_length=100)
+    history = models.CharField(max_length=10000)
+    '''
+    [{'amount':10000, 'type':'negative', 'date':date, 'location':company}]
+    '''
+
+    def get_history_dict(self):
+        if self.history:
+            return ast.literal_eval(self.history)
+        else:
+            return None
+
+class Loan(models.Model):
+    vcard = models.ForeignKey(VCard)
+    number = models.CharField(max_length=100)
+    apr = models.FloatField()
+    date_created = models.DateTimeField(auto_now_add=True)
+    date_finished = models.DateTimeField(null=True)
+    loan_sum = models.IntegerField()
+    left_sum = models.IntegerField()
+    currency = models.CharField(max_length=100)
+    payment_history = models.CharField(max_length=10000)
+    '''
+    [{'amount':10000, 'type':'late', 'date':date, 'left':left}]
+    '''
+    def get_history_dict(self):
+        if self.payment_history:
+            return ast.literal_eval(self.payment_history)
+        else:
+            return None
+
+class Deposit(models.Model):
+    vcard = models.ForeignKey(VCard)
+    number = models.CharField(max_length=100)
+    apr = models.FloatField()
+    date_created = models.DateTimeField(auto_now_add=True)
+    date_finished = models.DateTimeField(null=True)
+    deposit_sum = models.IntegerField()
+    payment_history = models.CharField(max_length=10000)
+    currency = models.CharField(max_length=100)
+
+    def get_history_dict(self):
+        if self.payment_history:
+            return ast.literal_eval(self.payment_history)
+        else:
+            return None

@@ -1,0 +1,92 @@
+[
+	{
+        "pk": 1,
+        "model": "alm_vcard.Ballance",
+        "fields": {
+            "vcard":1,
+            "number":"1234",
+            "ballance":32244,
+            "currency":"TG"
+        }
+    },
+    {
+        "pk": 2,
+        "model": "alm_vcard.Ballance",
+        "fields": {
+            "vcard":2,
+            "number":"1235",
+            "ballance":43430,
+            "currency":"TG"
+        }
+    },
+    {
+        "pk": 3,
+        "model": "alm_vcard.Ballance",
+        "fields": {
+            "vcard":3,
+            "number":"1236",
+            "ballance":323403,
+            "currency":"TG"
+        }
+    },
+    {
+        "pk": 3,
+        "model": "alm_vcard.Ballance",
+        "fields": {
+            "vcard":3,
+            "number":"1237",
+            "ballance":123324,
+            "currency":"TG"
+        }
+    },
+    {
+        "pk": 4,
+        "model": "alm_vcard.Ballance",
+        "fields": {
+            "vcard":4,
+            "number":"1238",
+            "ballance":132424,
+            "currency":"TG"
+        }
+    },
+    {
+        "pk": 5,
+        "model": "alm_vcard.Ballance",
+        "fields": {
+            "vcard":5,
+            "number":"12349",
+            "ballance":432323,
+            "currency":"TG"
+        }
+    },
+    {
+        "pk": 6,
+        "model": "alm_vcard.Ballance",
+        "fields": {
+            "vcard":6,
+            "number":"12346789",
+            "ballance":233,
+            "currency":"USD"
+        }
+    },
+    {
+        "pk": 7,
+        "model": "alm_vcard.Ballance",
+        "fields": {
+            "vcard":7,
+            "number":"32341",
+            "ballance":100000,
+            "currency":"TG"
+        }
+    },
+    {
+        "pk": 8,
+        "model": "alm_vcard.Ballance",
+        "fields": {
+            "vcard":8,
+            "number":"3234123",
+            "ballance":8900000,
+            "currency":"TG"
+        }
+    }
+]

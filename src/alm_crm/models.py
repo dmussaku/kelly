@@ -134,16 +134,54 @@ class Contact(SubscriptionObject):
     def last_contacted(self):
         return self.latest_activity and self.latest_activity.date_created
 
+    
+    
     @property
     def name(self):
         if not self.vcard:
             return 'Unknown'
         return self.vcard.fn
 
+    def rnn(self):
+        if not self.vcard:
+            return 'Unknown'
+        rnn = self.vcard.rnn_set.filter().first()
+        return rnn and rnn or None
+
+    def iban(self):
+        if not self.vcard:
+            return 'Unknown'
+        iban = self.vcard.iban_set.filter().first()
+        return iban and iban or None
+
+    def ballance(self):
+        if not self.vcard:
+            return 'Unknown'
+        ballance = self.vcard.ballance_set.filter().first()
+        return ballance and ballance or None
+
+    def cards(self):
+        if not self.vcard:
+            return 'Unknown'
+        cards = self.vcard.card_set.filter()
+        return cards and cards or None
+
+    def loans(self):
+        if not self.loans:
+            return 'Uknown'
+        loans = self.vcard.loan_set.filter()
+        return loans and loans or None
+
+    def deposits(self):
+        if not self.deposits:
+            return 'Uknown'
+        deposits = self.vcard.deposit_set.filter()
+        return deposits and deposits or None
+
     def tel(self, type='cell'):
         if not self.vcard:
             return 'Unknown'
-        tel = self.vcard.tel_set.filter(type=type).first()
+        tel = self.vcard.tel_set.filter().first()
         return tel and tel or None
 
     def mobile(self):
@@ -351,7 +389,7 @@ class Contact(SubscriptionObject):
             contacts = contacts|Contact.objects.filter(**query_dict)
         #vcards = VCard.objects.filter(**params)
         #contacts = [vcard.contact for vcard in vcards][offset:offset + limit]
-        return contacts
+        return contacts.distinct()
 
         '''
 

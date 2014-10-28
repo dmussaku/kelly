@@ -15,7 +15,7 @@
     </div>
     <div class="line line--compact">
       <div class="line-aside">
-        <div class="line-aside-label">mobile</div>
+        <div class="line-aside-label">мобильный</div>
       </div>
       <div class="line-body">
         {{ contact.mobile.value }}
@@ -23,16 +23,32 @@
     </div>
     <div class="line line--compact">
       <div class="line-aside">
-        <div class="line-aside-label">work</div>
+        <div class="line-aside-label">имэйл</div>
       </div>
       <div class="line-body">
         {{ contact.email_work }}
       </div>
     </div>
     <div class="line line--compact">
+      <div class="line-aside">
+        <div class="line-aside-label">РНН</div>
+      </div>
+      <div class="line-body">
+        {{ contact.rnn.value }}
+      </div>
+    </div>
+    <div class="line line--compact">
+      <div class="line-aside">
+        <div class="line-aside-label">IBAN</div>
+      </div>
+      <div class="line-body">
+        {{ contact.iban.value }}
+      </div>
+    </div>
+    <div class="line line--compact">
       <div class="line-aside"></div>
       <div class="line-body">
-        <div class="line-subtitle">Last contacted: {{ contact.last_contacted|date:'F j, H:i'|default:'never' }}</div>
+        <div class="line-subtitle">Последняя дата связи с контактом: {{ contact.last_contacted|date:'F j, H:i'|default:'никогда' }}</div>
       </div>
     </div>
     <div class="lineGroup-extra">
