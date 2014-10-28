@@ -1,4 +1,5 @@
 import json
+from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.contenttypes.models import ContentType
 from django.shortcuts import render, get_object_or_404
@@ -693,15 +694,39 @@ class CommentListView(ListView):
     template_name = 'comment/comment_list.html'
 
 
-def comments_by_activity(self, activity_id):
-    try:
-        activity = Activity.objects.get(id=activity_id)
-    except ObjectDoesNotExist:
-        return False
-    else:
-        comments = Comment().get_comments_by_context(activity.id, Activity)
+def feedback_by_activity(request, service_slug=None, pk=None):
+    activity = get_object_or_404(Activity, pk=pk)
+    current_crmuser = request.user.get_crmuser()
+
+    if request.method == 'GET':
+        try:
+            feedback_form = ActivityFeedbackForm(instance=activity.feedback)
+        except ObjectDoesNotExist:
+            feedback_form = ActivityFeedbackForm(
+                initial={'owner': current_crmuser, 'activity': activity})
+
+        context = {'activity': activity, 'feedback_form': feedback_form}
+        return render(request, 'crm/activity_feedback.html', context)
+
     if request.method == 'POST':
-        pass
+        form = ActivityFeedbackForm(request.POST,
+                                    instance=activity.feedback)
+        if form.is_valid():
+            form.save()
+            if activity.feedback is None:
+                activity.feedback = form.instance
+                activity.save()
+
+            data = {
+                'pk': form.instance.pk,
+                'activity_pk': activity.pk
+            }
+            return HttpResponse(json.dumps(data), mimetype="application/json")
+
+
+class BankProductsPage(TemplateView):
+    pass
+
 
 class ValueListView(ListView):
     model = Value

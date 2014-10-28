@@ -25,6 +25,7 @@ from .views import (
 
     ActivityCreateView,
     ActivityDetailView,
+    feedback_by_activity,
 
     SalesCycleCreateView,
     SalesCycleDetailView,
@@ -42,10 +43,17 @@ from .views import (
     comment_edit_view,
     ContactSearchListView,
     contact_create_view,
+
+    BankProductsPage,
     )
 
 urlpatterns = patterns(
     '',
+
+    url(r'^products/info/$', crmuser_required(BankProductsPage.as_view(
+        template_name="crm/bank_products_list.html")),
+        name='bank_products_list'),
+
     url(r'^$', crmuser_required(
         DashboardView.as_view()),
         name='crm_home'),
@@ -134,6 +142,9 @@ urlpatterns = patterns(
             template_name='crm/activity.html'
             ),
         name='activity_detail'),
+    url(r'^activities/(?P<pk>[\d]+)/feedback/$',
+        crmuser_required(feedback_by_activity),
+        name='feedback_by_activity'),
 
     url(r'^sales_cycles/create/$',
         crmuser_required(SalesCycleCreateView.as_view(

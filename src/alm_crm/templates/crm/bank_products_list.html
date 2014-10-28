@@ -1,0 +1,584 @@
+{% extends "crm/base.html" %}
+{% load i18n crm_tags %}
+{% load static from staticfiles %}
+{% block head_title %} {{ _("Products Info") }} {% endblock %}
+
+
+{% block crm_body %}
+<br>
+<div class='column'>
+
+<!-- Nav tabs -->
+<ul class="nav nav-tabs" role="tablist">
+  <li class="active"><a href="#deposits" role="tab" data-toggle="tab">Депозиты</a></li>
+  <li><a href="#cards" role="tab" data-toggle="tab">Платежные карточки</a></li>
+  <li><a href="#transaction" role="tab" data-toggle="tab">Денежные переводы</a></li>
+  <li><a href="#control" role="tab" data-toggle="tab">Управлять деньгами</a></li>
+  <li><a href="#atm" role="tab" data-toggle="tab">Банкоматы</a></li>
+</ul>
+
+<!-- Tab panes -->
+<div class="tab-content">
+  <div class="tab-pane active" id="deposits">
+
+    <div class="panel-group">
+
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <p class="panel-title">
+            <a data-toggle="collapse" data-parent="#accordion" href="#deposit-1">
+              ВКЛАД DEPOSITUM
+            </a>
+          </p>
+        </div>
+        <div id="deposit-1" class="panel-collapse collapse">
+          <div class="panel-body">
+            <div class='div-p'>
+              <p>ВКЛАД DEPOSITUM</p>
+
+              <p>Мультивалютный вклад DEPOSITUM позволяет хранить и приумножать деньги одновременно в трех валютах: тенге, долларах США и евро.</p>
+
+              <p>Преимущества:</p>
+
+              <p>возможность дистанционно проводить конвертацию денег в рамках счетов мультивалютного вклада без комиссий с использованием интернет-банкинга Банка:</p>
+
+              <p>– без ограничения максимальной суммы конвертации;</p>
+
+              <p>– время проведения конвертации: в рабочие дни Банка с 9:00 до 17:00 по времени Астаны;</p>
+
+              <p>– в случае, если совокупная сумма конвертации за один день превышает 15 000 000 тенге (эквивалент в долларах США/евро), требуется подтверждение дилера;</p>
+
+              <p>отсутствие комиссий за снятие сконвертированной суммы и средств, поступивших безналичным путем, при хранении их более 7 (семи) дней;</p>
+
+              <p>высокие процентные ставки;</p>
+
+              <p>возможность частичных изъятий до неснижаемого остатка,размер которого будет установлен в одной из валют: или 15 000 тенге, или 100 долларов США, или 100 евро;</p>
+
+              <p>фиксация процентной ставки на весь срок хранения вклада;</p>
+
+              <p>пополнение без ограничений;</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <p class="panel-title">
+            <a data-toggle="collapse" data-parent="#accordion" href="#deposit-2">
+              ДЕПОЗИТ V.P.R.O.K.
+            </a>
+          </p>
+        </div>
+        <div id="deposit-2" class="panel-collapse collapse">
+          <div class="panel-body">
+            <div class='div-p'>
+              <p>ДЕПОЗИТ V.P.R.O.K.</p>
+
+              <p>Валюта: KZT USD EUR</p>
+
+              <p>Срок вклада: от 12 до 36 месяцев</p>
+
+              <p>Минимальная сумма вклада: 15 000 KZT / 100 USD / 100 EUR</p>
+
+              <p>Пополнение вклада: без ограничений</p>
+
+              <p>Преимущества:</p>
+
+              <p>ставка вознаграждения по вкладу фиксируется на срок до 3-х лет;</p>
+
+              <p>ежемесячное начисление вознаграждения по вкладу позволяет вкладчику использовать процентный доход на каждодневные траты, не расходуя средства с основного вклада.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <p class="panel-title">
+            <a data-toggle="collapse" data-parent="#accordion" href="#deposit-3">
+              ДЕПОЗИТ DREAM
+            </a>
+          </p>
+        </div>
+        <div id="deposit-3" class="panel-collapse collapse">
+          <div class="panel-body">
+            <div class='div-p'>
+              <p>ДЕПОЗИТ DREAM</p>
+
+              <p>Валюта: KZT USD EUR</p>
+
+              <p>Срок вклада: от 36 до 60 месяцев</p>
+
+              <p>Минимальная сумма вклада: 15 000 KZT / 100 USD / 100 EUR</p>
+
+              <p>Пополнение вклада: без ограничений</p>
+
+              <p>Преимущества:</p>
+
+              <p>Бесплатный выпуск платежной карточки, с бесплатным обслуживанием за первый год</p>
+
+              <p>и возможностью установления кредитного лимита.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <p class="panel-title">
+            <a data-toggle="collapse" data-parent="#accordion" href="#deposit-4">
+              ДЕПОЗИТ SAFE
+            </a>
+          </p>
+        </div>
+        <div id="deposit-4" class="panel-collapse collapse">
+          <div class="panel-body">
+            <div class='div-p'>
+              <p>ДЕПОЗИТ SAFE</p>
+
+              <p>Валюта: KZT USD EUR</p>
+
+              <p>Срок вклада: от 12 до 60 месяцев</p>
+
+              <p>Минимальная сумма вклада: 15 000 KZT / 100 USD / 100 EUR</p>
+
+              <p>Пополнение вклада: без ограничений</p>
+
+              <p>Выплата вознаграждения:</p>
+
+              <p>ежегодная выплата на текущий счет</p>
+
+              <p>ежегодная выплата на текущий счет с применением платежной карточки.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <p class="panel-title">
+            <a data-toggle="collapse" data-parent="#accordion" href="#deposit-5">
+              ВКЛАД ЛЕГАЛИЗАЦИЯ
+            </a>
+          </p>
+        </div>
+        <div id="deposit-5" class="panel-collapse collapse">
+          <div class="panel-body">
+            <div class='div-p'>
+              <p>ВКЛАД ЛЕГАЛИЗАЦИЯ</p>
+
+              <p><br />
+              </p>
+
+              В связи со вступлением 01 сентября 2014 года в законную силу Закона Республики Казахстан № 213-Vот 30.06.2014 г. «Об амнистии граждан Республики Казахстан, оралманов и лиц, имеющих вид на жительство в Республике Казахстан, в связи с легализацией ими имущества» (далее – Закон), в рамках которого предусмотрена легализация денег физических лиц (в том числе ранее выведенных из легального экономического оборота) путем их размещения на сберегательных счетах в банках РК,
+
+              <p>АО «Bank RBK» уведомляет Вас о возможности открытия в АО «Bank RBK» условного вклада с целью легализации денег.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <p class="panel-title">
+            <a data-toggle="collapse" data-parent="#accordion" href="#deposit-6">
+              ДЕПОЗИТ "ДО ВОСТРЕБОВАНИЯ"
+            </a>
+          </p>
+        </div>
+        <div id="deposit-6" class="panel-collapse collapse">
+          <div class="panel-body">
+            <div class='div-p'>
+              <p>ДЕПОЗИТ "ДО ВОСТРЕБОВАНИЯ"</p>
+
+              <p>Валюта: KZT USD EUR</p>
+
+              <p>Срок вклада: бессрочный</p>
+
+              <p>Минимальная сумма вклада: без ограничений</p>
+
+              <p>Пополнение вклада: без ограничений</p>
+
+              <p>Выплата вознаграждения:</p>
+
+              <p>В последний рабочий день текущего месяца, при условии поддержания неснижаемого остатка на счете в течение календарного месяца не менее 300 000 KZT/ 2 000 USD/EUR</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="tab-pane" id="cards">
+
+    <div class="panel-group">
+
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <p class="panel-title">
+            <a data-toggle="collapse" data-parent="#accordion" href="#cards-1">
+              VISA ELECTRON
+            </a>
+          </p>
+        </div>
+        <div id="cards-1" class="panel-collapse collapse">
+          <div class="panel-body">
+            <div class='div-p'>
+            <p>VISA ELECTRON</p>
+            <span>Платежные карточки Visa Electron предназначены для получения наличных денег в банкоматах и расчетов в торгово-сервисных предприятиях, где присутствует логотип Visa/Visa Electron.Операции по таким карточкам осуществляются исключительно посредством электронных устройств, т.е. при помощи банкоматов и POS-терминалов. Держатели карточек Visa Electron могут обслуживаться в пределах собственных средств, имеющихся на банковском счете.</span>
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <p class="panel-title">
+            <a data-toggle="collapse" data-parent="#accordion" href="#cards-2">
+              VISA CLASSIC
+            </a>
+          </p>
+        </div>
+        <div id="cards-2" class="panel-collapse collapse">
+          <div class="panel-body">
+            <div class='div-p'>
+              <p>VISA CLASSIC</p>
+              <br>
+              <span>С помощью платежных карточек Visa Classic возможно получение наличных денег в банкоматах и оплаты товаров и услуг во всем мире, где присутствует логотип Visa/Visa Electron.</span>
+              <br><br>
+              <span>Они обслуживаются как в электронных устройствах, так и в механических. С помощью карточек данного класса можно забронировать номер в гостинице, авиабилеты и арендовать автомобиль.</span>
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <p class="panel-title">
+            <a data-toggle="collapse" data-parent="#accordion" href="#cards-3">
+              VISA GOLD
+            </a>
+          </p>
+        </div>
+        <div id="cards-3" class="panel-collapse collapse">
+          <div class="panel-body">
+            <div class='div-p'>
+              <p>VISA GOLD</p>
+              <span>Платежные карточки Visa Gold являются признаком состоятельности и респектабельности клиента. Они гарантируют держателям высокое качество обслуживания во всем мире, а также ряд дополнительных услуг и возможностей, таких как получение значительных скидок при оплате товаров и услуг за рубежом, выгодные предложения отелей и компаний по аренде автомобилей и т.д. Платежные карточки Visa Gold предусматривают предоставление банковского займа.</span>
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <p class="panel-title">
+            <a data-toggle="collapse" data-parent="#accordion" href="#cards-4">
+              VISA VIRTUON
+            </a>
+          </p>
+        </div>
+        <div id="cards-4" class="panel-collapse collapse">
+          <div class="panel-body">
+            <div class='div-p'>
+              <p>VISA VIRTUON</p>
+              <br>
+              <span>Платежная карточка Visa Virtuon, специально предназначенная для расчетов в сети Интернет, проведение которых не требует предъявления самой карточки. Виртуальная карточка не может быть использована для оплаты в обычных магазинах, для снятия наличных денег в банкоматах, а также для покупок в Интернете, требующих дальнейшего физического предъявления карты (бронирование билетов, отелей, аренда автомобилей и т.д.).</span>
+              <br><br>
+              <span>Вы сможете совершать самые разные покупки, не выходя из дома! Главным преимуществом Виртуальной карточки является безопасность. Вы можете зачислить на карточку только ту сумму, которая необходима Вам для совершения «виртуальных» покупок, таким образом, не подвергая риску остальные Ваши средства. Кроме того, подобная практика позволяет лучше контролировать свои расходы.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <p class="panel-title">
+            <a data-toggle="collapse" data-parent="#accordion" href="#cards-5">
+              VISA PLATINUM
+            </a>
+          </p>
+        </div>
+        <div id="cards-5" class="panel-collapse collapse">
+          <div class="panel-body">
+            <div class='div-p'>
+              <span>Visa Platinum – это престижные платежные карточки от Bank RBK для самых требовательных клиентов, которые ценят время и комфорт. Visa Platinum – свидетельство личного финансового благосостояния, символ престижа и успеха их держателя.</span>
+
+              <br><br>
+
+              <span>Карточка Visa Platinum выпускается в рамках пакета Platinum, который предусматривает дополнительный выпуск карточек Visa Gold и Visa Virtuon на бесплатной основе. Кроме того, основной и дополнительный держатели карты Visa Platinum получают в подарок сертификат Страховой компании «Чартис Казахстан» (AIG Inc) (для выезжающих за рубеж) и карточку Priority Pass, предоставляющую доступ к VIP-залам ожидания в аэропортах по всему миру. Карточка Visa Platinum обеспечивает эксклюзивный уровень сервиса и широкий спектр дополнительных услуг.</span>
+              <br><br>
+              <span>Ваша карточка Visa Platinum открывает перед Вами двери в мир потрясающих привилегий и возможностей.</span>
+              <br>
+              <span>Скидки и привилегии</span>
+              <br>
+              <span>Программа «Мир привилегий Visa» позволяет держателям карточки Visa Platinum получать скидки в магазинах, ресторанах и отелях по всему миру, воспользоваться квалифицированной медицинской и юридической помощью за рубежом, получить экстренную поддержку в случае утраты карточки или покупок. Полный спектр всех привилегий: <a href="http://www.visa.com.ru/wv/platinum/privileges.jsp">http://www.visa.com.ru/wv/platinum/privileges.jsp</a></span>
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <p class="panel-title">
+            <a data-toggle="collapse" data-parent="#accordion" href="#cards-6">
+              VISA INFINITE
+            </a>
+          </p>
+        </div>
+        <div id="cards-6" class="panel-collapse collapse">
+          <div class="panel-body">
+            <div class='div-p'>
+              <p>VISA INFINITE</p>
+              <br>
+              <span>Платежная карточка <b>Visa Infinite</b> занимает самое высокое положение в иерархической структуре карт платежной системы Visa.<br />
+              Специальные программы в дорогих сетях отелей по всему миру, эксклюзивное обслуживание в ведущих бюро проката автомобилей, скидки в самых дорогих и престижных бутиках и ресторанах мира – все это для держателей карточки <b>Visa Infinite</b>.<br /><br>
+              Карточка <b>Visa Infinite </b>выпускается в рамках пакета <b>Infinite, </b>который предусматривает дополнительный выпуск карточек <b>Visa Gold </b>и <b>Visa Virtuon</b> на бесплатной основе. Кроме того, основной и дополнительный держатели карты Visa Infinite получают в подарок сертификат Страховой компании «Чартис Казахстан» (AIG Inc) (для выезжающих за рубеж) и карточку <b>Priority Pass</b>, предоставляющую доступ к VIP-залам ожидания в аэропортах по всему миру.<br /><br>
+              С подробной информацией обо всех специальных предложениях для клиентов – держателей карт Visa Infinite Вы можете ознакомиться <b><a href="http://www.visainfinitecard.com/main.jsp">здесь</a>.</b></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="tab-pane" id="transaction">...</div>
+  <div class="tab-pane" id="control">..A.</div>
+  <div class="tab-pane" id="atm">
+
+    <div class="panel-group">
+
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <p class="panel-title">
+            <a data-toggle="collapse" data-parent="#accordion" href="#atm-1">
+              Алматы
+            </a>
+          </p>
+        </div>
+        <div id="atm-1" class="panel-collapse collapse">
+          <div class="panel-body">
+            <ul>
+              <li>
+              УЛ. ФУРМАНОВА, 43/171. VIP-ЦЕНТР
+              </li>
+              <li>
+              УЛ. ТОЛЕ БИ, 55, УГОЛ УЛ. ПАНФИЛОВА (ОФИС БАНКА)
+              </li>
+              <li>ПЛ. РЕСПУБЛИКИ, 13 УГОЛ УЛ. ФУРМАНОВА (ОФИС БАНКА)</li>
+              <li>УЛ. ШАРИПОВА, 84 (ОФИС БАНКА)</li>
+              <li>УЛ. РОЗЫБАКИЕВА, 263 (ТРЦ "MEGA CENTER ALMA-ATA-2")</li>
+              <li>УЛ. МАЙЛИНА, 1. (АО "МЕЖДУНАРОДНЫЙ АЭРОПОРТ АЛМАТЫ", 2 ЭТАЖ, ОБЩИЙ ЗАЛ)</li>
+              <li>УЛ. САТПАЕВА, 90/28, ТРК "ADK"</li>
+              <li>УЛ. МАКАТАЕВА, 51. ТЦ "ТУРКЕСТАН"</li>
+              <li>УЛ. ТОЛЕ БИ, 136. ТЦ "CITY CENTER"</li>
+              <li>УЛ. ТИМИРЯЗЕВА, 42 (ТЦ "КАРКАРА")</li>
+              <li>ПР. АЛЬ-ФАРАБИ, 77/8 (ТЦ "ЕСЕНТАЙ MALL")</li>
+              <li>УЛ. СЕВЕРНОЕ КОЛЬЦО, 3Б (ТД "МАГНУМ")</li>
+              <li>УЛ. ФУРМАНОВА, 269А (ОФИС БАНКА)</li>
+              <li>УЛ. НАУРЫЗБАЙ БАТЫРА, 70. ТОО "ФИРМА ЛАТОН"</li>
+              <li>УЛ. УТЕПОВА, 3. ЗДАНИЕ АЛМАТИНСКОГО ОНКОЛОГИЧЕСКОГО ЦЕНТРА РЕЖИМ РАБОТЫ ЗДАНИЯ</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <p class="panel-title">
+            <a data-toggle="collapse" data-parent="#accordion" href="#atm-2">
+              Астана
+            </a>
+          </p>
+        </div>
+        <div id="atm-2" class="panel-collapse collapse">
+          <div class="panel-body">
+            <ul>
+
+              <li>УЛ. ДОСТЫК, 5 (КОМПЛЕКС «СЕВЕРНОЕ СИЯНИЕ»)</li>
+              <li>КОРГАЛДЖИНСКОЕ ШОССЕ, 1. ТРЦ "MEGA ASTANA"</li>
+              <li>УЛ. ДОСТЫК, 9. ТЦ "КЕРУЕН"</li>
+              <li>УЛ. ГЕТЕ, 3/2. ЖД ВОКЗАЛ</li>
+              <li>ПР. КАБАНБАЙ БАТЫРА, 119. МЕЖДУНАРОДНЫЙ АЭРОПОРТ АСТАНА, 2 ЭТАЖ</li>
+              <li>УЛ. МУНАЙТПАСОВА, 5. (ЕНУ ИМ.Л.Н.ГУМИЛЕВА)</li>
+              <li>УЛ. МУНАЙТПАСОВА, 8. (ТД "ТУРКЕСТАН")</li>
+
+            </ul>
+          </div>
+        </div>
+      </div>
+
+
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <p class="panel-title">
+            <a data-toggle="collapse" data-parent="#accordion" href="#atm-3">
+              Караганда
+            </a>
+          </p>
+        </div>
+        <div id="atm-3" class="panel-collapse collapse">
+          <div class="panel-body">
+            <ul>
+
+              <li>ПР. БУХАР ЖЫРАУ, 47 (ФИЛИАЛ БАНКА)</li>
+              <li>ПР. ШАХТЕРОВ, 82 (ТД "МАГНУМ")</li>
+              <li>ПР. НУРКЕНА АБДИРОВА, 13 (АПТЕКА "ИМПЕРИЯ ЗДОРОВЬЯ")</li>
+              <li>ПР. БУХАР-ЖЫРАУ 59/2 (ТРЦ "CITY MALL")</li>
+              <li>ПР. БУЛЬВАР МИРА, 15. ТД "ГАЛЕРЕЯ"</li>
+              <li>ПР. БУХАР-ЖЫРАУ, 53 (ТД "ЦУМ")</li>
+
+            </ul>
+          </div>
+        </div>
+      </div>
+
+
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <p class="panel-title">
+            <a data-toggle="collapse" data-parent="#accordion" href="#atm-4">
+              Шымкент
+            </a>
+          </p>
+        </div>
+        <div id="atm-4" class="panel-collapse collapse">
+          <div class="panel-body">
+            <ul>
+
+              <li>УЛ. Г. ИЛЯЕВА, 47 УГОЛ УЛ. ШАЙМЕРДЕНОВА (ФИЛИАЛ БАНКА)</li>
+              <li>УЛ. РЫСКУЛОВА (Б/Н), УГ.УЛ. ДУЛАТИ (ТЦ "ГИПЕР ХАУС")</li>
+              <li>ПР. РЕСПУБЛИКИ, 42 (ТЦ "МЕРЕКЕ")</li>
+              <li>ПР. ТАУКЕ ХАНА, 330/1 (ТЦ "ФИРКАН-СИТИ")</li>
+              <li>ЮКО, П. САСТОБЕ (ЦЕМЕНТНЫЙ ЗАВОД)</li>
+              <li>УЛ. МАДЕЛИ КОЖА, 1Г (ЦОН Г.ШЫМКЕНТ)</li>
+              <li>УЛ. РАШИДОВА, 26. ТД "АЛТЫН ЖУЛДЫЗ"</li>
+
+            </ul>
+          </div>
+        </div>
+      </div>
+
+
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <p class="panel-title">
+            <a data-toggle="collapse" data-parent="#accordion" href="#atm-5">
+              Павлодар
+            </a>
+          </p>
+        </div>
+        <div id="atm-5" class="panel-collapse collapse">
+          <div class="panel-body">
+            <ul>
+
+              <li>УЛ. ИСИНАЛИЕВА, 11 (ФИЛИАЛ БАНКА)</li>
+              <li>УЛ. КУТУЗОВА, 41. ТД "АРТУР"</li>
+              <li>УЛ. ТОРАЙГЫРОВА, 36, ТД "ОКЕАН"</li>
+              <li>УЛ. ЛЕРМОНТОВА, 45/1. ТД "ЕВРО"</li>
+
+            </ul>
+          </div>
+        </div>
+      </div>
+
+
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <p class="panel-title">
+            <a data-toggle="collapse" data-parent="#accordion" href="#atm-6">
+              Экибастуз
+            </a>
+          </p>
+        </div>
+        <div id="atm-6" class="panel-collapse collapse">
+          <div class="panel-body">
+            <ul>
+
+              <li>УЛ. МАШХУР ЖУСУПА, 37 (ОФИС БАНКА)</li>
+              <li>УЛ. МАШХУР ЖУСУПА, 52В (ТД «КАМИЛЛА»)</li>
+              <li>УЛ. АУЭЗОВА, 38 (ТД "УАК")</li>
+
+            </ul>
+          </div>
+        </div>
+      </div>
+
+
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <p class="panel-title">
+            <a data-toggle="collapse" data-parent="#accordion" href="#atm-7">
+              Усть-Каменогорск
+            </a>
+          </p>
+        </div>
+        <div id="atm-7" class="panel-collapse collapse">
+          <div class="panel-body">
+            <ul>
+              <li>ПР. ПОБЕДЫ, 13 (ФИЛИАЛ БАНКА)</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+
+    </div>
+  </div>
+</div>
+
+
+</div>
+{% endblock crm_body %}
+
+
+{% block crm_footer %}
+  <div class="help">
+  This page contains products by groups.
+  </div>
+{% endblock crm_footer %}
+
+
+{% block js_content %}
+<style>
+  .div-p > p {
+    line-height: 0.428;
+    font-size: 14px;
+  }
+  .tab-pane {
+    padding: 15px 15px 5px 15px;
+    background-color: white;
+  }
+  .column {
+    position: relative;
+    display: block;
+    width: 90%;
+    max-width: 100%;
+    margin: 1rem auto 0;
+    vertical-align: top;
+  }
+</style>
+
+
+<link rel="stylesheet" href="{% static 'css/bootstrap-nav-tabs.css' %}">
+<link rel="stylesheet" href="{% static 'css/bootstrap-panels.css' %}">
+
+<script src='{% static "js/bootstrap_tab_collapse.min.js" %}'></script>
+<script>
+
+</script>
+{% endblock js_content %}

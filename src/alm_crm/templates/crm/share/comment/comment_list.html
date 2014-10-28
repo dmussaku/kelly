@@ -3,6 +3,7 @@
 {% load static from staticfiles %}
 {% block content %}
 <div class="comments-body">
+
   {% for comment in comments %}
   <div class="comment-{{comment.id}}" data-reply="Ren">
     <div class="comment-meta">
@@ -18,6 +19,21 @@
         <span id='comment-text'>
           {{comment.comment}}
         </span>
+
+        {% if comment.mentions.first %}
+          <span>
+            <hr>
+            {% for mention in comment.mentions.all %}
+              <a href="#" class="link-user">
+                <figure class="userpic">
+                  <img src="{% static 'img/example/userpic6.png' %}" alt="">
+                </figure>
+                {{mention.user}}
+              </a>
+            {% endfor %}
+          </span>
+        {% endif %}
+
         <div class="comment-body-meta js-commentForm-trigger">
           <button type="button" class="link" data-toggle="comment-reply">Reply</button>
             <input id="csrf" type="hidden" name="csrfmiddlewaretoken" value="{{csrf_token}}">

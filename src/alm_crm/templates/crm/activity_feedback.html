@@ -1,0 +1,15 @@
+{% load i18n crm_tags %}
+{% load static from staticfiles %}
+
+
+<form action="{% crm_url 'feedback_by_activity' pk=activity.pk %}" method='POST' data-js-activity-feedback="form">{% csrf_token %}
+
+    {{ feedback_form.status }}
+
+    <textarea name='{{ feedback_form.feedback.html_name }}' rows="2" placeholder='Feedback messsage'>{{ activity.feedback.feedback }}</textarea>
+
+    {{ feedback_form.author.as_hidden }}
+    {{ feedback_form.activity.as_hidden }}
+
+    <button type="submit" class="btn">Update</button>
+</form>
