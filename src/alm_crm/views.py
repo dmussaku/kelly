@@ -199,6 +199,7 @@ class ContactSearchListView(ListView):
                 self.request.GET['query'].encode('utf-8'),
                 [('given_name','startswith'),
                 ('family_name','startswith'),
+                ('fn','startswith'),
                 ('email__value','icontains'),
                 ('tel__value','icontains'),
                 ('org__organization_name','startswith'),
