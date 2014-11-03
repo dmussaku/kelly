@@ -1,5 +1,5 @@
 from django.contrib import admin
-
+from alm_vcard.api import VCardResource, EmailResource
 from django.conf.urls import patterns, include, url
 from django.conf.urls.static import static
 from django.conf import settings
@@ -14,8 +14,13 @@ from almanet.views import (
     ServiceDeleteView,
     ServiceDetailView,
     )
+from tastypie.api import Api
 
 admin.autodiscover()
+
+v1_api = Api(api_name='v1')
+v1_api.register(VCardResource())
+
 
 urlpatterns = patterns(
     '',
@@ -37,6 +42,7 @@ urlpatterns = patterns(
     url(r'^services/service_update/(?P<pk>\d+)/$', ServiceUpdateView.as_view(), name='service_update'),
     url(r'^services/service_detail/(?P<pk>\d+)/$', ServiceDetailView.as_view(), name='service_detail'),
     url(r'^services/service_delete/(?P<pk>\d+)/$', ServiceDeleteView.as_view(), name='service_delete'),
+    url(r'^api/', include(v1_api.urls)),
 
 )
 

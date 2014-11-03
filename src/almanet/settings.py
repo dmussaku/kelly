@@ -111,6 +111,7 @@ class BaseConfiguration(SubdomainConfiguration, Configuration):
         'alm_company',
         'alm_vcard',
         'alm_crm',
+        'tastypie',
     )
 
     MIDDLEWARE_CLASSES = (
