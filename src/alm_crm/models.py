@@ -384,7 +384,7 @@ class Contact(SubscriptionObject):
 
     @classmethod
     def _upload_contacts_by_vcard(cls, vcard_obj):
-        """Extracts contacts from vcard. Returns Queryset<Contact>."""
+        """Extracts contacts from vcard string. Returns Queryset<Contact>."""
         contact = cls()
         vcard = VCard.importFrom('vCard', vcard_obj)
         vcard.commit()
@@ -476,6 +476,15 @@ class Contact(SubscriptionObject):
             1. no assignee for contact
             2. status is NEW"""
         return cls.objects.filter(status=NEW)[offset:offset + limit]
+
+    @classmethod
+    def create_contact_on_vcard_create(cls, sender, created=False,
+                                       instance=None, **kwargs):
+        if not created:
+            return
+        vcard = instance
+        contact = cls(vcard=vcard, subscription_id=vcard.subscription_id)
+        contact.save()
 
 
 class Value(SubscriptionObject):
@@ -1009,7 +1018,6 @@ class Share(SubscriptionObject):
         return '%s : %s -> %s' % (self.contact, self.share_from, self.share_to)
 
 
-
 signals.post_save.connect(
     Contact.upd_lst_activity_on_create, sender=Activity)
 signals.post_save.connect(
@@ -1028,6 +1036,11 @@ def on_activity_delete(sender, instance=None, **kwargs):
     contact.save()
 
 signals.post_delete.connect(on_activity_delete, sender=Activity)
+
+
+signals.post_save.connect(
+    Contact.create_contact_on_vcard_create, sender=VCard)
+
 
 '''
 Function to get mentions by 3 of optional parameters:

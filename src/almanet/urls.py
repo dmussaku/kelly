@@ -1,11 +1,9 @@
 from django.contrib import admin
-from alm_vcard.api import VCardResource, EmailResource, TelResource, OrgResource
 from django.conf.urls import patterns, include, url
 from django.conf.urls.static import static
 from django.conf import settings
 from almanet.views import fork_index
 from almanet.views import (
-    TestView2,
     ServiceList,
     connect_service,
     disconnect_service,
@@ -15,14 +13,20 @@ from almanet.views import (
     ServiceDetailView,
     )
 from tastypie.api import Api
+from alm_vcard.api import (
+    VCardResource,
+    VCardEmailResource,
+    VCardTelResource,
+    VCardOrgResource
+    )
 
 admin.autodiscover()
 
 v1_api = Api(api_name='v1')
 v1_api.register(VCardResource())
-v1_api.register(EmailResource())
-v1_api.register(TelResource())
-v1_api.register(OrgResource())
+v1_api.register(VCardEmailResource())
+v1_api.register(VCardTelResource())
+v1_api.register(VCardOrgResource())
 
 
 urlpatterns = patterns(

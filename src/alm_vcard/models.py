@@ -8,6 +8,7 @@ import vobject
 from vobject.vcard import *
 from django.utils.translation import ugettext as _
 from django.conf import settings
+from almanet.models import SubscriptionObject
 
 
 class VObjectImportException(Exception):
@@ -22,7 +23,7 @@ class AttributeImportException(Exception):
         self.message = "Could not load " + attribute
 
 
-class VCard(models.Model):
+class VCard(SubscriptionObject):
     """
     import export functionality is done via vobject
 
@@ -703,7 +704,7 @@ class VCard(models.Model):
         return self.toVObject().serialize()
 
 """
-class N(models.Model):
+class N(SubscriptionObject):
     contact = models.ForeignKey(Contact, unique=True)
     family_name = models.CharField(max_length = 1024, verbose_name = _("Family Name"))
     given_name = models.CharField(max_length = 1024, verbose_name = _("Given Name"))
@@ -720,7 +721,7 @@ class N(models.Model):
 """
 
 
-class Tel(models.Model):
+class Tel(SubscriptionObject):
     """
     A telephone number of a contact
     """
@@ -752,7 +753,7 @@ class Tel(models.Model):
         verbose_name_plural = _("telephone numbers")
 
 
-class Email(models.Model):
+class Email(SubscriptionObject):
     """
     An email of a contact
     """
@@ -774,7 +775,7 @@ class Email(models.Model):
         return '%s' % self.value
 
 
-class Geo(models.Model):
+class Geo(SubscriptionObject):
     """
     A geographical location associated with the contact
     in geo uri format
@@ -789,7 +790,7 @@ class Geo(models.Model):
         verbose_name_plural = _("geographic uri's")
 
 
-class Org(models.Model):
+class Org(SubscriptionObject):
     """
     An organization and unit the contact is affiliated with.
     """
@@ -806,7 +807,7 @@ class Org(models.Model):
         return self.organization_name
 
 
-class Adr(models.Model):
+class Adr(SubscriptionObject):
     """
     An address
     """
@@ -836,7 +837,7 @@ class Adr(models.Model):
         verbose_name_plural = _("addresses")
 
 
-class Agent(models.Model):
+class Agent(SubscriptionObject):
     """
     An agent of the contact
     """
@@ -848,7 +849,7 @@ class Agent(models.Model):
         verbose_name_plural = _("agents")
 
 
-class Category(models.Model):
+class Category(SubscriptionObject):
     """
     Specifies application category information about the
     contact.  Also known as "tags".
@@ -861,7 +862,7 @@ class Category(models.Model):
         verbose_name_plural = _("categories")
 
 
-class Key(models.Model):
+class Key(SubscriptionObject):
     """
     Specifies a public key or authentication certificate
     associated with the contact information
@@ -874,7 +875,7 @@ class Key(models.Model):
         verbose_name_plural = _("keys")
 
 
-class Label(models.Model):
+class Label(SubscriptionObject):
     """
     Formatted text corresponding to a delivery
     address of the object the vCard represents
@@ -887,7 +888,7 @@ class Label(models.Model):
         verbose_name_plural = _("labels")
 
 
-# class Logo(models.Model):
+# class Logo(SubscriptionObject):
 #    """
 #    A logo associated with the contact
 
@@ -908,7 +909,7 @@ class Label(models.Model):
 #    data = models.TextField()
 
 
-class Mailer(models.Model):
+class Mailer(SubscriptionObject):
     """
     No longer supported in draft vcard specificiation of July 12 2010
     """
@@ -920,7 +921,7 @@ class Mailer(models.Model):
         verbose_name_plural = _("mailers")
 
 
-class Nickname(models.Model):
+class Nickname(SubscriptionObject):
     """
     The nickname of the
     object the vCard represents.
@@ -933,7 +934,7 @@ class Nickname(models.Model):
         verbose_name_plural = _("nicknames")
 
 
-class Note(models.Model):
+class Note(SubscriptionObject):
     """
     Supplemental information or a comment that is
     associated with the vCard.
@@ -946,7 +947,7 @@ class Note(models.Model):
         verbose_name_plural = _("notes")
 
 
-# class Photo(models.Model):
+# class Photo(SubscriptionObject):
 #    """
 #    A photo of some aspect of the contact
 #
@@ -968,7 +969,7 @@ class Note(models.Model):
 #    data = models.TextField()
 
 
-class Role(models.Model):
+class Role(SubscriptionObject):
     """
     The function or part played in a particular
     situation by the object the vCard represents.
@@ -981,7 +982,7 @@ class Role(models.Model):
         verbose_name_plural = _("roles")
 
 
-# class Sound(models.Model):
+# class Sound(SubscriptionObject):
 #    """
 #    A sound about some aspect of the contact
 
@@ -1001,7 +1002,7 @@ class Role(models.Model):
 #    data = models.TextField()
 
 
-class Title(models.Model):
+class Title(SubscriptionObject):
     """
     The position or job of the contact
     """
@@ -1013,7 +1014,7 @@ class Title(models.Model):
         verbose_name_plural = _("titles")
 
 
-class Tz(models.Model):
+class Tz(SubscriptionObject):
     """
     A time zone of a contact
 
@@ -1028,7 +1029,7 @@ class Tz(models.Model):
         verbose_name_plural = _("time zones")
 
 
-class Url(models.Model):
+class Url(SubscriptionObject):
     """
     A Url associted with a contact.
     """
