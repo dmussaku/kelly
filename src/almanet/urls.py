@@ -1,5 +1,5 @@
 from django.contrib import admin
-from alm_vcard.api import VCardResource, EmailResource
+from alm_vcard.api import VCardResource, EmailResource, TelResource, OrgResource
 from django.conf.urls import patterns, include, url
 from django.conf.urls.static import static
 from django.conf import settings
@@ -20,6 +20,9 @@ admin.autodiscover()
 
 v1_api = Api(api_name='v1')
 v1_api.register(VCardResource())
+v1_api.register(EmailResource())
+v1_api.register(TelResource())
+v1_api.register(OrgResource())
 
 
 urlpatterns = patterns(
