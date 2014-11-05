@@ -477,7 +477,7 @@ class Contact(SubscriptionObject):
         Cold contacts should satisfy two conditions:
             1. no assignee for contact
             2. status is NEW"""
-        return cls.objects.filter(status=NEW)[offset:offset + limit]
+        return cls.objects.filter(status=NEW).order_by('-date_created')[offset:offset + limit]
 
     @classmethod
     def create_contact_on_vcard_create(cls, sender, created=False,

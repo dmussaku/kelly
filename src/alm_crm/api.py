@@ -18,7 +18,7 @@ class ContactResource(ModelResource):
 	def prepend_urls(self):
 		return [
 			url(
-				r"^(?P<resource_name>%s)/last_contacted%s$" % 
+				r"^(?P<resource_name>%s)/recent%s$" % 
 				(self._meta.resource_name, trailing_slash()),
 				self.wrap_view('get_last_contacted'),
 				name = 'api_last_contacted'
@@ -66,21 +66,27 @@ class ContactResource(ModelResource):
 		assigned = bool(request.GET.get('assigned', False))
 		followed = bool(request.GET.get('followed', False))
 		contacts = Contact().get_contacts_by_last_activity_date(
-			userd_id=request.user.id, 
+			user_id=request.user.id, 
 			include_activities=include_activities,
 			owned=owned,
 			assigned=assigned,
 			followed=followed, 
 			limit=limit, 
 			offset=offset)
-		if not bool(include_activities):
+		if not include_activities:
 			return self.create_response(
 					request, {'objects':self.get_bundle_list(contacts, request)}
 				)
 		else:
+			'''
+			returns 
+				(Queryset<Contact>, 
+				Queryset<Activity>, 
+				{contact1_id: [activity1_id, activity2_id], contact2_id: [activity3_id]})
+			'''
 			obj_dict={}
 			obj_dict['contacts'] = self.get_bundle_list(contacts[0], request)
-			obj_dict['activities'] = self.get_bundle.list(contacts[1], request)
+			obj_dict['activities'] = self.get_bundle_list(contacts[1], request)
 			obj_dict['dict'] = contacts[2]
 			return self.create_response(request, obj_dict) 
 
