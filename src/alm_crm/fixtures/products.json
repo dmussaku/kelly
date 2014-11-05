@@ -7,7 +7,7 @@
             "description":"p1_d",
             "price":143,
             "currency":"KZT",
-            "owner_id": 1
+            "owner": 1
         }
     }
 ]

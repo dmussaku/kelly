@@ -1,8 +1,8 @@
 from tastypie.resources import ModelResource, ALL, ALL_WITH_RELATIONS
-from alm_vcard.models import VCard, Email, Tel, Org
-from tastypie import fields
 from tastypie.authentication import BasicAuthentication
 from tastypie.authorization import Authorization
+from tastypie import fields
+from alm_vcard.models import VCard, Email, Tel, Org
 
 
 class VCardResource(ModelResource):
@@ -19,18 +19,6 @@ class VCardResource(ModelResource):
         resource_name = 'vcard'
         authentication = BasicAuthentication()
         authorization = Authorization()
-
-    def obj_create(self, bundle, **kw):
-        bundle = super(VCardResource, self).obj_create(bundle, **kw)
-        return bundle
-
-    def obj_update(self, bundle, **kw):
-        bundle = super(VCardResource, self).obj_update(bundle, **kw)
-        return bundle
-
-    def obj_delete(self, bundle, **kw):
-        bundle = super(VCardResource, self).obj_delete(bundle, **kw)
-        return bundle
 
 
 class VCardEmailResource(ModelResource):

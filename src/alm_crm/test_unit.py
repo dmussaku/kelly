@@ -1,8 +1,18 @@
 import os
 from django.test import TestCase
 from django.utils import timezone
-from alm_crm.models import Contact, CRMUser, Activity, SalesCycle, Feedback,\
-    Mention, Feedback, Value, Comment
+from tastypie.test import ResourceTestCase
+from alm_crm.models import (
+    Contact,
+    CRMUser,
+    Activity,
+    SalesCycle,
+    Feedback,
+    Mention,
+    Feedback,
+    Value,
+    Comment,
+    )
 from alm_vcard.models import VCard
 
 
@@ -385,3 +395,57 @@ class SalesCycleTestCase(TestCase):
     def test_get_salescycles_by_contact(self):
         ret = SalesCycle.get_salescycles_by_contact(1)
         self.assertEqual(list(ret.values_list('pk', flat=True)), [1, 2, 3, 4])
+
+
+class SalesCycleResourceTest(ResourceTestCase):
+    fixtures = ['crmusers.json', 'contacts.json', 'salescycles.json',
+                'activities.json', 'products.json', 'mentions.json',
+                'values.json']
+
+    def setUp(self):
+        from alm_user.models import User
+        super(SalesCycleResourceTest, self).setUp()
+
+        # Create a user.
+        self.email = 'alma@cloud.com'
+        self.password = 'password'
+        self.user = User.objects.create_user("Alma", "Cloud", self.email,
+                                             self.password)
+
+        self.api_path_sales_cycle = '/api/v1/sales_cycle/'
+
+        self.sales_cycle = SalesCycle.objects.first()
+        self.sales_cycle_post_data = {
+            'title': 'New SalesCycle from test_unit',
+            'activities': []
+        }
+
+        self.get_resp = lambda path: self.api_client.get(
+            self.api_path_sales_cycle + path,
+            format='json',
+            authentication=self.get_credentials(),
+            HTTP_HOST='localhost')
+        self.get_des_res = lambda path: self.deserialize(self.get_resp(path))
+
+    def get_credentials(self):
+        return self.create_basic(self.email, self.password)
+
+    def test_get_list_unauthorzied(self):
+        self.assertHttpUnauthorized(self.api_client.get(
+            self.api_path_sales_cycle, format='json'))
+
+    def test_get_list_valid_json(self):
+        self.assertValidJSONResponse(self.get_resp(''))
+
+    def test_get_list_non_empty(self):
+        self.assertTrue(self.get_des_res('')['meta']['total_count'] > 0)
+
+    def test_get_detail_unauthorzied(self):
+        self.assertHttpUnauthorized(self.api_client.get(
+            self.api_path_sales_cycle + '1/', format='json'))
+
+    def test_get_detail_json(self):
+        self.assertEqual(
+            self.get_des_res(str(self.sales_cycle.pk)+'/')['title'],
+            self.sales_cycle.title
+            )
