@@ -22,6 +22,6 @@ class ActivityResource(ModelResource):
 
     class Meta:
         queryset = Activity.objects.all()
-        resource_name = 'activity'
+        resource_name = 'sales_cycle/activity'
         authentication = BasicAuthentication()
         authorization = Authorization()

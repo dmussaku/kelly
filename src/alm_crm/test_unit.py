@@ -414,18 +414,14 @@ class SalesCycleResourceTest(ResourceTestCase):
 
         self.api_path_sales_cycle = '/api/v1/sales_cycle/'
 
-        self.sales_cycle = SalesCycle.objects.first()
-        self.sales_cycle_post_data = {
-            'title': 'New SalesCycle from test_unit',
-            'activities': []
-        }
-
         self.get_resp = lambda path: self.api_client.get(
             self.api_path_sales_cycle + path,
             format='json',
             authentication=self.get_credentials(),
             HTTP_HOST='localhost')
         self.get_des_res = lambda path: self.deserialize(self.get_resp(path))
+
+        self.sales_cycle = SalesCycle.objects.first()
 
     def get_credentials(self):
         return self.create_basic(self.email, self.password)
@@ -449,3 +445,17 @@ class SalesCycleResourceTest(ResourceTestCase):
             self.get_des_res(str(self.sales_cycle.pk)+'/')['title'],
             self.sales_cycle.title
             )
+
+    # def test_create_sales_cycle(self):
+    #     post_data = {
+    #         'title': 'New SalesCycle from test_unit',
+    #         'activities': [],
+    #         'subscription_id': 1
+    #     }
+
+    #     count = SalesCycle.objects.count()
+    #     self.assertHttpCreated(self.api_client.post(
+    #         self.api_path_sales_cycle, format='json', data=post_data,
+    #         authentication=self.get_credentials()))
+    #     # Verify a new one has been added.
+    #     self.assertEqual(SalesCycle.objects.count(), count + 1)
