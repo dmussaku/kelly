@@ -7,6 +7,7 @@ from django.conf.urls import url
 from tastypie.utils import trailing_slash
 
 class ContactResource(ModelResource):
+	vcard = fields.ToOneField('alm_vcard.api.VCardResource','vcard', null=True, full=True)
 
 	class Meta:
 		queryset = Contact.objects.all()
@@ -41,10 +42,11 @@ class ContactResource(ModelResource):
 				name = 'api_search'
 			),
 		]
-	'''
-	receives a queryset and returns a list of bundles
-	'''
+	
 	def get_bundle_list(self,obj_list,request):
+		'''
+		receives a queryset and returns a list of bundles
+		'''
 		objects=[]
 		for obj in obj_list:
 			bundle = self.build_bundle(obj=obj, request=request)
@@ -53,27 +55,78 @@ class ContactResource(ModelResource):
 		return objects
 
 	def get_last_contacted(self, request, **kwargs):
-		contacts = Contact().get_contacts_by_last_activity_date(request.user.id)
-		return self.create_response(
-				request, {'objects':self.get_bundle_list(contacts,request)}
-			)
+		'''
+		pass limit, offset, owned (True by default, assigned, 
+	    followed and include_activities with GET request
+		'''
+		limit = int(request.GET.get('limit', 20))
+		offset = int(request.GET.get('offset', 0))
+		include_activities = bool(request.GET.get('include_activities', False))
+		owned = bool(request.GET.get('owned', True))
+		assigned = bool(request.GET.get('assigned', False))
+		followed = bool(request.GET.get('followed', False))
+		contacts = Contact().get_contacts_by_last_activity_date(
+			userd_id=request.user.id, 
+			include_activities=include_activities,
+			owned=owned,
+			assigned=assigned,
+			followed=followed, 
+			limit=limit, 
+			offset=offset)
+		if not bool(include_activities):
+			return self.create_response(
+					request, {'objects':self.get_bundle_list(contacts, request)}
+				)
+		else:
+			obj_dict={}
+			obj_dict['contacts'] = self.get_bundle_list(contacts[0], request)
+			obj_dict['activities'] = self.get_bundle.list(contacts[1], request)
+			obj_dict['dict'] = contacts[2]
+			return self.create_response(request, obj_dict) 
 
 	def get_cold_base(self, request, **kwargs):
-		contacts = Contact().get_cold_base()
+		'''
+		pass limit and offset  with GET request
+		'''
+		limit = int(request.GET.get('limit',20))
+		offset = int(request.GET.get('offset',0))
+		contacts = Contact().get_cold_base(limit, offset)
 		return self.create_response(
 				request, {'objects':self.get_bundle_list(contacts,request)}
 			)
 
 	def get_leads(self, request, **kwargs):
-		contacts = Contact().get_contacts_by_status(1,20)
+		'''
+		pass limit and offset through GET request
+		'''
+		STATUS_LEAD = 1
+		limit = int(request.GET.get('limit',20))
+		offset = int(request.GET.get('offset',0))
+		contacts = Contact().get_contacts_by_status(STATUS_LEAD, limit, offset)
 		return self.create_response(
 				request, {'objects':self.get_bundle_list(contacts,request)}
 			)
-	'''
-	Api implementation of search, pass search_params in this format:
-	[('fn', 'startswith'), ('org__organization_unit', 'icontains'), 'bday']
-	'''
+
 	def search(self, request, **kwargs):
-		query = request.GET.get('query','')
-		search_params = request.GET.get('search_params','')
-		contacts = Contact().filter_contacts_by_vcard(query,search_params)
+		'''
+		Api implementation of search, pass search_params in this format:
+		[('fn', 'startswith'), ('org__organization_unit', 'icontains'), 'bday']
+		will search by the beginning of fn if search_params are not provided
+		ast library f-n literal_eval converts the string representation of a
+		list to a python list
+		pass limit and offset through GET request
+		'''
+		import ast
+		limit = int(request.GET.get('limit',20))
+		offset = int(request.GET.get('offset',0))
+		search_text = request.GET.get('search_text','').encode('utf-8')
+		search_params = ast.literal_eval(
+			request.GET.get('search_params',"[('fn', 'startswith')]"))
+		contacts = Contact().filter_contacts_by_vcard(
+			search_text=search_text,
+			search_params=search_params,
+			limit=limit,
+			offset=offset)
+		return self.create_response(
+				request, {'objects':self.get_bundle_list(contacts,request)}
+			)

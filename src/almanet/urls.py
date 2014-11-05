@@ -19,6 +19,7 @@ from alm_vcard.api import (
     VCardTelResource,
     VCardOrgResource
     )
+from alm_crm.api import ContactResource
 
 admin.autodiscover()
 
@@ -27,6 +28,7 @@ v1_api.register(VCardResource())
 v1_api.register(VCardEmailResource())
 v1_api.register(VCardTelResource())
 v1_api.register(VCardOrgResource())
+v1_api.register(ContactResource())
 
 
 urlpatterns = patterns(

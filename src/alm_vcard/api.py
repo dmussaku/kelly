@@ -1,7 +1,7 @@
 from tastypie.resources import ModelResource, ALL, ALL_WITH_RELATIONS
 from alm_vcard.models import VCard, Email, Tel, Org
 from tastypie import fields
-from tastypie.authentication import BasicAuthentication
+from tastypie.authentication import SessionAuthentication
 from tastypie.authorization import Authorization
 
 
@@ -17,20 +17,8 @@ class VCardResource(ModelResource):
     class Meta:
         queryset = VCard.objects.all()
         resource_name = 'vcard'
-        authentication = BasicAuthentication()
+        authentication = SessionAuthentication()
         authorization = Authorization()
-
-    def obj_create(self, bundle, **kw):
-        bundle = super(VCardResource, self).obj_create(bundle, **kw)
-        return bundle
-
-    def obj_update(self, bundle, **kw):
-        bundle = super(VCardResource, self).obj_update(bundle, **kw)
-        return bundle
-
-    def obj_delete(self, bundle, **kw):
-        bundle = super(VCardResource, self).obj_delete(bundle, **kw)
-        return bundle
 
 
 class VCardEmailResource(ModelResource):
@@ -39,7 +27,7 @@ class VCardEmailResource(ModelResource):
     class Meta:
         queryset = Email.objects.all()
         resource_name = 'vcard_email'
-        authentication = BasicAuthentication()
+        authentication = SessionAuthentication()
         authorization = Authorization()
 
 
@@ -49,7 +37,7 @@ class VCardTelResource(ModelResource):
     class Meta:
         queryset = Tel.objects.all()
         resource_name = 'vcard_tel'
-        authentication = BasicAuthentication()
+        authentication = SessionAuthentication()
         authorization = Authorization()
 
 
@@ -59,5 +47,5 @@ class VCardOrgResource(ModelResource):
     class Meta:
         queryset = Org.objects.all()
         resource_name = 'vcard_org'
-        authentication = BasicAuthentication()
+        authentication = SessionAuthentication()
         authorization = Authorization()
