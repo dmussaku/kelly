@@ -6,7 +6,7 @@ from tastypie.authentication import (
     )
 from tastypie.authorization import Authorization
 from tastypie import fields
-from alm_crm.models import SalesCycle, Activity, Contact
+from alm_crm.models import SalesCycle, Activity, Contact, Product
 from almanet.settings import DEFAULT_SERVICE
 
 
@@ -53,6 +53,9 @@ class SalesCycleResource(CRMServiceModelResource):
     activities = fields.ToManyField(
         'alm_crm.api.ActivityResource', 'rel_activities',
         related_name='sales_cycle', null=True, full=True)
+    products = fields.ToManyField(
+        'alm_crm.api.ProductResource', 'products',
+        related_name='sales_cycles', null=True, full=True)
 
     class Meta(CRMServiceModelResource.Meta):
         queryset = SalesCycle.objects.all()
@@ -65,3 +68,11 @@ class ActivityResource(CRMServiceModelResource):
     class Meta(CRMServiceModelResource.Meta):
         queryset = Activity.objects.all()
         resource_name = 'activity'
+
+
+class ProductResource(CRMServiceModelResource):
+    sales_cycles = fields.ToManyField(SalesCycleResource, 'sales_cycles')
+
+    class Meta(CRMServiceModelResource.Meta):
+        queryset = Product.objects.all()
+        resource_name = 'product'

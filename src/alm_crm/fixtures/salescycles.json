@@ -3,7 +3,7 @@
         "pk": 1,
         "model": "alm_crm.SalesCycle",
         "fields": {
-            "products":[],
+            "products":[1],
             "owner":1,
             "followers":[],
             "contact":1,

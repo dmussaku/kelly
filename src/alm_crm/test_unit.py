@@ -1,5 +1,6 @@
 import os
 from django.test import TestCase
+from django.utils.unittest import skipIf
 from django.utils import timezone
 from tastypie.test import ResourceTestCase
 from alm_crm.models import (
@@ -7,7 +8,7 @@ from alm_crm.models import (
     CRMUser,
     Activity,
     SalesCycle,
-    Feedback,
+    Product,
     Mention,
     Feedback,
     Value,
@@ -491,6 +492,29 @@ class SalesCycleResourceTest(ResourceTestCase):
         # verify that added with one activity
         self.assertEqual(sales_cycle.rel_activities.count(), 1)
 
+    @skipIf(True, "Tastypie need overwrite save_m2m() to able create with M2M")
+    def test_create_sales_cycle_with_product(self):
+        post_data = {
+            'name': 'new SalesCycle with one Product',
+            'contact': {'pk': Contact.objects.last()},
+            'products': [{
+                'name': 'p1',
+                'description': 'new product p1',
+                'price': 100
+            }]
+        }
+
+        count = SalesCycle.objects.count()
+        # self.assertHttpCreated()
+        print self.api_client.post(
+            self.api_path_sales_cycle, format='json', data=post_data)
+
+        sales_cycle = SalesCycle.objects.last()
+        # verify that new one sales_cycle has been added.
+        self.assertEqual(SalesCycle.objects.count(), count + 1)
+        # verify that added with one activity
+        self.assertEqual(sales_cycle.products.count(), 1)
+
     def test_delete_sales_cycle(self):
         count = SalesCycle.objects.count()
         sales_cycle = SalesCycle.objects.last()
@@ -583,3 +607,89 @@ class ActivityResourceTest(ResourceTestCase):
             self.api_path_activity + '%s/' % self.activity.pk, format='json'))
         # verify that one sales_cycle has been deleted.
         self.assertEqual(sales_cycle.rel_activities.count(), count - 1)
+
+
+class ProductResourceTest(ResourceTestCase):
+    fixtures = ['companies.json', 'services.json', 'users.json',
+                'subscriptions.json',
+                'crmusers.json', 'contacts.json', 'salescycles.json',
+                'activities.json', 'products.json', 'mentions.json',
+                'values.json']
+
+    def setUp(self):
+        from alm_user.models import User
+        super(self.__class__, self).setUp()
+
+        self.user = User.objects.get(pk=1)
+        # reset password
+        # self.user.password = self.user_password
+        # self.user.save()
+        self.user_password = 'qweasdzxc'
+        # Log in self.user
+        self.login_user()
+
+        self.api_path_product = '/api/v1/product/'
+
+        # get_list
+        self.get_list_resp = self.api_client.get(self.api_path_product,
+                                                 format='json',
+                                                 HTTP_HOST='localhost')
+        self.get_list_des = self.deserialize(self.get_list_resp)
+
+        # get_detail(pk)
+        self.get_detail_resp = \
+            lambda pk: self.api_client.get(self.api_path_product+str(pk)+'/',
+                                           format='json',
+                                           HTTP_HOST='localhost')
+        self.get_detail_des = \
+            lambda pk: self.deserialize(self.get_detail_resp(pk))
+
+        self.product = Product.objects.first()
+
+    def login_user(self):
+        return self.api_client.client.login(email=self.user.email,
+                                            password=self.user_password)
+
+    def test_get_list_valid_json(self):
+        self.assertValidJSONResponse(self.get_list_resp)
+
+    def test_get_list_non_empty(self):
+        self.assertTrue(self.get_list_des['meta']['total_count'] > 0)
+
+    def test_get_detail(self):
+        self.assertEqual(
+            self.get_detail_des(self.product.pk)['name'],
+            self.product.name
+            )
+
+    def test_create_product(self):
+        sales_cycle = SalesCycle.objects.last()
+        post_data = {
+            'name': 'new product',
+            'description': 'new product by test_unit',
+            'price': 100,
+            'sales_cycles': [{'pk': sales_cycle.pk}]
+        }
+
+        count = sales_cycle.products.count()
+        self.assertHttpCreated(self.api_client.post(
+            self.api_path_product, format='json', data=post_data))
+        product = sales_cycle.products.last()
+        # verify that new one has been added.
+        self.assertEqual(sales_cycle.products.count(), count + 1)
+        # verify that subscription_id was set
+        self.assertIsInstance(product.subscription_id, int)
+        # verify that owner was set
+        self.assertIsInstance(product.owner, CRMUser)
+        self.assertEqual(
+            product.owner,
+            self.user.get_subscr_user(product.subscription_id)
+            )
+
+    def test_delete_product(self):
+        sales_cycle = self.product.sales_cycles.first()
+        count = sales_cycle.products.count()
+        self.assertHttpAccepted(self.api_client.delete(
+            self.api_path_product + '%s/' % self.product.pk, format='json'))
+        # verify that one sales_cycle has been deleted.
+        self.assertEqual(sales_cycle.products.count(), count - 1)
