@@ -1,5 +1,23 @@
 from tastypie.resources import ModelResource, ALL, ALL_WITH_RELATIONS
-from alm_vcard.models import VCard, Email, Tel, Org
+from alm_vcard.models import (
+    VCard, 
+    Email, 
+    Tel, 
+    Org,
+    Geo,
+    Adr,
+    Agent,
+    Category,
+    Key,
+    Label,
+    Mailer,
+    Nickname,
+    Note,
+    Role,
+    Title,
+    Tz,
+    Url
+    )
 from tastypie import fields
 from tastypie.authentication import SessionAuthentication
 from tastypie.authorization import Authorization
@@ -47,5 +65,135 @@ class VCardOrgResource(ModelResource):
     class Meta:
         queryset = Org.objects.all()
         resource_name = 'vcard_org'
+        authentication = SessionAuthentication()
+        authorization = Authorization()
+
+
+class VCardGeoResource(ModelResource):
+    vcard = fields.ForeignKey('alm_vcard.api.VCardResource', 'vcard')
+
+    class Meta:
+        queryset = Geo.objects.all()
+        resource_name = 'vcard_geo'
+        authentication = SessionAuthentication()
+        authorization = Authorization()
+
+
+class VCardAdrResource(ModelResource):
+    vcard = fields.ForeignKey('alm_vcard.api.VCardResource', 'vcard')
+
+    class Meta:
+        queryset = Adr.objects.all()
+        resource_name = 'vcard_adr'
+        authentication = SessionAuthentication()
+        authorization = Authorization()
+
+
+class VCardAgentResource(ModelResource):
+    vcard = fields.ForeignKey('alm_vcard.api.VCardResource', 'vcard')
+
+    class Meta:
+        queryset = Agent.objects.all()
+        resource_name = 'vcard_agent'
+        authentication = SessionAuthentication()
+        authorization = Authorization()
+
+
+class VCardCategoryResource(ModelResource):
+    vcard = fields.ForeignKey('alm_vcard.api.VCardResource', 'vcard')
+
+    class Meta:
+        queryset = Category.objects.all()
+        resource_name = 'vcard_category'
+        authentication = SessionAuthentication()
+        authorization = Authorization()
+
+
+class VCardKeyResource(ModelResource):
+    vcard = fields.ForeignKey('alm_vcard.api.VCardResource', 'vcard')
+
+    class Meta:
+        queryset = Key.objects.all()
+        resource_name = 'vcard_key'
+        authentication = SessionAuthentication()
+        authorization = Authorization()
+
+
+class VCardLabelResource(ModelResource):
+    vcard = fields.ForeignKey('alm_vcard.api.VCardResource', 'vcard')
+
+    class Meta:
+        queryset = Label.objects.all()
+        resource_name = 'vcard_label'
+        authentication = SessionAuthentication()
+        authorization = Authorization()
+
+
+class VCardMailerResource(ModelResource):
+    vcard = fields.ForeignKey('alm_vcard.api.VCardResource', 'vcard')
+
+    class Meta:
+        queryset = Mailer.objects.all()
+        resource_name = 'vcard_mailer'
+        authentication = SessionAuthentication()
+        authorization = Authorization()
+
+
+class VCardNicknameResource(ModelResource):
+    vcard = fields.ForeignKey('alm_vcard.api.VCardResource', 'vcard')
+
+    class Meta:
+        queryset = Nickname.objects.all()
+        resource_name = 'vcard_nickname'
+        authentication = SessionAuthentication()
+        authorization = Authorization()
+
+
+class VCardNoteResource(ModelResource):
+    vcard = fields.ForeignKey('alm_vcard.api.VCardResource', 'vcard')
+
+    class Meta:
+        queryset = Note.objects.all()
+        resource_name = 'vcard_note'
+        authentication = SessionAuthentication()
+        authorization = Authorization()
+
+
+class VCardRoleResource(ModelResource):
+    vcard = fields.ForeignKey('alm_vcard.api.VCardResource', 'vcard')
+
+    class Meta:
+        queryset = Role.objects.all()
+        resource_name = 'vcard_role'
+        authentication = SessionAuthentication()
+        authorization = Authorization()
+
+
+class VCardTitleResource(ModelResource):
+    vcard = fields.ForeignKey('alm_vcard.api.VCardResource', 'vcard')
+
+    class Meta:
+        queryset = Title.objects.all()
+        resource_name = 'vcard_title'
+        authentication = SessionAuthentication()
+        authorization = Authorization()
+
+
+class VCardTzResource(ModelResource):
+    vcard = fields.ForeignKey('alm_vcard.api.VCardResource', 'vcard')
+
+    class Meta:
+        queryset = Tz.objects.all()
+        resource_name = 'vcard_tz'
+        authentication = SessionAuthentication()
+        authorization = Authorization()
+
+
+class VCardUrlResource(ModelResource):
+    vcard = fields.ForeignKey('alm_vcard.api.VCardResource', 'vcard')
+
+    class Meta:
+        queryset = Url.objects.all()
+        resource_name = 'vcard_url'
         authentication = SessionAuthentication()
         authorization = Authorization()
