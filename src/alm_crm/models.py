@@ -550,7 +550,8 @@ class SalesCycle(SubscriptionObject):
     title = models.CharField(max_length=100)
     products = models.ManyToManyField(Product, related_name='sales_cycles',
                                       null=True, blank=True)
-    owner = models.ForeignKey(CRMUser, related_name='owned_sales_cycles')
+    owner = models.ForeignKey(CRMUser, related_name='owned_sales_cycles',
+                              null=True, blank=True)
     followers = models.ManyToManyField(
         CRMUser, related_name='follow_sales_cycles',
         null=True, blank=True)

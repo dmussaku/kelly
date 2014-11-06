@@ -1,0 +1,17 @@
+[
+    {
+        "pk": 1,
+        "model": "alm_user.user",
+        "fields": {
+            "first_name": "Sattar",
+            "last_name": "Stamkulov",
+            "company": [1],
+            "is_active": true,
+            "last_login": "2014-11-05T10:00:22.023Z",
+            "is_admin": true,
+            "timezone": "Asia/Almaty",
+            "password": "pbkdf2_sha256$12000$hWS15F49MKYP$d97Ch8S9Iwnk0xEqwGIBiIbRR82ZZGExrDZiX8wpbl8=",
+            "email": "sattar94@outlook.com"
+        }
+    }
+]
