@@ -64,4 +64,4 @@ class ActivityResource(CRMServiceModelResource):
 
     class Meta(CRMServiceModelResource.Meta):
         queryset = Activity.objects.all()
-        resource_name = 'sales_cycle/activity'
+        resource_name = 'activity'

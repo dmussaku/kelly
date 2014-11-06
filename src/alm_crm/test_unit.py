@@ -406,7 +406,7 @@ class SalesCycleResourceTest(ResourceTestCase):
 
     def setUp(self):
         from alm_user.models import User
-        super(SalesCycleResourceTest, self).setUp()
+        super(self.__class__, self).setUp()
 
         self.user = User.objects.get(pk=1)
         # reset password
@@ -490,3 +490,96 @@ class SalesCycleResourceTest(ResourceTestCase):
         self.assertEqual(SalesCycle.objects.count(), count + 1)
         # verify that added with one activity
         self.assertEqual(sales_cycle.rel_activities.count(), 1)
+
+    def test_delete_sales_cycle(self):
+        count = SalesCycle.objects.count()
+        sales_cycle = SalesCycle.objects.last()
+        self.assertHttpAccepted(self.api_client.delete(
+            self.api_path_sales_cycle + '%s/' % sales_cycle.pk, format='json'))
+        # verify that one sales_cycle has been deleted.
+        self.assertEqual(SalesCycle.objects.count(), count - 1)
+
+
+class ActivityResourceTest(ResourceTestCase):
+    fixtures = ['companies.json', 'services.json', 'users.json',
+                'subscriptions.json',
+                'crmusers.json', 'contacts.json', 'salescycles.json',
+                'activities.json', 'products.json', 'mentions.json',
+                'values.json']
+
+    def setUp(self):
+        from alm_user.models import User
+        super(self.__class__, self).setUp()
+
+        self.user = User.objects.get(pk=1)
+        # reset password
+        # self.user.password = self.user_password
+        # self.user.save()
+        self.user_password = 'qweasdzxc'
+        # Log in self.user
+        self.login_user()
+
+        self.api_path_activity = '/api/v1/activity/'
+
+        # get_list
+        self.get_list_resp = self.api_client.get(self.api_path_activity,
+                                                 format='json',
+                                                 HTTP_HOST='localhost')
+        self.get_list_des = self.deserialize(self.get_list_resp)
+
+        # get_detail(pk)
+        self.get_detail_resp = \
+            lambda pk: self.api_client.get(self.api_path_activity+str(pk)+'/',
+                                           format='json',
+                                           HTTP_HOST='localhost')
+        self.get_detail_des = \
+            lambda pk: self.deserialize(self.get_detail_resp(pk))
+
+        self.activity = Activity.objects.first()
+
+    def login_user(self):
+        return self.api_client.client.login(email=self.user.email,
+                                            password=self.user_password)
+
+    def test_get_list_valid_json(self):
+        self.assertValidJSONResponse(self.get_list_resp)
+
+    def test_get_list_non_empty(self):
+        self.assertTrue(self.get_list_des['meta']['total_count'] > 0)
+
+    def test_get_detail(self):
+        self.assertEqual(
+            self.get_detail_des(self.activity.pk)['title'],
+            self.activity.title
+            )
+
+    def test_create_activity(self):
+        sales_cycle = SalesCycle.objects.last()
+        post_data = {
+            'title': 'new activity1',
+            'description': 'new activity by test_unit',
+            'sales_cycle': {'pk': sales_cycle.pk}
+        }
+
+        count = sales_cycle.rel_activities.count()
+        self.assertHttpCreated(self.api_client.post(
+            self.api_path_activity, format='json', data=post_data))
+        activity = sales_cycle.rel_activities.last()
+        # verify that new one has been added.
+        self.assertEqual(sales_cycle.rel_activities.count(), count + 1)
+        # verify that subscription_id was set
+        self.assertIsInstance(activity.subscription_id, int)
+        # verify that owner was set
+        self.assertIsInstance(activity.owner, CRMUser)
+        self.assertEqual(
+            activity.owner,
+            self.user.get_subscr_user(activity.subscription_id)
+            )
+
+    def test_delete_activity(self):
+        sales_cycle = self.activity.sales_cycle
+        count = sales_cycle.rel_activities.count()
+        self.assertHttpAccepted(self.api_client.delete(
+            self.api_path_activity + '%s/' % self.activity.pk, format='json'))
+        # verify that one sales_cycle has been deleted.
+        self.assertEqual(sales_cycle.rel_activities.count(), count - 1)
