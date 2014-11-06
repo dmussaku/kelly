@@ -136,7 +136,7 @@ class ActivityTestCase(TestCase):
         self.assertNotEqual(0, len(Activity.objects.filter(sales_cycle_id=1)))
         self.assertNotEqual(0, len(Feedback.objects.all()))
         a = Activity(title='t6', description='d6', date_created=timezone.now(),
-                     sales_cycle_id=1, author_id=1)
+                     sales_cycle_id=1, owner_id=1)
         a.save()
         self.assertEqual(a, Activity.objects.get(id=a.id))
         self.assertEqual(0, len(Feedback.objects.filter(id=a.id)))
@@ -206,7 +206,7 @@ class ActivityTestCase(TestCase):
 
     def test_get_number_of_activities_by_day(self):
         user_id = 1
-        user_activities = Activity.objects.filter(author=user_id)\
+        user_activities = Activity.objects.filter(owner=user_id)\
             .order_by('date_created')
         from_dt = user_activities.first().date_created
         to_dt = user_activities.last().date_created
@@ -331,7 +331,7 @@ class SalesCycleTestCase(TestCase):
         self.assertEqual(self.sc1.followers.first().pk, 1)
 
     def test_upd_lst_activity_on_create(self):
-        activity = Activity(sales_cycle_id=1, author_id=1)
+        activity = Activity(sales_cycle_id=1, owner_id=1)
         activity.save()
         self.assertEqual(self.get_sc(pk=1).latest_activity.pk, activity.pk)
 
@@ -414,8 +414,6 @@ class SalesCycleResourceTest(ResourceTestCase):
         # self.user.save()
         self.user_password = 'qweasdzxc'
         # Log in self.user
-        # from django.contrib.auth import authenticate
-        # print "*** %s" % authenticate(email=self.user.email, password=self.user_password)
         self.get_credentials()
 
         self.api_path_sales_cycle = '/api/v1/sales_cycle/'
@@ -454,7 +452,7 @@ class SalesCycleResourceTest(ResourceTestCase):
 
     def test_create_sales_cycle(self):
         post_data = {
-            'title': 'New SalesCycle from test_unit',
+            'title': 'new SalesCycle from test_unit',
             'contact': {'pk': Contact.objects.last()},
             'activities': []
         }
@@ -462,5 +460,33 @@ class SalesCycleResourceTest(ResourceTestCase):
         count = SalesCycle.objects.count()
         self.assertHttpCreated(self.api_client.post(
             self.api_path_sales_cycle, format='json', data=post_data))
-        # Verify that new one has been added.
+        sales_cycle = SalesCycle.objects.last()
+        # verify that new one has been added.
         self.assertEqual(SalesCycle.objects.count(), count + 1)
+        # verify that subscription_id was set
+        self.assertIsInstance(sales_cycle.subscription_id, int)
+        # verify that owner was set
+        self.assertIsInstance(sales_cycle.owner, CRMUser)
+        self.assertEqual(
+            sales_cycle.owner,
+            self.user.get_subscr_user(sales_cycle.subscription_id)
+            )
+
+    def test_create_sales_cycle_with_activity(self):
+        post_data = {
+            'title': 'new SalesCycle with one Activity',
+            'contact': {'pk': Contact.objects.last()},
+            'activities': [{
+                'title': 'new_sc_a1',
+                'description': 'new sales_cycle\'s activity'
+            }]
+        }
+
+        count = SalesCycle.objects.count()
+        self.assertHttpCreated(self.api_client.post(
+            self.api_path_sales_cycle, format='json', data=post_data))
+        sales_cycle = SalesCycle.objects.last()
+        # verify that new one sales_cycle has been added.
+        self.assertEqual(SalesCycle.objects.count(), count + 1)
+        # verify that added with one activity
+        self.assertEqual(sales_cycle.rel_activities.count(), 1)

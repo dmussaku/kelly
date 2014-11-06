@@ -25,6 +25,8 @@ class CRMServiceModelResource(ModelResource):
             bundle.obj.subscription_pk = filter(
                 lambda x: user_env['subscription_{}'.format(x)]['slug'] == DEFAULT_SERVICE,
                 user_env['subscriptions'])[0]
+            bundle.obj.owner = bundle.request.user.get_subscr_user(
+                bundle.obj.subscription_pk)
 
         return bundle
 

@@ -304,7 +304,7 @@ class Contact(SubscriptionObject):
         Queryset of Contacts with whom `user_id` get contacted for that period.
         """
         crm_user = CRMUser.objects.get(id=user_id)
-        activities = crm_user.activity_author.filter(
+        activities = crm_user.activity_owner.filter(
             date_created__range=(from_dt, to_dt))
         return Contact.objects.filter(
             id__in=activities.values_list('sales_cycle__contact', flat=True))
@@ -550,8 +550,7 @@ class SalesCycle(SubscriptionObject):
     title = models.CharField(max_length=100)
     products = models.ManyToManyField(Product, related_name='sales_cycles',
                                       null=True, blank=True)
-    owner = models.ForeignKey(CRMUser, related_name='owned_sales_cycles',
-                              null=True, blank=True)
+    owner = models.ForeignKey(CRMUser, related_name='owned_sales_cycles')
     followers = models.ManyToManyField(
         CRMUser, related_name='follow_sales_cycles',
         null=True, blank=True)
@@ -743,7 +742,7 @@ class Activity(SubscriptionObject):
                                         auto_now_add=True)
     date_edited = models.DateTimeField(blank=True, null=True, auto_now=True)
     sales_cycle = models.ForeignKey(SalesCycle, related_name='rel_activities')
-    author = models.ForeignKey(CRMUser, related_name='activity_author')
+    owner = models.ForeignKey(CRMUser, related_name='activity_owner')
     mentions = generic.GenericRelation('Mention')
     comments = generic.GenericRelation('Comment')
 
@@ -755,8 +754,8 @@ class Activity(SubscriptionObject):
         return self.title
 
     @property
-    def owner(self):
-        return self.author
+    def author(self):
+        return self.owner
 
     @property
     def contact(self):
@@ -843,7 +842,7 @@ class Activity(SubscriptionObject):
         if (type(from_dt) and type(to_dt) == datetime.datetime):
             pass
         activity_queryset = Activity.objects.filter(
-            date_created__gte=from_dt, date_created__lte=to_dt, author=user)
+            date_created__gte=from_dt, date_created__lte=to_dt, owner=user)
         date_counts = {}
         for act in activity_queryset:
             date = str(act.date_created.date())
@@ -889,7 +888,7 @@ class Feedback(SubscriptionObject):
 
 class Mention(SubscriptionObject):
     user = models.ForeignKey(CRMUser, related_name='mentions', null=True)
-    author = models.ForeignKey(CRMUser, related_name='owned_mentions', null=True)
+    owner = models.ForeignKey(CRMUser, related_name='owned_mentions', null=True)
     content_type = models.ForeignKey(ContentType)
     object_id = models.IntegerField()
     content_object = generic.GenericForeignKey('content_type', 'object_id')
@@ -898,8 +897,8 @@ class Mention(SubscriptionObject):
         return "%s %s" % (self.user, self.content_object)
 
     @property
-    def owner(self):
-        return self.author
+    def author(self):
+        return self.owner
 
     @classmethod
     def build_new(cls, user_id, content_class=None,
@@ -929,7 +928,7 @@ class Mention(SubscriptionObject):
 
 class Comment(SubscriptionObject):
     comment = models.CharField(max_length=140)
-    author = models.ForeignKey(CRMUser, related_name='comment_author')
+    owner = models.ForeignKey(CRMUser, related_name='comment_owner')
     date_created = models.DateTimeField(blank=True, auto_now_add=True)
     date_edited = models.DateTimeField(blank=True, auto_now_add=True)
     object_id = models.IntegerField(null=True, blank=False)
@@ -938,11 +937,11 @@ class Comment(SubscriptionObject):
     mentions = generic.GenericRelation('Mention')
 
     def __unicode__(self):
-        return "%s's comment" % (self.author)
+        return "%s's comment" % (self.owner)
 
     @property
-    def owner(self):
-        return self.author
+    def author(self):
+        return self.owner
 
     def save(self, **kwargs):
         if self.date_created:
@@ -964,7 +963,7 @@ class Comment(SubscriptionObject):
     @classmethod
     def build_new(cls, user_id, content_class=None,
                   object_id=None, save=False):
-        comment = cls(author_id=user_id)
+        comment = cls(owner_id=user_id)
         comment.content_type = ContentType.objects.get_for_model(content_class)
         comment.object_id = object_id
         if save:
