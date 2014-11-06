@@ -26,7 +26,7 @@ class VCardEmailResource(ModelResource):
 
     class Meta:
         queryset = Email.objects.all()
-        resource_name = 'vcard/email'
+        resource_name = 'vcard_email'
         authentication = BasicAuthentication()
         authorization = Authorization()
 
@@ -36,7 +36,7 @@ class VCardTelResource(ModelResource):
 
     class Meta:
         queryset = Tel.objects.all()
-        resource_name = 'vcard/tel'
+        resource_name = 'vcard_tel'
         authentication = BasicAuthentication()
         authorization = Authorization()
 
@@ -46,6 +46,6 @@ class VCardOrgResource(ModelResource):
 
     class Meta:
         queryset = Org.objects.all()
-        resource_name = 'vcard/org'
+        resource_name = 'vcard_org'
         authentication = BasicAuthentication()
         authorization = Authorization()
