@@ -13,31 +13,34 @@ from almanet.views import (
     ServiceDetailView,
     )
 from tastypie.api import Api
-from alm_vcard.api import (
-    VCardResource,
-    VCardEmailResource,
-    VCardTelResource,
-    VCardOrgResource,
-    )
+from alm_vcard import api as vcard_api
 from alm_crm.api import (
     ContactResource,
     SalesCycleResource,
     ActivityResource,
+    ShareResource,
+    FeedbackResource,
+    CRMUserResource,
+    ValueResource
     )
 from alm_crm.api import ContactResource
+from tastypie.resources import ModelResource
 
 admin.autodiscover()
-
 v1_api = Api(api_name='v1')
-v1_api.register(VCardResource())
-v1_api.register(VCardEmailResource())
-v1_api.register(VCardTelResource())
-v1_api.register(VCardOrgResource())
-
+for obj in vars(vcard_api).values():
+    try:
+        if (issubclass(obj, ModelResource) and obj != ModelResource):
+            v1_api.register(obj())
+    except:
+        pass
 v1_api.register(ContactResource())
 v1_api.register(SalesCycleResource())
 v1_api.register(ActivityResource())
-
+v1_api.register(ShareResource())
+v1_api.register(ValueResource())
+v1_api.register(FeedbackResource())
+v1_api.register(CRMUserResource())
 
 urlpatterns = patterns(
     '',

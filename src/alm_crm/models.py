@@ -877,6 +877,7 @@ class Feedback(SubscriptionObject):
     value = models.OneToOneField(Value, blank=True, null=True)
     mentions = generic.GenericRelation('Mention')
     comments = generic.GenericRelation('Comment')
+    owner = models.ForeignKey(CRMUser, related_name='feedback_owner')
 
     def __unicode__(self):
         return self.feedback
