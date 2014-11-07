@@ -1,26 +1,8 @@
 from tastypie.resources import ModelResource, ALL, ALL_WITH_RELATIONS
-from alm_vcard.models import (
-    VCard, 
-    Email, 
-    Tel, 
-    Org,
-    Geo,
-    Adr,
-    Agent,
-    Category,
-    Key,
-    Label,
-    Mailer,
-    Nickname,
-    Note,
-    Role,
-    Title,
-    Tz,
-    Url
-    )
-from tastypie import fields
-from tastypie.authentication import SessionAuthentication
+from tastypie.authentication import SessionAuthentication, BasicAuthentication
 from tastypie.authorization import Authorization
+from tastypie import fields
+from alm_vcard.models import *
 
 
 class VCardResource(ModelResource):

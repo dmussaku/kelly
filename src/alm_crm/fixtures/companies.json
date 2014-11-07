@@ -1,0 +1,11 @@
+[
+    {
+        "pk": 1,
+        "model": "alm_company.company",
+        "fields": {
+            "owner": [],
+            "subdomain": "almacloud",
+            "name": "ALMACloud"
+        }
+    }
+]

@@ -17,7 +17,12 @@ from alm_vcard.api import (
     VCardResource,
     VCardEmailResource,
     VCardTelResource,
-    VCardOrgResource
+    VCardOrgResource,
+    )
+from alm_crm.api import (
+    ContactResource,
+    SalesCycleResource,
+    ActivityResource,
     )
 from alm_crm.api import ContactResource
 
@@ -28,7 +33,10 @@ v1_api.register(VCardResource())
 v1_api.register(VCardEmailResource())
 v1_api.register(VCardTelResource())
 v1_api.register(VCardOrgResource())
+
 v1_api.register(ContactResource())
+v1_api.register(SalesCycleResource())
+v1_api.register(ActivityResource())
 
 
 urlpatterns = patterns(

@@ -5,7 +5,7 @@ class GetSubdomainMiddleware(object):
 
     def process_request(self, request):
         request.subdomain = tldextract.extract(
-            request.META['HTTP_HOST']).subdomain
+            request.META.get('HTTP_HOST', '')).subdomain
 
 
 def set_user_env(user):
@@ -28,10 +28,11 @@ def set_user_env(user):
 {% with subscr = request.user_env|get_current_subscription:"id"
   subscr.
 '''
+
+
 class UserEnvMiddleware(object):
     def process_request(self, request):
         if not request.user.is_authenticated():
             request.user_env = {}
             return
         request.user_env = set_user_env(request.user)
-

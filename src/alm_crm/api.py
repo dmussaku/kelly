@@ -1,19 +1,54 @@
 from tastypie.resources import ModelResource
 from tastypie import fields
-from tastypie.authentication import SessionAuthentication
 from tastypie.authorization import Authorization
 from .models import Contact
 from django.conf.urls import url
 from tastypie.utils import trailing_slash
+from tastypie.authentication import (
+    MultiAuthentication,
+    SessionAuthentication,
+    BasicAuthentication,
+    )
+from alm_crm.models import SalesCycle, Activity, Contact
+from almanet.settings import DEFAULT_SERVICE
 
-class ContactResource(ModelResource):
+class CRMServiceModelResource(ModelResource):
+
+    def hydrate(self, bundle):
+        """
+        bundle.request.user_env is empty dict{}
+        because bundle.request.user is AnonymousUser
+        it happen when tastypie uses BasicAuthentication or another
+        which doesn't have session
+        """
+        user_env = bundle.request.user_env
+
+        if 'subscriptions' in user_env:
+            bundle.obj.subscription_pk = filter(
+                lambda x: user_env['subscription_{}'.format(x)]['slug'] == DEFAULT_SERVICE,
+                user_env['subscriptions'])[0]
+            bundle.obj.owner = bundle.request.user.get_subscr_user(
+                bundle.obj.subscription_pk)
+
+        return bundle
+
+    class Meta:
+        list_allowed_methods = ['get', 'post']
+        detail_allowed_methods = ['get', 'post', 'put', 'delete']
+        authentication = MultiAuthentication(BasicAuthentication(),
+                                             SessionAuthentication())
+        authorization = Authorization()
+
+
+class ContactResource(CRMServiceModelResource):
 	vcard = fields.ToOneField('alm_vcard.api.VCardResource','vcard', null=True, full=True)
+	sales_cycles = fields.ToManyField(
+        'alm_crm.api.SalesCycleResource', 'sales_cycles',
+        related_name='contact', null=True, full=True)
 
 	class Meta:
 		queryset = Contact.objects.all()
 		resource_name = 'contact'
-		authentication = SessionAuthentication()
-		authorization = Authorization()
 
 	def prepend_urls(self):
 		return [
@@ -136,3 +171,23 @@ class ContactResource(ModelResource):
 		return self.create_response(
 				request, {'objects':self.get_bundle_list(contacts,request)}
 			)
+
+
+class SalesCycleResource(CRMServiceModelResource):
+    contact = fields.ForeignKey(ContactResource, 'contact')
+    activities = fields.ToManyField(
+        'alm_crm.api.ActivityResource', 'rel_activities',
+        related_name='sales_cycle', null=True, full=True)
+
+    class Meta(CRMServiceModelResource.Meta):
+        queryset = SalesCycle.objects.all()
+        resource_name = 'sales_cycle'
+
+
+class ActivityResource(CRMServiceModelResource):
+    sales_cycle = fields.ForeignKey(SalesCycleResource, 'sales_cycle')
+
+    class Meta(CRMServiceModelResource.Meta):
+        queryset = Activity.objects.all()
+        resource_name = 'sales_cycle/activity'
+

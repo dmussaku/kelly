@@ -1,8 +1,18 @@
 import os
 from django.test import TestCase
 from django.utils import timezone
-from alm_crm.models import Contact, CRMUser, Activity, SalesCycle, Feedback,\
-    Mention, Feedback, Value, Comment
+from tastypie.test import ResourceTestCase
+from alm_crm.models import (
+    Contact,
+    CRMUser,
+    Activity,
+    SalesCycle,
+    Feedback,
+    Mention,
+    Feedback,
+    Value,
+    Comment,
+    )
 from alm_vcard.models import VCard
 
 
@@ -126,7 +136,7 @@ class ActivityTestCase(TestCase):
         self.assertNotEqual(0, len(Activity.objects.filter(sales_cycle_id=1)))
         self.assertNotEqual(0, len(Feedback.objects.all()))
         a = Activity(title='t6', description='d6', date_created=timezone.now(),
-                     sales_cycle_id=1, author_id=1)
+                     sales_cycle_id=1, owner_id=1)
         a.save()
         self.assertEqual(a, Activity.objects.get(id=a.id))
         self.assertEqual(0, len(Feedback.objects.filter(id=a.id)))
@@ -196,7 +206,7 @@ class ActivityTestCase(TestCase):
 
     def test_get_number_of_activities_by_day(self):
         user_id = 1
-        user_activities = Activity.objects.filter(author=user_id)\
+        user_activities = Activity.objects.filter(owner=user_id)\
             .order_by('date_created')
         from_dt = user_activities.first().date_created
         to_dt = user_activities.last().date_created
@@ -321,7 +331,7 @@ class SalesCycleTestCase(TestCase):
         self.assertEqual(self.sc1.followers.first().pk, 1)
 
     def test_upd_lst_activity_on_create(self):
-        activity = Activity(sales_cycle_id=1, author_id=1)
+        activity = Activity(sales_cycle_id=1, owner_id=1)
         activity.save()
         self.assertEqual(self.get_sc(pk=1).latest_activity.pk, activity.pk)
 
@@ -385,3 +395,98 @@ class SalesCycleTestCase(TestCase):
     def test_get_salescycles_by_contact(self):
         ret = SalesCycle.get_salescycles_by_contact(1)
         self.assertEqual(list(ret.values_list('pk', flat=True)), [1, 2, 3, 4])
+
+
+class SalesCycleResourceTest(ResourceTestCase):
+    fixtures = ['companies.json', 'services.json', 'users.json',
+                'subscriptions.json',
+                'crmusers.json', 'contacts.json', 'salescycles.json',
+                'activities.json', 'products.json', 'mentions.json',
+                'values.json']
+
+    def setUp(self):
+        from alm_user.models import User
+        super(SalesCycleResourceTest, self).setUp()
+
+        self.user = User.objects.get(pk=1)
+        # reset password
+        # self.user.password = self.user_password
+        # self.user.save()
+        self.user_password = 'qweasdzxc'
+        # Log in self.user
+        self.get_credentials()
+
+        self.api_path_sales_cycle = '/api/v1/sales_cycle/'
+
+        self.get_resp = lambda path: self.api_client.get(
+            self.api_path_sales_cycle + path,
+            format='json',
+            HTTP_HOST='localhost')
+        self.get_des_res = lambda path: self.deserialize(self.get_resp(path))
+
+        self.sales_cycle = SalesCycle.objects.first()
+
+    def get_credentials(self):
+        return self.api_client.client.login(email=self.user.email,
+                                            password=self.user_password)
+
+    # def test_get_list_unauthorzied(self):
+    #     self.assertHttpUnauthorized(self.api_client.get(
+    #         self.api_path_sales_cycle, format='json'))
+
+    def test_get_list_valid_json(self):
+        self.assertValidJSONResponse(self.get_resp(''))
+
+    def test_get_list_non_empty(self):
+        self.assertTrue(self.get_des_res('')['meta']['total_count'] > 0)
+
+    # def test_get_detail_unauthorzied(self):
+    #     self.assertHttpUnauthorized(self.api_client.get(
+    #         self.api_path_sales_cycle + '1/', format='json'))
+
+    def test_get_detail_json(self):
+        self.assertEqual(
+            self.get_des_res(str(self.sales_cycle.pk)+'/')['title'],
+            self.sales_cycle.title
+            )
+
+    def test_create_sales_cycle(self):
+        post_data = {
+            'title': 'new SalesCycle from test_unit',
+            'contact': {'pk': Contact.objects.last()},
+            'activities': []
+        }
+
+        count = SalesCycle.objects.count()
+        self.assertHttpCreated(self.api_client.post(
+            self.api_path_sales_cycle, format='json', data=post_data))
+        sales_cycle = SalesCycle.objects.last()
+        # verify that new one has been added.
+        self.assertEqual(SalesCycle.objects.count(), count + 1)
+        # verify that subscription_id was set
+        self.assertIsInstance(sales_cycle.subscription_id, int)
+        # verify that owner was set
+        self.assertIsInstance(sales_cycle.owner, CRMUser)
+        self.assertEqual(
+            sales_cycle.owner,
+            self.user.get_subscr_user(sales_cycle.subscription_id)
+            )
+
+    def test_create_sales_cycle_with_activity(self):
+        post_data = {
+            'title': 'new SalesCycle with one Activity',
+            'contact': {'pk': Contact.objects.last()},
+            'activities': [{
+                'title': 'new_sc_a1',
+                'description': 'new sales_cycle\'s activity'
+            }]
+        }
+
+        count = SalesCycle.objects.count()
+        self.assertHttpCreated(self.api_client.post(
+            self.api_path_sales_cycle, format='json', data=post_data))
+        sales_cycle = SalesCycle.objects.last()
+        # verify that new one sales_cycle has been added.
+        self.assertEqual(SalesCycle.objects.count(), count + 1)
+        # verify that added with one activity
+        self.assertEqual(sales_cycle.rel_activities.count(), 1)
