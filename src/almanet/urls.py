@@ -63,6 +63,7 @@ urlpatterns = patterns(
     url(r'^services/service_detail/(?P<pk>\d+)/$', ServiceDetailView.as_view(), name='service_detail'),
     url(r'^services/service_delete/(?P<pk>\d+)/$', ServiceDeleteView.as_view(), name='service_delete'),
     url(r'^api/', include(v1_api.urls)),
+    url(r'api/doc/', include('tastypie_swagger.urls', namespace='tastypie_swagger')),
 
 )
 

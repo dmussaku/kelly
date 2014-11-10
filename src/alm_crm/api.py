@@ -68,6 +68,134 @@ class ContactResource(CRMServiceModelResource):
     class Meta(CRMServiceModelResource.Meta):
         queryset = Contact.objects.all()
         resource_name = 'contact'
+        extra_actions = [
+        {
+            "name": "recent",
+            "http_method": "GET",
+            "resource_type": "list",
+            "description": "Get contacts ordered by their last activity date",
+            "fields": {
+                "limit": {
+                    "type": "int",
+                    "required": False,
+                    "description": "Limit queryset, if not provided gives 20\
+                     results by default"
+                },
+                "offset": {
+                    "type": "int",
+                    "required": False,
+                    "description": "offset queryset, if not provided gives 0\
+                     by default"
+                },
+                "owned": {
+                    "type": "boolean True or False",
+                    "required": False,
+                    "description": "if True then includes contacts owned by user,\
+                     if False then doesn't include, True by default"
+                },
+                "assigned": {
+                    "type": "boolean True or False",
+                    "required": False,
+                    "description": "if True then includes contacts assigned to user,\
+                     if False then doesn't include, True by default"
+                },
+                "followed": {
+                    "type": "boolean True or False",
+                    "required": False,
+                    "description": "if True then includes contacts followed by user,\
+                     if False then doesn't include, True by default"
+                },
+
+            }
+        },
+        {
+            "name": "cold base",
+            "http_method": "GET",
+            "resource_type": "list",
+            "description": "Get cold base of contacts, which are contacts \
+            which do not have any activities yet",
+            "fields": {
+                "limit": {
+                    "type": "int",
+                    "required": False,
+                    "description": "Limit queryset, if not provided gives 20 \
+                    results by default"
+                },
+                "offset": {
+                    "type": "int",
+                    "required": False,
+                    "description": "offset queryset, if not provided gives 0 \
+                    by default"
+                }
+            }
+        },
+        {
+            "name": "leads",
+            "http_method": "GET",
+            "resource_type": "list",
+            "description": "Returns all contacts with status 'LEAD'",
+            "fields": {
+                "limit": {
+                    "type": "int",
+                    "required": False,
+                    "description": "Limit queryset, if not provided gives \
+                    20 results by default"
+                },
+                "offset": {
+                    "type": "int",
+                    "required": False,
+                    "description": "offset queryset, if not provided gives \
+                    0 by default"
+                }
+            }
+        },
+        {
+            "name": "search",
+            "http_method": "GET",
+            "resource_type": "list",
+            "description": "Performs a recursive contat search by query and \
+            search_params",
+            "fields": {
+                "limit": {
+                    "type": "int",
+                    "required": False,
+                    "description": "Limit queryset, if not provided gives \
+                     20 results by default"
+                },
+                "offset": {
+                    "type": "int",
+                    "required": False,
+                    "description": "offset queryset, if not provided gives \
+                    0 by default"
+                },
+                "search_text": {
+                    "type": "string",
+                    "required": False,
+                    "description": "It is what it is, a text by which the  \
+                    search is performed"
+                },
+                "order_by": {
+                    "type": "string",
+                    "required": False,
+                    "description": "pass a parameter by which the queryset's \
+                    going to be ordered, look at vcard values for reference. If the value is not in \
+                    vcard itself but in additional vcard object prepend 'objname__' to it.\
+                    Eg. 'vcard__email__value', 'vcard__tel__type. Add 'asc' or 'desc' \
+                    for sort order list to be in ascending or descending order. \
+                    put both parameters in format of a list Eg. ['fn','asc']."
+                },
+                "search_params": {
+                    "type": "list of tupples example [('fn', 'startswith')]",
+                    "required": False,
+                    "description": "List of tupples of vcard field value and filter parameter\
+                    .Reference this api doc and find vcard values in order to know which search \
+                    params do you actually want to use for your request. If the value is not in \
+                    vcard itself but in additional vcard object prepend 'objname__' to it.\
+                    Eg. 'email__value', 'tel__type"
+                }
+            }
+        }
+    ]
 
     def prepend_urls(self):
         return [
@@ -171,9 +299,11 @@ class ContactResource(CRMServiceModelResource):
         search_text = request.GET.get('search_text','').encode('utf-8')
         search_params = ast.literal_eval(
             request.GET.get('search_params',"[('fn', 'startswith')]"))
+        order_by = ast.literal_eval(request.GET.get('order_by',"[]"))
         contacts = Contact().filter_contacts_by_vcard(
             search_text=search_text,
             search_params=search_params,
+            order_by=order_by,
             limit=limit,
             offset=offset)
         return self.create_response(
