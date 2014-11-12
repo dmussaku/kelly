@@ -1,17 +1,34 @@
 [
-    {
-        "pk": 1,
-        "model": "alm_user.user",
-        "fields": {
-            "first_name": "Sattar",
-            "last_name": "Stamkulov",
-            "company": [1],
-            "is_active": true,
-            "last_login": "2014-11-05T10:00:22.023Z",
-            "is_admin": true,
-            "timezone": "Asia/Almaty",
-            "password": "pbkdf2_sha256$12000$hWS15F49MKYP$d97Ch8S9Iwnk0xEqwGIBiIbRR82ZZGExrDZiX8wpbl8=",
-            "email": "sattar94@outlook.com"
-        }
+{
+    "pk": 1, 
+    "model": "alm_user.user", 
+    "fields": {
+        "first_name": "Bruce", 
+        "last_name": "Wayne", 
+        "company": [
+            1
+        ], 
+        "is_active": true, 
+        "last_login": "2014-11-11T07:51:02.253Z", 
+        "is_admin": false, 
+        "timezone": "Asia/Almaty", 
+        "password": "pbkdf2_sha256$12000$RfGiFmGJSeoz$063rfBSPM0AsFi1prglD5BW8qD1ElMYxBpRr5tO1M08=", 
+        "email": "b.wayne@batman.bat"
     }
+},
+{
+    "pk": 2, 
+    "model": "alm_user.user", 
+    "fields": {
+        "first_name": "Nurlan", 
+        "last_name": "Abiken", 
+        "company": [], 
+        "is_active": true, 
+        "last_login": "2014-11-11T10:08:02.503Z", 
+        "is_admin": false, 
+        "timezone": "Asia/Almaty", 
+        "password": "nurlan", 
+        "email": "abyken.nurlan@gmail.com"
+    }
+}
 ]

@@ -8,7 +8,8 @@
             "date_created":"2014-09-11 00:00:00+00:00",
             "date_edited":"2014-09-11 00:00:00+00:00",
             "activity": 1,
-            "value": null
+            "value": null,
+            "owner": 1
         }
     },
     {
@@ -20,7 +21,8 @@
             "date_created":"2014-09-12 00:00:00+00:00",
             "date_edited":"2014-09-12 00:00:00+00:00",
             "activity": 2,
-            "value": null
+            "value": null,
+            "owner": 1
         }
     },
     {
@@ -32,7 +34,8 @@
             "date_created":"2014-09-13 00:00:00+00:00",
             "date_edited":"2014-09-13 00:00:00+00:00",
             "activity": 3,
-            "value": null
+            "value": null,
+            "owner": 1
         }
     },
     {
@@ -44,7 +47,8 @@
             "date_created":"2014-09-14 00:00:00+00:00",
             "date_edited":"2014-09-14 00:00:00+00:00",
             "activity": 4,
-            "value": null
+            "value": null,
+            "owner": 1
         }
     },
     {
@@ -56,7 +60,8 @@
             "date_created":"2014-09-15 00:00:00+00:00",
             "date_edited":"2014-09-15 00:00:00+00:00",
             "activity": 5,
-            "value": null
+            "value": null,
+            "owner": 1
         }
     },
     {
@@ -68,7 +73,8 @@
             "date_created":"2014-09-12 00:00:00+00:00",
             "date_edited":"2014-09-12 00:00:00+00:00",
             "activity": 6,
-            "value": null
+            "value": null,
+            "owner": 1
         }
     },
     {
@@ -80,7 +86,8 @@
             "date_created":"2014-09-15 00:00:00+00:00",
             "date_edited":"2014-09-15 00:00:00+00:00",
             "activity": 7,
-            "value": null
+            "value": null,
+            "owner": 1
         }
     }
 ]
