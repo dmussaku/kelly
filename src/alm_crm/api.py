@@ -61,6 +61,9 @@ class CRMServiceModelResource(ModelResource):
 
 class ContactResource(CRMServiceModelResource):
     vcard = fields.ToOneField('alm_vcard.api.VCardResource','vcard', null=True, full=True)
+    owner = fields.ToOneField('alm_crm.api.CRMUserResource','owner', null=True, full=True)
+    followers = fields.ToManyField('alm_crm.api.CRMUserResource', 'followers', null=True, full=True)
+    assignees = fields.ToManyField('alm_crm.api.CRMUserResource', 'assignees', null=True, full=True)	    
     sales_cycles = fields.ToManyField(
         'alm_crm.api.SalesCycleResource', 'sales_cycles',
         related_name='contact', null=True, full=True)
@@ -126,6 +129,45 @@ class ContactResource(CRMServiceModelResource):
                     "required": False,
                     "description": "offset queryset, if not provided gives 0 \
                     by default"
+                }
+            }
+        },
+        {
+            "name": "assign contact",
+            "http_method": "GET",
+            "resource_type": "view",
+            "description": "Assign a single contact to a user, return True in\
+            case of success, anf False if not",
+            "fields": {
+                "user_id": {
+                    "type": "int",
+                    "required": True,
+                    "description": "User id to which you want to assign the contact"
+                },
+                "contact_id": {
+                    "type": "int",
+                    "required": True,
+                    "description": "Id of contact you want to assign to a user"
+                }
+            }
+        },
+        {
+            "name": "assign contacts",
+            "http_method": "GET",
+            "resource_type": "view",
+            "description": "Assign multiple contacts to a user, return True in\
+            case of success, anf False if not",
+            "fields": {
+                "user_id": {
+                    "type": "int",
+                    "required": True,
+                    "description": "User id to which you want to assign the contact"
+                },
+                "contact_ids": {
+                    "type": "list",
+                    "required": True,
+                    "description": "Ids of contacts you want to assign to a user\
+                    in structure of a list like so: [1,2,3...n]"
                 }
             }
         },
@@ -223,6 +265,18 @@ class ContactResource(CRMServiceModelResource):
                 self.wrap_view('search'),
                 name = 'api_search'
             ),
+            url(
+                r"^(?P<resource_name>%s)/assign_contact%s$" % 
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('assign_contact'),
+                name = 'api_assign_contact'
+            ),
+            url(
+                r"^(?P<resource_name>%s)/assign_contacts%s$" % 
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('assign_contacts'),
+                name = 'api_assign_contacts'
+            ),
         ]
 
     def get_last_contacted(self, request, **kwargs):
@@ -310,6 +364,29 @@ class ContactResource(CRMServiceModelResource):
                 request, {'objects':self.get_bundle_list(contacts,request)}
             )
 
+    def assign_contact(self, request, **kwargs):
+    	'''
+    	Sharing a single contact with user
+    	'''
+    	user_id = int(request.GET.get('user_id',0))
+    	contact_id = int(request.GET.get('contact_id',0))
+    	return self.create_response(
+    			request, {'success':Contact().assign_user_to_contact(user_id, contact_id)}
+    		)
+
+    def assign_contacts(self, request, **kwargs):
+    	'''
+    	Sharing multiple contacts with user, send multiple contacts as so
+    	contact_ids=[1,2,3,4...n]
+    	'''
+    	import ast
+    	print request.GET
+    	user_id = int(request.GET.get('user_id',0))
+    	contact_ids = ast.literal_eval(request.GET.get('contact_ids',[]))
+    	return self.create_response(
+    			request, {'success':Contact().assign_user_to_contacts(user_id, contact_ids)}
+    		)
+
 
 class SalesCycleResource(CRMServiceModelResource):
     contact = fields.ForeignKey(ContactResource, 'contact')
@@ -351,8 +428,8 @@ class CRMUserResource(CRMServiceModelResource):
 
 class ShareResource(CRMServiceModelResource):
     contact = fields.ForeignKey(ContactResource, 'contact', full=True, null=True)
-    share_to = fields.ForeignKey(ContactResource, 'contact', full=True, null=True)
-    share_from = fields.ForeignKey(ContactResource, 'contact', full=True, null=True)
+    share_to = fields.ForeignKey(CRMUserResource, 'share_to', full=True, null=True)
+    share_from = fields.ForeignKey(CRMUserResource, 'share_from', full=True, null=True)
 
     class Meta(CRMServiceModelResource.Meta):
         queryset = Share.objects.all()
