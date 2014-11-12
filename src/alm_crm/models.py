@@ -123,7 +123,7 @@ class Contact(SubscriptionObject):
         db_table = settings.DB_PREFIX.format('contact')
 
     def __unicode__(self):
-        return "%s %s" % (self.vcard, self.tp)
+        return "%s %s" % (self.vcard.fn, self.tp)
 
     def save(self, **kwargs):
         if not self.subscription_id and self.owner:
@@ -229,15 +229,6 @@ class Contact(SubscriptionObject):
         except CRMUser.DoesNotExist:
             return False
 
-    def json_serialize(self):
-        return {'pk':self.pk,
-        'name':self.name,
-        #'tel':self.tel()
-        #'mobile':self.mobile(),
-        #'email':self.email(),
-        #'company':self.company()
-        }
-
     @classmethod
     def assign_user_to_contact(cls, user_id, contact_id):
         """Assign user with `user_id` to contact with `contact_id`"""
@@ -311,7 +302,7 @@ class Contact(SubscriptionObject):
 
     @classmethod
     def filter_contacts_by_vcard(cls, search_text, search_params=None,
-                                 limit=20, offset=0):
+                                 limit=20, offset=0, order_by=None):
         r"""TODO Make a search query for contacts by their vcard.
         Important! Search params have one of the following formats:
             - name of vcard field, if simple field
@@ -351,6 +342,12 @@ class Contact(SubscriptionObject):
             contacts = contacts|Contact.objects.filter(**query_dict)
         #vcards = VCard.objects.filter(**params)
         #contacts = [vcard.contact for vcard in vcards][offset:offset + limit]
+        assert isinstance(order_by, list), "Must be a list"
+        if order_by:
+            if order_by[1]=='asc':
+                return contacts.order_by('vcard__'+str(order_by[0]))
+            else:
+                return contacts.order_by('-vcard__'+str(order_by[0]))
         return contacts
 
         '''
@@ -400,7 +397,8 @@ class Contact(SubscriptionObject):
 
     @classmethod
     def get_contacts_by_last_activity_date(
-            cls, user_id, include_activities=False, limit=20, offset=0):
+            cls, user_id, owned=True, assigned=False, 
+            followed=False, include_activities=False, limit=20, offset=0):
         """TEST Returns list of contacts ordered by last activity date.
             Returns:
                 Queryset<Contact>
@@ -421,8 +419,18 @@ class Contact(SubscriptionObject):
         pass
         # SECOND IMPL
         # contact_activity_map follows structure suggested by Askhat.
-        contacts = cls.objects.filter(assignees__user_id=user_id)\
-            .order_by('-latest_activity__date_created')
+        q = Q()
+        if owned:
+            q |= Q(owner_id=user_id)
+        if assigned:
+            q |= Q(assignees__user_id=user_id)
+        if followed:
+            q |= Q(followers__user_id=user_id)
+        if len(q.children) == 0:
+            contacts = cls.objects.none()
+        else:
+            contacts = cls.objects.filter(q).order_by(
+                '-latest_activity__date_created')[offset:offset + limit]
         if not include_activities:
             return contacts
         contact_activity_map = dict()
@@ -475,7 +483,7 @@ class Contact(SubscriptionObject):
         Cold contacts should satisfy two conditions:
             1. no assignee for contact
             2. status is NEW"""
-        return cls.objects.filter(status=NEW)[offset:offset + limit]
+        return cls.objects.filter(status=NEW).order_by('-date_created')[offset:offset + limit]
 
     @classmethod
     def create_contact_on_vcard_create(cls, sender, created=False,
@@ -875,6 +883,7 @@ class Feedback(SubscriptionObject):
     value = models.OneToOneField(Value, blank=True, null=True)
     mentions = generic.GenericRelation('Mention')
     comments = generic.GenericRelation('Comment')
+    owner = models.ForeignKey(CRMUser, related_name='feedback_owner')
 
     def __unicode__(self):
         return self.feedback

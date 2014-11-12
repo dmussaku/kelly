@@ -1,12 +1,24 @@
+from tastypie import fields
 from tastypie.resources import ModelResource
+from tastypie.authorization import Authorization
+from tastypie.utils import trailing_slash
 from tastypie.authentication import (
     MultiAuthentication,
     SessionAuthentication,
     BasicAuthentication,
     )
-from tastypie.authorization import Authorization
-from tastypie import fields
-from alm_crm.models import SalesCycle, Activity, Contact, Product
+from .models import Contact
+from django.conf.urls import url
+from alm_crm.models import (
+    SalesCycle,
+    Product,
+    Activity,
+    Contact,
+    Share,
+    CRMUser,
+    Value,
+    Feedback,
+    )
 from almanet.settings import DEFAULT_SERVICE
 
 
@@ -30,6 +42,17 @@ class CRMServiceModelResource(ModelResource):
 
         return bundle
 
+    def get_bundle_list(self, obj_list, request):
+        '''
+        receives a queryset and returns a list of bundles
+        '''
+        objects = []
+        for obj in obj_list:
+            bundle = self.build_bundle(obj=obj, request=request)
+            bundle = self.full_dehydrate(bundle)
+            objects.append(bundle)
+        return objects
+
     class Meta:
         list_allowed_methods = ['get', 'post']
         detail_allowed_methods = ['get', 'post', 'put', 'delete']
@@ -39,6 +62,14 @@ class CRMServiceModelResource(ModelResource):
 
 
 class ContactResource(CRMServiceModelResource):
+    vcard = fields.ToOneField('alm_vcard.api.VCardResource', 'vcard',
+                              null=True, full=True)
+    owner = fields.ToOneField('alm_crm.api.CRMUserResource', 'owner',
+                              null=True, full=True)
+    followers = fields.ToManyField('alm_crm.api.CRMUserResource', 'followers',
+                                   null=True, full=True)
+    assignees = fields.ToManyField('alm_crm.api.CRMUserResource', 'assignees',
+                                   null=True, full=True)
     sales_cycles = fields.ToManyField(
         'alm_crm.api.SalesCycleResource', 'sales_cycles',
         related_name='contact', null=True, full=True)
@@ -46,6 +77,328 @@ class ContactResource(CRMServiceModelResource):
     class Meta(CRMServiceModelResource.Meta):
         queryset = Contact.objects.all()
         resource_name = 'contact'
+        extra_actions = [
+        {
+            "name": "recent",
+            "http_method": "GET",
+            "resource_type": "list",
+            "description": "Get contacts ordered by their last activity date",
+            "fields": {
+                "limit": {
+                    "type": "int",
+                    "required": False,
+                    "description": "Limit queryset, if not provided gives 20\
+                     results by default"
+                },
+                "offset": {
+                    "type": "int",
+                    "required": False,
+                    "description": "offset queryset, if not provided gives 0\
+                     by default"
+                },
+                "owned": {
+                    "type": "boolean True or False",
+                    "required": False,
+                    "description": "if True then includes contacts owned by user,\
+                     if False then doesn't include, True by default"
+                },
+                "assigned": {
+                    "type": "boolean True or False",
+                    "required": False,
+                    "description": "if True then includes contacts assigned to user,\
+                     if False then doesn't include, True by default"
+                },
+                "followed": {
+                    "type": "boolean True or False",
+                    "required": False,
+                    "description": "if True then includes contacts followed by user,\
+                     if False then doesn't include, True by default"
+                },
+
+            }
+        },
+        {
+            "name": "cold base",
+            "http_method": "GET",
+            "resource_type": "list",
+            "description": "Get cold base of contacts, which are contacts \
+            which do not have any activities yet",
+            "fields": {
+                "limit": {
+                    "type": "int",
+                    "required": False,
+                    "description": "Limit queryset, if not provided gives 20 \
+                    results by default"
+                },
+                "offset": {
+                    "type": "int",
+                    "required": False,
+                    "description": "offset queryset, if not provided gives 0 \
+                    by default"
+                }
+            }
+        },
+        {
+            "name": "assign contact",
+            "http_method": "GET",
+            "resource_type": "view",
+            "description": "Assign a single contact to a user, return True in\
+            case of success, anf False if not",
+            "fields": {
+                "user_id": {
+                    "type": "int",
+                    "required": True,
+                    "description": "User id to which you want to assign the contact"
+                },
+                "contact_id": {
+                    "type": "int",
+                    "required": True,
+                    "description": "Id of contact you want to assign to a user"
+                }
+            }
+        },
+        {
+            "name": "assign contacts",
+            "http_method": "GET",
+            "resource_type": "view",
+            "description": "Assign multiple contacts to a user, return True in\
+            case of success, anf False if not",
+            "fields": {
+                "user_id": {
+                    "type": "int",
+                    "required": True,
+                    "description": "User id to which you want to assign the contact"
+                },
+                "contact_ids": {
+                    "type": "list",
+                    "required": True,
+                    "description": "Ids of contacts you want to assign to a user\
+                    in structure of a list like so: [1,2,3...n]"
+                }
+            }
+        },
+        {
+            "name": "leads",
+            "http_method": "GET",
+            "resource_type": "list",
+            "description": "Returns all contacts with status 'LEAD'",
+            "fields": {
+                "limit": {
+                    "type": "int",
+                    "required": False,
+                    "description": "Limit queryset, if not provided gives \
+                    20 results by default"
+                },
+                "offset": {
+                    "type": "int",
+                    "required": False,
+                    "description": "offset queryset, if not provided gives \
+                    0 by default"
+                }
+            }
+        },
+        {
+            "name": "search",
+            "http_method": "GET",
+            "resource_type": "list",
+            "description": "Performs a recursive contat search by query and \
+            search_params",
+            "fields": {
+                "limit": {
+                    "type": "int",
+                    "required": False,
+                    "description": "Limit queryset, if not provided gives \
+                     20 results by default"
+                },
+                "offset": {
+                    "type": "int",
+                    "required": False,
+                    "description": "offset queryset, if not provided gives \
+                    0 by default"
+                },
+                "search_text": {
+                    "type": "string",
+                    "required": False,
+                    "description": "It is what it is, a text by which the  \
+                    search is performed"
+                },
+                "order_by": {
+                    "type": "string",
+                    "required": False,
+                    "description": "pass a parameter by which the queryset's \
+                    going to be ordered, look at vcard values for reference. If the value is not in \
+                    vcard itself but in additional vcard object prepend 'objname__' to it.\
+                    Eg. 'vcard__email__value', 'vcard__tel__type. Add 'asc' or 'desc' \
+                    for sort order list to be in ascending or descending order. \
+                    put both parameters in format of a list Eg. ['fn','asc']."
+                },
+                "search_params": {
+                    "type": "list of tupples example [('fn', 'startswith')]",
+                    "required": False,
+                    "description": "List of tupples of vcard field value and filter parameter\
+                    .Reference this api doc and find vcard values in order to know which search \
+                    params do you actually want to use for your request. If the value is not in \
+                    vcard itself but in additional vcard object prepend 'objname__' to it.\
+                    Eg. 'email__value', 'tel__type"
+                }
+            }
+        }
+    ]
+
+    def prepend_urls(self):
+        return [
+            url(
+                r"^(?P<resource_name>%s)/recent%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('get_last_contacted'),
+                name='api_last_contacted'
+            ),
+            url(
+                r"^(?P<resource_name>%s)/cold_base%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('get_cold_base'),
+                name='api_cold_base'
+            ),
+            url(
+                r"^(?P<resource_name>%s)/leads%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('get_leads'),
+                name='api_leads'
+            ),
+            url(
+                r"^(?P<resource_name>%s)/search%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('search'),
+                name='api_search'
+            ),
+            url(
+                r"^(?P<resource_name>%s)/assign_contact%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('assign_contact'),
+                name='api_assign_contact'
+            ),
+            url(
+                r"^(?P<resource_name>%s)/assign_contacts%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('assign_contacts'),
+                name='api_assign_contacts'
+            ),
+        ]
+
+    def get_last_contacted(self, request, **kwargs):
+        '''
+        pass limit, offset, owned (True by default, assigned,
+        followed and include_activities with GET request
+        '''
+        limit = int(request.GET.get('limit', 20))
+        offset = int(request.GET.get('offset', 0))
+        include_activities = bool(request.GET.get('include_activities', False))
+        owned = bool(request.GET.get('owned', True))
+        assigned = bool(request.GET.get('assigned', False))
+        followed = bool(request.GET.get('followed', False))
+        contacts = Contact().get_contacts_by_last_activity_date(
+            user_id=request.user.id,
+            include_activities=include_activities,
+            owned=owned,
+            assigned=assigned,
+            followed=followed,
+            limit=limit,
+            offset=offset)
+        if not include_activities:
+            return self.create_response(
+                request,
+                {'objects': self.get_bundle_list(contacts, request)}
+                )
+        else:
+            '''
+            returns
+                (Queryset<Contact>,
+                Queryset<Activity>,
+                {contact1_id: [activity1_id, activity2_id], contact2_id: [activity3_id]})
+            '''
+            obj_dict = {}
+            obj_dict['contacts'] = self.get_bundle_list(contacts[0], request)
+            obj_dict['activities'] = self.get_bundle_list(contacts[1], request)
+            obj_dict['dict'] = contacts[2]
+            return self.create_response(request, obj_dict)
+
+    def get_cold_base(self, request, **kwargs):
+        '''
+        pass limit and offset  with GET request
+        '''
+        limit = int(request.GET.get('limit', 20))
+        offset = int(request.GET.get('offset', 0))
+        contacts = Contact().get_cold_base(limit, offset)
+        return self.create_response(
+            request,
+            {'objects': self.get_bundle_list(contacts, request)}
+            )
+
+    def get_leads(self, request, **kwargs):
+        '''
+        pass limit and offset through GET request
+        '''
+        STATUS_LEAD = 1
+        limit = int(request.GET.get('limit', 20))
+        offset = int(request.GET.get('offset', 0))
+        contacts = Contact().get_contacts_by_status(STATUS_LEAD, limit, offset)
+        return self.create_response(
+            request,
+            {'objects': self.get_bundle_list(contacts, request)}
+            )
+
+    def search(self, request, **kwargs):
+        '''
+        Api implementation of search, pass search_params in this format:
+        [('fn', 'startswith'), ('org__organization_unit', 'icontains'), 'bday']
+        will search by the beginning of fn if search_params are not provided
+        ast library f-n literal_eval converts the string representation of a
+        list to a python list
+        pass limit and offset through GET request
+        '''
+        import ast
+        limit = int(request.GET.get('limit', 20))
+        offset = int(request.GET.get('offset', 0))
+        search_text = request.GET.get('search_text', '').encode('utf-8')
+        search_params = ast.literal_eval(
+            request.GET.get('search_params', "[('fn', 'startswith')]"))
+        order_by = ast.literal_eval(request.GET.get('order_by', "[]"))
+        contacts = Contact().filter_contacts_by_vcard(
+            search_text=search_text,
+            search_params=search_params,
+            order_by=order_by,
+            limit=limit,
+            offset=offset)
+        return self.create_response(
+            request,
+            {'objects': self.get_bundle_list(contacts, request)}
+            )
+
+    def assign_contact(self, request, **kwargs):
+        '''
+        Sharing a single contact with user
+        '''
+        user_id = int(request.GET.get('user_id', 0))
+        contact_id = int(request.GET.get('contact_id', 0))
+        return self.create_response(
+            request,
+            {'success': Contact().assign_user_to_contact(user_id, contact_id)}
+            )
+
+    def assign_contacts(self, request, **kwargs):
+        '''
+        Sharing multiple contacts with user, send multiple contacts as so
+        contact_ids=[1,2,3,4...n]
+        '''
+        import ast
+        print request.GET
+        user_id = int(request.GET.get('user_id', 0))
+        contact_ids = ast.literal_eval(request.GET.get('contact_ids', []))
+        return self.create_response(
+            request,
+            {'success': Contact().assign_user_to_contacts(user_id,
+                                                          contact_ids)}
+            )
 
 
 class SalesCycleResource(CRMServiceModelResource):
@@ -56,6 +409,15 @@ class SalesCycleResource(CRMServiceModelResource):
     products = fields.ToManyField(
         'alm_crm.api.ProductResource', 'products',
         related_name='sales_cycles', null=True, full=True)
+    owner = fields.ToOneField('alm_crm.api.CRMUserResource',
+                              'rel_owner', null=True, full=True)
+    followers = fields.ToManyField('alm_crm.api.CRMUserResource',
+                                   'rel_followers', null=True, full=True)
+    projected_value = fields.ToOneField('alm_crm.api.ValueResource',
+                                        'projected_value', null=True,
+                                        full=True)
+    real_value = fields.ToOneField('alm_crm.api.ValueResource',
+                                   'real_value', null=True, full=True)
 
     class Meta(CRMServiceModelResource.Meta):
         queryset = SalesCycle.objects.all()
@@ -64,6 +426,10 @@ class SalesCycleResource(CRMServiceModelResource):
 
 class ActivityResource(CRMServiceModelResource):
     sales_cycle = fields.ForeignKey(SalesCycleResource, 'sales_cycle')
+    feedback = fields.ToOneField('alm_crm.api.FeedbackResource',
+                                 'activity_feedback', null=True, full=True)
+    owner = fields.ToOneField('alm_crm.api.CRMUserResource',
+                              'activity_owner', null=True, full=True)
 
     class Meta(CRMServiceModelResource.Meta):
         queryset = Activity.objects.all()
@@ -76,3 +442,61 @@ class ProductResource(CRMServiceModelResource):
     class Meta(CRMServiceModelResource.Meta):
         queryset = Product.objects.all()
         resource_name = 'product'
+
+
+class ValueResource(CRMServiceModelResource):
+
+    class Meta(CRMServiceModelResource.Meta):
+        queryset = Value.objects.all()
+        resource_name = 'sales_cycle/value'
+
+
+class CRMUserResource(CRMServiceModelResource):
+
+    class Meta(CRMServiceModelResource.Meta):
+        queryset = CRMUser.objects.all()
+        resource_name = 'crmuser'
+
+
+class ShareResource(CRMServiceModelResource):
+    contact = fields.ForeignKey(ContactResource, 'contact',
+                                full=True, null=True)
+    share_to = fields.ForeignKey(CRMUserResource, 'share_to',
+                                 full=True, null=True)
+    share_from = fields.ForeignKey(CRMUserResource, 'share_from',
+                                   full=True, null=True)
+
+    class Meta(CRMServiceModelResource.Meta):
+        queryset = Share.objects.all()
+        resource_name = 'share'
+
+    def prepend_urls(self):
+        return [
+            url(
+                r"^(?P<resource_name>%s)/recent%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('get_last_shares'),
+                name='api_last_shares'
+            ),
+        ]
+
+    def get_last_shares(self, request, **kwargs):
+        '''
+        pass limit and offset  with GET request
+        '''
+        limit = int(request.GET.get('limit', 20))
+        offset = int(request.GET.get('offset', 0))
+        shares = Share().get_shares(limit=limit, offset=offset)
+        return self.create_response(
+            request,
+            {'objects': self.get_bundle_list(shares, request)}
+            )
+
+
+class FeedbackResource(CRMServiceModelResource):
+    # activity = fields.OneToOneField(ActivityResource, 'feedback_activity', null=True, full=False)
+    # value = fields.ToOneField(ValueResource, 'feedback_value', null=True)
+
+    class Meta(CRMServiceModelResource.Meta):
+        queryset = Feedback.objects.all()
+        resource_name = 'feedback'
