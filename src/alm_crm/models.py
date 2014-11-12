@@ -253,6 +253,40 @@ class Contact(SubscriptionObject):
             return False
 
     @classmethod
+    def share_contact(cls, share_from, share_to, contact_id, comment=None):
+    	share_from = CRMUser.objects.get(id=share_from)
+    	share_to = CRMUser.objects.get(id=share_to)
+    	contact = Contact.objects.get(id=contact_id)
+    	try:
+    		share=Share.objects.get(
+    			share_from=share_from,
+    			share_to=share_to,
+    			contact=contact
+    			)
+    	except ObjectDoesNotExist:
+	    	share = Share(
+	    			share_from=share_from,
+	    			share_to=share_to,
+	    			contact=contact
+	    		)
+    		share.save()
+    	if comment:
+    		'''
+			I do not know how you will submit mentions in comments so i'm leaving 
+			this blank for now
+    		'''
+    		comment = Comment(
+    			comment=comment,
+    			object_id=share.id,
+    			owner_id=share_from.id,
+    			content_type=ContentType.objects.get_for_model(Share).id
+    			)
+    		comment.save()
+
+
+
+
+    @classmethod
     def upd_lst_activity_on_create(cls, sender, created=False,
                                    instance=None, **kwargs):
         if not created:
