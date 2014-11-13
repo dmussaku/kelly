@@ -706,6 +706,12 @@ class SalesCycle(SubscriptionObject):
             Raises:
                 User.DoesNotExist
         """
+
+        try:
+            CRMUser.objects.get(pk=user_id)
+        except CRMUser.DoesNotExist:
+            raise CRMUser.DoesNotExist
+
         q = Q()
         if owned:
             q |= Q(owner_id=user_id)
@@ -984,7 +990,7 @@ class Comment(SubscriptionObject):
     def get_comments_by_context(cls, context_object_id, context_class,
                                 limit=20, offset=0):
         try:
-            cttype = ContentType.objects.get(model=str(context_class))
+            cttype = ContentType.objects.get_for_model(context_class)
         except ContentType.DoesNotExist:
             return False
         return cls.objects.filter(

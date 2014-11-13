@@ -7,9 +7,8 @@ from tastypie.authentication import (
     SessionAuthentication,
     BasicAuthentication,
     )
-from .models import Contact
 from django.conf.urls import url
-from alm_crm.models import (
+from .models import (
     SalesCycle,
     Product,
     Activity,
@@ -410,9 +409,9 @@ class SalesCycleResource(CRMServiceModelResource):
         'alm_crm.api.ProductResource', 'products',
         related_name='sales_cycles', null=True, full=True)
     owner = fields.ToOneField('alm_crm.api.CRMUserResource',
-                              'rel_owner', null=True, full=True)
+                              'owner', null=True, full=True)
     followers = fields.ToManyField('alm_crm.api.CRMUserResource',
-                                   'rel_followers', null=True, full=True)
+                                   'followers', null=True, full=True)
     projected_value = fields.ToOneField('alm_crm.api.ValueResource',
                                         'projected_value', null=True,
                                         full=True)

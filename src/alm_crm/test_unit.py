@@ -18,8 +18,8 @@ from alm_vcard.models import VCard
 
 
 class ContactTestCase(TestCase):
-    fixtures = ['crmusers.json', 'contacts.json', 'salescycles.json',
-                'activities.json', 'feedbacks.json']
+    fixtures = ['crmusers.json', 'vcards.json', 'contacts.json',
+                'salescycles.json', 'activities.json', 'feedbacks.json']
 
     def setUp(self):
         super(ContactTestCase, self).setUp()
@@ -48,12 +48,20 @@ class ContactTestCase(TestCase):
             len(Contact.get_contacts_by_status(status=1, limit=1)), 1)
 
     def test_get_cold_base(self):
+        print [(c.pk, c.status) for c in Contact.objects.all()]
         self.assertEqual(len(Contact.get_cold_base()), 1)
 
-    def test_change_status(self):
-        self.assertEqual(self.contact1.status, 0)
-        self.contact1.change_status(1)
+    def test_change_status_without_save(self):
         self.assertEqual(self.contact1.status, 1)
+        self.contact1.change_status(0)
+        contact = Contact.objects.get(pk=self.contact1.pk)
+        self.assertEqual(contact.status, 1)
+
+    def test_change_status_with_save(self):
+        self.assertEqual(self.contact1.status, 1)
+        self.contact1.change_status(0, save=True)
+        contact = Contact.objects.get(pk=self.contact1.pk)
+        self.assertEqual(contact.status, 0)
 
     def test_upload_contacts(self):
         file_path = os.path.join(os.path.dirname(os.path.dirname(__file__)),
@@ -82,18 +90,22 @@ class ContactTestCase(TestCase):
         file_path = os.path.join(os.path.dirname(os.path.dirname(__file__)),
                                  'alm_crm/fixtures/aliya.vcf')
         file_obj = open(file_path, "r").read()
-        contacts = Contact.upload_contacts('vcard', file_obj, True)
+        contacts = Contact.upload_contacts(upload_type='vcard',
+                                           file_obj=file_obj, save=True)
         cs = Contact.filter_contacts_by_vcard(search_text='Aliya',
                                               search_params=[('fn')])
         self.assertEqual(len(cs), 1)
         cs = Contact.filter_contacts_by_vcard(search_text='Aliya',
-                                              search_params=[('fn', 'icontains')])
+                                              search_params=[('fn',
+                                                              'icontains')])
         self.assertEqual(len(cs), 1)
         cs = Contact.filter_contacts_by_vcard(search_text='666',
-                                              search_params=[('tel__value', 'icontains')])
+                                              search_params=[('tel__value',
+                                                              'icontains')])
         self.assertEqual(len(cs), 1)
         cs = Contact.filter_contacts_by_vcard(search_text='666',
-                                              search_params=[('tel__value', 'icontains'),
+                                              search_params=[('tel__value',
+                                                              'icontains'),
                                                              ('fn')])
         self.assertEqual(len(cs), 0)
 
@@ -118,8 +130,9 @@ class ContactTestCase(TestCase):
 
 
 class ActivityTestCase(TestCase):
-    fixtures = ['crmusers.json', 'contacts.json', 'salescycles.json',
-                'activities.json', 'feedbacks.json', 'mentions.json']
+    fixtures = ['crmusers.json', 'vcards.json', 'contacts.json',
+                'salescycles.json', 'activities.json', 'feedbacks.json',
+                'mentions.json']
 
     def setUp(self):
         super(ActivityTestCase, self).setUp()
@@ -143,7 +156,7 @@ class ActivityTestCase(TestCase):
         self.assertEqual(0, len(Feedback.objects.filter(id=a.id)))
         f = Feedback(feedback='feedback8', status="W",
                      date_created=timezone.now(), date_edited=timezone.now(),
-                     activity=a)
+                     activity=a, owner_id=1)
         f.save()
         self.assertEqual(f, Feedback.objects.get(id=f.id))
 
@@ -164,7 +177,7 @@ class ActivityTestCase(TestCase):
             return False
 
     def test_get_mentioned_activities_of(self):
-        user_ids = [1, 2]
+        user_ids = (1, 2)
         self.assertEqual(len(set(self.activity1.mentions.all())), 1)
         self.assertEqual(
             len(set(Activity.get_mentioned_activities_of(user_ids))), 4)
@@ -248,13 +261,13 @@ class MentionTestCase(TestCase):
 
 
 class CommentTestCase(TestCase):
-    fixtures = ['crmusers.json', 'contacts.json', 'salescycles.json',
-                'activities.json', 'mentions.json']
+    fixtures = ['crmusers.json', 'vcards.json', 'contacts.json',
+                'salescycles.json', 'activities.json', 'mentions.json']
 
     def setUp(self):
         super(CommentTestCase, self).setUp()
 
-    def test_build_new__without_save(self):
+    def test_build_new_without_save(self):
         user_id = 1
         before = Comment.get_comments_by_context(1, Activity).count()
 
@@ -283,9 +296,9 @@ class CommentTestCase(TestCase):
 
 
 class SalesCycleTestCase(TestCase):
-    fixtures = ['crmusers.json', 'contacts.json', 'salescycles.json',
-                'activities.json', 'mentions.json', 'products.json',
-                'values.json']
+    fixtures = ['crmusers.json', 'vcards.json', 'contacts.json',
+                'salescycles.json', 'activities.json', 'mentions.json',
+                'products.json', 'values.json']
 
     def setUp(self):
         super(SalesCycleTestCase, self).setUp()
@@ -316,9 +329,10 @@ class SalesCycleTestCase(TestCase):
             [4, 3, 2, 1])
 
     def test_add_product(self):
-        self.assertEqual(len(self.sc1.products.all()), 0)
-        self.assertTrue(self.sc1.add_product(1))
-        self.assertEqual(len(self.get_sc(1).products.all()), 1)
+        count = len(self.sc1.products.all())
+        self.assertTrue(self.sc1.add_product(2))
+        self.assertEqual(len(self.get_sc(self.sc1.pk).products.all()),
+                         count + 1)
 
     def test_set_result_without_save(self):
         self.assertEqual(self.sc1.real_value_id, 1)
@@ -398,23 +412,31 @@ class SalesCycleTestCase(TestCase):
         self.assertEqual(list(ret.values_list('pk', flat=True)), [1, 2, 3, 4])
 
 
-class SalesCycleResourceTest(ResourceTestCase):
+class ResourceTestMixin(object):
     fixtures = ['companies.json', 'services.json', 'users.json',
                 'subscriptions.json',
-                'crmusers.json', 'contacts.json', 'salescycles.json',
-                'activities.json', 'products.json', 'mentions.json',
-                'values.json']
+                'crmusers.json', 'vcards.json', 'contacts.json',
+                'salescycles.json', 'activities.json', 'products.json',
+                'mentions.json', 'values.json']
 
-    def setUp(self):
+    def get_credentials(self):
         from alm_user.models import User
-        super(self.__class__, self).setUp()
-
         self.user = User.objects.get(pk=1)
         # reset password
         # self.user.password = self.user_password
         # self.user.save()
-        self.user_password = 'qweasdzxc'
+        self.user_password = '123'
+
         # Log in self.user
+        self.api_client.client.login(email=self.user.email,
+                                     password=self.user_password)
+
+
+class SalesCycleResourceTest(ResourceTestMixin, ResourceTestCase):
+    def setUp(self):
+        super(self.__class__, self).setUp()
+
+        # login user
         self.get_credentials()
 
         self.api_path_sales_cycle = '/api/v1/sales_cycle/'
@@ -426,10 +448,6 @@ class SalesCycleResourceTest(ResourceTestCase):
         self.get_des_res = lambda path: self.deserialize(self.get_resp(path))
 
         self.sales_cycle = SalesCycle.objects.first()
-
-    def get_credentials(self):
-        return self.api_client.client.login(email=self.user.email,
-                                            password=self.user_password)
 
     # def test_get_list_unauthorzied(self):
     #     self.assertHttpUnauthorized(self.api_client.get(
@@ -524,24 +542,13 @@ class SalesCycleResourceTest(ResourceTestCase):
         self.assertEqual(SalesCycle.objects.count(), count - 1)
 
 
-class ActivityResourceTest(ResourceTestCase):
-    fixtures = ['companies.json', 'services.json', 'users.json',
-                'subscriptions.json',
-                'crmusers.json', 'contacts.json', 'salescycles.json',
-                'activities.json', 'products.json', 'mentions.json',
-                'values.json']
+class ActivityResourceTest(ResourceTestMixin, ResourceTestCase):
 
     def setUp(self):
-        from alm_user.models import User
         super(self.__class__, self).setUp()
 
-        self.user = User.objects.get(pk=1)
-        # reset password
-        # self.user.password = self.user_password
-        # self.user.save()
-        self.user_password = 'qweasdzxc'
-        # Log in self.user
-        self.login_user()
+        # login user
+        self.get_credentials()
 
         self.api_path_activity = '/api/v1/activity/'
 
@@ -560,10 +567,6 @@ class ActivityResourceTest(ResourceTestCase):
             lambda pk: self.deserialize(self.get_detail_resp(pk))
 
         self.activity = Activity.objects.first()
-
-    def login_user(self):
-        return self.api_client.client.login(email=self.user.email,
-                                            password=self.user_password)
 
     def test_get_list_valid_json(self):
         self.assertValidJSONResponse(self.get_list_resp)
@@ -609,24 +612,13 @@ class ActivityResourceTest(ResourceTestCase):
         self.assertEqual(sales_cycle.rel_activities.count(), count - 1)
 
 
-class ProductResourceTest(ResourceTestCase):
-    fixtures = ['companies.json', 'services.json', 'users.json',
-                'subscriptions.json',
-                'crmusers.json', 'contacts.json', 'salescycles.json',
-                'activities.json', 'products.json', 'mentions.json',
-                'values.json']
+class ProductResourceTest(ResourceTestMixin, ResourceTestCase):
 
     def setUp(self):
-        from alm_user.models import User
         super(self.__class__, self).setUp()
 
-        self.user = User.objects.get(pk=1)
-        # reset password
-        # self.user.password = self.user_password
-        # self.user.save()
-        self.user_password = 'qweasdzxc'
-        # Log in self.user
-        self.login_user()
+        # login user
+        self.get_credentials()
 
         self.api_path_product = '/api/v1/product/'
 
@@ -645,10 +637,6 @@ class ProductResourceTest(ResourceTestCase):
             lambda pk: self.deserialize(self.get_detail_resp(pk))
 
         self.product = Product.objects.first()
-
-    def login_user(self):
-        return self.api_client.client.login(email=self.user.email,
-                                            password=self.user_password)
 
     def test_get_list_valid_json(self):
         self.assertValidJSONResponse(self.get_list_resp)
