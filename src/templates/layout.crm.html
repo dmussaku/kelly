@@ -82,8 +82,8 @@
           <div class="dropdown-menu-body">
 
             <form
-              action="{% crm_url 'crm_import_vcard'  %}" id='file_upload_form' method="post" enctype="multipart/form-data"
-              data-js-upload-vcard='form'>
+              action="http://alma.net:8000/api/v1/contact/import_contacts_from_vcard/" id='file_upload_form' method="post" enctype="multipart/form-data"
+              data-js-upload-vcard='form' old-url="{% crm_url 'crm_import_vcard'  %}">
               {% csrf_token %}
               <p>{{ vcard_upload_form.non_field_errors }}</p>
               <p>{{ vcard_upload_form.myfile.label_tag }} {{ vcard_upload_form.myfile.help_text }}</p>

@@ -2,6 +2,7 @@ from tastypie.resources import ModelResource
 from tastypie import fields
 from tastypie.authorization import Authorization
 from .models import Contact
+from django.http import HttpResponse
 from django.conf.urls import url
 from tastypie.utils import trailing_slash
 from tastypie.authentication import (
@@ -63,7 +64,7 @@ class ContactResource(CRMServiceModelResource):
     vcard = fields.ToOneField('alm_vcard.api.VCardResource','vcard', null=True, full=True)
     owner = fields.ToOneField('alm_crm.api.CRMUserResource','owner', null=True, full=True)
     followers = fields.ToManyField('alm_crm.api.CRMUserResource', 'followers', null=True, full=True)
-    assignees = fields.ToManyField('alm_crm.api.CRMUserResource', 'assignees', null=True, full=True)	    
+    assignees = fields.ToManyField('alm_crm.api.CRMUserResource', 'assignees', null=True, full=True)        
     sales_cycles = fields.ToManyField(
         'alm_crm.api.SalesCycleResource', 'sales_cycles',
         related_name='contact', null=True, full=True)
@@ -338,6 +339,12 @@ class ContactResource(CRMServiceModelResource):
                 self.wrap_view('share_contacts'),
                 name = 'api_share_contacts'
             ),
+            url(
+                r"^(?P<resource_name>%s)/import_contacts_from_vcard%s$" % 
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('import_contacts_from_vcard'),
+                name = 'api_import_contacts_from_vcard'
+            ),
         ]
 
     def get_last_contacted(self, request, **kwargs):
@@ -426,49 +433,61 @@ class ContactResource(CRMServiceModelResource):
             )
 
     def assign_contact(self, request, **kwargs):
-    	'''
-    	Assigning a single contact with user
-    	'''
-    	user_id = int(request.GET.get('user_id',0))
-    	contact_id = int(request.GET.get('contact_id',0))
-    	return self.create_response(
-    			request, {'success':Contact().assign_user_to_contact(user_id, contact_id)}
-    		)
+        '''
+        Assigning a single contact with user
+        '''
+        user_id = int(request.GET.get('user_id',0))
+        contact_id = int(request.GET.get('contact_id',0))
+        return self.create_response(
+                request, {'success':Contact().assign_user_to_contact(user_id, contact_id)}
+            )
 
     def assign_contacts(self, request, **kwargs):
-    	'''
-    	Assigning multiple contacts with user, send multiple contacts as so
-    	contact_ids=[1,2,3,4...n]
-    	'''
-    	import ast
-    	user_id = int(request.GET.get('user_id',0))
-    	contact_ids = ast.literal_eval(request.GET.get('contact_ids',[]))
-    	return self.create_response(
-    			request, {'success':Contact().assign_user_to_contacts(user_id, contact_ids)}
-    		)
+        '''
+        Assigning multiple contacts with user, send multiple contacts as so
+        contact_ids=[1,2,3,4...n]
+        '''
+        import ast
+        user_id = int(request.GET.get('user_id',0))
+        contact_ids = ast.literal_eval(request.GET.get('contact_ids',[]))
+        return self.create_response(
+                request, {'success':Contact().assign_user_to_contacts(user_id, contact_ids)}
+            )
 
     def share_contact(self, request, **kwargs):
-    	'''	
-		Sharing a single contact with a single user
-    	'''
-    	share_to = int(request.GET.get('share_to',0))
-    	share_from = int(request.GET.get('share_from',0))
-    	contact_id = int(request.GET.get('contact_id',0))
-    	return self.create_response(
-    			request, {'success':Contact().share_contact(share_from, share_to, contact_id)}
-    		)
+        ''' 
+        Sharing a single contact with a single user
+        '''
+        share_to = int(request.GET.get('share_to',0))
+        share_from = int(request.GET.get('share_from',0))
+        contact_id = int(request.GET.get('contact_id',0))
+        return self.create_response(
+                request, {'success':Contact().share_contact(share_from, share_to, contact_id)}
+            )
 
     def share_contacts(self, request, **kwargs):
-    	'''	
-		Sharing a single contact with a single user
-    	'''
-    	import ast
-    	share_to = int(request.GET.get('share_to',0))
-    	share_from = int(request.GET.get('share_from',0))
-    	contact_ids = ast.literal_eval(request.GET.get('contact_ids',[]))
-    	return self.create_response(
-    			request, {'success':Contact().share_contacts(share_from, share_to, contact_ids)}
-    		)
+        ''' 
+        Sharing a single contact with a single user
+        '''
+        import ast
+        share_to = int(request.GET.get('share_to',0))
+        share_from = int(request.GET.get('share_from',0))
+        contact_ids = ast.literal_eval(request.GET.get('contact_ids',[]))
+        return self.create_response(
+                request, {'success':Contact().share_contacts(share_from, share_to, contact_ids)}
+            )
+
+    def import_contacts_from_vcard(self, request, **kwargs):
+        '''
+        Import contact(s) from single vcard file
+        '''
+        if request.method == 'POST':
+            print request.FILES['myfile']
+            return self.create_response(
+                    request, Contact().import_contacts_from_vcard(request.FILES['myfile'])
+                )
+        else:
+            print 'asdasd'
 
 class SalesCycleResource(CRMServiceModelResource):
     contact = fields.ForeignKey(ContactResource, 'contact')
