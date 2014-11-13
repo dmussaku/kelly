@@ -254,36 +254,45 @@ class Contact(SubscriptionObject):
 
     @classmethod
     def share_contact(cls, share_from, share_to, contact_id, comment=None):
-    	share_from = CRMUser.objects.get(id=share_from)
-    	share_to = CRMUser.objects.get(id=share_to)
-    	contact = Contact.objects.get(id=contact_id)
-    	try:
-    		share=Share.objects.get(
-    			share_from=share_from,
-    			share_to=share_to,
-    			contact=contact
-    			)
-    	except ObjectDoesNotExist:
-	    	share = Share(
-	    			share_from=share_from,
-	    			share_to=share_to,
-	    			contact=contact
-	    		)
-    		share.save()
-    	if comment:
-    		'''
-			I do not know how you will submit mentions in comments so i'm leaving 
-			this blank for now
-    		'''
-    		comment = Comment(
-    			comment=comment,
-    			object_id=share.id,
-    			owner_id=share_from.id,
-    			content_type=ContentType.objects.get_for_model(Share).id
-    			)
-    		comment.save()
-
-
+        return cls.share_contacts(share_from, share_to, [contact_id], comment)
+    
+    @classmethod
+    def share_contacts(cls, share_from, share_to, contact_ids, comment=None):
+        '''
+        Share multiple contacts to a single user
+        '''
+        assert isinstance(contact_ids, (list, tuple)), 'Must be a list'
+        if not contact_ids:
+            return false
+        try:
+            share_from = CRMUser.objects.get(id=share_from)
+            share_to = CRMUser.objects.get(id=share_to)
+            contacts = [Contact.objects.get(id=contact_id) for contact_id in contact_ids]
+            share_list=[]
+            for contact in contacts:
+                share = Share(
+                        share_from=share_from,
+                        share_to=share_to,
+                        contact=contact
+                    )
+                share.save()
+                share_list.append(share)
+            '''
+            I do not know how you will submit mentions in comments so i'm leaving 
+            this blank for now
+            '''
+            if comment:
+                for share in share_list:
+                    comment = Comment(
+                        comment=comment,
+                        object_id=share.id,
+                        owner_id=share_from.id,
+                        content_type_id=ContentType.objects.get_for_model(Share).id
+                        )
+                    comment.save()
+            return True
+        except:
+            return False
 
 
     @classmethod
