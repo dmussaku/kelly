@@ -61,6 +61,9 @@ class CRMServiceModelResource(ModelResource):
 
 class ContactResource(CRMServiceModelResource):
     vcard = fields.ToOneField('alm_vcard.api.VCardResource','vcard', null=True, full=True)
+    owner = fields.ToOneField('alm_crm.api.CRMUserResource','owner', null=True, full=True)
+    followers = fields.ToManyField('alm_crm.api.CRMUserResource', 'followers', null=True, full=True)
+    assignees = fields.ToManyField('alm_crm.api.CRMUserResource', 'assignees', null=True, full=True)	    
     sales_cycles = fields.ToManyField(
         'alm_crm.api.SalesCycleResource', 'sales_cycles',
         related_name='contact', null=True, full=True)
@@ -68,6 +71,222 @@ class ContactResource(CRMServiceModelResource):
     class Meta(CRMServiceModelResource.Meta):
         queryset = Contact.objects.all()
         resource_name = 'contact'
+        extra_actions = [
+        {
+            "name": "recent",
+            "http_method": "GET",
+            "resource_type": "list",
+            "description": "Get contacts ordered by their last activity date",
+            "fields": {
+                "limit": {
+                    "type": "int",
+                    "required": False,
+                    "description": "Limit queryset, if not provided gives 20\
+                     results by default"
+                },
+                "offset": {
+                    "type": "int",
+                    "required": False,
+                    "description": "offset queryset, if not provided gives 0\
+                     by default"
+                },
+                "owned": {
+                    "type": "boolean True or False",
+                    "required": False,
+                    "description": "if True then includes contacts owned by user,\
+                     if False then doesn't include, True by default"
+                },
+                "assigned": {
+                    "type": "boolean True or False",
+                    "required": False,
+                    "description": "if True then includes contacts assigned to user,\
+                     if False then doesn't include, True by default"
+                },
+                "followed": {
+                    "type": "boolean True or False",
+                    "required": False,
+                    "description": "if True then includes contacts followed by user,\
+                     if False then doesn't include, True by default"
+                },
+
+            }
+        },
+        {
+            "name": "cold_base",
+            "http_method": "GET",
+            "resource_type": "list",
+            "description": "Get cold base of contacts, which are contacts \
+            which do not have any activities yet",
+            "fields": {
+                "limit": {
+                    "type": "int",
+                    "required": False,
+                    "description": "Limit queryset, if not provided gives 20 \
+                    results by default"
+                },
+                "offset": {
+                    "type": "int",
+                    "required": False,
+                    "description": "offset queryset, if not provided gives 0 \
+                    by default"
+                },
+            }
+        },
+        {
+            "name": "assign_contact",
+            "http_method": "GET",
+            "resource_type": "list",
+            "description": "Assign a single contact to a user, return True in\
+            case of success, anf False if not",
+            "fields": {
+                "user_id": {
+                    "type": "int",
+                    "required": True,
+                    "description": "User id to which you want to assign the contact"
+                },
+                "contact_id": {
+                    "type": "int",
+                    "required": True,
+                    "description": "Id of contact you want to assign to a user"
+                },
+            }
+        },
+        {
+            "name": "assign_contacts",
+            "http_method": "GET",
+            "resource_type": "list",
+            "description": "Assign multiple contacts to a user, return True in\
+            case of success, anf False if not",
+            "fields": {
+                "user_id": {
+                    "type": "int",
+                    "required": True,
+                    "description": "User id to which you want to assign the contact"
+                },
+                "contact_ids": {
+                    "type": "list",
+                    "required": True,
+                    "description": "Ids of contacts you want to assign to a user\
+                    in structure of a list like so: [1,2,3...n]"
+                },
+            }
+        },
+        {
+            "name": "share_contact",
+            "http_method": "GET",
+            "resource_type": "list",
+            "description": "Share a single contact to a user, return True in\
+            case of success, anf False if not",
+            "fields": {
+                "share_from": {
+                    "type": "int",
+                    "required": True,
+                    "description": "User id from which you want to share the contact"
+                },
+                "share_to": {
+                    "type": "int",
+                    "required": True,
+                    "description": "User id to which you want to share the contact"
+                },
+                "contact_id": {
+                    "type": "int",
+                    "required": True,
+                    "description": "Id of contact you want to share to a user"
+                },
+            }
+        },
+        {
+            "name": "share_contacts",
+            "http_method": "GET",
+            "resource_type": "list",
+            "description": "Share multiple contacts with a user, return True in\
+            case of success, anf False if not",
+            "fields": {
+                "share_from": {
+                    "type": "int",
+                    "required": True,
+                    "description": "User id from which you want to share the contact"
+                },
+                "share_to": {
+                    "type": "int",
+                    "required": True,
+                    "description": "User id to which you want to share the contact"
+                },
+                "contact_ids": {
+                    "type": "list",
+                    "required": True,
+                    "description": "Ids of contacts you want to assign to a user\
+                    in structure of a list like so: [1,2,3...n]"
+                },
+            }
+        },
+        {
+            "name": "leads",
+            "http_method": "GET",
+            "resource_type": "list",
+            "description": "Returns all contacts with status 'LEAD'",
+            "fields": {
+                "limit": {
+                    "type": "int",
+                    "required": False,
+                    "description": "Limit queryset, if not provided gives \
+                    20 results by default"
+                },
+                "offset": {
+                    "type": "int",
+                    "required": False,
+                    "description": "offset queryset, if not provided gives \
+                    0 by default"
+                },
+            }
+        },
+        {
+            "name": "search",
+            "http_method": "GET",
+            "resource_type": "list",
+            "description": "Performs a recursive contat search by query and \
+            search_params",
+            "fields": {
+                "limit": {
+                    "type": "int",
+                    "required": False,
+                    "description": "Limit queryset, if not provided gives \
+                     20 results by default"
+                },
+                "offset": {
+                    "type": "int",
+                    "required": False,
+                    "description": "offset queryset, if not provided gives \
+                    0 by default"
+                },
+                "search_text": {
+                    "type": "string",
+                    "required": False,
+                    "description": "It is what it is, a text by which the  \
+                    search is performed"
+                },
+                "order_by": {
+                    "type": "string",
+                    "required": False,
+                    "description": "pass a parameter by which the queryset's \
+                    going to be ordered, look at vcard values for reference. If the value is not in \
+                    vcard itself but in additional vcard object prepend 'objname__' to it.\
+                    Eg. 'vcard__email__value', 'vcard__tel__type. Add 'asc' or 'desc' \
+                    for sort order list to be in ascending or descending order. \
+                    put both parameters in format of a list Eg. ['fn','asc']."
+                },
+                "search_params": {
+                    "type": "list of tupples example [('fn', 'startswith')]",
+                    "required": False,
+                    "description": "List of tupples of vcard field value and filter parameter\
+                    .Reference this api doc and find vcard values in order to know which search \
+                    params do you actually want to use for your request. If the value is not in \
+                    vcard itself but in additional vcard object prepend 'objname__' to it.\
+                    Eg. 'email__value', 'tel__type"
+                }
+            }
+        }
+    ]
 
     def prepend_urls(self):
         return [
@@ -94,6 +313,30 @@ class ContactResource(CRMServiceModelResource):
                 (self._meta.resource_name, trailing_slash()),
                 self.wrap_view('search'),
                 name = 'api_search'
+            ),
+            url(
+                r"^(?P<resource_name>%s)/assign_contact%s$" % 
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('assign_contact'),
+                name = 'api_assign_contact'
+            ),
+            url(
+                r"^(?P<resource_name>%s)/assign_contacts%s$" % 
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('assign_contacts'),
+                name = 'api_assign_contacts'
+            ),
+            url(
+                r"^(?P<resource_name>%s)/share_contact%s$" % 
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('share_contact'),
+                name = 'api_share_contact'
+            ),
+            url(
+                r"^(?P<resource_name>%s)/share_contacts%s$" % 
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('share_contacts'),
+                name = 'api_share_contacts'
             ),
         ]
 
@@ -171,15 +414,61 @@ class ContactResource(CRMServiceModelResource):
         search_text = request.GET.get('search_text','').encode('utf-8')
         search_params = ast.literal_eval(
             request.GET.get('search_params',"[('fn', 'startswith')]"))
+        order_by = ast.literal_eval(request.GET.get('order_by',"[]"))
         contacts = Contact().filter_contacts_by_vcard(
             search_text=search_text,
             search_params=search_params,
+            order_by=order_by,
             limit=limit,
             offset=offset)
         return self.create_response(
                 request, {'objects':self.get_bundle_list(contacts,request)}
             )
 
+    def assign_contact(self, request, **kwargs):
+    	'''
+    	Assigning a single contact with user
+    	'''
+    	user_id = int(request.GET.get('user_id',0))
+    	contact_id = int(request.GET.get('contact_id',0))
+    	return self.create_response(
+    			request, {'success':Contact().assign_user_to_contact(user_id, contact_id)}
+    		)
+
+    def assign_contacts(self, request, **kwargs):
+    	'''
+    	Assigning multiple contacts with user, send multiple contacts as so
+    	contact_ids=[1,2,3,4...n]
+    	'''
+    	import ast
+    	user_id = int(request.GET.get('user_id',0))
+    	contact_ids = ast.literal_eval(request.GET.get('contact_ids',[]))
+    	return self.create_response(
+    			request, {'success':Contact().assign_user_to_contacts(user_id, contact_ids)}
+    		)
+
+    def share_contact(self, request, **kwargs):
+    	'''	
+		Sharing a single contact with a single user
+    	'''
+    	share_to = int(request.GET.get('share_to',0))
+    	share_from = int(request.GET.get('share_from',0))
+    	contact_id = int(request.GET.get('contact_id',0))
+    	return self.create_response(
+    			request, {'success':Contact().share_contact(share_from, share_to, contact_id)}
+    		)
+
+    def share_contacts(self, request, **kwargs):
+    	'''	
+		Sharing a single contact with a single user
+    	'''
+    	import ast
+    	share_to = int(request.GET.get('share_to',0))
+    	share_from = int(request.GET.get('share_from',0))
+    	contact_ids = ast.literal_eval(request.GET.get('contact_ids',[]))
+    	return self.create_response(
+    			request, {'success':Contact().share_contacts(share_from, share_to, contact_ids)}
+    		)
 
 class SalesCycleResource(CRMServiceModelResource):
     contact = fields.ForeignKey(ContactResource, 'contact')
@@ -221,8 +510,8 @@ class CRMUserResource(CRMServiceModelResource):
 
 class ShareResource(CRMServiceModelResource):
     contact = fields.ForeignKey(ContactResource, 'contact', full=True, null=True)
-    share_to = fields.ForeignKey(ContactResource, 'contact', full=True, null=True)
-    share_from = fields.ForeignKey(ContactResource, 'contact', full=True, null=True)
+    share_to = fields.ForeignKey(CRMUserResource, 'share_to', full=True, null=True)
+    share_from = fields.ForeignKey(CRMUserResource, 'share_from', full=True, null=True)
 
     class Meta(CRMServiceModelResource.Meta):
         queryset = Share.objects.all()

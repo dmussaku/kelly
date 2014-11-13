@@ -123,7 +123,7 @@ class Contact(SubscriptionObject):
         db_table = settings.DB_PREFIX.format('contact')
 
     def __unicode__(self):
-        return "%s %s" % (self.vcard, self.tp)
+        return "%s %s" % (self.vcard.fn, self.tp)
 
     def save(self, **kwargs):
         if not self.subscription_id and self.owner:
@@ -253,6 +253,49 @@ class Contact(SubscriptionObject):
             return False
 
     @classmethod
+    def share_contact(cls, share_from, share_to, contact_id, comment=None):
+        return cls.share_contacts(share_from, share_to, [contact_id], comment)
+    
+    @classmethod
+    def share_contacts(cls, share_from, share_to, contact_ids, comment=None):
+        '''
+        Share multiple contacts to a single user
+        '''
+        assert isinstance(contact_ids, (list, tuple)), 'Must be a list'
+        if not contact_ids:
+            return false
+        try:
+            share_from = CRMUser.objects.get(id=share_from)
+            share_to = CRMUser.objects.get(id=share_to)
+            contacts = [Contact.objects.get(id=contact_id) for contact_id in contact_ids]
+            share_list=[]
+            for contact in contacts:
+                share = Share(
+                        share_from=share_from,
+                        share_to=share_to,
+                        contact=contact
+                    )
+                share.save()
+                share_list.append(share)
+            '''
+            I do not know how you will submit mentions in comments so i'm leaving 
+            this blank for now
+            '''
+            if comment:
+                for share in share_list:
+                    comment = Comment(
+                        comment=comment,
+                        object_id=share.id,
+                        owner_id=share_from.id,
+                        content_type_id=ContentType.objects.get_for_model(Share).id
+                        )
+                    comment.save()
+            return True
+        except:
+            return False
+
+
+    @classmethod
     def upd_lst_activity_on_create(cls, sender, created=False,
                                    instance=None, **kwargs):
         if not created:
@@ -302,7 +345,7 @@ class Contact(SubscriptionObject):
 
     @classmethod
     def filter_contacts_by_vcard(cls, search_text, search_params=None,
-                                 limit=20, offset=0):
+                                 limit=20, offset=0, order_by=None):
         r"""TODO Make a search query for contacts by their vcard.
         Important! Search params have one of the following formats:
             - name of vcard field, if simple field
@@ -342,6 +385,12 @@ class Contact(SubscriptionObject):
             contacts = contacts|Contact.objects.filter(**query_dict)
         #vcards = VCard.objects.filter(**params)
         #contacts = [vcard.contact for vcard in vcards][offset:offset + limit]
+        assert isinstance(order_by, list), "Must be a list"
+        if order_by:
+            if order_by[1]=='asc':
+                return contacts.order_by('vcard__'+str(order_by[0]))
+            else:
+                return contacts.order_by('-vcard__'+str(order_by[0]))
         return contacts
 
         '''

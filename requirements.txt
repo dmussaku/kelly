@@ -9,10 +9,10 @@ django-hosts==0.6
 django-mailviews==0.6.3
 django-nose2==0.1.1
 django-tastypie==0.12.1
+django-tastypie-swagger==0.1.2
 django-timezone-field==1.1
 djrill==1.1.1
 ecdsa==0.11
-ipython==2.3.0
 mock==1.0.1
 nose2==0.4.7
 nose2-cov==1.0a4

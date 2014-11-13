@@ -112,6 +112,7 @@ class BaseConfiguration(SubdomainConfiguration, Configuration):
         'alm_vcard',
         'alm_crm',
         'tastypie',
+        'tastypie_swagger',
     )
 
     MIDDLEWARE_CLASSES = (
@@ -207,6 +208,8 @@ class BaseConfiguration(SubdomainConfiguration, Configuration):
         rel('static'),
     )
     STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.CachedStaticFilesStorage'
+
+    TASTYPIE_SWAGGER_API_MODULE = 'almanet.urls.v1_api'
 
     EMAIL_HOST_USER = 'adm@v3na.com'
     EMAIL_HOST_PASSWORD = ''
