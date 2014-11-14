@@ -439,6 +439,7 @@ class ProductResource(CRMServiceModelResource):
 
     class Meta(CRMServiceModelResource.Meta):
         queryset = Product.objects.all()
+        detail_allowed_methods = ['get', 'post', 'put', 'patch', 'delete']
         resource_name = 'product'
 
 

@@ -744,3 +744,29 @@ class ProductResourceTest(ResourceTestMixin, ResourceTestCase):
             self.api_path_product + '%s/' % self.product.pk, format='json'))
         # verify that one sales_cycle has been deleted.
         self.assertEqual(sales_cycle.products.count(), count - 1)
+
+    def test_update_product_via_put(self):
+        # get exist product data
+        p = Product.objects.first()
+        product_data = self.get_detail_des(p.pk)
+        # update it
+        t = '_UPDATED!'
+        product_data['name'] += t
+        # PUT it
+        self.api_client.put(self.api_path_product + '%s/' % (p.pk),
+                            format='json', data=product_data)
+        # check
+        self.assertEqual(self.get_detail_des(p.pk)['name'], p.name + t)
+
+    def test_update_product_via_patch(self):
+        # get exist product data
+        p = Product.objects.first()
+        product_name = self.get_detail_des(p.pk)['name']
+        # update it
+        t = '_NAME_UPDATED!'
+        product_name += t
+        # PATCH it
+        self.api_client.patch(self.api_path_product + '%s/' % (p.pk),
+                              format='json', data={'name': product_name})
+        # check
+        self.assertEqual(self.get_detail_des(p.pk)['name'], product_name)
