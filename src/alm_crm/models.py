@@ -364,6 +364,27 @@ class Contact(SubscriptionObject):
         return c.first()
 
     @classmethod
+    def get_contact_products(cls, contact_id, limit=20, offset=0):
+        """
+            TEST Returns contact products by `contact_id`
+            get it from salescycles by contact
+        """
+        c = Contact.objects.get(pk=contact_id)
+        sales_cycle_ids = c.sales_cycles.values_list('pk', flat=True)
+
+        return Product.objects.filter(sales_cycles__pk__in=sales_cycle_ids)[
+            offset:offset + limit]
+
+    @classmethod
+    def get_contact_activities(cls, contact_id, limit=20, offset=0):
+        """TEST Returns list of activities ordered by date."""
+        c = Contact.objects.get(pk=contact_id)
+        sales_cycle_ids = c.sales_cycles.values_list('pk', flat=True)
+
+        return Activity.objects.filter(sales_cycle_id__in=sales_cycle_ids)\
+            .order_by('-date_created')[offset:offset + limit]
+
+    @classmethod
     def upload_contacts(cls, upload_type, file_obj, save=False):
         """Extracts contacts from source: vcard file or csv file or any
         other file objects. Build queryset from them and save if required.
@@ -397,7 +418,7 @@ class Contact(SubscriptionObject):
 
     @classmethod
     def get_contacts_by_last_activity_date(
-            cls, user_id, owned=True, assigned=False, 
+            cls, user_id, owned=True, assigned=False,
             followed=False, include_activities=False, limit=20, offset=0):
         """TEST Returns list of contacts ordered by last activity date.
             Returns:

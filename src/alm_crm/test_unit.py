@@ -770,3 +770,53 @@ class ProductResourceTest(ResourceTestMixin, ResourceTestCase):
                               format='json', data={'name': product_name})
         # check
         self.assertEqual(self.get_detail_des(p.pk)['name'], product_name)
+
+
+class ContactResourceTest(ResourceTestMixin, ResourceTestCase):
+
+    def setUp(self):
+        super(self.__class__, self).setUp()
+
+        # login user
+        self.get_credentials()
+
+        self.api_path_contact = '/api/v1/contact/'
+        self.api_path_contact_products_f = '/api/v1/contact/%s/products/'
+        self.api_path_contact_activities_f = '/api/v1/contact/%s/activities/'
+
+        # get_list
+        self.get_list_resp = self.api_client.get(self.api_path_contact,
+                                                 format='json',
+                                                 HTTP_HOST='localhost')
+        self.get_list_des = self.deserialize(self.get_list_resp)
+
+        # get_detail(pk)
+        self.get_detail_resp = \
+            lambda pk: self.api_client.get(self.api_path_contact+str(pk)+'/',
+                                           format='json',
+                                           HTTP_HOST='localhost')
+        self.get_detail_des = \
+            lambda pk: self.deserialize(self.get_detail_resp(pk))
+
+        self.contact = Contact.objects.first()
+
+    def test_get_list_valid_json(self):
+        self.assertValidJSONResponse(self.get_list_resp)
+
+    def test_get_products(self):
+        resp = self.api_client.get(
+            self.api_path_contact_products_f % (self.contact.pk),
+            format='json',
+            HTTP_HOST='localhost'
+            )
+        self.assertEqual(len(self.deserialize(resp)['objects']),
+                         len(Contact.get_contact_products(self.contact.pk)))
+
+    def test_get_activities(self):
+        resp = self.api_client.get(
+            self.api_path_contact_activities_f % (self.contact.pk),
+            format='json',
+            HTTP_HOST='localhost'
+            )
+        self.assertEqual(len(self.deserialize(resp)['objects']),
+                         len(Contact.get_contact_activities(self.contact.pk)))

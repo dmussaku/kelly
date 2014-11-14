@@ -81,7 +81,7 @@ class ContactResource(CRMServiceModelResource):
             "name": "recent",
             "http_method": "GET",
             "resource_type": "list",
-            "description": "Get contacts ordered by their last activity date",
+            "summary": "Get contacts ordered by their last activity date",
             "fields": {
                 "limit": {
                     "type": "int",
@@ -120,7 +120,7 @@ class ContactResource(CRMServiceModelResource):
             "name": "cold base",
             "http_method": "GET",
             "resource_type": "list",
-            "description": "Get cold base of contacts, which are contacts \
+            "summary": "Get cold base of contacts, which are contacts \
             which do not have any activities yet",
             "fields": {
                 "limit": {
@@ -141,7 +141,7 @@ class ContactResource(CRMServiceModelResource):
             "name": "assign contact",
             "http_method": "GET",
             "resource_type": "view",
-            "description": "Assign a single contact to a user, return True in\
+            "summary": "Assign a single contact to a user, return True in\
             case of success, anf False if not",
             "fields": {
                 "user_id": {
@@ -160,7 +160,7 @@ class ContactResource(CRMServiceModelResource):
             "name": "assign contacts",
             "http_method": "GET",
             "resource_type": "view",
-            "description": "Assign multiple contacts to a user, return True in\
+            "summary": "Assign multiple contacts to a user, return True in\
             case of success, anf False if not",
             "fields": {
                 "user_id": {
@@ -180,7 +180,48 @@ class ContactResource(CRMServiceModelResource):
             "name": "leads",
             "http_method": "GET",
             "resource_type": "list",
-            "description": "Returns all contacts with status 'LEAD'",
+            "summary": "Returns all contacts with status 'LEAD'",
+            "fields": {
+                "limit": {
+                    "type": "int",
+                    "required": False,
+                    "description": "Limit queryset, if not provided gives \
+                    20 results by default"
+                },
+                "offset": {
+                    "type": "int",
+                    "required": False,
+                    "description": "offset queryset, if not provided gives \
+                    0 by default"
+                }
+            }
+        },
+        {
+            "name": "get_products",
+            "http_method": "GET",
+            "resource_type": "list",
+            "summary": "get products by contact \
+                (you can get it from salescycle by contact)",
+            "fields": {
+                "limit": {
+                    "type": "int",
+                    "required": False,
+                    "description": "Limit queryset, if not provided gives \
+                    20 results by default"
+                },
+                "offset": {
+                    "type": "int",
+                    "required": False,
+                    "description": "offset queryset, if not provided gives \
+                    0 by default"
+                }
+            }
+        },
+        {
+            "name": "get_activities",
+            "http_method": "GET",
+            "resource_type": "list",
+            "summary": "get latest activities with embeded comments by contact",
             "fields": {
                 "limit": {
                     "type": "int",
@@ -200,7 +241,7 @@ class ContactResource(CRMServiceModelResource):
             "name": "search",
             "http_method": "GET",
             "resource_type": "list",
-            "description": "Performs a recursive contat search by query and \
+            "summary": "Performs a recursive contat search by query and \
             search_params",
             "fields": {
                 "limit": {
@@ -282,6 +323,18 @@ class ContactResource(CRMServiceModelResource):
                 self.wrap_view('assign_contacts'),
                 name='api_assign_contacts'
             ),
+            url(
+                r"^(?P<resource_name>%s)/(?P<id>\d+)/products%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('get_products'),
+                name='api_get_products'
+            ),
+            url(
+                r"^(?P<resource_name>%s)/(?P<id>\d+)/activities%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('get_activities'),
+                name='api_get_activities'
+            ),
         ]
 
     def get_last_contacted(self, request, **kwargs):
@@ -345,6 +398,38 @@ class ContactResource(CRMServiceModelResource):
             request,
             {'objects': self.get_bundle_list(contacts, request)}
             )
+
+    def get_products(self, request, **kwargs):
+        '''
+        pass limit and offset with GET request
+        '''
+        contact_id = kwargs.get('id')
+        limit = int(request.GET.get('limit', 20))
+        offset = int(request.GET.get('offset', 0))
+        products = Contact.get_contact_products(contact_id, limit=limit,
+                                                offset=offset)
+
+        product_resource = ProductResource()
+        obj_dict = {}
+        obj_dict['objects'] = product_resource.get_bundle_list(products,
+                                                               request)
+        return self.create_response(request, obj_dict)
+
+    def get_activities(self, request, **kwargs):
+        '''
+        pass limit and offset with GET request
+        '''
+        contact_id = kwargs.get('id')
+        limit = int(request.GET.get('limit', 20))
+        offset = int(request.GET.get('offset', 0))
+        activities = Contact.get_contact_activities(contact_id, limit=limit,
+                                                    offset=offset)
+
+        activity_resource = ActivityResource()
+        obj_dict = {}
+        obj_dict['objects'] = activity_resource.get_bundle_list(activities,
+                                                                request)
+        return self.create_response(request, obj_dict)
 
     def search(self, request, **kwargs):
         '''
