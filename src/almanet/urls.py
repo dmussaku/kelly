@@ -24,6 +24,7 @@ from alm_crm.api import (
     CRMUserResource,
     ValueResource
     )
+from alm_user.api import UserSessionResource, UserResource
 from tastypie.resources import ModelResource
 
 admin.autodiscover()
@@ -42,7 +43,8 @@ v1_api.register(ShareResource())
 v1_api.register(ValueResource())
 v1_api.register(FeedbackResource())
 v1_api.register(CRMUserResource())
-
+v1_api.register(UserSessionResource())
+v1_api.register(UserResource())
 
 urlpatterns = patterns(
     '',

@@ -48,7 +48,6 @@ class ContactTestCase(TestCase):
             len(Contact.get_contacts_by_status(status=1, limit=1)), 1)
 
     def test_get_cold_base(self):
-        print [(c.pk, c.status) for c in Contact.objects.all()]
         self.assertEqual(len(Contact.get_cold_base()), 1)
 
     def test_change_status_without_save(self):
@@ -419,17 +418,81 @@ class ResourceTestMixin(object):
                 'salescycles.json', 'activities.json', 'products.json',
                 'mentions.json', 'values.json']
 
-    def get_credentials(self):
+    def get_user(self):
         from alm_user.models import User
         self.user = User.objects.get(pk=1)
-        # reset password
-        # self.user.password = self.user_password
-        # self.user.save()
         self.user_password = '123'
 
-        # Log in self.user
-        self.api_client.client.login(email=self.user.email,
-                                     password=self.user_password)
+    def get_credentials(self):
+        self.get_user()
+        post_data = {
+            'email': self.user.email,
+            'password': self.user_password
+        }
+        self.api_path_user_session = '/api/v1/user_session/'
+
+        # create session
+        self.api_client.post(self.api_path_user_session, format='json',
+                             data=post_data)
+
+
+class UserSessionResourceTest(ResourceTestMixin, ResourceTestCase):
+    def setUp(self):
+        super(self.__class__, self).setUp()
+
+        self.api_path_user_session = '/api/v1/user_session/'
+
+    def test_get_detail_valid_json(self):
+        resp = self.api_client.get(
+            self.api_path_user_session, format='json', HTTP_HOST='localhost')
+        self.assertValidJSONResponse(resp)
+
+    def test_get_detail_without_session(self):
+        resp = self.api_client.get(
+            self.api_path_user_session, format='json', HTTP_HOST='localhost')
+        self.assertEqual(len(self.deserialize(resp)['objects']), 0)
+
+    def test_create_session(self):
+        self.get_user()
+        post_data = {
+            'email': self.user.email,
+            'password': self.user_password
+        }
+
+        # create session
+        resp = self.api_client.post(
+            self.api_path_user_session, format='json', data=post_data)
+        self.assertHttpCreated(resp)
+
+        # get_detail to check session was created
+        resp = self.api_client.get(
+            self.api_path_user_session, format='json', HTTP_HOST='localhost')
+        des_resp = self.deserialize(resp)
+        self.assertEqual(len(des_resp['objects']), 1)
+
+        session_user = des_resp['objects'][0]['user']
+        self.assertEqual(session_user['id'], self.user.id)
+
+    def test_delete_session(self):
+        # create session
+        self.get_credentials()
+
+        # get session_key by get_detail
+        resp = self.api_client.get(
+            self.api_path_user_session, format='json', HTTP_HOST='localhost')
+        session_key = self.deserialize(resp)['objects'][0]['id']
+
+        self.api_client.delete(self.api_path_user_session+'%s/' % session_key,
+                               format='json', HTTP_HOST='localhost')
+
+        # get_detail to check session was deleted
+        resp = self.api_client.get(
+            self.api_path_user_session, format='json', HTTP_HOST='localhost')
+        des_resp = self.deserialize(resp)
+        # find session with deleted session_key
+        prev_obj = filter(lambda s: s['id'] == session_key,
+                          des_resp['objects'])
+        self.assertEqual(len(prev_obj), 0)
 
 
 class SalesCycleResourceTest(ResourceTestMixin, ResourceTestCase):

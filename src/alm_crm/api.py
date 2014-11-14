@@ -390,7 +390,6 @@ class ContactResource(CRMServiceModelResource):
         contact_ids=[1,2,3,4...n]
         '''
         import ast
-        print request.GET
         user_id = int(request.GET.get('user_id', 0))
         contact_ids = ast.literal_eval(request.GET.get('contact_ids', []))
         return self.create_response(
