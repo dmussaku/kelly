@@ -18,12 +18,13 @@ from alm_crm.api import (
     ContactResource,
     SalesCycleResource,
     ActivityResource,
+    ProductResource,
     ShareResource,
     FeedbackResource,
     CRMUserResource,
     ValueResource
     )
-from alm_crm.api import ContactResource
+from alm_user.api import UserSessionResource, UserResource
 from tastypie.resources import ModelResource
 
 admin.autodiscover()
@@ -37,10 +38,13 @@ for obj in vars(vcard_api).values():
 v1_api.register(ContactResource())
 v1_api.register(SalesCycleResource())
 v1_api.register(ActivityResource())
+v1_api.register(ProductResource())
 v1_api.register(ShareResource())
 v1_api.register(ValueResource())
 v1_api.register(FeedbackResource())
 v1_api.register(CRMUserResource())
+v1_api.register(UserSessionResource())
+v1_api.register(UserResource())
 
 urlpatterns = patterns(
     '',

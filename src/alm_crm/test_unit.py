@@ -1,5 +1,6 @@
 import os
 from django.test import TestCase
+from django.utils.unittest import skipIf
 from django.utils import timezone
 from tastypie.test import ResourceTestCase
 from alm_crm.models import (
@@ -7,7 +8,7 @@ from alm_crm.models import (
     CRMUser,
     Activity,
     SalesCycle,
-    Feedback,
+    Product,
     Mention,
     Feedback,
     Value,
@@ -17,8 +18,8 @@ from alm_vcard.models import VCard
 
 
 class ContactTestCase(TestCase):
-    fixtures = ['crmusers.json', 'contacts.json', 'salescycles.json',
-                'activities.json', 'feedbacks.json']
+    fixtures = ['crmusers.json', 'vcards.json', 'contacts.json',
+                'salescycles.json', 'activities.json', 'feedbacks.json']
 
     def setUp(self):
         super(ContactTestCase, self).setUp()
@@ -49,10 +50,17 @@ class ContactTestCase(TestCase):
     def test_get_cold_base(self):
         self.assertEqual(len(Contact.get_cold_base()), 1)
 
-    def test_change_status(self):
-        self.assertEqual(self.contact1.status, 0)
-        self.contact1.change_status(1)
+    def test_change_status_without_save(self):
         self.assertEqual(self.contact1.status, 1)
+        self.contact1.change_status(0)
+        contact = Contact.objects.get(pk=self.contact1.pk)
+        self.assertEqual(contact.status, 1)
+
+    def test_change_status_with_save(self):
+        self.assertEqual(self.contact1.status, 1)
+        self.contact1.change_status(0, save=True)
+        contact = Contact.objects.get(pk=self.contact1.pk)
+        self.assertEqual(contact.status, 0)
 
     def test_upload_contacts(self):
         file_path = os.path.join(os.path.dirname(os.path.dirname(__file__)),
@@ -81,18 +89,22 @@ class ContactTestCase(TestCase):
         file_path = os.path.join(os.path.dirname(os.path.dirname(__file__)),
                                  'alm_crm/fixtures/aliya.vcf')
         file_obj = open(file_path, "r").read()
-        contacts = Contact.upload_contacts('vcard', file_obj, True)
+        contacts = Contact.upload_contacts(upload_type='vcard',
+                                           file_obj=file_obj, save=True)
         cs = Contact.filter_contacts_by_vcard(search_text='Aliya',
                                               search_params=[('fn')])
         self.assertEqual(len(cs), 1)
         cs = Contact.filter_contacts_by_vcard(search_text='Aliya',
-                                              search_params=[('fn', 'icontains')])
+                                              search_params=[('fn',
+                                                              'icontains')])
         self.assertEqual(len(cs), 1)
         cs = Contact.filter_contacts_by_vcard(search_text='666',
-                                              search_params=[('tel__value', 'icontains')])
+                                              search_params=[('tel__value',
+                                                              'icontains')])
         self.assertEqual(len(cs), 1)
         cs = Contact.filter_contacts_by_vcard(search_text='666',
-                                              search_params=[('tel__value', 'icontains'),
+                                              search_params=[('tel__value',
+                                                              'icontains'),
                                                              ('fn')])
         self.assertEqual(len(cs), 0)
 
@@ -117,8 +129,9 @@ class ContactTestCase(TestCase):
 
 
 class ActivityTestCase(TestCase):
-    fixtures = ['crmusers.json', 'contacts.json', 'salescycles.json',
-                'activities.json', 'feedbacks.json', 'mentions.json']
+    fixtures = ['crmusers.json', 'vcards.json', 'contacts.json',
+                'salescycles.json', 'activities.json', 'feedbacks.json',
+                'mentions.json']
 
     def setUp(self):
         super(ActivityTestCase, self).setUp()
@@ -142,7 +155,7 @@ class ActivityTestCase(TestCase):
         self.assertEqual(0, len(Feedback.objects.filter(id=a.id)))
         f = Feedback(feedback='feedback8', status="W",
                      date_created=timezone.now(), date_edited=timezone.now(),
-                     activity=a)
+                     activity=a, owner_id=1)
         f.save()
         self.assertEqual(f, Feedback.objects.get(id=f.id))
 
@@ -163,7 +176,7 @@ class ActivityTestCase(TestCase):
             return False
 
     def test_get_mentioned_activities_of(self):
-        user_ids = [1, 2]
+        user_ids = (1, 2)
         self.assertEqual(len(set(self.activity1.mentions.all())), 1)
         self.assertEqual(
             len(set(Activity.get_mentioned_activities_of(user_ids))), 4)
@@ -247,13 +260,13 @@ class MentionTestCase(TestCase):
 
 
 class CommentTestCase(TestCase):
-    fixtures = ['crmusers.json', 'contacts.json', 'salescycles.json',
-                'activities.json', 'mentions.json']
+    fixtures = ['crmusers.json', 'vcards.json', 'contacts.json',
+                'salescycles.json', 'activities.json', 'mentions.json']
 
     def setUp(self):
         super(CommentTestCase, self).setUp()
 
-    def test_build_new__without_save(self):
+    def test_build_new_without_save(self):
         user_id = 1
         before = Comment.get_comments_by_context(1, Activity).count()
 
@@ -282,9 +295,9 @@ class CommentTestCase(TestCase):
 
 
 class SalesCycleTestCase(TestCase):
-    fixtures = ['crmusers.json', 'contacts.json', 'salescycles.json',
-                'activities.json', 'mentions.json', 'products.json',
-                'values.json']
+    fixtures = ['crmusers.json', 'vcards.json', 'contacts.json',
+                'salescycles.json', 'activities.json', 'mentions.json',
+                'products.json', 'values.json']
 
     def setUp(self):
         super(SalesCycleTestCase, self).setUp()
@@ -315,9 +328,10 @@ class SalesCycleTestCase(TestCase):
             [4, 3, 2, 1])
 
     def test_add_product(self):
-        self.assertEqual(len(self.sc1.products.all()), 0)
-        self.assertTrue(self.sc1.add_product(1))
-        self.assertEqual(len(self.get_sc(1).products.all()), 1)
+        count = len(self.sc1.products.all())
+        self.assertTrue(self.sc1.add_product(2))
+        self.assertEqual(len(self.get_sc(self.sc1.pk).products.all()),
+                         count + 1)
 
     def test_set_result_without_save(self):
         self.assertEqual(self.sc1.real_value_id, 1)
@@ -397,23 +411,95 @@ class SalesCycleTestCase(TestCase):
         self.assertEqual(list(ret.values_list('pk', flat=True)), [1, 2, 3, 4])
 
 
-class SalesCycleResourceTest(ResourceTestCase):
+class ResourceTestMixin(object):
     fixtures = ['companies.json', 'services.json', 'users.json',
                 'subscriptions.json',
-                'crmusers.json', 'contacts.json', 'salescycles.json',
-                'activities.json', 'products.json', 'mentions.json',
-                'values.json']
+                'crmusers.json', 'vcards.json', 'contacts.json',
+                'salescycles.json', 'activities.json', 'products.json',
+                'mentions.json', 'values.json']
 
-    def setUp(self):
+    def get_user(self):
         from alm_user.models import User
-        super(SalesCycleResourceTest, self).setUp()
-
         self.user = User.objects.get(pk=1)
-        # reset password
-        # self.user.password = self.user_password
-        # self.user.save()
-        self.user_password = 'qweasdzxc'
-        # Log in self.user
+        self.user_password = '123'
+
+    def get_credentials(self):
+        self.get_user()
+        post_data = {
+            'email': self.user.email,
+            'password': self.user_password
+        }
+        self.api_path_user_session = '/api/v1/user_session/'
+
+        # create session
+        self.api_client.post(self.api_path_user_session, format='json',
+                             data=post_data)
+
+
+class UserSessionResourceTest(ResourceTestMixin, ResourceTestCase):
+    def setUp(self):
+        super(self.__class__, self).setUp()
+
+        self.api_path_user_session = '/api/v1/user_session/'
+
+    def test_get_detail_valid_json(self):
+        resp = self.api_client.get(
+            self.api_path_user_session, format='json', HTTP_HOST='localhost')
+        self.assertValidJSONResponse(resp)
+
+    def test_get_detail_without_session(self):
+        resp = self.api_client.get(
+            self.api_path_user_session, format='json', HTTP_HOST='localhost')
+        self.assertEqual(len(self.deserialize(resp)['objects']), 0)
+
+    def test_create_session(self):
+        self.get_user()
+        post_data = {
+            'email': self.user.email,
+            'password': self.user_password
+        }
+
+        # create session
+        resp = self.api_client.post(
+            self.api_path_user_session, format='json', data=post_data)
+        self.assertHttpCreated(resp)
+
+        # get_detail to check session was created
+        resp = self.api_client.get(
+            self.api_path_user_session, format='json', HTTP_HOST='localhost')
+        des_resp = self.deserialize(resp)
+        self.assertEqual(len(des_resp['objects']), 1)
+
+        session_user = des_resp['objects'][0]['user']
+        self.assertEqual(session_user['id'], self.user.id)
+
+    def test_delete_session(self):
+        # create session
+        self.get_credentials()
+
+        # get session_key by get_detail
+        resp = self.api_client.get(
+            self.api_path_user_session, format='json', HTTP_HOST='localhost')
+        session_key = self.deserialize(resp)['objects'][0]['id']
+
+        self.api_client.delete(self.api_path_user_session+'%s/' % session_key,
+                               format='json', HTTP_HOST='localhost')
+
+        # get_detail to check session was deleted
+        resp = self.api_client.get(
+            self.api_path_user_session, format='json', HTTP_HOST='localhost')
+        des_resp = self.deserialize(resp)
+        # find session with deleted session_key
+        prev_obj = filter(lambda s: s['id'] == session_key,
+                          des_resp['objects'])
+        self.assertEqual(len(prev_obj), 0)
+
+
+class SalesCycleResourceTest(ResourceTestMixin, ResourceTestCase):
+    def setUp(self):
+        super(self.__class__, self).setUp()
+
+        # login user
         self.get_credentials()
 
         self.api_path_sales_cycle = '/api/v1/sales_cycle/'
@@ -425,10 +511,6 @@ class SalesCycleResourceTest(ResourceTestCase):
         self.get_des_res = lambda path: self.deserialize(self.get_resp(path))
 
         self.sales_cycle = SalesCycle.objects.first()
-
-    def get_credentials(self):
-        return self.api_client.client.login(email=self.user.email,
-                                            password=self.user_password)
 
     # def test_get_list_unauthorzied(self):
     #     self.assertHttpUnauthorized(self.api_client.get(
@@ -490,3 +572,251 @@ class SalesCycleResourceTest(ResourceTestCase):
         self.assertEqual(SalesCycle.objects.count(), count + 1)
         # verify that added with one activity
         self.assertEqual(sales_cycle.rel_activities.count(), 1)
+
+    @skipIf(True, "Tastypie need overwrite save_m2m() to able create with M2M")
+    def test_create_sales_cycle_with_product(self):
+        post_data = {
+            'name': 'new SalesCycle with one Product',
+            'contact': {'pk': Contact.objects.last()},
+            'products': [{
+                'name': 'p1',
+                'description': 'new product p1',
+                'price': 100
+            }]
+        }
+
+        count = SalesCycle.objects.count()
+        # self.assertHttpCreated()
+        print self.api_client.post(
+            self.api_path_sales_cycle, format='json', data=post_data)
+
+        sales_cycle = SalesCycle.objects.last()
+        # verify that new one sales_cycle has been added.
+        self.assertEqual(SalesCycle.objects.count(), count + 1)
+        # verify that added with one activity
+        self.assertEqual(sales_cycle.products.count(), 1)
+
+    def test_delete_sales_cycle(self):
+        count = SalesCycle.objects.count()
+        sales_cycle = SalesCycle.objects.last()
+        self.assertHttpAccepted(self.api_client.delete(
+            self.api_path_sales_cycle + '%s/' % sales_cycle.pk, format='json'))
+        # verify that one sales_cycle has been deleted.
+        self.assertEqual(SalesCycle.objects.count(), count - 1)
+
+
+class ActivityResourceTest(ResourceTestMixin, ResourceTestCase):
+
+    def setUp(self):
+        super(self.__class__, self).setUp()
+
+        # login user
+        self.get_credentials()
+
+        self.api_path_activity = '/api/v1/activity/'
+
+        # get_list
+        self.get_list_resp = self.api_client.get(self.api_path_activity,
+                                                 format='json',
+                                                 HTTP_HOST='localhost')
+        self.get_list_des = self.deserialize(self.get_list_resp)
+
+        # get_detail(pk)
+        self.get_detail_resp = \
+            lambda pk: self.api_client.get(self.api_path_activity+str(pk)+'/',
+                                           format='json',
+                                           HTTP_HOST='localhost')
+        self.get_detail_des = \
+            lambda pk: self.deserialize(self.get_detail_resp(pk))
+
+        self.activity = Activity.objects.first()
+
+    def test_get_list_valid_json(self):
+        self.assertValidJSONResponse(self.get_list_resp)
+
+    def test_get_list_non_empty(self):
+        self.assertTrue(self.get_list_des['meta']['total_count'] > 0)
+
+    def test_get_detail(self):
+        self.assertEqual(
+            self.get_detail_des(self.activity.pk)['title'],
+            self.activity.title
+            )
+
+    def test_create_activity(self):
+        sales_cycle = SalesCycle.objects.last()
+        post_data = {
+            'title': 'new activity1',
+            'description': 'new activity by test_unit',
+            'sales_cycle': {'pk': sales_cycle.pk}
+        }
+
+        count = sales_cycle.rel_activities.count()
+        self.assertHttpCreated(self.api_client.post(
+            self.api_path_activity, format='json', data=post_data))
+        activity = sales_cycle.rel_activities.last()
+        # verify that new one has been added.
+        self.assertEqual(sales_cycle.rel_activities.count(), count + 1)
+        # verify that subscription_id was set
+        self.assertIsInstance(activity.subscription_id, int)
+        # verify that owner was set
+        self.assertIsInstance(activity.owner, CRMUser)
+        self.assertEqual(
+            activity.owner,
+            self.user.get_subscr_user(activity.subscription_id)
+            )
+
+    def test_delete_activity(self):
+        sales_cycle = self.activity.sales_cycle
+        count = sales_cycle.rel_activities.count()
+        self.assertHttpAccepted(self.api_client.delete(
+            self.api_path_activity + '%s/' % self.activity.pk, format='json'))
+        # verify that one sales_cycle has been deleted.
+        self.assertEqual(sales_cycle.rel_activities.count(), count - 1)
+
+
+class ProductResourceTest(ResourceTestMixin, ResourceTestCase):
+
+    def setUp(self):
+        super(self.__class__, self).setUp()
+
+        # login user
+        self.get_credentials()
+
+        self.api_path_product = '/api/v1/product/'
+
+        # get_list
+        self.get_list_resp = self.api_client.get(self.api_path_product,
+                                                 format='json',
+                                                 HTTP_HOST='localhost')
+        self.get_list_des = self.deserialize(self.get_list_resp)
+
+        # get_detail(pk)
+        self.get_detail_resp = \
+            lambda pk: self.api_client.get(self.api_path_product+str(pk)+'/',
+                                           format='json',
+                                           HTTP_HOST='localhost')
+        self.get_detail_des = \
+            lambda pk: self.deserialize(self.get_detail_resp(pk))
+
+        self.product = Product.objects.first()
+
+    def test_get_list_valid_json(self):
+        self.assertValidJSONResponse(self.get_list_resp)
+
+    def test_get_list_non_empty(self):
+        self.assertTrue(self.get_list_des['meta']['total_count'] > 0)
+
+    def test_get_detail(self):
+        self.assertEqual(
+            self.get_detail_des(self.product.pk)['name'],
+            self.product.name
+            )
+
+    def test_create_product(self):
+        sales_cycle = SalesCycle.objects.last()
+        post_data = {
+            'name': 'new product',
+            'description': 'new product by test_unit',
+            'price': 100,
+            'sales_cycles': [{'pk': sales_cycle.pk}]
+        }
+
+        count = sales_cycle.products.count()
+        self.assertHttpCreated(self.api_client.post(
+            self.api_path_product, format='json', data=post_data))
+        product = sales_cycle.products.last()
+        # verify that new one has been added.
+        self.assertEqual(sales_cycle.products.count(), count + 1)
+        # verify that subscription_id was set
+        self.assertIsInstance(product.subscription_id, int)
+        # verify that owner was set
+        self.assertIsInstance(product.owner, CRMUser)
+        self.assertEqual(
+            product.owner,
+            self.user.get_subscr_user(product.subscription_id)
+            )
+
+    def test_delete_product(self):
+        sales_cycle = self.product.sales_cycles.first()
+        count = sales_cycle.products.count()
+        self.assertHttpAccepted(self.api_client.delete(
+            self.api_path_product + '%s/' % self.product.pk, format='json'))
+        # verify that one sales_cycle has been deleted.
+        self.assertEqual(sales_cycle.products.count(), count - 1)
+
+    def test_update_product_via_put(self):
+        # get exist product data
+        p = Product.objects.first()
+        product_data = self.get_detail_des(p.pk)
+        # update it
+        t = '_UPDATED!'
+        product_data['name'] += t
+        # PUT it
+        self.api_client.put(self.api_path_product + '%s/' % (p.pk),
+                            format='json', data=product_data)
+        # check
+        self.assertEqual(self.get_detail_des(p.pk)['name'], p.name + t)
+
+    def test_update_product_via_patch(self):
+        # get exist product data
+        p = Product.objects.first()
+        product_name = self.get_detail_des(p.pk)['name']
+        # update it
+        t = '_NAME_UPDATED!'
+        product_name += t
+        # PATCH it
+        self.api_client.patch(self.api_path_product + '%s/' % (p.pk),
+                              format='json', data={'name': product_name})
+        # check
+        self.assertEqual(self.get_detail_des(p.pk)['name'], product_name)
+
+
+class ContactResourceTest(ResourceTestMixin, ResourceTestCase):
+
+    def setUp(self):
+        super(self.__class__, self).setUp()
+
+        # login user
+        self.get_credentials()
+
+        self.api_path_contact = '/api/v1/contact/'
+        self.api_path_contact_products_f = '/api/v1/contact/%s/products/'
+        self.api_path_contact_activities_f = '/api/v1/contact/%s/activities/'
+
+        # get_list
+        self.get_list_resp = self.api_client.get(self.api_path_contact,
+                                                 format='json',
+                                                 HTTP_HOST='localhost')
+        self.get_list_des = self.deserialize(self.get_list_resp)
+
+        # get_detail(pk)
+        self.get_detail_resp = \
+            lambda pk: self.api_client.get(self.api_path_contact+str(pk)+'/',
+                                           format='json',
+                                           HTTP_HOST='localhost')
+        self.get_detail_des = \
+            lambda pk: self.deserialize(self.get_detail_resp(pk))
+
+        self.contact = Contact.objects.first()
+
+    def test_get_list_valid_json(self):
+        self.assertValidJSONResponse(self.get_list_resp)
+
+    def test_get_products(self):
+        resp = self.api_client.get(
+            self.api_path_contact_products_f % (self.contact.pk),
+            format='json',
+            HTTP_HOST='localhost'
+            )
+        self.assertEqual(len(self.deserialize(resp)['objects']),
+                         len(Contact.get_contact_products(self.contact.pk)))
+
+    def test_get_activities(self):
+        resp = self.api_client.get(
+            self.api_path_contact_activities_f % (self.contact.pk),
+            format='json',
+            HTTP_HOST='localhost'
+            )
+        self.assertEqual(len(self.deserialize(resp)['objects']),
+                         len(Contact.get_contact_activities(self.contact.pk)))

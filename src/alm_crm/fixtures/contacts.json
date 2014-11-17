@@ -6,7 +6,7 @@
             "status":0,
             "tp":"user",
             "date_created":"2014-09-10 00:00:00+00:00",
-            "vcard":null,
+            "vcard":1,
             "company_contact":null,
             "followers":[],
             "assignees":[]
@@ -19,7 +19,7 @@
             "status":1,
             "tp":"user",
             "date_created":"2014-09-10 00:00:00+00:00",
-            "vcard":null,
+            "vcard":2,
             "company_contact":null,
             "followers":[],
             "assignees":[]
@@ -32,7 +32,7 @@
             "status":1,
             "tp":"user",
             "date_created":"2014-09-10 00:00:00+00:00",
-            "vcard":null,
+            "vcard":3,
             "company_contact":null,
             "followers":[],
             "assignees":[]
@@ -45,7 +45,7 @@
             "status":2,
             "tp":"user",
             "date_created":"2014-09-10 00:00:00+00:00",
-            "vcard":null,
+            "vcard":4,
             "company_contact":null,
             "followers":[],
             "assignees":[]
