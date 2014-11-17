@@ -1,7 +1,7 @@
-from tastypie.resources import ModelResource, ALL, ALL_WITH_RELATIONS
-from tastypie.authentication import SessionAuthentication, BasicAuthentication
-from tastypie.authorization import Authorization
 from tastypie import fields
+from tastypie.resources import ModelResource
+from tastypie.authentication import SessionAuthentication
+from tastypie.authorization import Authorization
 from alm_vcard.models import *
 
 
