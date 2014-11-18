@@ -13,6 +13,7 @@ from alm_crm.models import (
     Feedback,
     Value,
     Comment,
+    Share
     )
 from alm_vcard.models import VCard
 
@@ -415,7 +416,7 @@ class ResourceTestMixin(object):
                 'subscriptions.json',
                 'crmusers.json', 'vcards.json', 'contacts.json',
                 'salescycles.json', 'activities.json', 'products.json',
-                'mentions.json', 'values.json']
+                'mentions.json', 'values.json', 'emails.json']
 
     def get_user(self):
         from alm_user.models import User
@@ -744,6 +745,7 @@ class ProductResourceTest(ResourceTestMixin, ResourceTestCase):
         # verify that one sales_cycle has been deleted.
         self.assertEqual(sales_cycle.products.count(), count - 1)
 
+
 class ContactResourceTest(ResourceTestMixin, ResourceTestCase):
 
     def setUp(self):
@@ -782,14 +784,6 @@ class ContactResourceTest(ResourceTestMixin, ResourceTestCase):
 
         self.get_list_recent_des = self.deserialize(self.get_list_recent_resp)
 
-        #get list for assign contact
-        self.get_list_assign_contact_resp = self.api_client.get(self.api_path_contact+'assign_contact/', 
-                                                                            format='json',
-                                                                            HTTP_HOST='localhost')
-
-        self.get_list_assign_contact_des = self.deserialize(self.get_list_assign_contact_resp)
-
-
         # get_detail(pk)
         self.get_detail_resp = \
             lambda pk: self.api_client.get(self.api_path_contact+str(pk)+'/',
@@ -817,9 +811,9 @@ class ContactResourceTest(ResourceTestMixin, ResourceTestCase):
 
     def test_create_contact(self):
         post_data = {
-            'sales_cycles':[{'pk': SalesCycle.objects.first()}],
             'status': 1,
             'tp': 'user',
+            'assignees':[], 
         }
 
         count = Contact.objects.count()
@@ -828,9 +822,15 @@ class ContactResourceTest(ResourceTestMixin, ResourceTestCase):
         # verify that new one has been added.
         self.assertEqual(Contact.objects.count(), count + 1)
 
-    @skipIf(True, "IntegrityError")
     def test_delete_contact(self):
         count = Contact.objects.count()
+
+        sales_cycles = self.contact.sales_cycles.all()
+
+        for sales_cycle in sales_cycles:
+            self.assertHttpAccepted(self.api_client.delete(
+                '/api/v1/sales_cycle/' + '%s/' % sales_cycle.pk, format='json'))
+
         self.assertHttpAccepted(self.api_client.delete(
             self.api_path_contact + '%s/' % self.contact.pk, format='json'))
         # verify that one contact been deleted.
@@ -862,11 +862,6 @@ class ContactResourceTest(ResourceTestMixin, ResourceTestCase):
 
 
     def test_assign_contact(self):
-        self.contact.assignees.add(CRMUser.objects.last())
-        post_data = {
-            'user_id': 1,
-            'contact_id': 1
-        }
         count = self.contact.assignees.count()
 
         self.assertHttpOK(self.api_client.get(
@@ -879,11 +874,97 @@ class ContactResourceTest(ResourceTestMixin, ResourceTestCase):
 
         self.assertEqual(self.contact.assignees.count(), count+1)
 
-    # def test_assign_contacts(self, request, **kwargs):
+    def test_assign_contacts(self):
+        contact1 = Contact.objects.get(pk=2)
+        contact2 = Contact.objects.get(pk=3)
+        contact3 = Contact.objects.get(pk=4)
 
-   	# def test_search(self, request, **kwargs):
+        count1 = contact1.assignees.count()
+        count2 = contact2.assignees.count()
+        count3 = contact3.assignees.count()
 
-    # def test_share_contact(self, request, **kwargs):
+        self.assertHttpOK(self.api_client.get(
+            self.api_path_contact+'assign_contacts/?contact_ids=%5B2%2C3%2C4%5D&user_id=2'))
 
-    # def test_share_contacts(self, request, **kwargs):
+        self.assertEqual(contact1.assignees.count(), count1+1)
+        self.assertEqual(contact2.assignees.count(), count2+1)
+        self.assertEqual(contact3.assignees.count(), count3+1)
 
+    def test_share_contact(self):
+        count = Share.objects.count()
+
+        self.assertHttpOK(self.api_client.get(
+            self.api_path_contact+'share_contact/?contact_id=1&share_from=1&share_to=2'))
+
+        self.assertEqual(Share.objects.count(), count+1)
+
+        share_to = Share.objects.get(id=1).share_to
+        share_from = Share.objects.get(id=1).share_from
+
+        self.assertEqual(share_from, CRMUser.objects.get(pk=1))
+        self.assertEqual(share_to, CRMUser.objects.get(pk=2))
+
+    def test_share_contacts(self):
+        count = Share.objects.count()
+
+        self.assertHttpOK(self.api_client.get(
+            self.api_path_contact+'share_contacts/?contact_ids=%5B2%2C3%2C4%5D&share_from=1&share_to=2'))
+
+        self.assertEqual(Share.objects.count(), count+3)
+
+        share_to = CRMUser.objects.get(id = Share.objects.get(id=1).share_to.id)
+        share_from = CRMUser.objects.get(id = Share.objects.get(id=1).share_from.id)
+
+        self.assertEqual(share_from, CRMUser.objects.get(pk=1))
+        self.assertEqual(share_to, CRMUser.objects.get(pk=2))
+
+    def test_search(self):
+        search_text_A = Contact.filter_contacts_by_vcard(search_text='A', search_params=[('fn', 'startswith')],
+                                                             order_by=[])
+        srch_tx_A_ord_dc = Contact.filter_contacts_by_vcard(search_text='A', search_params=[('fn', 'startswith')],
+                                                             order_by=['fn','desc'])
+        srch_by_bday = Contact.filter_contacts_by_vcard(search_text='1991-09-10', search_params=['bday'],
+                                                             order_by=[])
+        srch_by_email = Contact.filter_contacts_by_vcard(search_text='mus', search_params=[('email__value','startswith')],
+                                                             order_by=[])
+
+
+        get_list_search_resp = self.api_client.get(self.api_path_contact+
+                                            "search/?search_params=%5B('fn'%2C+'startswith')%5D&search_text=A", 
+                                            format='json',
+                                            HTTP_HOST='localhost')
+
+        get_list_search_ord_dc_resp = self.api_client.get(self.api_path_contact+
+                                            "search/?search_params=%5B('fn'%2C+'startswith')%5D&order_by=%5B'fn'%2C'desc'%5D&search_text=A", 
+                                            format='json',
+                                            HTTP_HOST='localhost')
+
+        get_list_search_by_bday_resp = self.api_client.get(self.api_path_contact+
+                                            "search/?search_params=%5B'bday'%5D&search_text=1991-09-10", 
+                                            format='json',
+                                            HTTP_HOST='localhost')
+        
+        get_list_search_by_email_resp = self.api_client.get(self.api_path_contact+
+                                            "search/?search_params=%5B('email__value'%2C+'startswith')%5D&search_text=mus", 
+                                            format='json',
+                                            HTTP_HOST='localhost')
+
+
+
+        get_list_search_des = self.deserialize(get_list_search_resp)
+        get_list_search_ord_dc_des = self.deserialize(get_list_search_ord_dc_resp)
+        get_list_search_by_bday_des = self.deserialize(get_list_search_by_bday_resp)
+        get_list_search_by_email_resp = self.deserialize(get_list_search_by_email_resp)
+
+        self.assertEqual(get_list_search_des['objects'][0]['vcard']['fn'], search_text_A[0].vcard.fn)
+        self.assertEqual(get_list_search_des['objects'][1]['vcard']['fn'], search_text_A[1].vcard.fn)
+
+        self.assertEqual(get_list_search_des['objects'][0]['vcard']['fn'], srch_tx_A_ord_dc[1].vcard.fn)
+        self.assertEqual(get_list_search_des['objects'][1]['vcard']['fn'], srch_tx_A_ord_dc[0].vcard.fn)
+        
+        self.assertEqual(get_list_search_ord_dc_des['objects'][0]['vcard']['fn'], srch_tx_A_ord_dc[0].vcard.fn)
+        self.assertEqual(get_list_search_ord_dc_des['objects'][1]['vcard']['fn'], srch_tx_A_ord_dc[1].vcard.fn)
+        self.assertEqual(get_list_search_by_bday_des['objects'][0]['vcard']['fn'], srch_by_bday[0].vcard.fn)
+
+        self.assertEqual(get_list_search_by_email_resp['objects'][0]['vcard']['fn'], srch_by_email[0].vcard.fn)
+        self.assertEqual(get_list_search_by_email_resp['objects'][1]['vcard']['fn'], srch_by_email[1].vcard.fn)

@@ -14,7 +14,7 @@
         "owner": null, 
         "date_created": "2014-09-10T00:00:00Z", 
         "subscription_id": null, 
-        "vcard": null
+        "vcard": 1
     }
 },
 {
@@ -24,13 +24,15 @@
         "status": 1, 
         "latest_activity": null, 
         "tp": "user", 
-        "assignees": [], 
+        "assignees": [
+            1
+        ], 
         "company_contact": null, 
         "followers": [], 
         "owner": null, 
         "date_created": "2014-09-10T00:00:00Z", 
         "subscription_id": null, 
-        "vcard": null
+        "vcard": 2
     }
 },
 {
@@ -40,13 +42,15 @@
         "status": 1, 
         "latest_activity": null, 
         "tp": "user", 
-        "assignees": [], 
+        "assignees": [
+            1
+        ], 
         "company_contact": null, 
         "followers": [], 
         "owner": null, 
         "date_created": "2014-09-10T00:00:00Z", 
         "subscription_id": null, 
-        "vcard": null
+        "vcard": 3
     }
 },
 {
@@ -56,13 +60,15 @@
         "status": 2, 
         "latest_activity": null, 
         "tp": "user", 
-        "assignees": [], 
+        "assignees": [
+            1
+        ], 
         "company_contact": null, 
         "followers": [], 
         "owner": null, 
         "date_created": "2014-09-10T00:00:00Z", 
         "subscription_id": null, 
-        "vcard": null
+        "vcard": 4
     }
 }
 ]

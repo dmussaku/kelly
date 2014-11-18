@@ -435,28 +435,6 @@ class ContactResource(CRMServiceModelResource):
             )
 
     def assign_contact(self, request, **kwargs):
-#<<<<<<< HEAD
-    	'''
-    	Assigning a single contact with user
-    	'''
-    	user_id = int(request.GET.get('user_id',0))
-    	contact_id = int(request.GET.get('contact_id',0))
-    	return self.create_response(
-    			request, {'success':Contact().assign_user_to_contact(user_id, contact_id)}
-    		)
-
-    def assign_contacts(self, request, **kwargs):
-    	'''
-    	Assigning multiple contacts with user, send multiple contacts as so
-    	contact_ids=[1,2,3,4...n]
-    	'''
-    	import ast
-    	user_id = int(request.GET.get('user_id',0))
-    	contact_ids = ast.literal_eval(request.GET.get('contact_ids',[]))
-    	return self.create_response(
-    			request, {'success':Contact().assign_user_to_contacts(user_id, contact_ids)}
-    		)
-#=======
         '''
         Sharing a single contact with user
         '''
@@ -480,7 +458,6 @@ class ContactResource(CRMServiceModelResource):
             {'success': Contact().assign_user_to_contacts(user_id,
                                                           contact_ids)}
             )
-#>>>>>>> 6de3ff81fe164dfb7a9fe7fcf50b22f05ebe8553
 
     def share_contact(self, request, **kwargs):
     	'''	

@@ -7,7 +7,7 @@ activity_file = open('activities.json', 'w')
 activity_file.write( '[\n')
 
 for i in range(1, 301):
-	j=randint(1,10) # generate randomly values for sales_cycles 
+	j=randint(1,30) # generate randomly values for sales_cycles 
 	k=randint(1,4) # generate randomly values for owners
 	activity_file.write( '	{\n')
 	activity_file.write( '		"pk": %i,\n'%i)
