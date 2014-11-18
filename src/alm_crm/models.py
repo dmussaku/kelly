@@ -461,14 +461,16 @@ class Contact(SubscriptionObject):
     @classmethod
     def import_contacts_from_vcard(cls, vcard_file):
         print 'getting to import_contacts models function'
-        return True
         try:
             data_list = vcard_file.read().split('END:VCARD')[:-1]
             contact_ids=[]
             for i in range(0, len(data_list)):
                 data_list[i] += 'END:VCARD'
-                c = cls.upload_contacts('vcard', data_list[i], save=True)
+                print data_list[i]
+                #c = cls.upload_contacts('vcard', data_list[i], save=True)
+                c = cls._upload_contacts_by_vcard(data_list[i])
                 contact_ids.append({'contact_id':c.id, 'name':c.name})
+                print contact_ids
                 #contact_ids.append(Contact.upload_contacts('vcard', data_list[i], save=True).id)
             return {'success': True, 'contact_ids': contact_ids}
         except:
