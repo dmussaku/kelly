@@ -1,0 +1,182 @@
+[
+{
+    "pk": 1, 
+    "model": "alm_crm.contact", 
+    "fields": {
+        "status": 0, 
+        "latest_activity": null, 
+        "tp": "user", 
+        "assignees": [
+            1
+        ], 
+        "company_contact": null, 
+        "followers": [], 
+        "owner": null, 
+        "date_created": "2014-09-10T00:00:00Z", 
+        "subscription_id": null, 
+        "vcard": null
+    }
+},
+{
+    "pk": 2, 
+    "model": "alm_crm.contact", 
+    "fields": {
+        "status": 1, 
+        "latest_activity": null, 
+        "tp": "user", 
+        "assignees": [
+            3
+        ], 
+        "company_contact": null, 
+        "followers": [], 
+        "owner": null, 
+        "date_created": "2014-09-10T00:00:00Z", 
+        "subscription_id": null, 
+        "vcard": null
+    }
+},
+{
+    "pk": 3, 
+    "model": "alm_crm.contact", 
+    "fields": {
+        "status": 1, 
+        "latest_activity": null, 
+        "tp": "user", 
+        "assignees": [
+            2
+        ], 
+        "company_contact": null, 
+        "followers": [], 
+        "owner": null, 
+        "date_created": "2014-09-10T00:00:00Z", 
+        "subscription_id": null, 
+        "vcard": null
+    }
+},
+{
+    "pk": 4, 
+    "model": "alm_crm.contact", 
+    "fields": {
+        "status": 2, 
+        "latest_activity": null, 
+        "tp": "user", 
+        "assignees": [
+            4
+        ], 
+        "company_contact": null, 
+        "followers": [], 
+        "owner": null, 
+        "date_created": "2014-09-10T00:00:00Z", 
+        "subscription_id": null, 
+        "vcard": null
+    }
+},
+{
+    "pk": 5, 
+    "model": "alm_crm.contact", 
+    "fields": {
+        "status": 2, 
+        "latest_activity": null, 
+        "tp": "user", 
+        "assignees": [
+            1
+        ], 
+        "company_contact": null, 
+        "followers": [], 
+        "owner": null, 
+        "date_created": "2014-09-10T00:00:00Z", 
+        "subscription_id": null, 
+        "vcard": null
+    }
+},
+{
+    "pk": 6, 
+    "model": "alm_crm.contact", 
+    "fields": {
+        "status": 3, 
+        "latest_activity": null, 
+        "tp": "user", 
+        "assignees": [
+            1
+        ], 
+        "company_contact": null, 
+        "followers": [], 
+        "owner": null, 
+        "date_created": "2014-09-10T00:00:00Z", 
+        "subscription_id": null, 
+        "vcard": null
+    }
+},
+{
+    "pk": 7, 
+    "model": "alm_crm.contact", 
+    "fields": {
+        "status": 3, 
+        "latest_activity": null, 
+        "tp": "user", 
+        "assignees": [
+            3
+        ], 
+        "company_contact": null, 
+        "followers": [], 
+        "owner": null, 
+        "date_created": "2014-09-10T00:00:00Z", 
+        "subscription_id": null, 
+        "vcard": null
+    }
+},
+{
+    "pk": 8, 
+    "model": "alm_crm.contact", 
+    "fields": {
+        "status": 0, 
+        "latest_activity": null, 
+        "tp": "user", 
+        "assignees": [
+            4
+        ], 
+        "company_contact": null, 
+        "followers": [], 
+        "owner": null, 
+        "date_created": "2014-09-10T00:00:00Z", 
+        "subscription_id": null, 
+        "vcard": null
+    }
+},
+{
+    "pk": 9, 
+    "model": "alm_crm.contact", 
+    "fields": {
+        "status": 1, 
+        "latest_activity": null, 
+        "tp": "user", 
+        "assignees": [
+            1
+        ], 
+        "company_contact": null, 
+        "followers": [], 
+        "owner": null, 
+        "date_created": "2014-09-10T00:00:00Z", 
+        "subscription_id": null, 
+        "vcard": null
+    }
+},
+{
+    "pk": 10, 
+    "model": "alm_crm.contact", 
+    "fields": {
+        "status": 0, 
+        "latest_activity": null, 
+        "tp": "user", 
+        "assignees": [
+            2
+        ], 
+        "company_contact": null, 
+        "followers": [], 
+        "owner": null, 
+        "date_created": "2014-09-10T00:00:00Z", 
+        "subscription_id": null, 
+        "vcard": null
+    }
+}
+]
