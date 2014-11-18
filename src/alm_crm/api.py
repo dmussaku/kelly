@@ -199,7 +199,7 @@ class ContactResource(CRMServiceModelResource):
         {
             "name": "get_products",
             "http_method": "GET",
-            "resource_type": "list",
+            "resource_type": "view",
             "summary": "get products by contact \
                 (you can get it from salescycle by contact)",
             "fields": {
@@ -220,7 +220,7 @@ class ContactResource(CRMServiceModelResource):
         {
             "name": "get_activities",
             "http_method": "GET",
-            "resource_type": "list",
+            "resource_type": "view",
             "summary": "get latest activities with embeded comments by contact",
             "fields": {
                 "limit": {
