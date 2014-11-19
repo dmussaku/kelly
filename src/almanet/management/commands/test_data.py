@@ -4,13 +4,13 @@ from django.conf import settings
 from os import path as os_path
 
 
+main_database = 'default'
+db_backup_filename = os_path.join(
+    os_path.expanduser('~/.almanet/test_data__db_backup.json'))
+
+
 def path_rel(*x):
     return os_path.join(settings.BASE_DIR, *x)
-
-
-main_database = 'default'
-db_backup_filename = \
-    path_rel('almanet/management/commands/test_data_db_backup.json')
 
 
 def load_fixtures():
