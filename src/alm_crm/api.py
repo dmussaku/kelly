@@ -1,4 +1,5 @@
 from tastypie import fields
+from tastypie.contrib.contenttypes.fields import GenericForeignKeyField
 from tastypie.resources import ModelResource
 from tastypie.authorization import Authorization
 from tastypie.utils import trailing_slash
@@ -8,6 +9,7 @@ from tastypie.authentication import (
     BasicAuthentication,
     )
 from django.conf.urls import url
+from django.contrib.contenttypes.models import ContentType
 from .models import (
     SalesCycle,
     Product,
@@ -17,6 +19,8 @@ from .models import (
     CRMUser,
     Value,
     Feedback,
+    Comment,
+    Mention,
     )
 from almanet.settings import DEFAULT_SERVICE
 
@@ -513,6 +517,22 @@ class ActivityResource(CRMServiceModelResource):
                                  'activity_feedback', null=True, full=True)
     owner = fields.ToOneField('alm_crm.api.CRMUserResource',
                               'activity_owner', null=True, full=True)
+    comments = fields.ToManyField(
+        'alm_crm.api.CommentResource',
+        attribute=lambda bundle: Comment.objects.filter(
+            content_type=ContentType.objects.get_for_model(bundle.obj),
+            object_id=bundle.obj.id
+            ),
+        null=True, full=True
+        )
+    mentions = fields.ToManyField(
+        'alm_crm.api.MentionResource',
+        attribute=lambda bundle: Mention.objects.filter(
+            content_type=ContentType.objects.get_for_model(bundle.obj),
+            object_id=bundle.obj.id
+            ),
+        null=True, full=True
+        )
 
     class Meta(CRMServiceModelResource.Meta):
         queryset = Activity.objects.all()
@@ -584,3 +604,30 @@ class FeedbackResource(CRMServiceModelResource):
     class Meta(CRMServiceModelResource.Meta):
         queryset = Feedback.objects.all()
         resource_name = 'feedback'
+
+
+class CommentResource(CRMServiceModelResource):
+    content_object = GenericForeignKeyField({
+        Activity: ActivityResource,
+        Contact: ContactResource,
+        Share: ShareResource,
+        Feedback: FeedbackResource
+    }, 'content_object')
+
+    class Meta(CRMServiceModelResource.Meta):
+        queryset = Comment.objects.all()
+        resource_name = 'comment'
+
+
+class MentionResource(CRMServiceModelResource):
+    content_object = GenericForeignKeyField({
+        Contact: ContactResource,
+        SalesCycle: SalesCycleResource,
+        Activity: ActivityResource,
+        Feedback: FeedbackResource,
+        Comment: CommentResource,
+    }, 'content_object')
+
+    class Meta(CRMServiceModelResource.Meta):
+        queryset = Mention.objects.all()
+        resource_name = 'mention'
