@@ -13,6 +13,7 @@ django-tastypie-swagger==0.1.2
 django-timezone-field==1.1
 djrill==1.1.1
 ecdsa==0.11
+epydoc==3.0.1
 mock==1.0.1
 nose2==0.4.7
 nose2-cov==1.0a4
