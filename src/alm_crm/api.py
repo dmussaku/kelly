@@ -468,7 +468,8 @@ class ContactResource(CRMServiceModelResource):
 
         @return:  contacts ordered by last_activity_date.
 
-        >>> {
+        >>> "objecs":[ 
+        ...    {
         ...     "assignees": [
         ...         "/api/v1/crmuser/1/"
         ...     ],
@@ -487,6 +488,7 @@ class ContactResource(CRMServiceModelResource):
         ...     "tp": "user",
         ...     "vcard": {...}
         ... }, 
+        ... ]
 
         '''
         limit = int(request.GET.get('limit', 20))
@@ -536,7 +538,8 @@ class ContactResource(CRMServiceModelResource):
 
         @return: contacts that have no salescycles and activities.
 
-        >>> {
+        >>> "objects":[
+        ... {
         ... "assignees": [
         ...     "/api/v1/crmuser/1/"
         ... ],
@@ -555,7 +558,7 @@ class ContactResource(CRMServiceModelResource):
         ... "tp": "user",
         ... "vcard": {...}
         ... }, 
-
+        ... ]
         '''
         limit = int(request.GET.get('limit', 20))
         offset = int(request.GET.get('offset', 0))
@@ -580,7 +583,8 @@ class ContactResource(CRMServiceModelResource):
 
         @return: contacts.
 
-        >>> {
+        >>> "objects": [
+        ...   {
         ...     "assignees": [
         ...         "/api/v1/crmuser/1/"
         ...     ],
@@ -599,7 +603,7 @@ class ContactResource(CRMServiceModelResource):
         ...     "tp": "user",
         ...     "vcard": {...}
         ... }, 
-
+        ... ]
         '''
         STATUS_LEAD = 1
         limit = int(request.GET.get('limit', 20))
@@ -788,12 +792,12 @@ class ContactResource(CRMServiceModelResource):
         user_id = int(request.GET.get('user_id',0))
         if not user_id:
             return self.create_response(
-                    request, {'success':False, error_string:'User id is not set'}
+                    request, {'success':False, 'message':'User id is not set'}
                 )
         contact_id = int(request.GET.get('contact_id',0))
         if not contact_id:
             return self.create_response(
-                    request, {'success':False, error_string:'Contact id is not set'}
+                    request, {'success':False, 'message':'Contact id is not set'}
                 )
         return self.create_response(
                 request, {'success':Contact.assign_user_to_contact(user_id, contact_id)}
@@ -824,12 +828,12 @@ class ContactResource(CRMServiceModelResource):
         user_id = int(request.GET.get('user_id',0))
         if not user_id:
             return self.create_response(
-                    request, {'success':False, error_string:'User id is not set'}
+                    request, {'success':False, 'message':'User id is not set'}
                 )
         contact_ids = ast.literal_eval(request.GET.get('contact_ids',[]))
         if not contact_ids:
             return self.create_response(
-                    request, {'success':False, error_string:'Contact ids are not set'}
+                    request, {'success':False, 'message':'Contact ids are not set'}
                 )
         return self.create_response(
                 request, {'success':Contact.assign_user_to_contacts(user_id, contact_ids)}
