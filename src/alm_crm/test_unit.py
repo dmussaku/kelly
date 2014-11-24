@@ -673,6 +673,25 @@ class ActivityResourceTest(ResourceTestMixin, ResourceTestCase):
             self.user.get_subscr_user(activity.subscription_id)
             )
 
+    def test_create_activity_mentions(self):
+        sales_cycle = SalesCycle.objects.last()
+        post_data = {
+            'title': 'new activity1',
+            'description': 'new activity by test_unit',
+            'sales_cycle': {'pk': sales_cycle.pk},
+            'mention_user_ids': [1, 2]
+        }
+
+        count_activities = sales_cycle.rel_activities.count()
+        count_mentions = Mention.objects.count()
+
+        self.assertHttpCreated(self.api_client.post(
+            self.api_path_activity, format='json', data=post_data))
+
+        self.assertEqual(count_activities + 1,
+                         sales_cycle.rel_activities.count())
+        self.assertEqual(count_mentions + 2, Mention.objects.count())
+
     def test_delete_activity(self):
         sales_cycle = self.activity.sales_cycle
         count = sales_cycle.rel_activities.count()

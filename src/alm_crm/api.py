@@ -534,6 +534,44 @@ class ActivityResource(CRMServiceModelResource):
         null=True, full=True
         )
 
+    def save(self, bundle, skip_errors=False):
+        """
+        method was overrided,
+        because we work with GenericRelation,
+        it is not like a ManyToManyRelation.
+        So, we can't use save_m2m,
+        because before call it we should
+        add GenericRelation instance to bundle.obj,
+        but we can't create GenericRelation instance without pk of bundle.obj
+        """
+        bundle = super(self.__class__, self).save(bundle, skip_errors)
+
+        if bundle.data.get('mention_user_ids'):
+            user_ids = bundle.data.get('mention_user_ids')
+            for uid in user_ids:
+                bundle.obj.mentions.add(
+                    Mention.build_new(user_id=uid,
+                                      content_class=bundle.obj,
+                                      object_id=bundle.obj.pk,
+                                      save=True)
+                    )
+
+        return bundle
+
+    # def hydrate(self, bundle):
+    #     # Don't change existing slugs.
+    #     # In reality, this would be better implemented at the ``Note.save``
+    #     # level, but is for demonstration.
+    #     # if not bundle.obj.pk:
+    #     #     bundle.obj.slug = slugify(bundle.data['title'])
+
+    #     if bundle.data.get('mention_user_ids'):
+    #         user_ids = bundle.data.get('mention_user_ids')
+    #         for uid in user_ids:
+
+
+    #     return bundle
+
     class Meta(CRMServiceModelResource.Meta):
         queryset = Activity.objects.all()
         resource_name = 'activity'
