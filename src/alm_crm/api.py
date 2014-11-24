@@ -64,9 +64,39 @@ class CRMServiceModelResource(ModelResource):
 
 class ContactResource(CRMServiceModelResource):
     """
-    I{URL}:  U{alma.net/api/smth}
+    GET Method 
+    I{URL}:  U{alma.net/api/v1/contact}
+    
+    Description
+    Api function to return contacts filtered by the last contact date
 
-    Some Description
+    @type  limit: number
+    @param limit: The limit of results, 20 by default.
+    @type  offset: number
+    @param offset: The offset of results, 0 by default
+
+    @return:  contacts
+
+    >>> {
+    ...     "assignees": [
+    ...         "/api/v1/crmuser/1/"
+    ...     ],
+    ...     "date_created": "2014-09-10T00:00:00",
+    ...     "followers": [],
+    ...     "id": 1,
+    ...     "owner": "/api/v1/crmuser/1/",
+    ...     "resource_uri": "/api/v1/contact/1/",
+    ...     "sales_cycles": [
+    ...         "/api/v1/sales_cycle/1/",
+    ...         "/api/v1/sales_cycle/2/",
+    ...         "/api/v1/sales_cycle/3/"
+    ...     ],
+    ...     "status": 0,
+    ...     "subscription_id": 1,
+    ...     "tp": "user",
+    ...     "vcard": {...}
+    ... }, 
+
     """
     vcard = fields.ToOneField('alm_vcard.api.VCardResource', 'vcard',
                               null=True, full=True)
@@ -413,8 +443,51 @@ class ContactResource(CRMServiceModelResource):
 
     def get_last_contacted(self, request, **kwargs):
         '''
-        pass limit, offset, owned (True by default, assigned,
-        followed and include_activities with GET request
+        GET METHOD
+        I{URL}:  U{alma.net:8000/api/v1/contact/recent/}
+    
+        Description
+        Api function to return contacts filtered by the last contact date
+
+        @type  limit: number
+        @param limit: The limit of results, 20 by default.
+        @type  offset: number
+        @param offset: The offset of results, 0 by default
+        @type  include_activities: boolean
+        @param include_activities: Boolean value indicating the inclusion of
+                            activities in the result outputs. False by default.
+        @type  owned: boolean
+        @param owned: Boolean value indicating the inclusion of contacts
+                owned by the user. True by default.
+        @type  assigned: boolean
+        @param assigned: Boolean value indicating the inclusion of contacts
+                that are assigned to the user. False by default.
+        @type  followed: boolean
+        @param followed: Boolean value indicating the inclusion of contacts
+                that user follows. False by default.
+
+        @return:  contacts ordered by last_activity_date.
+
+        >>> {
+        ...     "assignees": [
+        ...         "/api/v1/crmuser/1/"
+        ...     ],
+        ...     "date_created": "2014-09-10T00:00:00",
+        ...     "followers": [],
+        ...     "id": 1,
+        ...     "owner": "/api/v1/crmuser/1/",
+        ...     "resource_uri": "/api/v1/contact/1/",
+        ...     "sales_cycles": [
+        ...         "/api/v1/sales_cycle/1/",
+        ...         "/api/v1/sales_cycle/2/",
+        ...         "/api/v1/sales_cycle/3/"
+        ...     ],
+        ...     "status": 0,
+        ...     "subscription_id": 1,
+        ...     "tp": "user",
+        ...     "vcard": {...}
+        ... }, 
+
         '''
         limit = int(request.GET.get('limit', 20))
         offset = int(request.GET.get('offset', 0))
@@ -450,7 +523,39 @@ class ContactResource(CRMServiceModelResource):
 
     def get_cold_base(self, request, **kwargs):
         '''
-        pass limit and offset  with GET request
+        GET METHOD
+        I{URL}:  U{alma.net:8000/api/v1/contact/cold_base/}
+    
+        Description
+        Api function to return contacts that have not been contacted yet
+
+        @type  limit: number
+        @param limit: The limit of results, 20 by default.
+        @type  offset: number
+        @param offset: The offset of results, 0 by default
+
+        @return: contacts that have no salescycles and activities.
+
+        >>> {
+        ... "assignees": [
+        ...     "/api/v1/crmuser/1/"
+        ... ],
+        ... "date_created": "2014-09-10T00:00:00",
+        ... "followers": [],
+        ... "id": 1,
+        ... "owner": "/api/v1/crmuser/1/",
+        ... "resource_uri": "/api/v1/contact/1/",
+        ... "sales_cycles": [
+        ...     "/api/v1/sales_cycle/1/",
+        ...     "/api/v1/sales_cycle/2/",
+        ...     "/api/v1/sales_cycle/3/"
+        ... ],
+        ... "status": 0,
+        ... "subscription_id": 1,
+        ... "tp": "user",
+        ... "vcard": {...}
+        ... }, 
+
         '''
         limit = int(request.GET.get('limit', 20))
         offset = int(request.GET.get('offset', 0))
@@ -462,7 +567,39 @@ class ContactResource(CRMServiceModelResource):
 
     def get_leads(self, request, **kwargs):
         '''
-        pass limit and offset through GET request
+        GET METHOD
+        I{URL}:  U{alma.net:8000/api/v1/contact/leads/}
+    
+        Description
+        Api function to return contacts that have a status of LEAD
+
+        @type  limit: number
+        @param limit: The limit of results, 20 by default.
+        @type  offset: number
+        @param offset: The offset of results, 0 by default
+
+        @return: contacts.
+
+        >>> {
+        ...     "assignees": [
+        ...         "/api/v1/crmuser/1/"
+        ...     ],
+        ...     "date_created": "2014-09-10T00:00:00",
+        ...     "followers": [],
+        ...     "id": 1,
+        ...     "owner": "/api/v1/crmuser/1/",
+        ...     "resource_uri": "/api/v1/contact/1/",
+        ...     "sales_cycles": [
+        ...         "/api/v1/sales_cycle/1/",
+        ...         "/api/v1/sales_cycle/2/",
+        ...         "/api/v1/sales_cycle/3/"
+        ...     ],
+        ...     "status": 0,
+        ...     "subscription_id": 1,
+        ...     "tp": "user",
+        ...     "vcard": {...}
+        ... }, 
+
         '''
         STATUS_LEAD = 1
         limit = int(request.GET.get('limit', 20))
@@ -475,9 +612,42 @@ class ContactResource(CRMServiceModelResource):
 
     def get_products(self, request, **kwargs):
         '''
-        pass limit and offset with GET request
-        '''
+        GET METHOD
+        I{URL}:  U{alma.net:8000/api/v1/contact/:id/products/}
+    
+        Description
+        Api function to return products associated with that contact
 
+        @type  limit: number
+        @param limit: The limit of results, 20 by default.
+        @type  offset: number
+        @param offset: The offset of results, 0 by default
+
+        @return: list of products associated with this contact.
+
+        >>> "objects": [
+        ... {
+        ...     currency": "KZT",
+        ...     "description": "Paragraph Online is product for lawyers",
+        ...     "id": 4,
+        ...     "name": "p2: Paragraph Online",
+        ...     "price": 59000,
+        ...     "resource_uri": "/api/v1/product/4/",
+        ...     "sales_cycles": [
+        ...         "/api/v1/sales_cycle/1/",
+        ...         "/api/v1/sales_cycle/4/",
+        ...         "/api/v1/sales_cycle/6/",
+        ...         "/api/v1/sales_cycle/18/",
+        ...         "/api/v1/sales_cycle/20/",
+        ...         "/api/v1/sales_cycle/21/",
+        ...         "/api/v1/sales_cycle/22/",
+        ...         "/api/v1/sales_cycle/23/"
+        ...     ],
+        ...     "subscription_id": null
+        ...     },
+        ... ]
+
+        '''
         contact_id = kwargs.get('id')
         limit = int(request.GET.get('limit', 20))
         offset = int(request.GET.get('offset', 0))
@@ -492,7 +662,33 @@ class ContactResource(CRMServiceModelResource):
 
     def get_activities(self, request, **kwargs):
         '''
-        pass limit and offset with GET request
+        GET METHOD
+        I{URL}:  U{alma.net:8000/api/v1/contact/:id/activities/}
+    
+        Description
+        Api function to return activities associated with that contact
+
+        @type  limit: number
+        @param limit: The limit of results, 20 by default.
+        @type  offset: number
+        @param offset: The offset of results, 0 by default
+
+        @return: list of activities associated with this contact.
+
+        >>> "objects": [
+        ... {
+        ...     "date_created": "2014-03-19T00:00:00",
+        ...     "date_edited": true,
+        ...     "description": "activity #10 of SalesCycle #3",
+        ...     "feedback": null,
+        ...     "id": 30,
+        ...     "owner": null,
+        ...     "resource_uri": "/api/v1/activity/30/",
+        ...     "sales_cycle": "/api/v1/sales_cycle/3/",
+        ...     "subscription_id": null,
+        ...     "title": "activity #10 of SalesCycle #3"
+        ... },  
+
         '''
         contact_id = kwargs.get('id')
         limit = int(request.GET.get('limit', 20))
@@ -508,19 +704,55 @@ class ContactResource(CRMServiceModelResource):
 
     def search(self, request, **kwargs):
         '''
+        GET METHOD
+        I{URL}:  U{alma.net:8000/api/v1/contact/search/}
+    
+        Description
         Api implementation of search, pass search_params in this format:
         [('fn', 'startswith'), ('org__organization_unit', 'icontains'), 'bday']
         will search by the beginning of fn if search_params are not provided
         ast library f-n literal_eval converts the string representation of a
-        list to a python list
+        list to a python list, will search by ('fn','startswith') by default
         pass limit and offset through GET request
+
+        @type  limit: number
+        @param limit: The limit of results, 20 by default.
+        @type  offset: number
+        @param offset: The offset of results, 0 by default
+        @type  search_text: string
+        @param search_text: The text you want to search by
+        @type  search_params: list of tuples
+        @param search_params: The search params you want to include in your
+                            search.
+        @type  order_by: list
+        @param order_by: A list consisting of 2 elements, first one is
+                    parameter like fn, or email__value. The second one is order,
+                    'asc' or 'desc'. ['fn','asc'] by default
+
+
+        @return: list of contacts.
+
+        >>> "objects": [
+        ... {
+        ...     "assignees": [],
+        ...     "date_created": "2014-11-18T09:20:23.359796",
+        ...     "followers": [],
+        ...     "id": 12,
+        ...     "owner": null,
+        ...     "resource_uri": "/api/v1/contact/12/",
+        ...     "sales_cycles": [],
+        ...     "status": 0,
+        ...     "subscription_id": null,
+        ...     "tp": "user",
+        ...     "vcard": {}
+        ... },
         '''
         limit = int(request.GET.get('limit', 20))
         offset = int(request.GET.get('offset', 0))
         search_text = request.GET.get('search_text', '').encode('utf-8')
         search_params = ast.literal_eval(
             request.GET.get('search_params', "[('fn', 'startswith')]"))
-        order_by = ast.literal_eval(request.GET.get('order_by', "[]"))
+        order_by = ast.literal_eval(request.GET.get('order_by', "['fn','asc']"))
         contacts = Contact.filter_contacts_by_vcard(
             search_text=search_text,
             search_params=search_params,
@@ -534,7 +766,24 @@ class ContactResource(CRMServiceModelResource):
 
     def assign_contact(self, request, **kwargs):
         '''
-        Assigning a single contact with user
+        GET METHOD
+        I{URL}:  U{alma.net:8000/api/v1/contact/assign_contact/}
+    
+        Description
+        Assign a signle user to a signle contact
+
+        @type  user_id: number
+        @param user_id: user id 
+        @type  contact_id: number
+        @param contact_id: contact id 
+
+
+        @return: json.
+
+        >>> 
+        ... {
+        ...     'success':True
+        ... },
         '''
         user_id = int(request.GET.get('user_id',0))
         if not user_id:
@@ -552,8 +801,24 @@ class ContactResource(CRMServiceModelResource):
 
     def assign_contacts(self, request, **kwargs):
         '''
-        Assigning multiple contacts with user, send multiple contacts as so
-        contact_ids=[1,2,3,4...n]
+        GET METHOD
+        I{URL}:  U{alma.net:8000/api/v1/contact/assign_contacts/}
+    
+        Description
+        Assign a single user to multiple contacts
+
+        @type  user_id: number
+        @param user_id: user id 
+        @type  contact_ids: list
+        @param contact_ids: List of contact ids, [1,2,3] 
+
+
+        @return: json.
+
+        >>> 
+        ... {
+        ...     'success':True
+        ... },
         '''
         import ast
         user_id = int(request.GET.get('user_id',0))
@@ -571,8 +836,27 @@ class ContactResource(CRMServiceModelResource):
                 )
 
     def share_contact(self, request, **kwargs):
-        ''' 
-        Sharing a single contact with a single user
+        '''
+        GET METHOD
+        I{URL}:  U{alma.net:8000/api/v1/contact/share_contact/}
+    
+        Description
+        Share a contact with a user
+
+        @type  share_to: number
+        @param share_to: Id of a user to share a contact with
+        @type  share_from: number
+        @param share_from: Id of a user who is sharing a contact
+        @type  contact_id: number
+        @param contact_id: Id of a desired contact
+
+
+        @return: json.
+
+        >>> 
+        ... {
+        ...     'success':True
+        ... },
         '''
         share_to = int(request.GET.get('share_to',0))
         if not share_to:
@@ -594,22 +878,29 @@ class ContactResource(CRMServiceModelResource):
             )
 
     def share_contacts(self, request, **kwargs):
-        """
-        I{URL}:  U{alma.net/api/smth}
+        '''
+        GET METHOD
+        I{URL}:  U{alma.net:8000/api/v1/contact/share_contacts/}
+    
+        Description
+        Share multiple contact with a user
 
-        Some Description
+        @type  share_to: number
+        @param share_to: Id of a user to share a contact with
+        @type  share_from: number
+        @param share_from: Id of a user who is sharing a contact
+        @type  contact_id: list
+        @param contact_id: list of contact ids to be shared
 
-        @type  m: number
-        @param m: The slope of the line.
-        @type  b: number
-        @param b: The y intercept of the line.  The X{y intercept} of a
-                  line is the point at which it crosses the y axis (M{x=0}).
-        
-        @return:  the x intercept of the line M{y=m*x+b}.
 
-        >>> print 'This is a doctest block'
-        This is a doctest block
-        """
+        @return: json.
+
+        >>> 
+        ... {
+        ...     'success':True
+        ... },
+
+        '''
         import ast
         share_to = int(request.GET.get('share_to',0))
         if not share_to:
@@ -632,7 +923,27 @@ class ContactResource(CRMServiceModelResource):
 
     def import_contacts_from_vcard(self, request, **kwargs):
         '''
-        Import contact(s) from single vcard file
+        POST METHOD
+        I{URL}:  U{alma.net:8000/api/v1/contact/import_contacts_from_vcard/}
+    
+        Description
+        Import contacts from a vcard file
+
+        @type  my_file: file
+        @param my_file: A vcard file
+
+        @return: json.
+
+        >>> 
+        ... {
+        ...    'success':True,
+        ...    'contact_ids':[
+        ...            91,
+        ...            92,
+        ...            93,
+        ...        ],
+        ... },
+
         '''
         if request.method == 'POST':
             print request.FILES['myfile']
