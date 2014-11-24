@@ -16,6 +16,8 @@ var upload_vcard = (function($) {
           url: o.$form.attr('action'),
           type: o.$form.attr('method'),
           data: data,
+          dataType: jsonp,
+          crossdomain: true,
           cache: false,
           processData: false,
           contentType: false

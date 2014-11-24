@@ -253,6 +253,49 @@ class Contact(SubscriptionObject):
             return False
 
     @classmethod
+    def share_contact(cls, share_from, share_to, contact_id, comment=None):
+        return cls.share_contacts(share_from, share_to, [contact_id], comment)
+    
+    @classmethod
+    def share_contacts(cls, share_from, share_to, contact_ids, comment=None):
+        '''
+        Share multiple contacts to a single user
+        '''
+        assert isinstance(contact_ids, (list, tuple)), 'Must be a list'
+        if not contact_ids:
+            return false
+        try:
+            share_from = CRMUser.objects.get(id=share_from)
+            share_to = CRMUser.objects.get(id=share_to)
+            contacts = [Contact.objects.get(id=contact_id) for contact_id in contact_ids]
+            share_list=[]
+            for contact in contacts:
+                share = Share(
+                        share_from=share_from,
+                        share_to=share_to,
+                        contact=contact
+                    )
+                share.save()
+                share_list.append(share)
+            '''
+            I do not know how you will submit mentions in comments so i'm leaving 
+            this blank for now
+            '''
+            if comment:
+                for share in share_list:
+                    comment = Comment(
+                        comment=comment,
+                        object_id=share.id,
+                        owner_id=share_from.id,
+                        content_type_id=ContentType.objects.get_for_model(Share).id
+                        )
+                    comment.save()
+            return True
+        except:
+            return False
+
+
+    @classmethod
     def upd_lst_activity_on_create(cls, sender, created=False,
                                    instance=None, **kwargs):
         if not created:
@@ -415,6 +458,23 @@ class Contact(SubscriptionObject):
     #         What is the structure of csv file ???
     #     """
     #     pass
+    @classmethod
+    def import_contacts_from_vcard(cls, vcard_file):
+        print 'getting to import_contacts models function'
+        try:
+            data_list = vcard_file.read().split('END:VCARD')[:-1]
+            contact_ids=[]
+            for i in range(0, len(data_list)):
+                data_list[i] += 'END:VCARD'
+                print data_list[i]
+                #c = cls.upload_contacts('vcard', data_list[i], save=True)
+                c = cls._upload_contacts_by_vcard(data_list[i])
+                contact_ids.append({'contact_id':c.id, 'name':c.name})
+                print contact_ids
+                #contact_ids.append(Contact.upload_contacts('vcard', data_list[i], save=True).id)
+            return {'success': True, 'contact_ids': contact_ids}
+        except:
+            return {'success': False, 'contact_ids': None}
 
     @classmethod
     def get_contacts_by_last_activity_date(
@@ -1020,6 +1080,7 @@ class Comment(SubscriptionObject):
 
 
 class Share(SubscriptionObject):
+    is_read = models.BooleanField(default=False, blank=False)
     contact = models.ForeignKey(
         Contact, related_name='shares',
         on_delete=models.SET_DEFAULT, default=None)
