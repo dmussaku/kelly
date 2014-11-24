@@ -63,6 +63,11 @@ class CRMServiceModelResource(ModelResource):
 
 
 class ContactResource(CRMServiceModelResource):
+    """
+    I{URL}:  U{alma.net/api/smth}
+
+    Some Description
+    """
     vcard = fields.ToOneField('alm_vcard.api.VCardResource', 'vcard',
                               null=True, full=True)
     owner = fields.ToOneField('alm_crm.api.CRMUserResource', 'owner',
@@ -589,9 +594,22 @@ class ContactResource(CRMServiceModelResource):
             )
 
     def share_contacts(self, request, **kwargs):
-        ''' 
-        Sharing a single contact with a single user
-        '''
+        """
+        I{URL}:  U{alma.net/api/smth}
+
+        Some Description
+
+        @type  m: number
+        @param m: The slope of the line.
+        @type  b: number
+        @param b: The y intercept of the line.  The X{y intercept} of a
+                  line is the point at which it crosses the y axis (M{x=0}).
+        
+        @return:  the x intercept of the line M{y=m*x+b}.
+
+        >>> print 'This is a doctest block'
+        This is a doctest block
+        """
         import ast
         share_to = int(request.GET.get('share_to',0))
         if not share_to:
