@@ -41,7 +41,8 @@ class CRMServiceModelResource(ModelResource):
         if 'subscriptions' in user_env:
             bundle.obj.subscription_pk = filter(
                 lambda x: user_env['subscription_{}'.format(x)]['slug'] == DEFAULT_SERVICE,
-                user_env['subscriptions'])[0]
+                user_env['subscriptions']
+                )[0]
             bundle.obj.owner = bundle.request.user.get_subscr_user(
                 bundle.obj.subscription_pk)
 
@@ -68,9 +69,9 @@ class CRMServiceModelResource(ModelResource):
 
 class ContactResource(CRMServiceModelResource):
     """
-    GET Method 
+    GET Method
     I{URL}:  U{alma.net/api/v1/contact}
-    
+
     Description
     Api function to return contacts filtered by the last contact date
 
@@ -99,7 +100,7 @@ class ContactResource(CRMServiceModelResource):
     ...     "subscription_id": 1,
     ...     "tp": "user",
     ...     "vcard": {...}
-    ... }, 
+    ... },
 
     """
     vcard = fields.ToOneField('alm_vcard.api.VCardResource', 'vcard',
@@ -426,22 +427,22 @@ class ContactResource(CRMServiceModelResource):
                 name='api_get_activities'
             ),
             url(
-                r"^(?P<resource_name>%s)/share_contact%s$" % 
+                r"^(?P<resource_name>%s)/share_contact%s$" %
                 (self._meta.resource_name, trailing_slash()),
                 self.wrap_view('share_contact'),
-                name = 'api_share_contact'
+                name='api_share_contact'
             ),
             url(
-                r"^(?P<resource_name>%s)/share_contacts%s$" % 
+                r"^(?P<resource_name>%s)/share_contacts%s$" %
                 (self._meta.resource_name, trailing_slash()),
                 self.wrap_view('share_contacts'),
-                name = 'api_share_contacts'
+                name='api_share_contacts'
             ),
             url(
-                r"^(?P<resource_name>%s)/import_contacts_from_vcard%s$" % 
+                r"^(?P<resource_name>%s)/import_contacts_from_vcard%s$" %
                 (self._meta.resource_name, trailing_slash()),
                 self.wrap_view('import_contacts_from_vcard'),
-                name = 'api_import_contacts_from_vcard'
+                name='api_import_contacts_from_vcard'
             ),
         ]
 
@@ -449,7 +450,7 @@ class ContactResource(CRMServiceModelResource):
         '''
         GET METHOD
         I{URL}:  U{alma.net:8000/api/v1/contact/recent/}
-    
+
         Description
         Api function to return contacts filtered by the last contact date
 
@@ -490,7 +491,7 @@ class ContactResource(CRMServiceModelResource):
         ...     "subscription_id": 1,
         ...     "tp": "user",
         ...     "vcard": {...}
-        ... }, 
+        ... },
 
         '''
         limit = int(request.GET.get('limit', 20))
@@ -529,7 +530,7 @@ class ContactResource(CRMServiceModelResource):
         '''
         GET METHOD
         I{URL}:  U{alma.net:8000/api/v1/contact/cold_base/}
-    
+
         Description
         Api function to return contacts that have not been contacted yet
 
@@ -558,7 +559,7 @@ class ContactResource(CRMServiceModelResource):
         ... "subscription_id": 1,
         ... "tp": "user",
         ... "vcard": {...}
-        ... }, 
+        ... },
 
         '''
         limit = int(request.GET.get('limit', 20))
@@ -573,7 +574,7 @@ class ContactResource(CRMServiceModelResource):
         '''
         GET METHOD
         I{URL}:  U{alma.net:8000/api/v1/contact/leads/}
-    
+
         Description
         Api function to return contacts that have a status of LEAD
 
@@ -602,7 +603,7 @@ class ContactResource(CRMServiceModelResource):
         ...     "subscription_id": 1,
         ...     "tp": "user",
         ...     "vcard": {...}
-        ... }, 
+        ... },
 
         '''
         STATUS_LEAD = 1
@@ -618,7 +619,7 @@ class ContactResource(CRMServiceModelResource):
         '''
         GET METHOD
         I{URL}:  U{alma.net:8000/api/v1/contact/:id/products/}
-    
+
         Description
         Api function to return products associated with that contact
 
@@ -668,7 +669,7 @@ class ContactResource(CRMServiceModelResource):
         '''
         GET METHOD
         I{URL}:  U{alma.net:8000/api/v1/contact/:id/activities/}
-    
+
         Description
         Api function to return activities associated with that contact
 
@@ -691,7 +692,7 @@ class ContactResource(CRMServiceModelResource):
         ...     "sales_cycle": "/api/v1/sales_cycle/3/",
         ...     "subscription_id": null,
         ...     "title": "activity #10 of SalesCycle #3"
-        ... },  
+        ... },
 
         '''
         contact_id = kwargs.get('id')
@@ -710,7 +711,7 @@ class ContactResource(CRMServiceModelResource):
         '''
         GET METHOD
         I{URL}:  U{alma.net:8000/api/v1/contact/search/}
-    
+
         Description
         Api implementation of search, pass search_params in this format:
         [('fn', 'startswith'), ('org__organization_unit', 'icontains'), 'bday']
@@ -772,78 +773,84 @@ class ContactResource(CRMServiceModelResource):
         '''
         GET METHOD
         I{URL}:  U{alma.net:8000/api/v1/contact/assign_contact/}
-    
+
         Description
         Assign a signle user to a signle contact
 
         @type  user_id: number
-        @param user_id: user id 
+        @param user_id: user id
         @type  contact_id: number
-        @param contact_id: contact id 
+        @param contact_id: contact id
 
 
         @return: json.
 
-        >>> 
+        >>>
         ... {
         ...     'success':True
         ... },
         '''
-        user_id = int(request.GET.get('user_id',0))
+        user_id = int(request.GET.get('user_id', 0))
         if not user_id:
             return self.create_response(
-                    request, {'success':False, error_string:'User id is not set'}
+                request,
+                {'success': False, 'error_string': 'User id is not set'}
                 )
-        contact_id = int(request.GET.get('contact_id',0))
+        contact_id = int(request.GET.get('contact_id', 0))
         if not contact_id:
             return self.create_response(
-                    request, {'success':False, error_string:'Contact id is not set'}
+                request,
+                {'success': False, 'error_string': 'Contact id is not set'}
                 )
         return self.create_response(
-                request, {'success':Contact.assign_user_to_contact(user_id, contact_id)}
-                )
+            request,
+            {'success': Contact.assign_user_to_contact(user_id, contact_id)}
+            )
 
     def assign_contacts(self, request, **kwargs):
         '''
         GET METHOD
         I{URL}:  U{alma.net:8000/api/v1/contact/assign_contacts/}
-    
+
         Description
         Assign a single user to multiple contacts
 
         @type  user_id: number
-        @param user_id: user id 
+        @param user_id: user id
         @type  contact_ids: list
-        @param contact_ids: List of contact ids, [1,2,3] 
+        @param contact_ids: List of contact ids, [1,2,3]
 
 
         @return: json.
 
-        >>> 
+        >>>
         ... {
         ...     'success':True
         ... },
         '''
         import ast
-        user_id = int(request.GET.get('user_id',0))
+        user_id = int(request.GET.get('user_id', 0))
         if not user_id:
             return self.create_response(
-                    request, {'success':False, error_string:'User id is not set'}
+                request,
+                {'success': False, 'error_string': 'User id is not set'}
                 )
-        contact_ids = ast.literal_eval(request.GET.get('contact_ids',[]))
+        contact_ids = ast.literal_eval(request.GET.get('contact_ids', []))
         if not contact_ids:
             return self.create_response(
-                    request, {'success':False, error_string:'Contact ids are not set'}
+                request,
+                {'success': False, 'error_string': 'Contact ids are not set'}
                 )
         return self.create_response(
-                request, {'success':Contact.assign_user_to_contacts(user_id, contact_ids)}
-                )
+            request,
+            {'success': Contact.assign_user_to_contacts(user_id, contact_ids)}
+            )
 
     def share_contact(self, request, **kwargs):
         '''
         GET METHOD
         I{URL}:  U{alma.net:8000/api/v1/contact/share_contact/}
-    
+
         Description
         Share a contact with a user
 
@@ -857,35 +864,39 @@ class ContactResource(CRMServiceModelResource):
 
         @return: json.
 
-        >>> 
+        >>>
         ... {
         ...     'success':True
         ... },
         '''
-        share_to = int(request.GET.get('share_to',0))
+        share_to = int(request.GET.get('share_to', 0))
         if not share_to:
             return self.create_response(
-                request, {'success':False, 
-                          'error_message':"You didn't specify with whom you want to share contact(s)"
-                         }
+                request,
+                {'success': False,
+                'error_message': "You didn't specify with whom you want to share contact(s)"
+                }
                 )
-        share_from = int(request.GET.get('share_from',0))
+        share_from = int(request.GET.get('share_from', 0))
         if not share_from:
             return self.create_response(
-                request, {'success':False, 
-                          'error_message':"You didn't specify the user whos sharing contact(s)"
-                         }
+                request,
+                {'success': False,
+                'error_message': "You didn't specify the user whos sharing contact(s)"
+                }
                 )
-        contact_id = int(request.GET.get('contact_id',0))
+        contact_id = int(request.GET.get('contact_id', 0))
         return self.create_response(
-                request, {'success':Contact.share_contact(share_from, share_to, contact_id)}
+            request,
+            {'success':
+                Contact.share_contact(share_from, share_to, contact_id)}
             )
 
     def share_contacts(self, request, **kwargs):
         '''
         GET METHOD
         I{URL}:  U{alma.net:8000/api/v1/contact/share_contacts/}
-    
+
         Description
         Share multiple contact with a user
 
@@ -899,37 +910,41 @@ class ContactResource(CRMServiceModelResource):
 
         @return: json.
 
-        >>> 
+        >>>
         ... {
         ...     'success':True
         ... },
 
         '''
         import ast
-        share_to = int(request.GET.get('share_to',0))
+        share_to = int(request.GET.get('share_to', 0))
         if not share_to:
             return self.create_response(
-                request, {'success':False, 
-                          'error_message':"You didn't specify with whom you want to share contact(s)"
-                         }
+                request,
+                {'success': False,
+                 'error_message': "You didn't specify with whom you want to share contact(s)"
+                 }
                 )
-        share_from = int(request.GET.get('share_from',0))
+        share_from = int(request.GET.get('share_from', 0))
         if not share_from:
             return self.create_response(
-                request, {'success':False, 
-                          'error_message':"You didn't specify the user whos sharing contact(s)"
-                         }
+                request,
+                {'success': False,
+                 'error_message': "You didn't specify the user whos sharing contact(s)"
+                 }
                 )
-        contact_ids = ast.literal_eval(request.GET.get('contact_ids',[]))
+        contact_ids = ast.literal_eval(request.GET.get('contact_ids', []))
         return self.create_response(
-                request, {'success':Contact.share_contacts(share_from, share_to, contact_ids)}
+            request,
+            {'success':
+                Contact.share_contacts(share_from, share_to, contact_ids)}
             )
 
     def import_contacts_from_vcard(self, request, **kwargs):
         '''
         POST METHOD
         I{URL}:  U{alma.net:8000/api/v1/contact/import_contacts_from_vcard/}
-    
+
         Description
         Import contacts from a vcard file
 
@@ -938,7 +953,7 @@ class ContactResource(CRMServiceModelResource):
 
         @return: json.
 
-        >>> 
+        >>>
         ... {
         ...    'success':True,
         ...    'contact_ids':[
@@ -950,11 +965,11 @@ class ContactResource(CRMServiceModelResource):
 
         '''
         if request.method == 'POST':
-            print request.FILES['myfile']
             return self.create_response(
-                    request, Contact.import_contacts_from_vcard(request.FILES['myfile'])
+                request,
+                Contact.import_contacts_from_vcard(request.FILES['myfile'])
                 )
-        
+
 
 class SalesCycleResource(CRMServiceModelResource):
     contact = fields.ForeignKey(ContactResource, 'contact')
@@ -980,6 +995,14 @@ class SalesCycleResource(CRMServiceModelResource):
 
 
 class ActivityResource(CRMServiceModelResource):
+    """
+    GET Method
+    I{URL}:  U{alma.net/api/v1/activity}
+
+    B{Description}:
+    API resource to manage Activities
+    """
+
     sales_cycle = fields.ForeignKey(SalesCycleResource, 'sales_cycle')
     feedback = fields.ToOneField('alm_crm.api.FeedbackResource',
                                  'activity_feedback', null=True, full=True)
@@ -1008,7 +1031,7 @@ class ActivityResource(CRMServiceModelResource):
         because we work with GenericRelation,
         it is not like a ManyToManyRelation.
         So, we can't use save_m2m,
-        because before call it we should
+        because before call it we will
         add GenericRelation instance to bundle.obj,
         but we can't create GenericRelation instance without pk of bundle.obj
         """
@@ -1026,23 +1049,32 @@ class ActivityResource(CRMServiceModelResource):
 
         return bundle
 
-    # def hydrate(self, bundle):
-    #     # Don't change existing slugs.
-    #     # In reality, this would be better implemented at the ``Note.save``
-    #     # level, but is for demonstration.
-    #     # if not bundle.obj.pk:
-    #     #     bundle.obj.slug = slugify(bundle.data['title'])
-
-    #     if bundle.data.get('mention_user_ids'):
-    #         user_ids = bundle.data.get('mention_user_ids')
-    #         for uid in user_ids:
-
-
-    #     return bundle
-
     class Meta(CRMServiceModelResource.Meta):
         queryset = Activity.objects.all()
         resource_name = 'activity'
+
+    def post_list(self, request, **kwargs):
+        '''
+        POST METHOD
+        I{URL}:  U{alma.net:8000/api/v1/activity/}
+
+        Description
+        API standart function to Create new Activity
+
+        @type  mention_user_ids: list[id]
+        @param mention_user_ids: The list of crmuser ids,
+        to add them as mentioned users of new activity
+
+        @return: HTTP status code back (201) and a Location header,
+        which gives us the URI to our newly created resource.
+
+        >>> HTTP/1.0 201 CREATED
+        ... Date: Fri, 11 Nov 2014 06:48:36 GMT
+        ... Server: WSGIServer/0.1 Python/2.7
+        ... Content-Type: text/html; charset=utf-8
+        ... Location: http://alma.net/api/v1/activity/1/
+        '''
+        super(self.__class__, self).save(request, **kwargs)
 
 
 class ProductResource(CRMServiceModelResource):
