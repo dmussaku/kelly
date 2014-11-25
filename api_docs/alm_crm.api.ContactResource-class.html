@@ -14,9 +14,6 @@
 <table class="navbar" border="0" width="100%" cellpadding="0"
        bgcolor="#a0c0ff" cellspacing="0">
   <tr valign="middle">
-  <!-- Home link -->
-      <th>&nbsp;&nbsp;&nbsp;<a
-        href="alm_crm.api-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
 
   <!-- Tree link -->
       <th>&nbsp;&nbsp;&nbsp;<a
@@ -66,10 +63,9 @@ tastypie.resources.ModelResource --+
 </pre>
 
 <hr />
-<p>GET Method <i>URL</i>:  <a href="http://alma.net/api/v1/contact" 
-  target="_top">alma.net/api/v1/contact</a></p>
-  <p>Description Api function to return contacts filtered by the last 
-  contact date</p>
+<p>GET Method <i>URL</i>:  <a href="http://alma.net:8000/api/v1/contact/"
+  target="_top">alma.net:8000/api/v1/contact/</a></p>
+  <p>Description Api for Contact model</p>
 
 <!-- ==================== NESTED CLASSES ==================== -->
 <a name="section-NestedClasses"></a>
@@ -113,6 +109,27 @@ tastypie.resources.ModelResource --+
     </table>
   </td>
 </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="alm_crm.api.ContactResource-class.html#post_list" class="summary-sig-name">post_list</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">request</span>,
+        <span class="summary-sig-arg">**kwargs</span>)</span><br />
+      GET Method <i>URL</i>:  <a 
+      href="http://alma.net:8000/api/v1/contact/" 
+      target="_top">alma.net:8000/api/v1/contact/</a></td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="alm_crm.api-pysrc.html#ContactResource.post_list">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
@@ -460,6 +477,36 @@ elated_name= 'contact', null= True, full= True)">fields.ToManyField('alm_crm.api
   </td>
 </tr>
 </table>
+<a name="post_list"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">post_list</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">request</span>,
+        <span class="sig-arg">**kwargs</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="alm_crm.api-pysrc.html#ContactResource.post_list">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>GET Method <i>URL</i>:  <a href="http://alma.net:8000/api/v1/contact/"
+  target="_top">alma.net:8000/api/v1/contact/</a></p>
+  <p>Description Api for Contact model</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>limit</code></strong> (number) - The limit of results, 20 by default.</li>
+        <li><strong class="pname"><code>offset</code></strong> (number) - The offset of results, 0 by default</li>
+    </ul></dd>
+    <dt>Returns:</dt>
+        <dd>contacts</dd>
+  </dl>
+</td></tr></table>
+</div>
 <a name="get_last_contacted"></a>
 <div>
 <table class="details" border="1" cellpadding="3"
@@ -498,7 +545,8 @@ elated_name= 'contact', null= True, full= True)">fields.ToManyField('alm_crm.api
     <dt>Returns:</dt>
         <dd>contacts ordered by last_activity_date.
 <pre class="py-doctest">
-<span class="py-prompt">&gt;&gt;&gt; </span>{
+<span class="py-prompt">&gt;&gt;&gt; </span><span class="py-string">&quot;objecs&quot;</span>:[ 
+<span class="py-more">... </span>   {
 <span class="py-more">... </span>    <span class="py-string">&quot;assignees&quot;</span>: [
 <span class="py-more">... </span>        <span class="py-string">&quot;/api/v1/crmuser/1/&quot;</span>
 <span class="py-more">... </span>    ],
@@ -516,7 +564,8 @@ elated_name= 'contact', null= True, full= True)">fields.ToManyField('alm_crm.api
 <span class="py-more">... </span>    <span class="py-string">&quot;subscription_id&quot;</span>: 1,
 <span class="py-more">... </span>    <span class="py-string">&quot;tp&quot;</span>: <span class="py-string">&quot;user&quot;</span>,
 <span class="py-more">... </span>    <span class="py-string">&quot;vcard&quot;</span>: {...}
-<span class="py-more">... </span>},</pre></dd>
+<span class="py-more">... </span>}, 
+<span class="py-more">... </span>]</pre></dd>
   </dl>
 </td></tr></table>
 </div>
@@ -550,7 +599,8 @@ elated_name= 'contact', null= True, full= True)">fields.ToManyField('alm_crm.api
     <dt>Returns:</dt>
         <dd>contacts that have no salescycles and activities.
 <pre class="py-doctest">
-<span class="py-prompt">&gt;&gt;&gt; </span>{
+<span class="py-prompt">&gt;&gt;&gt; </span><span class="py-string">&quot;objects&quot;</span>:[
+<span class="py-more">... </span>{
 <span class="py-more">... </span><span class="py-string">&quot;assignees&quot;</span>: [
 <span class="py-more">... </span>    <span class="py-string">&quot;/api/v1/crmuser/1/&quot;</span>
 <span class="py-more">... </span>],
@@ -568,7 +618,8 @@ elated_name= 'contact', null= True, full= True)">fields.ToManyField('alm_crm.api
 <span class="py-more">... </span><span class="py-string">&quot;subscription_id&quot;</span>: 1,
 <span class="py-more">... </span><span class="py-string">&quot;tp&quot;</span>: <span class="py-string">&quot;user&quot;</span>,
 <span class="py-more">... </span><span class="py-string">&quot;vcard&quot;</span>: {...}
-<span class="py-more">... </span>},</pre></dd>
+<span class="py-more">... </span>}, 
+<span class="py-more">... </span>]</pre></dd>
   </dl>
 </td></tr></table>
 </div>
@@ -602,7 +653,8 @@ elated_name= 'contact', null= True, full= True)">fields.ToManyField('alm_crm.api
     <dt>Returns:</dt>
         <dd>contacts.
 <pre class="py-doctest">
-<span class="py-prompt">&gt;&gt;&gt; </span>{
+<span class="py-prompt">&gt;&gt;&gt; </span><span class="py-string">&quot;objects&quot;</span>: [
+<span class="py-more">... </span>  {
 <span class="py-more">... </span>    <span class="py-string">&quot;assignees&quot;</span>: [
 <span class="py-more">... </span>        <span class="py-string">&quot;/api/v1/crmuser/1/&quot;</span>
 <span class="py-more">... </span>    ],
@@ -620,7 +672,8 @@ elated_name= 'contact', null= True, full= True)">fields.ToManyField('alm_crm.api
 <span class="py-more">... </span>    <span class="py-string">&quot;subscription_id&quot;</span>: 1,
 <span class="py-more">... </span>    <span class="py-string">&quot;tp&quot;</span>: <span class="py-string">&quot;user&quot;</span>,
 <span class="py-more">... </span>    <span class="py-string">&quot;vcard&quot;</span>: {...}
-<span class="py-more">... </span>},</pre></dd>
+<span class="py-more">... </span>}, 
+<span class="py-more">... </span>]</pre></dd>
   </dl>
 </td></tr></table>
 </div>
@@ -1085,9 +1138,6 @@ elated_name= 'contact', null= True, full= True)
 <table class="navbar" border="0" width="100%" cellpadding="0"
        bgcolor="#a0c0ff" cellspacing="0">
   <tr valign="middle">
-  <!-- Home link -->
-      <th>&nbsp;&nbsp;&nbsp;<a
-        href="alm_crm.api-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
 
   <!-- Tree link -->
       <th>&nbsp;&nbsp;&nbsp;<a
@@ -1107,7 +1157,7 @@ elated_name= 'contact', null= True, full= True)
 <table border="0" cellpadding="0" cellspacing="0" width="100%%">
   <tr>
     <td align="left" class="footer">
-    Generated by Epydoc 3.0.1 on Mon Nov 24 15:11:39 2014
+    Generated by Epydoc 3.0.1 on Tue Nov 25 17:06:15 2014
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

@@ -6,6 +6,13 @@ from alm_vcard.models import *
 
 
 class VCardResource(ModelResource):
+    """
+    GET Method 
+    I{URL}:  U{alma.net:8000/api/v1/vcard/}
+    
+    Description
+    Api for VCard model 
+    """
     emails = fields.ToManyField('alm_vcard.api.VCardEmailResource',
                                 'email_set', related_name='vcard', null=True,
                                 full=True)

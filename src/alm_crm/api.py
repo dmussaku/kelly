@@ -69,10 +69,10 @@ class CRMServiceModelResource(ModelResource):
 class ContactResource(CRMServiceModelResource):
     """
     GET Method 
-    I{URL}:  U{alma.net/api/v1/contact}
+    I{URL}:  U{alma.net:8000/api/v1/contact/}
     
     Description
-    Api function to return contacts filtered by the last contact date
+    Api for Contact model
 
     @type  limit: number
     @param limit: The limit of results, 20 by default.
@@ -117,6 +117,7 @@ class ContactResource(CRMServiceModelResource):
     class Meta(CRMServiceModelResource.Meta):
         queryset = Contact.objects.all()
         resource_name = 'contact'
+<<<<<<< Updated upstream
         extra_actions = [
         {
             "name": "recent",
@@ -376,6 +377,25 @@ class ContactResource(CRMServiceModelResource):
             }
         }
     ]
+=======
+
+    def post_list(self, request, **kwargs):
+        """
+        GET Method 
+        I{URL}:  U{alma.net:8000/api/v1/contact/}
+        
+        Description
+        Api for Contact model
+
+        @type  limit: number
+        @param limit: The limit of results, 20 by default.
+        @type  offset: number
+        @param offset: The offset of results, 0 by default
+
+        @return:  contacts
+        """
+        return super(self.__class__, self).post_list(request)
+>>>>>>> Stashed changes
 
     def prepend_urls(self):
         return [
