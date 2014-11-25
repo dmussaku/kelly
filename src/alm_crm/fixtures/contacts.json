@@ -1,54 +1,68 @@
 [
-    {
-        "pk": 1,
-        "model": "alm_crm.Contact",
-        "fields": {
-            "status":0,
-            "tp":"user",
-            "date_created":"2014-09-10 00:00:00+00:00",
-            "vcard":1,
-            "company_contact":null,
-            "followers":[],
-            "assignees":[]
-        }
-    },
-    {
-        "pk": 2,
-        "model": "alm_crm.Contact",
-        "fields": {
-            "status":1,
-            "tp":"user",
-            "date_created":"2014-09-10 00:00:00+00:00",
-            "vcard":2,
-            "company_contact":null,
-            "followers":[],
-            "assignees":[]
-        }
-    },
-    {
-        "pk": 3,
-        "model": "alm_crm.Contact",
-        "fields": {
-            "status":1,
-            "tp":"user",
-            "date_created":"2014-09-10 00:00:00+00:00",
-            "vcard":3,
-            "company_contact":null,
-            "followers":[],
-            "assignees":[]
-        }
-    },
-    {
-        "pk": 4,
-        "model": "alm_crm.Contact",
-        "fields": {
-            "status":2,
-            "tp":"user",
-            "date_created":"2014-09-10 00:00:00+00:00",
-            "vcard":4,
-            "company_contact":null,
-            "followers":[],
-            "assignees":[]
-        }
+{
+    "pk": 1, 
+    "model": "alm_crm.contact", 
+    "fields": {
+        "status": 0, 
+        "latest_activity": null, 
+        "tp": "user", 
+        "assignees": [
+            1
+        ], 
+        "company_contact": null, 
+        "followers": [], 
+        "owner": null, 
+        "date_created": "2014-09-10T00:00:00Z", 
+        "subscription_id": null, 
+        "vcard": null
     }
+},
+{
+    "pk": 2, 
+    "model": "alm_crm.contact", 
+    "fields": {
+        "status": 1, 
+        "latest_activity": null, 
+        "tp": "user", 
+        "assignees": [], 
+        "company_contact": null, 
+        "followers": [], 
+        "owner": null, 
+        "date_created": "2014-09-10T00:00:00Z", 
+        "subscription_id": null, 
+        "vcard": null
+    }
+},
+{
+    "pk": 3, 
+    "model": "alm_crm.contact", 
+    "fields": {
+        "status": 1, 
+        "latest_activity": null, 
+        "tp": "user", 
+        "assignees": [], 
+        "company_contact": null, 
+        "followers": [], 
+        "owner": null, 
+        "date_created": "2014-09-10T00:00:00Z", 
+        "subscription_id": null, 
+        "vcard": null
+    }
+},
+{
+    "pk": 4, 
+    "model": "alm_crm.contact", 
+    "fields": {
+        "status": 2, 
+        "latest_activity": null, 
+        "tp": "user", 
+        "assignees": [], 
+        "company_contact": null, 
+        "followers": [], 
+        "owner": null, 
+        "date_created": "2014-09-10T00:00:00Z", 
+        "subscription_id": null, 
+        "vcard": null
+    }
+}
 ]

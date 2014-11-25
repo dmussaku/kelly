@@ -16,7 +16,6 @@ from alm_crm.models import (
     )
 from alm_vcard.models import VCard
 
-
 class ContactTestCase(TestCase):
     fixtures = ['crmusers.json', 'vcards.json', 'contacts.json',
                 'salescycles.json', 'activities.json', 'feedbacks.json']
@@ -771,6 +770,7 @@ class ProductResourceTest(ResourceTestMixin, ResourceTestCase):
         # verify that one sales_cycle has been deleted.
         self.assertEqual(sales_cycle.products.count(), count - 1)
 
+<<<<<<< HEAD
     def test_update_product_via_put(self):
         # get exist product data
         p = Product.objects.first()
@@ -798,6 +798,8 @@ class ProductResourceTest(ResourceTestMixin, ResourceTestCase):
         self.assertEqual(self.get_detail_des(p.pk)['name'], product_name)
 
 
+=======
+>>>>>>> feature/tastypie_api_tests_nurlan
 class ContactResourceTest(ResourceTestMixin, ResourceTestCase):
 
     def setUp(self):
@@ -807,20 +809,62 @@ class ContactResourceTest(ResourceTestMixin, ResourceTestCase):
         self.get_credentials()
 
         self.api_path_contact = '/api/v1/contact/'
+<<<<<<< HEAD
         self.api_path_contact_products_f = '/api/v1/contact/%s/products/'
         self.api_path_contact_activities_f = '/api/v1/contact/%s/activities/'
+=======
+>>>>>>> feature/tastypie_api_tests_nurlan
 
         # get_list
         self.get_list_resp = self.api_client.get(self.api_path_contact,
                                                  format='json',
                                                  HTTP_HOST='localhost')
+<<<<<<< HEAD
         self.get_list_des = self.deserialize(self.get_list_resp)
 
+=======
+
+        self.get_list_des = self.deserialize(self.get_list_resp)
+
+        #get list for cold base
+        self.get_list_cold_base_resp = self.api_client.get(self.api_path_contact+'cold_base/', 
+                                                                            format='json',
+                                                                            HTTP_HOST='localhost')
+
+        self.get_list_cold_base_des = self.deserialize(self.get_list_cold_base_resp)
+
+        #get list for leads
+        self.get_list_leads_resp = self.api_client.get(self.api_path_contact+'leads/', 
+                                                                            format='json',
+                                                                            HTTP_HOST='localhost')
+
+        self.get_list_leads_des = self.deserialize(self.get_list_leads_resp)
+
+        #get list for recent contacts
+        self.get_list_recent_resp = self.api_client.get(self.api_path_contact+'recent/', 
+                                                                            format='json',
+                                                                            HTTP_HOST='localhost')
+
+        self.get_list_recent_des = self.deserialize(self.get_list_recent_resp)
+
+        #get list for assign contact
+        self.get_list_assign_contact_resp = self.api_client.get(self.api_path_contact+'assign_contact/', 
+                                                                            format='json',
+                                                                            HTTP_HOST='localhost')
+
+        self.get_list_assign_contact_des = self.deserialize(self.get_list_assign_contact_resp)
+
+
+>>>>>>> feature/tastypie_api_tests_nurlan
         # get_detail(pk)
         self.get_detail_resp = \
             lambda pk: self.api_client.get(self.api_path_contact+str(pk)+'/',
                                            format='json',
                                            HTTP_HOST='localhost')
+<<<<<<< HEAD
+=======
+
+>>>>>>> feature/tastypie_api_tests_nurlan
         self.get_detail_des = \
             lambda pk: self.deserialize(self.get_detail_resp(pk))
 
@@ -828,6 +872,7 @@ class ContactResourceTest(ResourceTestMixin, ResourceTestCase):
 
     def test_get_list_valid_json(self):
         self.assertValidJSONResponse(self.get_list_resp)
+<<<<<<< HEAD
 
     def test_get_products(self):
         resp = self.api_client.get(
@@ -857,3 +902,89 @@ class ContactResourceTest(ResourceTestMixin, ResourceTestCase):
                 len(Activity.objects.get(pk=a['id']).comments.all()),
                 len(a['comments'])
                 )
+=======
+        self.assertValidJSONResponse(self.get_list_cold_base_resp)
+        self.assertValidJSONResponse(self.get_list_leads_resp)
+
+    def test_get_list_non_empty(self):
+        self.assertTrue(self.get_list_des['meta']['total_count'] > 0)
+
+    def test_get_detail(self):
+        self.assertEqual(
+            self.get_detail_des(self.contact.pk)['id'],
+            self.contact.id
+            )
+
+    def test_create_contact(self):
+        post_data = {
+            'sales_cycles':[{'pk': SalesCycle.objects.first()}],
+            'status': 1,
+            'tp': 'user',
+        }
+
+        count = Contact.objects.count()
+        self.assertHttpCreated(self.api_client.post(
+            self.api_path_contact, format='json', data=post_data))
+        # verify that new one has been added.
+        self.assertEqual(Contact.objects.count(), count + 1)
+
+    @skipIf(True, "IntegrityError")
+    def test_delete_contact(self):
+        count = Contact.objects.count()
+        self.assertHttpAccepted(self.api_client.delete(
+            self.api_path_contact + '%s/' % self.contact.pk, format='json'))
+        # verify that one contact been deleted.
+        self.assertEqual(Contact.objects.count(), count - 1)
+
+    
+    def test_get_last_contacted(self):
+        recent = Contact.get_contacts_by_last_activity_date(1)
+        self.assertEqual(
+            len(self.get_list_recent_des['objects']),
+            len(recent)
+            )
+
+    def test_get_cold_base(self):
+        cold_base = Contact.get_cold_base()
+        self.assertEqual(
+            len(self.get_list_cold_base_des['objects']),
+            len(cold_base)
+            )
+
+        
+    def test_get_leads(self):
+        STATUS_LEAD = 1
+        leads = Contact.get_contacts_by_status(STATUS_LEAD)
+        self.assertEqual(
+            len(self.get_list_leads_des['objects']),
+            len(leads)
+            )        
+
+
+    def test_assign_contact(self):
+        self.contact.assignees.add(CRMUser.objects.last())
+        post_data = {
+            'user_id': 1,
+            'contact_id': 1
+        }
+        count = self.contact.assignees.count()
+
+        self.assertHttpOK(self.api_client.get(
+            self.api_path_contact+'assign_contact/?user_id=1&contact_id=1'))
+
+        self.assertEqual(self.contact.assignees.count(), count)
+
+        self.assertHttpOK(self.api_client.get(
+            self.api_path_contact+'assign_contact/?user_id=2&contact_id=1'))
+
+        self.assertEqual(self.contact.assignees.count(), count+1)
+
+    # def test_assign_contacts(self, request, **kwargs):
+
+   	# def test_search(self, request, **kwargs):
+
+    # def test_share_contact(self, request, **kwargs):
+
+    # def test_share_contacts(self, request, **kwargs):
+
+>>>>>>> feature/tastypie_api_tests_nurlan
