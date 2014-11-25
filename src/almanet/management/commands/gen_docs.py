@@ -7,7 +7,13 @@ class Command(BaseCommand):
     epydoc -v --html src/alm_crm/api.py -o api_docs --parse-only'''
 
     def handle(self, *args, **options):
-        subprocess.call(['epydoc', '-v',
-                        '--html', 'src/alm_crm/api.py',
-                        '-o', 'api_docs',
-                        '--parse-only'])
+        r = subprocess.call([
+            'epydoc', '-v',
+            '--html',
+            'src/alm_crm/api.py', 'src/alm_user/api.py',
+            'src/alm_vcard/api.py',
+            '-o', 'api_docs',
+            '--parse-only'
+            ])
+
+        print r

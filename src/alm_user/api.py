@@ -90,7 +90,6 @@ class UserSessionResource(Resource):
     def obj_get_list(self, bundle, **kwargs):
         '''
         GET METHOD
-
         I{URL}:  U{alma.net:8000/api/v1/user_session/}
 
         B{Description}:
@@ -123,7 +122,6 @@ class UserSessionResource(Resource):
     def obj_create(self, bundle, **kwargs):
         '''
         POST METHOD
-
         I{URL}:  U{alma.net:8000/api/v1/user_session/}
 
         B{Description}:
@@ -157,7 +155,6 @@ class UserSessionResource(Resource):
     def obj_delete(self, bundle, **kwargs):
         '''
         DELETE METHOD
-
         I{URL}:  U{alma.net:8000/api/v1/user_session/:id}
 
         B{Description}:

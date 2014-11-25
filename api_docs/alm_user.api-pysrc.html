@@ -1,0 +1,420 @@
+<?xml version="1.0" encoding="ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>alm_user.api</title>
+  <link rel="stylesheet" href="epydoc.css" type="text/css" />
+  <script type="text/javascript" src="epydoc.js"></script>
+</head>
+
+<body bgcolor="white" text="black" link="blue" vlink="#204080"
+      alink="#204080">
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+      <th class="navbar" width="100%"></th>
+  </tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr valign="top">
+    <td width="100%">
+      <span class="breadcrumbs">
+        Package&nbsp;alm_user ::
+        Module&nbsp;api
+      </span>
+    </td>
+    <td>
+      <table cellpadding="0" cellspacing="0">
+        <!-- hide/show private -->
+        <tr><td align="right"><span class="options">[<a href="javascript:void(0);" class="privatelink"
+    onclick="toggle_private();">hide&nbsp;private</a>]</span></td></tr>
+        <tr><td align="right"><span class="options"
+            >[<a href="frames.html" target="_top">frames</a
+            >]&nbsp;|&nbsp;<a href="alm_user.api-pysrc.html"
+            target="_top">no&nbsp;frames</a>]</span></td></tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<h1 class="epydoc">Source Code for <a href="alm_user.api-module.html">Module alm_user.api</a></h1>
+<pre class="py-src">
+<a name="L1"></a><tt class="py-lineno">  1</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt class="py-name">tastypie</tt> <tt class="py-keyword">import</tt> <tt class="py-name">fields</tt> </tt>
+<a name="L2"></a><tt class="py-lineno">  2</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt class="py-name">tastypie</tt><tt class="py-op">.</tt><tt class="py-name">bundle</tt> <tt class="py-keyword">import</tt> <tt class="py-name">Bundle</tt> </tt>
+<a name="L3"></a><tt class="py-lineno">  3</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt class="py-name">tastypie</tt><tt class="py-op">.</tt><tt class="py-name">resources</tt> <tt class="py-keyword">import</tt> <tt class="py-name">Resource</tt><tt class="py-op">,</tt> <tt class="py-name">ModelResource</tt> </tt>
+<a name="L4"></a><tt class="py-lineno">  4</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt class="py-name">tastypie</tt><tt class="py-op">.</tt><tt class="py-name">exceptions</tt> <tt class="py-keyword">import</tt> <tt class="py-name">NotFound</tt><tt class="py-op">,</tt> <tt class="py-name">BadRequest</tt> </tt>
+<a name="L5"></a><tt class="py-lineno">  5</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt class="py-name">django</tt><tt class="py-op">.</tt><tt class="py-name">contrib</tt><tt class="py-op">.</tt><tt class="py-name">auth</tt> <tt class="py-keyword">import</tt> <tt class="py-name">login</tt><tt class="py-op">,</tt> <tt class="py-name">logout</tt><tt class="py-op">,</tt> <tt class="py-name">authenticate</tt> </tt>
+<a name="L6"></a><tt class="py-lineno">  6</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt class="py-op">.</tt><tt class="py-name">models</tt> <tt class="py-keyword">import</tt> <tt class="py-name">User</tt> </tt>
+<a name="UserSession"></a><div id="UserSession-def"><a name="L7"></a><tt class="py-lineno">  7</tt>  <tt class="py-line"> </tt>
+<a name="L8"></a><tt class="py-lineno">  8</tt>  <tt class="py-line"> </tt>
+<a name="L9"></a><tt class="py-lineno">  9</tt> <a class="py-toggle" href="#" id="UserSession-toggle" onclick="return toggle('UserSession');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="alm_user.api.UserSession-class.html">UserSession</a><tt class="py-op">(</tt><tt class="py-base-class">object</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="UserSession-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="UserSession-expanded"><a name="L10"></a><tt class="py-lineno"> 10</tt>  <tt class="py-line"> </tt>
+<a name="L11"></a><tt class="py-lineno"> 11</tt>  <tt class="py-line">    <tt class="py-decorator">@</tt><tt class="py-decorator">classmethod</tt> </tt>
+<a name="UserSession.session_get_key"></a><div id="UserSession.session_get_key-def"><a name="L12"></a><tt class="py-lineno"> 12</tt> <a class="py-toggle" href="#" id="UserSession.session_get_key-toggle" onclick="return toggle('UserSession.session_get_key');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="alm_user.api.UserSession-class.html#session_get_key">session_get_key</a><tt class="py-op">(</tt><tt class="py-param">cls</tt><tt class="py-op">,</tt> <tt class="py-param">request</tt><tt class="py-op">,</tt> <tt class="py-param">create_if_needed</tt><tt class="py-op">=</tt><tt class="py-name">True</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="UserSession.session_get_key-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="UserSession.session_get_key-expanded"><a name="L13"></a><tt class="py-lineno"> 13</tt>  <tt class="py-line">        <tt class="py-keyword">if</tt> <tt class="py-keyword">not</tt> <tt class="py-name">request</tt><tt class="py-op">.</tt><tt class="py-name">session</tt><tt class="py-op">.</tt><tt class="py-name">session_key</tt> <tt class="py-keyword">and</tt> <tt class="py-name">create_if_needed</tt><tt class="py-op">:</tt> </tt>
+<a name="L14"></a><tt class="py-lineno"> 14</tt>  <tt class="py-line">            <tt class="py-name">request</tt><tt class="py-op">.</tt><tt class="py-name">session</tt><tt class="py-op">.</tt><tt class="py-name">create</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L15"></a><tt class="py-lineno"> 15</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt class="py-name">request</tt><tt class="py-op">.</tt><tt class="py-name">session</tt><tt class="py-op">.</tt><tt class="py-name">session_key</tt> </tt>
+</div><a name="L16"></a><tt class="py-lineno"> 16</tt>  <tt class="py-line"> </tt>
+<a name="L17"></a><tt class="py-lineno"> 17</tt>  <tt class="py-line">    <tt class="py-decorator">@</tt><tt class="py-decorator">classmethod</tt> </tt>
+<a name="UserSession.object_for_request"></a><div id="UserSession.object_for_request-def"><a name="L18"></a><tt class="py-lineno"> 18</tt> <a class="py-toggle" href="#" id="UserSession.object_for_request-toggle" onclick="return toggle('UserSession.object_for_request');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="alm_user.api.UserSession-class.html#object_for_request">object_for_request</a><tt class="py-op">(</tt><tt class="py-param">cls</tt><tt class="py-op">,</tt> <tt class="py-param">request</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="UserSession.object_for_request-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="UserSession.object_for_request-expanded"><a name="L19"></a><tt class="py-lineno"> 19</tt>  <tt class="py-line">        <tt class="py-name">s</tt> <tt class="py-op">=</tt> <tt class="py-name">cls</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L20"></a><tt class="py-lineno"> 20</tt>  <tt class="py-line">        <tt class="py-name">s</tt><tt class="py-op">.</tt><tt id="link-0" class="py-name" targets="Variable alm_user.api.UserSessionResource.id=alm_user.api.UserSessionResource-class.html#id"><a title="alm_user.api.UserSessionResource.id" class="py-name" href="#" onclick="return doclink('link-0', 'id', 'link-0');">id</a></tt> <tt class="py-op">=</tt> <tt class="py-name">cls</tt><tt class="py-op">.</tt><tt id="link-1" class="py-name" targets="Class Method alm_user.api.UserSession.session_get_key()=alm_user.api.UserSession-class.html#session_get_key"><a title="alm_user.api.UserSession.session_get_key" class="py-name" href="#" onclick="return doclink('link-1', 'session_get_key', 'link-1');">session_get_key</a></tt><tt class="py-op">(</tt><tt class="py-name">request</tt><tt class="py-op">)</tt> </tt>
+<a name="L21"></a><tt class="py-lineno"> 21</tt>  <tt class="py-line">        <tt class="py-name">s</tt><tt class="py-op">.</tt><tt id="link-2" class="py-name" targets="Variable alm_user.api.UserSessionResource.expire_date=alm_user.api.UserSessionResource-class.html#expire_date"><a title="alm_user.api.UserSessionResource.expire_date" class="py-name" href="#" onclick="return doclink('link-2', 'expire_date', 'link-2');">expire_date</a></tt> <tt class="py-op">=</tt> <tt class="py-name">request</tt><tt class="py-op">.</tt><tt class="py-name">session</tt><tt class="py-op">.</tt><tt class="py-name">get_expiry_date</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L22"></a><tt class="py-lineno"> 22</tt>  <tt class="py-line">        <tt class="py-name">s</tt><tt class="py-op">.</tt><tt id="link-3" class="py-name" targets="Variable alm_user.api.UserSessionResource.user=alm_user.api.UserSessionResource-class.html#user"><a title="alm_user.api.UserSessionResource.user" class="py-name" href="#" onclick="return doclink('link-3', 'user', 'link-3');">user</a></tt> <tt class="py-op">=</tt> <tt class="py-name">None</tt> </tt>
+<a name="L23"></a><tt class="py-lineno"> 23</tt>  <tt class="py-line"> </tt>
+<a name="L24"></a><tt class="py-lineno"> 24</tt>  <tt class="py-line">        <tt class="py-keyword">if</tt> <tt class="py-name">request</tt><tt class="py-op">.</tt><tt id="link-4" class="py-name"><a title="alm_user.api.UserSessionResource.user" class="py-name" href="#" onclick="return doclink('link-4', 'user', 'link-3');">user</a></tt><tt class="py-op">.</tt><tt class="py-name">is_authenticated</tt><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L25"></a><tt class="py-lineno"> 25</tt>  <tt class="py-line">            <tt class="py-name">s</tt><tt class="py-op">.</tt><tt id="link-5" class="py-name"><a title="alm_user.api.UserSessionResource.user" class="py-name" href="#" onclick="return doclink('link-5', 'user', 'link-3');">user</a></tt> <tt class="py-op">=</tt> <tt class="py-name">request</tt><tt class="py-op">.</tt><tt id="link-6" class="py-name"><a title="alm_user.api.UserSessionResource.user" class="py-name" href="#" onclick="return doclink('link-6', 'user', 'link-3');">user</a></tt> </tt>
+<a name="L26"></a><tt class="py-lineno"> 26</tt>  <tt class="py-line"> </tt>
+<a name="L27"></a><tt class="py-lineno"> 27</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt class="py-name">s</tt> </tt>
+</div></div><a name="L28"></a><tt class="py-lineno"> 28</tt>  <tt class="py-line"> </tt>
+<a name="UserResource"></a><div id="UserResource-def"><a name="L29"></a><tt class="py-lineno"> 29</tt>  <tt class="py-line"> </tt>
+<a name="L30"></a><tt class="py-lineno"> 30</tt> <a class="py-toggle" href="#" id="UserResource-toggle" onclick="return toggle('UserResource');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="alm_user.api.UserResource-class.html">UserResource</a><tt class="py-op">(</tt><tt class="py-base-class">ModelResource</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="UserResource-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="UserResource-expanded"><a name="UserResource.Meta"></a><div id="UserResource.Meta-def"><a name="L31"></a><tt class="py-lineno"> 31</tt> <a class="py-toggle" href="#" id="UserResource.Meta-toggle" onclick="return toggle('UserResource.Meta');">-</a><tt class="py-line">    <tt class="py-keyword">class</tt> <a class="py-def-name" href="alm_user.api.UserResource.Meta-class.html">Meta</a><tt class="py-op">:</tt> </tt>
+</div><div id="UserResource.Meta-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="UserResource.Meta-expanded"><a name="L32"></a><tt class="py-lineno"> 32</tt>  <tt class="py-line">        <tt id="link-7" class="py-name" targets="Variable alm_crm.api.ActivityResource.Meta.queryset=alm_crm.api.ActivityResource.Meta-class.html#queryset,Variable alm_crm.api.CRMUserResource.Meta.queryset=alm_crm.api.CRMUserResource.Meta-class.html#queryset,Variable alm_crm.api.CommentResource.Meta.queryset=alm_crm.api.CommentResource.Meta-class.html#queryset,Variable alm_crm.api.ContactResource.Meta.queryset=alm_crm.api.ContactResource.Meta-class.html#queryset,Variable alm_crm.api.FeedbackResource.Meta.queryset=alm_crm.api.FeedbackResource.Meta-class.html#queryset,Variable alm_crm.api.MentionResource.Meta.queryset=alm_crm.api.MentionResource.Meta-class.html#queryset,Variable alm_crm.api.ProductResource.Meta.queryset=alm_crm.api.ProductResource.Meta-class.html#queryset,Variable alm_crm.api.SalesCycleResource.Meta.queryset=alm_crm.api.SalesCycleResource.Meta-class.html#queryset,Variable alm_crm.api.ShareResource.Meta.queryset=alm_crm.api.ShareResource.Meta-class.html#queryset,Variable alm_crm.api.ValueResource.Meta.queryset=alm_crm.api.ValueResource.Meta-class.html#queryset,Variable alm_user.api.UserResource.Meta.queryset=alm_user.api.UserResource.Meta-class.html#queryset,Variable alm_vcard.api.VCardAdrResource.Meta.queryset=alm_vcard.api.VCardAdrResource.Meta-class.html#queryset,Variable alm_vcard.api.VCardAgentResource.Meta.queryset=alm_vcard.api.VCardAgentResource.Meta-class.html#queryset,Variable alm_vcard.api.VCardCategoryResource.Meta.queryset=alm_vcard.api.VCardCategoryResource.Meta-class.html#queryset,Variable alm_vcard.api.VCardEmailResource.Meta.queryset=alm_vcard.api.VCardEmailResource.Meta-class.html#queryset,Variable alm_vcard.api.VCardGeoResource.Meta.queryset=alm_vcard.api.VCardGeoResource.Meta-class.html#queryset,Variable alm_vcard.api.VCardKeyResource.Meta.queryset=alm_vcard.api.VCardKeyResource.Meta-class.html#queryset,Variable alm_vcard.api.VCardLabelResource.Meta.queryset=alm_vcard.api.VCardLabelResource.Meta-class.html#queryset,Variable alm_vcard.api.VCardMailerResource.Meta.queryset=alm_vcard.api.VCardMailerResource.Meta-class.html#queryset,Variable alm_vcard.api.VCardNicknameResource.Meta.queryset=alm_vcard.api.VCardNicknameResource.Meta-class.html#queryset,Variable alm_vcard.api.VCardNoteResource.Meta.queryset=alm_vcard.api.VCardNoteResource.Meta-class.html#queryset,Variable alm_vcard.api.VCardOrgResource.Meta.queryset=alm_vcard.api.VCardOrgResource.Meta-class.html#queryset,Variable alm_vcard.api.VCardResource.Meta.queryset=alm_vcard.api.VCardResource.Meta-class.html#queryset,Variable alm_vcard.api.VCardRoleResource.Meta.queryset=alm_vcard.api.VCardRoleResource.Meta-class.html#queryset,Variable alm_vcard.api.VCardTelResource.Meta.queryset=alm_vcard.api.VCardTelResource.Meta-class.html#queryset,Variable alm_vcard.api.VCardTitleResource.Meta.queryset=alm_vcard.api.VCardTitleResource.Meta-class.html#queryset,Variable alm_vcard.api.VCardTzResource.Meta.queryset=alm_vcard.api.VCardTzResource.Meta-class.html#queryset,Variable alm_vcard.api.VCardUrlResource.Meta.queryset=alm_vcard.api.VCardUrlResource.Meta-class.html#queryset"><a title="alm_crm.api.ActivityResource.Meta.queryset
+alm_crm.api.CRMUserResource.Meta.queryset
+alm_crm.api.CommentResource.Meta.queryset
+alm_crm.api.ContactResource.Meta.queryset
+alm_crm.api.FeedbackResource.Meta.queryset
+alm_crm.api.MentionResource.Meta.queryset
+alm_crm.api.ProductResource.Meta.queryset
+alm_crm.api.SalesCycleResource.Meta.queryset
+alm_crm.api.ShareResource.Meta.queryset
+alm_crm.api.ValueResource.Meta.queryset
+alm_user.api.UserResource.Meta.queryset
+alm_vcard.api.VCardAdrResource.Meta.queryset
+alm_vcard.api.VCardAgentResource.Meta.queryset
+alm_vcard.api.VCardCategoryResource.Meta.queryset
+alm_vcard.api.VCardEmailResource.Meta.queryset
+alm_vcard.api.VCardGeoResource.Meta.queryset
+alm_vcard.api.VCardKeyResource.Meta.queryset
+alm_vcard.api.VCardLabelResource.Meta.queryset
+alm_vcard.api.VCardMailerResource.Meta.queryset
+alm_vcard.api.VCardNicknameResource.Meta.queryset
+alm_vcard.api.VCardNoteResource.Meta.queryset
+alm_vcard.api.VCardOrgResource.Meta.queryset
+alm_vcard.api.VCardResource.Meta.queryset
+alm_vcard.api.VCardRoleResource.Meta.queryset
+alm_vcard.api.VCardTelResource.Meta.queryset
+alm_vcard.api.VCardTitleResource.Meta.queryset
+alm_vcard.api.VCardTzResource.Meta.queryset
+alm_vcard.api.VCardUrlResource.Meta.queryset" class="py-name" href="#" onclick="return doclink('link-7', 'queryset', 'link-7');">queryset</a></tt> <tt class="py-op">=</tt> <tt class="py-name">User</tt><tt class="py-op">.</tt><tt class="py-name">objects</tt><tt class="py-op">.</tt><tt class="py-name">all</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L33"></a><tt class="py-lineno"> 33</tt>  <tt class="py-line">        <tt id="link-8" class="py-name" targets="Variable alm_user.api.UserResource.Meta.excludes=alm_user.api.UserResource.Meta-class.html#excludes"><a title="alm_user.api.UserResource.Meta.excludes" class="py-name" href="#" onclick="return doclink('link-8', 'excludes', 'link-8');">excludes</a></tt> <tt class="py-op">=</tt> <tt class="py-op">[</tt><tt class="py-string">'password'</tt><tt class="py-op">,</tt> <tt class="py-string">'is_admin'</tt><tt class="py-op">]</tt> </tt>
+<a name="L34"></a><tt class="py-lineno"> 34</tt>  <tt class="py-line">        <tt id="link-9" class="py-name" targets="Variable alm_crm.api.CRMServiceModelResource.Meta.list_allowed_methods=alm_crm.api.CRMServiceModelResource.Meta-class.html#list_allowed_methods,Variable alm_user.api.UserResource.Meta.list_allowed_methods=alm_user.api.UserResource.Meta-class.html#list_allowed_methods,Variable alm_user.api.UserSessionResource.Meta.list_allowed_methods=alm_user.api.UserSessionResource.Meta-class.html#list_allowed_methods"><a title="alm_crm.api.CRMServiceModelResource.Meta.list_allowed_methods
+alm_user.api.UserResource.Meta.list_allowed_methods
+alm_user.api.UserSessionResource.Meta.list_allowed_methods" class="py-name" href="#" onclick="return doclink('link-9', 'list_allowed_methods', 'link-9');">list_allowed_methods</a></tt> <tt class="py-op">=</tt> <tt class="py-op">[</tt><tt class="py-string">'get'</tt><tt class="py-op">]</tt> </tt>
+<a name="L35"></a><tt class="py-lineno"> 35</tt>  <tt class="py-line">        <tt id="link-10" class="py-name" targets="Variable alm_crm.api.CRMServiceModelResource.Meta.detail_allowed_methods=alm_crm.api.CRMServiceModelResource.Meta-class.html#detail_allowed_methods,Variable alm_crm.api.ProductResource.Meta.detail_allowed_methods=alm_crm.api.ProductResource.Meta-class.html#detail_allowed_methods,Variable alm_user.api.UserResource.Meta.detail_allowed_methods=alm_user.api.UserResource.Meta-class.html#detail_allowed_methods,Variable alm_user.api.UserSessionResource.Meta.detail_allowed_methods=alm_user.api.UserSessionResource.Meta-class.html#detail_allowed_methods"><a title="alm_crm.api.CRMServiceModelResource.Meta.detail_allowed_methods
+alm_crm.api.ProductResource.Meta.detail_allowed_methods
+alm_user.api.UserResource.Meta.detail_allowed_methods
+alm_user.api.UserSessionResource.Meta.detail_allowed_methods" class="py-name" href="#" onclick="return doclink('link-10', 'detail_allowed_methods', 'link-10');">detail_allowed_methods</a></tt> <tt class="py-op">=</tt> <tt class="py-op">[</tt><tt class="py-string">'get'</tt><tt class="py-op">]</tt> </tt>
+<a name="L36"></a><tt class="py-lineno"> 36</tt>  <tt class="py-line">        <tt id="link-11" class="py-name" targets="Variable alm_crm.api.ActivityResource.Meta.resource_name=alm_crm.api.ActivityResource.Meta-class.html#resource_name,Variable alm_crm.api.CRMUserResource.Meta.resource_name=alm_crm.api.CRMUserResource.Meta-class.html#resource_name,Variable alm_crm.api.CommentResource.Meta.resource_name=alm_crm.api.CommentResource.Meta-class.html#resource_name,Variable alm_crm.api.ContactResource.Meta.resource_name=alm_crm.api.ContactResource.Meta-class.html#resource_name,Variable alm_crm.api.FeedbackResource.Meta.resource_name=alm_crm.api.FeedbackResource.Meta-class.html#resource_name,Variable alm_crm.api.MentionResource.Meta.resource_name=alm_crm.api.MentionResource.Meta-class.html#resource_name,Variable alm_crm.api.ProductResource.Meta.resource_name=alm_crm.api.ProductResource.Meta-class.html#resource_name,Variable alm_crm.api.SalesCycleResource.Meta.resource_name=alm_crm.api.SalesCycleResource.Meta-class.html#resource_name,Variable alm_crm.api.ShareResource.Meta.resource_name=alm_crm.api.ShareResource.Meta-class.html#resource_name,Variable alm_crm.api.ValueResource.Meta.resource_name=alm_crm.api.ValueResource.Meta-class.html#resource_name,Variable alm_user.api.UserResource.Meta.resource_name=alm_user.api.UserResource.Meta-class.html#resource_name,Variable alm_user.api.UserSessionResource.Meta.resource_name=alm_user.api.UserSessionResource.Meta-class.html#resource_name,Variable alm_vcard.api.VCardAdrResource.Meta.resource_name=alm_vcard.api.VCardAdrResource.Meta-class.html#resource_name,Variable alm_vcard.api.VCardAgentResource.Meta.resource_name=alm_vcard.api.VCardAgentResource.Meta-class.html#resource_name,Variable alm_vcard.api.VCardCategoryResource.Meta.resource_name=alm_vcard.api.VCardCategoryResource.Meta-class.html#resource_name,Variable alm_vcard.api.VCardEmailResource.Meta.resource_name=alm_vcard.api.VCardEmailResource.Meta-class.html#resource_name,Variable alm_vcard.api.VCardGeoResource.Meta.resource_name=alm_vcard.api.VCardGeoResource.Meta-class.html#resource_name,Variable alm_vcard.api.VCardKeyResource.Meta.resource_name=alm_vcard.api.VCardKeyResource.Meta-class.html#resource_name,Variable alm_vcard.api.VCardLabelResource.Meta.resource_name=alm_vcard.api.VCardLabelResource.Meta-class.html#resource_name,Variable alm_vcard.api.VCardMailerResource.Meta.resource_name=alm_vcard.api.VCardMailerResource.Meta-class.html#resource_name,Variable alm_vcard.api.VCardNicknameResource.Meta.resource_name=alm_vcard.api.VCardNicknameResource.Meta-class.html#resource_name,Variable alm_vcard.api.VCardNoteResource.Meta.resource_name=alm_vcard.api.VCardNoteResource.Meta-class.html#resource_name,Variable alm_vcard.api.VCardOrgResource.Meta.resource_name=alm_vcard.api.VCardOrgResource.Meta-class.html#resource_name,Variable alm_vcard.api.VCardResource.Meta.resource_name=alm_vcard.api.VCardResource.Meta-class.html#resource_name,Variable alm_vcard.api.VCardRoleResource.Meta.resource_name=alm_vcard.api.VCardRoleResource.Meta-class.html#resource_name,Variable alm_vcard.api.VCardTelResource.Meta.resource_name=alm_vcard.api.VCardTelResource.Meta-class.html#resource_name,Variable alm_vcard.api.VCardTitleResource.Meta.resource_name=alm_vcard.api.VCardTitleResource.Meta-class.html#resource_name,Variable alm_vcard.api.VCardTzResource.Meta.resource_name=alm_vcard.api.VCardTzResource.Meta-class.html#resource_name,Variable alm_vcard.api.VCardUrlResource.Meta.resource_name=alm_vcard.api.VCardUrlResource.Meta-class.html#resource_name"><a title="alm_crm.api.ActivityResource.Meta.resource_name
+alm_crm.api.CRMUserResource.Meta.resource_name
+alm_crm.api.CommentResource.Meta.resource_name
+alm_crm.api.ContactResource.Meta.resource_name
+alm_crm.api.FeedbackResource.Meta.resource_name
+alm_crm.api.MentionResource.Meta.resource_name
+alm_crm.api.ProductResource.Meta.resource_name
+alm_crm.api.SalesCycleResource.Meta.resource_name
+alm_crm.api.ShareResource.Meta.resource_name
+alm_crm.api.ValueResource.Meta.resource_name
+alm_user.api.UserResource.Meta.resource_name
+alm_user.api.UserSessionResource.Meta.resource_name
+alm_vcard.api.VCardAdrResource.Meta.resource_name
+alm_vcard.api.VCardAgentResource.Meta.resource_name
+alm_vcard.api.VCardCategoryResource.Meta.resource_name
+alm_vcard.api.VCardEmailResource.Meta.resource_name
+alm_vcard.api.VCardGeoResource.Meta.resource_name
+alm_vcard.api.VCardKeyResource.Meta.resource_name
+alm_vcard.api.VCardLabelResource.Meta.resource_name
+alm_vcard.api.VCardMailerResource.Meta.resource_name
+alm_vcard.api.VCardNicknameResource.Meta.resource_name
+alm_vcard.api.VCardNoteResource.Meta.resource_name
+alm_vcard.api.VCardOrgResource.Meta.resource_name
+alm_vcard.api.VCardResource.Meta.resource_name
+alm_vcard.api.VCardRoleResource.Meta.resource_name
+alm_vcard.api.VCardTelResource.Meta.resource_name
+alm_vcard.api.VCardTitleResource.Meta.resource_name
+alm_vcard.api.VCardTzResource.Meta.resource_name
+alm_vcard.api.VCardUrlResource.Meta.resource_name" class="py-name" href="#" onclick="return doclink('link-11', 'resource_name', 'link-11');">resource_name</a></tt> <tt class="py-op">=</tt> <tt class="py-string">'user'</tt> </tt>
+</div></div><a name="L37"></a><tt class="py-lineno"> 37</tt>  <tt class="py-line"> </tt>
+<a name="UserSessionResource"></a><div id="UserSessionResource-def"><a name="L38"></a><tt class="py-lineno"> 38</tt>  <tt class="py-line"> </tt>
+<a name="L39"></a><tt class="py-lineno"> 39</tt> <a class="py-toggle" href="#" id="UserSessionResource-toggle" onclick="return toggle('UserSessionResource');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="alm_user.api.UserSessionResource-class.html">UserSessionResource</a><tt class="py-op">(</tt><tt class="py-base-class">Resource</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="UserSessionResource-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="UserSessionResource-expanded"><a name="L40"></a><tt class="py-lineno"> 40</tt>  <tt class="py-line">    <tt class="py-docstring">"""</tt> </tt>
+<a name="L41"></a><tt class="py-lineno"> 41</tt>  <tt class="py-line"><tt class="py-docstring">    GET Method</tt> </tt>
+<a name="L42"></a><tt class="py-lineno"> 42</tt>  <tt class="py-line"><tt class="py-docstring">    I{URL}:  U{alma.net/api/v1/user_session}</tt> </tt>
+<a name="L43"></a><tt class="py-lineno"> 43</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L44"></a><tt class="py-lineno"> 44</tt>  <tt class="py-line"><tt class="py-docstring">    B{Description}:</tt> </tt>
+<a name="L45"></a><tt class="py-lineno"> 45</tt>  <tt class="py-line"><tt class="py-docstring">    API resource to manage session of authentication</tt> </tt>
+<a name="L46"></a><tt class="py-lineno"> 46</tt>  <tt class="py-line"><tt class="py-docstring">    """</tt> </tt>
+<a name="L47"></a><tt class="py-lineno"> 47</tt>  <tt class="py-line"> </tt>
+<a name="L48"></a><tt class="py-lineno"> 48</tt>  <tt class="py-line">    <tt id="link-12" class="py-name"><a title="alm_user.api.UserSessionResource.id" class="py-name" href="#" onclick="return doclink('link-12', 'id', 'link-0');">id</a></tt> <tt class="py-op">=</tt> <tt class="py-name">fields</tt><tt class="py-op">.</tt><tt class="py-name">CharField</tt><tt class="py-op">(</tt><tt class="py-name">attribute</tt><tt class="py-op">=</tt><tt class="py-string">"id"</tt><tt class="py-op">,</tt> <tt class="py-name">readonly</tt><tt class="py-op">=</tt><tt class="py-name">True</tt><tt class="py-op">)</tt> </tt>
+<a name="L49"></a><tt class="py-lineno"> 49</tt>  <tt class="py-line">    <tt id="link-13" class="py-name"><a title="alm_user.api.UserSessionResource.expire_date" class="py-name" href="#" onclick="return doclink('link-13', 'expire_date', 'link-2');">expire_date</a></tt> <tt class="py-op">=</tt> <tt class="py-name">fields</tt><tt class="py-op">.</tt><tt class="py-name">DateTimeField</tt><tt class="py-op">(</tt><tt class="py-name">attribute</tt><tt class="py-op">=</tt><tt class="py-string">"expire_date"</tt><tt class="py-op">,</tt> <tt class="py-name">readonly</tt><tt class="py-op">=</tt><tt class="py-name">True</tt><tt class="py-op">)</tt> </tt>
+<a name="L50"></a><tt class="py-lineno"> 50</tt>  <tt class="py-line">    <tt id="link-14" class="py-name"><a title="alm_user.api.UserSessionResource.user" class="py-name" href="#" onclick="return doclink('link-14', 'user', 'link-3');">user</a></tt> <tt class="py-op">=</tt> <tt class="py-name">fields</tt><tt class="py-op">.</tt><tt class="py-name">ForeignKey</tt><tt class="py-op">(</tt><tt id="link-15" class="py-name" targets="Class alm_user.api.UserResource=alm_user.api.UserResource-class.html"><a title="alm_user.api.UserResource" class="py-name" href="#" onclick="return doclink('link-15', 'UserResource', 'link-15');">UserResource</a></tt><tt class="py-op">,</tt> <tt class="py-name">attribute</tt><tt class="py-op">=</tt><tt class="py-string">"user"</tt><tt class="py-op">,</tt> <tt class="py-name">readonly</tt><tt class="py-op">=</tt><tt class="py-name">True</tt><tt class="py-op">,</tt> </tt>
+<a name="L51"></a><tt class="py-lineno"> 51</tt>  <tt class="py-line">                             <tt class="py-name">full</tt><tt class="py-op">=</tt><tt class="py-name">True</tt><tt class="py-op">,</tt> <tt class="py-name">null</tt><tt class="py-op">=</tt><tt class="py-name">True</tt><tt class="py-op">)</tt> </tt>
+<a name="L52"></a><tt class="py-lineno"> 52</tt>  <tt class="py-line"> </tt>
+<a name="UserSessionResource.Meta"></a><div id="UserSessionResource.Meta-def"><a name="L53"></a><tt class="py-lineno"> 53</tt> <a class="py-toggle" href="#" id="UserSessionResource.Meta-toggle" onclick="return toggle('UserSessionResource.Meta');">-</a><tt class="py-line">    <tt class="py-keyword">class</tt> <a class="py-def-name" href="alm_user.api.UserSessionResource.Meta-class.html">Meta</a><tt class="py-op">:</tt> </tt>
+</div><div id="UserSessionResource.Meta-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="UserSessionResource.Meta-expanded"><a name="L54"></a><tt class="py-lineno"> 54</tt>  <tt class="py-line">        <tt id="link-16" class="py-name"><a title="alm_crm.api.ActivityResource.Meta.resource_name
+alm_crm.api.CRMUserResource.Meta.resource_name
+alm_crm.api.CommentResource.Meta.resource_name
+alm_crm.api.ContactResource.Meta.resource_name
+alm_crm.api.FeedbackResource.Meta.resource_name
+alm_crm.api.MentionResource.Meta.resource_name
+alm_crm.api.ProductResource.Meta.resource_name
+alm_crm.api.SalesCycleResource.Meta.resource_name
+alm_crm.api.ShareResource.Meta.resource_name
+alm_crm.api.ValueResource.Meta.resource_name
+alm_user.api.UserResource.Meta.resource_name
+alm_user.api.UserSessionResource.Meta.resource_name
+alm_vcard.api.VCardAdrResource.Meta.resource_name
+alm_vcard.api.VCardAgentResource.Meta.resource_name
+alm_vcard.api.VCardCategoryResource.Meta.resource_name
+alm_vcard.api.VCardEmailResource.Meta.resource_name
+alm_vcard.api.VCardGeoResource.Meta.resource_name
+alm_vcard.api.VCardKeyResource.Meta.resource_name
+alm_vcard.api.VCardLabelResource.Meta.resource_name
+alm_vcard.api.VCardMailerResource.Meta.resource_name
+alm_vcard.api.VCardNicknameResource.Meta.resource_name
+alm_vcard.api.VCardNoteResource.Meta.resource_name
+alm_vcard.api.VCardOrgResource.Meta.resource_name
+alm_vcard.api.VCardResource.Meta.resource_name
+alm_vcard.api.VCardRoleResource.Meta.resource_name
+alm_vcard.api.VCardTelResource.Meta.resource_name
+alm_vcard.api.VCardTitleResource.Meta.resource_name
+alm_vcard.api.VCardTzResource.Meta.resource_name
+alm_vcard.api.VCardUrlResource.Meta.resource_name" class="py-name" href="#" onclick="return doclink('link-16', 'resource_name', 'link-11');">resource_name</a></tt> <tt class="py-op">=</tt> <tt class="py-string">'user_session'</tt> </tt>
+<a name="L55"></a><tt class="py-lineno"> 55</tt>  <tt class="py-line">        <tt class="py-name">object_class</tt> <tt class="py-op">=</tt> <tt id="link-17" class="py-name" targets="Class alm_user.api.UserSession=alm_user.api.UserSession-class.html"><a title="alm_user.api.UserSession" class="py-name" href="#" onclick="return doclink('link-17', 'UserSession', 'link-17');">UserSession</a></tt> </tt>
+<a name="L56"></a><tt class="py-lineno"> 56</tt>  <tt class="py-line">        <tt id="link-18" class="py-name"><a title="alm_crm.api.CRMServiceModelResource.Meta.list_allowed_methods
+alm_user.api.UserResource.Meta.list_allowed_methods
+alm_user.api.UserSessionResource.Meta.list_allowed_methods" class="py-name" href="#" onclick="return doclink('link-18', 'list_allowed_methods', 'link-9');">list_allowed_methods</a></tt> <tt class="py-op">=</tt> <tt class="py-op">[</tt><tt class="py-string">'get'</tt><tt class="py-op">,</tt> <tt class="py-string">'post'</tt><tt class="py-op">]</tt> </tt>
+<a name="L57"></a><tt class="py-lineno"> 57</tt>  <tt class="py-line">        <tt id="link-19" class="py-name"><a title="alm_crm.api.CRMServiceModelResource.Meta.detail_allowed_methods
+alm_crm.api.ProductResource.Meta.detail_allowed_methods
+alm_user.api.UserResource.Meta.detail_allowed_methods
+alm_user.api.UserSessionResource.Meta.detail_allowed_methods" class="py-name" href="#" onclick="return doclink('link-19', 'detail_allowed_methods', 'link-10');">detail_allowed_methods</a></tt> <tt class="py-op">=</tt> <tt class="py-op">[</tt><tt class="py-string">'get'</tt><tt class="py-op">,</tt> <tt class="py-string">'delete'</tt><tt class="py-op">]</tt> </tt>
+</div><a name="L58"></a><tt class="py-lineno"> 58</tt>  <tt class="py-line"> </tt>
+<a name="UserSessionResource.get_resource_uri"></a><div id="UserSessionResource.get_resource_uri-def"><a name="L59"></a><tt class="py-lineno"> 59</tt> <a class="py-toggle" href="#" id="UserSessionResource.get_resource_uri-toggle" onclick="return toggle('UserSessionResource.get_resource_uri');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="alm_user.api.UserSessionResource-class.html#get_resource_uri">get_resource_uri</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">bundle_or_obj</tt><tt class="py-op">=</tt><tt class="py-name">None</tt><tt class="py-op">,</tt> </tt>
+<a name="L60"></a><tt class="py-lineno"> 60</tt>  <tt class="py-line">                         <tt class="py-param">url_name</tt><tt class="py-op">=</tt><tt class="py-string">"api_dispatch_list"</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="UserSessionResource.get_resource_uri-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="UserSessionResource.get_resource_uri-expanded"><a name="L61"></a><tt class="py-lineno"> 61</tt>  <tt class="py-line">        <tt class="py-keyword">if</tt> <tt class="py-keyword">not</tt> <tt class="py-name">bundle_or_obj</tt><tt class="py-op">:</tt> </tt>
+<a name="L62"></a><tt class="py-lineno"> 62</tt>  <tt class="py-line">            <tt class="py-keyword">return</tt> <tt class="py-name">super</tt><tt class="py-op">(</tt><tt id="link-20" class="py-name" targets="Class alm_user.api.UserSessionResource=alm_user.api.UserSessionResource-class.html"><a title="alm_user.api.UserSessionResource" class="py-name" href="#" onclick="return doclink('link-20', 'UserSessionResource', 'link-20');">UserSessionResource</a></tt><tt class="py-op">,</tt> <tt class="py-name">self</tt><tt class="py-op">)</tt><tt class="py-op">.</tt><tt id="link-21" class="py-name" targets="Method alm_user.api.UserSessionResource.get_resource_uri()=alm_user.api.UserSessionResource-class.html#get_resource_uri"><a title="alm_user.api.UserSessionResource.get_resource_uri" class="py-name" href="#" onclick="return doclink('link-21', 'get_resource_uri', 'link-21');">get_resource_uri</a></tt><tt class="py-op">(</tt> </tt>
+<a name="L63"></a><tt class="py-lineno"> 63</tt>  <tt class="py-line">                <tt class="py-name">bundle_or_obj</tt><tt class="py-op">,</tt> <tt class="py-name">url_name</tt><tt class="py-op">)</tt> </tt>
+<a name="L64"></a><tt class="py-lineno"> 64</tt>  <tt class="py-line"> </tt>
+<a name="L65"></a><tt class="py-lineno"> 65</tt>  <tt class="py-line">        <tt class="py-name">obj</tt> <tt class="py-op">=</tt> <tt class="py-name">bundle_or_obj</tt> </tt>
+<a name="L66"></a><tt class="py-lineno"> 66</tt>  <tt class="py-line">        <tt class="py-keyword">if</tt> <tt class="py-name">isinstance</tt><tt class="py-op">(</tt><tt class="py-name">obj</tt><tt class="py-op">,</tt> <tt class="py-name">Bundle</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L67"></a><tt class="py-lineno"> 67</tt>  <tt class="py-line">            <tt class="py-name">obj</tt> <tt class="py-op">=</tt> <tt class="py-name">obj</tt><tt class="py-op">.</tt><tt class="py-name">obj</tt> </tt>
+<a name="L68"></a><tt class="py-lineno"> 68</tt>  <tt class="py-line"> </tt>
+<a name="L69"></a><tt class="py-lineno"> 69</tt>  <tt class="py-line">        <tt class="py-name">kwargs</tt> <tt class="py-op">=</tt> <tt class="py-op">{</tt> </tt>
+<a name="L70"></a><tt class="py-lineno"> 70</tt>  <tt class="py-line">            <tt class="py-string">"resource_name"</tt><tt class="py-op">:</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">_meta</tt><tt class="py-op">.</tt><tt id="link-22" class="py-name"><a title="alm_crm.api.ActivityResource.Meta.resource_name
+alm_crm.api.CRMUserResource.Meta.resource_name
+alm_crm.api.CommentResource.Meta.resource_name
+alm_crm.api.ContactResource.Meta.resource_name
+alm_crm.api.FeedbackResource.Meta.resource_name
+alm_crm.api.MentionResource.Meta.resource_name
+alm_crm.api.ProductResource.Meta.resource_name
+alm_crm.api.SalesCycleResource.Meta.resource_name
+alm_crm.api.ShareResource.Meta.resource_name
+alm_crm.api.ValueResource.Meta.resource_name
+alm_user.api.UserResource.Meta.resource_name
+alm_user.api.UserSessionResource.Meta.resource_name
+alm_vcard.api.VCardAdrResource.Meta.resource_name
+alm_vcard.api.VCardAgentResource.Meta.resource_name
+alm_vcard.api.VCardCategoryResource.Meta.resource_name
+alm_vcard.api.VCardEmailResource.Meta.resource_name
+alm_vcard.api.VCardGeoResource.Meta.resource_name
+alm_vcard.api.VCardKeyResource.Meta.resource_name
+alm_vcard.api.VCardLabelResource.Meta.resource_name
+alm_vcard.api.VCardMailerResource.Meta.resource_name
+alm_vcard.api.VCardNicknameResource.Meta.resource_name
+alm_vcard.api.VCardNoteResource.Meta.resource_name
+alm_vcard.api.VCardOrgResource.Meta.resource_name
+alm_vcard.api.VCardResource.Meta.resource_name
+alm_vcard.api.VCardRoleResource.Meta.resource_name
+alm_vcard.api.VCardTelResource.Meta.resource_name
+alm_vcard.api.VCardTitleResource.Meta.resource_name
+alm_vcard.api.VCardTzResource.Meta.resource_name
+alm_vcard.api.VCardUrlResource.Meta.resource_name" class="py-name" href="#" onclick="return doclink('link-22', 'resource_name', 'link-11');">resource_name</a></tt><tt class="py-op">,</tt> </tt>
+<a name="L71"></a><tt class="py-lineno"> 71</tt>  <tt class="py-line">            <tt class="py-string">"pk"</tt><tt class="py-op">:</tt> <tt class="py-name">obj</tt><tt class="py-op">.</tt><tt id="link-23" class="py-name"><a title="alm_user.api.UserSessionResource.id" class="py-name" href="#" onclick="return doclink('link-23', 'id', 'link-0');">id</a></tt> </tt>
+<a name="L72"></a><tt class="py-lineno"> 72</tt>  <tt class="py-line">        <tt class="py-op">}</tt> </tt>
+<a name="L73"></a><tt class="py-lineno"> 73</tt>  <tt class="py-line">        <tt class="py-keyword">if</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">_meta</tt><tt class="py-op">.</tt><tt class="py-name">api_name</tt><tt class="py-op">:</tt> </tt>
+<a name="L74"></a><tt class="py-lineno"> 74</tt>  <tt class="py-line">            <tt class="py-name">kwargs</tt><tt class="py-op">[</tt><tt class="py-string">"api_name"</tt><tt class="py-op">]</tt> <tt class="py-op">=</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">_meta</tt><tt class="py-op">.</tt><tt class="py-name">api_name</tt> </tt>
+<a name="L75"></a><tt class="py-lineno"> 75</tt>  <tt class="py-line"> </tt>
+<a name="L76"></a><tt class="py-lineno"> 76</tt>  <tt class="py-line">        <tt class="py-name">url</tt> <tt class="py-op">=</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">_build_reverse_url</tt><tt class="py-op">(</tt><tt class="py-string">"api_dispatch_detail"</tt><tt class="py-op">,</tt> <tt class="py-name">kwargs</tt><tt class="py-op">=</tt><tt class="py-name">kwargs</tt><tt class="py-op">)</tt> </tt>
+<a name="L77"></a><tt class="py-lineno"> 77</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt class="py-name">url</tt> </tt>
+</div><a name="L78"></a><tt class="py-lineno"> 78</tt>  <tt class="py-line"> </tt>
+<a name="UserSessionResource.get_object_list"></a><div id="UserSessionResource.get_object_list-def"><a name="L79"></a><tt class="py-lineno"> 79</tt> <a class="py-toggle" href="#" id="UserSessionResource.get_object_list-toggle" onclick="return toggle('UserSessionResource.get_object_list');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="alm_user.api.UserSessionResource-class.html#get_object_list">get_object_list</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">request</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="UserSessionResource.get_object_list-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="UserSessionResource.get_object_list-expanded"><a name="L80"></a><tt class="py-lineno"> 80</tt>  <tt class="py-line">        <tt class="py-name">l</tt> <tt class="py-op">=</tt> <tt class="py-op">[</tt><tt class="py-op">]</tt> </tt>
+<a name="L81"></a><tt class="py-lineno"> 81</tt>  <tt class="py-line"> </tt>
+<a name="L82"></a><tt class="py-lineno"> 82</tt>  <tt class="py-line">        <tt class="py-keyword">try</tt><tt class="py-op">:</tt> </tt>
+<a name="L83"></a><tt class="py-lineno"> 83</tt>  <tt class="py-line">            <tt class="py-name">obj</tt> <tt class="py-op">=</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-24" class="py-name" targets="Method alm_user.api.UserSessionResource._build_session_object_or_raise()=alm_user.api.UserSessionResource-class.html#_build_session_object_or_raise"><a title="alm_user.api.UserSessionResource._build_session_object_or_raise" class="py-name" href="#" onclick="return doclink('link-24', '_build_session_object_or_raise', 'link-24');">_build_session_object_or_raise</a></tt><tt class="py-op">(</tt><tt class="py-name">request</tt><tt class="py-op">)</tt> </tt>
+<a name="L84"></a><tt class="py-lineno"> 84</tt>  <tt class="py-line">            <tt class="py-name">l</tt><tt class="py-op">.</tt><tt class="py-name">append</tt><tt class="py-op">(</tt><tt class="py-name">obj</tt><tt class="py-op">)</tt> </tt>
+<a name="L85"></a><tt class="py-lineno"> 85</tt>  <tt class="py-line">        <tt class="py-keyword">except</tt> <tt class="py-name">NotFound</tt><tt class="py-op">:</tt> </tt>
+<a name="L86"></a><tt class="py-lineno"> 86</tt>  <tt class="py-line">            <tt class="py-keyword">pass</tt> </tt>
+<a name="L87"></a><tt class="py-lineno"> 87</tt>  <tt class="py-line"> </tt>
+<a name="L88"></a><tt class="py-lineno"> 88</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt class="py-name">l</tt> </tt>
+</div><a name="L89"></a><tt class="py-lineno"> 89</tt>  <tt class="py-line"> </tt>
+<a name="UserSessionResource.obj_get_list"></a><div id="UserSessionResource.obj_get_list-def"><a name="L90"></a><tt class="py-lineno"> 90</tt> <a class="py-toggle" href="#" id="UserSessionResource.obj_get_list-toggle" onclick="return toggle('UserSessionResource.obj_get_list');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="alm_user.api.UserSessionResource-class.html#obj_get_list">obj_get_list</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">bundle</tt><tt class="py-op">,</tt> <tt class="py-op">**</tt><tt class="py-param">kwargs</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="UserSessionResource.obj_get_list-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="UserSessionResource.obj_get_list-expanded"><a name="L91"></a><tt class="py-lineno"> 91</tt>  <tt class="py-line">        <tt class="py-docstring">'''</tt> </tt>
+<a name="L92"></a><tt class="py-lineno"> 92</tt>  <tt class="py-line"><tt class="py-docstring">        GET METHOD</tt> </tt>
+<a name="L93"></a><tt class="py-lineno"> 93</tt>  <tt class="py-line"><tt class="py-docstring">        I{URL}:  U{alma.net:8000/api/v1/user_session/}</tt> </tt>
+<a name="L94"></a><tt class="py-lineno"> 94</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L95"></a><tt class="py-lineno"> 95</tt>  <tt class="py-line"><tt class="py-docstring">        B{Description}:</tt> </tt>
+<a name="L96"></a><tt class="py-lineno"> 96</tt>  <tt class="py-line"><tt class="py-docstring">        API function to get list of active session</tt> </tt>
+<a name="L97"></a><tt class="py-lineno"> 97</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L98"></a><tt class="py-lineno"> 98</tt>  <tt class="py-line"><tt class="py-docstring">        @return: HTTP status code back (201) and a Location header,</tt> </tt>
+<a name="L99"></a><tt class="py-lineno"> 99</tt>  <tt class="py-line"><tt class="py-docstring">        which gives us the URI to our newly created resource.</tt> </tt>
+<a name="L100"></a><tt class="py-lineno">100</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L101"></a><tt class="py-lineno">101</tt>  <tt class="py-line"><tt class="py-docstring">        &gt;&gt;&gt; {</tt> </tt>
+<a name="L102"></a><tt class="py-lineno">102</tt>  <tt class="py-line"><tt class="py-docstring">        ... "objects": [{</tt> </tt>
+<a name="L103"></a><tt class="py-lineno">103</tt>  <tt class="py-line"><tt class="py-docstring">        ...     "id": "ec30q2m7229il39ugk4aempehqyo5k1i",</tt> </tt>
+<a name="L104"></a><tt class="py-lineno">104</tt>  <tt class="py-line"><tt class="py-docstring">        ...     "expire_date": "2014-12-08T11:49:43.298172",</tt> </tt>
+<a name="L105"></a><tt class="py-lineno">105</tt>  <tt class="py-line"><tt class="py-docstring">        ...     "resource_uri": "/api/v1/user_session/ec30q2m7229il39ugk4aempehqyo5k1i/",</tt> </tt>
+<a name="L106"></a><tt class="py-lineno">106</tt>  <tt class="py-line"><tt class="py-docstring">        ...     "user": {</tt> </tt>
+<a name="L107"></a><tt class="py-lineno">107</tt>  <tt class="py-line"><tt class="py-docstring">        ...         "id": 1,</tt> </tt>
+<a name="L108"></a><tt class="py-lineno">108</tt>  <tt class="py-line"><tt class="py-docstring">        ...         "resource_uri": "/api/v1/user/1/",</tt> </tt>
+<a name="L109"></a><tt class="py-lineno">109</tt>  <tt class="py-line"><tt class="py-docstring">        ...         "last_name": "Wayne",</tt> </tt>
+<a name="L110"></a><tt class="py-lineno">110</tt>  <tt class="py-line"><tt class="py-docstring">        ...         "first_name": "Bruce",</tt> </tt>
+<a name="L111"></a><tt class="py-lineno">111</tt>  <tt class="py-line"><tt class="py-docstring">        ...         "email": "b.wayne@batman.bat",</tt> </tt>
+<a name="L112"></a><tt class="py-lineno">112</tt>  <tt class="py-line"><tt class="py-docstring">        ...         "is_active": true,</tt> </tt>
+<a name="L113"></a><tt class="py-lineno">113</tt>  <tt class="py-line"><tt class="py-docstring">        ...         "last_login": "2014-11-24T11:49:43.174099",</tt> </tt>
+<a name="L114"></a><tt class="py-lineno">114</tt>  <tt class="py-line"><tt class="py-docstring">        ...         "timezone": "Asia/Almaty"</tt> </tt>
+<a name="L115"></a><tt class="py-lineno">115</tt>  <tt class="py-line"><tt class="py-docstring">        ...     }</tt> </tt>
+<a name="L116"></a><tt class="py-lineno">116</tt>  <tt class="py-line"><tt class="py-docstring">        ... }]</tt> </tt>
+<a name="L117"></a><tt class="py-lineno">117</tt>  <tt class="py-line"><tt class="py-docstring">        ...}</tt> </tt>
+<a name="L118"></a><tt class="py-lineno">118</tt>  <tt class="py-line"><tt class="py-docstring">        '''</tt> </tt>
+<a name="L119"></a><tt class="py-lineno">119</tt>  <tt class="py-line"> </tt>
+<a name="L120"></a><tt class="py-lineno">120</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-25" class="py-name" targets="Method alm_user.api.UserSessionResource.get_object_list()=alm_user.api.UserSessionResource-class.html#get_object_list"><a title="alm_user.api.UserSessionResource.get_object_list" class="py-name" href="#" onclick="return doclink('link-25', 'get_object_list', 'link-25');">get_object_list</a></tt><tt class="py-op">(</tt><tt class="py-name">bundle</tt><tt class="py-op">.</tt><tt class="py-name">request</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L121"></a><tt class="py-lineno">121</tt>  <tt class="py-line"> </tt>
+<a name="UserSessionResource.obj_create"></a><div id="UserSessionResource.obj_create-def"><a name="L122"></a><tt class="py-lineno">122</tt> <a class="py-toggle" href="#" id="UserSessionResource.obj_create-toggle" onclick="return toggle('UserSessionResource.obj_create');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="alm_user.api.UserSessionResource-class.html#obj_create">obj_create</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">bundle</tt><tt class="py-op">,</tt> <tt class="py-op">**</tt><tt class="py-param">kwargs</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="UserSessionResource.obj_create-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="UserSessionResource.obj_create-expanded"><a name="L123"></a><tt class="py-lineno">123</tt>  <tt class="py-line">        <tt class="py-docstring">'''</tt> </tt>
+<a name="L124"></a><tt class="py-lineno">124</tt>  <tt class="py-line"><tt class="py-docstring">        POST METHOD</tt> </tt>
+<a name="L125"></a><tt class="py-lineno">125</tt>  <tt class="py-line"><tt class="py-docstring">        I{URL}:  U{alma.net:8000/api/v1/user_session/}</tt> </tt>
+<a name="L126"></a><tt class="py-lineno">126</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L127"></a><tt class="py-lineno">127</tt>  <tt class="py-line"><tt class="py-docstring">        B{Description}:</tt> </tt>
+<a name="L128"></a><tt class="py-lineno">128</tt>  <tt class="py-line"><tt class="py-docstring">        API function to Create new user session (login)</tt> </tt>
+<a name="L129"></a><tt class="py-lineno">129</tt>  <tt class="py-line"><tt class="py-docstring">        by the given user credentials: email, password.</tt> </tt>
+<a name="L130"></a><tt class="py-lineno">130</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L131"></a><tt class="py-lineno">131</tt>  <tt class="py-line"><tt class="py-docstring">        @type  email: string</tt> </tt>
+<a name="L132"></a><tt class="py-lineno">132</tt>  <tt class="py-line"><tt class="py-docstring">        @param email: The email of user</tt> </tt>
+<a name="L133"></a><tt class="py-lineno">133</tt>  <tt class="py-line"><tt class="py-docstring">        @type  password: string</tt> </tt>
+<a name="L134"></a><tt class="py-lineno">134</tt>  <tt class="py-line"><tt class="py-docstring">        @param password: The password of user</tt> </tt>
+<a name="L135"></a><tt class="py-lineno">135</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L136"></a><tt class="py-lineno">136</tt>  <tt class="py-line"><tt class="py-docstring">        @return: HTTP status code back (201) and a Location header,</tt> </tt>
+<a name="L137"></a><tt class="py-lineno">137</tt>  <tt class="py-line"><tt class="py-docstring">        which gives us the URI to our newly created resource.</tt> </tt>
+<a name="L138"></a><tt class="py-lineno">138</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L139"></a><tt class="py-lineno">139</tt>  <tt class="py-line"><tt class="py-docstring">        &gt;&gt;&gt; HTTP/1.0 201 CREATED</tt> </tt>
+<a name="L140"></a><tt class="py-lineno">140</tt>  <tt class="py-line"><tt class="py-docstring">        ... Date: Fri, 11 Nov 2014 06:48:36 GMT</tt> </tt>
+<a name="L141"></a><tt class="py-lineno">141</tt>  <tt class="py-line"><tt class="py-docstring">        ... Server: WSGIServer/0.1 Python/2.7</tt> </tt>
+<a name="L142"></a><tt class="py-lineno">142</tt>  <tt class="py-line"><tt class="py-docstring">        ... Content-Type: text/html; charset=utf-8</tt> </tt>
+<a name="L143"></a><tt class="py-lineno">143</tt>  <tt class="py-line"><tt class="py-docstring">        ... Location: http://alma.net/api/v1/user_session/ec30q2m7229il39ugk4aempehqyo5k1i/</tt> </tt>
+<a name="L144"></a><tt class="py-lineno">144</tt>  <tt class="py-line"><tt class="py-docstring">        '''</tt> </tt>
+<a name="L145"></a><tt class="py-lineno">145</tt>  <tt class="py-line"> </tt>
+<a name="L146"></a><tt class="py-lineno">146</tt>  <tt class="py-line">        <tt id="link-26" class="py-name"><a title="alm_user.api.UserSessionResource.user" class="py-name" href="#" onclick="return doclink('link-26', 'user', 'link-3');">user</a></tt> <tt class="py-op">=</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-27" class="py-name" targets="Method alm_user.api.UserSessionResource.find_or_create_user_for_new_session()=alm_user.api.UserSessionResource-class.html#find_or_create_user_for_new_session"><a title="alm_user.api.UserSessionResource.find_or_create_user_for_new_session" class="py-name" href="#" onclick="return doclink('link-27', 'find_or_create_user_for_new_session', 'link-27');">find_or_create_user_for_new_session</a></tt><tt class="py-op">(</tt><tt class="py-name">bundle</tt><tt class="py-op">,</tt> <tt class="py-op">**</tt><tt class="py-name">kwargs</tt><tt class="py-op">)</tt> </tt>
+<a name="L147"></a><tt class="py-lineno">147</tt>  <tt class="py-line">        <tt class="py-keyword">if</tt> <tt class="py-keyword">not</tt> <tt id="link-28" class="py-name"><a title="alm_user.api.UserSessionResource.user" class="py-name" href="#" onclick="return doclink('link-28', 'user', 'link-3');">user</a></tt><tt class="py-op">:</tt> </tt>
+<a name="L148"></a><tt class="py-lineno">148</tt>  <tt class="py-line">            <tt class="py-keyword">raise</tt> <tt class="py-name">NotFound</tt><tt class="py-op">(</tt><tt class="py-string">"No user was found with your credentials."</tt><tt class="py-op">)</tt> </tt>
+<a name="L149"></a><tt class="py-lineno">149</tt>  <tt class="py-line">        <tt class="py-name">login</tt><tt class="py-op">(</tt><tt class="py-name">bundle</tt><tt class="py-op">.</tt><tt class="py-name">request</tt><tt class="py-op">,</tt> <tt id="link-29" class="py-name"><a title="alm_user.api.UserSessionResource.user" class="py-name" href="#" onclick="return doclink('link-29', 'user', 'link-3');">user</a></tt><tt class="py-op">)</tt> </tt>
+<a name="L150"></a><tt class="py-lineno">150</tt>  <tt class="py-line"> </tt>
+<a name="L151"></a><tt class="py-lineno">151</tt>  <tt class="py-line">        <tt class="py-name">bundle</tt><tt class="py-op">.</tt><tt class="py-name">obj</tt> <tt class="py-op">=</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-30" class="py-name" targets="Method alm_user.api.UserSessionResource._build_session_object()=alm_user.api.UserSessionResource-class.html#_build_session_object"><a title="alm_user.api.UserSessionResource._build_session_object" class="py-name" href="#" onclick="return doclink('link-30', '_build_session_object', 'link-30');">_build_session_object</a></tt><tt class="py-op">(</tt><tt class="py-name">bundle</tt><tt class="py-op">.</tt><tt class="py-name">request</tt><tt class="py-op">)</tt> </tt>
+<a name="L152"></a><tt class="py-lineno">152</tt>  <tt class="py-line">        <tt class="py-name">bundle</tt> <tt class="py-op">=</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">full_hydrate</tt><tt class="py-op">(</tt><tt class="py-name">bundle</tt><tt class="py-op">)</tt> </tt>
+<a name="L153"></a><tt class="py-lineno">153</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt class="py-name">bundle</tt> </tt>
+</div><a name="L154"></a><tt class="py-lineno">154</tt>  <tt class="py-line"> </tt>
+<a name="UserSessionResource.obj_delete"></a><div id="UserSessionResource.obj_delete-def"><a name="L155"></a><tt class="py-lineno">155</tt> <a class="py-toggle" href="#" id="UserSessionResource.obj_delete-toggle" onclick="return toggle('UserSessionResource.obj_delete');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="alm_user.api.UserSessionResource-class.html#obj_delete">obj_delete</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">bundle</tt><tt class="py-op">,</tt> <tt class="py-op">**</tt><tt class="py-param">kwargs</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="UserSessionResource.obj_delete-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="UserSessionResource.obj_delete-expanded"><a name="L156"></a><tt class="py-lineno">156</tt>  <tt class="py-line">        <tt class="py-docstring">'''</tt> </tt>
+<a name="L157"></a><tt class="py-lineno">157</tt>  <tt class="py-line"><tt class="py-docstring">        DELETE METHOD</tt> </tt>
+<a name="L158"></a><tt class="py-lineno">158</tt>  <tt class="py-line"><tt class="py-docstring">        I{URL}:  U{alma.net:8000/api/v1/user_session/:id}</tt> </tt>
+<a name="L159"></a><tt class="py-lineno">159</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L160"></a><tt class="py-lineno">160</tt>  <tt class="py-line"><tt class="py-docstring">        B{Description}:</tt> </tt>
+<a name="L161"></a><tt class="py-lineno">161</tt>  <tt class="py-line"><tt class="py-docstring">        API function to Delete session (logout)</tt> </tt>
+<a name="L162"></a><tt class="py-lineno">162</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L163"></a><tt class="py-lineno">163</tt>  <tt class="py-line"><tt class="py-docstring">        @type  id: string</tt> </tt>
+<a name="L164"></a><tt class="py-lineno">164</tt>  <tt class="py-line"><tt class="py-docstring">        @param id: session id</tt> </tt>
+<a name="L165"></a><tt class="py-lineno">165</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L166"></a><tt class="py-lineno">166</tt>  <tt class="py-line"><tt class="py-docstring">        @return: response &#226;&#128;&#156;Accepted&#226;&#128;&#157; with HTTP status code 204</tt> </tt>
+<a name="L167"></a><tt class="py-lineno">167</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L168"></a><tt class="py-lineno">168</tt>  <tt class="py-line"><tt class="py-docstring">        &gt;&gt;&gt; HTTP/1.0 204 NO CONTENT</tt> </tt>
+<a name="L169"></a><tt class="py-lineno">169</tt>  <tt class="py-line"><tt class="py-docstring">        ... Date: Fri, 11 Nov 2014 06:48:36 GMT</tt> </tt>
+<a name="L170"></a><tt class="py-lineno">170</tt>  <tt class="py-line"><tt class="py-docstring">        ... Server: WSGIServer/0.1 Python/2.7</tt> </tt>
+<a name="L171"></a><tt class="py-lineno">171</tt>  <tt class="py-line"><tt class="py-docstring">        ... Content-Length: 0</tt> </tt>
+<a name="L172"></a><tt class="py-lineno">172</tt>  <tt class="py-line"><tt class="py-docstring">        ... Content-Type: text/html; charset=utf-8</tt> </tt>
+<a name="L173"></a><tt class="py-lineno">173</tt>  <tt class="py-line"><tt class="py-docstring">        '''</tt> </tt>
+<a name="L174"></a><tt class="py-lineno">174</tt>  <tt class="py-line"> </tt>
+<a name="L175"></a><tt class="py-lineno">175</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-31" class="py-name"><a title="alm_user.api.UserSessionResource._build_session_object_or_raise" class="py-name" href="#" onclick="return doclink('link-31', '_build_session_object_or_raise', 'link-24');">_build_session_object_or_raise</a></tt><tt class="py-op">(</tt><tt class="py-name">bundle</tt><tt class="py-op">.</tt><tt class="py-name">request</tt><tt class="py-op">,</tt> <tt class="py-name">pk</tt><tt class="py-op">=</tt><tt class="py-name">kwargs</tt><tt class="py-op">[</tt><tt class="py-string">"pk"</tt><tt class="py-op">]</tt><tt class="py-op">)</tt> </tt>
+<a name="L176"></a><tt class="py-lineno">176</tt>  <tt class="py-line">        <tt class="py-name">logout</tt><tt class="py-op">(</tt><tt class="py-name">bundle</tt><tt class="py-op">.</tt><tt class="py-name">request</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L177"></a><tt class="py-lineno">177</tt>  <tt class="py-line"> </tt>
+<a name="UserSessionResource._build_session_object"></a><div id="UserSessionResource._build_session_object-def"><a name="L178"></a><tt class="py-lineno">178</tt> <a class="py-toggle" href="#" id="UserSessionResource._build_session_object-toggle" onclick="return toggle('UserSessionResource._build_session_object');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="alm_user.api.UserSessionResource-class.html#_build_session_object">_build_session_object</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">request</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="UserSessionResource._build_session_object-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="UserSessionResource._build_session_object-expanded"><a name="L179"></a><tt class="py-lineno">179</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">_meta</tt><tt class="py-op">.</tt><tt class="py-name">object_class</tt><tt class="py-op">.</tt><tt id="link-32" class="py-name" targets="Class Method alm_user.api.UserSession.object_for_request()=alm_user.api.UserSession-class.html#object_for_request"><a title="alm_user.api.UserSession.object_for_request" class="py-name" href="#" onclick="return doclink('link-32', 'object_for_request', 'link-32');">object_for_request</a></tt><tt class="py-op">(</tt><tt class="py-name">request</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L180"></a><tt class="py-lineno">180</tt>  <tt class="py-line"> </tt>
+<a name="UserSessionResource._build_session_object_or_raise"></a><div id="UserSessionResource._build_session_object_or_raise-def"><a name="L181"></a><tt class="py-lineno">181</tt> <a class="py-toggle" href="#" id="UserSessionResource._build_session_object_or_raise-toggle" onclick="return toggle('UserSessionResource._build_session_object_or_raise');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="alm_user.api.UserSessionResource-class.html#_build_session_object_or_raise">_build_session_object_or_raise</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">request</tt><tt class="py-op">,</tt> <tt class="py-param">pk</tt><tt class="py-op">=</tt><tt class="py-name">None</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="UserSessionResource._build_session_object_or_raise-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="UserSessionResource._build_session_object_or_raise-expanded"><a name="L182"></a><tt class="py-lineno">182</tt>  <tt class="py-line">        <tt class="py-name">key</tt> <tt class="py-op">=</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">_meta</tt><tt class="py-op">.</tt><tt class="py-name">object_class</tt><tt class="py-op">.</tt><tt id="link-33" class="py-name"><a title="alm_user.api.UserSession.session_get_key" class="py-name" href="#" onclick="return doclink('link-33', 'session_get_key', 'link-1');">session_get_key</a></tt><tt class="py-op">(</tt><tt class="py-name">request</tt><tt class="py-op">,</tt> </tt>
+<a name="L183"></a><tt class="py-lineno">183</tt>  <tt class="py-line">                                                      <tt class="py-name">create_if_needed</tt><tt class="py-op">=</tt><tt class="py-name">False</tt><tt class="py-op">)</tt> </tt>
+<a name="L184"></a><tt class="py-lineno">184</tt>  <tt class="py-line"> </tt>
+<a name="L185"></a><tt class="py-lineno">185</tt>  <tt class="py-line">        <tt class="py-keyword">if</tt> <tt class="py-keyword">not</tt> <tt class="py-name">key</tt><tt class="py-op">:</tt> </tt>
+<a name="L186"></a><tt class="py-lineno">186</tt>  <tt class="py-line">            <tt class="py-keyword">raise</tt> <tt class="py-name">NotFound</tt><tt class="py-op">(</tt><tt class="py-string">"Session could not be found for the request."</tt><tt class="py-op">)</tt> </tt>
+<a name="L187"></a><tt class="py-lineno">187</tt>  <tt class="py-line"> </tt>
+<a name="L188"></a><tt class="py-lineno">188</tt>  <tt class="py-line">        <tt class="py-keyword">if</tt> <tt class="py-name">pk</tt> <tt class="py-keyword">and</tt> <tt class="py-name">pk</tt> <tt class="py-op">!=</tt> <tt class="py-name">key</tt><tt class="py-op">:</tt> </tt>
+<a name="L189"></a><tt class="py-lineno">189</tt>  <tt class="py-line">            <tt class="py-keyword">raise</tt> <tt class="py-name">NotFound</tt><tt class="py-op">(</tt><tt class="py-string">"That's not your session."</tt><tt class="py-op">)</tt> </tt>
+<a name="L190"></a><tt class="py-lineno">190</tt>  <tt class="py-line"> </tt>
+<a name="L191"></a><tt class="py-lineno">191</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-34" class="py-name"><a title="alm_user.api.UserSessionResource._build_session_object" class="py-name" href="#" onclick="return doclink('link-34', '_build_session_object', 'link-30');">_build_session_object</a></tt><tt class="py-op">(</tt><tt class="py-name">request</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L192"></a><tt class="py-lineno">192</tt>  <tt class="py-line"> </tt>
+<a name="UserSessionResource.find_or_create_user_for_new_session"></a><div id="UserSessionResource.find_or_create_user_for_new_session-def"><a name="L193"></a><tt class="py-lineno">193</tt> <a class="py-toggle" href="#" id="UserSessionResource.find_or_create_user_for_new_session-toggle" onclick="return toggle('UserSessionResource.find_or_create_user_for_new_session');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="alm_user.api.UserSessionResource-class.html#find_or_create_user_for_new_session">find_or_create_user_for_new_session</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">bundle</tt><tt class="py-op">,</tt> <tt class="py-op">**</tt><tt class="py-param">kwargs</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="UserSessionResource.find_or_create_user_for_new_session-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="UserSessionResource.find_or_create_user_for_new_session-expanded"><a name="L194"></a><tt class="py-lineno">194</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt class="py-name">authenticate</tt><tt class="py-op">(</tt><tt class="py-op">**</tt><tt class="py-name">bundle</tt><tt class="py-op">.</tt><tt class="py-name">data</tt><tt class="py-op">)</tt> </tt>
+</div></div><a name="L195"></a><tt class="py-lineno">195</tt>  <tt class="py-line"> </tt><script type="text/javascript">
+<!--
+expandto(location.href);
+// -->
+</script>
+</pre>
+<br />
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+      <th class="navbar" width="100%"></th>
+  </tr>
+</table>
+<table border="0" cellpadding="0" cellspacing="0" width="100%%">
+  <tr>
+    <td align="left" class="footer">
+    Generated by Epydoc 3.0.1 on Tue Nov 25 08:33:12 2014
+    </td>
+    <td align="right" class="footer">
+      <a target="mainFrame" href="http://epydoc.sourceforge.net"
+        >http://epydoc.sourceforge.net</a>
+    </td>
+  </tr>
+</table>
+
+<script type="text/javascript">
+  <!--
+  // Private objects are initially displayed (because if
+  // javascript is turned off then we want them to be
+  // visible); but by default, we want to hide them.  So hide
+  // them unless we have a cookie that says to show them.
+  checkCookie();
+  // -->
+</script>
+</body>
+</html>
