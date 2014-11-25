@@ -352,8 +352,10 @@ class ContactResource(CRMServiceModelResource):
                     "type": "string",
                     "required": False,
                     "description": "pass a parameter by which the queryset's \
-                    going to be ordered, look at vcard values for reference. If the value is not in \
-                    vcard itself but in additional vcard object prepend 'objname__' to it.\
+                    going to be ordered, look at vcard values for reference. \
+                    If the value is not in \
+                    vcard itself but in additional vcard object prepend \
+                    'objname__' to it.\
                     Eg. 'vcard__email__value', 'vcard__tel__type. Add 'asc' or 'desc' \
                     for sort order list to be in ascending or descending order. \
                     put both parameters in format of a list Eg. ['fn','asc']."
@@ -515,7 +517,8 @@ class ContactResource(CRMServiceModelResource):
             returns
                 (Queryset<Contact>,
                 Queryset<Activity>,
-                {contact1_id: [activity1_id, activity2_id], contact2_id: [activity3_id]})
+                {contact1_id: [activity1_id, 
+                    activity2_id], contact2_id: [activity3_id]})
             '''
             obj_dict = {}
             obj_dict['contacts'] = self.get_bundle_list(contacts[0], request)
