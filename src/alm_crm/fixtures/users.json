@@ -30,5 +30,20 @@
         "password": "nurlan", 
         "email": "abyken.nurlan@gmail.com"
     }
+},
+{
+    "pk": 3, 
+    "model": "alm_user.user", 
+    "fields": {
+        "first_name": "Sattar", 
+        "last_name": "Stamkulov", 
+        "company": [], 
+        "is_active": true, 
+        "last_login": "2014-11-11T10:08:02.503Z", 
+        "is_admin": false, 
+        "timezone": "Asia/Almaty", 
+        "password": "sattar", 
+        "email": "stamkulov.sattar@gmail.com"
+    }
 }
 ]

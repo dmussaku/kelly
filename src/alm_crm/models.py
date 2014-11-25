@@ -137,24 +137,24 @@ class Contact(SubscriptionObject):
     @property
     def name(self):
         if not self.vcard:
-            return 'Unknown'
+            return _('Unknown')
         return self.vcard.fn
 
-    def tel(self, type='cell'):
+    def tel(self, type='CELL'):
         if not self.vcard:
-            return 'Unknown'
-        tel = self.vcard.tel_set.filter(type=type).first()
+            return _('Unknown')
+        tel = self.vcard.tel_set.filter(type=type).first().value
         return tel and tel or None
 
     def mobile(self):
-        if not self.tel(type='cell'):
-            return "Unknown"
-        return self.tel(type='cell')
+        if not self.tel(type='CELL'):
+            return _('Unknown')
+        return self.tel(type='CELL')
 
     def email(self, type='WORK'):
         if not self.vcard:
-            return 'Unknown'
-        email = self.vcard.email_set.filter(type=type).first()
+            return _('Unknown')
+        email = self.vcard.email_set.filter(type=type).first().value
         return email and email or None
 
     def email_work(self):
@@ -166,7 +166,7 @@ class Contact(SubscriptionObject):
         org = self.vcard.org_set.first()
         if not org:
             return _('Unknown organization')
-        return org
+        return org.name
 
     def get_tp(self):
         return dict(self.TYPES_WITH_CAPS).get(self.tp, None)
@@ -263,7 +263,7 @@ class Contact(SubscriptionObject):
         '''
         assert isinstance(contact_ids, (list, tuple)), 'Must be a list'
         if not contact_ids:
-            return false
+            return False
         try:
             share_from = CRMUser.objects.get(id=share_from)
             share_to = CRMUser.objects.get(id=share_to)

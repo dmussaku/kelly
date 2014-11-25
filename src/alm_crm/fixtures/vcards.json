@@ -9,11 +9,11 @@
             "additional_name": "",
             "rev": null,
             "honorific_prefix": "",
-            "bday": null,
+            "bday": "1990-09-10",
             "given_name": "Akerke",
             "sort_string": null,
             "classP": null,
-            "subscription_id": null,
+            "subscription_id": 1,
             "fn": "Akerke Akerke"
             }
     },
@@ -27,11 +27,11 @@
             "additional_name": "",
             "rev": null,
             "honorific_prefix": "",
-            "bday": null,
+            "bday": "1991-09-10",
             "given_name": "Nurlan",
             "sort_string": null,
             "classP": null,
-            "subscription_id": null,
+            "subscription_id": 1,
             "fn": "Nurlan Heisenberg"
         }
     },
@@ -45,11 +45,11 @@
             "additional_name": "",
             "rev": null,
             "honorific_prefix": "",
-            "bday": null,
+            "bday": "1991-09-11",
             "given_name": "Aliya",
             "sort_string": null,
             "classP": null,
-            "subscription_id": null,
+            "subscription_id": 1,
             "fn": "Aliya Mussina"
         }
     },
@@ -63,11 +63,11 @@
             "additional_name": "",
             "rev": null,
             "honorific_prefix": "",
-            "bday": null,
+            "bday": "1989-09-10",
             "given_name": "Daniyar",
             "sort_string": null,
             "classP": null,
-            "subscription_id": null,
+            "subscription_id": 1,
             "fn": "Daniyar Mussakulov"
         }
     },
@@ -75,7 +75,7 @@
         "pk": 1,
         "model": "alm_vcard.tel",
         "fields": {
-            "subscription_id": null,
+            "subscription_id": 1,
             "type": "CELL",
             "vcard": 1,
             "value": "87753591453"
