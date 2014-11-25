@@ -1016,11 +1016,13 @@ class ActivityResource(CRMServiceModelResource):
             ),
         null=True, full=True
         )
-    mentions = fields.ToManyField(
-        'alm_crm.api.MentionResource',
-        attribute=lambda bundle: Mention.objects.filter(
-            content_type=ContentType.objects.get_for_model(bundle.obj),
-            object_id=bundle.obj.id
+    mention_users = fields.ToManyField(
+        'alm_crm.api.CRMUserResource',
+        attribute=lambda bundle: CRMUser.objects.filter(
+            pk__in=Mention.objects.filter(
+                content_type=ContentType.objects.get_for_model(bundle.obj),
+                object_id=bundle.obj.id
+            ).values_list('user_id', flat=True).distinct()
             ),
         null=True, full=True
         )
@@ -1074,7 +1076,7 @@ class ActivityResource(CRMServiceModelResource):
         ... Content-Type: text/html; charset=utf-8
         ... Location: http://alma.net/api/v1/activity/1/
         '''
-        super(self.__class__, self).save(request, **kwargs)
+        return super(self.__class__, self).post_list(request, **kwargs)
 
 
 class ProductResource(CRMServiceModelResource):

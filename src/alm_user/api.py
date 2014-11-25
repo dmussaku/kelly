@@ -1,3 +1,5 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 from tastypie import fields
 from tastypie.bundle import Bundle
 from tastypie.resources import Resource, ModelResource
@@ -43,6 +45,9 @@ class UserSessionResource(Resource):
 
     B{Description}:
     API resource to manage session of authentication
+
+    @undocumented: get_resource_uri, get_object_list, _build_session_object,
+    _build_session_object_or_raise, find_or_create_user_for_new_session
     """
 
     id = fields.CharField(attribute="id", readonly=True)

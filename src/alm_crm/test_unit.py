@@ -646,9 +646,11 @@ class ActivityResourceTest(ResourceTestMixin, ResourceTestCase):
         self.assertEqual(len(self.activity.comments.all()),
                          len(resp_activity['comments']))
 
-        self.assertTrue(len(resp_activity['mentions']) > 0)
-        self.assertEqual(len(self.activity.mentions.all()),
-                         len(resp_activity['mentions']))
+        self.assertTrue(len(resp_activity['mention_users']) > 0)
+        mentions_user_ids = \
+            self.activity.mentions.values_list('user_id', flat=True).distinct()
+        self.assertEqual(len(mentions_user_ids),
+                         len(resp_activity['mention_users']))
 
     def test_create_activity(self):
         sales_cycle = SalesCycle.objects.last()
