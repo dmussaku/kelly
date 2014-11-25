@@ -1,51 +1,54 @@
-
- [
-    {
-        "pk": 1,
-        "model": "alm_crm.Comment",
-        "fields": {
-			"comment":"Test comment 1",
-			"owner":1,
-			"date_created":"2014-09-10 00:00:00",
-			"date_edited":"2014-09-10 00:00:00",
-			"object_id":1,
-			"content_type":33
-        }
-    },
-    {
-        "pk": 2,
-        "model": "alm_crm.Comment",
-        "fields": {
-        	"comment":"Test comment 2",
-			"owner":1,
-			"date_created":"2014-09-10 00:00:00",
-			"date_edited":"2014-09-10 00:00:00",
-			"object_id":1,
-			"content_type":33
-        }
-    },
-    {
-        "pk": 3,
-        "model": "alm_crm.Comment",
-        "fields": {
-        	"comment":"Test comment 3",
-			"owner":1,
-			"date_created":"2014-09-10 00:00:00",
-			"date_edited":"2014-09-10 00:00:00",
-			"object_id":1,
-			"content_type":33
-        }
-    },
-    {
-        "pk": 4,
-        "model": "alm_crm.Comment",
-        "fields": {
-        	"comment":"Test comment 4",
-			"owner":1,
-			"date_created":"2014-09-10 00:00:00",
-			"date_edited":"2014-09-10 00:00:00",
-			"object_id":1,
-			"content_type":33
-        }
+[
+{
+    "pk": 1, 
+    "model": "alm_crm.comment", 
+    "fields": {
+        "comment": "Test comment 1", 
+        "object_id": 1, 
+        "content_type": 33, 
+        "owner": 1, 
+        "date_created": "2014-09-10T00:00:00Z", 
+        "subscription_id": 1, 
+        "date_edited": "2014-09-10T00:00:00Z"
     }
+},
+{
+    "pk": 2, 
+    "model": "alm_crm.comment", 
+    "fields": {
+        "comment": "Test comment 2", 
+        "object_id": 1, 
+        "content_type": 33, 
+        "owner": 1, 
+        "date_created": "2014-09-10T00:00:00Z", 
+        "subscription_id": 2, 
+        "date_edited": "2014-09-10T00:00:00Z"
+    }
+},
+{
+    "pk": 3, 
+    "model": "alm_crm.comment", 
+    "fields": {
+        "comment": "Test comment 3", 
+        "object_id": 1, 
+        "content_type": 33, 
+        "owner": 1, 
+        "date_created": "2014-09-10T00:00:00Z", 
+        "subscription_id": 1, 
+        "date_edited": "2014-09-10T00:00:00Z"
+    }
+},
+{
+    "pk": 4, 
+    "model": "alm_crm.comment", 
+    "fields": {
+        "comment": "Test comment 4", 
+        "object_id": 1, 
+        "content_type": 33, 
+        "owner": 1, 
+        "date_created": "2014-09-10T00:00:00Z", 
+        "subscription_id": 1, 
+        "date_edited": "2014-09-10T00:00:00Z"
+    }
+}
 ]

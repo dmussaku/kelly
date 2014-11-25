@@ -1,6 +1,7 @@
 from tastypie import fields
 from tastypie.resources import ModelResource
 from tastypie.authorization import Authorization
+from django.http import HttpResponse
 from tastypie.utils import trailing_slash
 from tastypie.authentication import (
     MultiAuthentication,
@@ -19,6 +20,7 @@ from .models import (
     Feedback,
     )
 from almanet.settings import DEFAULT_SERVICE
+import ast
 
 
 class CRMServiceModelResource(ModelResource):
@@ -81,7 +83,7 @@ class ContactResource(CRMServiceModelResource):
             "name": "recent",
             "http_method": "GET",
             "resource_type": "list",
-            "description": "Get contacts ordered by their last activity date",
+            "summary": "Get contacts ordered by their last activity date",
             "fields": {
                 "limit": {
                     "type": "int",
@@ -120,7 +122,7 @@ class ContactResource(CRMServiceModelResource):
             "name": "cold_base",
             "http_method": "GET",
             "resource_type": "list",
-            "description": "Get cold base of contacts, which are contacts \
+            "summary": "Get cold base of contacts, which are contacts \
             which do not have any activities yet",
             "fields": {
                 "limit": {
@@ -140,8 +142,8 @@ class ContactResource(CRMServiceModelResource):
         {
             "name": "assign_contact",
             "http_method": "GET",
-            "resource_type": "list",
-            "description": "Assign a single contact to a user, return True in\
+            "resource_type": "view",
+            "summary": "Assign a single contact to a user, return True in\
             case of success, anf False if not",
             "fields": {
                 "user_id": {
@@ -159,8 +161,8 @@ class ContactResource(CRMServiceModelResource):
         {
             "name": "assign_contacts",
             "http_method": "GET",
-            "resource_type": "list",
-            "description": "Assign multiple contacts to a user, return True in\
+            "resource_type": "view",
+            "summary": "Assign multiple contacts to a user, return True in\
             case of success, anf False if not",
             "fields": {
                 "user_id": {
@@ -229,7 +231,48 @@ class ContactResource(CRMServiceModelResource):
             "name": "leads",
             "http_method": "GET",
             "resource_type": "list",
-            "description": "Returns all contacts with status 'LEAD'",
+            "summary": "Returns all contacts with status 'LEAD'",
+            "fields": {
+                "limit": {
+                    "type": "int",
+                    "required": False,
+                    "description": "Limit queryset, if not provided gives \
+                    20 results by default"
+                },
+                "offset": {
+                    "type": "int",
+                    "required": False,
+                    "description": "offset queryset, if not provided gives \
+                    0 by default"
+                }
+            }
+        },
+        {
+            "name": "get_products",
+            "http_method": "GET",
+            "resource_type": "list",
+            "summary": "get products by contact \
+                (you can get it from salescycle by contact)",
+            "fields": {
+                "limit": {
+                    "type": "int",
+                    "required": False,
+                    "description": "Limit queryset, if not provided gives \
+                    20 results by default"
+                },
+                "offset": {
+                    "type": "int",
+                    "required": False,
+                    "description": "offset queryset, if not provided gives \
+                    0 by default"
+                }
+            }
+        },
+        {
+            "name": "get_activities",
+            "http_method": "GET",
+            "resource_type": "list",
+            "summary": "get latest activities with embeded comments by contact",
             "fields": {
                 "limit": {
                     "type": "int",
@@ -249,7 +292,7 @@ class ContactResource(CRMServiceModelResource):
             "name": "search",
             "http_method": "GET",
             "resource_type": "list",
-            "description": "Performs a recursive contat search by query and \
+            "summary": "Performs a recursive contat search by query and \
             search_params",
             "fields": {
                 "limit": {
@@ -332,6 +375,18 @@ class ContactResource(CRMServiceModelResource):
                 name='api_assign_contacts'
             ),
             url(
+                r"^(?P<resource_name>%s)/(?P<id>\d+)/products%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('get_products'),
+                name='api_get_products'
+            ),
+            url(
+                r"^(?P<resource_name>%s)/(?P<id>\d+)/activities%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('get_activities'),
+                name='api_get_activities'
+            ),
+            url(
                 r"^(?P<resource_name>%s)/share_contact%s$" % 
                 (self._meta.resource_name, trailing_slash()),
                 self.wrap_view('share_contact'),
@@ -342,6 +397,12 @@ class ContactResource(CRMServiceModelResource):
                 (self._meta.resource_name, trailing_slash()),
                 self.wrap_view('share_contacts'),
                 name = 'api_share_contacts'
+            ),
+            url(
+                r"^(?P<resource_name>%s)/import_contacts_from_vcard%s$" % 
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('import_contacts_from_vcard'),
+                name = 'api_import_contacts_from_vcard'
             ),
         ]
 
@@ -356,7 +417,7 @@ class ContactResource(CRMServiceModelResource):
         owned = bool(request.GET.get('owned', True))
         assigned = bool(request.GET.get('assigned', False))
         followed = bool(request.GET.get('followed', False))
-        contacts = Contact().get_contacts_by_last_activity_date(
+        contacts = Contact.get_contacts_by_last_activity_date(
             user_id=request.user.id,
             include_activities=include_activities,
             owned=owned,
@@ -388,7 +449,7 @@ class ContactResource(CRMServiceModelResource):
         '''
         limit = int(request.GET.get('limit', 20))
         offset = int(request.GET.get('offset', 0))
-        contacts = Contact().get_cold_base(limit, offset)
+        contacts = Contact.get_cold_base(limit, offset)
         return self.create_response(
             request,
             {'objects': self.get_bundle_list(contacts, request)}
@@ -401,11 +462,44 @@ class ContactResource(CRMServiceModelResource):
         STATUS_LEAD = 1
         limit = int(request.GET.get('limit', 20))
         offset = int(request.GET.get('offset', 0))
-        contacts = Contact().get_contacts_by_status(STATUS_LEAD, limit, offset)
+        contacts = Contact.get_contacts_by_status(STATUS_LEAD, limit, offset)
         return self.create_response(
             request,
             {'objects': self.get_bundle_list(contacts, request)}
             )
+
+    def get_products(self, request, **kwargs):
+        '''
+        pass limit and offset with GET request
+        '''
+
+        contact_id = kwargs.get('id')
+        limit = int(request.GET.get('limit', 20))
+        offset = int(request.GET.get('offset', 0))
+        products = Contact.get_contact_products(contact_id, limit=limit,
+                                                offset=offset)
+
+        product_resource = ProductResource()
+        obj_dict = {}
+        obj_dict['objects'] = product_resource.get_bundle_list(products,
+                                                               request)
+        return self.create_response(request, obj_dict)
+
+    def get_activities(self, request, **kwargs):
+        '''
+        pass limit and offset with GET request
+        '''
+        contact_id = kwargs.get('id')
+        limit = int(request.GET.get('limit', 20))
+        offset = int(request.GET.get('offset', 0))
+        activities = Contact.get_contact_activities(contact_id, limit=limit,
+                                                    offset=offset)
+
+        activity_resource = ActivityResource()
+        obj_dict = {}
+        obj_dict['objects'] = activity_resource.get_bundle_list(activities,
+                                                                request)
+        return self.create_response(request, obj_dict)
 
     def search(self, request, **kwargs):
         '''
@@ -416,14 +510,13 @@ class ContactResource(CRMServiceModelResource):
         list to a python list
         pass limit and offset through GET request
         '''
-        import ast
         limit = int(request.GET.get('limit', 20))
         offset = int(request.GET.get('offset', 0))
         search_text = request.GET.get('search_text', '').encode('utf-8')
         search_params = ast.literal_eval(
             request.GET.get('search_params', "[('fn', 'startswith')]"))
         order_by = ast.literal_eval(request.GET.get('order_by', "[]"))
-        contacts = Contact().filter_contacts_by_vcard(
+        contacts = Contact.filter_contacts_by_vcard(
             search_text=search_text,
             search_params=search_params,
             order_by=order_by,
@@ -436,51 +529,99 @@ class ContactResource(CRMServiceModelResource):
 
     def assign_contact(self, request, **kwargs):
         '''
-        Sharing a single contact with user
+        Assigning a single contact with user
         '''
-        user_id = int(request.GET.get('user_id', 0))
-        contact_id = int(request.GET.get('contact_id', 0))
+        user_id = int(request.GET.get('user_id',0))
+        if not user_id:
+            return self.create_response(
+                    request, {'success':False, error_string:'User id is not set'}
+                )
+        contact_id = int(request.GET.get('contact_id',0))
+        if not contact_id:
+            return self.create_response(
+                    request, {'success':False, error_string:'Contact id is not set'}
+                )
         return self.create_response(
-            request,
-            {'success': Contact().assign_user_to_contact(user_id, contact_id)}
-            )
+                request, {'success':Contact.assign_user_to_contact(user_id, contact_id)}
+                )
 
     def assign_contacts(self, request, **kwargs):
         '''
-        Sharing multiple contacts with user, send multiple contacts as so
+        Assigning multiple contacts with user, send multiple contacts as so
         contact_ids=[1,2,3,4...n]
         '''
         import ast
-        user_id = int(request.GET.get('user_id', 0))
-        contact_ids = ast.literal_eval(request.GET.get('contact_ids', []))
+        user_id = int(request.GET.get('user_id',0))
+        if not user_id:
+            return self.create_response(
+                    request, {'success':False, error_string:'User id is not set'}
+                )
+        contact_ids = ast.literal_eval(request.GET.get('contact_ids',[]))
+        if not contact_ids:
+            return self.create_response(
+                    request, {'success':False, error_string:'Contact ids are not set'}
+                )
         return self.create_response(
-            request,
-            {'success': Contact().assign_user_to_contacts(user_id,
-                                                          contact_ids)}
-            )
+                request, {'success':Contact.assign_user_to_contacts(user_id, contact_ids)}
+                )
 
     def share_contact(self, request, **kwargs):
-    	'''	
-		Sharing a single contact with a single user
-    	'''
-    	share_to = int(request.GET.get('share_to',0))
-    	share_from = int(request.GET.get('share_from',0))
-    	contact_id = int(request.GET.get('contact_id',0))
-    	return self.create_response(
-    			request, {'success':Contact().share_contact(share_from, share_to, contact_id)}
-    		)
+        ''' 
+        Sharing a single contact with a single user
+        '''
+        share_to = int(request.GET.get('share_to',0))
+        if not share_to:
+            return self.create_response(
+                request, {'success':False, 
+                          'error_message':"You didn't specify with whom you want to share contact(s)"
+                         }
+                )
+        share_from = int(request.GET.get('share_from',0))
+        if not share_from:
+            return self.create_response(
+                request, {'success':False, 
+                          'error_message':"You didn't specify the user whos sharing contact(s)"
+                         }
+                )
+        contact_id = int(request.GET.get('contact_id',0))
+        return self.create_response(
+                request, {'success':Contact.share_contact(share_from, share_to, contact_id)}
+            )
 
     def share_contacts(self, request, **kwargs):
-    	'''	
-		Sharing a single contact with a single user
-    	'''
-    	import ast
-    	share_to = int(request.GET.get('share_to',0))
-    	share_from = int(request.GET.get('share_from',0))
-    	contact_ids = ast.literal_eval(request.GET.get('contact_ids',[]))
-    	return self.create_response(
-    			request, {'success':Contact().share_contacts(share_from, share_to, contact_ids)}
-    		)
+        ''' 
+        Sharing a single contact with a single user
+        '''
+        import ast
+        share_to = int(request.GET.get('share_to',0))
+        if not share_to:
+            return self.create_response(
+                request, {'success':False, 
+                          'error_message':"You didn't specify with whom you want to share contact(s)"
+                         }
+                )
+        share_from = int(request.GET.get('share_from',0))
+        if not share_from:
+            return self.create_response(
+                request, {'success':False, 
+                          'error_message':"You didn't specify the user whos sharing contact(s)"
+                         }
+                )
+        contact_ids = ast.literal_eval(request.GET.get('contact_ids',[]))
+        return self.create_response(
+                request, {'success':Contact.share_contacts(share_from, share_to, contact_ids)}
+            )
+
+    def import_contacts_from_vcard(self, request, **kwargs):
+        '''
+        Import contact(s) from single vcard file
+        '''
+        if request.method == 'POST':
+            print request.FILES['myfile']
+            return self.create_response(
+                    request, Contact.import_contacts_from_vcard(request.FILES['myfile'])
+                )
+        
 
 class SalesCycleResource(CRMServiceModelResource):
     contact = fields.ForeignKey(ContactResource, 'contact')
@@ -522,6 +663,7 @@ class ProductResource(CRMServiceModelResource):
 
     class Meta(CRMServiceModelResource.Meta):
         queryset = Product.objects.all()
+        detail_allowed_methods = ['get', 'post', 'put', 'patch', 'delete']
         resource_name = 'product'
 
 

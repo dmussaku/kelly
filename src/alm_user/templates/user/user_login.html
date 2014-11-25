@@ -2,19 +2,19 @@
 {% load i18n %}
 {% block head_title %} Login page {% endblock %}
 {% block content %}
-	<h2>Login </h2>
+    <h2>Login </h2>
     {{message}}
-	<form name="login-form" action="" method="post">
+    <form name="login-form" action="" method="post">
         {% csrf_token %}
         {{ form.errors }}
         {{ form.non_field_errors }}
         <li><label for="id_username">Email: </label>
-	        <input id="id_username" type="text" name="username"/>
+            <input id="id_username" type="text" name="username"/>
         </li>
-	    <li>
+        <li>
             <label for="password">Password: </label>
-    	    <input id="password" type="password" name="password"/>
-		</li>
+            <input id="password" type="password" name="password"/>
+        </li>
         <input name="submit" id="id_submit" type="submit" value="login"/> or <a href="{% url 'password_reset' %}">{{ _("Reset your password") }}</a>
-	</form>
+    </form>
 {% endblock %}

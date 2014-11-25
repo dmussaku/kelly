@@ -13,7 +13,7 @@
             "given_name": "Akerke",
             "sort_string": null,
             "classP": null,
-            "subscription_id": null,
+            "subscription_id": 1,
             "fn": "Akerke Akerke"
             }
     },
@@ -31,7 +31,7 @@
             "given_name": "Nurlan",
             "sort_string": null,
             "classP": null,
-            "subscription_id": null,
+            "subscription_id": 1,
             "fn": "Nurlan Heisenberg"
         }
     },
@@ -49,7 +49,7 @@
             "given_name": "Aliya",
             "sort_string": null,
             "classP": null,
-            "subscription_id": null,
+            "subscription_id": 1,
             "fn": "Aliya Mussina"
         }
     },
@@ -67,7 +67,7 @@
             "given_name": "Daniyar",
             "sort_string": null,
             "classP": null,
-            "subscription_id": null,
+            "subscription_id": 1,
             "fn": "Daniyar Mussakulov"
         }
     },
@@ -75,7 +75,7 @@
         "pk": 1,
         "model": "alm_vcard.tel",
         "fields": {
-            "subscription_id": null,
+            "subscription_id": 1,
             "type": "CELL",
             "vcard": 1,
             "value": "87753591453"

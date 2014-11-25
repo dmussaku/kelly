@@ -137,24 +137,24 @@ class Contact(SubscriptionObject):
     @property
     def name(self):
         if not self.vcard:
-            return 'Unknown'
+            return _('Unknown')
         return self.vcard.fn
 
-    def tel(self, type='cell'):
+    def tel(self, type='CELL'):
         if not self.vcard:
-            return 'Unknown'
-        tel = self.vcard.tel_set.filter(type=type).first()
+            return _('Unknown')
+        tel = self.vcard.tel_set.filter(type=type).first().value
         return tel and tel or None
 
     def mobile(self):
-        if not self.tel(type='cell'):
-            return "Unknown"
-        return self.tel(type='cell')
+        if not self.tel(type='CELL'):
+            return _('Unknown')
+        return self.tel(type='CELL')
 
     def email(self, type='WORK'):
         if not self.vcard:
-            return 'Unknown'
-        email = self.vcard.email_set.filter(type=type).first()
+            return _('Unknown')
+        email = self.vcard.email_set.filter(type=type).first().value
         return email and email or None
 
     def email_work(self):
@@ -166,7 +166,7 @@ class Contact(SubscriptionObject):
         org = self.vcard.org_set.first()
         if not org:
             return _('Unknown organization')
-        return org
+        return org.name
 
     def get_tp(self):
         return dict(self.TYPES_WITH_CAPS).get(self.tp, None)
@@ -263,7 +263,7 @@ class Contact(SubscriptionObject):
         '''
         assert isinstance(contact_ids, (list, tuple)), 'Must be a list'
         if not contact_ids:
-            return false
+            return False
         try:
             share_from = CRMUser.objects.get(id=share_from)
             share_to = CRMUser.objects.get(id=share_to)
@@ -407,6 +407,27 @@ class Contact(SubscriptionObject):
         return c.first()
 
     @classmethod
+    def get_contact_products(cls, contact_id, limit=20, offset=0):
+        """
+            TEST Returns contact products by `contact_id`
+            get it from salescycles by contact
+        """
+        c = Contact.objects.get(pk=contact_id)
+        sales_cycle_ids = c.sales_cycles.values_list('pk', flat=True)
+
+        return Product.objects.filter(sales_cycles__pk__in=sales_cycle_ids)[
+            offset:offset + limit]
+
+    @classmethod
+    def get_contact_activities(cls, contact_id, limit=20, offset=0):
+        """TEST Returns list of activities ordered by date."""
+        c = Contact.objects.get(pk=contact_id)
+        sales_cycle_ids = c.sales_cycles.values_list('pk', flat=True)
+
+        return Activity.objects.filter(sales_cycle_id__in=sales_cycle_ids)\
+            .order_by('-date_created')[offset:offset + limit]
+
+    @classmethod
     def upload_contacts(cls, upload_type, file_obj, save=False):
         """Extracts contacts from source: vcard file or csv file or any
         other file objects. Build queryset from them and save if required.
@@ -437,10 +458,27 @@ class Contact(SubscriptionObject):
     #         What is the structure of csv file ???
     #     """
     #     pass
+    @classmethod
+    def import_contacts_from_vcard(cls, vcard_file):
+        print 'getting to import_contacts models function'
+        try:
+            data_list = vcard_file.read().split('END:VCARD')[:-1]
+            contact_ids=[]
+            for i in range(0, len(data_list)):
+                data_list[i] += 'END:VCARD'
+                print data_list[i]
+                #c = cls.upload_contacts('vcard', data_list[i], save=True)
+                c = cls._upload_contacts_by_vcard(data_list[i])
+                contact_ids.append({'contact_id':c.id, 'name':c.name})
+                print contact_ids
+                #contact_ids.append(Contact.upload_contacts('vcard', data_list[i], save=True).id)
+            return {'success': True, 'contact_ids': contact_ids}
+        except:
+            return {'success': False, 'contact_ids': None}
 
     @classmethod
     def get_contacts_by_last_activity_date(
-            cls, user_id, owned=True, assigned=False, 
+            cls, user_id, owned=True, assigned=False,
             followed=False, include_activities=False, limit=20, offset=0):
         """TEST Returns list of contacts ordered by last activity date.
             Returns:
@@ -1042,6 +1080,7 @@ class Comment(SubscriptionObject):
 
 
 class Share(SubscriptionObject):
+    is_read = models.BooleanField(default=False, blank=False)
     contact = models.ForeignKey(
         Contact, related_name='shares',
         on_delete=models.SET_DEFAULT, default=None)
