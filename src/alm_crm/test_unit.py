@@ -415,8 +415,8 @@ class ResourceTestMixin(object):
     fixtures = ['companies.json', 'services.json', 'users.json',
                 'subscriptions.json',
                 'crmusers.json', 'vcards.json', 'contacts.json',
-                'salescycles.json', 'activities.json', 'products.json',
-                'mentions.json', 'values.json']
+                'salescycles.json', 'products.json', 'values.json',
+                'activities.json', 'mentions.json', 'comments.json']
 
     def get_user(self):
         from alm_user.models import User
@@ -638,10 +638,17 @@ class ActivityResourceTest(ResourceTestMixin, ResourceTestCase):
         self.assertTrue(self.get_list_des['meta']['total_count'] > 0)
 
     def test_get_detail(self):
-        self.assertEqual(
-            self.get_detail_des(self.activity.pk)['title'],
-            self.activity.title
-            )
+        resp_activity = self.get_detail_des(self.activity.pk)
+
+        self.assertEqual(resp_activity['title'], self.activity.title)
+
+        self.assertTrue(len(resp_activity['comments']) > 0)
+        self.assertEqual(len(self.activity.comments.all()),
+                         len(resp_activity['comments']))
+
+        self.assertTrue(len(resp_activity['mentions']) > 0)
+        self.assertEqual(len(self.activity.mentions.all()),
+                         len(resp_activity['mentions']))
 
     def test_create_activity(self):
         sales_cycle = SalesCycle.objects.last()
@@ -665,6 +672,25 @@ class ActivityResourceTest(ResourceTestMixin, ResourceTestCase):
             activity.owner,
             self.user.get_subscr_user(activity.subscription_id)
             )
+
+    def test_create_activity_mentions(self):
+        sales_cycle = SalesCycle.objects.last()
+        post_data = {
+            'title': 'new activity1',
+            'description': 'new activity by test_unit',
+            'sales_cycle': {'pk': sales_cycle.pk},
+            'mention_user_ids': [1, 2]
+        }
+
+        count_activities = sales_cycle.rel_activities.count()
+        count_mentions = Mention.objects.count()
+
+        self.assertHttpCreated(self.api_client.post(
+            self.api_path_activity, format='json', data=post_data))
+
+        self.assertEqual(count_activities + 1,
+                         sales_cycle.rel_activities.count())
+        self.assertEqual(count_mentions + 2, Mention.objects.count())
 
     def test_delete_activity(self):
         sales_cycle = self.activity.sales_cycle
@@ -812,11 +838,22 @@ class ContactResourceTest(ResourceTestMixin, ResourceTestCase):
         self.assertEqual(len(self.deserialize(resp)['objects']),
                          len(Contact.get_contact_products(self.contact.pk)))
 
-    def test_get_activities(self):
+    def test_get_activities_with_embedded_comments(self):
         resp = self.api_client.get(
             self.api_path_contact_activities_f % (self.contact.pk),
             format='json',
             HTTP_HOST='localhost'
             )
-        self.assertEqual(len(self.deserialize(resp)['objects']),
+        activites = self.deserialize(resp)['objects']
+
+        self.assertEqual(len(activites),
                          len(Contact.get_contact_activities(self.contact.pk)))
+
+        # exists at least one comment from activities
+        self.assertTrue(sum(len(a['comments']) for a in activites) > 0)
+
+        for a in activites:
+            self.assertEqual(
+                len(Activity.objects.get(pk=a['id']).comments.all()),
+                len(a['comments'])
+                )

@@ -1,0 +1,277 @@
+[
+    {
+        "pk": 1,
+        "model": "alm_vcard.vcard",
+        "fields": {
+            "family_name": "Kamun",
+            "uid": null,
+            "honorific_suffix": "",
+            "additional_name": "",
+            "rev": null,
+            "honorific_prefix": "",
+            "bday": null,
+            "given_name": "Rustem",
+            "sort_string": null,
+            "classP": null,
+            "subscription_id": 1,
+            "fn": "Rustem Kamun"
+        }
+    },
+    {
+        "pk": 2,
+        "model": "alm_vcard.vcard",
+        "fields": {
+            "family_name": "Heisenberg",
+            "uid": null,
+            "honorific_suffix": "",
+            "additional_name": "Mett",
+            "rev": null,
+            "honorific_prefix": "",
+            "bday": null,
+            "given_name": "Nurlan",
+            "sort_string": null,
+            "classP": null,
+            "subscription_id": 1,
+            "fn": "Nurlan Heisenberg"
+        }
+    },
+    {
+        "pk": 3,
+        "model": "alm_vcard.vcard",
+        "fields": {
+            "family_name": "Mussina",
+            "uid": null,
+            "honorific_suffix": "",
+            "additional_name": "",
+            "rev": null,
+            "honorific_prefix": "",
+            "bday": null,
+            "given_name": "Aliya",
+            "sort_string": null,
+            "classP": null,
+            "subscription_id": 1,
+            "fn": "Aliya Mussina"
+        }
+    },
+    {
+        "pk": 4,
+        "model": "alm_vcard.vcard",
+        "fields": {
+            "family_name": "Mussakulov",
+            "uid": null,
+            "honorific_suffix": "",
+            "additional_name": "",
+            "rev": null,
+            "honorific_prefix": "",
+            "bday": null,
+            "given_name": "Daniyar",
+            "sort_string": null,
+            "classP": null,
+            "subscription_id": 1,
+            "fn": "Daniyar Mussakulov"
+        }
+    },
+    {
+        "pk": 5,
+        "model": "alm_vcard.vcard",
+        "fields": {
+            "family_name": "Kotov",
+            "uid": null,
+            "honorific_suffix": "",
+            "additional_name": "",
+            "rev": null,
+            "honorific_prefix": "",
+            "bday": null,
+            "given_name": "Vadim",
+            "sort_string": null,
+            "classP": null,
+            "subscription_id": 1,
+            "fn": "Kotov Vadim"
+        }
+    },
+    {
+        "pk": 6,
+        "model": "alm_vcard.vcard",
+        "fields": {
+            "family_name": "Lusto",
+            "uid": null,
+            "honorific_suffix": "",
+            "additional_name": "",
+            "rev": null,
+            "honorific_prefix": "",
+            "bday": null,
+            "given_name": "Stass",
+            "sort_string": null,
+            "classP": null,
+            "subscription_id": 1,
+            "fn": "Lusto Stass"
+        }
+    },
+    {
+        "pk": 7,
+        "model": "alm_vcard.vcard",
+        "fields": {
+            "family_name": "Mailubayev",
+            "uid": null,
+            "honorific_suffix": "",
+            "additional_name": "",
+            "rev": null,
+            "honorific_prefix": "",
+            "bday": null,
+            "given_name": "Yernar",
+            "sort_string": null,
+            "classP": null,
+            "subscription_id": 1,
+            "fn": "Yernar Mailubayev"
+        }
+    },
+    {
+        "pk": 8,
+        "model": "alm_vcard.vcard",
+        "fields": {
+            "family_name": "Baitursynov",
+            "uid": null,
+            "honorific_suffix": "",
+            "additional_name": "",
+            "rev": null,
+            "honorific_prefix": "",
+            "bday": null,
+            "given_name": "Dauren",
+            "sort_string": null,
+            "classP": null,
+            "subscription_id": 1,
+            "fn": "Dauren Baitursynov"
+        }
+    },
+    {
+        "pk": 9,
+        "model": "alm_vcard.vcard",
+        "fields": {
+            "family_name": "Omarov",
+            "uid": null,
+            "honorific_suffix": "",
+            "additional_name": "",
+            "rev": null,
+            "honorific_prefix": "",
+            "bday": null,
+            "given_name": "Ashat",
+            "sort_string": null,
+            "classP": null,
+            "subscription_id": 1,
+            "fn": "Ashat Omarov"
+        }
+    },
+    {
+        "pk": 10,
+        "model": "alm_vcard.vcard",
+        "fields": {
+            "family_name": "Abiken",
+            "uid": null,
+            "honorific_suffix": "",
+            "additional_name": "acm_nerd",
+            "rev": null,
+            "honorific_prefix": "",
+            "bday": null,
+            "given_name": "Nurlan",
+            "sort_string": null,
+            "classP": null,
+            "subscription_id": 1,
+            "fn": "Nurlan Abiken"
+        }
+    },
+
+
+    {
+        "pk": 1,
+        "model": "alm_vcard.tel",
+        "fields": {
+            "subscription_id": 1,
+            "type": "CELL",
+            "vcard": 3,
+            "value": "87753591453"
+        }
+    },
+    {
+        "pk": 2,
+        "model": "alm_vcard.tel",
+        "fields": {
+            "subscription_id": 1,
+            "type": "HOME",
+            "vcard": 7,
+            "value": "87078887722"
+        }
+    },
+    {
+        "pk": 3,
+        "model": "alm_vcard.tel",
+        "fields": {
+            "subscription_id": 1,
+            "type": "CELL",
+            "vcard": 2,
+            "value": "87077776633"
+        }
+    },
+
+    {
+        "pk": 1,
+        "model": "alm_vcard.email",
+        "fields": {
+            "subscription_id": 1,
+            "type": "INTERNET",
+            "vcard": 1,
+            "value": "r.kamun@gmail.com"
+        }
+    },
+    {
+        "pk": 2,
+        "model": "alm_vcard.email",
+        "fields": {
+            "subscription_id": 1,
+            "type": "INTERNET",
+            "vcard": 4,
+            "value": "dmussaku@gmail.com"
+        }
+    },
+    {
+        "pk": 3,
+        "model": "alm_vcard.email",
+        "fields": {
+            "subscription_id": 1,
+            "type": "INTERNET",
+            "vcard": 5,
+            "value": "igeeko@gmail.com"
+        }
+    },
+    {
+        "pk": 4,
+        "model": "alm_vcard.email",
+        "fields": {
+            "subscription_id": 1,
+            "type": "INTERNET",
+            "vcard": 6,
+            "value": "sta3@me.com"
+        }
+    },
+    {
+        "pk": 5,
+        "model": "alm_vcard.email",
+        "fields": {
+            "subscription_id": 1,
+            "type": "INTERNET",
+            "vcard": 7,
+            "value": "mafioso@gmail.com"
+        }
+    },
+    {
+        "pk": 6,
+        "model": "alm_vcard.email",
+        "fields": {
+            "subscription_id": 1,
+            "type": "INTERNET",
+            "vcard": 10,
+            "value": "nurlan.abiken@gmail.com"
+        }
+    }
+
+
+]

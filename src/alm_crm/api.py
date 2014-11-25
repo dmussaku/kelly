@@ -1,4 +1,5 @@
 from tastypie import fields
+from tastypie.contrib.contenttypes.fields import GenericForeignKeyField
 from tastypie.resources import ModelResource
 from tastypie.authorization import Authorization
 from django.http import HttpResponse
@@ -9,6 +10,7 @@ from tastypie.authentication import (
     BasicAuthentication,
     )
 from django.conf.urls import url
+from django.contrib.contenttypes.models import ContentType
 from .models import (
     SalesCycle,
     Product,
@@ -18,6 +20,8 @@ from .models import (
     CRMUser,
     Value,
     Feedback,
+    Comment,
+    Mention,
     )
 from almanet.settings import DEFAULT_SERVICE
 import ast
@@ -285,7 +289,7 @@ class ContactResource(CRMServiceModelResource):
         {
             "name": "get_products",
             "http_method": "GET",
-            "resource_type": "list",
+            "resource_type": "view",
             "summary": "get products by contact \
                 (you can get it from salescycle by contact)",
             "fields": {
@@ -306,7 +310,7 @@ class ContactResource(CRMServiceModelResource):
         {
             "name": "get_activities",
             "http_method": "GET",
-            "resource_type": "list",
+            "resource_type": "view",
             "summary": "get latest activities with embeded comments by contact",
             "fields": {
                 "limit": {
@@ -988,6 +992,60 @@ class ActivityResource(CRMServiceModelResource):
                                  'activity_feedback', null=True, full=True)
     owner = fields.ToOneField('alm_crm.api.CRMUserResource',
                               'activity_owner', null=True, full=True)
+    comments = fields.ToManyField(
+        'alm_crm.api.CommentResource',
+        attribute=lambda bundle: Comment.objects.filter(
+            content_type=ContentType.objects.get_for_model(bundle.obj),
+            object_id=bundle.obj.id
+            ),
+        null=True, full=True
+        )
+    mentions = fields.ToManyField(
+        'alm_crm.api.MentionResource',
+        attribute=lambda bundle: Mention.objects.filter(
+            content_type=ContentType.objects.get_for_model(bundle.obj),
+            object_id=bundle.obj.id
+            ),
+        null=True, full=True
+        )
+
+    def save(self, bundle, skip_errors=False):
+        """
+        method was overrided,
+        because we work with GenericRelation,
+        it is not like a ManyToManyRelation.
+        So, we can't use save_m2m,
+        because before call it we should
+        add GenericRelation instance to bundle.obj,
+        but we can't create GenericRelation instance without pk of bundle.obj
+        """
+        bundle = super(self.__class__, self).save(bundle, skip_errors)
+
+        if bundle.data.get('mention_user_ids'):
+            user_ids = bundle.data.get('mention_user_ids')
+            for uid in user_ids:
+                bundle.obj.mentions.add(
+                    Mention.build_new(user_id=uid,
+                                      content_class=bundle.obj,
+                                      object_id=bundle.obj.pk,
+                                      save=True)
+                    )
+
+        return bundle
+
+    # def hydrate(self, bundle):
+    #     # Don't change existing slugs.
+    #     # In reality, this would be better implemented at the ``Note.save``
+    #     # level, but is for demonstration.
+    #     # if not bundle.obj.pk:
+    #     #     bundle.obj.slug = slugify(bundle.data['title'])
+
+    #     if bundle.data.get('mention_user_ids'):
+    #         user_ids = bundle.data.get('mention_user_ids')
+    #         for uid in user_ids:
+
+
+    #     return bundle
 
     class Meta(CRMServiceModelResource.Meta):
         queryset = Activity.objects.all()
@@ -1059,3 +1117,30 @@ class FeedbackResource(CRMServiceModelResource):
     class Meta(CRMServiceModelResource.Meta):
         queryset = Feedback.objects.all()
         resource_name = 'feedback'
+
+
+class CommentResource(CRMServiceModelResource):
+    content_object = GenericForeignKeyField({
+        Activity: ActivityResource,
+        Contact: ContactResource,
+        Share: ShareResource,
+        Feedback: FeedbackResource
+    }, 'content_object')
+
+    class Meta(CRMServiceModelResource.Meta):
+        queryset = Comment.objects.all()
+        resource_name = 'comment'
+
+
+class MentionResource(CRMServiceModelResource):
+    content_object = GenericForeignKeyField({
+        Contact: ContactResource,
+        SalesCycle: SalesCycleResource,
+        Activity: ActivityResource,
+        Feedback: FeedbackResource,
+        Comment: CommentResource,
+    }, 'content_object')
+
+    class Meta(CRMServiceModelResource.Meta):
+        queryset = Mention.objects.all()
+        resource_name = 'mention'
