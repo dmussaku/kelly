@@ -1,0 +1,46 @@
+[
+    {
+        "pk":1,
+        "model":"alm_crm.Product",
+        "fields": {
+            "name":"p1: Microsoft Office 360",
+            "description":"Microsoft Office 360 is your new Office in everyplace where you are.",
+            "price":8900,
+            "currency":"KZT",
+            "owner": 1
+        }
+    },
+    {
+        "pk":2,
+        "model":"alm_crm.Product",
+        "fields": {
+            "name":"p2: 1C Online (monthly)",
+            "description":"1C Online - monthly subscription",
+            "price":3000,
+            "currency":"KZT",
+            "owner": 1
+        }
+    },
+    {
+        "pk":3,
+        "model":"alm_crm.Product",
+        "fields": {
+            "name":"p2: 1C Online (year)",
+            "description":"1C Online - year subscription",
+            "price":25000,
+            "currency":"KZT",
+            "owner": 1
+        }
+    },
+    {
+        "pk":4,
+        "model":"alm_crm.Product",
+        "fields": {
+            "name":"p2: Paragraph Online",
+            "description":"Paragraph Online is product for lawyers",
+            "price":59000,
+            "currency":"KZT",
+            "owner": 1
+        }
+    }
+]
