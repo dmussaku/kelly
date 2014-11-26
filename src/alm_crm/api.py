@@ -14,6 +14,7 @@ from .models import (
     Product,
     Activity,
     Contact,
+    ContactList,
     Share,
     CRMUser,
     Value,
@@ -732,5 +733,8 @@ class ContactListResource(CRMServiceModelResource):
     class Meta(object):
         queryset = ContactList.objects.all()
         resource_name = 'contact_list'
+
+
         
+
             

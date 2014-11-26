@@ -13,7 +13,8 @@ from alm_crm.models import (
     Feedback,
     Value,
     Comment,
-    Share
+    Share, 
+    ContactList
     )
 from alm_vcard.models import VCard, Tel, Email, Org
 from alm_user.models import User
@@ -545,26 +546,33 @@ class SalesCycleTestCase(TestCase):
         self.assertEqual(list(ret.values_list('pk', flat=True)), [1, 2, 3, 4])
 
 
-class ContactListTestCase(TestCase):
-    fixtures = ['crmusers.json', 'contactlist.json', 'users.json']
+# class ContactListTestCase(TestCase):
+#     fixtures = ['crmusers.json', 'contactlist.json', 'users.json']
 
-    def setUp(self):
-        super(self.__class__, self).setUp()
+#     def setUp(self):
+#         super(self.__class__, self).setUp()
 
-    def test_add_user(self):
-        pass
+#     def test_create_contact_list(self):
+#         contact_list = ContactList(title = 'UNREGISTERED')
+#         self.assertEqual(contact_list, 'UNREGISTERED')
 
-    def test_add_users(self):
-        pass
+#     def test_add_user(self):
+#         pass
 
-    def test_check_user(self):
-        pass
+#     def test_user_contact_lists(self):
+#         pass
 
-    def test_delete_user(self):
-        pass
+#     def test_add_users(self):
+#         pass
 
-    def test_count(self):
-        pass
+#     def test_check_user(self):
+#         pass
+
+#     def test_delete_user(self):
+#         pass
+
+#     def test_count(self):
+#         pass
 
 
 class ResourceTestMixin(object):

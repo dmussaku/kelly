@@ -1165,16 +1165,24 @@ class ContactList(SubscriptionObject):
     def __unicode__(self):
         return self.title
 
-    def add_user(self, user_id):
-        return self.add_users([user_id])
+    def check_user(self, user_id):
+        try:
+            crm_user = self.users.get(user_id=user_id)
+            if  crm_user != None:
+                return True
+            else:
+                return False
+        except CRMUser.DoesNotExist:
+            return False
+
 
     def add_users(self, user_ids):
         assert isinstance(user_ids, (tuple, list)), 'must be a list'
         status = []
         for user_id in user_ids:
             try:
-                if check_user(user_id) == False:
-                    crm_user = CRMUser.objects.get(id=user_id)
+                crm_user = CRMUser.objects.get(id=user_id)
+                if self.check_user(user_id=user_id) == False:
                     self.users.add(crm_user)
                     status.append(True)
                 else:
@@ -1183,12 +1191,8 @@ class ContactList(SubscriptionObject):
                 status.append(False)
         return status
 
-    def check_user(self, user_id):
-        crm_user = CRMUser.objects.get(id=user_id)
-        if self.users.get(crm_user):
-            return True
-        else:
-            return False
+    def add_user(self, user_id):
+        return self.add_users([user_id])
 
     def delete_user(self, user_id):
         status = False
@@ -1197,7 +1201,7 @@ class ContactList(SubscriptionObject):
             try:
                 self.users.remove(crm_user)
                 status = True
-            except DoesNotExist:
+            except CRMUser.DoesNotExist:
                 status = False
         else:
             return False
