@@ -1000,7 +1000,54 @@ class ActivityResource(CRMServiceModelResource):
     I{URL}:  U{alma.net/api/v1/activity}
 
     B{Description}:
-    API resource to manage Activities
+    API resource to manage SalesCycle's Activities
+
+    @return:  activities
+    >>> 'objects': [
+    ... {
+    ...     'id': 1,
+    ...     'resource_uri': '/api/v1/activity/1/',
+    ...     'title': 't1',
+    ...     'description': 'd1'
+    ...     'sales_cycle': '/api/v1/sales_cycle/1/',
+    ...     'owner': None,
+    ...     'feedback': None,
+    ...     'date_edited': True,
+    ...     'date_created': '2014-09-11T00:00:00',
+    ...     'subscription_id': None,
+    ...     'mention_users': [
+    ...         {
+    ...             'organization_id': 1,
+    ...             'user_id': 1,
+    ...             'is_supervisor': False,
+    ...             'subscription_id': 1,
+    ...             'id': 1,
+    ...             'resource_uri': '/api/v1/crmuser/1/'
+    ...         }
+    ...     ],
+    ...     'comments': [
+    ...         {
+    ...             'comment': 'Test comment 1',
+    ...             'object_id': 1,
+    ...             'content_object': '/api/v1/activity/1/',
+    ...             'date_created': '2014-09-11T00:00:00.253000',
+    ...             'subscription_id': None,
+    ...             'resource_uri': '',
+    ...             'id': 1,
+    ...             'date_edited': '2014-09-11T00:00:00.253000'
+    ...         }, {
+    ...             'comment': 'Test comment 2',
+    ...             'object_id': 1,
+    ...             'content_object': '/api/v1/activity/1/',
+    ...             'date_created': '2014-09-11T00:00:00.253000',
+    ...             'subscription_id': None,
+    ...             'resource_uri': '',
+    ...             'id': 2,
+    ...             'date_edited': '2014-09-11T00:00:00.253000'
+    ...         }
+    ...     ],
+    ... }
+    ... ]
     """
 
     sales_cycle = fields.ForeignKey(SalesCycleResource, 'sales_cycle')
