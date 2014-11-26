@@ -1150,3 +1150,66 @@ def get_mentions(user_id=None, content_class=None, object_id=None):
     return Mention.objects.filter(user_id=user_id,
                                   content_type=cttype,
                                   object_id=object_id)
+
+
+
+class ContactList(SubscriptionObject):
+    title = models.CharField(max_length=150)
+    users = models.ManyToManyField(CRMUser, related_name='contact_list',
+                                                 null=True, blank=True)
+
+    class Meta:
+        verbose_name = _('contact_list')
+        db_table = settings.DB_PREFIX.format('contact_list')
+
+    def __unicode__(self):
+        return self.title
+
+    def add_user(self, user_id):
+        return self.add_users([user_id])
+
+    def add_users(self, user_ids):
+        assert isinstance(user_ids, (tuple, list)), 'must be a list'
+        status = []
+        for user_id in user_ids:
+            try:
+                if check_user(user_id) == False:
+                    crm_user = CRMUser.objects.get(id=user_id)
+                    self.users.add(crm_user)
+                    status.append(True)
+                else:
+                    status.append(False)
+            except CRMUser.DoesNotExist:
+                status.append(False)
+        return status
+
+    def check_user(self, user_id):
+        crm_user = CRMUser.objects.get(id=user_id)
+        if self.users.get(crm_user):
+            return True
+        else:
+            return False
+
+    def delete_user(self, user_id):
+        status = False
+        if self.check_user(user_id):
+            crm_user = CRMUser.objects.get(id=user_id)
+            try:
+                self.users.remove(crm_user)
+                status = True
+            except DoesNotExist:
+                status = False
+        else:
+            return False
+        
+        return status
+
+
+    def count(self):
+        return self.users.count()
+
+
+
+
+    
+        

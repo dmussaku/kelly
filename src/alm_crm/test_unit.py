@@ -545,6 +545,28 @@ class SalesCycleTestCase(TestCase):
         self.assertEqual(list(ret.values_list('pk', flat=True)), [1, 2, 3, 4])
 
 
+class ContactListTestCase(TestCase):
+    fixtures = ['crmusers.json', 'contactlist.json', 'users.json']
+
+    def setUp(self):
+        super(self.__class__, self).setUp()
+
+    def test_add_user(self):
+        pass
+
+    def test_add_users(self):
+        pass
+
+    def test_check_user(self):
+        pass
+
+    def test_delete_user(self):
+        pass
+
+    def test_count(self):
+        pass
+
+
 class ResourceTestMixin(object):
     fixtures = ['companies.json', 'services.json', 'users.json',
                 'subscriptions.json',

@@ -1,0 +1,48 @@
+BEGIN:VCARD
+VERSION:3.0
+ADR;TYPE=WORK:050001;Tolebi 1\, 12\, 14;Tole bi;;Almaty;050001;Kazakhstan
+ADR;TYPE=dom:1;1;1;;1;1;1
+BDAY:20120202
+CLASS:manager
+EMAIL;TYPE=INTERNET:aslan.mukatayev@gmail.com
+FN:Aliya
+N:Mukatayev;Aslan;A;Mr;
+ORG:Almacloud;LLC
+ROLE:sales manager
+ROLE:sales supervisor
+TEL;TYPE=cell:87077101020
+TEL;TYPE=WORK:87012032022
+TZ:UTC
+END:VCARD
+BEGIN:VCARD
+VERSION:3.0
+ADR;TYPE=WORK:050001;Tolebi 1\, 12\, 14;Tole bi;;Almaty;050001;Kazakhstan
+ADR;TYPE=dom:1;1;1;;1;1;1
+BDAY:20120202
+CLASS:manager
+EMAIL;TYPE=INTERNET:serik.mukatayev@gmail.com
+FN:Aliya
+N:Mukatayev;Serik;A;Mr;
+ORG:Almacloud;LLC
+ROLE:sales manager
+ROLE:sales supervisor
+TEL;TYPE=cell:87772002222
+TEL;TYPE=WORK:87472245224
+TZ:UTC
+END:VCARD
+BEGIN:VCARD
+VERSION:3.0
+ADR;TYPE=WORK:050001;Tolebi 1\, 12\, 14;Tole bi;;Almaty;050001;Kazakhstan
+ADR;TYPE=dom:1;1;1;;1;1;1
+BDAY:20120202
+CLASS:manager
+EMAIL;TYPE=INTERNET:almat.mukatayev@gmail.com
+FN:Aliya
+N:Mukatayev;Almat;A;Mr;
+ORG:Almacloud;LLC
+ROLE:sales manager
+ROLE:sales supervisor
+TEL;TYPE=cell:87470020202
+TEL;TYPE=WORK:87775025555
+TZ:UTC
+END:VCARD

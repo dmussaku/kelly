@@ -723,3 +723,14 @@ class FeedbackResource(CRMServiceModelResource):
     class Meta(CRMServiceModelResource.Meta):
         queryset = Feedback.objects.all()
         resource_name = 'feedback'
+
+
+class ContactListResource(CRMServiceModelResource):
+    users = fields.ToManyField('alm_crm.api.CRMUserResource',
+                                   'contact_list', null=True, full=True)
+
+    class Meta(object):
+        queryset = ContactList.objects.all()
+        resource_name = 'contact_list'
+        
+            
