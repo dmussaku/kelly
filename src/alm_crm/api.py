@@ -727,14 +727,31 @@ class FeedbackResource(CRMServiceModelResource):
 
 
 class ContactListResource(CRMServiceModelResource):
-    users = fields.ToManyField('alm_crm.api.CRMUserResource',
-                                   'contact_list', null=True, full=True)
+    users = fields.ToManyField('alm_crm.api.CRMUserResource', 'users',
+                                   related_name = 'contact_list', null=True, full=True)
 
-    class Meta(object):
+    class Meta(CRMServiceModelResource.Meta):
         queryset = ContactList.objects.all()
         resource_name = 'contact_list'
 
+    def prepend_urls(self):
+        return [
+            url(
+                r"^(?P<resource_name>%s)/(?P<id>\d+)/users%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('get_users'),
+                name='api_get_users'
+            )
+        ]
 
-        
+    def get_users(self, request, **kwargs):
+        contact_list_id = kwargs.get('id')
+        users = ContactList.objects.get(id=contact_list_id).users.all()
+        crm_user_resource = CRMUserResource()
+        obj_dict = {}
+        obj_dict['objects'] = crm_user_resource.get_bundle_list(users,
+                                                               request)
+        return self.create_response(request, obj_dict)
+
 
             

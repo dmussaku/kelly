@@ -1175,6 +1175,9 @@ class ContactList(SubscriptionObject):
         except CRMUser.DoesNotExist:
             return False
 
+        
+    def get_contact_list_users(self, limit=20, offset=0):
+        return self.users.all()[offset:offset + limit]
 
     def add_users(self, user_ids):
         assert isinstance(user_ids, (tuple, list)), 'must be a list'

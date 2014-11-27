@@ -177,6 +177,8 @@ class BaseConfiguration(SubdomainConfiguration, Configuration):
         'django.template.loaders.app_directories.Loader',
     )
 
+    TASTYPIE_DEFAULT_FORMATS = ['json']
+
     TEMPLATE_CONTEXT_PROCESSORS = (
         'django.core.context_processors.debug',
         'django.core.context_processors.i18n',

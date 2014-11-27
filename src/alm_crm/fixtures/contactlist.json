@@ -9,5 +9,25 @@
         ], 
         "title": "ALMA Cloud"
     }
+},
+{
+    "pk": 2, 
+    "model": "alm_crm.contactlist", 
+    "fields": {
+        "subscription_id": null, 
+        "users": [
+            2
+        ], 
+        "title": "Arta"
+    }
+},
+{
+    "pk": 3, 
+    "model": "alm_crm.contactlist", 
+    "fields": {
+        "subscription_id": null, 
+        "users": [], 
+        "title": "NASA"
+    }
 }
 ]
