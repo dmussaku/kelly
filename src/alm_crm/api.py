@@ -44,7 +44,7 @@ class CRMServiceModelResource(ModelResource):
                 user_env['subscriptions'])[0]
             bundle.obj.owner = bundle.request.user.get_subscr_user(
                 bundle.obj.subscription_pk)
-
+        print bundle
         return bundle
 
     def get_bundle_list(self, obj_list, request):
@@ -105,35 +105,76 @@ class ContactResource(CRMServiceModelResource):
     vcard = fields.ToOneField('alm_vcard.api.VCardResource', 'vcard',
                               null=True, full=True)
     owner = fields.ToOneField('alm_crm.api.CRMUserResource', 'owner',
-                              null=True, full=True)
+                              null=True, full=False)
     followers = fields.ToManyField('alm_crm.api.CRMUserResource', 'followers',
-                                   null=True, full=True)
+                                   null=True, full=False)
     assignees = fields.ToManyField('alm_crm.api.CRMUserResource', 'assignees',
-                                   null=True, full=True)
+                                   null=True, full=False)
     sales_cycles = fields.ToManyField(
         'alm_crm.api.SalesCycleResource', 'sales_cycles',
-        related_name='contact', null=True, full=True)
+        related_name='contact', null=True, full=False)
 
     class Meta(CRMServiceModelResource.Meta):
         queryset = Contact.objects.all()
         resource_name = 'contact'
-
+    
     def post_list(self, request, **kwargs):
-        """
-        GET Method 
+        '''
+        POST METHOD
         I{URL}:  U{alma.net:8000/api/v1/contact/}
-        
+    
         Description
-        Api for Contact model
+        Api function for contact creation. It creates contact and vcard objects,
+        plust it creates a Share objects, so that the user could see that Contact
+        in his feed.
 
-        @type  limit: number
-        @param limit: The limit of results, 20 by default.
-        @type  offset: number
-        @param offset: The offset of results, 0 by default
+        @type  vcard: dictionary object
+        @param vcard: Vcard resource object, look at /api/v1/vcard/ for variable
+            names
 
-        @return:  contacts
-        """
-        return super(self.__class__, self).post_list(request)
+        @return:  status 201
+        
+        >>> example POST payload
+        ... {
+        ...  "owner": "/api/v1/crmuser/1/",
+        ...  "vcard": {
+        ...      "given_name":"Barry",
+        ...      "family_name":"Allen"
+        ...      },
+        ...  "comment": "Met this contact on conference"
+        ...  } 
+
+        '''
+        return super(self.__class__, self).post_list(request, **kwargs)
+        
+    def save(self, bundle, skip_errors=False):
+        self.is_valid(bundle)
+
+        if bundle.errors and not skip_errors:
+            raise ImmediateHttpResponse(response=self.error_response(bundle.request, bundle.errors))
+
+        # Check if they're authorized.
+        if bundle.obj.pk:
+            self.authorized_update_detail(self.get_object_list(bundle.request), bundle)
+        else:
+            self.authorized_create_detail(self.get_object_list(bundle.request), bundle)
+
+        # Save FKs just in case.
+        self.save_related(bundle)
+
+        #If Contact is saved with a small note/comment
+        # Save the main object.
+        try:
+            comment = bundle.data['comment']
+            bundle.obj.save(**{'comment':comment})
+        except KeyError:
+            bundle.obj.save()
+        bundle.objects_saved.add(self.create_identifier(bundle.obj))
+
+        # Now pick up the M2M bits.
+        m2m_bundle = self.hydrate_m2m(bundle)
+        self.save_m2m(m2m_bundle)
+        return bundle
 
 
     def prepend_urls(self):
