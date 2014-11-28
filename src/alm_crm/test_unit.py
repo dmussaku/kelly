@@ -18,6 +18,7 @@ from alm_crm.models import (
     )
 from alm_vcard.models import VCard, Tel, Email, Org
 from alm_user.models import User
+from django.core import serializers
 
 
 class CRMUserTestCase(TestCase):
@@ -1328,16 +1329,92 @@ class ContactListResourceTest(ResourceTestMixin, ResourceTestCase):
         self.assertEqual(user.contact_list.count(), count + 1)
         self.assertEqual(ContactList.objects.last().title, 'Mobiliuz')
 
-    def test_delete_user_from_contact_list(self):
-        pass
+    def test_delete_contact_list(self):
+        count = ContactList.objects.count()
+        contact_list = ContactList.objects.last()
+        self.assertHttpAccepted(self.api_client.delete(
+            self.api_path_contact_list + '%s/' % contact_list.pk, format='json'))
+        # verify that one sales_cycle has been deleted.
+        self.assertEqual(ContactList.objects.count(), count - 1)
+        count = count - 1
+        self.assertHttpAccepted(self.api_client.delete(
+            self.api_path_contact_list + '%s/' % self.contact_list.pk, format='json'))
+        self.assertEqual(ContactList.objects.count(), count - 1)
 
-    def test_add_user(self):
-        pass
+
+    def test_delete_user_from_contact_list(self):
+        api_path_delete_user = self.api_path_contact_list+'%s/delete_user/' % self.contact_list.pk
+        user_id = self.contact_list.users.first().id 
+        count = self.contact_list.users.all().count()
+        self.assertHttpOK(self.api_client.get(api_path_delete_user+'?user_id=%d'%user_id))
+        self.assertEqual(self.contact_list.users.all().count(), count-1)
+        self.assertHttpOK(self.api_client.get(api_path_delete_user+'?user_id=%d'%user_id))
+        self.assertEqual(self.contact_list.users.all().count(), count-1)
 
     def test_add_users(self):
-        pass
+        user = CRMUser.objects.get(pk=3)
+        user3 = CRMUser.objects.get(pk=2)
+        user4 = CRMUser.objects.get(pk=1)
+        users = [user.pk, user3.pk, user4.pk]
 
-    def test_delete_contact_list(self):
-        pass
+        api_path_add_user = self.api_path_contact_list+'%s/add_users/' % self.contact_list.pk
+        count = self.contact_list.users.all().count()
 
+        self.assertHttpOK(self.api_client.get(api_path_add_user+'?user_ids=%s'%[user.pk]))
+        self.assertEqual(self.contact_list.users.all().count(), count+1)
+
+        self.assertHttpOK(self.api_client.get(api_path_add_user+'?user_ids=%s'%[user.pk]))
+        self.assertEqual(self.contact_list.users.all().count(), count+1)
+
+        count = count+1
+        self.assertHttpOK(self.api_client.get(api_path_add_user+'?user_ids=%s'%users))
+        self.assertEqual(self.contact_list.users.all().count(), count+1)
+
+        contact_list2 = ContactList(title='HP Webcam')
+        contact_list2.save()
+        count = contact_list2.users.all().count()
+        api_path_add_user = self.api_path_contact_list+'%s/add_users/' % contact_list2.pk
+
+        self.assertHttpOK(self.api_client.post(api_path_add_user+'?user_ids=%s'%users))
+        self.assertEqual(contact_list2.users.all().count(), count+3)
+
+    def test_check_user(self):
+        user = CRMUser.objects.get(pk=1)
+        user2 = CRMUser.objects.get(pk=2)
+
+        api_path_check_user = self.api_path_contact_list+'%s/check_user/?user_id=%s' % \
+                                                            (self.contact_list.pk, user.pk)
+
+        get_list_check_user_resp = self.api_client.get(api_path_check_user, 
+                                                                            format='json',
+                                                                            HTTP_HOST='localhost')
+
+        get_list_check_user_des = self.deserialize(get_list_check_user_resp)
+        self.assertTrue(get_list_check_user_des['success'])
+
+        api_path_check_user = self.api_path_contact_list+'%s/check_user/?user_id=%s' % \
+                                                            (self.contact_list.pk, user2.pk)
+
+        get_list_check_user_resp = self.api_client.get(api_path_check_user, 
+                                                                            format='json',
+                                                                            HTTP_HOST='localhost')
+
+        get_list_check_user_des = self.deserialize(get_list_check_user_resp)
+        self.assertFalse(get_list_check_user_des['success'])
+
+    def test_get_users(self):
+        user = CRMUser.objects.get(pk=1)
+
+        api_path_get_user = self.api_path_contact_list+'%s/users/' % \
+                                                            self.contact_list.pk
+
+        get_list_get_user_resp = self.api_client.get(api_path_get_user, 
+                                                                            format='json',
+                                                                            HTTP_HOST='localhost')
+
+        get_list_get_user_des = self.deserialize(get_list_get_user_resp)
+
+        users = self.contact_list.users.all()
+        self.assertEqual(get_list_get_user_des['objects'][0]['user_id'], users.first().user_id)
+        self.assertEqual(get_list_get_user_des['objects'][0]['id'], users.first().id)
 
