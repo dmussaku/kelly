@@ -729,6 +729,44 @@ class FeedbackResource(CRMServiceModelResource):
 class ContactListResource(CRMServiceModelResource):
     users = fields.ToManyField('alm_crm.api.CRMUserResource', 'users',
                                    related_name = 'contact_list', null=True, full=True)
+    """
+    GET Method 
+    I{URL}:  U{alma.net/api/v1/contact}
+    
+    Description
+    Api function to return contacts lists 
+    @type  limit: number
+    @param limit: The limit of results, 20 by default.
+    @type  offset: number
+    @param offset: The offset of results, 0 by default
+    @return:  contacts
+    >>> "objects": [
+            {
+              "id": 1,
+              "resource_uri": "/api/v1/contact_list/1/",
+              "subscription_id": null,
+              "title": "ALMA Cloud",
+              "users": [
+                {
+                  "id": 1,
+                  "is_supervisor": false,
+                  "organization_id": 1,
+                  "resource_uri": "/api/v1/crmuser/1/",
+                  "subscription_id": 1,
+                  "user_id": 1
+                },
+                {
+                  "id": 2,
+                  "is_supervisor": false,
+                  "organization_id": 1,
+                  "resource_uri": "/api/v1/crmuser/2/",
+                  "subscription_id": 1,
+                  "user_id": 2
+                }
+              ]
+            }
+          ]
+    """
 
     class Meta(CRMServiceModelResource.Meta):
         queryset = ContactList.objects.all()
@@ -805,6 +843,44 @@ class ContactListResource(CRMServiceModelResource):
         ]
 
     def get_users(self, request, **kwargs):
+    """
+    GET Method 
+    I{URL}:  U{alma.net/api/v1/contact/:id/users}
+    
+    Description
+    Api function to return the contacts list users
+    @type  limit: number
+    @param limit: The limit of results, 20 by default.
+    @type  offset: number
+    @param offset: The offset of results, 0 by default
+    @return:  contacts
+    >>> "objects": [
+            {
+              "id": 1,
+              "resource_uri": "/api/v1/contact_list/1/",
+              "subscription_id": null,
+              "title": "ALMA Cloud",
+              "users": [
+                {
+                  "id": 1,
+                  "is_supervisor": false,
+                  "organization_id": 1,
+                  "resource_uri": "/api/v1/crmuser/1/",
+                  "subscription_id": 1,
+                  "user_id": 1
+                },
+                {
+                  "id": 2,
+                  "is_supervisor": false,
+                  "organization_id": 1,
+                  "resource_uri": "/api/v1/crmuser/2/",
+                  "subscription_id": 1,
+                  "user_id": 2
+                }
+              ]
+            }
+          ]
+    """
         try:
             contact_list = ContactList.objects.get(id=kwargs.get('id'))
             limit = int(request.GET.get('limit', 20))
