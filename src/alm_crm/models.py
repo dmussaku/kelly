@@ -123,12 +123,23 @@ class Contact(SubscriptionObject):
         db_table = settings.DB_PREFIX.format('contact')
 
     def __unicode__(self):
-        return "%s %s" % (self.vcard.fn, self.tp)
+        try:
+            return "%s %s" % (self.vcard.fn, self.tp)
+        except:
+            return "No name %s " %(self.tp)
 
     def save(self, **kwargs):
+        is_new = self.pk is None
+        try:
+            comment = kwargs['comment']
+            del kwargs['comment']
+        except KeyError:
+            comment = None
         if not self.subscription_id and self.owner:
             self.subscription_id = self.owner.subscription_id
-        super(Contact, self).save(**kwargs)
+        super(self.__class__, self).save(**kwargs)
+        if is_new:
+            self.share_contact(self.owner.id, self.owner.id, self.pk, comment)
 
     @property
     def last_contacted(self):
@@ -1135,8 +1146,8 @@ def on_activity_delete(sender, instance=None, **kwargs):
 signals.post_delete.connect(on_activity_delete, sender=Activity)
 
 
-signals.post_save.connect(
-    Contact.create_contact_on_vcard_create, sender=VCard)
+# signals.post_save.connect(
+#     Contact.create_contact_on_vcard_create, sender=VCard)
 
 
 '''

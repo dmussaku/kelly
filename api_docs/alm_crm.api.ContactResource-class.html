@@ -14,9 +14,6 @@
 <table class="navbar" border="0" width="100%" cellpadding="0"
        bgcolor="#a0c0ff" cellspacing="0">
   <tr valign="middle">
-  <!-- Home link -->
-      <th>&nbsp;&nbsp;&nbsp;<a
-        href="alm_crm.api-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
 
   <!-- Tree link -->
       <th>&nbsp;&nbsp;&nbsp;<a
@@ -66,10 +63,9 @@ tastypie.resources.ModelResource --+
 </pre>
 
 <hr />
-<p>GET Method <i>URL</i>:  <a href="http://alma.net/api/v1/contact" 
-  target="_top">alma.net/api/v1/contact</a></p>
-  <p>Description Api function to return contacts filtered by the last 
-  contact date</p>
+<p>GET Method <i>URL</i>:  <a href="http://alma.net:8000/api/v1/contact/"
+  target="_top">alma.net:8000/api/v1/contact/</a></p>
+  <p>Description Api for Contact model</p>
 
 <!-- ==================== NESTED CLASSES ==================== -->
 <a name="section-NestedClasses"></a>
@@ -113,6 +109,45 @@ tastypie.resources.ModelResource --+
     </table>
   </td>
 </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="alm_crm.api.ContactResource-class.html#post_list" class="summary-sig-name">post_list</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">request</span>,
+        <span class="summary-sig-arg">**kwargs</span>)</span><br />
+      POST METHOD <i>URL</i>:  <a 
+      href="http://alma.net:8000/api/v1/contact/" 
+      target="_top">alma.net:8000/api/v1/contact/</a></td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="alm_crm.api-pysrc.html#ContactResource.post_list">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="save"></a><span class="summary-sig-name">save</span>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">bundle</span>,
+        <span class="summary-sig-arg">skip_errors</span>=<span class="summary-sig-default">False</span>)</span></td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="alm_crm.api-pysrc.html#ContactResource.save">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
@@ -400,7 +435,7 @@ full= True)">fields.ToOneField('alm_vcard.api.VCardResource', 'vcar<code class="
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
         <a href="alm_crm.api.ContactResource-class.html#owner" class="summary-name">owner</a> = <code title="fields.ToOneField('alm_crm.api.CRMUserResource', 'owner', null= True, \
-full= True)">fields.ToOneField('alm_crm.api.CRMUserResource', 'owne<code class="variable-ellipsis">...</code></code>
+full= False)">fields.ToOneField('alm_crm.api.CRMUserResource', 'owne<code class="variable-ellipsis">...</code></code>
     </td>
   </tr>
 <tr>
@@ -408,7 +443,7 @@ full= True)">fields.ToOneField('alm_crm.api.CRMUserResource', 'owne<code class="
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
         <a href="alm_crm.api.ContactResource-class.html#followers" class="summary-name">followers</a> = <code title="fields.ToManyField('alm_crm.api.CRMUserResource', 'followers', null= T\
-rue, full= True)">fields.ToManyField('alm_crm.api.CRMUserResource', <code class="variable-ellipsis">...</code></code>
+rue, full= False)">fields.ToManyField('alm_crm.api.CRMUserResource', <code class="variable-ellipsis">...</code></code>
     </td>
   </tr>
 <tr>
@@ -416,7 +451,7 @@ rue, full= True)">fields.ToManyField('alm_crm.api.CRMUserResource', <code class=
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
         <a href="alm_crm.api.ContactResource-class.html#assignees" class="summary-name">assignees</a> = <code title="fields.ToManyField('alm_crm.api.CRMUserResource', 'assignees', null= T\
-rue, full= True)">fields.ToManyField('alm_crm.api.CRMUserResource', <code class="variable-ellipsis">...</code></code>
+rue, full= False)">fields.ToManyField('alm_crm.api.CRMUserResource', <code class="variable-ellipsis">...</code></code>
     </td>
   </tr>
 <tr>
@@ -424,7 +459,7 @@ rue, full= True)">fields.ToManyField('alm_crm.api.CRMUserResource', <code class=
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
         <a href="alm_crm.api.ContactResource-class.html#sales_cycles" class="summary-name">sales_cycles</a> = <code title="fields.ToManyField('alm_crm.api.SalesCycleResource', 'sales_cycles', r\
-elated_name= 'contact', null= True, full= True)">fields.ToManyField('alm_crm.api.SalesCycleResou<code class="variable-ellipsis">...</code></code>
+elated_name= 'contact', null= True, full= False)">fields.ToManyField('alm_crm.api.SalesCycleResou<code class="variable-ellipsis">...</code></code>
     </td>
   </tr>
 <tr>
@@ -460,6 +495,48 @@ elated_name= 'contact', null= True, full= True)">fields.ToManyField('alm_crm.api
   </td>
 </tr>
 </table>
+<a name="post_list"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">post_list</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">request</span>,
+        <span class="sig-arg">**kwargs</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="alm_crm.api-pysrc.html#ContactResource.post_list">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>POST METHOD <i>URL</i>:  <a 
+  href="http://alma.net:8000/api/v1/contact/" 
+  target="_top">alma.net:8000/api/v1/contact/</a></p>
+  <p>Description Api function for contact creation. It creates contact and 
+  vcard objects, plust it creates a Share objects, so that the user could 
+  see that Contact in his feed.</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>vcard</code></strong> (dictionary object) - Vcard resource object, look at /api/v1/vcard/ for variable names</li>
+    </ul></dd>
+    <dt>Returns:</dt>
+        <dd>status 201
+<pre class="py-doctest">
+<span class="py-prompt">&gt;&gt;&gt; </span>example POST payload
+<span class="py-more">... </span>{
+<span class="py-more">... </span> <span class="py-string">&quot;owner&quot;</span>: <span class="py-string">&quot;/api/v1/crmuser/1/&quot;</span>,
+<span class="py-more">... </span> <span class="py-string">&quot;vcard&quot;</span>: {
+<span class="py-more">... </span>     <span class="py-string">&quot;given_name&quot;</span>:<span class="py-string">&quot;Barry&quot;</span>,
+<span class="py-more">... </span>     <span class="py-string">&quot;family_name&quot;</span>:<span class="py-string">&quot;Allen&quot;</span>
+<span class="py-more">... </span>     },
+<span class="py-more">... </span> <span class="py-string">&quot;comment&quot;</span>: <span class="py-string">&quot;Met this contact on conference&quot;</span>
+<span class="py-more">... </span> }</pre></dd>
+  </dl>
+</td></tr></table>
+</div>
 <a name="get_last_contacted"></a>
 <div>
 <table class="details" border="1" cellpadding="3"
@@ -498,7 +575,8 @@ elated_name= 'contact', null= True, full= True)">fields.ToManyField('alm_crm.api
     <dt>Returns:</dt>
         <dd>contacts ordered by last_activity_date.
 <pre class="py-doctest">
-<span class="py-prompt">&gt;&gt;&gt; </span>{
+<span class="py-prompt">&gt;&gt;&gt; </span><span class="py-string">&quot;objecs&quot;</span>:[ 
+<span class="py-more">... </span>   {
 <span class="py-more">... </span>    <span class="py-string">&quot;assignees&quot;</span>: [
 <span class="py-more">... </span>        <span class="py-string">&quot;/api/v1/crmuser/1/&quot;</span>
 <span class="py-more">... </span>    ],
@@ -516,7 +594,8 @@ elated_name= 'contact', null= True, full= True)">fields.ToManyField('alm_crm.api
 <span class="py-more">... </span>    <span class="py-string">&quot;subscription_id&quot;</span>: 1,
 <span class="py-more">... </span>    <span class="py-string">&quot;tp&quot;</span>: <span class="py-string">&quot;user&quot;</span>,
 <span class="py-more">... </span>    <span class="py-string">&quot;vcard&quot;</span>: {...}
-<span class="py-more">... </span>},</pre></dd>
+<span class="py-more">... </span>}, 
+<span class="py-more">... </span>]</pre></dd>
   </dl>
 </td></tr></table>
 </div>
@@ -550,7 +629,8 @@ elated_name= 'contact', null= True, full= True)">fields.ToManyField('alm_crm.api
     <dt>Returns:</dt>
         <dd>contacts that have no salescycles and activities.
 <pre class="py-doctest">
-<span class="py-prompt">&gt;&gt;&gt; </span>{
+<span class="py-prompt">&gt;&gt;&gt; </span><span class="py-string">&quot;objects&quot;</span>:[
+<span class="py-more">... </span>{
 <span class="py-more">... </span><span class="py-string">&quot;assignees&quot;</span>: [
 <span class="py-more">... </span>    <span class="py-string">&quot;/api/v1/crmuser/1/&quot;</span>
 <span class="py-more">... </span>],
@@ -568,7 +648,8 @@ elated_name= 'contact', null= True, full= True)">fields.ToManyField('alm_crm.api
 <span class="py-more">... </span><span class="py-string">&quot;subscription_id&quot;</span>: 1,
 <span class="py-more">... </span><span class="py-string">&quot;tp&quot;</span>: <span class="py-string">&quot;user&quot;</span>,
 <span class="py-more">... </span><span class="py-string">&quot;vcard&quot;</span>: {...}
-<span class="py-more">... </span>},</pre></dd>
+<span class="py-more">... </span>}, 
+<span class="py-more">... </span>]</pre></dd>
   </dl>
 </td></tr></table>
 </div>
@@ -602,7 +683,8 @@ elated_name= 'contact', null= True, full= True)">fields.ToManyField('alm_crm.api
     <dt>Returns:</dt>
         <dd>contacts.
 <pre class="py-doctest">
-<span class="py-prompt">&gt;&gt;&gt; </span>{
+<span class="py-prompt">&gt;&gt;&gt; </span><span class="py-string">&quot;objects&quot;</span>: [
+<span class="py-more">... </span>  {
 <span class="py-more">... </span>    <span class="py-string">&quot;assignees&quot;</span>: [
 <span class="py-more">... </span>        <span class="py-string">&quot;/api/v1/crmuser/1/&quot;</span>
 <span class="py-more">... </span>    ],
@@ -620,7 +702,8 @@ elated_name= 'contact', null= True, full= True)">fields.ToManyField('alm_crm.api
 <span class="py-more">... </span>    <span class="py-string">&quot;subscription_id&quot;</span>: 1,
 <span class="py-more">... </span>    <span class="py-string">&quot;tp&quot;</span>: <span class="py-string">&quot;user&quot;</span>,
 <span class="py-more">... </span>    <span class="py-string">&quot;vcard&quot;</span>: {...}
-<span class="py-more">... </span>},</pre></dd>
+<span class="py-more">... </span>}, 
+<span class="py-more">... </span>]</pre></dd>
   </dl>
 </td></tr></table>
 </div>
@@ -1017,7 +1100,7 @@ full= True)
     <dt>Value:</dt>
       <dd><table><tr><td><pre class="variable">
 fields.ToOneField('alm_crm.api.CRMUserResource', 'owner', null= True, <span class="variable-linewrap"><img src="crarr.png" alt="\" /></span>
-full= True)
+full= False)
 </pre></td></tr></table>
 </dd>
   </dl>
@@ -1036,7 +1119,7 @@ full= True)
     <dt>Value:</dt>
       <dd><table><tr><td><pre class="variable">
 fields.ToManyField('alm_crm.api.CRMUserResource', 'followers', null= T<span class="variable-linewrap"><img src="crarr.png" alt="\" /></span>
-rue, full= True)
+rue, full= False)
 </pre></td></tr></table>
 </dd>
   </dl>
@@ -1055,7 +1138,7 @@ rue, full= True)
     <dt>Value:</dt>
       <dd><table><tr><td><pre class="variable">
 fields.ToManyField('alm_crm.api.CRMUserResource', 'assignees', null= T<span class="variable-linewrap"><img src="crarr.png" alt="\" /></span>
-rue, full= True)
+rue, full= False)
 </pre></td></tr></table>
 </dd>
   </dl>
@@ -1074,7 +1157,7 @@ rue, full= True)
     <dt>Value:</dt>
       <dd><table><tr><td><pre class="variable">
 fields.ToManyField('alm_crm.api.SalesCycleResource', 'sales_cycles', r<span class="variable-linewrap"><img src="crarr.png" alt="\" /></span>
-elated_name= 'contact', null= True, full= True)
+elated_name= 'contact', null= True, full= False)
 </pre></td></tr></table>
 </dd>
   </dl>
@@ -1085,9 +1168,6 @@ elated_name= 'contact', null= True, full= True)
 <table class="navbar" border="0" width="100%" cellpadding="0"
        bgcolor="#a0c0ff" cellspacing="0">
   <tr valign="middle">
-  <!-- Home link -->
-      <th>&nbsp;&nbsp;&nbsp;<a
-        href="alm_crm.api-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
 
   <!-- Tree link -->
       <th>&nbsp;&nbsp;&nbsp;<a
@@ -1107,7 +1187,7 @@ elated_name= 'contact', null= True, full= True)
 <table border="0" cellpadding="0" cellspacing="0" width="100%%">
   <tr>
     <td align="left" class="footer">
-    Generated by Epydoc 3.0.1 on Mon Nov 24 15:11:39 2014
+    Generated by Epydoc 3.0.1 on Thu Nov 27 16:55:16 2014
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"
