@@ -13,7 +13,8 @@ from alm_crm.models import (
     Feedback,
     Value,
     Comment,
-    Share
+    Share, 
+    ContactList
     )
 from alm_vcard.models import VCard, Tel, Email, Org
 from alm_user.models import User
@@ -545,12 +546,77 @@ class SalesCycleTestCase(TestCase):
         self.assertEqual(list(ret.values_list('pk', flat=True)), [1, 2, 3, 4])
 
 
+class ContactListTestCase(TestCase):
+    fixtures = ['crmusers.json', 'contactlist.json', 'users.json']
+
+    def setUp(self):
+        super(self.__class__, self).setUp()
+        self.contact_list = ContactList.objects.first()
+
+    def test_create_contact_list(self):
+        contact_list = ContactList(title = 'UNREGISTERED')
+        self.assertEqual(contact_list.__unicode__(), 'UNREGISTERED')
+
+    def test_add_user(self):
+        crm_user = CRMUser.objects.get(id=2)
+        self.contact_list.add_user(user_id=crm_user.id)
+        self.assertEqual(self.contact_list.users.get(user_id=2), crm_user)
+        self.assertFalse(self.contact_list.add_user(user_id=1)[0])
+
+
+    def test_user_contact_lists(self):
+        crm_user = CRMUser.objects.get(pk=1)
+        self.assertEqual(self.contact_list, 
+                                crm_user.contact_list.get(id=1))
+
+
+    def test_add_users(self):
+        crm_user_1 = CRMUser.objects.get(id=1)
+        crm_user_2 = CRMUser.objects.get(id=2)
+        crm_user_3 = CRMUser.objects.get(id=3)
+        self.assertEqual(self.contact_list.add_users(user_ids=[crm_user_1.id, crm_user_2.id, crm_user_3.id]), [False, True, True])
+        self.assertEqual(self.contact_list.users.get(user_id=crm_user_2.id), crm_user_2)
+        self.assertEqual(self.contact_list.users.get(user_id=crm_user_3.id), crm_user_3)
+
+    def test_check_user(self):
+        crm_user_1 = CRMUser.objects.get(id=1)
+        crm_user_2 = CRMUser.objects.get(id=2)
+        crm_user_3 = CRMUser.objects.get(id=3)
+        self.contact_list.add_user(user_id=crm_user_2.id)
+        self.assertTrue(self.contact_list.check_user(user_id=crm_user_1.id))
+        self.assertTrue(self.contact_list.check_user(user_id=crm_user_2.id))
+        self.assertFalse(self.contact_list.check_user(user_id=crm_user_3.id))
+
+    def test_delete_user(self):
+        crm_user_1 = CRMUser.objects.get(id=1)
+        crm_user_2 = CRMUser.objects.get(id=2)
+        crm_user_3 = CRMUser.objects.get(id=3)
+        contact_list2 = ContactList(title='Test Contact list')
+        contact_list2.save()
+        contact_list2.add_users(user_ids=[crm_user_1.id, crm_user_2.id])
+        self.assertFalse(contact_list2.delete_user(user_id=crm_user_3.id))
+        self.assertTrue(contact_list2.delete_user(user_id=crm_user_2.id))
+        self.assertFalse(contact_list2.delete_user(user_id=crm_user_2.id))
+        self.assertTrue(contact_list2.delete_user(user_id=crm_user_1.id))
+        self.assertFalse(contact_list2.delete_user(user_id=crm_user_1.id))
+        self.assertEqual(contact_list2.count(), 0)
+
+    def test_count(self):
+        crm_user_1 = CRMUser.objects.get(id=1)
+        crm_user_2 = CRMUser.objects.get(id=2)
+        crm_user_3 = CRMUser.objects.get(id=3)
+        contact_list2 = ContactList(title='Test Contact list')
+        contact_list2.save()
+        contact_list2.add_users(user_ids=[crm_user_1.id, crm_user_2.id, crm_user_3.id])
+        self.assertEqual(contact_list2.count(), 3)
+
+
 class ResourceTestMixin(object):
     fixtures = ['companies.json', 'services.json', 'users.json',
                 'subscriptions.json', 'comments.json',
                 'crmusers.json', 'vcards.json', 'contacts.json',
                 'salescycles.json', 'activities.json', 'products.json',
-                'mentions.json', 'values.json', 'emails.json']
+                'mentions.json', 'values.json', 'emails.json', 'contactlist.json']
 
     def get_user(self):
         from alm_user.models import User
@@ -1206,3 +1272,58 @@ class ContactResourceTest(ResourceTestMixin, ResourceTestCase):
             )
         self.assertEqual(len(self.deserialize(resp)['objects']),
                          len(Contact.get_contact_activities(self.contact.pk)))
+
+
+class ContactListResourceTest(ResourceTestMixin, ResourceTestCase): 
+
+    def setUp(self):
+        super(self.__class__, self).setUp()
+
+        # login user
+        self.get_credentials()
+
+        self.api_path_contact_list = '/api/v1/contact_list/'
+
+        # get_list
+        self.get_list_resp = self.api_client.get(self.api_path_contact_list,
+                                                 format='json',
+                                                 HTTP_HOST='localhost')
+        self.get_list_des = self.deserialize(self.get_list_resp)
+
+        # get_detail(pk)
+        self.get_detail_resp = \
+            lambda pk: self.api_client.get(self.api_path_contact_list+str(pk)+'/',
+                                           format='json',
+                                           HTTP_HOST='localhost')
+        self.get_detail_des = \
+            lambda pk: self.deserialize(self.get_detail_resp(pk))
+
+        self.contact_list = ContactList.objects.first()
+
+
+    def test_get_list_valid_json(self):
+        self.assertValidJSONResponse(self.get_list_resp)
+
+    def test_get_list_non_empty(self):
+        self.assertTrue(self.get_list_des['meta']['total_count'] > 0)
+
+    def test_get_detail(self):
+        self.assertEqual(
+            self.get_detail_des(self.contact_list.pk)['title'],
+            self.contact_list.title
+            )
+
+    def test_create_contact_list(self):
+        user = CRMUser.objects.last()
+        post_data = {
+            'title': 'Mobiliuz',
+            'users': [{'pk':user.pk}]
+        }
+
+        count = user.contact_list.count()
+        self.assertHttpCreated(self.api_client.post(
+            self.api_path_contact_list, format='json', data=post_data))
+        contact_list = user.contact_list.last()
+        # verify that new one has been added.
+        self.assertEqual(user.contact_list.count(), count + 1)
+        self.assertEqual(ContactList.objects.last().title, 'Mobiliuz')
