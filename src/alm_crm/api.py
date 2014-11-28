@@ -733,6 +733,54 @@ class ContactListResource(CRMServiceModelResource):
     class Meta(CRMServiceModelResource.Meta):
         queryset = ContactList.objects.all()
         resource_name = 'contact_list'
+        extra_actions = [
+            {
+            "name": "users",
+            "http_method": "GET",
+            "resource_type": "view",
+            "summary": "Get users of the contact list",
+             "fields": {
+                "limit": {
+                    "type": "int",
+                    "required": False,
+                    "description": "Limit queryset, if not provided gives 20 \
+                    results by default"
+                },
+                "offset": {
+                    "type": "int",
+                    "required": False,
+                    "description": "offset queryset, if not provided gives 0 \
+                    by default"
+                    },
+                }
+            },
+            {
+            "name": "check_user",
+            "http_method": "GET",
+            "resource_type": "view",
+            "summary": "Check is the crm user in the contact list",
+            "fields": {
+                "user_id": {
+                    "type": "int",
+                    "required": True,
+                    "description": "id of a CRMUser that you want to check"
+                    },
+                }
+            },
+            {
+            "name": "add_users",
+            "http_method": "GET",
+            "resource_type": "view",
+            "summary": "Check is the crm user in the contact list",
+            "fields": {
+                "user_ids": {
+                    "type": "list",
+                    "required": True,
+                    "description": "list of CRMUser ids that you want to add"
+                    },
+                }
+            }
+        ]
 
     def prepend_urls(self):
         return [
@@ -741,17 +789,66 @@ class ContactListResource(CRMServiceModelResource):
                 (self._meta.resource_name, trailing_slash()),
                 self.wrap_view('get_users'),
                 name='api_get_users'
-            )
+            ),
+            url(
+                r"^(?P<resource_name>%s)/(?P<id>\d+)/check_user%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('check_user'),
+                name='api_check_user'
+            ),
+            url(
+                r"^(?P<resource_name>%s)/(?P<id>\d+)/add_users%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('add_users'),
+                name='api_add_users'
+            ),
         ]
 
     def get_users(self, request, **kwargs):
-        contact_list_id = kwargs.get('id')
-        users = ContactList.objects.get(id=contact_list_id).users.all()
-        crm_user_resource = CRMUserResource()
-        obj_dict = {}
-        obj_dict['objects'] = crm_user_resource.get_bundle_list(users,
-                                                               request)
-        return self.create_response(request, obj_dict)
+        try:
+            contact_list = ContactList.objects.get(id=kwargs.get('id'))
+            limit = int(request.GET.get('limit', 20))
+            offset = int(request.GET.get('offset', 0))
+            users = ContactList.objects.get(id=contact_list.id).users.all()[offset:offset + limit]
+            crm_user_resource = CRMUserResource()
+            obj_dict = {}
+            obj_dict['objects'] = crm_user_resource.get_bundle_list(users,
+                                                                   request)
+            return self.create_response(request, obj_dict)
+        except ContactList.DoesNotExist:
+            return self.create_response(
+                    request, {'success':False, 'error_string':'Contact list does not exits'}
+                )
 
+    def check_user(self, request, **kwargs):
+        try: 
+            contact_list = ContactList.objects.get(id=kwargs.get('id'))
+            user_id = int(request.GET.get('user_id',0))
+            if not user_id:
+                return self.create_response(
+                        request, {'success':False, 'error_string':'User id is not set'}
+                    )
+            return self.create_response(
+                    request, {'success': ContactList.objects.get(id=kwargs.get('id')).check_user(user_id=user_id)}
+                    )
+        except ContactList.DoesNotExist:
+            return self.create_response(
+                    request, {'success':False, 'error_string':'Contact list does not exits'}
+                )
 
-            
+    def add_users(self, request, **kwargs):
+        try:
+            user_ids = ast.literal_eval(request.GET.get('user_ids'))
+            if not user_ids:
+                return self.create_response(
+                        request, {'success':False, 'error_string':'User ids is not set'}
+                    )
+            obj_dict = {}
+            obj_dict['success'] = ContactList.objects.get(id=kwargs.get('id')).add_users(user_ids=user_ids)
+            return self.create_response(
+                    request, obj_dict)
+        except ContactList.DoesNotExist:
+            return self.create_response(
+                    request, {'success':False, 'error_string':'Contact list does not exits'}
+                )
+
