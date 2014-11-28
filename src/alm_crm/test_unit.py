@@ -604,6 +604,25 @@ class SalesCycleResourceTest(ResourceTestMixin, ResourceTestCase):
         # verify that one sales_cycle has been deleted.
         self.assertEqual(SalesCycle.objects.count(), count - 1)
 
+    def test_finish_sales_cycle(self):
+        put_data = {
+            'amount': 1000
+        }
+
+        resp = self.api_client.put(
+            self.api_path_sales_cycle+str(self.sales_cycle.pk)+'/finish/',
+            format='json', data=put_data)
+        self.assertHttpAccepted(resp)
+
+        updated_data = self.get_des_res(str(self.sales_cycle.pk)+'/')
+        sales_cycle = SalesCycle.objects.get(pk=self.sales_cycle.pk)
+
+        self.assertTrue(sales_cycle.real_value is not None)
+        self.assertEqual(sales_cycle.real_value.amount, put_data.get('amount'))
+
+        self.assertEqual(updated_data['real_value']['amount'],
+                         put_data.get('amount'))
+
 
 class ActivityResourceTest(ResourceTestMixin, ResourceTestCase):
 

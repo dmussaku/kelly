@@ -1,8 +1,7 @@
-from tastypie import fields
+from tastypie import fields, http
 from tastypie.contrib.contenttypes.fields import GenericForeignKeyField
 from tastypie.resources import ModelResource
 from tastypie.authorization import Authorization
-from django.http import HttpResponse
 from tastypie.utils import trailing_slash
 from tastypie.authentication import (
     MultiAuthentication,
@@ -11,6 +10,7 @@ from tastypie.authentication import (
     )
 from django.conf.urls import url
 from django.contrib.contenttypes.models import ContentType
+from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from .models import (
     SalesCycle,
     Product,
@@ -75,6 +75,7 @@ class ContactResource(CRMServiceModelResource):
     Description
     Api function to return contacts filtered by the last contact date
 
+
     @type  limit: number
     @param limit: The limit of results, 20 by default.
     @type  offset: number
@@ -102,6 +103,8 @@ class ContactResource(CRMServiceModelResource):
     ...     "vcard": {...}
     ... },
 
+
+    @undocumented: prepend_urls, Meta
     """
     vcard = fields.ToOneField('alm_vcard.api.VCardResource', 'vcard',
                               null=True, full=True)
@@ -449,7 +452,7 @@ class ContactResource(CRMServiceModelResource):
     def get_last_contacted(self, request, **kwargs):
         '''
         GET METHOD
-        I{URL}:  U{alma.net:8000/api/v1/contact/recent/}
+        I{URL}:  U{alma.net/api/v1/contact/recent/}
 
         Description
         Api function to return contacts filtered by the last contact date
@@ -518,7 +521,10 @@ class ContactResource(CRMServiceModelResource):
             returns
                 (Queryset<Contact>,
                 Queryset<Activity>,
-                {contact1_id: [activity1_id, activity2_id], contact2_id: [activity3_id]})
+                {
+                    contact1_id: [activity1_id, activity2_id],
+                    contact2_id: [activity3_id]
+                })
             '''
             obj_dict = {}
             obj_dict['contacts'] = self.get_bundle_list(contacts[0], request)
@@ -529,7 +535,7 @@ class ContactResource(CRMServiceModelResource):
     def get_cold_base(self, request, **kwargs):
         '''
         GET METHOD
-        I{URL}:  U{alma.net:8000/api/v1/contact/cold_base/}
+        I{URL}:  U{alma.net/api/v1/contact/cold_base/}
 
         Description
         Api function to return contacts that have not been contacted yet
@@ -573,7 +579,7 @@ class ContactResource(CRMServiceModelResource):
     def get_leads(self, request, **kwargs):
         '''
         GET METHOD
-        I{URL}:  U{alma.net:8000/api/v1/contact/leads/}
+        I{URL}:  U{alma.net/api/v1/contact/leads/}
 
         Description
         Api function to return contacts that have a status of LEAD
@@ -618,7 +624,7 @@ class ContactResource(CRMServiceModelResource):
     def get_products(self, request, **kwargs):
         '''
         GET METHOD
-        I{URL}:  U{alma.net:8000/api/v1/contact/:id/products/}
+        I{URL}:  U{alma.net/api/v1/contact/:id/products/}
 
         Description
         Api function to return products associated with that contact
@@ -668,7 +674,7 @@ class ContactResource(CRMServiceModelResource):
     def get_activities(self, request, **kwargs):
         '''
         GET METHOD
-        I{URL}:  U{alma.net:8000/api/v1/contact/:id/activities/}
+        I{URL}:  U{alma.net/api/v1/contact/:id/activities/}
 
         Description
         Api function to return activities associated with that contact
@@ -710,7 +716,7 @@ class ContactResource(CRMServiceModelResource):
     def search(self, request, **kwargs):
         '''
         GET METHOD
-        I{URL}:  U{alma.net:8000/api/v1/contact/search/}
+        I{URL}:  U{alma.net/api/v1/contact/search/}
 
         Description
         Api implementation of search, pass search_params in this format:
@@ -772,7 +778,7 @@ class ContactResource(CRMServiceModelResource):
     def assign_contact(self, request, **kwargs):
         '''
         GET METHOD
-        I{URL}:  U{alma.net:8000/api/v1/contact/assign_contact/}
+        I{URL}:  U{alma.net/api/v1/contact/assign_contact/}
 
         Description
         Assign a signle user to a signle contact
@@ -810,7 +816,7 @@ class ContactResource(CRMServiceModelResource):
     def assign_contacts(self, request, **kwargs):
         '''
         GET METHOD
-        I{URL}:  U{alma.net:8000/api/v1/contact/assign_contacts/}
+        I{URL}:  U{alma.net/api/v1/contact/assign_contacts/}
 
         Description
         Assign a single user to multiple contacts
@@ -849,7 +855,7 @@ class ContactResource(CRMServiceModelResource):
     def share_contact(self, request, **kwargs):
         '''
         GET METHOD
-        I{URL}:  U{alma.net:8000/api/v1/contact/share_contact/}
+        I{URL}:  U{alma.net/api/v1/contact/share_contact/}
 
         Description
         Share a contact with a user
@@ -895,7 +901,7 @@ class ContactResource(CRMServiceModelResource):
     def share_contacts(self, request, **kwargs):
         '''
         GET METHOD
-        I{URL}:  U{alma.net:8000/api/v1/contact/share_contacts/}
+        I{URL}:  U{alma.net/api/v1/contact/share_contacts/}
 
         Description
         Share multiple contact with a user
@@ -943,7 +949,7 @@ class ContactResource(CRMServiceModelResource):
     def import_contacts_from_vcard(self, request, **kwargs):
         '''
         POST METHOD
-        I{URL}:  U{alma.net:8000/api/v1/contact/import_contacts_from_vcard/}
+        I{URL}:  U{alma.net/api/v1/contact/import_contacts_from_vcard/}
 
         Description
         Import contacts from a vcard file
@@ -972,6 +978,15 @@ class ContactResource(CRMServiceModelResource):
 
 
 class SalesCycleResource(CRMServiceModelResource):
+    '''
+    GET Method
+    I{URL}:  U{alma.net/api/v1/sales_cycle}
+
+    B{Description}:
+    API resource manage Contact's SalesCycles
+
+    @undocumented: prepend_urls, Meta
+    '''
     contact = fields.ForeignKey(ContactResource, 'contact')
     activities = fields.ToManyField(
         'alm_crm.api.ActivityResource', 'rel_activities',
@@ -992,6 +1007,108 @@ class SalesCycleResource(CRMServiceModelResource):
     class Meta(CRMServiceModelResource.Meta):
         queryset = SalesCycle.objects.all()
         resource_name = 'sales_cycle'
+
+    def prepend_urls(self):
+        return [
+            url(
+                r"^(?P<resource_name>%s)/(?P<id>\d+)/finish%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('finish'),
+                name='api_finish'
+            ),
+        ]
+
+    def finish(self, request, **kwargs):
+        '''
+        PUT METHOD
+        I{URL}:  U{alma.net/api/v1/sales_cycle/finish/}
+
+        B{Description}:
+        finish SalesCycle by
+        setting real_value and update status to 'C' ('Completed')
+
+        @type  amount: number
+        @param amount: Amount of real_value
+        @type  salary: string (optional)
+        @param salary: Salary type of real_value: [monthly|annualy|instant]
+        @type  currency: string (optional)
+        @param currency: Currency type of real_value: [KZT|USD|RUB]
+
+
+        @return: updated SalesCycle
+
+        >>> {
+        ...     'id': 1,
+        ...     'resource_uri': '/api/v1/sales_cycle/1/'
+        ...     'status': 'C',
+        ...     'real_value': {
+        ...         'salary': 'monthly',
+        ...         'currency': 'KZT',
+        ...         'amount': 1000,
+        ...         'subscription_id': 1,
+        ...         'id': 8,
+        ...         'resource_uri': '/api/v1/sales_cycle/value/8/'
+        ...     },
+        ...     'projected_value': {
+        ...         'salary': 'monthly',
+        ...         'currency': 'KZT',
+        ...         'amount': 100000,
+        ...         'subscription_id': 1,
+        ...         'id': 1,
+        ...         'resource_uri': '/api/v1/sales_cycle/value/1/'
+        ...     },
+        ...     'activities': [],
+        ...     'contact': '/api/v1/contact/1/',
+        ...     'from_date': '2014-09-10T00:00:00',
+        ...     'to_date': '2014-09-10T00:00:00',
+        ...     'owner': {...}
+        ...     'date_created': u'2014-09-10T00:00:00',
+        ...     'subscription_id': 1,
+        ...     'followers': []
+        ... }
+        '''
+        self.method_check(request, allowed=['put'])
+
+        basic_bundle = self.build_bundle(request=request)
+
+        # get sales_cycle
+        try:
+            obj = self.cached_obj_get(bundle=basic_bundle,
+                                      **self.remove_api_resource_names(kwargs))
+        except ObjectDoesNotExist:
+            return http.HttpNotFound()
+        except MultipleObjectsReturned:
+            return http.HttpMultipleChoices(
+                "More than one resource is found at this URI.")
+        bundle = self.build_bundle(obj=obj, request=request)
+
+        # get PUT's data from request.body
+        deserialized = self.deserialize(
+            request, request.body,
+            format=request.META.get('CONTENT_TYPE', 'application/json'))
+        deserialized = self.alter_deserialized_list_data(request, deserialized)
+
+        if deserialized.get('amount'):
+            real_value = {
+                'amount': deserialized.get('amount'),
+                'salary': deserialized.get('salary'),
+                'currency': deserialized.get('currency')
+                }
+
+            # backend function to set real_value and update status
+            bundle.obj.finish(**real_value)
+        else:
+            return http.HttpBadRequest(
+                content="must be provided 'amount' value of 'real_value'",
+                content_type='text/plain')
+
+        if not hasattr(self.Meta, 'always_return_data') or \
+                not self.Meta.always_return_data:
+            return http.HttpNoContent()
+        else:
+            bundle = self.full_dehydrate(bundle)
+            bundle = self.alter_detail_data_to_serialize(request, bundle)
+            return self.create_response(request, bundle)
 
 
 class ActivityResource(CRMServiceModelResource):
@@ -1048,6 +1165,9 @@ class ActivityResource(CRMServiceModelResource):
     ...     ],
     ... }
     ... ]
+
+
+    @undocumented: Meta
     """
 
     sales_cycle = fields.ForeignKey(SalesCycleResource, 'sales_cycle')
@@ -1105,7 +1225,7 @@ class ActivityResource(CRMServiceModelResource):
     def post_list(self, request, **kwargs):
         '''
         POST METHOD
-        I{URL}:  U{alma.net:8000/api/v1/activity/}
+        I{URL}:  U{alma.net/api/v1/activity/}
 
         Description
         API standart function to Create new Activity
@@ -1127,6 +1247,16 @@ class ActivityResource(CRMServiceModelResource):
 
 
 class ProductResource(CRMServiceModelResource):
+    '''
+    ALL+PATCH Method
+    I{URL}:  U{alma.net/api/v1/product/}
+
+    B{Description}:
+    API resource to manage SalesCycle's Products
+
+
+    @undocumented: Meta
+    '''
     sales_cycles = fields.ToManyField(SalesCycleResource, 'sales_cycles')
 
     class Meta(CRMServiceModelResource.Meta):
@@ -1136,6 +1266,16 @@ class ProductResource(CRMServiceModelResource):
 
 
 class ValueResource(CRMServiceModelResource):
+    '''
+    ALL Method
+    I{URL}:  U{alma.net/api/v1/value/}
+
+    B{Description}:
+    API resource to manage SalesCycle's Value
+
+
+    @undocumented: Meta
+    '''
 
     class Meta(CRMServiceModelResource.Meta):
         queryset = Value.objects.all()
@@ -1143,6 +1283,15 @@ class ValueResource(CRMServiceModelResource):
 
 
 class CRMUserResource(CRMServiceModelResource):
+    '''
+    ALL Method
+    I{URL}:  U{alma.net/api/v1/crmuser/}
+
+    B{Description}:
+    API resource to manage CRMUsers
+
+    @undocumented: Meta
+    '''
 
     class Meta(CRMServiceModelResource.Meta):
         queryset = CRMUser.objects.all()
@@ -1150,6 +1299,15 @@ class CRMUserResource(CRMServiceModelResource):
 
 
 class ShareResource(CRMServiceModelResource):
+    '''
+    ALL Method
+    I{URL}:  U{alma.net/api/v1/share/}
+
+    B{Description}:
+    API resource to manage Shares of Contacts
+
+    @undocumented: prepend_urls, Meta
+    '''
     contact = fields.ForeignKey(ContactResource, 'contact',
                                 full=True, null=True)
     share_to = fields.ForeignKey(CRMUserResource, 'share_to',
@@ -1185,6 +1343,15 @@ class ShareResource(CRMServiceModelResource):
 
 
 class FeedbackResource(CRMServiceModelResource):
+    '''
+    ALL Method
+    I{URL}:  U{alma.net/api/v1/feedback/}
+
+    B{Description}:
+    API resource to manage Activity's Feedback
+
+    @undocumented: Meta
+    '''
     # activity = fields.OneToOneField(ActivityResource, 'feedback_activity', null=True, full=False)
     # value = fields.ToOneField(ValueResource, 'feedback_value', null=True)
 
@@ -1194,6 +1361,16 @@ class FeedbackResource(CRMServiceModelResource):
 
 
 class CommentResource(CRMServiceModelResource):
+    '''
+    ALL Method
+    I{URL}:  U{alma.net/api/v1/comment/}
+
+    B{Description}:
+    API resource to manage Comments
+    (GenericRelation with Activity, Contact, Share, Feedback)
+
+    @undocumented: Meta
+    '''
     content_object = GenericForeignKeyField({
         Activity: ActivityResource,
         Contact: ContactResource,
@@ -1207,6 +1384,16 @@ class CommentResource(CRMServiceModelResource):
 
 
 class MentionResource(CRMServiceModelResource):
+    '''
+    ALL Method
+    I{URL}:  U{alma.net/api/v1/comment/}
+
+    B{Description}:
+    API resource to manage Comments
+    (GenericRelation with Contact, SalesCycle, Activity, Feedback, Comment)
+
+    @undocumented: Meta
+    '''
     content_object = GenericForeignKeyField({
         Contact: ContactResource,
         SalesCycle: SalesCycleResource,

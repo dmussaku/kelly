@@ -255,7 +255,7 @@ class Contact(SubscriptionObject):
     @classmethod
     def share_contact(cls, share_from, share_to, contact_id, comment=None):
         return cls.share_contacts(share_from, share_to, [contact_id], comment)
-    
+
     @classmethod
     def share_contacts(cls, share_from, share_to, contact_ids, comment=None):
         '''
@@ -278,7 +278,7 @@ class Contact(SubscriptionObject):
                 share.save()
                 share_list.append(share)
             '''
-            I do not know how you will submit mentions in comments so i'm leaving 
+            I do not know how you will submit mentions in comments so i'm leaving
             this blank for now
             '''
             if comment:
@@ -632,9 +632,9 @@ class Product(SubscriptionObject):
 
 class SalesCycle(SubscriptionObject):
     STATUS_OPTIONS = (
+        ('N', 'New'),
         ('P', 'Pending'),
         ('C', 'Completed'),
-        ('N', 'New'),
     )
     title = models.CharField(max_length=100)
     products = models.ManyToManyField(Product, related_name='sales_cycles',
@@ -762,6 +762,26 @@ class SalesCycle(SubscriptionObject):
             except CRMUser.DoesNotExist:
                 status.append(False)
         return status
+
+    def finish(self, **kw):
+        """
+        1. set real_value by
+        given amount(, salary, currency) field values of Value
+        2. update status to 'Completed'
+        """
+        assert 'amount' in kw, 'must be provided amount of real_value'
+
+        if self.projected_value:
+            if 'salary' not in kw or not kw['salary']:
+                kw['salary'] = self.projected_value.salary
+            if 'currency' not in kw or not kw['currency']:
+                kw['currency'] = self.projected_value.currency
+        v = Value(**kw)
+        v.save()
+
+        self.real_value = v
+        self.status = 'C'
+        self.save()
 
     @classmethod
     def upd_lst_activity_on_create(cls, sender,
