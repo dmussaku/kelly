@@ -1327,3 +1327,17 @@ class ContactListResourceTest(ResourceTestMixin, ResourceTestCase):
         # verify that new one has been added.
         self.assertEqual(user.contact_list.count(), count + 1)
         self.assertEqual(ContactList.objects.last().title, 'Mobiliuz')
+
+    def test_delete_user_from_contact_list(self):
+        pass
+
+    def test_add_user(self):
+        pass
+
+    def test_add_users(self):
+        pass
+
+    def test_delete_contact_list(self):
+        pass
+
+

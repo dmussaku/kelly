@@ -1040,14 +1040,14 @@ class ContactListResource(CRMServiceModelResource):
     @param limit: The limit of results, 20 by default.
     @type  offset: number
     @param offset: The offset of results, 0 by default
-    @return:  contacts
+    @return:  contact_list
     >>> "objects": [
             {
-              "id": 1,
-              "resource_uri": "/api/v1/contact_list/1/",
-              "subscription_id": null,
-              "title": "ALMA Cloud",
-              "users": [
+            "id": 1,
+            "resource_uri": "/api/v1/contact_list/1/",
+            "subscription_id": null,
+            "title": "ALMA Cloud",
+            "users": [
                 {
                   "id": 1,
                   "is_supervisor": false,
@@ -1064,9 +1064,9 @@ class ContactListResource(CRMServiceModelResource):
                   "subscription_id": 1,
                   "user_id": 2
                 }
-              ]
+            ]
             }
-          ]
+        ]
     """
 
     class Meta(CRMServiceModelResource.Meta):
@@ -1141,6 +1141,12 @@ class ContactListResource(CRMServiceModelResource):
                 self.wrap_view('add_users'),
                 name='api_add_users'
             ),
+            url(
+                r"^(?P<resource_name>%s)/(?P<id>\d+)/delete_user%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('delete_user'),
+                name='api_delete_user'
+            ),
         ]
 
     def get_users(self, request, **kwargs):
@@ -1178,9 +1184,7 @@ class ContactListResource(CRMServiceModelResource):
                   "subscription_id": 1,
                   "user_id": 2
                 }
-              ]
-            }
-          ]
+            ]
     """
         try:
             contact_list = ContactList.objects.get(id=kwargs.get('id'))
