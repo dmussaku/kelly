@@ -5,3 +5,4 @@ venv
 *.save
 *.DS_store
 .coverage
+api_docs/*

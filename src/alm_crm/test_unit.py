@@ -616,9 +616,9 @@ class UserSessionResourceTest(ResourceTestMixin, ResourceTestCase):
             self.api_path_user_session, format='json', HTTP_HOST='localhost')
         session_key = self.deserialize(resp)['objects'][0]['id']
 
-        self.api_client.delete(self.api_path_user_session+'%s/' % session_key,
-                               format='json', HTTP_HOST='localhost')
-
+        resp = self.api_client.delete(
+            self.api_path_user_session+'%s/' % session_key,
+            format='json', HTTP_HOST='localhost')
         # get_detail to check session was deleted
         resp = self.api_client.get(
             self.api_path_user_session, format='json', HTTP_HOST='localhost')
@@ -780,9 +780,11 @@ class ActivityResourceTest(ResourceTestMixin, ResourceTestCase):
         self.assertEqual(len(self.activity.comments.all()),
                          len(resp_activity['comments']))
 
-        self.assertTrue(len(resp_activity['mentions']) > 0)
-        self.assertEqual(len(self.activity.mentions.all()),
-                         len(resp_activity['mentions']))
+        self.assertTrue(len(resp_activity['mention_users']) > 0)
+        mentions_user_ids = \
+            self.activity.mentions.values_list('user_id', flat=True).distinct()
+        self.assertEqual(len(mentions_user_ids),
+                         len(resp_activity['mention_users']))
 
     def test_create_activity(self):
         sales_cycle = SalesCycle.objects.last()
