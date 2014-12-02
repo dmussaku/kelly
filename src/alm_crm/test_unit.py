@@ -788,8 +788,8 @@ class SalesCycleResourceTest(ResourceTestMixin, ResourceTestCase):
 
         count = SalesCycle.objects.count()
         # self.assertHttpCreated()
-        print self.api_client.post(
-            self.api_path_sales_cycle, format='json', data=post_data)
+        # print self.api_client.post(
+        #     self.api_path_sales_cycle, format='json', data=post_data)
 
         sales_cycle = SalesCycle.objects.last()
         # verify that new one sales_cycle has been added.

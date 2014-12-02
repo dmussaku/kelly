@@ -1029,7 +1029,7 @@ class MentionResource(CRMServiceModelResource):
 
 class ContactListResource(CRMServiceModelResource):
     users = fields.ToManyField('alm_crm.api.CRMUserResource', 'users',
-                                   related_name = 'contact_list', null=True, full=True)
+                                   related_name = 'contact_list', null=True, full=False)
 
     class Meta(CRMServiceModelResource.Meta):
         queryset = ContactList.objects.all()
@@ -1077,12 +1077,48 @@ class ContactListResource(CRMServiceModelResource):
         ... {
         ...     title: "ALMA Cloud",
         ...     users: [
-        ...     {
-        ...         "pk": 1,
-        ...     }
+        ...         "/api/v1/crmuser/1/",
+        ...         "/api/v1/crmuser/2/",
+        ...     ]
         ... }
         '''
         return super(self.__class__, self).post_list(request, **kwargs)
+
+    def delete_list(self, request, **kwargs):
+        '''
+        DELETE METHOD
+        I{URL}:  U{alma.net:8000/api/v1/contact_list/:id/}
+    
+        Description:
+        Api function for contact list creation. It creates contact list
+
+        @return:  status 204
+        
+        >>> HTTP/1.0 204 NO CONTENT
+        ... Date: Fri, 11 Nov 2014 06:48:36 GMT
+        ... Server: WSGIServer/0.1 Python/2.7
+        ... Content-Lenght: 0
+        ... Content-Type:  text/html; charset=utf-8 
+        '''
+        return super(self.__class__, self).delete_list(request, **kwargs)
+
+    def put_detail(self, request, **kwargs):
+        '''
+        PATCH METHOD
+        I{URL}:  U{alma.net:8000/api/v1/contact_list/:id/}
+    
+        Description:
+        Api function for contact list creation. It creates contact list
+
+        @return:  If a new resource is created status 201, if an existing resource is modified status 204, 
+        
+        >>> HTTP/1.0 204 NO CONTENT
+        ... Date: Fri, 11 Nov 2014 06:48:36 GMT
+        ... Server: WSGIServer/0.1 Python/2.7
+        ... Content-Lenght: 0
+        ... Content-Type:  text/html; charset=utf-8 
+        '''
+        return super(self.__class__, self).put_detail(request, **kwargs)
 
 
     def get_users(self, request, **kwargs):
