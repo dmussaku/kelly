@@ -26,6 +26,8 @@ from .models import (
     )
 from almanet.settings import DEFAULT_SERVICE
 import ast
+from django.core.files.temp import NamedTemporaryFile
+from django.core.servers.basehttp import FileWrapper
 
 
 class CRMServiceModelResource(ModelResource):
@@ -245,6 +247,12 @@ class ContactResource(CRMServiceModelResource):
                 (self._meta.resource_name, trailing_slash()),
                 self.wrap_view('import_contacts_from_vcard'),
                 name='api_import_contacts_from_vcard'
+            ),
+            url(
+                r"^(?P<resource_name>%s)/export_contacts_to_vcard%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('export_contacts_to_vcard'),
+                name='api_export_contacts_to_vcard'
             ),
         ]
 
@@ -617,7 +625,7 @@ class ContactResource(CRMServiceModelResource):
             )
 
     def assign_contacts(self, request, **kwargs):
-    	'''
+        '''
         GET METHOD
         I{URL}:  U{alma.net:8000/api/v1/contact/assign_contacts/}
 
@@ -776,6 +784,41 @@ class ContactResource(CRMServiceModelResource):
                 request,
                 Contact.import_contacts_from_vcard(request.FILES['myfile'])
                 )
+
+    def export_contacts_to_vcard(self, request, **kwargs):
+        '''
+        GET METHOD
+        I{URL}:  U{alma.net:8000/api/v1/contact/export_contacts_to_vcard/}
+
+        Description
+        Export selected contacts to vcard.txt file
+
+        @type  contact_ids: list
+        @param contact_ids: A list of contact ids like so [1,2,3]
+
+        @return: file disposition.
+
+        >>> if list is empty returns 
+        ... No contacts have been selected
+        ... 
+        >>> if contact id doesn't exist returns:
+        ... Contact with id=contact_id does not exist 
+
+        '''
+        contact_ids = ast.literal_eval(request.GET.get('contact_ids', []))
+        if contact_ids:
+            temp = NamedTemporaryFile()
+            response = HttpResponse(FileWrapper(temp), mimetype='application/force-download')
+            response['Content-Disposition'] = 'attachment; filename="%s.txt"' % 'vcard'
+            for contact_id in contact_ids:
+                try:
+                    vcard = Contact.objects.get(id=contact_id).vcard
+                    response.write(vcard.exportTo('vCard'))
+                except:
+                    return HttpResponse('Contact with id=%s does not exist' % contact_id)
+            return response
+        else:
+            return HttpResponse('No contacts have been selected')
 
 
 class SalesCycleResource(CRMServiceModelResource):
@@ -1150,42 +1193,6 @@ class ContactListResource(CRMServiceModelResource):
         ]
 
     def get_users(self, request, **kwargs):
-    """
-    GET Method 
-    I{URL}:  U{alma.net/api/v1/contact/:id/users}
-    
-    Description
-    Api function to return the contacts list users
-    @type  limit: number
-    @param limit: The limit of results, 20 by default.
-    @type  offset: number
-    @param offset: The offset of results, 0 by default
-    @return:  contacts
-    >>> "objects": [
-            {
-              "id": 1,
-              "resource_uri": "/api/v1/contact_list/1/",
-              "subscription_id": null,
-              "title": "ALMA Cloud",
-              "users": [
-                {
-                  "id": 1,
-                  "is_supervisor": false,
-                  "organization_id": 1,
-                  "resource_uri": "/api/v1/crmuser/1/",
-                  "subscription_id": 1,
-                  "user_id": 1
-                },
-                {
-                  "id": 2,
-                  "is_supervisor": false,
-                  "organization_id": 1,
-                  "resource_uri": "/api/v1/crmuser/2/",
-                  "subscription_id": 1,
-                  "user_id": 2
-                }
-            ]
-    """
         try:
             contact_list = ContactList.objects.get(id=kwargs.get('id'))
             limit = int(request.GET.get('limit', 20))
