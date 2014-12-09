@@ -1259,96 +1259,10 @@ class MentionResource(CRMServiceModelResource):
 class ContactListResource(CRMServiceModelResource):
     users = fields.ToManyField('alm_crm.api.CRMUserResource', 'users',
                                    related_name = 'contact_list', null=True, full=True)
-    """
-    GET Method 
-    I{URL}:  U{alma.net/api/v1/contact}
-    
-    Description
-    Api function to return contacts lists 
-    @type  limit: number
-    @param limit: The limit of results, 20 by default.
-    @type  offset: number
-    @param offset: The offset of results, 0 by default
-    @return:  contact_list
-    >>> "objects": [
-            {
-            "id": 1,
-            "resource_uri": "/api/v1/contact_list/1/",
-            "subscription_id": null,
-            "title": "ALMA Cloud",
-            "users": [
-                {
-                  "id": 1,
-                  "is_supervisor": false,
-                  "organization_id": 1,
-                  "resource_uri": "/api/v1/crmuser/1/",
-                  "subscription_id": 1,
-                  "user_id": 1
-                },
-                {
-                  "id": 2,
-                  "is_supervisor": false,
-                  "organization_id": 1,
-                  "resource_uri": "/api/v1/crmuser/2/",
-                  "subscription_id": 1,
-                  "user_id": 2
-                }
-            ]
-            }
-        ]
-    """
 
     class Meta(CRMServiceModelResource.Meta):
         queryset = ContactList.objects.all()
         resource_name = 'contact_list'
-        extra_actions = [
-            {
-            "name": "users",
-            "http_method": "GET",
-            "resource_type": "view",
-            "summary": "Get users of the contact list",
-             "fields": {
-                "limit": {
-                    "type": "int",
-                    "required": False,
-                    "description": "Limit queryset, if not provided gives 20 \
-                    results by default"
-                },
-                "offset": {
-                    "type": "int",
-                    "required": False,
-                    "description": "offset queryset, if not provided gives 0 \
-                    by default"
-                    },
-                }
-            },
-            {
-            "name": "check_user",
-            "http_method": "GET",
-            "resource_type": "view",
-            "summary": "Check is the crm user in the contact list",
-            "fields": {
-                "user_id": {
-                    "type": "int",
-                    "required": True,
-                    "description": "id of a CRMUser that you want to check"
-                    },
-                }
-            },
-            {
-            "name": "add_users",
-            "http_method": "GET",
-            "resource_type": "view",
-            "summary": "Check is the crm user in the contact list",
-            "fields": {
-                "user_ids": {
-                    "type": "list",
-                    "required": True,
-                    "description": "list of CRMUser ids that you want to add"
-                    },
-                }
-            }
-        ]
 
     def prepend_urls(self):
         return [
@@ -1378,7 +1292,68 @@ class ContactListResource(CRMServiceModelResource):
             ),
         ]
 
+    def post_list(self, request, **kwargs):
+        '''
+        POST METHOD
+        I{URL}:  U{alma.net:8000/api/v1/contact_list/}
+    
+        Description:
+        Api function for contact list creation. It creates contact list
+
+        @return:  status 201
+        
+        >>> example POST payload
+        ... {
+        ...     title: "ALMA Cloud",
+        ...     users: [
+        ...     {
+        ...         "pk": 1,
+        ...     }
+        ... }
+        '''
+        return super(self.__class__, self).post_list(request, **kwargs)
+
+
     def get_users(self, request, **kwargs):
+        '''
+        GET METHOD
+        I{URL}:  U{alma.net/api/v1/contact/:id/users}
+
+        Description:
+        Api function to return the contact list users
+
+        @type  limit: number
+        @param limit: The limit of results, 20 by default.
+        @type  offset: number
+        @param offset: The offset of results, 0 by default
+        @return:  contacts
+
+        >>> "objects": [
+        ...     {
+        ...         "id": 1,
+        ...         "resource_uri": "/api/v1/contact_list/1/",
+        ...         "subscription_id": null,
+        ...         "title": "ALMA Cloud",
+        ...         "users": [
+        ...         {
+        ...             "id": 1,
+        ...             "is_supervisor": false,
+        ...             "organization_id": 1,
+        ...             "resource_uri": "/api/v1/crmuser/1/",
+        ...             "subscription_id": 1,
+        ...             "user_id": 1
+        ...         },
+        ...         {
+        ...             "id": 2,
+        ...             "is_supervisor": false,
+        ...             "organization_id": 1,
+        ...             "resource_uri": "/api/v1/crmuser/2/",
+        ...             "subscription_id": 1,
+        ...             "user_id": 2
+        ...         }
+        ...     ]
+
+        '''
         try:
             contact_list = ContactList.objects.get(id=kwargs.get('id'))
             limit = int(request.GET.get('limit', 20))
@@ -1395,6 +1370,23 @@ class ContactListResource(CRMServiceModelResource):
                 )
 
     def check_user(self, request, **kwargs):
+        '''
+        GET METHOD
+        I{URL}:  U{alma.net/api/v1/contact/:id/check_user}
+
+        Description:
+        Api function to return existence user in the contact list
+
+        @type  user_id: number
+        @param user_id: User id which you are checking.
+
+        @return:  success and list of boolean fields
+ 
+        >>> {
+        ...    "success": true
+        ... }
+
+        '''
         try: 
             contact_list = ContactList.objects.get(id=kwargs.get('id'))
             user_id = int(request.GET.get('user_id',0))
@@ -1411,6 +1403,23 @@ class ContactListResource(CRMServiceModelResource):
                 )
 
     def add_users(self, request, **kwargs):
+        '''
+        GET METHOD
+        I{URL}:  U{alma.net/api/v1/contact/:id/add_users}
+
+        Description:
+        Api function to add users to the contact list
+
+        @type  user_ids: list
+        @param user_ids: Adding user ids for adding.
+
+        @return:  success and list of boolean fields
+
+        >>> {
+        ...    "success": [True, False, False, True]
+        ... }
+
+        '''
         try:
             user_ids = ast.literal_eval(request.GET.get('user_ids'))
             if not user_ids:
@@ -1421,6 +1430,39 @@ class ContactListResource(CRMServiceModelResource):
             obj_dict['success'] = ContactList.objects.get(id=kwargs.get('id')).add_users(user_ids=user_ids)
             return self.create_response(
                     request, obj_dict)
+        except ContactList.DoesNotExist:
+            return self.create_response(
+                    request, {'success':False, 'error_string':'Contact list does not exits'}
+                )
+
+    def delete_user(self, request, **kwargs):
+        '''
+        GET METHOD
+        I{URL}:  U{alma.net/api/v1/contact/:id/delete_user}
+
+        Description:
+        Api function to delete a user in the contact list 
+
+        @type  user_id: number
+        @param user_id: User id which you are checking.
+
+        @return:  success delated or not
+
+        >>> {
+        ...    "success": true
+        ... }
+
+        '''
+        try: 
+            contact_list = ContactList.objects.get(id=kwargs.get('id'))
+            user_id = int(request.GET.get('user_id',0))
+            if not user_id:
+                return self.create_response(
+                        request, {'success':False, 'error_string':'User id is not set'}
+                    )
+            return self.create_response(
+                    request, {'success': ContactList.objects.get(id=kwargs.get('id')).delete_user(user_id=user_id)}
+                    )
         except ContactList.DoesNotExist:
             return self.create_response(
                     request, {'success':False, 'error_string':'Contact list does not exits'}
