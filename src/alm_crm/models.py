@@ -11,7 +11,6 @@ from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
 from django.utils import timezone
 import datetime
-import json
 # from dateutil.relativedelta import relativedelta
 
 
@@ -805,16 +804,19 @@ class SalesCycle(SubscriptionObject):
 
     @classmethod
     def get_salescycles_by_last_activity_date(
-            cls, user_id, owned=True, mentioned=False, followed=False,
-            limit=20, offset=0):
+        cls, user_id, owned=True, mentioned=False, followed=False,
+            include_activities=False, limit=20, offset=0):
         """Returns sales_cycles where user is owner, mentioned or followed
             ordered by last activity date.
 
             Returns
             -------
+            if include_activities=True:
+                (Queryset<SalesCycle>,
+                 Queryset<Activity>,
+                 sales_cycle_activity_map =  {1: [2, 3, 4], 2:[3, 5, 7]})
+            else:
                 Queryset<SalesCycle>
-                Queryset<Activity>
-                sales_cycle_activity_map =  {1: [2, 3, 4], 2:[3, 5, 7]}
             Raises:
                 User.DoesNotExist
         """
@@ -836,13 +838,17 @@ class SalesCycle(SubscriptionObject):
         else:
             sales_cycles = SalesCycle.objects.filter(q).order_by(
                 '-latest_activity__date_created')[offset:offset + limit]
-        activities = Activity.objects.filter(
-            sales_cycle_id__in=sales_cycles.values_list('pk', flat=True))
-        sales_cycle_activity_map = {}
-        for sc in sales_cycles:
-            sales_cycle_activity_map[sc.id] = \
-                sc.rel_activities.values_list('pk', flat=True)
-        return (sales_cycles, activities, sales_cycle_activity_map)
+
+        if not include_activities:
+            return sales_cycles
+        else:
+            activities = Activity.objects.filter(
+                sales_cycle_id__in=sales_cycles.values_list('pk', flat=True))
+            sales_cycle_activity_map = {}
+            for sc in sales_cycles:
+                sales_cycle_activity_map[sc.id] = \
+                    sc.rel_activities.values_list('pk', flat=True)
+            return (sales_cycles, activities, sales_cycle_activity_map)
 
     @classmethod
     def get_salescycles_by_contact(cls, contact_id, limit=20, offset=0):
@@ -977,6 +983,52 @@ class Activity(SubscriptionObject):
             else:
                 date_counts[date] = 1
         return date_counts
+
+    @classmethod
+    def get_activities_by_date_created(
+        cls, user_id, owned=True, mentioned=False,
+            include_sales_cycles=False, limit=20, offset=0):
+        """Returns activities where crmuser is owner or mentioned
+            ordered by created date.
+
+            Returns
+            -------
+            if include_sales_cycles=True:
+                (Queryset<Activity>,
+                 Queryset<SalesCycle>,
+                 sales_cycle_activity_map =  {1: [2, 3, 4], 2:[3, 5, 7]})
+            else:
+                Queryset<Activity>
+            Raises:
+                User.DoesNotExist
+        """
+
+        try:
+            CRMUser.objects.get(pk=user_id)
+        except CRMUser.DoesNotExist:
+            raise CRMUser.DoesNotExist
+
+        q = Q()
+        if owned:
+            q |= Q(owner_id=user_id)
+        if mentioned:
+            q |= Q(mentions__user_id=user_id)
+        if len(q.children) == 0:
+            activities = Activity.objects.none()
+        else:
+            activities = Activity.objects.filter(q).order_by('-date_created')[
+                offset:offset + limit]
+
+        if not include_sales_cycles:
+            return activities
+        else:
+            sales_cycles = SalesCycle.objects.filter(
+                sales_cycle_id__in=activities.values_list('pk', flat=True))
+            sales_cycle_activity_map = {}
+            for sc in sales_cycles:
+                sales_cycle_activity_map[sc.id] = \
+                    sc.rel_activities.values_list('pk', flat=True)
+            return (activities, sales_cycles, sales_cycle_activity_map)
 
     def save(self, **kwargs):
         if not self.subscription_id and self.owner:
@@ -1206,7 +1258,7 @@ class ContactList(SubscriptionObject):
         except CRMUser.DoesNotExist:
             return False
 
-        
+
     def get_contact_list_users(self, limit=20, offset=0):
         return self.users.all()[offset:offset + limit]
 
@@ -1239,7 +1291,7 @@ class ContactList(SubscriptionObject):
                 status = False
         else:
             return False
-        
+
         return status
 
 
@@ -1249,5 +1301,5 @@ class ContactList(SubscriptionObject):
 
 
 
-    
-        
+
+

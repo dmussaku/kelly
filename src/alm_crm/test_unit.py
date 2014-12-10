@@ -13,12 +13,12 @@ from alm_crm.models import (
     Feedback,
     Value,
     Comment,
-    Share, 
+    Share,
     ContactList
     )
 from alm_vcard.models import VCard, Tel, Email, Org
 from alm_user.models import User
-from django.core import serializers
+from almanet.models import Subscription
 
 
 class CRMUserTestCase(TestCase):
@@ -33,7 +33,7 @@ class CRMUserTestCase(TestCase):
 
     def test_get_billing_user(self):
         self.assertEqual(self.crmuser.get_billing_user(), User.objects.get(pk=self.crmuser.user_id))
-        
+
     def test_set_supervisor(self):
         self.crmuser.set_supervisor()
         self.assertTrue(self.crmuser.is_supervisor)
@@ -216,7 +216,7 @@ class ContactTestCase(TestCase):
         self.assertTrue(contact1.first() in Contact.objects.all())
         self.assertTrue(contact2.first() in Contact.objects.all())
         self.assertTrue(contact3.first() in Contact.objects.all())
-        
+
 
     def test_get_tp(self):
         tp_unicode = unicode(self.contact1.get_tp())
@@ -353,9 +353,9 @@ class ActivityTestCase(TestCase):
         self.assertEqual(owned_data, {'2014-09-15': 1, '2014-09-11': 1,
                          '2014-09-13': 1, '2014-09-12': 2})
 
-    
+
     def test_unicode(self):
-        self.assertEqual(self.activity1.__unicode__(), self.activity1.title) 
+        self.assertEqual(self.activity1.__unicode__(), self.activity1.title)
 
 
 class MentionTestCase(TestCase):
@@ -567,7 +567,7 @@ class ContactListTestCase(TestCase):
 
     def test_user_contact_lists(self):
         crm_user = CRMUser.objects.get(pk=1)
-        self.assertEqual(self.contact_list, 
+        self.assertEqual(self.contact_list,
                                 crm_user.contact_list.get(id=1))
 
 
@@ -1040,28 +1040,28 @@ class ContactResourceTest(ResourceTestMixin, ResourceTestCase):
         self.get_list_des = self.deserialize(self.get_list_resp)
 
         #get list for cold base
-        self.get_list_cold_base_resp = self.api_client.get(self.api_path_contact+'cold_base/', 
+        self.get_list_cold_base_resp = self.api_client.get(self.api_path_contact+'cold_base/',
                                                                             format='json',
                                                                             HTTP_HOST='localhost')
 
         self.get_list_cold_base_des = self.deserialize(self.get_list_cold_base_resp)
 
         #get list for leads
-        self.get_list_leads_resp = self.api_client.get(self.api_path_contact+'leads/', 
+        self.get_list_leads_resp = self.api_client.get(self.api_path_contact+'leads/',
                                                                             format='json',
                                                                             HTTP_HOST='localhost')
 
         self.get_list_leads_des = self.deserialize(self.get_list_leads_resp)
 
         #get list for recent contacts
-        self.get_list_recent_resp = self.api_client.get(self.api_path_contact+'recent/', 
+        self.get_list_recent_resp = self.api_client.get(self.api_path_contact+'recent/',
                                                                             format='json',
                                                                             HTTP_HOST='localhost')
 
         self.get_list_recent_des = self.deserialize(self.get_list_recent_resp)
 
         #get list for assign contact
-        self.get_list_assign_contact_resp = self.api_client.get(self.api_path_contact+'assign_contact/', 
+        self.get_list_assign_contact_resp = self.api_client.get(self.api_path_contact+'assign_contact/',
                                                                             format='json',
                                                                             HTTP_HOST='localhost')
 
@@ -1102,7 +1102,7 @@ class ContactResourceTest(ResourceTestMixin, ResourceTestCase):
                 len(Activity.objects.get(pk=a['id']).comments.all()),
                 len(a['comments'])
                 )
-        
+
 
     def test_get_list_non_empty(self):
         self.assertTrue(self.get_list_des['meta']['total_count'] > 0)
@@ -1117,7 +1117,7 @@ class ContactResourceTest(ResourceTestMixin, ResourceTestCase):
         post_data = {
             'status': 1,
             'tp': 'user',
-            'assignees':[], 
+            'assignees':[],
         }
 
         count = Contact.objects.count()
@@ -1140,7 +1140,7 @@ class ContactResourceTest(ResourceTestMixin, ResourceTestCase):
         # verify that one contact been deleted.
         self.assertEqual(Contact.objects.count(), count - 1)
 
-    
+
     def test_get_last_contacted(self):
         recent = Contact.get_contacts_by_last_activity_date(1)
         self.assertEqual(
@@ -1155,14 +1155,14 @@ class ContactResourceTest(ResourceTestMixin, ResourceTestCase):
             len(cold_base)
             )
 
-        
+
     def test_get_leads(self):
         STATUS_LEAD = 1
         leads = Contact.get_contacts_by_status(STATUS_LEAD)
         self.assertEqual(
             len(self.get_list_leads_des['objects']),
             len(leads)
-            )        
+            )
 
 
     def test_assign_contact(self):
@@ -1236,22 +1236,22 @@ class ContactResourceTest(ResourceTestMixin, ResourceTestCase):
 
 
         get_list_search_resp = self.api_client.get(self.api_path_contact+
-                                            "search/?search_params=%5B('fn'%2C+'startswith')%5D&search_text=A", 
+                                            "search/?search_params=%5B('fn'%2C+'startswith')%5D&search_text=A",
                                             format='json',
                                             HTTP_HOST='localhost')
 
         get_list_search_ord_dc_resp = self.api_client.get(self.api_path_contact+
-                                            "search/?search_params=%5B('fn'%2C+'startswith')%5D&order_by=%5B'fn'%2C'desc'%5D&search_text=A", 
+                                            "search/?search_params=%5B('fn'%2C+'startswith')%5D&order_by=%5B'fn'%2C'desc'%5D&search_text=A",
                                             format='json',
                                             HTTP_HOST='localhost')
 
         get_list_search_by_bday_resp = self.api_client.get(self.api_path_contact+
-                                            "search/?search_params=%5B'bday'%5D&search_text=1991-09-10", 
+                                            "search/?search_params=%5B'bday'%5D&search_text=1991-09-10",
                                             format='json',
                                             HTTP_HOST='localhost')
-        
+
         get_list_search_by_email_resp = self.api_client.get(self.api_path_contact+
-                                            "search/?search_params=%5B('email__value'%2C+'startswith')%5D&search_text=mus", 
+                                            "search/?search_params=%5B('email__value'%2C+'startswith')%5D&search_text=mus",
                                             format='json',
                                             HTTP_HOST='localhost')
 
@@ -1267,7 +1267,7 @@ class ContactResourceTest(ResourceTestMixin, ResourceTestCase):
 
         self.assertEqual(get_list_search_des['objects'][0]['vcard']['fn'], srch_tx_A_ord_dc[1].vcard.fn)
         self.assertEqual(get_list_search_des['objects'][1]['vcard']['fn'], srch_tx_A_ord_dc[0].vcard.fn)
-        
+
         self.assertEqual(get_list_search_ord_dc_des['objects'][0]['vcard']['fn'], srch_tx_A_ord_dc[0].vcard.fn)
         self.assertEqual(get_list_search_ord_dc_des['objects'][1]['vcard']['fn'], srch_tx_A_ord_dc[1].vcard.fn)
         self.assertEqual(get_list_search_by_bday_des['objects'][0]['vcard']['fn'], srch_by_bday[0].vcard.fn)
@@ -1294,7 +1294,7 @@ class ContactResourceTest(ResourceTestMixin, ResourceTestCase):
                          len(Contact.get_contact_activities(self.contact.pk)))
 
 
-class ContactListResourceTest(ResourceTestMixin, ResourceTestCase): 
+class ContactListResourceTest(ResourceTestMixin, ResourceTestCase):
 
     def setUp(self):
         super(self.__class__, self).setUp()
@@ -1363,7 +1363,7 @@ class ContactListResourceTest(ResourceTestMixin, ResourceTestCase):
 
     def test_delete_user_from_contact_list(self):
         api_path_delete_user = self.api_path_contact_list+'%s/delete_user/' % self.contact_list.pk
-        user_id = self.contact_list.users.first().id 
+        user_id = self.contact_list.users.first().id
         count = self.contact_list.users.all().count()
         self.assertHttpOK(self.api_client.get(api_path_delete_user+'?user_id=%d'%user_id))
         self.assertEqual(self.contact_list.users.all().count(), count-1)
@@ -1404,7 +1404,7 @@ class ContactListResourceTest(ResourceTestMixin, ResourceTestCase):
         api_path_check_user = self.api_path_contact_list+'%s/check_user/?user_id=%s' % \
                                                             (self.contact_list.pk, user.pk)
 
-        get_list_check_user_resp = self.api_client.get(api_path_check_user, 
+        get_list_check_user_resp = self.api_client.get(api_path_check_user,
                                                                             format='json',
                                                                             HTTP_HOST='localhost')
 
@@ -1414,7 +1414,7 @@ class ContactListResourceTest(ResourceTestMixin, ResourceTestCase):
         api_path_check_user = self.api_path_contact_list+'%s/check_user/?user_id=%s' % \
                                                             (self.contact_list.pk, user2.pk)
 
-        get_list_check_user_resp = self.api_client.get(api_path_check_user, 
+        get_list_check_user_resp = self.api_client.get(api_path_check_user,
                                                                             format='json',
                                                                             HTTP_HOST='localhost')
 
@@ -1427,7 +1427,7 @@ class ContactListResourceTest(ResourceTestMixin, ResourceTestCase):
         api_path_get_user = self.api_path_contact_list+'%s/users/' % \
                                                             self.contact_list.pk
 
-        get_list_get_user_resp = self.api_client.get(api_path_get_user, 
+        get_list_get_user_resp = self.api_client.get(api_path_get_user,
                                                                             format='json',
                                                                             HTTP_HOST='localhost')
 
@@ -1437,3 +1437,34 @@ class ContactListResourceTest(ResourceTestMixin, ResourceTestCase):
         self.assertEqual(get_list_get_user_des['objects'][0]['user_id'], users.first().user_id)
         self.assertEqual(get_list_get_user_des['objects'][0]['id'], users.first().id)
 
+
+class AppStateResourceTest(ResourceTestMixin, ResourceTestCase):
+
+    def setUp(self):
+        super(self.__class__, self).setUp()
+
+        # login user
+        self.get_credentials()
+
+        self.api_path_app_state_list = '/api/v1/app_state/'
+
+        # get_detail(pk)
+        self.get_detail_resp = \
+            lambda pk: self.api_client.get(
+                self.api_path_app_state_list+str(pk)+'/',
+                format='json',
+                HTTP_HOST='localhost')
+        self.get_detail_des = \
+            lambda pk: self.deserialize(self.get_detail_resp(pk))
+
+        self.subscription_id = Subscription.objects.first().pk
+
+    def test_get(self):
+        app_state = self.get_detail_des(self.subscription_id)
+        self.assertTrue('objects' in app_state)
+        self.assertTrue('users' in app_state['objects'])
+        self.assertTrue('company' in app_state['objects'])
+        self.assertTrue('contacts' in app_state['objects'])
+        self.assertTrue('sales_cycles' in app_state['objects'])
+        self.assertTrue('shares' in app_state['objects'])
+        self.assertTrue('activities' in app_state['objects'])

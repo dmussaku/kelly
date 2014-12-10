@@ -1,6 +1,6 @@
 from tastypie import fields, http
 from tastypie.contrib.contenttypes.fields import GenericForeignKeyField
-from tastypie.resources import ModelResource
+from tastypie.resources import ModelResource, Resource
 from tastypie.authorization import Authorization
 from tastypie.utils import trailing_slash
 from tastypie.authentication import (
@@ -11,6 +11,10 @@ from tastypie.authentication import (
 from django.conf.urls import url
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
+from django.core.files.temp import NamedTemporaryFile
+from django.core.servers.basehttp import FileWrapper
+from django.forms.models import model_to_dict
+from django.utils import translation
 from .models import (
     SalesCycle,
     Product,
@@ -24,10 +28,15 @@ from .models import (
     Comment,
     Mention,
     )
+from almanet.models import Subscription
+from alm_vcard.models import (
+    VCard,
+    Email as VCardEmail,
+    Adr as VCardAdr,
+    Tel as VCardTel,
+    )
 from almanet.settings import DEFAULT_SERVICE
 import ast
-from django.core.files.temp import NamedTemporaryFile
-from django.core.servers.basehttp import FileWrapper
 
 
 class CRMServiceModelResource(ModelResource):
@@ -124,12 +133,12 @@ class ContactResource(CRMServiceModelResource):
     class Meta(CRMServiceModelResource.Meta):
         queryset = Contact.objects.all()
         resource_name = 'contact'
-    
+
     def post_list(self, request, **kwargs):
         '''
         POST METHOD
         I{URL}:  U{alma.net:8000/api/v1/contact/}
-    
+
         Description
         Api function for contact creation. It creates contact and vcard objects,
         plust it creates a Share objects, so that the user could see that Contact
@@ -140,7 +149,7 @@ class ContactResource(CRMServiceModelResource):
             names
 
         @return:  status 201
-        
+
         >>> example POST payload
         ... {
         ...  "owner": "/api/v1/crmuser/1/",
@@ -149,11 +158,11 @@ class ContactResource(CRMServiceModelResource):
         ...      "family_name":"Allen"
         ...      },
         ...  "comment": "Met this contact on conference"
-        ...  } 
+        ...  }
 
         '''
         return super(self.__class__, self).post_list(request, **kwargs)
-        
+
     def save(self, bundle, skip_errors=False):
         self.is_valid(bundle)
 
@@ -286,7 +295,7 @@ class ContactResource(CRMServiceModelResource):
 
         @return:  contacts ordered by last_activity_date.
 
-        >>> "objecs":[ 
+        >>> "objecs":[
         ...    {
         ...     "assignees": [
         ...         "/api/v1/crmuser/1/"
@@ -305,7 +314,7 @@ class ContactResource(CRMServiceModelResource):
         ...     "subscription_id": 1,
         ...     "tp": "user",
         ...     "vcard": {...}
-        ... }, 
+        ... },
         ... ]
 
         '''
@@ -378,7 +387,7 @@ class ContactResource(CRMServiceModelResource):
         ... "subscription_id": 1,
         ... "tp": "user",
         ... "vcard": {...}
-        ... }, 
+        ... },
         ... ]
 
         '''
@@ -424,7 +433,7 @@ class ContactResource(CRMServiceModelResource):
         ...     "subscription_id": 1,
         ...     "tp": "user",
         ...     "vcard": {...}
-        ... }, 
+        ... },
         ... ]
 
         '''
@@ -803,11 +812,11 @@ class ContactResource(CRMServiceModelResource):
 
         @return: file disposition.
 
-        >>> if list is empty returns 
+        >>> if list is empty returns
         ... No contacts have been selected
-        ... 
+        ...
         >>> if contact id doesn't exist returns:
-        ... Contact with id=contact_id does not exist 
+        ... Contact with id=contact_id does not exist
 
         '''
         contact_ids = ast.literal_eval(request.GET.get('contact_ids', []))
@@ -1258,7 +1267,8 @@ class MentionResource(CRMServiceModelResource):
 
 class ContactListResource(CRMServiceModelResource):
     users = fields.ToManyField('alm_crm.api.CRMUserResource', 'users',
-                                   related_name = 'contact_list', null=True, full=True)
+                               related_name='contact_list',
+                               null=True, full=True)
 
     class Meta(CRMServiceModelResource.Meta):
         queryset = ContactList.objects.all()
@@ -1296,12 +1306,12 @@ class ContactListResource(CRMServiceModelResource):
         '''
         POST METHOD
         I{URL}:  U{alma.net:8000/api/v1/contact_list/}
-    
+
         Description:
         Api function for contact list creation. It creates contact list
 
         @return:  status 201
-        
+
         >>> example POST payload
         ... {
         ...     title: "ALMA Cloud",
@@ -1312,7 +1322,6 @@ class ContactListResource(CRMServiceModelResource):
         ... }
         '''
         return super(self.__class__, self).post_list(request, **kwargs)
-
 
     def get_users(self, request, **kwargs):
         '''
@@ -1361,12 +1370,14 @@ class ContactListResource(CRMServiceModelResource):
             users = ContactList.objects.get(id=contact_list.id).users.all()[offset:offset + limit]
             crm_user_resource = CRMUserResource()
             obj_dict = {}
-            obj_dict['objects'] = crm_user_resource.get_bundle_list(users,
-                                                                   request)
+            obj_dict['objects'] = \
+                crm_user_resource.get_bundle_list(users, request)
             return self.create_response(request, obj_dict)
         except ContactList.DoesNotExist:
             return self.create_response(
-                    request, {'success':False, 'error_string':'Contact list does not exits'}
+                request,
+                {'success': False,
+                 'error_string': 'Contact list does not exits'}
                 )
 
     def check_user(self, request, **kwargs):
@@ -1381,25 +1392,29 @@ class ContactListResource(CRMServiceModelResource):
         @param user_id: User id which you are checking.
 
         @return:  success and list of boolean fields
- 
+
         >>> {
         ...    "success": true
         ... }
 
         '''
-        try: 
+        try:
             contact_list = ContactList.objects.get(id=kwargs.get('id'))
-            user_id = int(request.GET.get('user_id',0))
+            user_id = int(request.GET.get('user_id', 0))
             if not user_id:
                 return self.create_response(
-                        request, {'success':False, 'error_string':'User id is not set'}
+                    request,
+                    {'success': False, 'error_string': 'User id is not set'}
                     )
             return self.create_response(
-                    request, {'success': ContactList.objects.get(id=kwargs.get('id')).check_user(user_id=user_id)}
-                    )
+                request,
+                {'success': ContactList.objects.get(id=kwargs.get('id')).check_user(user_id=user_id)}
+                )
         except ContactList.DoesNotExist:
             return self.create_response(
-                    request, {'success':False, 'error_string':'Contact list does not exits'}
+                request,
+                {'success': False,
+                 'error_string': 'Contact list does not exits'}
                 )
 
     def add_users(self, request, **kwargs):
@@ -1424,15 +1439,18 @@ class ContactListResource(CRMServiceModelResource):
             user_ids = ast.literal_eval(request.GET.get('user_ids'))
             if not user_ids:
                 return self.create_response(
-                        request, {'success':False, 'error_string':'User ids is not set'}
+                    request,
+                    {'success': False, 'error_string': 'User ids is not set'}
                     )
             obj_dict = {}
             obj_dict['success'] = ContactList.objects.get(id=kwargs.get('id')).add_users(user_ids=user_ids)
             return self.create_response(
-                    request, obj_dict)
+                request, obj_dict)
         except ContactList.DoesNotExist:
             return self.create_response(
-                    request, {'success':False, 'error_string':'Contact list does not exits'}
+                request,
+                {'success': False,
+                 'error_string': 'Contact list does not exits'}
                 )
 
     def delete_user(self, request, **kwargs):
@@ -1441,7 +1459,7 @@ class ContactListResource(CRMServiceModelResource):
         I{URL}:  U{alma.net/api/v1/contact/:id/delete_user}
 
         Description:
-        Api function to delete a user in the contact list 
+        Api function to delete a user in the contact list
 
         @type  user_id: number
         @param user_id: User id which you are checking.
@@ -1453,18 +1471,206 @@ class ContactListResource(CRMServiceModelResource):
         ... }
 
         '''
-        try: 
+        try:
             contact_list = ContactList.objects.get(id=kwargs.get('id'))
-            user_id = int(request.GET.get('user_id',0))
+            user_id = int(request.GET.get('user_id', 0))
             if not user_id:
                 return self.create_response(
-                        request, {'success':False, 'error_string':'User id is not set'}
+                    request,
+                    {'success': False, 'error_string': 'User id is not set'}
                     )
             return self.create_response(
-                    request, {'success': ContactList.objects.get(id=kwargs.get('id')).delete_user(user_id=user_id)}
-                    )
+                request,
+                {'success':
+                    ContactList.objects.get(id=kwargs.get('id')).delete_user(
+                        user_id=user_id)}
+                )
         except ContactList.DoesNotExist:
             return self.create_response(
-                    request, {'success':False, 'error_string':'Contact list does not exits'}
+                request,
+                {'success': False,
+                 'error_string': 'Contact list does not exits'}
                 )
 
+
+class AppStateObject(object):
+
+    def __init__(self, subscription_id=None, request=None):
+        if subscription_id is None:
+            return
+
+        self.subscription = Subscription.objects.get(pk=subscription_id)
+        self.company = self.subscription.organization
+        self.request = request
+        self.current_user = request.user
+        self.current_crmuser = \
+            request.user.get_subscr_user(self.subscription.pk)
+
+        self.objects = {
+            'users': self.get_users(),
+            'company': self.get_company(),
+            'contacts': self.get_contacts(),
+            'sales_cycles': self.get_sales_cycles(),
+            'activities': self.get_activities(),
+            'shares': self.get_shares(),
+        }
+        self.constants = self.get_constants()
+        self.session = self.get_session()
+
+    def get_users(self):
+        crmusers, users = CRMUser.get_crmusers(with_users=True)
+
+        def _map(crmuser):
+            data = model_to_dict(users.get(pk=crmuser.pk), fields=[
+                'email', 'first_name', 'last_name', 'is_admin'])
+            data.update({'id': crmuser.pk, 'company_id': self.company.pk})
+            return data
+
+        return map(_map, crmusers)
+
+    def get_company(self):
+        data = model_to_dict(self.company, fields=['name', 'subdomain', 'id'])
+        crmuser = \
+            self.company.owner.first().get_subscr_user(self.subscription.pk)
+        data.update({'owner_id': crmuser.pk})
+        return [data]
+
+    def get_contacts(self):
+        contacts = Contact.get_contacts_by_last_activity_date(
+            self.current_crmuser.pk, owned=True, assigned=True, followed=True)
+
+        def _get_vcard(vcard):
+            data = {}
+            data.update({
+                'org': {
+                    'id': None,  # TODO
+                    'value': vcard.org_set.first() and
+                        vcard.org_set.first().organization_name},
+                'emails': map(lambda e: model_to_dict(
+                    e, fields=['id', 'type', 'value']), vcard.email_set.all()),
+                'phones': map(lambda p: model_to_dict(
+                    p, fields=['id', 'type', 'value']), vcard.tel_set.all()),
+                'urls': map(lambda u: model_to_dict(
+                    u, fields=['id', 'type', 'value']), vcard.url_set.all()),
+                'adrs': map(lambda a: model_to_dict(
+                    a, fields=['id', 'type', 'street_address', 'region',
+                               'locality', 'country_name', 'postal_code']
+                    ), vcard.adr_set.all()),
+                })
+            return data
+
+        def _map(contact):
+            data = model_to_dict(contact, fields=['id', 'status', 'tp'])
+            parent_id = contact.company_contact and contact.company_contact.pk
+            data.update({
+                'parent_id': parent_id,
+                'vcard': _get_vcard(contact.vcard),
+                'owner_id': contact.owner.pk,
+                'date_created': contact.date_created.strftime('%Y-%m-%d %H:%M')
+                })
+            return data
+
+        return map(_map, contacts)
+
+    def get_sales_cycles(self):
+        sales_cycles = SalesCycle.get_salescycles_by_last_activity_date(
+            self.current_crmuser.pk, owned=True, mentioned=True,
+            followed=True, include_activities=False)
+
+        def _map(sc):
+            data = model_to_dict(sc, fields=['id', 'title', 'status'])
+            data.update({
+                'owner_id': sc.owner.pk,
+                'contact_id': sc.contact.pk,
+                'description': None,  # TODO
+                'date_created': sc.date_created.strftime('%Y-%m-%d %H:%M'),
+                'product_ids': sc.products.values_list('pk', flat=True),
+                'projected_value': {
+                    'id': sc.projected_value and sc.projected_value.pk,
+                    'value': sc.projected_value and sc.projected_value.amount},
+                'real_value': {
+                    'id': sc.real_value and sc.real_value.pk,
+                    'value': sc.real_value and sc.real_value.amount}
+                })
+            return data
+
+        return map(_map, sales_cycles)
+
+    def get_activities(self):
+        activities = Activity.get_activities_by_date_created(
+            self.current_crmuser.pk, owned=True, mentioned=True,
+            include_sales_cycles=False)
+
+        def _map(a):
+            data = model_to_dict(a, fields=['id', 'description'])
+            try:
+                feedback_status = a.feedback.status
+            except Feedback.DoesNotExist:
+                feedback_status = None
+            data.update({
+                'author_id': a.owner.pk,
+                'feedback': feedback_status,
+                'date_created': a.date_created.strftime('%Y-%m-%d %H:%M')
+                })
+            return data
+
+        return map(_map, activities)
+
+    def get_shares(self):
+        shares = Share.get_shares_owned_for(self.current_crmuser.pk)
+
+        def _map(share):
+            data = model_to_dict(share,
+                                 fields=['id', 'share_to', 'share_from'])
+            data.update({
+                'note': None,  # TODO
+                'contact_id': shares.contact.pk,
+                'date_created': share.date_created.strftime('%Y-%m-%d %H:%M'),
+                })
+            return data
+
+        return map(_map, shares)
+
+    def get_constants(self):
+        return {
+            'salescycle': {'statuses': map(lambda s: {s[0]: s[1]},
+                                           SalesCycle.STATUS_OPTIONS)},
+            'feedback': {'statuses': map(lambda s: {s[0]: s[1]},
+                                         Feedback.STATUS_OPTIONS)},
+            'contacts': {
+                'statuses': map(lambda s: {s[0]: s[1]}, Contact.STATUS_CODES),
+                'tp': map(lambda t: {t[0]: t[1]}, Contact.TYPES_WITH_CAPS)
+            },
+            'vcard__email': {'types': map(lambda s: {s[0]: s[1]},
+                                          VCardEmail.TYPE_CHOICES)},
+            'vcard__adr': {'types': map(lambda s: {s[0]: s[1]},
+                                        VCardAdr.TYPE_CHOICES)},
+            'vcard__phone': {'types': map(lambda s: {s[0]: s[1]},
+                                          VCardTel.TYPE_CHOICES)},
+        }
+
+    def get_session(self):
+        return {
+            'user_id': self.current_crmuser.pk,
+            'session_key': self.request.session.session_key,
+            'logged_in': self.current_user.is_authenticated(),
+            'language': translation.get_language()
+        }
+
+    def to_dict(self):
+        return self._data
+
+
+class AppStateResource(Resource):
+    objects = fields.DictField(attribute='objects', readonly=True)
+    constants = fields.DictField(attribute='constants', readonly=True)
+    session = fields.DictField(attribute='session', readonly=True)
+
+    class Meta:
+        resource_name = 'app_state'
+        object_class = AppStateObject
+        authorization = Authorization()
+
+    def obj_get(self, bundle, **kwargs):
+        return AppStateObject(subscription_id=kwargs['pk'],
+                              request=bundle.request)
