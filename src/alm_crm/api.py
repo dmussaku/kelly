@@ -1494,6 +1494,11 @@ class ContactListResource(CRMServiceModelResource):
 
 
 class AppStateObject(object):
+    '''
+    @undocumented: __init__, get_users, get_company, get_contacts,
+    get_sales_cycles, get_activities, get_shares, get_constants,
+    get_session
+    '''
 
     def __init__(self, subscription_id=None, request=None):
         if subscription_id is None:
@@ -1662,6 +1667,16 @@ class AppStateObject(object):
 
 
 class AppStateResource(Resource):
+    '''
+    ALL Method
+    I{URL}:  U{alma.net/api/v1/app_state/}
+
+    B{Description}:
+    API resource to get all data of application initial state:
+    objects(users, contacts, activities, etc.), constants and session data
+
+    @undocumented: Meta
+    '''
     objects = fields.DictField(attribute='objects', readonly=True)
     constants = fields.DictField(attribute='constants', readonly=True)
     session = fields.DictField(attribute='session', readonly=True)
@@ -1672,5 +1687,110 @@ class AppStateResource(Resource):
         authorization = Authorization()
 
     def obj_get(self, bundle, **kwargs):
+        '''
+        GET METHOD
+        I{URL}:  U{alma.net/api/v1/app_state/:subscription_id/}
+
+        B{Description}:
+        API function to get application's initial data
+
+        @type  subscription_id: number
+        @param subscription_id: Subscription's id to identify data.
+
+        @return: dict of objects, contacts and session data
+
+        >>> {
+        ... 'session': {
+        ...     'logged_in': True,
+        ...     'session_key': '0pp2uy626ochy0kz0remjl29tbdc8b15',
+        ...     'user_id': 1,
+        ...     'language': 'en-us'
+        ...     },
+        ... 'objects': {
+        ...     'activities': [{
+        ...         'id': 5,
+        ...         'date_created':
+        ...         '2014-09-15 00:00',
+        ...         'author_id': 1,
+        ...         'description': 'd5',
+        ...         'feedback': 'W'
+        ...     }],
+        ...     'users': [{
+        ...         'first_name': 'Bruce',
+        ...         'last_name': 'Wayne',
+        ...         'company_id': 1,
+        ...         'email': 'b.wayne@batman.bat',
+        ...         'is_admin': False,
+        ...         'id': 1
+        ...         }],
+        ...     'contacts': [{
+        ...         'status': 1,
+        ...         'tp': 'user',
+        ...         'vcard': {
+        ...             'org': {'id': None, 'value': None},
+        ...             'adrs': [],
+        ...             'emails': [{'type': 'WORK', 'id': 1, 'value': 'akerke.akerke@gmail.com'}],
+        ...             'urls': [],
+        ...             'phones': [{'type': 'CELL', 'id': 1, 'value': '87753591453'}]
+        ...             },
+        ...         'parent_id': 1,
+        ...         'date_created':
+        ...         '2014-09-10 00:00',
+        ...         'id': 1,
+        ...         'owner_id': 1
+        ...         }],
+        ...     'company': [{
+        ...         'subdomain': 'almacloud',
+        ...         'owner_id': 1,
+        ...         'id': 1,
+        ...         'name': 'ALMACloud'
+        ...         }],
+        ...     'shares': [],
+        ...     'sales_cycles': [{
+        ...         'status': 'N',
+        ...         'description': None,
+        ...         'title': '',
+        ...         'real_value': {'id': 3, 'value': 100000},
+        ...         'projected_value': {'id': 3, 'value': 100000},
+        ...         'contact_id': 1,
+        ...         'product_ids': '[]',
+        ...         'date_created': '2014-09-12 00:00',
+        ...         'id': 3,
+        ...         'owner_id': 1
+        ...         }]
+        ...     },
+        ... 'constants': {
+        ...     'vcard__adr': {
+        ...         'types': [{'INTL': 'INTL'}, {'POSTAL': 'postal'},
+        ...             {'PARCEL': 'parcel'}, {u'WORK': u'work'}, {u'dom': u'dom'},
+        ...             {u'home': u'home'}, {u'pref': u'pref'}
+        ...             ]
+        ...         },
+        ...     'feedback': {'statuses': [
+        ...             {'W': 'waiting'}, {'$': '1000'}, {'1': 'Client is happy'},
+        ...             {'2': 'Client is OK'}, {'3': 'Client is neutral'},
+        ...             {'4': 'Client is disappointed'}, {'5': 'Client is angry'}
+        ...             ]
+        ...         },
+        ...     'vcard__phone': {
+        ...         'types': [{'VOICE': 'INTL'}, {'HOME': 'home'},
+        ...             {'MSG': 'message'}, {'WORK': 'work'}, {'pref': 'prefered'},
+        ...             {'fax': 'fax'}, {'cell': 'cell phone'}, {'video': 'video'},
+        ...             {'pager': 'pager'}, {'bbs': 'bbs'}, {'modem': 'modem'},
+        ...             {'car': 'car phone'}, {'isdn': 'isdn'}, {'pcs': 'pcs'}
+        ...             ]
+        ...         },
+        ...     'contacts': {
+        ...         'tp': [{'co': 'company type'}, {'user': 'user type'}],
+        ...         'statuses': [{'0': 'new_contact'}, {'1': 'lead_contact'},
+        ...             {'2': u'opportunity_contact'}, {'3': 'client_contact'}]
+        ...     },
+        ...     'vcard__email': {'types': [{'INTERNET': 'internet'}, {'x400': 'x400'}, {'pref': 'pref'}]},
+        ...     'salescycle': {'statuses': [{'N': 'New'}, {'P': 'Pending'}, {'C': 'Completed'}]}
+        ...     },
+        ... 'resource_uri': ''
+        ... }
+
+        '''
         return AppStateObject(subscription_id=kwargs['pk'],
                               request=bundle.request)
