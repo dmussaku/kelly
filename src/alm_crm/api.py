@@ -1,6 +1,6 @@
 from tastypie import fields
 from tastypie.contrib.contenttypes.fields import GenericForeignKeyField
-from tastypie.resources import ModelResource
+from tastypie.resources import Resource, ModelResource
 from tastypie.authorization import Authorization
 from django.http import HttpResponse
 from tastypie.utils import trailing_slash
@@ -28,6 +28,7 @@ from almanet.settings import DEFAULT_SERVICE
 import ast
 from django.core.files.temp import NamedTemporaryFile
 from django.core.servers.basehttp import FileWrapper
+from tastypie.serializers import Serializer
 
 
 class CRMServiceModelResource(ModelResource):
@@ -69,6 +70,57 @@ class CRMServiceModelResource(ModelResource):
                                              SessionAuthentication())
         authorization = Authorization()
 
+
+class SubscriptionResource(Resource):
+    users = fields.ToManyField('alm_crm.api.CRMUserResource', 'users',
+                                   null=True, full=True)
+    #company = fields.ToManyField('alm')
+    contacts = fields.ToManyField('alm_crm.api.ContactResource','contacts', null=True, full=True)
+    sales_cycles = fields.ToManyField('alm_crm.api.SalesCycleResource','sales_cycles', null=True, full=False)
+    shares = fields.ToManyField('alm_crm.api.ShareResource','shares', null=True, full=False)
+    activities = fields.ToManyField('alm_crm.api.ActivityResource', 'activities', null=True, full=True)
+
+    class Meta:
+        resource_name='app_state'
+        allowed_methods = ['get']
+        serializer = Serializer(formats=['json'])
+
+    def get_bundle_list(self, queryset, request):
+        print 'get_bundle_list'
+        objects=[]
+        for obj in queryset:
+            bundle = self.build_bundle(obj=obj, request=request)
+            bundle = self.full_dehydrate(bundle, for_list=True)
+            objects.append(bundle)
+        return objects
+
+    def obj_get_list(self, request=None, **kwargs):
+        print 'obj_get_list'
+        if not request:
+            request = kwargs['bundle'].request
+        return self.get_object_list(request)
+
+    def get_object_list(self, request, **kwargs):
+        print self.kwargs
+        print 'get_object_list'
+        #subscription_id = self.kwargs.get('subscription_id')
+        subscription_id = 1
+        users = CRMUser.objects.filter(subscription_id=subscription_id)
+        contacts = Contact.objects.filter(subscription_id=subscription_id)
+        sales_cycles = SalesCycle.objects.filter(subscription_id=subscription_id)
+        shares = Share.objects.filter(subscription_id=subscription_id)
+        activities = Activity.objects.filter(subscription_id=subscription_id)
+        results={}
+        results['users'] = self.get_bundle_list(users, request)
+        results['contacts'] = self.get_bundle_list(contacts, request)
+        print results
+        return results
+
+    def get_list(self, request, **kwargs):
+        print 'get_list'
+        base_bundle = self.build_bundle(request=request)
+        objects = self.obj_get_list(bundle=base_bundle, **self.remove_api_resource_names(kwargs))
+        return self.create_response(request, self.alter_list_data_to_serialize(request,objects))
 
 class ContactResource(CRMServiceModelResource):
     """

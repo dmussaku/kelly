@@ -23,7 +23,8 @@ from alm_crm.api import (
     FeedbackResource,
     CRMUserResource,
     ValueResource,
-    ContactListResource
+    ContactListResource,
+    SubscriptionResource
     )
 from alm_user.api import UserSessionResource, UserResource
 from tastypie.resources import ModelResource
@@ -47,6 +48,7 @@ v1_api.register(CRMUserResource())
 v1_api.register(UserSessionResource())
 v1_api.register(UserResource())
 v1_api.register(ContactListResource())
+v1_api.register(SubscriptionResource())
 
 urlpatterns = patterns(
     '',

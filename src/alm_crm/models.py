@@ -1098,6 +1098,7 @@ class Share(SubscriptionObject):
     share_to = models.ForeignKey(CRMUser, related_name='in_shares')
     share_from = models.ForeignKey(CRMUser, related_name='owned_shares')
     date_created = models.DateTimeField(blank=True, auto_now_add=True)
+    note = models.CharField(blank=True, max_length=200)
     comments = generic.GenericRelation('Comment')
 
     class Meta:
