@@ -44,7 +44,49 @@ class UserSessionResource(Resource):
     I{URL}:  U{alma.net/api/v1/user_session}
 
     B{Description}:
-    API resource to manage Session of authentication
+    API resource to manage Session Authentication
+
+    B{How to use with cURL}:
+
+    I{Create session via email & password:}
+
+    curl --dump-header - -H "Content-Type: application/json" -X POST --data '{"email": "sattar94@outlook.com", "password": "qweasdzxc"}' http://alma.net:8000/api/v1/user_session/
+
+    >>> HTTP/1.0 201 CREATED
+    ... Date: Fri, 26 Dec 2014 03:58:09 GMT
+    ... Server: WSGIServer/0.1 Python/2.7.6
+    ... Access-Control-Allow-Headers: Content-Type,*
+    ... Vary: Accept, Cookie
+    ... Location: http://alma.net:8000/api/v1/user_session/3neickljn2s3hg9e6ahtysko0srm7umn/
+    ... Access-Control-Allow-Credentials: true
+    ... Access-Control-Allow-Origin: *
+    ... Access-Control-Allow-Methods: POST,GET,OPTIONS,PUT,DELETE
+    ... Content-Type: text/html; charset=utf-8
+    ... Set-Cookie:  csrftoken=QU2hIAvkUxtnnncAf3nhOX7OvNy3W9fW; expires=Fri, 25-Dec-2015 03:58:08 GMT; Max-Age=31449600; Path=/
+    ... Set-Cookie:  sessionid=3neickljn2s3hg9e6ahtysko0srm7umn; Domain=.alma.net; expires=Fri, 09-Jan-2015 03:58:08 GMT; httponly; Max-Age=1209600; Path=/
+
+    I{Get information of created session via Cookie 'sessionid'}
+
+    curl --dump-header - -H "Content-Type: application/json" -X GET -b "sessionid=3neickljn2s3hg9e6ahtysko0srm7umn" http://localhost:8000/api/v1/user_session/
+
+    >>> {
+    ... "meta": {"limit": 20, "next": null, "offset": 0, "previous": null, "total_count": 1},
+    ... "objects": [{
+    ... "expire_date": "2015-01-09T04:12:55.022264",
+    ... "id": "3neickljn2s3hg9e6ahtysko0srm7umn",
+    ... "resource_uri": "/api/v1/user_session/3neickljn2s3hg9e6ahtysko0srm7umn/",
+    ... "user": {
+    ...     "id": 1,
+    ...     "email": "sattar94@outlook.com",
+    ...     "first_name": "Sattar",
+    ...     "last_name": "Stamkulov",
+    ...     "is_active": true,
+    ...     "last_login": "2014-12-26T03:58:08.795864",
+    ...     "resource_uri": "/api/v1/user/1/",
+    ...     "timezone": "Asia/Almaty"
+    ...     }
+    ... }]
+    ... }
 
     @undocumented: Meta, get_resource_uri, get_object_list,
     _build_session_object, _build_session_object_or_raise,
