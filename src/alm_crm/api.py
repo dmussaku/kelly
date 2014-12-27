@@ -1515,9 +1515,10 @@ class AppStateObject(object):
             'users': self.get_users(),
             'company': self.get_company(),
             'contacts': self.get_contacts(),
+            'shares': self.get_shares(),
             'sales_cycles': self.get_sales_cycles(),
             'activities': self.get_activities(),
-            'shares': self.get_shares(),
+            'products': self.get_products(),
         }
         self.constants = self.get_constants()
         self.session = self.get_session()
@@ -1526,7 +1527,7 @@ class AppStateObject(object):
         crmusers, users = CRMUser.get_crmusers(with_users=True)
 
         def _map(crmuser):
-            data = model_to_dict(users.get(pk=crmuser.pk), fields=[
+            data = model_to_dict(users.get(pk=crmuser.user_id), fields=[
                 'email', 'first_name', 'last_name', 'is_admin'])
             data.update({'id': crmuser.pk, 'company_id': self.company.pk})
             return data
@@ -1621,6 +1622,17 @@ class AppStateObject(object):
 
         return map(_map, activities)
 
+    def get_products(self):
+        products = Product.get_products()
+
+        def _map(p):
+            data = model_to_dict(p,
+                fields=['id', 'name', 'description', 'price', 'currency'])
+            data.update({'owner_id': p.owner.pk})
+            return data
+
+        return map(_map, products)
+
     def get_shares(self):
         shares = Share.get_shares_owned_for(self.current_crmuser.pk)
 
@@ -1629,7 +1641,7 @@ class AppStateObject(object):
                                  fields=['id', 'share_to', 'share_from'])
             data.update({
                 'note': None,  # TODO
-                'contact_id': shares.contact.pk,
+                'contact_id': share.contact.pk,
                 'date_created': share.date_created.strftime('%Y-%m-%d %H:%M'),
                 })
             return data

@@ -79,10 +79,17 @@ class User(AbstractBaseUser):
     def get_owned_company(self):
         return self.owned_company.first()
 
-    def get_subscriptions(self):
-        return self.subscriptions.all()
+    def get_subscriptions(self, flat=False):
+        subscriptions = self.subscriptions.all()
+        if not flat:
+            return subscriptions
+        else:
+            data = {}
+            for s in subscriptions:
+                data[s.service.slug] = {'id': s.id, 'is_active': s.is_active}
+            return data
 
-    def get_active_subscriptions(self):
+    def get_active_subscriptions(self, flat=False):
         return self.get_company().get_connected_services()
 
     def connected_services(self):
