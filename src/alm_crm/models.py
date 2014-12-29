@@ -863,6 +863,10 @@ class Activity(SubscriptionObject):
     def author(self):
         return self.owner
 
+    @property 
+    def author_id(self):
+        return self.owner.id
+
     @property
     def contact(self):
         return self.sales_cycle.contact.id
@@ -1006,6 +1010,7 @@ class Mention(SubscriptionObject):
     @property
     def author(self):
         return self.owner
+
 
     @classmethod
     def build_new(cls, user_id, content_class=None,
