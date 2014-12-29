@@ -857,15 +857,17 @@ class SalesCycleResource(CRMServiceModelResource):
 
     @undocumented: prepend_urls, Meta
     '''
-    contact = fields.ForeignKey(ContactResource, 'contact')
+    #contact = fields.ForeignKey(ContactResource, 'contact')
+    contact_id = fields.IntegerField(attribute='contact_id')
     activities = fields.ToManyField(
         'alm_crm.api.ActivityResource', 'rel_activities',
         related_name='sales_cycle', null=True, full=True)
-    products = fields.ToManyField(
-        'alm_crm.api.ProductResource', 'products',
-        related_name='sales_cycles', null=True, full=True)
-    owner = fields.ToOneField('alm_crm.api.CRMUserResource',
-                              'owner', null=True, full=True)
+    # products = fields.ToManyField(
+    #     'alm_crm.api.ProductResource', 'products',
+    #     related_name='sales_cycles', null=True, full=True)
+    product_ids = fields.ListField(attribute='product_ids')
+    # owner = fields.ToOneField('alm_crm.api.CRMUserResource', 'owner', null=True, full=True)
+    owner_id = fields.IntegerField(attribute='owner_id')
     followers = fields.ToManyField('alm_crm.api.CRMUserResource',
                                    'followers', null=True, full=True)
     projected_value = fields.ToOneField('alm_crm.api.ValueResource',
@@ -877,6 +879,9 @@ class SalesCycleResource(CRMServiceModelResource):
     class Meta(CRMServiceModelResource.Meta):
         queryset = SalesCycle.objects.all()
         resource_name = 'sales_cycle'
+
+    def dehydrate_date_created(self, bundle):
+        return bundle.obj.date_created.strftime('%Y-%m-%d %H:%M')
 
     def prepend_urls(self):
         return [

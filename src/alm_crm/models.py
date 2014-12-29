@@ -681,6 +681,14 @@ class SalesCycle(SubscriptionObject):
         verbose_name = 'sales_cycle'
         db_table = settings.DB_PREFIX.format('sales_cycle')
 
+    @property
+    def product_ids(self):
+        return self.products.values_list('pk', flat=True)
+
+    @product_ids.setter
+    def product_ids(self, value):
+        self.products = Product.objects.filter(id__in=value)
+
     def find_latest_activity(self):
         return self.rel_activities.order_by('-date_created').first()
 
