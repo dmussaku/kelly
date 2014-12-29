@@ -48,16 +48,9 @@ class CRMServiceModelResource(ModelResource):
         it happen when tastypie uses BasicAuthentication or another
         which doesn't have session
         """
-        user_env = bundle.request.user_env
-
-        if 'subscriptions' in user_env:
-            bundle.obj.subscription_pk = filter(
-                lambda x: user_env['subscription_{}'.format(x)]['slug'] == DEFAULT_SERVICE,
-                user_env['subscriptions']
-                )[0]
-            bundle.obj.owner = bundle.request.user.get_subscr_user(
-                bundle.obj.subscription_pk)
-        print bundle
+        crmuser = self.get_crmuser(bundle.request)
+        if crmuser:
+            bundle.obj.owner = crmuser
         return bundle
 
     def get_bundle_list(self, obj_list, request):
@@ -70,6 +63,25 @@ class CRMServiceModelResource(ModelResource):
             bundle = self.full_dehydrate(bundle)
             objects.append(bundle)
         return objects
+
+    @classmethod
+    def get_crm_subscription(cls, request):
+        user_env = request.user_env
+        subscription_pk = None
+        if 'subscriptions' in user_env:
+            subscription_pk = filter(
+                lambda x: user_env['subscription_{}'.format(x)]['slug'] == DEFAULT_SERVICE,
+                user_env['subscriptions']
+                )[0]
+        return subscription_pk
+
+    @classmethod
+    def get_crmuser(cls, request):
+        subscription_pk = cls.get_crm_subscription(request)
+        crmuser = None
+        if subscription_pk:
+            crmuser = request.user.get_subscr_user(subscription_pk)
+        return crmuser
 
     class Meta:
         list_allowed_methods = ['get', 'post']
@@ -1543,11 +1555,13 @@ class AppStateObject(object):
 
     def get_contacts(self):
         contacts = Contact.get_contacts_by_last_activity_date(
-            self.current_crmuser.pk, owned=True, assigned=True, followed=True)
+            self.current_crmuser.pk, owned=True, assigned=True, followed=True,
+            in_shares=True)
 
         def _get_vcard(vcard):
             data = {}
             data.update({
+                'fn': vcard.fn,
                 'org': {
                     'id': None,  # TODO
                     'value': vcard.org_set.first() and
@@ -1614,6 +1628,7 @@ class AppStateObject(object):
             except Feedback.DoesNotExist:
                 feedback_status = None
             data.update({
+                'salescycle_id': a.sales_cycle.pk,
                 'author_id': a.owner.pk,
                 'feedback': feedback_status,
                 'date_created': a.date_created.strftime('%Y-%m-%d %H:%M')
@@ -1697,6 +1712,15 @@ class AppStateResource(Resource):
         resource_name = 'app_state'
         object_class = AppStateObject
         authorization = Authorization()
+
+    def prepend_urls(self):
+        return [
+            url(
+                r"^(?P<resource_name>%s)/my_feed%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('my_feed'),
+                name='api_my_feed'
+            )]
 
     def obj_get(self, bundle, **kwargs):
         '''
@@ -1806,3 +1830,53 @@ class AppStateResource(Resource):
         '''
         return AppStateObject(subscription_id=kwargs['pk'],
                               request=bundle.request)
+
+    def my_feed(self, request, **kwargs):
+        '''
+        pass limit and offset with GET request
+        '''
+        current_crmuser = CRMServiceModelResource.get_crmuser(request)
+
+        activities, sales_cycles, s2a_map = Activity.get_activities_by_date_created(
+            current_crmuser.pk, owned=True, mentioned=True,
+            include_sales_cycles=True, limit=100000)
+
+        def _map_activity(a):
+            data = model_to_dict(a, fields=['id', 'description'])
+            try:
+                feedback_status = a.feedback.status
+            except Feedback.DoesNotExist:
+                feedback_status = None
+            data.update({
+                'salescycle_id': a.sales_cycle.pk,
+                'author_id': a.owner.pk,
+                'feedback': feedback_status,
+                'date_created': a.date_created.strftime('%Y-%m-%d %H:%M')
+                })
+            return data
+
+        def _map_sales_cycle(sc):
+            data = model_to_dict(sc, fields=['id', 'title', 'status'])
+            data.update({
+                'owner_id': sc.owner.pk,
+                'contact_id': sc.contact.pk,
+                'description': None,  # TODO
+                'date_created': sc.date_created.strftime('%Y-%m-%d %H:%M'),
+                'product_ids': sc.products.values_list('pk', flat=True),
+                'projected_value': {
+                    'id': sc.projected_value and sc.projected_value.pk,
+                    'value': sc.projected_value and sc.projected_value.amount},
+                'real_value': {
+                    'id': sc.real_value and sc.real_value.pk,
+                    'value': sc.real_value and sc.real_value.amount}
+                })
+            return data
+
+        activities = map(_map_activity, activities)
+        sales_cycles = map(_map_sales_cycle, sales_cycles)
+
+        return self.create_response(
+            request,
+            {'sales_cycles': sales_cycles, 'activities': activities}
+            # {'objects': self.get_bundle_list(shares, request)}
+            )

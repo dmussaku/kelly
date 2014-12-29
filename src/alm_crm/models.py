@@ -489,7 +489,8 @@ class Contact(SubscriptionObject):
     @classmethod
     def get_contacts_by_last_activity_date(
             cls, user_id, owned=True, assigned=False,
-            followed=False, include_activities=False, limit=20, offset=0):
+            followed=False, in_shares=False, include_activities=False,
+            limit=20, offset=0):
         """TEST Returns list of contacts ordered by last activity date.
             Returns:
                 Queryset<Contact>
@@ -517,6 +518,10 @@ class Contact(SubscriptionObject):
             q |= Q(assignees__user_id=user_id)
         if followed:
             q |= Q(followers__user_id=user_id)
+        if in_shares:
+            crmuser = CRMUser.objects.get(pk=user_id)
+            shares = crmuser.in_shares
+            q |= Q(id__in=set(shares.values_list('contact_id', flat=True)))
         if len(q.children) == 0:
             contacts = cls.objects.none()
         else:
@@ -1023,12 +1028,11 @@ class Activity(SubscriptionObject):
             return activities
         else:
             sales_cycles = SalesCycle.objects.filter(
-                sales_cycle_id__in=activities.values_list('pk', flat=True))
-            sales_cycle_activity_map = {}
+                id__in=activities.values_list('sales_cycle_id', flat=True))
+            s2a_map = {}
             for sc in sales_cycles:
-                sales_cycle_activity_map[sc.id] = \
-                    sc.rel_activities.values_list('pk', flat=True)
-            return (activities, sales_cycles, sales_cycle_activity_map)
+                s2a_map[sc.id] = sc.rel_activities.values_list('pk', flat=True)
+            return (activities, sales_cycles, s2a_map)
 
     def save(self, **kwargs):
         if not self.subscription_id and self.owner:
