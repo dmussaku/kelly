@@ -8,22 +8,15 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Adding model 'Product'
-        db.create_table('alma_product', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('subscription_id', self.gf('django.db.models.fields.IntegerField')(null=True, blank=True)),
-            ('name', self.gf('django.db.models.fields.CharField')(max_length=100)),
-            ('description', self.gf('django.db.models.fields.TextField')()),
-            ('price', self.gf('django.db.models.fields.IntegerField')()),
-            ('currency', self.gf('django.db.models.fields.CharField')(default='KZT', max_length=3)),
-            ('owner', self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='crm_products', null=True, to=orm['alm_crm.CRMUser'])),
-        ))
-        db.send_create_signal(u'alm_crm', ['Product'])
+        # Adding field 'SalesCycle.description'
+        db.add_column('alma_sales_cycle', 'description',
+                      self.gf('django.db.models.fields.CharField')(default='', max_length=500),
+                      keep_default=False)
 
 
     def backwards(self, orm):
-        # Deleting model 'Product'
-        db.delete_table('alma_product')
+        # Deleting field 'SalesCycle.description'
+        db.delete_column('alma_sales_cycle', 'description')
 
 
     models = {
@@ -113,6 +106,7 @@ class Migration(SchemaMigration):
             'Meta': {'object_name': 'SalesCycle', 'db_table': "'alma_sales_cycle'"},
             'contact': ('django.db.models.fields.related.ForeignKey', [], {'default': 'None', 'related_name': "'sales_cycles'", 'on_delete': 'models.SET_DEFAULT', 'to': u"orm['alm_crm.Contact']"}),
             'date_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
+            'description': ('django.db.models.fields.CharField', [], {'max_length': '500'}),
             'followers': ('django.db.models.fields.related.ManyToManyField', [], {'blank': 'True', 'related_name': "'follow_sales_cycles'", 'null': 'True', 'symmetrical': 'False', 'to': u"orm['alm_crm.CRMUser']"}),
             'from_date': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),

@@ -859,17 +859,16 @@ class SalesCycleResource(CRMServiceModelResource):
     '''
     #contact = fields.ForeignKey(ContactResource, 'contact')
     contact_id = fields.IntegerField(attribute='contact_id')
-    activities = fields.ToManyField(
-        'alm_crm.api.ActivityResource', 'rel_activities',
-        related_name='sales_cycle', null=True, full=True)
-    # products = fields.ToManyField(
-    #     'alm_crm.api.ProductResource', 'products',
-    #     related_name='sales_cycles', null=True, full=True)
-    product_ids = fields.ListField(attribute='product_ids')
+    # activities = fields.ToManyField(
+    #     'alm_crm.api.ActivityResource', 'rel_activities',
+    #     related_name='sales_cycle', null=True, full=True)
+    product_ids = fields.ToManyField(
+        'alm_crm.api.ProductResource', 'products',
+        related_name='sales_cycles', null=True, full=False)
     # owner = fields.ToOneField('alm_crm.api.CRMUserResource', 'owner', null=True, full=True)
     owner_id = fields.IntegerField(attribute='owner_id')
-    followers = fields.ToManyField('alm_crm.api.CRMUserResource',
-                                   'followers', null=True, full=True)
+    # followers = fields.ToManyField('alm_crm.api.CRMUserResource',
+    #                                'followers', null=True, full=True)
     projected_value = fields.ToOneField('alm_crm.api.ValueResource',
                                         'projected_value', null=True,
                                         full=True)
@@ -879,9 +878,21 @@ class SalesCycleResource(CRMServiceModelResource):
     class Meta(CRMServiceModelResource.Meta):
         queryset = SalesCycle.objects.all()
         resource_name = 'sales_cycle'
+        excludes = ['from_date', 'to_date']
 
     def dehydrate_date_created(self, bundle):
         return bundle.obj.date_created.strftime('%Y-%m-%d %H:%M')
+
+    def dehydrate_product_ids(self, bundle):
+        return bundle.obj.products.values_list('pk', flat=True)
+
+    def hydrate_product_ids(self, bundle):
+        ids = bundle.data.get('product_ids', [])
+        # check to prevent second run, because hydrate runs twice
+        if len(ids) > 0 and type(ids[0]) == int:
+            ids = map(int, ids)
+            bundle.data['product_ids'] = Product.objects.filter(id__in=ids)
+        return bundle
 
     def prepend_urls(self):
         return [
@@ -963,9 +974,9 @@ class SalesCycleResource(CRMServiceModelResource):
             format=request.META.get('CONTENT_TYPE', 'application/json'))
         deserialized = self.alter_deserialized_list_data(request, deserialized)
 
-        if deserialized.get('amount'):
+        if deserialized.get('value', False):
             real_value = {
-                'amount': deserialized.get('amount'),
+                'amount': deserialized.get('value'),
                 'salary': deserialized.get('salary'),
                 'currency': deserialized.get('currency')
                 }
@@ -974,7 +985,7 @@ class SalesCycleResource(CRMServiceModelResource):
             bundle.obj.finish(**real_value)
         else:
             return http.HttpBadRequest(
-                content="must be provided 'amount' value of 'real_value'",
+                content="must be provided 'value' value of 'real_value'",
                 content_type='text/plain')
 
         if not hasattr(self.Meta, 'always_return_data') or \
@@ -1147,14 +1158,27 @@ class ValueResource(CRMServiceModelResource):
 
     B{Description}:
     API resource to manage SalesCycle's Value
+    I{Note}: Model's 'amount' field was changed to 'value' in API
 
+    @return: Value of SalesCycle
+
+    >>> {
+    ... "id": 1,
+    ... "value": 20000
+    ... "currency": "KZT",
+    ... "resource_uri": "/api/v1/sales_cycle/value/1/",
+    ... "salary": "monthly",
+    ... "subscription_id": null,
+    ... }
 
     @undocumented: Meta
     '''
+    value = fields.IntegerField(attribute='amount')
 
     class Meta(CRMServiceModelResource.Meta):
         queryset = Value.objects.all()
         resource_name = 'sales_cycle/value'
+        excludes = ['amount']
 
 
 class CRMUserResource(CRMServiceModelResource):

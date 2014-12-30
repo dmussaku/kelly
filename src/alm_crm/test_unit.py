@@ -713,31 +713,27 @@ class SalesCycleResourceTest(ResourceTestMixin, ResourceTestCase):
 
         self.sales_cycle = SalesCycle.objects.first()
 
-    # def test_get_list_unauthorzied(self):
-    #     self.assertHttpUnauthorized(self.api_client.get(
-    #         self.api_path_sales_cycle, format='json'))
-
     def test_get_list_valid_json(self):
         self.assertValidJSONResponse(self.get_resp(''))
 
     def test_get_list_non_empty(self):
         self.assertTrue(self.get_des_res('')['meta']['total_count'] > 0)
 
-    # def test_get_detail_unauthorzied(self):
-    #     self.assertHttpUnauthorized(self.api_client.get(
-    #         self.api_path_sales_cycle + '1/', format='json'))
-
     def test_get_detail_json(self):
         self.assertEqual(
             self.get_des_res(str(self.sales_cycle.pk)+'/')['title'],
             self.sales_cycle.title
             )
+        self.assertEqual(
+            self.get_des_res(str(self.sales_cycle.pk)+'/')['id'],
+            self.sales_cycle.id
+            )
 
     def test_create_sales_cycle(self):
         post_data = {
             'title': 'new SalesCycle from test_unit',
-            'contact': {'pk': Contact.objects.last()},
-            'activities': []
+            'contact_id': Contact.objects.last().pk,
+            'product_ids': [1, 2]
         }
 
         count = SalesCycle.objects.count()
@@ -754,7 +750,10 @@ class SalesCycleResourceTest(ResourceTestMixin, ResourceTestCase):
             sales_cycle.owner,
             self.user.get_subscr_user(sales_cycle.subscription_id)
             )
+        # verify products
+        self.assertEqual(sales_cycle.products.count(), 2)
 
+    @skipIf(True, "now, activities is not presented in SalesCycleResource")
     def test_create_sales_cycle_with_activity(self):
         post_data = {
             'title': 'new SalesCycle with one Activity',
@@ -807,7 +806,7 @@ class SalesCycleResourceTest(ResourceTestMixin, ResourceTestCase):
 
     def test_finish_sales_cycle(self):
         put_data = {
-            'amount': 1000
+            'value': 1000
         }
 
         resp = self.api_client.put(
@@ -819,10 +818,9 @@ class SalesCycleResourceTest(ResourceTestMixin, ResourceTestCase):
         sales_cycle = SalesCycle.objects.get(pk=self.sales_cycle.pk)
 
         self.assertTrue(sales_cycle.real_value is not None)
-        self.assertEqual(sales_cycle.real_value.amount, put_data.get('amount'))
-
-        self.assertEqual(updated_data['real_value']['amount'],
-                         put_data.get('amount'))
+        self.assertEqual(sales_cycle.real_value.amount, put_data.get('value'))
+        self.assertEqual(updated_data['real_value']['value'],
+                         put_data.get('value'))
 
 
 class ActivityResourceTest(ResourceTestMixin, ResourceTestCase):
