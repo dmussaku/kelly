@@ -841,59 +841,30 @@ class ActivityResourceTest(ResourceTestMixin, ResourceTestCase):
     def test_get_detail(self):
         resp_activity = self.get_detail_des(self.activity.pk)
 
-        self.assertEqual(resp_activity['title'], self.activity.title)
-
-        self.assertTrue(len(resp_activity['comments']) > 0)
-        self.assertEqual(len(self.activity.comments.all()),
-                         len(resp_activity['comments']))
-
-        self.assertTrue(len(resp_activity['mention_users']) > 0)
-        mentions_user_ids = \
-            self.activity.mentions.values_list('user_id', flat=True).distinct()
-        self.assertEqual(len(mentions_user_ids),
-                         len(resp_activity['mention_users']))
+        self.assertEqual(resp_activity['description'], self.activity.description)
+        self.assertEqual(resp_activity['date_created'], self.activity.date_created.strftime('%Y-%m-%d %H:%M'))
+        self.assertEqual(resp_activity['author_id'], self.activity.owner.id)
 
     def test_create_activity(self):
-        sales_cycle = SalesCycle.objects.last()
+        owner = CRMUser.objects.last()
+        sales_cycle = SalesCycle.objects.first()
         post_data = {
-            'title': 'new activity1',
-            'description': 'new activity by test_unit',
-            'sales_cycle': {'pk': sales_cycle.pk}
+            'author_id': owner.id,
+            'description': 'new activity, test_unit',
+            'sales_cycle': sales_cycle.id
         }
-
-        count = sales_cycle.rel_activities.count()
+        count = Activity.objects.all().count()
+        count2 = sales_cycle.rel_activities.count()
         self.assertHttpCreated(self.api_client.post(
             self.api_path_activity, format='json', data=post_data))
-        activity = sales_cycle.rel_activities.last()
+        self.assertEqual(Activity.objects.all().count(), count+1)
         # verify that new one has been added.
-        self.assertEqual(sales_cycle.rel_activities.count(), count + 1)
+        self.assertEqual(sales_cycle.rel_activities.count(), count2 + 1)
+        activity = sales_cycle.rel_activities.last()
         # verify that subscription_id was set
         self.assertIsInstance(activity.subscription_id, int)
         # verify that owner was set
         self.assertIsInstance(activity.owner, CRMUser)
-        self.assertEqual(
-            activity.owner,
-            self.user.get_subscr_user(activity.subscription_id)
-            )
-
-    def test_create_activity_mentions(self):
-        sales_cycle = SalesCycle.objects.last()
-        post_data = {
-            'title': 'new activity1',
-            'description': 'new activity by test_unit',
-            'sales_cycle': {'pk': sales_cycle.pk},
-            'mention_user_ids': [1, 2]
-        }
-
-        count_activities = sales_cycle.rel_activities.count()
-        count_mentions = Mention.objects.count()
-
-        self.assertHttpCreated(self.api_client.post(
-            self.api_path_activity, format='json', data=post_data))
-
-        self.assertEqual(count_activities + 1,
-                         sales_cycle.rel_activities.count())
-        self.assertEqual(count_mentions + 2, Mention.objects.count())
 
     def test_delete_activity(self):
         sales_cycle = self.activity.sales_cycle
@@ -902,6 +873,31 @@ class ActivityResourceTest(ResourceTestMixin, ResourceTestCase):
             self.api_path_activity + '%s/' % self.activity.pk, format='json'))
         # verify that one sales_cycle has been deleted.
         self.assertEqual(sales_cycle.rel_activities.count(), count - 1)
+
+    def test_update_activity_via_put(self):
+        # get exist product data
+        activity = Activity.objects.last()
+        activity_data = self.get_detail_des(activity.pk)
+        # update it
+        t = '_UPDATED!'
+        activity_data['description'] += t
+        # PUT it
+        self.api_client.put(self.api_path_activity + '%s/' % (activity.pk),
+                            format='json', data=activity_data)
+        # check
+        activity_last = Activity.objects.last()
+        self.assertEqual(activity_last.description, activity.description + t)
+        self.assertEqual(self.get_detail_des(activity.pk)['description'], activity.description + t)
+
+        sales_cycle = SalesCycle.objects.last()
+        activity_data['sales_cycle'] = sales_cycle.id
+        self.api_client.put(self.api_path_activity + '%s/' % (activity.pk),
+                            format='json', data=activity_data)
+
+        activity_last = Activity.objects.last()
+        self.assertEqual(self.get_detail_des(activity.pk)['sales_cycle'], sales_cycle.id)
+        self.assertEqual(sales_cycle.id, activity_last.sales_cycle.id)
+
 
 
 class ProductResourceTest(ResourceTestMixin, ResourceTestCase):

@@ -814,60 +814,18 @@ class ActivityResource(CRMServiceModelResource):
     ... {
     ...     'id': 1,
     ...     'resource_uri': '/api/v1/activity/1/',
-    ...     'title': 't1',
+    ...     'sales_cycle_id': 1,
     ...     'description': 'd1'
-    ...     'sales_cycle': '/api/v1/sales_cycle/1/',
-    ...     'owner': None,
-    ...     'feedback': None,
-    ...     'date_edited': True,
+    ...     'author_id': 2,
     ...     'date_created': '2014-09-11T00:00:00',
-    ...     'subscription_id': None,
-    ...     'mention_users': [
-    ...         {
-    ...             'organization_id': 1,
-    ...             'user_id': 1,
-    ...             'is_supervisor': False,
-    ...             'subscription_id': 1,
-    ...             'id': 1,
-    ...             'resource_uri': '/api/v1/crmuser/1/'
-    ...         }
-    ...     ],
-    ...     'comments': [
-    ...         {
-    ...             'comment': 'Test comment 1',
-    ...             'object_id': 1,
-    ...             'content_object': '/api/v1/activity/1/',
-    ...             'date_created': '2014-09-11T00:00:00.253000',
-    ...             'subscription_id': None,
-    ...             'resource_uri': '',
-    ...             'id': 1,
-    ...             'date_edited': '2014-09-11T00:00:00.253000'
-    ...         }, {
-    ...             'comment': 'Test comment 2',
-    ...             'object_id': 1,
-    ...             'content_object': '/api/v1/activity/1/',
-    ...             'date_created': '2014-09-11T00:00:00.253000',
-    ...             'subscription_id': None,
-    ...             'resource_uri': '',
-    ...             'id': 2,
-    ...             'date_edited': '2014-09-11T00:00:00.253000'
-    ...         }
-    ...     ],
     ... }
     ... ]
     """
 
-     # "activities": [{
-     #        "id": 1,
-     #        "date_created": "2014-10-05 22:22",
-     #        "description": "Hello contact",
-     #        "feedback": "W",
-     #        "author_id": 1
-     #    }]
-
-    author_id = fields.IntegerField(attribute='author_id', null=True)
+    author_id = fields.IntegerField(attribute='author_id')
+    # sales_cycle_id = fields.IntegerField(attribute='sales_cycle_id')
     description = fields.CharField(attribute='description')
-    # sales_cycle = fields.ForeignKey(SalesCycleResource, 'sales_cycle')
+    sales_cycle = fields.ForeignKey(SalesCycleResource, 'sales_cycle')
     # feedback = fields.ToOneField('alm_crm.api.FeedbackResource',
     #                              'activity_feedback', null=True, full=False)
 
@@ -902,6 +860,14 @@ class ActivityResource(CRMServiceModelResource):
 
     def dehydrate_date_created(self, bundle):
         return bundle.obj.date_created.strftime('%Y-%m-%d %H:%M')    
+
+    def dehydrate_sales_cycle(self, bundle):
+        return bundle.obj.sales_cycle.id
+
+    def hydrate_sales_cycle(self, bundle):
+        sales_cycle = SalesCycle.objects.get(id = bundle.data['sales_cycle'])
+        bundle.data['sales_cycle'] = sales_cycle
+        return bundle
 
     def get_comments(self, request, **kwargs):
         '''
@@ -1068,6 +1034,12 @@ class CommentResource(CRMServiceModelResource):
         Share: ShareResource,
         Feedback: FeedbackResource
     }, 'content_object')
+
+    def dehydrate_date_created(self, bundle):
+        return bundle.obj.date_created.strftime('%Y-%m-%d %H:%M')    
+    
+    def dehydrate_date_edited(self, bundle):
+        return bundle.obj.date_edited.strftime('%Y-%m-%d %H:%M')    
 
     class Meta(CRMServiceModelResource.Meta):
         queryset = Comment.objects.all()

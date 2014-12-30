@@ -842,22 +842,22 @@ class SalesCycle(SubscriptionObject):
 
 
 class Activity(SubscriptionObject):
-    title = models.CharField(max_length=100)
+    title = models.CharField(max_length=100, null=True, blank=True)
     description = models.CharField(max_length=500)
     date_created = models.DateTimeField(blank=True, null=True,
                                         auto_now_add=True)
     date_edited = models.DateTimeField(blank=True, null=True, auto_now=True)
     sales_cycle = models.ForeignKey(SalesCycle, related_name='rel_activities')
     owner = models.ForeignKey(CRMUser, related_name='activity_owner')
-    mentions = generic.GenericRelation('Mention')
-    comments = generic.GenericRelation('Comment')
+    mentions = generic.GenericRelation('Mention', null=True)
+    comments = generic.GenericRelation('Comment', null=True)
 
     class Meta:
         verbose_name = 'activity'
         db_table = settings.DB_PREFIX.format('activity')
 
     def __unicode__(self):
-        return self.title
+        return self.description
 
     @property
     def author(self):
@@ -866,6 +866,10 @@ class Activity(SubscriptionObject):
     @property 
     def author_id(self):
         return self.owner.id
+
+    @author_id.setter
+    def author_id(self, author_id):
+        self.owner = CRMUser.objects.get(id=author_id)
 
     @property
     def contact(self):
