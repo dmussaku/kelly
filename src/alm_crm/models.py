@@ -470,17 +470,17 @@ class Contact(SubscriptionObject):
     #     pass
     @classmethod
     def import_contacts_from_vcard(cls, vcard_file):
-        print 'getting to import_contacts models function'
+        #print 'getting to import_contacts models function'
         try:
             data_list = vcard_file.read().split('END:VCARD')[:-1]
-            contact_ids=[]
+            contact_ids = []
             for i in range(0, len(data_list)):
                 data_list[i] += 'END:VCARD'
-                print data_list[i]
+                #print data_list[i]
                 #c = cls.upload_contacts('vcard', data_list[i], save=True)
                 c = cls._upload_contacts_by_vcard(data_list[i])
-                contact_ids.append({'contact_id':c.id, 'name':c.name})
-                print contact_ids
+                contact_ids.append({'contact_id': c.id, 'name': c.name})
+                # print contact_ids
                 #contact_ids.append(Contact.upload_contacts('vcard', data_list[i], save=True).id)
             return {'success': True, 'contact_ids': contact_ids}
         except:
@@ -874,26 +874,34 @@ class SalesCycle(SubscriptionObject):
 
 
 class Activity(SubscriptionObject):
-    title = models.CharField(max_length=100)
+    title = models.CharField(max_length=100, null=True, blank=True)
     description = models.CharField(max_length=500)
     date_created = models.DateTimeField(blank=True, null=True,
                                         auto_now_add=True)
     date_edited = models.DateTimeField(blank=True, null=True, auto_now=True)
     sales_cycle = models.ForeignKey(SalesCycle, related_name='rel_activities')
     owner = models.ForeignKey(CRMUser, related_name='activity_owner')
-    mentions = generic.GenericRelation('Mention')
-    comments = generic.GenericRelation('Comment')
+    mentions = generic.GenericRelation('Mention', null=True)
+    comments = generic.GenericRelation('Comment', null=True)
 
     class Meta:
         verbose_name = 'activity'
         db_table = settings.DB_PREFIX.format('activity')
 
     def __unicode__(self):
-        return self.title
+        return self.description
 
     @property
     def author(self):
         return self.owner
+
+    @property
+    def author_id(self):
+        return self.owner.id
+
+    @author_id.setter
+    def author_id(self, author_id):
+        self.owner = CRMUser.objects.get(id=author_id)
 
     @property
     def contact(self):
@@ -1083,6 +1091,7 @@ class Mention(SubscriptionObject):
     @property
     def author(self):
         return self.owner
+
 
     @classmethod
     def build_new(cls, user_id, content_class=None,

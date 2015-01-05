@@ -9,7 +9,6 @@ from tastypie.authentication import (
     BasicAuthentication,
     )
 from django.conf.urls import url
-from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.core.files.temp import NamedTemporaryFile
 from django.core.servers.basehttp import FileWrapper
@@ -1010,45 +1009,10 @@ class ActivityResource(CRMServiceModelResource):
     ... {
     ...     'id': 1,
     ...     'resource_uri': '/api/v1/activity/1/',
-    ...     'title': 't1',
+    ...     'sales_cycle_id': 1,
     ...     'description': 'd1'
-    ...     'sales_cycle': '/api/v1/sales_cycle/1/',
-    ...     'owner': None,
-    ...     'feedback': None,
-    ...     'date_edited': True,
+    ...     'author_id': 2,
     ...     'date_created': '2014-09-11T00:00:00',
-    ...     'subscription_id': None,
-    ...     'mention_users': [
-    ...         {
-    ...             'organization_id': 1,
-    ...             'user_id': 1,
-    ...             'is_supervisor': False,
-    ...             'subscription_id': 1,
-    ...             'id': 1,
-    ...             'resource_uri': '/api/v1/crmuser/1/'
-    ...         }
-    ...     ],
-    ...     'comments': [
-    ...         {
-    ...             'comment': 'Test comment 1',
-    ...             'object_id': 1,
-    ...             'content_object': '/api/v1/activity/1/',
-    ...             'date_created': '2014-09-11T00:00:00.253000',
-    ...             'subscription_id': None,
-    ...             'resource_uri': '',
-    ...             'id': 1,
-    ...             'date_edited': '2014-09-11T00:00:00.253000'
-    ...         }, {
-    ...             'comment': 'Test comment 2',
-    ...             'object_id': 1,
-    ...             'content_object': '/api/v1/activity/1/',
-    ...             'date_created': '2014-09-11T00:00:00.253000',
-    ...             'subscription_id': None,
-    ...             'resource_uri': '',
-    ...             'id': 2,
-    ...             'date_edited': '2014-09-11T00:00:00.253000'
-    ...         }
-    ...     ],
     ... }
     ... ]
 
@@ -1056,29 +1020,90 @@ class ActivityResource(CRMServiceModelResource):
     @undocumented: Meta
     """
 
+    author_id = fields.IntegerField(attribute='author_id')
+    # sales_cycle_id = fields.IntegerField(attribute='sales_cycle_id')
+    description = fields.CharField(attribute='description')
     sales_cycle = fields.ForeignKey(SalesCycleResource, 'sales_cycle')
-    feedback = fields.ToOneField('alm_crm.api.FeedbackResource',
-                                 'activity_feedback', null=True, full=True)
-    owner = fields.ToOneField('alm_crm.api.CRMUserResource',
-                              'activity_owner', null=True, full=True)
-    comments = fields.ToManyField(
-        'alm_crm.api.CommentResource',
-        attribute=lambda bundle: Comment.objects.filter(
-            content_type=ContentType.objects.get_for_model(bundle.obj),
-            object_id=bundle.obj.id
-            ),
-        null=True, full=True
-        )
-    mention_users = fields.ToManyField(
-        'alm_crm.api.CRMUserResource',
-        attribute=lambda bundle: CRMUser.objects.filter(
-            pk__in=Mention.objects.filter(
-                content_type=ContentType.objects.get_for_model(bundle.obj),
-                object_id=bundle.obj.id
-            ).values_list('user_id', flat=True).distinct()
-            ),
-        null=True, full=True
-        )
+    # feedback = fields.ToOneField('alm_crm.api.FeedbackResource',
+    #                              'activity_feedback', null=True, full=False)
+
+    # comments = fields.ToManyField(
+    #     'alm_crm.api.CommentResource',
+    #     attribute=lambda bundle: Comment.objects.filter(
+    #         content_type=ContentType.objects.get_for_model(bundle.obj),
+    #         object_id=bundle.obj.id
+    #         ),
+    #     null=True, full=True
+    #     )
+    # mention_users = fields.ToManyField(
+    #     'alm_crm.api.CRMUserResource',
+    #     attribute=lambda bundle: CRMUser.objects.filter(
+    #         pk__in=Mention.objects.filter(
+    #             content_type=ContentType.objects.get_for_model(bundle.obj),
+    #             object_id=bundle.obj.id
+    #         ).values_list('user_id', flat=True).distinct()
+    #         ),
+    #     null=True, full=False
+    #     )
+
+    def prepend_urls(self):
+        return [
+            url(
+                r"^(?P<resource_name>%s)/(?P<id>\d+)/comments%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('get_comments'),
+                name='api_get_comments'
+            )
+        ]
+
+    def dehydrate_date_created(self, bundle):
+        return bundle.obj.date_created.strftime('%Y-%m-%d %H:%M')
+
+    def dehydrate_sales_cycle(self, bundle):
+        return bundle.obj.sales_cycle.id
+
+    def hydrate_sales_cycle(self, bundle):
+        sales_cycle = SalesCycle.objects.get(id = bundle.data['sales_cycle'])
+        bundle.data['sales_cycle'] = sales_cycle
+        return bundle
+
+    def get_comments(self, request, **kwargs):
+        '''
+        GET METHOD
+        I{URL}:  U{alma.net/api/v1/activity/:id/comments}
+
+        Description:
+        Api function to return comments of the activity
+        @return:  comments
+
+        >>> "objects": [
+        ...     {
+        ...         "comment": "Test comment 1",
+        ...         "content_object": "/api/v1/activity/1/",
+        ...         "date_created": "2014-09-10T00:00:00",
+        ...         "date_edited": "2014-12-29T09:45:24.166720",
+        ...         "id": 1,
+        ...         "object_id": 1,
+        ...         "resource_uri": "",
+        ...         "subscription_id": 1
+        ...         }
+        ...     ]
+
+        '''
+
+        try:
+            activity = Activity.objects.get(id=kwargs.get('id'))
+            comments = activity.comments.all()
+            comment_resource = CommentResource()
+            obj_dict = {}
+            obj_dict['objects'] = comment_resource.get_bundle_list(comments,
+                                                                   request)
+            return self.create_response(request, obj_dict)
+        except ContactList.DoesNotExist:
+            return self.create_response(
+                    request, {'success':False, 'error_string':'Has no any comments'}
+                )
+
 
     def save(self, bundle, skip_errors=False):
         """
@@ -1107,6 +1132,7 @@ class ActivityResource(CRMServiceModelResource):
     class Meta(CRMServiceModelResource.Meta):
         queryset = Activity.objects.all()
         resource_name = 'activity'
+        excludes = ['date_edited', 'subscription_id', 'title']
 
     def post_list(self, request, **kwargs):
         '''
@@ -1277,6 +1303,12 @@ class CommentResource(CRMServiceModelResource):
         Feedback: FeedbackResource
     }, 'content_object')
 
+    def dehydrate_date_created(self, bundle):
+        return bundle.obj.date_created.strftime('%Y-%m-%d %H:%M')
+
+    def dehydrate_date_edited(self, bundle):
+        return bundle.obj.date_edited.strftime('%Y-%m-%d %H:%M')
+
     class Meta(CRMServiceModelResource.Meta):
         queryset = Comment.objects.all()
         resource_name = 'comment'
@@ -1308,8 +1340,8 @@ class MentionResource(CRMServiceModelResource):
 
 class ContactListResource(CRMServiceModelResource):
     users = fields.ToManyField('alm_crm.api.CRMUserResource', 'users',
-                               related_name='contact_list',
-                               null=True, full=True)
+                               related_name='contact_list', null=True,
+                               full=False)
 
     class Meta(CRMServiceModelResource.Meta):
         queryset = ContactList.objects.all()
@@ -1357,12 +1389,48 @@ class ContactListResource(CRMServiceModelResource):
         ... {
         ...     title: "ALMA Cloud",
         ...     users: [
-        ...     {
-        ...         "pk": 1,
-        ...     }
+        ...         "/api/v1/crmuser/1/",
+        ...         "/api/v1/crmuser/2/",
+        ...     ]
         ... }
         '''
         return super(self.__class__, self).post_list(request, **kwargs)
+
+    def delete_list(self, request, **kwargs):
+        '''
+        DELETE METHOD
+        I{URL}:  U{alma.net:8000/api/v1/contact_list/:id/}
+
+        Description:
+        Api function for contact list creation. It creates contact list
+
+        @return:  status 204
+
+        >>> HTTP/1.0 204 NO CONTENT
+        ... Date: Fri, 11 Nov 2014 06:48:36 GMT
+        ... Server: WSGIServer/0.1 Python/2.7
+        ... Content-Lenght: 0
+        ... Content-Type:  text/html; charset=utf-8
+        '''
+        return super(self.__class__, self).delete_list(request, **kwargs)
+
+    def put_detail(self, request, **kwargs):
+        '''
+        PATCH METHOD
+        I{URL}:  U{alma.net:8000/api/v1/contact_list/:id/}
+
+        Description:
+        Api function for contact list creation. It creates contact list
+
+        @return:  If a new resource is created status 201, if an existing resource is modified status 204,
+
+        >>> HTTP/1.0 204 NO CONTENT
+        ... Date: Fri, 11 Nov 2014 06:48:36 GMT
+        ... Server: WSGIServer/0.1 Python/2.7
+        ... Content-Lenght: 0
+        ... Content-Type:  text/html; charset=utf-8
+        '''
+        return super(self.__class__, self).put_detail(request, **kwargs)
 
     def get_users(self, request, **kwargs):
         '''
@@ -1408,7 +1476,7 @@ class ContactListResource(CRMServiceModelResource):
             contact_list = ContactList.objects.get(id=kwargs.get('id'))
             limit = int(request.GET.get('limit', 20))
             offset = int(request.GET.get('offset', 0))
-            users = ContactList.objects.get(id=contact_list.id).users.all()[offset:offset + limit]
+            users = contact_list.users.all()[offset:offset + limit]
             crm_user_resource = CRMUserResource()
             obj_dict = {}
             obj_dict['objects'] = \
