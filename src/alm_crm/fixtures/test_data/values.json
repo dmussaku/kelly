@@ -4,7 +4,7 @@
     "model": "alm_crm.Value", 
     "fields": {
         "salary":"monthly",
-        "amount":20000,
+        "amount":25000,
         "currency":"KZT"
     }
 },
@@ -13,7 +13,7 @@
     "model": "alm_crm.Value", 
     "fields": {
         "salary":"monthly",
-        "amount":20000,
+        "amount":35000,
         "currency":"KZT"
     }
 },
@@ -22,7 +22,7 @@
     "model": "alm_crm.Value", 
     "fields": {
         "salary":"monthly",
-        "amount":35000,
+        "amount":50000,
         "currency":"KZT"
     }
 },
@@ -31,7 +31,7 @@
     "model": "alm_crm.Value", 
     "fields": {
         "salary":"monthly",
-        "amount":10000,
+        "amount":25000,
         "currency":"KZT"
     }
 },
@@ -40,7 +40,7 @@
     "model": "alm_crm.Value", 
     "fields": {
         "salary":"monthly",
-        "amount":10000,
+        "amount":20000,
         "currency":"KZT"
     }
 },
@@ -76,7 +76,7 @@
     "model": "alm_crm.Value", 
     "fields": {
         "salary":"monthly",
-        "amount":5000,
+        "amount":30000,
         "currency":"KZT"
     }
 },
@@ -85,7 +85,7 @@
     "model": "alm_crm.Value", 
     "fields": {
         "salary":"monthly",
-        "amount":15000,
+        "amount":50000,
         "currency":"KZT"
     }
 },
@@ -94,7 +94,7 @@
     "model": "alm_crm.Value", 
     "fields": {
         "salary":"monthly",
-        "amount":45000,
+        "amount":10000,
         "currency":"KZT"
     }
 },
@@ -112,7 +112,7 @@
     "model": "alm_crm.Value", 
     "fields": {
         "salary":"monthly",
-        "amount":30000,
+        "amount":25000,
         "currency":"KZT"
     }
 },
@@ -121,7 +121,7 @@
     "model": "alm_crm.Value", 
     "fields": {
         "salary":"monthly",
-        "amount":50000,
+        "amount":30000,
         "currency":"KZT"
     }
 },
@@ -130,7 +130,7 @@
     "model": "alm_crm.Value", 
     "fields": {
         "salary":"monthly",
-        "amount":20000,
+        "amount":5000,
         "currency":"KZT"
     }
 },
@@ -139,7 +139,7 @@
     "model": "alm_crm.Value", 
     "fields": {
         "salary":"monthly",
-        "amount":25000,
+        "amount":15000,
         "currency":"KZT"
     }
 },
@@ -148,7 +148,7 @@
     "model": "alm_crm.Value", 
     "fields": {
         "salary":"monthly",
-        "amount":45000,
+        "amount":20000,
         "currency":"KZT"
     }
 },
@@ -157,7 +157,7 @@
     "model": "alm_crm.Value", 
     "fields": {
         "salary":"monthly",
-        "amount":35000,
+        "amount":25000,
         "currency":"KZT"
     }
 },
@@ -175,7 +175,7 @@
     "model": "alm_crm.Value", 
     "fields": {
         "salary":"monthly",
-        "amount":50000,
+        "amount":10000,
         "currency":"KZT"
     }
 },
@@ -184,7 +184,7 @@
     "model": "alm_crm.Value", 
     "fields": {
         "salary":"monthly",
-        "amount":45000,
+        "amount":25000,
         "currency":"KZT"
     }
 },
@@ -193,7 +193,7 @@
     "model": "alm_crm.Value", 
     "fields": {
         "salary":"monthly",
-        "amount":20000,
+        "amount":25000,
         "currency":"KZT"
     }
 },
@@ -202,7 +202,7 @@
     "model": "alm_crm.Value", 
     "fields": {
         "salary":"monthly",
-        "amount":35000,
+        "amount":5000,
         "currency":"KZT"
     }
 },
@@ -220,7 +220,7 @@
     "model": "alm_crm.Value", 
     "fields": {
         "salary":"monthly",
-        "amount":30000,
+        "amount":10000,
         "currency":"KZT"
     }
 },
@@ -229,7 +229,7 @@
     "model": "alm_crm.Value", 
     "fields": {
         "salary":"monthly",
-        "amount":30000,
+        "amount":10000,
         "currency":"KZT"
     }
 },
@@ -238,7 +238,7 @@
     "model": "alm_crm.Value", 
     "fields": {
         "salary":"monthly",
-        "amount":35000,
+        "amount":30000,
         "currency":"KZT"
     }
 },
@@ -247,7 +247,7 @@
     "model": "alm_crm.Value", 
     "fields": {
         "salary":"monthly",
-        "amount":40000,
+        "amount":5000,
         "currency":"KZT"
     }
 },
@@ -256,7 +256,7 @@
     "model": "alm_crm.Value", 
     "fields": {
         "salary":"monthly",
-        "amount":40000,
+        "amount":30000,
         "currency":"KZT"
     }
 },
@@ -265,7 +265,7 @@
     "model": "alm_crm.Value", 
     "fields": {
         "salary":"monthly",
-        "amount":40000,
+        "amount":35000,
         "currency":"KZT"
     }
 },
@@ -274,7 +274,7 @@
     "model": "alm_crm.Value", 
     "fields": {
         "salary":"monthly",
-        "amount":45000,
+        "amount":50000,
         "currency":"KZT"
     }
 },
@@ -283,7 +283,7 @@
     "model": "alm_crm.Value", 
     "fields": {
         "salary":"monthly",
-        "amount":5000,
+        "amount":30000,
         "currency":"KZT"
     }
 },
@@ -292,7 +292,7 @@
     "model": "alm_crm.Value", 
     "fields": {
         "salary":"monthly",
-        "amount":25000,
+        "amount":50000,
         "currency":"KZT"
     }
 },
@@ -301,7 +301,7 @@
     "model": "alm_crm.Value", 
     "fields": {
         "salary":"monthly",
-        "amount":35000,
+        "amount":10000,
         "currency":"KZT"
     }
 },
@@ -310,7 +310,7 @@
     "model": "alm_crm.Value", 
     "fields": {
         "salary":"monthly",
-        "amount":35000,
+        "amount":45000,
         "currency":"KZT"
     }
 },
@@ -319,7 +319,7 @@
     "model": "alm_crm.Value", 
     "fields": {
         "salary":"monthly",
-        "amount":10000,
+        "amount":40000,
         "currency":"KZT"
     }
 },
@@ -328,7 +328,7 @@
     "model": "alm_crm.Value", 
     "fields": {
         "salary":"monthly",
-        "amount":50000,
+        "amount":25000,
         "currency":"KZT"
     }
 },
@@ -337,7 +337,7 @@
     "model": "alm_crm.Value", 
     "fields": {
         "salary":"monthly",
-        "amount":15000,
+        "amount":25000,
         "currency":"KZT"
     }
 },
@@ -346,7 +346,7 @@
     "model": "alm_crm.Value", 
     "fields": {
         "salary":"monthly",
-        "amount":10000,
+        "amount":25000,
         "currency":"KZT"
     }
 },
@@ -355,7 +355,7 @@
     "model": "alm_crm.Value", 
     "fields": {
         "salary":"monthly",
-        "amount":15000,
+        "amount":25000,
         "currency":"KZT"
     }
 },
@@ -364,7 +364,7 @@
     "model": "alm_crm.Value", 
     "fields": {
         "salary":"monthly",
-        "amount":35000,
+        "amount":15000,
         "currency":"KZT"
     }
 },
@@ -373,7 +373,7 @@
     "model": "alm_crm.Value", 
     "fields": {
         "salary":"monthly",
-        "amount":30000,
+        "amount":40000,
         "currency":"KZT"
     }
 },
@@ -382,7 +382,7 @@
     "model": "alm_crm.Value", 
     "fields": {
         "salary":"monthly",
-        "amount":25000,
+        "amount":20000,
         "currency":"KZT"
     }
 },
@@ -391,7 +391,7 @@
     "model": "alm_crm.Value", 
     "fields": {
         "salary":"monthly",
-        "amount":5000,
+        "amount":25000,
         "currency":"KZT"
     }
 },
@@ -400,7 +400,7 @@
     "model": "alm_crm.Value", 
     "fields": {
         "salary":"monthly",
-        "amount":40000,
+        "amount":50000,
         "currency":"KZT"
     }
 },
@@ -409,7 +409,7 @@
     "model": "alm_crm.Value", 
     "fields": {
         "salary":"monthly",
-        "amount":45000,
+        "amount":40000,
         "currency":"KZT"
     }
 },
@@ -427,7 +427,7 @@
     "model": "alm_crm.Value", 
     "fields": {
         "salary":"monthly",
-        "amount":50000,
+        "amount":45000,
         "currency":"KZT"
     }
 },
@@ -436,7 +436,7 @@
     "model": "alm_crm.Value", 
     "fields": {
         "salary":"monthly",
-        "amount":25000,
+        "amount":40000,
         "currency":"KZT"
     }
 },
@@ -445,7 +445,7 @@
     "model": "alm_crm.Value", 
     "fields": {
         "salary":"monthly",
-        "amount":5000,
+        "amount":30000,
         "currency":"KZT"
     }
 },
@@ -454,7 +454,7 @@
     "model": "alm_crm.Value", 
     "fields": {
         "salary":"monthly",
-        "amount":15000,
+        "amount":45000,
         "currency":"KZT"
     }
 },
@@ -472,7 +472,7 @@
     "model": "alm_crm.Value", 
     "fields": {
         "salary":"monthly",
-        "amount":45000,
+        "amount":20000,
         "currency":"KZT"
     }
 },
@@ -499,7 +499,7 @@
     "model": "alm_crm.Value", 
     "fields": {
         "salary":"monthly",
-        "amount":10000,
+        "amount":50000,
         "currency":"KZT"
     }
 },
@@ -508,7 +508,7 @@
     "model": "alm_crm.Value", 
     "fields": {
         "salary":"monthly",
-        "amount":35000,
+        "amount":10000,
         "currency":"KZT"
     }
 },
@@ -517,7 +517,7 @@
     "model": "alm_crm.Value", 
     "fields": {
         "salary":"monthly",
-        "amount":45000,
+        "amount":25000,
         "currency":"KZT"
     }
 },
@@ -526,7 +526,7 @@
     "model": "alm_crm.Value", 
     "fields": {
         "salary":"monthly",
-        "amount":50000,
+        "amount":15000,
         "currency":"KZT"
     }
 },
@@ -535,7 +535,7 @@
     "model": "alm_crm.Value", 
     "fields": {
         "salary":"monthly",
-        "amount":35000,
+        "amount":15000,
         "currency":"KZT"
     }
 }

@@ -21,10 +21,9 @@ def load_fixtures():
         'mentions')
 
     # syncdb, migrate on main_database db and delete all data
-    management.call_command('syncdb', database=main_database)
-    management.call_command('migrate', database=main_database)
-    management.call_command('flush', database=main_database, interactive=False,
-                            verbosity=0)
+    #management.call_command('syncdb', database=main_database)
+    #management.call_command('migrate', database=main_database)
+    #management.call_command('flush', database=main_database, interactive=False, verbosity=0)
 
     # load fixtures
     for fixture_name in fixtures:
