@@ -24,11 +24,13 @@ from .models import (
     Comment,
     Mention,
     )
+from alm_vcard.models import *
 from almanet.settings import DEFAULT_SERVICE
 import ast
 from django.core.files.temp import NamedTemporaryFile
 from django.core.servers.basehttp import FileWrapper
 from tastypie.serializers import Serializer
+from django.db import models
 
 
 class CRMServiceModelResource(ModelResource):
@@ -49,7 +51,6 @@ class CRMServiceModelResource(ModelResource):
                 )[0]
             bundle.obj.owner = bundle.request.user.get_subscr_user(
                 bundle.obj.subscription_pk)
-        print bundle
         return bundle
 
     def get_bundle_list(self, obj_list, request):
@@ -162,8 +163,130 @@ class ContactResource(CRMServiceModelResource):
             setattr(bundle.obj, key, value)
 
         bundle = self.full_hydrate(bundle)
-        return self.save(bundle)
+        # return self.save(bundle)
+        return bundle
+    
+    def obj_update(self, bundle, skip_errors=False, **kwargs):
+        print 'obj_update'
+        """
+        A ORM-specific implementation of ``obj_update``.
+        """
+        if not bundle.obj or not self.get_bundle_detail_data(bundle):
+            try:
+                lookup_kwargs = self.lookup_kwargs_with_identifiers(bundle, kwargs)
+            except:
+                # if there is trouble hydrating the data, fall back to just
+                # using kwargs by itself (usually it only contains a "pk" key
+                # and this will work fine.
+                lookup_kwargs = kwargs
+
+            try:
+                bundle.obj = self.obj_get(bundle=bundle, **lookup_kwargs)
+            except ObjectDoesNotExist:
+                raise NotFound("A model instance matching the provided arguments could not be found.")
+
+        bundle = self.full_hydrate(bundle)
+        #return self.save(bundle, skip_errors=skip_errors)
+        return bundle
+
+    def full_hydrate(self, bundle):
+        contact_id = bundle.data.get('id', None)
+        if contact_id:
+            bundle.obj = Contact.objects.get(id=int(contact_id))
+        if bundle.obj is None:
+            bundle.obj = self._meta.object_class()
+            bundle.obj.owner_id = bundle.request.user.get_crmuser().id
+            bundle.obj.save()
+        '''
+        Go through all field names in the Contact Model and check with
+        the json that has been submitted. So if the attribute is there
+        then i use bundle.obj and setattr of current field_name to whatever
+        i got in a json. If its missing then i just delete it.
         
+        '''
+        for field_name in bundle.obj._meta.get_all_field_names():
+            if bundle.data.get(field_name, None):
+                field_object = ast.literal_eval(str(bundle.data.get(field_name, None)))
+                if isinstance(field_object, str):
+                    bundle.obj.__setattr__(field_name, field_object)
+                elif isinstance(field_object, list):
+                    pass
+                elif isinstance(field_object, dict):
+                    self.vcard_full_hydrate(bundle)
+        bundle.obj.save()
+        return bundle    
+
+    def vcard_full_hydrate(self, bundle):
+        field_object = bundle.data.get('vcard',{})
+        if bundle.obj.vcard:
+            vcard = bundle.obj.vcard
+        else:
+            vcard = VCard()
+            vcard.save()
+            vcard.contact = bundle.obj
+        vcard_fields = list(VCard._meta.get_fields_with_model())
+        for vcard_field in vcard_fields:
+            if vcard_field[0].__class__==models.fields.AutoField:
+                pass
+            elif vcard_field[0].__class__==models.fields.IntegerField:
+                pass
+            elif vcard_field[0].__class__==models.fields.DateField:
+                '''
+                TBD with the format of the date that will be sent from
+                the frontend
+                '''
+                pass
+            elif vcard_field[0].__class__==models.fields.DateTimeField:
+                '''
+                TBD with the format of the date that will be sent from
+                the frontend
+                '''
+                pass
+            elif vcard_field[0].__class__==models.fields.CharField:
+                attname = vcard_field[0].attname
+                vcard.__setattr__(attname, 
+                    field_object.get(attname, ""))
+        '''
+        Now i need to go over the list of vcard keys
+        check their model names, go through each and every
+        model and check for three things
+        1) if id is set, then change the values in json
+        2) if id is not set, then create 
+        3) if models are missing then delete the missing values
+        '''
+        vcard_rel_fields = vcard._meta.get_all_related_objects()
+
+        for vcard_field in vcard_rel_fields:
+            if vcard_field.model == Contact:
+                pass
+            else:
+                field_value = vcard_field.var_name+'s'
+                obj_list = ast.literal_eval(str(field_object.get(vcard_field.var_name+'s','None')))
+                vcard_field_name = vcard_field.var_name+'_set'
+                model = vcard.__getattribute__(vcard_field_name).model
+                if obj_list:    
+                    queryset = vcard.__getattribute__(vcard_field_name).all()
+                    json_objects = obj_list
+                    id_list = []
+                    for obj in json_objects:
+                        if obj.get('id',None):
+                            vcard_obj = model.objects.get(id=int(obj.get('id',None)))
+                            del obj['id']
+                        else:
+                            vcard_obj = model()
+                        for key, value in obj.viewitems():
+                            vcard_obj.__setattr__(key, value)
+                        vcard_obj.vcard = vcard
+                        vcard_obj.save()
+                        id_list.append(vcard_obj.id)
+                    for obj in queryset:
+                        if not obj.id in id_list:
+                            obj.delete()
+                else:
+                    for obj in model.objects.filter(vcard=vcard):
+                        obj.delete()
+        vcard.save()
+
     def save(self, bundle, skip_errors=False):
         self.is_valid(bundle)
 
@@ -202,7 +325,6 @@ class ContactResource(CRMServiceModelResource):
         except KeyError:
             bundle.obj.save()
         bundle.objects_saved.add(self.create_identifier(bundle.obj))
-
         # Now pick up the M2M bits.
         m2m_bundle = self.hydrate_m2m(bundle)
         self.save_m2m(m2m_bundle)

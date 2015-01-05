@@ -99,7 +99,6 @@ class VCard(SubscriptionObject):
         return "name undefined"
 
     def save(self, **kwargs):
-        print kwargs
         if self.given_name and self.family_name:
             self.fn = self.given_name + ' ' + self.family_name
         super(self.__class__, self).save(**kwargs)
