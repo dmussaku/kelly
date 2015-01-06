@@ -185,15 +185,15 @@ class ContactResource(CRMServiceModelResource):
             except ObjectDoesNotExist:
                 raise NotFound("A model instance matching the provided arguments could not be found.")
 
-        bundle = self.full_hydrate(bundle)
+        bundle = self.full_hydrate(bundle, **kwargs)
         #return self.save(bundle, skip_errors=skip_errors)
         return bundle
 
-    def full_hydrate(self, bundle):
-        contact_id = bundle.data.get('id', None)
+    def full_hydrate(self, bundle, **kwargs):
+        contact_id = kwargs.get('pk',"")
         if contact_id:
             bundle.obj = Contact.objects.get(id=int(contact_id))
-        if bundle.obj is None:
+        else:
             bundle.obj = self._meta.object_class()
             bundle.obj.owner_id = bundle.request.user.get_crmuser().id
             bundle.obj.save()
@@ -214,6 +214,14 @@ class ContactResource(CRMServiceModelResource):
                 elif isinstance(field_object, dict):
                     self.vcard_full_hydrate(bundle)
         bundle.obj.save()
+        if bundle.data.get('note') and not kwargs:
+            share = Share(
+                    note=bundle.data.get('note'),
+                    share_to_id=bundle.data['owner'],
+                    share_from_id=bundle.data['owner'],
+                    contact_id=bundle.obj.id
+                    )
+            share.save()
         return bundle    
 
     def vcard_full_hydrate(self, bundle):
@@ -286,6 +294,7 @@ class ContactResource(CRMServiceModelResource):
                     for obj in model.objects.filter(vcard=vcard):
                         obj.delete()
         vcard.save()
+        
 
     def save(self, bundle, skip_errors=False):
         self.is_valid(bundle)
