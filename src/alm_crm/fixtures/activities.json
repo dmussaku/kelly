@@ -11,5 +11,18 @@
         "subscription_id": 1, 
         "date_edited": "2014-12-29T09:46:02.273Z"
     }
+},
+{
+    "pk": 2, 
+    "model": "alm_crm.activity", 
+    "fields": {
+        "sales_cycle": 1, 
+        "description": "Description", 
+        "title": null, 
+        "owner": 2, 
+        "date_created": "2014-12-30T06:49:44.407Z", 
+        "subscription_id": 1, 
+        "date_edited": "2014-12-30T09:19:08.109Z"
+    }
 }
 ]

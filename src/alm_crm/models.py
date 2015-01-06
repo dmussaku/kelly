@@ -875,6 +875,15 @@ class Activity(SubscriptionObject):
     def contact(self):
         return self.sales_cycle.contact.id
 
+    # @property
+    # def feedback(self):
+    #     return Feedback.objects.get(activity=self)
+
+    # @feedback.setter
+    # def feedback(self, feedback_obj):
+    #     feedback_obj.activity = self
+    #     feedback_obj.save()
+
     def set_feedback(self, feedback_obj, save=False):
         """Set feedback to activity instance. Saves if `save` is set(True)."""
         feedback_obj.activity = self
@@ -981,8 +990,8 @@ class Feedback(SubscriptionObject):
         ('3', _('Client is neutral')),
         ('4', _('Client is disappointed')),
         ('5', _('Client is angry')))
-    feedback = models.CharField(max_length=300)
-    status = models.CharField(max_length=1, choices=STATUS_OPTIONS, default='')
+    feedback = models.CharField(max_length=300, null=True)
+    status = models.CharField(max_length=1, choices=STATUS_OPTIONS, default='W')
     date_created = models.DateTimeField(blank=True, auto_now_add=True)
     date_edited = models.DateTimeField(blank=True, auto_now_add=True)
     activity = models.OneToOneField(Activity, blank=False)
@@ -1108,6 +1117,7 @@ class Share(SubscriptionObject):
     share_from = models.ForeignKey(CRMUser, related_name='owned_shares')
     date_created = models.DateTimeField(blank=True, auto_now_add=True)
     comments = generic.GenericRelation('Comment')
+    description = models.CharField(max_length=500, null=True)
 
     class Meta:
         verbose_name = 'share'
@@ -1116,6 +1126,18 @@ class Share(SubscriptionObject):
     @property
     def owner(self):
         return self.share_from
+
+    @owner.setter
+    def owner(self, owner_object):
+        self.share_from = owner_object
+
+    @property
+    def note(self):
+        return self.description
+
+    @note.setter
+    def note(self, note):
+        self.description = note
 
     @classmethod
     def get_shares(cls, limit=20, offset=0):
