@@ -23,10 +23,12 @@ from alm_crm.api import (
     FeedbackResource,
     CRMUserResource,
     ValueResource,
-    ContactListResource
+    ContactListResource,
+    AppStateResource,
     )
 from alm_user.api import UserSessionResource, UserResource
 from tastypie.resources import ModelResource
+from django.views.generic.base import TemplateView
 
 admin.autodiscover()
 v1_api = Api(api_name='v1')
@@ -47,9 +49,12 @@ v1_api.register(CRMUserResource())
 v1_api.register(UserSessionResource())
 v1_api.register(UserResource())
 v1_api.register(ContactListResource())
+v1_api.register(AppStateResource())
 
 urlpatterns = patterns(
     '',
+    url(r'^$', TemplateView.as_view(template_name='frontend.index.html'), name="frontend"),
+
     url(r'^auth/', include('alm_user.urls')),
     # TODO: temp, needs to be deleted
     url(r'^crm/', include('alm_crm.urls')),

@@ -31,6 +31,7 @@ for contact_id in range(1, 11):
         s += '    "pk": %i,\n' % (id_sales_cycles)
         s += '    "model": "alm_crm.SalesCycle",\n'
         s += '    "fields": {\n'
+        s += '        "title":"SalesCycle #%i",\n' % (id_sales_cycles)
         s += '        "products":[%i],\n' % (randint(1, 4))
         s += '        "owner":%i,\n' % (randint(1, 3))
         s += '        "followers":[],\n'

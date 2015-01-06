@@ -3,7 +3,7 @@
         "pk": 1,
         "model": "alm_company.company",
         "fields": {
-            "owner": [],
+            "owner": [1],
             "subdomain": "almacloud",
             "name": "ALMACloud"
         }

@@ -124,6 +124,7 @@ class BaseConfiguration(SubdomainConfiguration, Configuration):
         'django.contrib.messages.middleware.MessageMiddleware',
         # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
         'django_hosts.middleware.HostsMiddleware',
+        'almanet.middleware.XsSharingMiddleware',
         'almanet.middleware.GetSubdomainMiddleware',
         'almanet.middleware.UserEnvMiddleware'
     )
