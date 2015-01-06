@@ -97,8 +97,8 @@ class CRMServiceModelResource(ModelResource):
     class Meta:
         list_allowed_methods = ['get', 'post']
         detail_allowed_methods = ['get', 'post', 'put', 'delete']
-        authentication = MultiAuthentication(BasicAuthentication(),
-                                             SessionAuthentication())
+        authentication = MultiAuthentication(SessionAuthentication(),
+                                             BasicAuthentication())
         authorization = Authorization()
 
 
@@ -1188,7 +1188,7 @@ class ActivityResource(CRMServiceModelResource):
     ... {
     ...     'id': 1,
     ...     'resource_uri': '/api/v1/activity/1/',
-    ...     'sales_cycle_id': 1,
+    ...     'salescycle_id': 1,
     ...     'description': 'd1'
     ...     'author_id': 2,
     ...     'date_created': '2014-09-11T00:00:00',
@@ -1200,9 +1200,9 @@ class ActivityResource(CRMServiceModelResource):
     """
     author_id = fields.IntegerField(attribute='author_id', null=True)
     description = fields.CharField(attribute='description')
-    sales_cycle = fields.ForeignKey(SalesCycleResource, 'sales_cycle')
-    feedback = fields.ToOneField('alm_crm.api.FeedbackResource', 'feedback', null=True, blank=True)
-
+    salescycle_id = fields.ForeignKey(SalesCycleResource, 'sales_cycle')
+    feedback = fields.ToOneField('alm_crm.api.FeedbackResource', 'feedback',
+                                 null=True, blank=True)
 
     # comments = fields.ToManyField(
     #     'alm_crm.api.CommentResource',
@@ -1233,39 +1233,27 @@ class ActivityResource(CRMServiceModelResource):
             )
         ]
 
-
-    def dehydrate_sales_cycle(self, bundle):
+    def dehydrate_salescycle_id(self, bundle):
         return bundle.obj.sales_cycle.id
 
     def dehydrate_feedback(self, bundle):
         return hasattr(bundle.obj, 'feedback') and bundle.obj.feedback.status or None
 
-    def hydrate_sales_cycle(self, bundle):
-        sales_cycle = SalesCycle.objects.get(id = bundle.data['sales_cycle'])
-        bundle.data['sales_cycle'] = sales_cycle
+    def hydrate_salescycle_id(self, bundle):
+        if bundle.data.get('salescycle_id'):
+            id = bundle.data['salescycle_id']
+            if type(id) == int:
+                sales_cycle = SalesCycle.objects.get(id=id)
+                bundle.data['salescycle_id'] = sales_cycle
         return bundle
 
     def hydrate_feedback(self, bundle):
-        # feedback = Feedback()
-        # if bundle.request.method == "PUT":
-        #     feedback = Activity.objects.get(id=bundle.data['id']).feedback
-        #     feedback.status = bundle.data['feedback']
-        # elif bundle.request.method == "POST" and bundle.data.get('feedback', None):
-        #     feedback.status = bundle.data['feedback']
-        #     feedback.owner = CRMUser.objects.get(id=bundle.data['author_id'])
-        # else:
-        #      feedback.owner = CRMUser.objects.get(id=bundle.data['author_id'])
-        #      feedback.status = 'W'
-
-        # bundle.data['feedback'] = feedback
-        # feedback.save()
-
+        # see save() method below
         if bundle.data.get('feedback'):
             bundle.data['feedback_status'] = bundle.data['feedback']
             bundle.data['feedback'] = None
-
         return bundle
-    
+
     def get_comments(self, request, **kwargs):
         '''
         GET METHOD
@@ -1300,23 +1288,22 @@ class ActivityResource(CRMServiceModelResource):
             return self.create_response(request, obj_dict)
         except ContactList.DoesNotExist:
             return self.create_response(
-                    request, {'success':False, 'error_string':'Has no any comments'}
+                request,
+                {'success': False, 'error_string': 'Has no any comments'}
                 )
-
 
     def save(self, bundle, skip_errors=False):
         bundle = super(self.__class__, self).save(bundle, skip_errors)
         status = 'W'
         feedback = None
-        if bundle.data.get('feedback_status', None):
+        if bundle.data.get('feedback_status'):
             status = bundle.data['feedback_status']
         if bundle.request.method == 'PUT':
-            feedback = Feedback.objects.get(activity = bundle.obj)
+            feedback = Feedback.objects.get(activity=bundle.obj)
             feedback.status = status
-        else:        
-            feedback = Feedback(owner = bundle.obj.owner,
-                                activity = bundle.obj,
-                                 status = status)
+        else:
+            feedback = Feedback(owner=bundle.obj.owner, activity=bundle.obj,
+                                status=status)
         feedback.save()
         bundle.data['feedback'] = feedback
         return bundle
@@ -1459,7 +1446,7 @@ class ShareResource(CRMServiceModelResource):
             request,
             {'objects': self.get_bundle_list(shares, request)}
             )
-   
+
 
     def dehydrate_contact(self, bundle):
         return bundle.obj.contact.id
