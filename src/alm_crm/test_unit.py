@@ -617,7 +617,8 @@ class ResourceTestMixin(object):
                 'subscriptions.json', 'comments.json',
                 'crmusers.json', 'vcards.json', 'contacts.json',
                 'salescycles.json', 'activities.json', 'products.json',
-                'mentions.json', 'values.json', 'emails.json', 'contactlist.json']
+                'mentions.json', 'values.json', 'emails.json', 'contactlist.json', 'share.json',
+                'feedbacks.json']
 
     def get_user(self):
         from alm_user.models import User
@@ -837,6 +838,7 @@ class ActivityResourceTest(ResourceTestMixin, ResourceTestCase):
         self.get_list_resp = self.api_client.get(self.api_path_activity,
                                                  format='json',
                                                  HTTP_HOST='localhost')
+
         self.get_list_des = self.deserialize(self.get_list_resp)
 
         # get_detail(pk)
@@ -859,10 +861,33 @@ class ActivityResourceTest(ResourceTestMixin, ResourceTestCase):
         resp_activity = self.get_detail_des(self.activity.pk)
 
         self.assertEqual(resp_activity['description'], self.activity.description)
-        self.assertEqual(resp_activity['date_created'], self.activity.date_created.strftime('%Y-%m-%d %H:%M'))
         self.assertEqual(resp_activity['author_id'], self.activity.owner.id)
+        self.assertEqual(resp_activity['feedback'], self.activity.feedback.status)
 
-    def test_create_activity(self):
+    def test_create_activity_with_feedback(self):
+        owner = CRMUser.objects.last()
+        sales_cycle = SalesCycle.objects.first()
+        post_data = {
+            'author_id': owner.id,
+            'description': 'new activity, test_unit',
+            'sales_cycle': sales_cycle.id,
+            'feedback': "$"
+        }
+        count = Activity.objects.all().count()
+        count2 = sales_cycle.rel_activities.count()
+        resp = self.api_client.post(self.api_path_activity, format='json', data=post_data)
+        self.assertHttpCreated(resp)
+        self.assertEqual(Activity.objects.all().count(), count+1)
+        # verify that new one has been added.
+        self.assertEqual(sales_cycle.rel_activities.count(), count2 + 1)
+        activity = sales_cycle.rel_activities.last()
+        # verify that subscription_id was set
+        self.assertIsInstance(activity.subscription_id, int)
+        # verify that owner was set
+        self.assertIsInstance(activity.owner, CRMUser)
+        self.assertIsInstance(activity.feedback, Feedback)
+
+    def test_create_activity_without_feedback(self):
         owner = CRMUser.objects.last()
         sales_cycle = SalesCycle.objects.first()
         post_data = {
@@ -884,20 +909,24 @@ class ActivityResourceTest(ResourceTestMixin, ResourceTestCase):
         self.assertIsInstance(activity.owner, CRMUser)
 
     def test_delete_activity(self):
-        sales_cycle = self.activity.sales_cycle
-        count = sales_cycle.rel_activities.count()
+        count = Activity.objects.count()
+        activity = Activity.objects.get(id = 2)
         self.assertHttpAccepted(self.api_client.delete(
-            self.api_path_activity + '%s/' % self.activity.pk, format='json'))
+        self.api_path_activity + '%s/' % activity.pk, format='json'))
         # verify that one sales_cycle has been deleted.
-        self.assertEqual(sales_cycle.rel_activities.count(), count - 1)
+        self.assertEqual(Activity.objects.count(), count - 1)
 
     def test_update_activity_via_put(self):
         # get exist product data
         activity = Activity.objects.last()
         activity_data = self.get_detail_des(activity.pk)
+        sales_cycle_id = SalesCycle.objects.last().id
+        new_feedback = "5"
         # update it
         t = '_UPDATED!'
         activity_data['description'] += t
+        activity_data['feedback'] = new_feedback
+        activity_data['sales_cycle'] = sales_cycle_id
         # PUT it
         self.api_client.put(self.api_path_activity + '%s/' % (activity.pk),
                             format='json', data=activity_data)
@@ -906,14 +935,12 @@ class ActivityResourceTest(ResourceTestMixin, ResourceTestCase):
         self.assertEqual(activity_last.description, activity.description + t)
         self.assertEqual(self.get_detail_des(activity.pk)['description'], activity.description + t)
 
-        sales_cycle = SalesCycle.objects.last()
-        activity_data['sales_cycle'] = sales_cycle.id
-        self.api_client.put(self.api_path_activity + '%s/' % (activity.pk),
-                            format='json', data=activity_data)
+        self.assertEqual(activity_last.feedback.status, new_feedback)
+        self.assertEqual(self.get_detail_des(activity.pk)['feedback'], new_feedback)
 
         activity_last = Activity.objects.last()
-        self.assertEqual(self.get_detail_des(activity.pk)['sales_cycle'], sales_cycle.id)
-        self.assertEqual(sales_cycle.id, activity_last.sales_cycle.id)
+        self.assertEqual(self.get_detail_des(activity.pk)['sales_cycle'], sales_cycle_id)
+        self.assertEqual(sales_cycle_id, activity_last.sales_cycle.id)
 
 
 
@@ -1462,3 +1489,107 @@ class AppStateResourceTest(ResourceTestMixin, ResourceTestCase):
         self.assertTrue('sales_cycles' in app_state['objects'])
         self.assertTrue('shares' in app_state['objects'])
         self.assertTrue('activities' in app_state['objects'])
+
+
+class ShareResourceTest(ResourceTestMixin, ResourceTestCase):
+
+    def setUp(self):
+        super(self.__class__, self).setUp()
+
+        # login user
+        self.get_credentials()
+
+        self.api_path_share = '/api/v1/share/'
+
+        # get_list
+        self.get_list_resp = self.api_client.get(self.api_path_share,
+                                                 format='json',
+                                                 HTTP_HOST='localhost')
+        self.get_list_des = self.deserialize(self.get_list_resp)
+
+        # get_detail(pk)
+        self.get_detail_resp = \
+            lambda pk: self.api_client.get(self.api_path_share+str(pk)+'/',
+                                           format='json',
+                                           HTTP_HOST='localhost')
+        self.get_detail_des = \
+            lambda pk: self.deserialize(self.get_detail_resp(pk))
+
+        self.share = Share.objects.first()
+
+    def test_get_list_valid_json(self):
+        self.assertValidJSONResponse(self.get_list_resp)
+
+    def test_get_list_non_empty(self):
+        self.assertTrue(self.get_list_des['meta']['total_count'] > 0)
+
+    def test_get_detail(self):
+        resp_share = self.get_detail_des(self.share.pk)
+
+        self.assertEqual(resp_share['share_to'], self.share.share_to.id)
+        self.assertEqual(resp_share['share_from'], self.share.share_from.id)
+        self.assertEqual(resp_share['contact'], self.share.contact.id)
+        self.assertEqual(resp_share['note'], self.share.description)
+
+
+    def test_create_share(self):
+        share_to = CRMUser.objects.last()
+        share_from = CRMUser.objects.first()
+        contact = Contact.objects.last()
+        note = 'We have meeting at 3 PM'
+
+        post_data = {
+            'share_to':share_to.id,
+            'share_from':share_from.id,
+            'contact':contact.id,
+            'note':note
+        }
+
+        count = Share.objects.all().count()
+        count_in_shares = share_to.in_shares.count()
+        count_owned_shares = share_from.owned_shares.count()
+        count_contact_shares = contact.shares.count()
+
+        self.assertHttpCreated(self.api_client.post(
+             self.api_path_share, format='json', data=post_data))
+
+        self.assertEqual(Share.objects.all().count(), count+1)
+        self.assertEqual(share_to.in_shares.count(), count_in_shares+1)
+        self.assertEqual(share_from.owned_shares.count(), count_owned_shares+1)
+        self.assertEqual(contact.shares.count(), count_contact_shares+1)
+        # verify that subscription_id was set
+        self.assertIsInstance(Share.objects.last().subscription_id, int)
+        # verify that owner was set
+        self.assertIsInstance(Share.objects.last().share_to, CRMUser)
+        self.assertIsInstance(Share.objects.last().share_from, CRMUser)
+        self.assertIsInstance(Share.objects.last().contact, Contact)
+
+
+    def test_delete_share(self):
+        count = Share.objects.all().count()
+        count_in_shares = CRMUser.objects.first().in_shares.count()
+        count_owned_shares = CRMUser.objects.first().owned_shares.count()
+        count_contact_shares = Contact.objects.first().shares.count()
+        self.assertHttpAccepted(self.api_client.delete(
+             self.api_path_share + '%s/' % self.share.pk, format='json'))
+
+        self.assertEqual(Share.objects.all().count(), count-1)
+        self.assertEqual(CRMUser.objects.first().in_shares.count(), count_in_shares-1)
+        self.assertEqual(CRMUser.objects.first().owned_shares.count(), count_owned_shares-1)
+        self.assertEqual(Contact.objects.first().shares.count(), count_contact_shares-1)
+
+    def test_update_share_via_put(self):
+        share = Share.objects.last()
+        share_data = self.get_detail_des(share.pk)
+        note_update = "_UPDATED"
+        share_data['note'] += note_update
+        share_data['share_to'] = 2
+        share_data['contact'] = 2
+        self.api_client.put(self.api_path_share + '%s/' % (self.share.pk),
+                             format='json', data=share_data)
+
+        share_last = Share.objects.last()
+        self.assertEqual(share_last.description, share.description + note_update)
+        self.assertEqual(share_last.share_to.id, 2)
+        self.assertEqual(share_last.contact.id, 2)
+

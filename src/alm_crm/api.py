@@ -61,6 +61,7 @@ class CRMServiceModelResource(ModelResource):
         crmuser = self.get_crmuser(bundle.request)
         if crmuser:
             bundle.obj.owner = crmuser
+
         return bundle
 
     def get_bundle_list(self, obj_list, request):
@@ -1197,13 +1198,11 @@ class ActivityResource(CRMServiceModelResource):
 
     @undocumented: Meta
     """
+    author_id = fields.IntegerField(attribute='author_id', null=True)
+    description = fields.CharField(attribute='description')
+    sales_cycle = fields.ForeignKey(SalesCycleResource, 'sales_cycle')
+    feedback = fields.ToOneField('alm_crm.api.FeedbackResource', 'feedback', null=True, blank=True)
 
-    author_id = fields.IntegerField(attribute='author_id')
-    # sales_cycle_id = fields.IntegerField(attribute='sales_cycle_id')
-    description = fields.CharField(attribute='title')
-    salescycle_id = fields.ForeignKey(SalesCycleResource, 'sales_cycle')
-    # feedback = fields.ToOneField('alm_crm.api.FeedbackResource',
-    #                              'activity_feedback', null=True, full=False)
 
     # comments = fields.ToManyField(
     #     'alm_crm.api.CommentResource',
@@ -1234,17 +1233,39 @@ class ActivityResource(CRMServiceModelResource):
             )
         ]
 
-    def dehydrate_date_created(self, bundle):
-        return bundle.obj.date_created.strftime('%Y-%m-%d %H:%M')
 
-    def dehydrate_salescycle_id(self, bundle):
+    def dehydrate_sales_cycle(self, bundle):
         return bundle.obj.sales_cycle.id
 
-    def hydrate_salescycle_id(self, bundle):
-        sales_cycle = SalesCycle.objects.get(id=bundle.data['salescycle_id'])
-        bundle.data['salescycle_id'] = sales_cycle
+    def dehydrate_feedback(self, bundle):
+        return hasattr(bundle.obj, 'feedback') and bundle.obj.feedback.status or None
+
+    def hydrate_sales_cycle(self, bundle):
+        sales_cycle = SalesCycle.objects.get(id = bundle.data['sales_cycle'])
+        bundle.data['sales_cycle'] = sales_cycle
         return bundle
 
+    def hydrate_feedback(self, bundle):
+        # feedback = Feedback()
+        # if bundle.request.method == "PUT":
+        #     feedback = Activity.objects.get(id=bundle.data['id']).feedback
+        #     feedback.status = bundle.data['feedback']
+        # elif bundle.request.method == "POST" and bundle.data.get('feedback', None):
+        #     feedback.status = bundle.data['feedback']
+        #     feedback.owner = CRMUser.objects.get(id=bundle.data['author_id'])
+        # else:
+        #      feedback.owner = CRMUser.objects.get(id=bundle.data['author_id'])
+        #      feedback.status = 'W'
+
+        # bundle.data['feedback'] = feedback
+        # feedback.save()
+
+        if bundle.data.get('feedback'):
+            bundle.data['feedback_status'] = bundle.data['feedback']
+            bundle.data['feedback'] = None
+
+        return bundle
+    
     def get_comments(self, request, **kwargs):
         '''
         GET METHOD
@@ -1284,27 +1305,20 @@ class ActivityResource(CRMServiceModelResource):
 
 
     def save(self, bundle, skip_errors=False):
-        """
-        method was overrided,
-        because we work with GenericRelation,
-        it is not like a ManyToManyRelation.
-        So, we can't use save_m2m,
-        because before call it we will
-        add GenericRelation instance to bundle.obj,
-        but we can't create GenericRelation instance without pk of bundle.obj
-        """
         bundle = super(self.__class__, self).save(bundle, skip_errors)
-
-        if bundle.data.get('mention_user_ids'):
-            user_ids = bundle.data.get('mention_user_ids')
-            for uid in user_ids:
-                bundle.obj.mentions.add(
-                    Mention.build_new(user_id=uid,
-                                      content_class=bundle.obj,
-                                      object_id=bundle.obj.pk,
-                                      save=True)
-                    )
-
+        status = 'W'
+        feedback = None
+        if bundle.data.get('feedback_status', None):
+            status = bundle.data['feedback_status']
+        if bundle.request.method == 'PUT':
+            feedback = Feedback.objects.get(activity = bundle.obj)
+            feedback.status = status
+        else:        
+            feedback = Feedback(owner = bundle.obj.owner,
+                                activity = bundle.obj,
+                                 status = status)
+        feedback.save()
+        bundle.data['feedback'] = feedback
         return bundle
 
     class Meta(CRMServiceModelResource.Meta):
@@ -1412,16 +1426,17 @@ class ShareResource(CRMServiceModelResource):
 
     @undocumented: prepend_urls, Meta
     '''
-    contact = fields.ForeignKey(ContactResource, 'contact',
-                                full=True, null=True)
+    contact = fields.ForeignKey(ContactResource, 'contact')
     share_to = fields.ForeignKey(CRMUserResource, 'share_to',
                                  full=True, null=True)
     share_from = fields.ForeignKey(CRMUserResource, 'share_from',
                                    full=True, null=True)
+    note = fields.CharField(attribute='description', null = True)
 
     class Meta(CRMServiceModelResource.Meta):
         queryset = Share.objects.all()
         resource_name = 'share'
+        excludes = ['is_read', 'subscription_id', 'description']
 
     def prepend_urls(self):
         return [
@@ -1444,6 +1459,31 @@ class ShareResource(CRMServiceModelResource):
             request,
             {'objects': self.get_bundle_list(shares, request)}
             )
+   
+
+    def dehydrate_contact(self, bundle):
+        return bundle.obj.contact.id
+
+    def dehydrate_share_from(self, bundle):
+        return bundle.obj.share_from.id
+
+    def dehydrate_share_to(self, bundle):
+        return bundle.obj.share_to.id
+
+    def hydrate_contact(self, bundle):
+        contact = Contact.objects.get(id=bundle.data['contact'])
+        bundle.data['contact'] = contact
+        return bundle
+
+    def hydrate_share_from(self, bundle):
+        share_from = CRMUser.objects.get(id=bundle.data['share_from'])
+        bundle.data['share_from'] = share_from
+        return bundle
+
+    def hydrate_share_to(self, bundle):
+        share_to = CRMUser.objects.get(id=bundle.data['share_to'])
+        bundle.data['share_to'] = share_to
+        return bundle
 
 
 class FeedbackResource(CRMServiceModelResource):
@@ -1456,8 +1496,11 @@ class FeedbackResource(CRMServiceModelResource):
 
     @undocumented: Meta
     '''
-    # activity = fields.OneToOneField(ActivityResource, 'feedback_activity', null=True, full=False)
+
+    #activity = fields.OneToOneField(ActivityResource, 'activity', related_name='activity_feedback', null=True, full=False)
     # value = fields.ToOneField(ValueResource, 'feedback_value', null=True)
+    owner = fields.ToOneField('alm_crm.api.CRMUserResource', 'owner', null=True, full=True)
+    status = fields.CharField(attribute='status')
 
     class Meta(CRMServiceModelResource.Meta):
         queryset = Feedback.objects.all()

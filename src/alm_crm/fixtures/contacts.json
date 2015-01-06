@@ -9,7 +9,7 @@
         "assignees": [
             1
         ],
-        "company_contact": null,
+        "parent": null,
         "followers": [],
         "owner": 1,
         "date_created": "2014-09-10T00:00:00Z",
@@ -27,7 +27,7 @@
         "assignees": [
             1
         ],
-        "company_contact": null,
+        "parent": null,
         "followers": [],
         "owner": 1,
         "date_created": "2014-09-10T00:00:00Z",
@@ -45,7 +45,7 @@
         "assignees": [
             1
         ],
-        "company_contact": null,
+        "parent": null,
         "followers": [],
         "owner": 1,
         "date_created": "2014-09-10T00:00:00Z",
@@ -63,7 +63,7 @@
         "assignees": [
             1
         ],
-        "company_contact": null,
+        "parent": null,
         "followers": [],
         "owner": 1,
         "date_created": "2014-09-10T00:00:00Z",
