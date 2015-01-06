@@ -27,7 +27,7 @@ class VCardResource(BaseVCardResource):
     """
     emails = fields.ToManyField('alm_vcard.api.VCardEmailResource',
                                 'email_set', related_name='vcard', null=True,
-                                full=False)
+                                full=True)
     tels = fields.ToManyField('alm_vcard.api.VCardTelResource', 'tel_set',
                               related_name='vcard', null=True, full=False)
     orgs = fields.ToManyField('alm_vcard.api.VCardOrgResource', 'org_set',

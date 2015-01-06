@@ -91,7 +91,7 @@ class Contact(SubscriptionObject):
         choices=TYPES_WITH_CAPS, default=USER_TP)
     date_created = models.DateTimeField(blank=True, auto_now_add=True)
     vcard = models.OneToOneField('alm_vcard.VCard', blank=True, null=True)
-    company_contact = models.ForeignKey(
+    parent = models.ForeignKey(
         'Contact', blank=True, null=True, related_name='user_contacts')
     owner = models.ForeignKey(
         CRMUser, related_name='owned_contacts',
@@ -139,7 +139,8 @@ class Contact(SubscriptionObject):
             self.subscription_id = self.owner.subscription_id
         super(self.__class__, self).save(**kwargs)
         if is_new:
-            self.share_contact(self.owner.id, self.owner.id, self.pk, comment)
+            # self.share_contact(self.owner.id, self.owner.id, self.pk, comment)
+            pass
 
     @property
     def last_contacted(self):
@@ -471,17 +472,14 @@ class Contact(SubscriptionObject):
     #     pass
     @classmethod
     def import_contacts_from_vcard(cls, vcard_file):
-        print 'getting to import_contacts models function'
         try:
             data_list = vcard_file.read().split('END:VCARD')[:-1]
             contact_ids=[]
             for i in range(0, len(data_list)):
                 data_list[i] += 'END:VCARD'
-                print data_list[i]
                 #c = cls.upload_contacts('vcard', data_list[i], save=True)
                 c = cls._upload_contacts_by_vcard(data_list[i])
                 contact_ids.append({'contact_id':c.id, 'name':c.name})
-                print contact_ids
                 #contact_ids.append(Contact.upload_contacts('vcard', data_list[i], save=True).id)
             return {'success': True, 'contact_ids': contact_ids}
         except:
@@ -1118,6 +1116,7 @@ class Share(SubscriptionObject):
     share_to = models.ForeignKey(CRMUser, related_name='in_shares')
     share_from = models.ForeignKey(CRMUser, related_name='owned_shares')
     date_created = models.DateTimeField(blank=True, auto_now_add=True)
+    note = models.CharField(blank=True, max_length=200)
     comments = generic.GenericRelation('Comment')
 
     class Meta:

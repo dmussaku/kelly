@@ -113,6 +113,7 @@ class BaseConfiguration(SubdomainConfiguration, Configuration):
         'alm_crm',
         'tastypie',
         'tastypie_swagger',
+        'django_extensions',
     )
 
     MIDDLEWARE_CLASSES = (
