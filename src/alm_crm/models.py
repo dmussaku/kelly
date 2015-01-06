@@ -91,7 +91,7 @@ class Contact(SubscriptionObject):
         choices=TYPES_WITH_CAPS, default=USER_TP)
     date_created = models.DateTimeField(blank=True, auto_now_add=True)
     vcard = models.OneToOneField('alm_vcard.VCard', blank=True, null=True)
-    company_contact = models.ForeignKey(
+    parent = models.ForeignKey(
         'Contact', blank=True, null=True, related_name='user_contacts')
     owner = models.ForeignKey(
         CRMUser, related_name='owned_contacts',
