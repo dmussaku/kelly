@@ -27,7 +27,7 @@ from .models import (
     Comment,
     Mention,
     )
-from almanet.models import Subscription
+from almanet.models import Subscription, Service
 from alm_vcard.models import (
     VCard,
     Email as VCardEmail,
@@ -1610,14 +1610,15 @@ class AppStateObject(object):
     get_session
     '''
 
-    def __init__(self, subscription_id=None, request=None):
-        if subscription_id is None:
+    def __init__(self, service_slug=None, request=None):
+        if service_slug is None:
             return
+        service = Service.objects.get(slug=service_slug)
 
-        self.subscription = Subscription.objects.get(pk=subscription_id)
-        self.company = self.subscription.organization
         self.request = request
         self.current_user = request.user
+        self.subscription = self.current_user.get_subscr_by_service(service)
+        self.company = self.subscription.organization
         self.current_crmuser = \
             request.user.get_subscr_user(self.subscription.pk)
 
@@ -1790,13 +1791,13 @@ class AppStateResource(Resource):
     def obj_get(self, bundle, **kwargs):
         '''
         GET METHOD
-        I{URL}:  U{alma.net/api/v1/app_state/:subscription_id/}
+        I{URL}:  U{alma.net/api/v1/app_state/:service_slug/}
 
         B{Description}:
         API function to get application's initial data
 
-        @type  subscription_id: number
-        @param subscription_id: Subscription's id to identify data.
+        @type  service_slug: string
+        @param service_slug: Service's slug name.
 
         @return: dict of objects, contacts and session data
 
@@ -1893,7 +1894,7 @@ class AppStateResource(Resource):
         ... }
 
         '''
-        return AppStateObject(subscription_id=kwargs['pk'],
+        return AppStateObject(service_slug=kwargs['pk'],
                               request=bundle.request)
 
     def my_feed(self, request, **kwargs):

@@ -182,6 +182,7 @@ class UserSessionResource(Resource):
         object_class = UserSession
         list_allowed_methods = ['get', 'post']
         detail_allowed_methods = ['get', 'delete']
+        always_return_data = True
 
     def get_resource_uri(self, bundle_or_obj=None,
                          url_name="api_dispatch_list"):
