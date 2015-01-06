@@ -883,7 +883,7 @@ class SalesCycleResource(CRMServiceModelResource):
         return bundle.obj.date_created.strftime('%Y-%m-%d %H:%M')
 
     def dehydrate_product_ids(self, bundle):
-        return bundle.obj.products.values_list('pk', flat=True)
+        return list(bundle.obj.products.values_list('pk', flat=True))
 
     def hydrate_product_ids(self, bundle):
         ids = bundle.data.get('product_ids', [])
@@ -1022,8 +1022,8 @@ class ActivityResource(CRMServiceModelResource):
 
     author_id = fields.IntegerField(attribute='author_id')
     # sales_cycle_id = fields.IntegerField(attribute='sales_cycle_id')
-    description = fields.CharField(attribute='description')
-    sales_cycle = fields.ForeignKey(SalesCycleResource, 'sales_cycle')
+    description = fields.CharField(attribute='title')
+    salescycle_id = fields.ForeignKey(SalesCycleResource, 'sales_cycle')
     # feedback = fields.ToOneField('alm_crm.api.FeedbackResource',
     #                              'activity_feedback', null=True, full=False)
 
@@ -1059,12 +1059,12 @@ class ActivityResource(CRMServiceModelResource):
     def dehydrate_date_created(self, bundle):
         return bundle.obj.date_created.strftime('%Y-%m-%d %H:%M')
 
-    def dehydrate_sales_cycle(self, bundle):
+    def dehydrate_salescycle_id(self, bundle):
         return bundle.obj.sales_cycle.id
 
-    def hydrate_sales_cycle(self, bundle):
-        sales_cycle = SalesCycle.objects.get(id = bundle.data['sales_cycle'])
-        bundle.data['sales_cycle'] = sales_cycle
+    def hydrate_salescycle_id(self, bundle):
+        sales_cycle = SalesCycle.objects.get(id=bundle.data['salescycle_id'])
+        bundle.data['salescycle_id'] = sales_cycle
         return bundle
 
     def get_comments(self, request, **kwargs):
@@ -1133,6 +1133,7 @@ class ActivityResource(CRMServiceModelResource):
         queryset = Activity.objects.all()
         resource_name = 'activity'
         excludes = ['date_edited', 'subscription_id', 'title']
+        always_return_data = True
 
     def post_list(self, request, **kwargs):
         '''
@@ -1691,48 +1692,15 @@ class AppStateObject(object):
 
     def get_sales_cycles(self):
         sales_cycles = SalesCycle.get_salescycles_by_last_activity_date(
-            self.current_crmuser.pk, owned=True, mentioned=True,
-            followed=True, include_activities=False)
+            self.current_crmuser.pk, all=True, include_activities=False)
 
-        def _map(sc):
-            data = model_to_dict(sc, fields=['id', 'title', 'status'])
-            data.update({
-                'owner_id': sc.owner.pk,
-                'contact_id': sc.contact.pk,
-                'description': None,  # TODO
-                'date_created': sc.date_created.strftime('%Y-%m-%d %H:%M'),
-                'product_ids': sc.products.values_list('pk', flat=True),
-                'projected_value': {
-                    'id': sc.projected_value and sc.projected_value.pk,
-                    'value': sc.projected_value and sc.projected_value.amount},
-                'real_value': {
-                    'id': sc.real_value and sc.real_value.pk,
-                    'value': sc.real_value and sc.real_value.amount}
-                })
-            return data
-
-        return map(_map, sales_cycles)
+        return SalesCycleResource().get_bundle_list(sales_cycles, self.request)
 
     def get_activities(self):
         activities = Activity.get_activities_by_date_created(
-            self.current_crmuser.pk, owned=True, mentioned=True,
-            include_sales_cycles=False)
+            self.current_crmuser.pk, all=True, include_sales_cycles=False)
 
-        def _map(a):
-            data = model_to_dict(a, fields=['id', 'description'])
-            try:
-                feedback_status = a.feedback.status
-            except Feedback.DoesNotExist:
-                feedback_status = None
-            data.update({
-                'salescycle_id': a.sales_cycle.pk,
-                'author_id': a.owner.pk,
-                'feedback': feedback_status,
-                'date_created': a.date_created.strftime('%Y-%m-%d %H:%M')
-                })
-            return data
-
-        return map(_map, activities)
+        return ActivityResource().get_bundle_list(activities, self.request)
 
     def get_products(self):
         products = Product.get_products()

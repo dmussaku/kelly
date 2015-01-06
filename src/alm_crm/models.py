@@ -810,8 +810,8 @@ class SalesCycle(SubscriptionObject):
 
     @classmethod
     def get_salescycles_by_last_activity_date(
-        cls, user_id, owned=True, mentioned=False, followed=False,
-            include_activities=False, limit=20, offset=0):
+        cls, user_id, owned=True, mentioned=False, followed=False, all=False,
+            include_activities=False):
         """Returns sales_cycles where user is owner, mentioned or followed
             ordered by last activity date.
 
@@ -833,17 +833,20 @@ class SalesCycle(SubscriptionObject):
             raise CRMUser.DoesNotExist
 
         q = Q()
-        if owned:
-            q |= Q(owner_id=user_id)
-        if mentioned:
-            q |= Q(mentions__user_id=user_id)
-        if followed:
-            q |= Q(followers__user_id=user_id)
-        if len(q.children) == 0:
+        if all:
+            q |= Q()
+        else:
+            if owned:
+                q |= Q(owner_id=user_id)
+            if mentioned:
+                q |= Q(mentions__user_id=user_id)
+            if followed:
+                q |= Q(followers__user_id=user_id)
+        if not all and len(q.children) == 0:
             sales_cycles = SalesCycle.objects.none()
         else:
             sales_cycles = SalesCycle.objects.filter(q).order_by(
-                '-latest_activity__date_created')[offset:offset + limit]
+                '-latest_activity__date_created')
 
         if not include_activities:
             return sales_cycles
@@ -1000,8 +1003,8 @@ class Activity(SubscriptionObject):
 
     @classmethod
     def get_activities_by_date_created(
-        cls, user_id, owned=True, mentioned=False,
-            include_sales_cycles=False, limit=20, offset=0):
+        cls, user_id, owned=True, mentioned=False, all=False,
+            include_sales_cycles=False):
         """Returns activities where crmuser is owner or mentioned
             ordered by created date.
 
@@ -1023,15 +1026,15 @@ class Activity(SubscriptionObject):
             raise CRMUser.DoesNotExist
 
         q = Q()
-        if owned:
-            q |= Q(owner_id=user_id)
-        if mentioned:
-            q |= Q(mentions__user_id=user_id)
-        if len(q.children) == 0:
+        if not all:
+            if owned:
+                q |= Q(owner_id=user_id)
+            if mentioned:
+                q |= Q(mentions__user_id=user_id)
+        if not all and len(q.children) == 0:
             activities = Activity.objects.none()
         else:
-            activities = Activity.objects.filter(q).order_by('-date_created')[
-                offset:offset + limit]
+            activities = Activity.objects.filter(q).order_by('-date_created')
 
         if not include_sales_cycles:
             return activities
