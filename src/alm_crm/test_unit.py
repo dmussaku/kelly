@@ -854,12 +854,12 @@ class ActivityResourceTest(ResourceTestMixin, ResourceTestCase):
             'author_id': owner.id,
             'description': 'new activity, test_unit',
             'sales_cycle': sales_cycle.id,
-            'feedback': "5"
+            'feedback': "$"
         }
         count = Activity.objects.all().count()
         count2 = sales_cycle.rel_activities.count()
-        self.assertHttpCreated(self.api_client.post(
-            self.api_path_activity, format='json', data=post_data))
+        resp = self.api_client.post(self.api_path_activity, format='json', data=post_data)
+        self.assertHttpCreated(resp)
         self.assertEqual(Activity.objects.all().count(), count+1)
         # verify that new one has been added.
         self.assertEqual(sales_cycle.rel_activities.count(), count2 + 1)
@@ -868,6 +868,7 @@ class ActivityResourceTest(ResourceTestMixin, ResourceTestCase):
         self.assertIsInstance(activity.subscription_id, int)
         # verify that owner was set
         self.assertIsInstance(activity.owner, CRMUser)
+        self.assertIsInstance(activity.feedback, Feedback)
 
     def test_create_activity_without_feedback(self):
         owner = CRMUser.objects.last()
@@ -890,14 +891,13 @@ class ActivityResourceTest(ResourceTestMixin, ResourceTestCase):
         # verify that owner was set
         self.assertIsInstance(activity.owner, CRMUser)
 
-    # def test_delete_activity(self):
-    #     sales_cycle = self.activity.sales_cycle
-    #     count = sales_cycle.rel_activities.count()
-    #     print count
-    #     self.assertHttpAccepted(self.api_client.delete(
-    #         self.api_path_activity + '%s/' % self.activity.pk, format='json'))
-    #     # verify that one sales_cycle has been deleted.
-    #     self.assertEqual(sales_cycle.rel_activities.count(), count - 1)
+    def test_delete_activity(self):
+        count = Activity.objects.count()
+        activity = Activity.objects.get(id = 2)
+        self.assertHttpAccepted(self.api_client.delete(
+        self.api_path_activity + '%s/' % activity.pk, format='json'))
+        # verify that one sales_cycle has been deleted.
+        self.assertEqual(Activity.objects.count(), count - 1)
 
     def test_update_activity_via_put(self):
         # get exist product data

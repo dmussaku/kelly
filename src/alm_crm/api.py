@@ -823,8 +823,7 @@ class ActivityResource(CRMServiceModelResource):
     author_id = fields.IntegerField(attribute='author_id', null=True)
     description = fields.CharField(attribute='description')
     sales_cycle = fields.ForeignKey(SalesCycleResource, 'sales_cycle')
-    feedback = fields.ToOneField('alm_crm.api.FeedbackResource',
-                                 'activity_feedback', null=True)
+    feedback = fields.ToOneField('alm_crm.api.FeedbackResource', 'feedback', null=True, blank=True)
 
     # comments = fields.ToManyField(
     #     'alm_crm.api.CommentResource',
@@ -859,7 +858,7 @@ class ActivityResource(CRMServiceModelResource):
         return bundle.obj.sales_cycle.id
 
     def dehydrate_feedback(self, bundle):
-        return bundle.obj.feedback.status
+        return hasattr(bundle.obj, 'feedback') and bundle.obj.feedback.status or None
 
     def hydrate_sales_cycle(self, bundle):
         sales_cycle = SalesCycle.objects.get(id = bundle.data['sales_cycle'])
@@ -880,7 +879,11 @@ class ActivityResource(CRMServiceModelResource):
 
         # bundle.data['feedback'] = feedback
         # feedback.save()
-        self.save(bundle = bundle, skip_errors = True)
+
+        if bundle.data.get('feedback'):
+            bundle.data['feedback_status'] = bundle.data['feedback']
+            bundle.data['feedback'] = None
+
         return bundle
     
     def get_comments(self, request, **kwargs):
@@ -922,31 +925,20 @@ class ActivityResource(CRMServiceModelResource):
 
 
     def save(self, bundle, skip_errors=False):
-        """
-        method was overrided,
-        because we work with GenericRelation,
-        it is not like a ManyToManyRelation.
-        So, we can't use save_m2m,
-        because before call it we will
-        add GenericRelation instance to bundle.obj,
-        but we can't create GenericRelation instance without pk of bundle.obj
-        """
         bundle = super(self.__class__, self).save(bundle, skip_errors)
-        feedback = Feedback()
-        if bundle.request.method == "PUT":
-            feedback = Activity.objects.get(id=bundle.data['id']).feedback
-            feedback.status = bundle.data['feedback']
-        elif bundle.request.method == "POST" and bundle.data.get('feedback', None):
-            feedback.status = bundle.data['feedback']
-            feedback.owner = CRMUser.objects.get(id=bundle.data['author_id'])
-            feedback.activity = Activity.objects.get(id=bundle.obj.pk)
-        else:
-             feedback.owner = CRMUser.objects.get(id=bundle.data['author_id'])
-             feedback.activity = Activity.objects.get(id=bundle.obj.pk)
-             feedback.status = 'W'
-
+        status = 'W'
+        feedback = None
+        if bundle.data.get('feedback_status', None):
+            status = bundle.data['feedback_status']
+        if bundle.request.method == 'PUT':
+            feedback = Feedback.objects.get(activity = bundle.obj)
+            feedback.status = status
+        else:        
+            feedback = Feedback(owner = bundle.obj.owner,
+                                activity = bundle.obj,
+                                 status = status)
         feedback.save()
-        # bundle.obj.feedback = FeedbackResource().post_detail(requet)
+        bundle.data['feedback'] = feedback
         return bundle
 
     class Meta(CRMServiceModelResource.Meta):
@@ -1063,8 +1055,10 @@ class ShareResource(CRMServiceModelResource):
 
 
 class FeedbackResource(CRMServiceModelResource):
-    # activity = fields.OneToOneField(ActivityResource, 'feedback_activity', null=True, full=False)
+    #activity = fields.OneToOneField(ActivityResource, 'activity', related_name='activity_feedback', null=True, full=False)
     # value = fields.ToOneField(ValueResource, 'feedback_value', null=True)
+    owner = fields.ToOneField('alm_crm.api.CRMUserResource', 'owner', null=True, full=True)
+    status = fields.CharField(attribute='status')
 
     class Meta(CRMServiceModelResource.Meta):
         queryset = Feedback.objects.all()
