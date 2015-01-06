@@ -31,6 +31,18 @@ from django.core.files.temp import NamedTemporaryFile
 from django.core.servers.basehttp import FileWrapper
 from tastypie.serializers import Serializer
 from django.db import models
+# try:
+#     from django.views.decorators.csrf import csrf_exempt
+# except ImportError:
+#     def csrf_exempt(func):
+#         return func
+# from tastypie.exceptions import NotFound, BadRequest, InvalidFilterError, HydrationError, InvalidSortError, ImmediateHttpResponse, Unauthorized
+from tastypie.exceptions import ImmediateHttpResponse
+# from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned, ValidationError
+# from django.utils.cache import patch_cache_control, patch_vary_headers
+import json
+from tastypie.http import HttpNotFound
+from django.http import HttpResponse
 
 
 class CRMServiceModelResource(ModelResource):
@@ -163,7 +175,12 @@ class ContactResource(CRMServiceModelResource):
             setattr(bundle.obj, key, value)
 
         bundle = self.full_hydrate(bundle)
-        # return self.save(bundle)
+        raise ImmediateHttpResponse(
+            HttpResponse(
+                content=Serializer().to_json(bundle.data),
+                content_type='application/json; charset=utf-8', status=200
+                )
+            )
         return bundle
     
     def obj_update(self, bundle, skip_errors=False, **kwargs):
@@ -187,6 +204,12 @@ class ContactResource(CRMServiceModelResource):
 
         bundle = self.full_hydrate(bundle, **kwargs)
         #return self.save(bundle, skip_errors=skip_errors)
+        raise ImmediateHttpResponse(
+            HttpResponse(
+                content=Serializer().to_json(bundle.data),
+                content_type='application/json; charset=utf-8', status=200
+                )
+            )
         return bundle
 
     def full_hydrate(self, bundle, **kwargs):
@@ -294,7 +317,6 @@ class ContactResource(CRMServiceModelResource):
                     for obj in model.objects.filter(vcard=vcard):
                         obj.delete()
         vcard.save()
-        
 
     def save(self, bundle, skip_errors=False):
         self.is_valid(bundle)
