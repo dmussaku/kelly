@@ -1057,6 +1057,7 @@ class SalesCycleResource(CRMServiceModelResource):
         queryset = SalesCycle.objects.all()
         resource_name = 'sales_cycle'
         excludes = ['from_date', 'to_date']
+        detail_allowed_methods = ['get', 'post', 'put', 'patch', 'delete']
         always_return_data = True
 
     def dehydrate_product_ids(self, bundle):

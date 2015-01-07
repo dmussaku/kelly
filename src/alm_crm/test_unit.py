@@ -754,6 +754,19 @@ class SalesCycleResourceTest(ResourceTestMixin, ResourceTestCase):
         # verify products
         self.assertEqual(sales_cycle.products.count(), 2)
 
+    def test_patch_sales_cycle_with_products(self):
+        patch_data = {
+            'product_ids': [1, 2]
+        }
+        before = self.sales_cycle.products.count()
+
+        resp = self.api_client.patch(
+            self.api_path_sales_cycle+str(self.sales_cycle.pk)+'/',
+            format='json',
+            data=patch_data)
+        self.assertHttpAccepted(resp)
+        self.assertTrue(before < self.sales_cycle.products.count())
+
     @skipIf(True, "now, activities is not presented in SalesCycleResource")
     def test_create_sales_cycle_with_activity(self):
         post_data = {
