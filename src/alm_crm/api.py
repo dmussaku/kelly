@@ -154,9 +154,9 @@ class ContactResource(CRMServiceModelResource):
     sales_cycles = fields.ToManyField(
         'alm_crm.api.SalesCycleResource', 'sales_cycles',
         related_name='contact', null=True, full=False)
-    parent = fields.ToManyField(
-        'alm_crm.api.ContactResource', 'company_contact',
-        related_name='parent', null=True, full=False
+    parent = fields.ToOneField(
+        'alm_crm.api.ContactResource', 'parent',
+        null=True, full=False
         )
 
     class Meta(CRMServiceModelResource.Meta):
@@ -241,7 +241,6 @@ class ContactResource(CRMServiceModelResource):
 
 
     def full_dehydrate(self, bundle, for_list=False):
-        print "full dehydrating"
         bundle = super(self.__class__, self).full_dehydrate(bundle, for_list=True)
         '''
         Custom representation of followers, assignees etc.
@@ -255,6 +254,11 @@ class ContactResource(CRMServiceModelResource):
         bundle.data['sales_cycles'] = []
         for obj in bundle.obj.sales_cycles.all():
             bundle.data['sales_cycles'].append(obj.id)
+        del bundle.data['owner']
+        del bundle.data['parent']
+        del bundle.data['resource_uri']
+        bundle.data['author_id'] = bundle.obj.owner.id
+        bundle.data['parent_id'] = bundle.obj.parent.id
         return bundle
 
 
@@ -265,7 +269,7 @@ class ContactResource(CRMServiceModelResource):
         else:
             bundle.obj = self._meta.object_class()
             # bundle.obj.owner_id = bundle.request.user.get_crmuser().id
-            # bundle.obj.save()
+            bundle.obj.save()
         '''
         Go through all field names in the Contact Model and check with
         the json that has been submitted. So if the attribute is there
@@ -278,23 +282,26 @@ class ContactResource(CRMServiceModelResource):
                 bundle.obj.tp='co'
             else:
                 bundle.obj.tp='user'
-        if bundle.data['owner_id']:
-            bundle.obj.owner_id = int(bundle.data['owner_id'])
+        if bundle.data.get('author_id',""):
+            bundle.obj.owner_id = int(bundle.data['author_id'])
+        if bundle.data.get('parent_id',""):
+            bundle.obj.parent_id = int(bundle.data['parent_id'])
         for field_name in bundle.obj._meta.get_all_field_names():
             if bundle.data.get(field_name, None):
                 field_object = ast.literal_eval(str(bundle.data.get(field_name, None)))
                 if isinstance(field_object, str):
                     bundle.obj.__setattr__(field_name, field_object)
                 elif isinstance(field_object, list):
-                    pass
+                    for obj in field_object:
+                        bundle.obj.__getattribute__(field_name).add(int(obj))
                 elif isinstance(field_object, dict):
                     self.vcard_full_hydrate(bundle)
         bundle.obj.save()
         if bundle.data.get('note') and not kwargs:
             share = Share(
-                    note=bundle.data.get('note'),
-                    share_to_id=bundle.data['owner'],
-                    share_from_id=bundle.data['owner'],
+                    description=bundle.data.get('note'),
+                    share_to_id=int(bundle.data['author_id']),
+                    share_from_id=int(bundle.data['author_id']),
                     contact_id=bundle.obj.id
                     )
             share.save()
