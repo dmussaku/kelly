@@ -257,8 +257,14 @@ class ContactResource(CRMServiceModelResource):
         del bundle.data['owner']
         del bundle.data['parent']
         del bundle.data['resource_uri']
-        bundle.data['author_id'] = bundle.obj.owner.id
-        bundle.data['parent_id'] = bundle.obj.parent.id
+        try:
+            bundle.data['author_id'] = bundle.obj.owner.id
+        except:
+            bundle.data['author_id'] = None
+        try:
+            bundle.data['parent_id'] = bundle.obj.parent.id
+        except:
+            bundle.data['parent_id'] = None
         return bundle
 
 
