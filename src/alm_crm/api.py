@@ -264,8 +264,8 @@ class ContactResource(CRMServiceModelResource):
             bundle.obj = Contact.objects.get(id=int(contact_id))
         else:
             bundle.obj = self._meta.object_class()
-            bundle.obj.owner_id = bundle.request.user.get_crmuser().id
-            bundle.obj.save()
+            # bundle.obj.owner_id = bundle.request.user.get_crmuser().id
+            # bundle.obj.save()
         '''
         Go through all field names in the Contact Model and check with
         the json that has been submitted. So if the attribute is there
@@ -278,6 +278,8 @@ class ContactResource(CRMServiceModelResource):
                 bundle.obj.tp='co'
             else:
                 bundle.obj.tp='user'
+        if bundle.data['owner_id']:
+            bundle.obj.owner_id = int(bundle.data['owner_id'])
         for field_name in bundle.obj._meta.get_all_field_names():
             if bundle.data.get(field_name, None):
                 field_object = ast.literal_eval(str(bundle.data.get(field_name, None)))
