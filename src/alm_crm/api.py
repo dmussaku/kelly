@@ -152,6 +152,10 @@ class ContactResource(CRMServiceModelResource):
     sales_cycles = fields.ToManyField(
         'alm_crm.api.SalesCycleResource', 'sales_cycles',
         related_name='contact', null=True, full=False)
+    parent = fields.ToManyField(
+        'alm_crm.api.ContactResource', 'company_contact',
+        related_name='parent', null=True, full=False
+        )
 
     class Meta(CRMServiceModelResource.Meta):
         queryset = Contact.objects.all()
@@ -233,8 +237,27 @@ class ContactResource(CRMServiceModelResource):
             )
         return bundle
 
+
+    def full_dehydrate(self, bundle, for_list=False):
+        print "full dehydrating"
+        bundle = super(self.__class__, self).full_dehydrate(bundle, for_list=True)
+        '''
+        Custom representation of followers, assignees etc.
+        '''
+        bundle.data['assignees'] = []
+        for obj in bundle.obj.assignees.all():
+            bundle.data['assignees'].append(obj.id)
+        bundle.data['followers'] = []
+        for obj in bundle.obj.followers.all():
+            bundle.data['followers'].append(obj.id)
+        bundle.data['sales_cycles'] = []
+        for obj in bundle.obj.sales_cycles.all():
+            bundle.data['sales_cycles'].append(obj.id)
+        return bundle
+
+
     def full_hydrate(self, bundle, **kwargs):
-        contact_id = kwargs.get('pk',"")
+        contact_id = kwargs.get('id', None)
         if contact_id:
             bundle.obj = Contact.objects.get(id=int(contact_id))
         else:
@@ -248,6 +271,11 @@ class ContactResource(CRMServiceModelResource):
         i got in a json. If its missing then i just delete it.
 
         '''
+        if bundle.data['is_company']:
+            if bundle.data['is_company']=='True':
+                bundle.obj.tp='co'
+            else:
+                bundle.obj.tp='user'
         for field_name in bundle.obj._meta.get_all_field_names():
             if bundle.data.get(field_name, None):
                 field_object = ast.literal_eval(str(bundle.data.get(field_name, None)))
@@ -356,11 +384,7 @@ class ContactResource(CRMServiceModelResource):
 
         #If Contact is saved with a small note/comment
         # Save the main object.
-        if bundle.data['is_company']:
-            if bundle.data['is_company']=='True':
-                bundle.obj.tp='co'
-            else:
-                bundle.obj.tp='user'
+        
         if bundle.data['owner_id']:
             bundle.obj.owner_id=int(bundle.data['owner_id'])
         bundle.obj.save()

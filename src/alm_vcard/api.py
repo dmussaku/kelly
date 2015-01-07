@@ -17,6 +17,10 @@ class BaseVCardResource(ModelResource):
                                              SessionAuthentication())
         authorization = Authorization()
 
+    # def full_dehydrate(self, bundle, for_list=False):
+    #     bundle = super(self.__class__, self).full_dehydrate(bundle, for_list=True)
+    #     return bundle
+
 class VCardResource(BaseVCardResource):
     """
     GET Method 
