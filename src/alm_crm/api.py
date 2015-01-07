@@ -51,6 +51,13 @@ import datetime
 import time
 
 
+class CommonMeta:
+    list_allowed_methods = ['get', 'post']
+    detail_allowed_methods = ['get', 'post', 'put', 'delete']
+    authentication = MultiAuthentication(BasicAuthentication(),
+                                         SessionAuthentication())
+    authorization = Authorization()
+
 
 class CRMServiceModelResource(ModelResource):
 
@@ -96,13 +103,6 @@ class CRMServiceModelResource(ModelResource):
         if subscription_pk:
             crmuser = request.user.get_subscr_user(subscription_pk)
         return crmuser
-
-    class Meta:
-        list_allowed_methods = ['get', 'post']
-        detail_allowed_methods = ['get', 'post', 'put', 'delete']
-        authentication = MultiAuthentication(BasicAuthentication(),
-                                             SessionAuthentication())
-        authorization = Authorization()
 
 
 class ContactResource(CRMServiceModelResource):
@@ -164,7 +164,7 @@ class ContactResource(CRMServiceModelResource):
         null=True, full=True
         )
 
-    class Meta(CRMServiceModelResource.Meta):
+    class Meta(CommonMeta):
         queryset = Contact.objects.all()
         resource_name = 'contact'
 
@@ -220,29 +220,6 @@ class ContactResource(CRMServiceModelResource):
             )
         return bundle
 
-    def obj_delete(self, bundle, **kwargs):
-        """
-        A ORM-specific implementation of ``obj_delete``.
-
-        Takes optional ``kwargs``, which are used to narrow the query to find
-        the instance.
-        """
-        if not hasattr(bundle.obj, 'delete'):
-            try:
-                bundle.obj = self.obj_get(bundle=bundle, **kwargs)
-            except ObjectDoesNotExist:
-                raise NotFound("A model instance matching the provided arguments could not be found.")
-        for share in bundle.obj.shares.all():
-            share.delete()
-        for vcard_rel in bundle.obj.vcard._meta.get_all_related_objects():
-            if vcard_rel.model == Contact:
-                pass
-            else:
-                for obj in vcard_rel.model.objects.filter(vcard=bundle.obj.vcard):
-                    obj.delete()
-        self.authorized_delete_detail(self.get_object_list(bundle.request), bundle)
-        bundle.obj.delete()
-
     def obj_update(self, bundle, skip_errors=False, **kwargs):
         """
         A ORM-specific implementation of ``obj_update``.
@@ -276,34 +253,22 @@ class ContactResource(CRMServiceModelResource):
             )
         return bundle
 
-
     def full_dehydrate(self, bundle, for_list=False):
-        bundle = super(self.__class__, self).full_dehydrate(bundle, for_list=True)
-        '''
-        Custom representation of followers, assignees etc.
-        '''
-        bundle.data['assignees'] = []
-        for obj in bundle.obj.assignees.all():
-            bundle.data['assignees'].append(obj.id)
-        bundle.data['followers'] = []
-        for obj in bundle.obj.followers.all():
-            bundle.data['followers'].append(obj.id)
-        bundle.data['sales_cycles'] = []
-        for obj in bundle.obj.sales_cycles.all():
-            bundle.data['sales_cycles'].append(obj.id)
-        del bundle.data['owner']
-        del bundle.data['parent']
-        del bundle.data['resource_uri']
-        try:
-            bundle.data['author_id'] = bundle.obj.owner.id
-        except:
-            bundle.data['author_id'] = None
-        try:
-            bundle.data['parent_id'] = bundle.obj.parent.id
-        except:
-            bundle.data['parent_id'] = None
+        '''Custom representation of followers, assignees etc.'''
+        bundle = super(self.__class__, self).full_dehydrate(
+            bundle, for_list=True)
+        bundle.data['author_id'] = bundle.obj.owner_id
+        bundle.data['parent_id'] = bundle.obj.parent_id
         return bundle
 
+    def dehydrate_assignees(self, bundle):
+        return [assignee.pk for assignee in bundle.obj.assignees.all()]
+
+    def dehydrate_followers(self, bundle):
+        return [follower.pk for follower in bundle.obj.followers.all()]
+
+    def dehydrate_sales_cycles(self, bundle):
+        return [sc.pk for sc in bundle.obj.sales_cycles.all()]
 
     def full_hydrate(self, bundle, **kwargs):
         t1 = time.time()
@@ -1162,7 +1127,7 @@ class SalesCycleResource(CRMServiceModelResource):
     real_value = fields.ToOneField('alm_crm.api.ValueResource',
                                    'real_value', null=True, full=True)
 
-    class Meta(CRMServiceModelResource.Meta):
+    class Meta(CommonMeta):
         queryset = SalesCycle.objects.all()
         resource_name = 'sales_cycle'
         excludes = ['from_date', 'to_date']
@@ -1430,7 +1395,7 @@ class ActivityResource(CRMServiceModelResource):
         bundle.data['feedback'] = feedback
         return bundle
 
-    class Meta(CRMServiceModelResource.Meta):
+    class Meta(CommonMeta):
         queryset = Activity.objects.all()
         resource_name = 'activity'
         excludes = ['date_edited', 'subscription_id', 'title']
@@ -1473,7 +1438,7 @@ class ProductResource(CRMServiceModelResource):
     '''
     sales_cycles = fields.ToManyField(SalesCycleResource, 'sales_cycles')
 
-    class Meta(CRMServiceModelResource.Meta):
+    class Meta(CommonMeta):
         queryset = Product.objects.all()
         detail_allowed_methods = ['get', 'post', 'put', 'patch', 'delete']
         resource_name = 'product'
@@ -1503,7 +1468,7 @@ class ValueResource(CRMServiceModelResource):
     '''
     value = fields.IntegerField(attribute='amount')
 
-    class Meta(CRMServiceModelResource.Meta):
+    class Meta(CommonMeta):
         queryset = Value.objects.all()
         resource_name = 'sales_cycle/value'
         excludes = ['amount']
@@ -1520,7 +1485,7 @@ class CRMUserResource(CRMServiceModelResource):
     @undocumented: Meta
     '''
 
-    class Meta(CRMServiceModelResource.Meta):
+    class Meta(CommonMeta):
         queryset = CRMUser.objects.all()
         resource_name = 'crmuser'
 
@@ -1542,7 +1507,7 @@ class ShareResource(CRMServiceModelResource):
                                    full=True, null=True)
     note = fields.CharField(attribute='description', null = True)
 
-    class Meta(CRMServiceModelResource.Meta):
+    class Meta(CommonMeta):
         queryset = Share.objects.all()
         resource_name = 'share'
         excludes = ['is_read', 'subscription_id', 'description']
@@ -1611,7 +1576,7 @@ class FeedbackResource(CRMServiceModelResource):
     owner = fields.ToOneField('alm_crm.api.CRMUserResource', 'owner', null=True, full=True)
     status = fields.CharField(attribute='status')
 
-    class Meta(CRMServiceModelResource.Meta):
+    class Meta(CommonMeta):
         queryset = Feedback.objects.all()
         resource_name = 'feedback'
 
@@ -1640,7 +1605,7 @@ class CommentResource(CRMServiceModelResource):
     def dehydrate_date_edited(self, bundle):
         return bundle.obj.date_edited.strftime('%Y-%m-%d %H:%M')
 
-    class Meta(CRMServiceModelResource.Meta):
+    class Meta(CommonMeta):
         queryset = Comment.objects.all()
         resource_name = 'comment'
 
@@ -1664,7 +1629,7 @@ class MentionResource(CRMServiceModelResource):
         Comment: CommentResource,
     }, 'content_object')
 
-    class Meta(CRMServiceModelResource.Meta):
+    class Meta(CommonMeta):
         queryset = Mention.objects.all()
         resource_name = 'mention'
 
@@ -1674,7 +1639,7 @@ class ContactListResource(CRMServiceModelResource):
                                related_name='contact_list', null=True,
                                full=False)
 
-    class Meta(CRMServiceModelResource.Meta):
+    class Meta(CommonMeta):
         queryset = ContactList.objects.all()
         resource_name = 'contact_list'
 

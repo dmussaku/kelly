@@ -240,7 +240,7 @@ class Contact(SubscriptionObject):
         except CRMUser.DoesNotExist:
             return False
 
-    
+
 
 
     @classmethod
@@ -662,7 +662,7 @@ class SalesCycle(SubscriptionObject):
         null=True, blank=True)
     contact = models.ForeignKey(
         Contact, related_name='sales_cycles',
-        on_delete=models.SET_DEFAULT, default=None)
+        default=None)
     latest_activity = models.OneToOneField('Activity',
                                            blank=True, null=True,
                                            on_delete=models.SET_NULL)
@@ -1192,8 +1192,7 @@ class Comment(SubscriptionObject):
 class Share(SubscriptionObject):
     is_read = models.BooleanField(default=False, blank=False)
     contact = models.ForeignKey(
-        Contact, related_name='shares',
-        on_delete=models.SET_DEFAULT, default=None)
+        Contact, related_name='shares', default=None)
     share_to = models.ForeignKey(CRMUser, related_name='in_shares')
     share_from = models.ForeignKey(CRMUser, related_name='owned_shares')
     date_created = models.DateTimeField(blank=True, auto_now_add=True)
