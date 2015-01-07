@@ -41,7 +41,7 @@ from django.db import models
 #     def csrf_exempt(func):
 #         return func
 # from tastypie.exceptions import NotFound, BadRequest, InvalidFilterError, HydrationError, InvalidSortError, ImmediateHttpResponse, Unauthorized
-from tastypie.exceptions import ImmediateHttpResponse
+from tastypie.exceptions import ImmediateHttpResponse, NotFound
 # from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned, ValidationError
 # from django.utils.cache import patch_cache_control, patch_vary_headers
 from tastypie.http import HttpNotFound
@@ -219,6 +219,29 @@ class ContactResource(CRMServiceModelResource):
                 )
             )
         return bundle
+
+    def obj_delete(self, bundle, **kwargs):
+        """
+        A ORM-specific implementation of ``obj_delete``.
+
+        Takes optional ``kwargs``, which are used to narrow the query to find
+        the instance.
+        """
+        if not hasattr(bundle.obj, 'delete'):
+            try:
+                bundle.obj = self.obj_get(bundle=bundle, **kwargs)
+            except ObjectDoesNotExist:
+                raise NotFound("A model instance matching the provided arguments could not be found.")
+        for share in bundle.obj.shares.all():
+            share.delete()
+        for vcard_rel in bundle.obj.vcard._meta.get_all_related_objects():
+            if vcard_rel.model == Contact:
+                pass
+            else:
+                for obj in vcard_rel.model.objects.filter(vcard=bundle.obj.vcard):
+                    obj.delete()
+        self.authorized_delete_detail(self.get_object_list(bundle.request), bundle)
+        bundle.obj.delete()
 
     def obj_update(self, bundle, skip_errors=False, **kwargs):
         """
