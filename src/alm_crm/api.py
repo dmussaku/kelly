@@ -48,6 +48,7 @@ from tastypie.http import HttpNotFound
 from django.http import HttpResponse
 import json
 import datetime
+import time
 
 
 
@@ -204,14 +205,18 @@ class ContactResource(CRMServiceModelResource):
         bundle = self.full_hydrate(bundle)
         raise ImmediateHttpResponse(
             HttpResponse(
-                content=Serializer().to_json(bundle.data),
+                content=Serializer().to_json(
+                    self.full_dehydrate(
+                        self.build_bundle(
+                            obj=Contact.objects.get(id=bundle.obj.id))
+                        )
+                    ),
                 content_type='application/json; charset=utf-8', status=200
                 )
             )
         return bundle
 
     def obj_update(self, bundle, skip_errors=False, **kwargs):
-        print 'obj_update'
         """
         A ORM-specific implementation of ``obj_update``.
         """
@@ -233,14 +238,19 @@ class ContactResource(CRMServiceModelResource):
         #return self.save(bundle, skip_errors=skip_errors)
         raise ImmediateHttpResponse(
             HttpResponse(
-                content=Serializer().to_json(bundle.data),
+                content=Serializer().to_json(
+                    self.full_dehydrate(
+                        self.build_bundle(
+                            obj=Contact.objects.get(id=bundle.obj.id))
+                        )
+                    ),
                 content_type='application/json; charset=utf-8', status=200
                 )
             )
         return bundle
 
 
-    def full_dehydrate(self, bundle, for_list=False):
+    def full_dehydrate(self, bundle, for_list=False):    
         bundle = super(self.__class__, self).full_dehydrate(bundle, for_list=True)
         '''
         Custom representation of followers, assignees etc.
@@ -269,6 +279,7 @@ class ContactResource(CRMServiceModelResource):
 
 
     def full_hydrate(self, bundle, **kwargs):
+        t1 = time.time()
         contact_id = kwargs.get('id', None)
         if contact_id:
             bundle.obj = Contact.objects.get(id=int(contact_id))
@@ -283,8 +294,8 @@ class ContactResource(CRMServiceModelResource):
         i got in a json. If its missing then i just delete it.
 
         '''
-        if bundle.data['is_company']:
-            if bundle.data['is_company']=='True':
+        if bundle.data.get('is_company',""):
+            if bundle.data['is_company']==1:
                 bundle.obj.tp='co'
             else:
                 bundle.obj.tp='user'
@@ -301,7 +312,11 @@ class ContactResource(CRMServiceModelResource):
                     for obj in field_object:
                         bundle.obj.__getattribute__(field_name).add(int(obj))
                 elif isinstance(field_object, dict):
+                    t2 = time.time() - t1
+                    print "Time to finish contact hydration = %s seconds" % t2
                     self.vcard_full_hydrate(bundle)
+                    t3 = time.time() - t2
+                    print "Time to finish vcard hydration = %s seconds" % t2
         bundle.obj.save()
         if bundle.data.get('note') and not kwargs:
             share = Share(
