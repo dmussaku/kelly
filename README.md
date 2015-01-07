@@ -71,3 +71,19 @@ SITE_DOMAIN = PARENT_HOST
 
 put this config to almanet.conf.py file. After this you need to connect to vpn and write on test server host file your vpn ip and your domain
 ```
+
+Integrate browserify project with Django
+----------------------------------------
+
+1. Create local file for settings overriding
+```touch ~/.almanet/almanet.conf.py```
+
+2. Update it by setting directory to your browserify project
+```STATICFILES_DIRS = '+/home/anguix/work/projects/alma.net/frontend/almanet-frontend```
+
+Attention: '+' indicates add it to original STATICFILES_DIRS. The final constant will look like:
+```
+('/home/anguix/work/projects/alma.net/alma.net/alma.net/src/static',
+ '/home/anguix/work/projects/alma.net/frontend/almanet-frontend')
+ ```
+
