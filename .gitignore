@@ -7,4 +7,4 @@ venv
 .coverage
 api_docs/*
 src/static/js/bundle.js
-src/static/css/frontend.app.min.css
+src/static/css/app.min.css

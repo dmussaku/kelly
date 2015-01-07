@@ -277,7 +277,7 @@ class ContactResource(CRMServiceModelResource):
         return bundle
 
 
-    def full_dehydrate(self, bundle, for_list=False):    
+    def full_dehydrate(self, bundle, for_list=False):
         bundle = super(self.__class__, self).full_dehydrate(bundle, for_list=True)
         '''
         Custom representation of followers, assignees etc.
@@ -446,7 +446,7 @@ class ContactResource(CRMServiceModelResource):
 
         #If Contact is saved with a small note/comment
         # Save the main object.
-        
+
         if bundle.data['owner_id']:
             bundle.obj.owner_id=int(bundle.data['owner_id'])
         bundle.obj.save()
@@ -1374,7 +1374,7 @@ class ActivityResource(CRMServiceModelResource):
             bundle.data['feedback'] = None
 
         return bundle
-    
+
     def get_comments(self, request, **kwargs):
         '''
         GET METHOD
@@ -1422,7 +1422,7 @@ class ActivityResource(CRMServiceModelResource):
         if bundle.request.method == 'PUT':
             feedback = Feedback.objects.get(activity = bundle.obj)
             feedback.status = status
-        else:        
+        else:
             feedback = Feedback(owner = bundle.obj.owner,
                                 activity = bundle.obj,
                                  status = status)
@@ -1568,7 +1568,7 @@ class ShareResource(CRMServiceModelResource):
             request,
             {'objects': self.get_bundle_list(shares, request)}
             )
-   
+
 
     def dehydrate_contact(self, bundle):
         return bundle.obj.contact.id
@@ -1943,7 +1943,7 @@ class AppStateObject(object):
     def __init__(self, service_slug=None, request=None):
         if service_slug is None:
             return
-        service = Service.objects.get(slug=service_slug)
+        service = Service.objects.get(pk=service_slug)
 
         self.request = request
         self.current_user = request.user

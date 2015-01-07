@@ -62,6 +62,13 @@ def FileSettings(path):
                       "using default settings\n\n" % (path, e.strerror))
 
             for name, value in uppercase_attributes(mod).items():
+                if hasattr(self, name):
+                    original_value = getattr(self, name)
+                    if isinstance(original_value, (tuple, list)):
+                        if value.startswith('+'):
+                            value = tuple(original_value) + tuple([value[1:]])
+                        else:
+                            value = tuple([value])
                 setattr(self, name, value)
 
     return Holder
@@ -210,6 +217,7 @@ class BaseConfiguration(SubdomainConfiguration, Configuration):
     STATIC_ROOT = rel('../..', 'static')
     STATICFILES_DIRS = (
         rel('static'),
+
     )
     STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.CachedStaticFilesStorage'
 
