@@ -1044,7 +1044,7 @@ class SalesCycleResource(CRMServiceModelResource):
         'alm_crm.api.ProductResource', 'products',
         related_name='sales_cycles', null=True, full=False)
     # owner = fields.ToOneField('alm_crm.api.CRMUserResource', 'owner', null=True, full=True)
-    owner_id = fields.IntegerField(attribute='owner_id')
+    author_id = fields.IntegerField(attribute='owner_id')
     # followers = fields.ToManyField('alm_crm.api.CRMUserResource',
     #                                'followers', null=True, full=True)
     projected_value = fields.ToOneField('alm_crm.api.ValueResource',
@@ -1057,9 +1057,7 @@ class SalesCycleResource(CRMServiceModelResource):
         queryset = SalesCycle.objects.all()
         resource_name = 'sales_cycle'
         excludes = ['from_date', 'to_date']
-
-    def dehydrate_date_created(self, bundle):
-        return bundle.obj.date_created.strftime('%Y-%m-%d %H:%M')
+        always_return_data = True
 
     def dehydrate_product_ids(self, bundle):
         return list(bundle.obj.products.values_list('pk', flat=True))
