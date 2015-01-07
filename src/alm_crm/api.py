@@ -672,7 +672,12 @@ class ContactResource(CRMServiceModelResource):
         contacts = Contact.get_cold_base(limit, offset)
         return self.create_response(
             request,
-            {'objects': self.get_bundle_list(contacts, request)}
+            {
+            'meta':{
+                'limit': limit,
+                'offset': offset
+            },
+            'objects': self.get_bundle_list(contacts, request)}
             )
 
     def get_leads(self, request, **kwargs):
@@ -719,7 +724,12 @@ class ContactResource(CRMServiceModelResource):
         contacts = Contact.get_contacts_by_status(STATUS_LEAD, limit, offset)
         return self.create_response(
             request,
-            {'objects': self.get_bundle_list(contacts, request)}
+            {
+            'meta':{
+                'limit': limit,
+                'offset': offset
+            },
+            'objects': self.get_bundle_list(contacts, request)}
             )
 
     def get_products(self, request, **kwargs):
@@ -768,6 +778,10 @@ class ContactResource(CRMServiceModelResource):
 
         product_resource = ProductResource()
         obj_dict = {}
+        obj_dict['meta'] ={
+                'limit': limit,
+                'offset': offset
+            },
         obj_dict['objects'] = product_resource.get_bundle_list(products,
                                                                request)
         return self.create_response(request, obj_dict)
@@ -810,6 +824,10 @@ class ContactResource(CRMServiceModelResource):
 
         activity_resource = ActivityResource()
         obj_dict = {}
+        obj_dict['meta'] ={
+                'limit': limit,
+                'offset': offset
+            },
         obj_dict['objects'] = activity_resource.get_bundle_list(activities,
                                                                 request)
         return self.create_response(request, obj_dict)
@@ -873,7 +891,12 @@ class ContactResource(CRMServiceModelResource):
             offset=offset)
         return self.create_response(
             request,
-            {'objects': self.get_bundle_list(contacts, request)}
+            {
+            'meta':{
+                'limit': limit,
+                'offset': offset
+            },
+            'objects': self.get_bundle_list(contacts, request)}
             )
 
     def assign_contact(self, request, **kwargs):
