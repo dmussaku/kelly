@@ -159,6 +159,10 @@ class ContactResource(CRMServiceModelResource):
         'alm_crm.api.ContactResource', 'parent',
         null=True, full=False
         )
+    shares = fields.ToManyField(
+        'alm_crm.api.ShareResource', 'shares',
+        null=True, full=True
+        )
 
     class Meta(CRMServiceModelResource.Meta):
         queryset = Contact.objects.all()
@@ -318,7 +322,7 @@ class ContactResource(CRMServiceModelResource):
                     t3 = time.time() - t2
                     print "Time to finish vcard hydration = %s seconds" % t2
         bundle.obj.save()
-        if bundle.data.get('note') and not kwargs:
+        if bundle.data.get('note') and not kwargs.get('id'):
             share = Share(
                     description=bundle.data.get('note'),
                     share_to_id=int(bundle.data['author_id']),

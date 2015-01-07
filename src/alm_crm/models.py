@@ -240,6 +240,9 @@ class Contact(SubscriptionObject):
         except CRMUser.DoesNotExist:
             return False
 
+    
+
+
     @classmethod
     def assign_user_to_contact(cls, user_id, contact_id):
         """Assign user with `user_id` to contact with `contact_id`"""
@@ -1231,6 +1234,10 @@ class Share(SubscriptionObject):
         return cls.objects.filter(share_from__pk=user_id)\
             .order_by('-date_created')
 
+    # @classmethod
+    # def delete_share_on_delete(cls):
+    #     cls.delete()
+
     def __unicode__(self):
         return '%s : %s -> %s' % (self.contact, self.share_from, self.share_to)
 
@@ -1241,6 +1248,8 @@ signals.post_save.connect(
     Contact.upd_status_when_first_activity_created, sender=Activity)
 signals.post_save.connect(
     SalesCycle.upd_lst_activity_on_create, sender=Activity)
+# signals.pre_delete.connect(
+#     Share.delete_share_on_delete, sender=Contact)
 
 
 def on_activity_delete(sender, instance=None, **kwargs):
