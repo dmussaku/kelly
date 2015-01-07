@@ -10,7 +10,6 @@ from django.utils.translation import ugettext as _
 from django.conf import settings
 from almanet.models import SubscriptionObject
 
-
 class VObjectImportException(Exception):
     message = _("The vCard could not be converted into a vObject")
 

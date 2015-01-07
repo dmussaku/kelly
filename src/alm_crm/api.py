@@ -47,6 +47,8 @@ from tastypie.exceptions import ImmediateHttpResponse
 from tastypie.http import HttpNotFound
 from django.http import HttpResponse
 import json
+import datetime
+
 
 
 class CRMServiceModelResource(ModelResource):
@@ -311,17 +313,20 @@ class ContactResource(CRMServiceModelResource):
             elif vcard_field[0].__class__==models.fields.IntegerField:
                 pass
             elif vcard_field[0].__class__==models.fields.DateField:
+                attname = vcard_field[0].attname
+                bday = field_object.get(attname, "")
                 '''
-                TBD with the format of the date that will be sent from
-                the frontend
+                format = yyyy-mm-dd
                 '''
-                pass
+                if bday:
+                    bday = datetime.datetime.strptime(bday, '%Y-%m-%d').date()
+                    vcard.__setattr__(attname, bday)
             elif vcard_field[0].__class__==models.fields.DateTimeField:
-                '''
-                TBD with the format of the date that will be sent from
-                the frontend
-                '''
-                pass
+                attname = vcard_field[0].attname
+                rev = field_object.get(attname, "")
+                if rev:
+                    rev = datetime.datetime.strptime(date, "%Y-%m-%dT%H:%M:%S.%f")
+                    vcard.__setattr__(attname, bday)
             elif vcard_field[0].__class__==models.fields.CharField:
                 attname = vcard_field[0].attname
                 vcard.__setattr__(attname,
