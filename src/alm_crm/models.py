@@ -29,6 +29,9 @@ CURRENCY_OPTIONS = (
     ('KZT', 'Tenge'),
 )
 
+GLOBAL_CYCLE_TITLE = 'GLOBAL CYCLE'
+GLOBAL_CYCLE_DESCRIPTION = 'AUTOMATICALLY CREATED GLOBAL SALES CYCLE'
+
 
 class CRMUser(SubscriptionObject):
 
@@ -217,9 +220,13 @@ class Contact(SubscriptionObject):
 
     def find_latest_activity(self):
         """Find latest activity among all sales_cycle_contacts."""
-        sales_cycle = self.sales_cycles.order_by(
-            'latest_activity__date_created').first()
-        return sales_cycle and sales_cycle.latest_activity or None
+        sales_cycle = self.sales_cycles.order_by('latest_activity__date_created').first()
+        latest_activity = None
+        try:
+            latest_activity = sales_cycle.latest_activity
+        except Activity.DoesNotExist:
+            return None
+        return sales_cycle and latest_activity or None
 
     def add_mention(self, user_ids=None):
         if isinstance(user_ids, int):
@@ -649,6 +656,7 @@ class SalesCycle(SubscriptionObject):
         ('P', 'Pending'),
         ('C', 'Completed'),
     )
+    is_global = models.BooleanField(default=False)
     title = models.CharField(max_length=100)
     description = models.CharField(max_length=500)
     products = models.ManyToManyField(Product, related_name='sales_cycles',
@@ -659,7 +667,7 @@ class SalesCycle(SubscriptionObject):
         null=True, blank=True)
     contact = models.ForeignKey(
         Contact, related_name='sales_cycles',
-        on_delete=models.SET_DEFAULT, default=None)
+        on_delete=models.SET_DEFAULT, default=None, null=True, blank=True)
     latest_activity = models.OneToOneField('Activity',
                                            blank=True, null=True,
                                            on_delete=models.SET_NULL)
@@ -689,6 +697,24 @@ class SalesCycle(SubscriptionObject):
     # Adds mentions to a current class, takes a lsit of user_ids as an input
     # and then runs through the list and calls the function build_new which
     # is declared in Mention class
+    
+    @classmethod
+    def on_subscribtion_reconn(cls, sender, **kwargs):
+        service = kwargs.get('service')
+        service_user = kwargs.get('service_user')
+        if not service.slug == settings.DEFAULT_SERVICE:
+            return
+        try:
+            service_user.owned_sales_cycles.get(is_global=True)
+        except SalesCycle.DoesNotExist:
+            cls.create_globalcycle(owner=service_user)
+        
+    @classmethod
+    def create_globalcycle(cls, **kwargs):
+        global_cycle = cls(is_global=True, title=GLOBAL_CYCLE_TITLE, description=GLOBAL_CYCLE_DESCRIPTION, **kwargs)
+        global_cycle.save()
+        return global_cycle
+
     def add_mention(self, user_ids=None):
         if isinstance(user_ids, int):
             user_ids = [user_ids]
@@ -880,7 +906,7 @@ class Activity(SubscriptionObject):
     date_created = models.DateTimeField(blank=True, null=True,
                                         auto_now_add=True)
     date_edited = models.DateTimeField(blank=True, null=True, auto_now=True)
-    sales_cycle = models.ForeignKey(SalesCycle, related_name='rel_activities')
+    sales_cycle = models.ForeignKey(SalesCycle, related_name='rel_activities', null=True, blank=True)
     owner = models.ForeignKey(CRMUser, related_name='activity_owner')
     mentions = generic.GenericRelation('Mention', null=True)
     comments = generic.GenericRelation('Comment', null=True)
@@ -928,17 +954,17 @@ class Activity(SubscriptionObject):
         return Activity.objects.filter(sales_cycle__contact_id=contact_id)
 
     @classmethod
-    def get_activities_by_salescycle(cls, sales_cycle_id, limit=20, offset=0):
-        try:
-            sales_cycle = SalesCycle.objects.get(id=sales_cycle_id)
-        except SalesCycle.DoesNotExist:
-            return False
-        if (limit):
-            return cls.objects.filter(sales_cycle=sales_cycle)\
-                .order_by('-date_created')[offset:offset + limit]
-        else:
-            return cls.objects.filter(sales_cycle=sales_cycle)\
-                .order_by('-date_created')
+    def get_user_activities(cls, user):
+        return cls.objects.filter(owner=user).order_by('-date_created')
+        
+
+    @classmethod
+    def get_activities_by_salescycle(cls, sales_cycle_id):
+        #try:
+        sales_cycle = SalesCycle.objects.get(id=sales_cycle_id)
+        # except SalesCycle.DoesNotExist:
+        #     return SalesCycle.DoesNotExist
+        return cls.objects.filter(sales_cycle=sales_cycle).order_by('-date_created')
 
     @classmethod
     def get_activities_by_subscription(cls, subscription_id):
@@ -1053,6 +1079,9 @@ class Activity(SubscriptionObject):
                 s2a_map[sc.id] = sc.rel_activities.values_list('pk', flat=True)
             return (activities, sales_cycles, s2a_map)
 
+    # @classmethod
+    # def assign_sales_cycle(cls, activity_id, sales_cycle_id):
+
     def save(self, **kwargs):
         if not self.subscription_id and self.owner:
             self.subscription_id = self.owner.subscription_id
@@ -1079,7 +1108,7 @@ class Feedback(SubscriptionObject):
     owner = models.ForeignKey(CRMUser, related_name='feedback_owner')
 
     def __unicode__(self):
-        return self.feedback
+        return '%s: %s' % (self.activity, self.status)
 
     def save(self, **kwargs):
         self.date_edited = timezone.now()
@@ -1209,14 +1238,6 @@ class Share(SubscriptionObject):
     def owner(self, owner_object):
         self.share_from = owner_object
 
-    # @property
-    # def note(self):
-    #     return self.description
-
-    # @note.setter
-    # def note(self, note):
-    #     self.description = note
-
     @classmethod
     def get_shares(cls, limit=20, offset=0):
         return cls.objects.order_by('-date_created')[offset:offset + limit]
@@ -1233,6 +1254,11 @@ class Share(SubscriptionObject):
 
     def __unicode__(self):
         return '%s : %s -> %s' % (self.contact, self.share_from, self.share_to)
+
+    def save(self, **kwargs):
+        if not self.subscription_id and self.owner:
+            self.subscription_id = self.owner.subscription_id
+        super(Share, self).save(**kwargs)
 
 
 signals.post_save.connect(
@@ -1336,7 +1362,5 @@ class ContactList(SubscriptionObject):
         return self.users.count()
 
 
-
-
-
-
+from almanet import signals
+signals.subscription_reconn.connect(SalesCycle.on_subscribtion_reconn)

@@ -4,7 +4,9 @@ from django.contrib.auth.models import (
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from timezone_field import TimeZoneField
+from almanet import signals
 from almanet.models import Subscription
+from almanet.settings import DEFAULT_SERVICE
 
 
 class UserManager(contrib_user_manager):
@@ -109,12 +111,14 @@ class User(AbstractBaseUser):
         finally:
             s.is_active = True
             s.save()
-            if self.get_subscr_user(s.pk) is None:
+            service_user = self.get_subscr_user(s.pk)
+            if service_user is None:
                 # create user in corresponding service
                 # eg.: CRMUser in CRM service, CRM's slug = crm
                 create_user = getattr(self,
                                       'create_{}user'.format(service.slug))
-                create_user(s.pk, self.get_company().pk)
+                service_user = create_user(s.pk, self.get_company().pk)
+            signals.subscription_reconn.send(self.__class__, service=service, service_user=service_user)
 
     def disconnect_service(self, service):
         s = self.subscriptions.filter(is_active=True, service=service).first()

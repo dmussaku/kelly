@@ -1,5 +1,6 @@
 from tastypie import fields, http
 from tastypie.contrib.contenttypes.fields import GenericForeignKeyField
+from tastypie.constants import ALL, ALL_WITH_RELATIONS
 from tastypie.resources import Resource, ModelResource
 from tastypie.authorization import Authorization
 from tastypie.utils import trailing_slash
@@ -95,8 +96,8 @@ class CRMServiceModelResource(ModelResource):
         return crmuser
 
     class Meta:
-        list_allowed_methods = ['get', 'post']
-        detail_allowed_methods = ['get', 'post', 'put', 'delete']
+        list_allowed_methods = ['get', 'post', 'patch']
+        detail_allowed_methods = ['get', 'post', 'put', 'delete', 'patch']
         authentication = MultiAuthentication(BasicAuthentication(),
                                              SessionAuthentication())
         authorization = Authorization()
@@ -1190,19 +1191,19 @@ class ActivityResource(CRMServiceModelResource):
     ...     'resource_uri': '/api/v1/activity/1/',
     ...     'sales_cycle_id': 1,
     ...     'description': 'd1'
+    ...     'feedback': '$',
     ...     'author_id': 2,
     ...     'date_created': '2014-09-11T00:00:00',
     ... }
     ... ]
 
-
     @undocumented: Meta
     """
+
     author_id = fields.IntegerField(attribute='author_id', null=True)
     description = fields.CharField(attribute='description')
-    sales_cycle = fields.ForeignKey(SalesCycleResource, 'sales_cycle')
+    sales_cycle = fields.ForeignKey(SalesCycleResource, 'sales_cycle', null=True, blank=True)
     feedback = fields.ToOneField('alm_crm.api.FeedbackResource', 'feedback', null=True, blank=True)
-
 
     # comments = fields.ToManyField(
     #     'alm_crm.api.CommentResource',
@@ -1223,6 +1224,13 @@ class ActivityResource(CRMServiceModelResource):
     #     null=True, full=False
     #     )
 
+    class Meta(CRMServiceModelResource.Meta):
+        queryset = Activity.objects.all()
+        resource_name = 'activity'
+        excludes = ['date_edited', 'subscription_id', 'title']
+        always_return_data = True
+        filtering = {'author_id': ('exact', ), 'owner': ALL_WITH_RELATIONS, 'sales_cycle': ALL}
+
     def prepend_urls(self):
         return [
             url(
@@ -1230,9 +1238,39 @@ class ActivityResource(CRMServiceModelResource):
                 (self._meta.resource_name, trailing_slash()),
                 self.wrap_view('get_comments'),
                 name='api_get_comments'
-            )
+            ),
+            url(
+                r"^(?P<resource_name>%s)/my_activities%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('get_my_activities'),
+                name='api_my_activities'
+            ),
+            url(
+                r"^(?P<resource_name>%s)/company_activities%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('get_company_activities'),
+                name='api_company_activities'
+            ),
+            url(
+                r"^(?P<resource_name>%s)/contact_activities/(?P<id>\d+)%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('get_contact_activities'),
+                name='api_contact_activities'
+            )           
         ]
 
+    def build_filters(self, filters=None):
+        filters = super(self.__class__, self).build_filters(filters=filters)
+        _add_filters, _del_keys = {}, set([])
+        for k, v in filters.iteritems():
+            if k.startswith('author_id'):
+                _add_filters[k.replace('author_id', 'owner__id')] = v
+                _del_keys.add(k)
+
+        for k in _del_keys:
+            filters.pop(k)
+        filters.update(_add_filters)
+        return filters
 
     def dehydrate_sales_cycle(self, bundle):
         return bundle.obj.sales_cycle.id
@@ -1241,31 +1279,99 @@ class ActivityResource(CRMServiceModelResource):
         return hasattr(bundle.obj, 'feedback') and bundle.obj.feedback.status or None
 
     def hydrate_sales_cycle(self, bundle):
-        sales_cycle = SalesCycle.objects.get(id = bundle.data['sales_cycle'])
-        bundle.data['sales_cycle'] = sales_cycle
+        if bundle.data.get('sales_cycle'):
+            sales_cycle = SalesCycle.objects.get(id = bundle.data['sales_cycle'])
+            bundle.data['sales_cycle'] = sales_cycle
+        else:
+            bundle.data['sales_cycle'] = SalesCycle.objects.get(owner=bundle.request.user.get_crmuser(), is_global=True)
         return bundle
 
     def hydrate_feedback(self, bundle):
-        # feedback = Feedback()
-        # if bundle.request.method == "PUT":
-        #     feedback = Activity.objects.get(id=bundle.data['id']).feedback
-        #     feedback.status = bundle.data['feedback']
-        # elif bundle.request.method == "POST" and bundle.data.get('feedback', None):
-        #     feedback.status = bundle.data['feedback']
-        #     feedback.owner = CRMUser.objects.get(id=bundle.data['author_id'])
-        # else:
-        #      feedback.owner = CRMUser.objects.get(id=bundle.data['author_id'])
-        #      feedback.status = 'W'
-
-        # bundle.data['feedback'] = feedback
-        # feedback.save()
-
         if bundle.data.get('feedback'):
             bundle.data['feedback_status'] = bundle.data['feedback']
             bundle.data['feedback'] = None
 
         return bundle
+
+    def get_my_activities(self, request, **kwargs):
+        try:
+            activities = Activity.get_activities_by_date_created(user_id=request.user.get_crmuser().id,\
+                                                                         owned=True, mentioned=True,\
+                                                                         include_sales_cycles=False)
+            obj_dict = {}
+            obj_dict['objects'] = self.get_bundle_list(activities, request)
+            return self.create_response(request, obj_dict)
+        except CRMUser.DoesNotExist:
+            return self.create_response(
+                    request, {'success':False, 'error_string':'CRMUser does not exists'}
+            )
     
+    def get_company_activities(self, request, **kwargs):
+        '''
+        GET METHOD
+        I{URL}:  U{alma.net/api/v1/activity/company_activities}
+
+        Description:
+        Api function to return activity of requested user company,
+        by requested user subscription_id
+        @return:  comments
+
+        >>> 'objects': [
+        ... {
+        ...     'id': 1,
+        ...     'resource_uri': '/api/v1/activity/1/',
+        ...     'sales_cycle_id': 1,
+        ...     'description': 'd1'
+        ...     'feedback': '$',
+        ...     'author_id': 2,
+        ...     'date_created': '2014-09-11T00:00:00',
+        ... }
+        ... ]
+
+        '''
+        try:
+            activities = Activity.get_activities_by_subscription(subscription_id=\
+                        request.user.get_crmuser().subscription_id)
+            obj_dict = {}
+            obj_dict['objects'] = self.get_bundle_list(activities, request)
+            return self.create_response(request, obj_dict)
+        except CRMUser.DoesNotExist:
+            return self.create_response(
+                    request, {'success':False, 'error_string':'CRMUser does not exists'}
+                )
+
+    def get_contact_activities(self, request, **kwargs):
+        '''
+        GET METHOD
+        I{URL}:  U{alma.net/api/v1/activity/contact_activities/:id}
+
+        Description:
+        Api function to return activity of requested user
+        @return:  comments
+
+        >>> 'objects': [
+        ... {
+        ...     'id': 1,
+        ...     'resource_uri': '/api/v1/activity/1/',
+        ...     'sales_cycle_id': 1,
+        ...     'description': 'd1'
+        ...     'feedback': '$',
+        ...     'author_id': 2,
+        ...     'date_created': '2014-09-11T00:00:00',
+        ... }
+        ... ]
+
+        '''
+        try:
+            activities = Activity.get_activities_by_contact(contact_id=kwargs['id'])
+            obj_dict = {}
+            obj_dict['objects'] = self.get_bundle_list(activities, request)
+            return self.create_response(request, obj_dict)
+        except Contact.DoesNotExist:
+            return self.create_response(
+                    request, {'success':False, 'error_string':'the contact does not exists'}
+                )
+
     def get_comments(self, request, **kwargs):
         '''
         GET METHOD
@@ -1298,9 +1404,9 @@ class ActivityResource(CRMServiceModelResource):
             obj_dict['objects'] = comment_resource.get_bundle_list(comments,
                                                                    request)
             return self.create_response(request, obj_dict)
-        except ContactList.DoesNotExist:
+        except Activity.DoesNotExist:
             return self.create_response(
-                    request, {'success':False, 'error_string':'Has no any comments'}
+                    request, {'success':False, 'error_string':'Activity does not exists'}
                 )
 
 
@@ -1310,7 +1416,8 @@ class ActivityResource(CRMServiceModelResource):
         feedback = None
         if bundle.data.get('feedback_status', None):
             status = bundle.data['feedback_status']
-        if bundle.request.method == 'PUT':
+
+        if bundle.request.method == 'PUT' or bundle.request.method == 'PATCH':
             feedback = Feedback.objects.get(activity = bundle.obj)
             feedback.status = status
         else:        
@@ -1321,11 +1428,6 @@ class ActivityResource(CRMServiceModelResource):
         bundle.data['feedback'] = feedback
         return bundle
 
-    class Meta(CRMServiceModelResource.Meta):
-        queryset = Activity.objects.all()
-        resource_name = 'activity'
-        excludes = ['date_edited', 'subscription_id', 'title']
-        always_return_data = True
 
     def post_list(self, request, **kwargs):
         '''
@@ -1366,7 +1468,6 @@ class ProductResource(CRMServiceModelResource):
 
     class Meta(CRMServiceModelResource.Meta):
         queryset = Product.objects.all()
-        detail_allowed_methods = ['get', 'post', 'put', 'patch', 'delete']
         resource_name = 'product'
 
 
@@ -2126,44 +2227,11 @@ class AppStateResource(Resource):
 
         activities, sales_cycles, s2a_map = Activity.get_activities_by_date_created(
             current_crmuser.pk, owned=True, mentioned=True,
-            include_sales_cycles=True, limit=100000)
-
-        def _map_activity(a):
-            data = model_to_dict(a, fields=['id', 'description'])
-            try:
-                feedback_status = a.feedback.status
-            except Feedback.DoesNotExist:
-                feedback_status = None
-            data.update({
-                'salescycle_id': a.sales_cycle.pk,
-                'author_id': a.owner.pk,
-                'feedback': feedback_status,
-                'date_created': a.date_created.strftime('%Y-%m-%d %H:%M')
-                })
-            return data
-
-        def _map_sales_cycle(sc):
-            data = model_to_dict(sc, fields=['id', 'title', 'status'])
-            data.update({
-                'owner_id': sc.owner.pk,
-                'contact_id': sc.contact.pk,
-                'description': None,  # TODO
-                'date_created': sc.date_created.strftime('%Y-%m-%d %H:%M'),
-                'product_ids': sc.products.values_list('pk', flat=True),
-                'projected_value': {
-                    'id': sc.projected_value and sc.projected_value.pk,
-                    'value': sc.projected_value and sc.projected_value.amount},
-                'real_value': {
-                    'id': sc.real_value and sc.real_value.pk,
-                    'value': sc.real_value and sc.real_value.amount}
-                })
-            return data
-
-        activities = map(_map_activity, activities)
-        sales_cycles = map(_map_sales_cycle, sales_cycles)
+            include_sales_cycles=True)
 
         return self.create_response(
             request,
-            {'sales_cycles': sales_cycles, 'activities': activities}
-            # {'objects': self.get_bundle_list(shares, request)}
-            )
+            {
+                'sales_cycles': SalesCycleResource().get_bundle_list(sales_cycles, request), 
+                'activities': ActivityResource().get_bundle_list(activities, request)
+            })
