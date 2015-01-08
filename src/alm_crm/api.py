@@ -42,12 +42,22 @@ from django.db import models
 #     def csrf_exempt(func):
 #         return func
 # from tastypie.exceptions import NotFound, BadRequest, InvalidFilterError, HydrationError, InvalidSortError, ImmediateHttpResponse, Unauthorized
-from tastypie.exceptions import ImmediateHttpResponse
+from tastypie.exceptions import ImmediateHttpResponse, NotFound
 # from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned, ValidationError
 # from django.utils.cache import patch_cache_control, patch_vary_headers
 from tastypie.http import HttpNotFound
 from django.http import HttpResponse
 import json
+import datetime
+import time
+
+
+class CommonMeta:
+    list_allowed_methods = ['get', 'post', 'patch']
+    detail_allowed_methods = ['get', 'post', 'put', 'delete', 'patch']
+    authentication = MultiAuthentication(BasicAuthentication(),
+                                         SessionAuthentication())
+    authorization = Authorization()
 
 
 class CRMServiceModelResource(ModelResource):
@@ -161,8 +171,16 @@ class ContactResource(CRMServiceModelResource):
     sales_cycles = fields.ToManyField(
         'alm_crm.api.SalesCycleResource', 'sales_cycles',
         related_name='contact', null=True, full=False)
+    parent = fields.ToOneField(
+        'alm_crm.api.ContactResource', 'parent',
+        null=True, full=False
+        )
+    shares = fields.ToManyField(
+        'alm_crm.api.ShareResource', 'shares',
+        null=True, full=True
+        )
 
-    class Meta(CRMServiceModelResource.Meta):
+    class Meta(CommonMeta):
         queryset = Contact.objects.all()
         resource_name = 'contact'
 
@@ -207,14 +225,18 @@ class ContactResource(CRMServiceModelResource):
         bundle = self.full_hydrate(bundle)
         raise ImmediateHttpResponse(
             HttpResponse(
-                content=Serializer().to_json(bundle.data),
+                content=Serializer().to_json(
+                    self.full_dehydrate(
+                        self.build_bundle(
+                            obj=Contact.objects.get(id=bundle.obj.id))
+                        )
+                    ),
                 content_type='application/json; charset=utf-8', status=200
                 )
             )
         return bundle
 
     def obj_update(self, bundle, skip_errors=False, **kwargs):
-        print 'obj_update'
         """
         A ORM-specific implementation of ``obj_update``.
         """
@@ -236,19 +258,42 @@ class ContactResource(CRMServiceModelResource):
         #return self.save(bundle, skip_errors=skip_errors)
         raise ImmediateHttpResponse(
             HttpResponse(
-                content=Serializer().to_json(bundle.data),
+                content=Serializer().to_json(
+                    self.full_dehydrate(
+                        self.build_bundle(
+                            obj=Contact.objects.get(id=bundle.obj.id))
+                        )
+                    ),
                 content_type='application/json; charset=utf-8', status=200
                 )
             )
         return bundle
 
+    def full_dehydrate(self, bundle, for_list=False):
+        '''Custom representation of followers, assignees etc.'''
+        bundle = super(self.__class__, self).full_dehydrate(
+            bundle, for_list=True)
+        bundle.data['author_id'] = bundle.obj.owner_id
+        bundle.data['parent_id'] = bundle.obj.parent_id
+        return bundle
+
+    def dehydrate_assignees(self, bundle):
+        return [assignee.pk for assignee in bundle.obj.assignees.all()]
+
+    def dehydrate_followers(self, bundle):
+        return [follower.pk for follower in bundle.obj.followers.all()]
+
+    def dehydrate_sales_cycles(self, bundle):
+        return [sc.pk for sc in bundle.obj.sales_cycles.all()]
+
     def full_hydrate(self, bundle, **kwargs):
-        contact_id = kwargs.get('pk',"")
+        t1 = time.time()
+        contact_id = kwargs.get('id', None)
         if contact_id:
             bundle.obj = Contact.objects.get(id=int(contact_id))
         else:
             bundle.obj = self._meta.object_class()
-            bundle.obj.owner_id = bundle.request.user.get_crmuser().id
+            # bundle.obj.owner_id = bundle.request.user.get_crmuser().id
             bundle.obj.save()
         '''
         Go through all field names in the Contact Model and check with
@@ -257,21 +302,35 @@ class ContactResource(CRMServiceModelResource):
         i got in a json. If its missing then i just delete it.
 
         '''
+        if bundle.data.get('is_company',""):
+            if bundle.data['is_company']==1:
+                bundle.obj.tp='co'
+            else:
+                bundle.obj.tp='user'
+        if bundle.data.get('author_id',""):
+            bundle.obj.owner_id = int(bundle.data['author_id'])
+        if bundle.data.get('parent_id',""):
+            bundle.obj.parent_id = int(bundle.data['parent_id'])
         for field_name in bundle.obj._meta.get_all_field_names():
             if bundle.data.get(field_name, None):
                 field_object = ast.literal_eval(str(bundle.data.get(field_name, None)))
                 if isinstance(field_object, str):
                     bundle.obj.__setattr__(field_name, field_object)
                 elif isinstance(field_object, list):
-                    pass
+                    for obj in field_object:
+                        bundle.obj.__getattribute__(field_name).add(int(obj))
                 elif isinstance(field_object, dict):
+                    t2 = time.time() - t1
+                    print "Time to finish contact hydration = %s seconds" % t2
                     self.vcard_full_hydrate(bundle)
+                    t3 = time.time() - t2
+                    print "Time to finish vcard hydration = %s seconds" % t2
         bundle.obj.save()
-        if bundle.data.get('note') and not kwargs:
+        if bundle.data.get('note') and not kwargs.get('id'):
             share = Share(
-                    note=bundle.data.get('note'),
-                    share_to_id=bundle.data['owner'],
-                    share_from_id=bundle.data['owner'],
+                    description=bundle.data.get('note'),
+                    share_to_id=int(bundle.data['author_id']),
+                    share_from_id=int(bundle.data['author_id']),
                     contact_id=bundle.obj.id
                     )
             share.save()
@@ -292,17 +351,20 @@ class ContactResource(CRMServiceModelResource):
             elif vcard_field[0].__class__==models.fields.IntegerField:
                 pass
             elif vcard_field[0].__class__==models.fields.DateField:
+                attname = vcard_field[0].attname
+                bday = field_object.get(attname, "")
                 '''
-                TBD with the format of the date that will be sent from
-                the frontend
+                format = yyyy-mm-dd
                 '''
-                pass
+                if bday:
+                    bday = datetime.datetime.strptime(bday, '%Y-%m-%d').date()
+                    vcard.__setattr__(attname, bday)
             elif vcard_field[0].__class__==models.fields.DateTimeField:
-                '''
-                TBD with the format of the date that will be sent from
-                the frontend
-                '''
-                pass
+                attname = vcard_field[0].attname
+                rev = field_object.get(attname, "")
+                if rev:
+                    rev = datetime.datetime.strptime(date, "%Y-%m-%dT%H:%M:%S.%f")
+                    vcard.__setattr__(attname, bday)
             elif vcard_field[0].__class__==models.fields.CharField:
                 attname = vcard_field[0].attname
                 vcard.__setattr__(attname,
@@ -365,11 +427,7 @@ class ContactResource(CRMServiceModelResource):
 
         #If Contact is saved with a small note/comment
         # Save the main object.
-        if bundle.data['is_company']:
-            if bundle.data['is_company']=='True':
-                bundle.obj.tp='co'
-            else:
-                bundle.obj.tp='user'
+
         if bundle.data['owner_id']:
             bundle.obj.owner_id=int(bundle.data['owner_id'])
         bundle.obj.save()
@@ -595,7 +653,12 @@ class ContactResource(CRMServiceModelResource):
         contacts = Contact.get_cold_base(limit, offset)
         return self.create_response(
             request,
-            {'objects': self.get_bundle_list(contacts, request)}
+            {
+            'meta':{
+                'limit': limit,
+                'offset': offset
+            },
+            'objects': self.get_bundle_list(contacts, request)}
             )
 
     def get_leads(self, request, **kwargs):
@@ -642,7 +705,12 @@ class ContactResource(CRMServiceModelResource):
         contacts = Contact.get_contacts_by_status(STATUS_LEAD, limit, offset)
         return self.create_response(
             request,
-            {'objects': self.get_bundle_list(contacts, request)}
+            {
+            'meta':{
+                'limit': limit,
+                'offset': offset
+            },
+            'objects': self.get_bundle_list(contacts, request)}
             )
 
     def get_products(self, request, **kwargs):
@@ -691,6 +759,10 @@ class ContactResource(CRMServiceModelResource):
 
         product_resource = ProductResource()
         obj_dict = {}
+        obj_dict['meta'] ={
+                'limit': limit,
+                'offset': offset
+            },
         obj_dict['objects'] = product_resource.get_bundle_list(products,
                                                                request)
         return self.create_response(request, obj_dict)
@@ -733,6 +805,10 @@ class ContactResource(CRMServiceModelResource):
 
         activity_resource = ActivityResource()
         obj_dict = {}
+        obj_dict['meta'] ={
+                'limit': limit,
+                'offset': offset
+            },
         obj_dict['objects'] = activity_resource.get_bundle_list(activities,
                                                                 request)
         return self.create_response(request, obj_dict)
@@ -796,7 +872,12 @@ class ContactResource(CRMServiceModelResource):
             offset=offset)
         return self.create_response(
             request,
-            {'objects': self.get_bundle_list(contacts, request)}
+            {
+            'meta':{
+                'limit': limit,
+                'offset': offset
+            },
+            'objects': self.get_bundle_list(contacts, request)}
             )
 
     def assign_contact(self, request, **kwargs):
@@ -1062,7 +1143,7 @@ class SalesCycleResource(CRMServiceModelResource):
     real_value = fields.ToOneField('alm_crm.api.ValueResource',
                                    'real_value', null=True, full=True)
 
-    class Meta(CRMServiceModelResource.Meta):
+    class Meta(CommonMeta):
         queryset = SalesCycle.objects.all()
         resource_name = 'sales_cycle'
         excludes = ['from_date', 'to_date']
@@ -1200,7 +1281,7 @@ class ActivityResource(CRMServiceModelResource):
     #     null=True, full=False
     #     )
 
-    class Meta(CRMServiceModelResource.Meta):
+    class Meta(CommonMeta):
         queryset = Activity.objects.all()
         resource_name = 'activity'
         excludes = ['date_edited', 'subscription_id', 'title']
@@ -1439,7 +1520,7 @@ class ProductResource(CRMServiceModelResource):
     '''
     sales_cycles = fields.ToManyField(SalesCycleResource, 'sales_cycles')
 
-    class Meta(CRMServiceModelResource.Meta):
+    class Meta(CommonMeta):
         queryset = Product.objects.all()
         resource_name = 'product'
 
@@ -1468,7 +1549,7 @@ class ValueResource(CRMServiceModelResource):
     '''
     value = fields.IntegerField(attribute='amount')
 
-    class Meta(CRMServiceModelResource.Meta):
+    class Meta(CommonMeta):
         queryset = Value.objects.all()
         resource_name = 'sales_cycle/value'
         excludes = ['amount']
@@ -1485,7 +1566,7 @@ class CRMUserResource(CRMServiceModelResource):
     @undocumented: Meta
     '''
 
-    class Meta(CRMServiceModelResource.Meta):
+    class Meta(CommonMeta):
         queryset = CRMUser.objects.all()
         resource_name = 'crmuser'
 
@@ -1507,7 +1588,7 @@ class ShareResource(CRMServiceModelResource):
                                    full=True, null=True)
     note = fields.CharField(attribute='description', null = True)
 
-    class Meta(CRMServiceModelResource.Meta):
+    class Meta(CommonMeta):
         queryset = Share.objects.all()
         resource_name = 'share'
         excludes = ['is_read', 'subscription_id', 'description']
@@ -1576,7 +1657,7 @@ class FeedbackResource(CRMServiceModelResource):
     owner = fields.ToOneField('alm_crm.api.CRMUserResource', 'owner', null=True, full=True)
     status = fields.CharField(attribute='status')
 
-    class Meta(CRMServiceModelResource.Meta):
+    class Meta(CommonMeta):
         queryset = Feedback.objects.all()
         resource_name = 'feedback'
 
@@ -1605,7 +1686,7 @@ class CommentResource(CRMServiceModelResource):
     def dehydrate_date_edited(self, bundle):
         return bundle.obj.date_edited.strftime('%Y-%m-%d %H:%M')
 
-    class Meta(CRMServiceModelResource.Meta):
+    class Meta(CommonMeta):
         queryset = Comment.objects.all()
         resource_name = 'comment'
 
@@ -1629,7 +1710,7 @@ class MentionResource(CRMServiceModelResource):
         Comment: CommentResource,
     }, 'content_object')
 
-    class Meta(CRMServiceModelResource.Meta):
+    class Meta(CommonMeta):
         queryset = Mention.objects.all()
         resource_name = 'mention'
 
@@ -1639,7 +1720,7 @@ class ContactListResource(CRMServiceModelResource):
                                related_name='contact_list', null=True,
                                full=False)
 
-    class Meta(CRMServiceModelResource.Meta):
+    class Meta(CommonMeta):
         queryset = ContactList.objects.all()
         resource_name = 'contact_list'
 
@@ -1908,7 +1989,7 @@ class AppStateObject(object):
     def __init__(self, service_slug=None, request=None):
         if service_slug is None:
             return
-        service = Service.objects.get(slug=service_slug)
+        service = Service.objects.get(pk=service_slug)
 
         self.request = request
         self.current_user = request.user

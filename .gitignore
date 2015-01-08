@@ -6,3 +6,5 @@ venv
 *.DS_store
 .coverage
 api_docs/*
+src/static/js/bundle.js
+src/static/css/app.min.css
