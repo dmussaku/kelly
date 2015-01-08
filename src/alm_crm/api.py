@@ -1313,7 +1313,7 @@ class ActivityResource(CRMServiceModelResource):
                 (self._meta.resource_name, trailing_slash()),
                 self.wrap_view('get_contact_activities'),
                 name='api_contact_activities'
-            )           
+            )
         ]
 
     def build_filters(self, filters=None):
@@ -1362,7 +1362,7 @@ class ActivityResource(CRMServiceModelResource):
             return self.create_response(
                     request, {'success':False, 'error_string':'CRMUser does not exists'}
             )
-    
+
     def get_company_activities(self, request, **kwargs):
         '''
         GET METHOD
@@ -1463,7 +1463,7 @@ class ActivityResource(CRMServiceModelResource):
             return self.create_response(request, obj_dict)
         except Activity.DoesNotExist:
             return self.create_response(
-                request, 
+                request,
                 {'success':False, 'error_string':'Activity does not exists'}
                 )
 
@@ -1989,7 +1989,7 @@ class AppStateObject(object):
     def __init__(self, service_slug=None, request=None):
         if service_slug is None:
             return
-        service = Service.objects.get(pk=service_slug)
+        service = Service.objects.get(slug=service_slug)
 
         self.request = request
         self.current_user = request.user
@@ -2286,6 +2286,6 @@ class AppStateResource(Resource):
         return self.create_response(
             request,
             {
-                'sales_cycles': SalesCycleResource().get_bundle_list(sales_cycles, request), 
+                'sales_cycles': SalesCycleResource().get_bundle_list(sales_cycles, request),
                 'activities': ActivityResource().get_bundle_list(activities, request)
             })
