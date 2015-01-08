@@ -35,6 +35,10 @@ class CRMUser(SubscriptionObject):
     user_id = models.IntegerField(_('user id'))
     organization_id = models.IntegerField(_('organization id'))
     is_supervisor = models.BooleanField(_('is supervisor'), default=False)
+    unfollow_list = models.ManyToManyField(
+        'Contact', related_name='unfollowers', 
+        null=True, blank=True
+        )
 
     def __unicode__(self):
         u = self.get_billing_user()
@@ -95,12 +99,6 @@ class Contact(SubscriptionObject):
     owner = models.ForeignKey(
         CRMUser, related_name='owned_contacts',
         null=True, blank=True)
-    followers = models.ManyToManyField(
-        CRMUser, related_name='following_contacts',
-        null=True, blank=True)
-    assignees = models.ManyToManyField(
-        CRMUser, related_name='assigned_contacts',
-        null=True, blank=True)
 
     # Commented by Rustem K
     # first_name = models.CharField(max_length=31,
@@ -115,7 +113,14 @@ class Contact(SubscriptionObject):
         'Activity', on_delete=models.SET_NULL,
         related_name='contact_latest_activity', null=True)
     mentions = generic.GenericRelation('Mention')
-    comments = generic.GenericRelation('Comment')
+    comments = generic.GenericRelation('Comment')    
+    followers = models.ManyToManyField(
+        CRMUser, related_name='following_contacts',
+        null=True, blank=True)
+    assignees = models.ManyToManyField(
+        CRMUser, related_name='assigned_contacts',
+        null=True, blank=True)
+    
 
     class Meta:
         verbose_name = _('contact')
@@ -236,32 +241,6 @@ class Contact(SubscriptionObject):
         try:
             user = CRMUser.objects.get(user_id=user_id)
             self.assignees.add(user)
-            return True
-        except CRMUser.DoesNotExist:
-            return False
-
-    
-
-
-    @classmethod
-    def assign_user_to_contact(cls, user_id, contact_id):
-        """Assign user with `user_id` to contact with `contact_id`"""
-        return cls.assign_user_to_contacts(user_id, [contact_id])
-
-    @classmethod
-    def assign_user_to_contacts(cls, user_id, contact_ids):
-        """Assign user `user_id` to set of contacts
-        defined by `contact_ids`."""
-        assert isinstance(contact_ids, (list, tuple)), 'Must be a list'
-        try:
-            user = CRMUser.objects.get(user_id=user_id)
-            for contact_id in contact_ids:
-                try:
-                    contact = cls.objects.get(pk=contact_id)
-                    contact.assignees.add(user)
-                    contact.save()
-                except cls.DoesNotExist:
-                    pass
             return True
         except CRMUser.DoesNotExist:
             return False

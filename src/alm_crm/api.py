@@ -166,6 +166,10 @@ class ContactResource(CRMServiceModelResource):
     class Meta(CRMServiceModelResource.Meta):
         queryset = Contact.objects.all()
         resource_name = 'contact'
+        filtering={
+            'status':['exact'],
+            'tp':['exact']
+        }
 
     def post_list(self, request, **kwargs):
         '''
@@ -496,6 +500,24 @@ class ContactResource(CRMServiceModelResource):
     def prepend_urls(self):
         return [
             url(
+                r"^(?P<resource_name>%s)/(?P<contact_id>\d+)/assign_company_contact/(?P<company_contact_id>\d+)%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('assign_company_contact'),
+                name='api_assign_company_contact'
+            ),
+            url(
+                r"^(?P<resource_name>%s)/follow/(?P<contact_ids>\w+)%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('follow_contacts'),
+                name='api_follow_contacts'
+            ),
+            url(
+                r"^(?P<resource_name>%s)/unfollow/(?P<contact_ids>\w+)%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('unfollow_contacts'),
+                name='api_unfollow_contacts'
+            ),
+            url(
                 r"^(?P<resource_name>%s)/recent%s$" %
                 (self._meta.resource_name, trailing_slash()),
                 self.wrap_view('get_last_contacted'),
@@ -518,18 +540,6 @@ class ContactResource(CRMServiceModelResource):
                 (self._meta.resource_name, trailing_slash()),
                 self.wrap_view('search'),
                 name='api_search'
-            ),
-            url(
-                r"^(?P<resource_name>%s)/assign_contact%s$" %
-                (self._meta.resource_name, trailing_slash()),
-                self.wrap_view('assign_contact'),
-                name='api_assign_contact'
-            ),
-            url(
-                r"^(?P<resource_name>%s)/assign_contacts%s$" %
-                (self._meta.resource_name, trailing_slash()),
-                self.wrap_view('assign_contacts'),
-                name='api_assign_contacts'
             ),
             url(
                 r"^(?P<resource_name>%s)/(?P<id>\d+)/products%s$" %
@@ -568,6 +578,80 @@ class ContactResource(CRMServiceModelResource):
                 name='api_export_contacts_to_vcard'
             ),
         ]
+    def follow_contacts(self, request, **kwargs):
+        if kwargs.get('contact_ids'):
+            try:
+                contact_ids = ast.literal_eval(
+                    kwargs.get('contact_ids'))
+            except:
+                return self.create_response(
+                    request, {'success':False, 'message':'Pass a list as a parameter'}
+                    )
+        crmuser = request.user.get_crmuser()
+        for contact_id in contact_ids:
+            try:
+                crmuser.unfollow_list.remove(
+                    Contact.objects.get(id=contact_id))
+            except DoesNotExist:
+                return self.create_response(
+                    request, {'success':False, 'message':'Contact with a given id does not exist'}
+                    )
+        crmuser.save()
+        return self.create_response(
+                    request, {'success':True, 'message':'You successfully followed %s' % contact}
+                    )
+
+    def unfollow_contacts(self, request, **kwargs):
+        if kwargs.get('contact_ids'):
+            try:
+                contact_ids = ast.literal_eval(
+                    kwargs.get('contact_ids'))
+            except:
+                return self.create_response(
+                    request, {'success':False, 'message':'Pass a list as a parameter'}
+                    )
+        crmuser = request.user.get_crmuser()
+        for contact_id in contact_ids:
+            try:
+                crmuser.unfollow_list.add(
+                    Contact.objects.get(id=contact_id))
+            except DoesNotExist:
+                return self.create_response(
+                    request, {'success':False, 'message':'Contact with a given id does not exist'}
+                    )
+        crmuser.save()
+        return self.create_response(
+                    request, {'success':True, 'message':'You successfully followed %s' % contact}
+                    )
+
+    def assign_company_contact(self, request, **kwargs):
+        if kwargs.get('contact_id'):
+            try:
+                contact = Contact.objects.get(
+                    id=int(kwargs.get('contact_id'))
+                    )
+            except:
+                return self.create_response(
+                    request, {'success':False, 'message':'Contact with such id does not exist'}
+                    )
+        if kwargs.get('company_contact_id'):
+            try:
+                company_contact = Contact.objects.get(
+                    id=int(kwargs.get('company_contact_id'))
+                    )
+                if company_contact.tp == 'user':
+                    return self.create_response(
+                        request, {'success':False, 'message':'Company Contact with such id is not of company type'}
+                        )
+            except:
+                return self.create_response(
+                    request, {'success':False, 'message':'Company Contact with such id does not exist'}
+                    )
+        contact.parent_id = company_contact.id
+        contact.save()
+        return self.create_response(
+                    request, {'success':True, 'message':'Contact has been assigned to a Company Contact'}
+                    )
 
     def get_last_contacted(self, request, **kwargs):
         '''
@@ -925,82 +1009,6 @@ class ContactResource(CRMServiceModelResource):
                 'offset': offset
             },
             'objects': self.get_bundle_list(contacts, request)}
-            )
-
-    def assign_contact(self, request, **kwargs):
-        '''
-        GET METHOD
-        I{URL}:  U{alma.net/api/v1/contact/assign_contact/}
-
-        Description
-        Assign a signle user to a signle contact
-
-        @type  user_id: number
-        @param user_id: user id
-        @type  contact_id: number
-        @param contact_id: contact id
-
-
-        @return: json.
-
-        >>>
-        ... {
-        ...     'success':True
-        ... },
-        '''
-        user_id = int(request.GET.get('user_id', 0))
-        if not user_id:
-            return self.create_response(
-                request,
-                {'success': False, 'error_string': 'User id is not set'}
-                )
-        contact_id = int(request.GET.get('contact_id', 0))
-        if not contact_id:
-            return self.create_response(
-                request,
-                {'success': False, 'error_string': 'Contact id is not set'}
-                )
-        return self.create_response(
-            request,
-            {'success': Contact.assign_user_to_contact(user_id, contact_id)}
-            )
-
-    def assign_contacts(self, request, **kwargs):
-        '''
-        GET METHOD
-        I{URL}:  U{alma.net/api/v1/contact/assign_contacts/}
-
-        Description
-        Assign a single user to multiple contacts
-
-        @type  user_id: number
-        @param user_id: user id
-        @type  contact_ids: list
-        @param contact_ids: List of contact ids, [1,2,3]
-
-
-        @return: json.
-
-        >>>
-        ... {
-        ...     'success':True
-        ... },
-        '''
-        user_id = int(request.GET.get('user_id', 0))
-        if not user_id:
-            return self.create_response(
-                request,
-                {'success': False, 'error_string': 'User id is not set'}
-                )
-        contact_ids = ast.literal_eval(request.GET.get('contact_ids', []))
-        if not contact_ids:
-            return self.create_response(
-                request,
-                {'success': False, 'error_string': 'Contact ids are not set'}
-                )
-        return self.create_response(
-            request,
-            {'success': Contact.assign_user_to_contacts(user_id, contact_ids)}
             )
 
     def share_contact(self, request, **kwargs):
