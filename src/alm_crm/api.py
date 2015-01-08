@@ -76,6 +76,14 @@ class CRMServiceModelResource(ModelResource):
             objects.append(bundle)
         return objects
 
+    def get_bundle_detail(self, obj, request):
+        '''
+        receives a object and returns a bundle
+        '''
+        bundle = self.build_bundle(obj=obj, request=request)
+        bundle = self.full_dehydrate(bundle)
+        return bundle
+
     @classmethod
     def get_crm_subscription(cls, request):
         user_env = request.user_env
@@ -1045,7 +1053,7 @@ class SalesCycleResource(CRMServiceModelResource):
         'alm_crm.api.ProductResource', 'products',
         related_name='sales_cycles', null=True, full=False)
     # owner = fields.ToOneField('alm_crm.api.CRMUserResource', 'owner', null=True, full=True)
-    owner_id = fields.IntegerField(attribute='owner_id')
+    author_id = fields.IntegerField(attribute='owner_id')
     # followers = fields.ToManyField('alm_crm.api.CRMUserResource',
     #                                'followers', null=True, full=True)
     projected_value = fields.ToOneField('alm_crm.api.ValueResource',
@@ -1058,9 +1066,8 @@ class SalesCycleResource(CRMServiceModelResource):
         queryset = SalesCycle.objects.all()
         resource_name = 'sales_cycle'
         excludes = ['from_date', 'to_date']
-
-    def dehydrate_date_created(self, bundle):
-        return bundle.obj.date_created.strftime('%Y-%m-%d %H:%M')
+        detail_allowed_methods = ['get', 'post', 'put', 'patch', 'delete']
+        always_return_data = True
 
     def dehydrate_product_ids(self, bundle):
         return list(bundle.obj.products.values_list('pk', flat=True))
@@ -1076,61 +1083,32 @@ class SalesCycleResource(CRMServiceModelResource):
     def prepend_urls(self):
         return [
             url(
-                r"^(?P<resource_name>%s)/(?P<id>\d+)/finish%s$" %
+                r"^(?P<resource_name>%s)/(?P<id>\d+)/close%s$" %
                 (self._meta.resource_name, trailing_slash()),
-                self.wrap_view('finish'),
-                name='api_finish'
+                self.wrap_view('close'),
+                name='api_close'
             ),
         ]
 
-    def finish(self, request, **kwargs):
+    def close(self, request, **kwargs):
         '''
         PUT METHOD
-        I{URL}:  U{alma.net/api/v1/sales_cycle/finish/}
+        I{URL}:  U{alma.net/api/v1/sales_cycle/:id/close/}
 
         B{Description}:
-        finish SalesCycle by
-        setting real_value and update status to 'C' ('Completed')
+        close SalesCycle by set real_value
+        and update status to 'C'('Completed')
 
-        @type  amount: number
-        @param amount: Amount of real_value
+        @type  value: number
+        @param value: Amount of real_value
         @type  salary: string (optional)
         @param salary: Salary type of real_value: [monthly|annualy|instant]
         @type  currency: string (optional)
         @param currency: Currency type of real_value: [KZT|USD|RUB]
 
 
-        @return: updated SalesCycle
+        @return: updated SalesCycle and close Activity
 
-        >>> {
-        ...     'id': 1,
-        ...     'resource_uri': '/api/v1/sales_cycle/1/'
-        ...     'status': 'C',
-        ...     'real_value': {
-        ...         'salary': 'monthly',
-        ...         'currency': 'KZT',
-        ...         'amount': 1000,
-        ...         'subscription_id': 1,
-        ...         'id': 8,
-        ...         'resource_uri': '/api/v1/sales_cycle/value/8/'
-        ...     },
-        ...     'projected_value': {
-        ...         'salary': 'monthly',
-        ...         'currency': 'KZT',
-        ...         'amount': 100000,
-        ...         'subscription_id': 1,
-        ...         'id': 1,
-        ...         'resource_uri': '/api/v1/sales_cycle/value/1/'
-        ...     },
-        ...     'activities': [],
-        ...     'contact': '/api/v1/contact/1/',
-        ...     'from_date': '2014-09-10T00:00:00',
-        ...     'to_date': '2014-09-10T00:00:00',
-        ...     'owner': {...}
-        ...     'date_created': u'2014-09-10T00:00:00',
-        ...     'subscription_id': 1,
-        ...     'followers': []
-        ... }
         '''
         self.method_check(request, allowed=['put'])
 
@@ -1153,27 +1131,25 @@ class SalesCycleResource(CRMServiceModelResource):
             format=request.META.get('CONTENT_TYPE', 'application/json'))
         deserialized = self.alter_deserialized_list_data(request, deserialized)
 
-        if deserialized.get('value', False):
+        if deserialized.get('value'):
             real_value = {
                 'amount': deserialized.get('value'),
                 'salary': deserialized.get('salary'),
                 'currency': deserialized.get('currency')
                 }
-
             # backend function to set real_value and update status
-            bundle.obj.finish(**real_value)
+            sales_cycle, activity = bundle.obj.close(**real_value)
         else:
             return http.HttpBadRequest(
                 content="must be provided 'value' value of 'real_value'",
                 content_type='text/plain')
 
-        if not hasattr(self.Meta, 'always_return_data') or \
-                not self.Meta.always_return_data:
-            return http.HttpNoContent()
-        else:
-            bundle = self.full_dehydrate(bundle)
-            bundle = self.alter_detail_data_to_serialize(request, bundle)
-            return self.create_response(request, bundle)
+        return self.create_response(
+            request, {
+                'sales_cycle': SalesCycleResource().get_bundle_detail(sales_cycle, request),
+                'activity': ActivityResource().get_bundle_detail(activity, request)
+            },
+            response_class=http.HttpAccepted)
 
 
 class ActivityResource(CRMServiceModelResource):
@@ -1189,7 +1165,7 @@ class ActivityResource(CRMServiceModelResource):
     ... {
     ...     'id': 1,
     ...     'resource_uri': '/api/v1/activity/1/',
-    ...     'sales_cycle_id': 1,
+    ...     'salescycle_id': 1,
     ...     'description': 'd1'
     ...     'feedback': '$',
     ...     'author_id': 2,
@@ -1202,7 +1178,7 @@ class ActivityResource(CRMServiceModelResource):
 
     author_id = fields.IntegerField(attribute='author_id', null=True)
     description = fields.CharField(attribute='description')
-    sales_cycle = fields.ForeignKey(SalesCycleResource, 'sales_cycle', null=True, blank=True)
+    salescycle_id = fields.ForeignKey(SalesCycleResource, 'sales_cycle', null=True, blank=True)
     feedback = fields.ToOneField('alm_crm.api.FeedbackResource', 'feedback', null=True, blank=True)
 
     # comments = fields.ToManyField(
@@ -1272,25 +1248,25 @@ class ActivityResource(CRMServiceModelResource):
         filters.update(_add_filters)
         return filters
 
-    def dehydrate_sales_cycle(self, bundle):
+    def dehydrate_salescycle_id(self, bundle):
         return bundle.obj.sales_cycle.id
 
     def dehydrate_feedback(self, bundle):
         return hasattr(bundle.obj, 'feedback') and bundle.obj.feedback.status or None
 
-    def hydrate_sales_cycle(self, bundle):
-        if bundle.data.get('sales_cycle'):
-            sales_cycle = SalesCycle.objects.get(id = bundle.data['sales_cycle'])
-            bundle.data['sales_cycle'] = sales_cycle
+    def hydrate_salescycle_id(self, bundle):
+        if bundle.data.get('salescycle_id'):
+            sales_cycle = SalesCycle.objects.get(id = bundle.data['salescycle_id'])
+            bundle.data['salescycle_id'] = sales_cycle
         else:
-            bundle.data['sales_cycle'] = SalesCycle.objects.get(owner=bundle.request.user.get_crmuser(), is_global=True)
+            bundle.data['salescycle_id'] = SalesCycle.objects.get(owner=bundle.request.user.get_crmuser(), is_global=True)
         return bundle
 
     def hydrate_feedback(self, bundle):
+        # see save() method below
         if bundle.data.get('feedback'):
             bundle.data['feedback_status'] = bundle.data['feedback']
             bundle.data['feedback'] = None
-
         return bundle
 
     def get_my_activities(self, request, **kwargs):
@@ -1406,28 +1382,9 @@ class ActivityResource(CRMServiceModelResource):
             return self.create_response(request, obj_dict)
         except Activity.DoesNotExist:
             return self.create_response(
-                    request, {'success':False, 'error_string':'Activity does not exists'}
+                request, 
+                {'success':False, 'error_string':'Activity does not exists'}
                 )
-
-
-    def save(self, bundle, skip_errors=False):
-        bundle = super(self.__class__, self).save(bundle, skip_errors)
-        status = 'W'
-        feedback = None
-        if bundle.data.get('feedback_status', None):
-            status = bundle.data['feedback_status']
-
-        if bundle.request.method == 'PUT' or bundle.request.method == 'PATCH':
-            feedback = Feedback.objects.get(activity = bundle.obj)
-            feedback.status = status
-        else:        
-            feedback = Feedback(owner = bundle.obj.owner,
-                                activity = bundle.obj,
-                                 status = status)
-        feedback.save()
-        bundle.data['feedback'] = feedback
-        return bundle
-
 
     def post_list(self, request, **kwargs):
         '''
@@ -1451,6 +1408,22 @@ class ActivityResource(CRMServiceModelResource):
         ... Location: http://alma.net/api/v1/activity/1/
         '''
         return super(self.__class__, self).post_list(request, **kwargs)
+
+    def save(self, bundle, skip_errors=False):
+        bundle = super(self.__class__, self).save(bundle, skip_errors)
+        status = 'W'
+        feedback = None
+        if bundle.data.get('feedback_status'):
+            status = bundle.data['feedback_status']
+        if bundle.request.method == 'PUT' or bundle.request.method == 'PATCH':
+            feedback = Feedback.objects.get(activity = bundle.obj)
+            feedback.status = status
+        else:
+            feedback = Feedback(owner=bundle.obj.owner, activity=bundle.obj,
+                                status=status)
+        feedback.save()
+        bundle.data['feedback'] = feedback
+        return bundle
 
 
 class ProductResource(CRMServiceModelResource):
@@ -1560,7 +1533,7 @@ class ShareResource(CRMServiceModelResource):
             request,
             {'objects': self.get_bundle_list(shares, request)}
             )
-   
+
 
     def dehydrate_contact(self, bundle):
         return bundle.obj.contact.id
