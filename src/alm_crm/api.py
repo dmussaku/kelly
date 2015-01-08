@@ -8,6 +8,7 @@ from tastypie.authentication import (
     SessionAuthentication,
     BasicAuthentication,
     )
+from tastypie.paginator import Paginator
 from django.conf.urls import url
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.core.files.temp import NamedTemporaryFile
@@ -49,8 +50,6 @@ from django.http import HttpResponse
 import json
 import datetime
 import time
-
-
 
 class CRMServiceModelResource(ModelResource):
 
@@ -196,6 +195,32 @@ class ContactResource(CRMServiceModelResource):
 
         '''
         return super(self.__class__, self).post_list(request, **kwargs)
+
+    def get_meta_dict(self, limit, offset, count, url):
+        obj_dict={}
+        obj_dict['limit'] = limit
+        obj_dict['offset'] = offset
+        obj_dict['url'] = url
+
+
+        obj_dict['next'] = self.get_next(limit, offset, count, url)
+        obj_dict['previous'] = self.get_previous(limit, offset, url)
+
+        return obj_dict
+
+    def get_previous(self, limit, offset, url):
+        if offset-limit<0:
+            return None
+        if not url[len(url)-1]=='/':
+            url+'/'
+        return url+'?limit=%s&offset=%s' % (limit, offset-limit)
+            
+    def get_next(self, limit, offset, count, url):
+        if offset + limit >= count:
+            return None
+        if not url[len(url)-1]=='/':
+            url+'/'
+        return url+'?limit=%s&offset=%s' % (limit, offset+limit)
 
     def obj_create(self, bundle, **kwargs):
         """
@@ -606,12 +631,15 @@ class ContactResource(CRMServiceModelResource):
             owned=owned,
             assigned=assigned,
             followed=followed,
-            limit=limit,
+            limit=limit+20,
             offset=offset)
+        print "Len of contacts =%s" % len(contacts)
         if not include_activities:
             return self.create_response(
                 request,
-                {'objects': self.get_bundle_list(contacts, request)}
+                {
+                'meta':self.get_meta_dict(limit, offset, len(contacts), 'api/v1/contact/'),
+                'objects': self.get_bundle_list(contacts, request)}
                 )
         else:
             '''
