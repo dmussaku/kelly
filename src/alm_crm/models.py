@@ -777,11 +777,11 @@ class SalesCycle(SubscriptionObject):
                 status.append(False)
         return status
 
-    def finish(self, **kw):
+    def close(self, **kw):
         """
         1. set real_value by
         given amount(, salary, currency) field values of Value
-        2. update status to 'Completed'
+        2. update status to 'C' ('Completed')
         """
         assert 'amount' in kw, 'must be provided amount of real_value'
 
@@ -790,12 +790,28 @@ class SalesCycle(SubscriptionObject):
                 kw['salary'] = self.projected_value.salary
             if 'currency' not in kw or not kw['currency']:
                 kw['currency'] = self.projected_value.currency
+        if 'salary' in kw and not kw['salary']:
+            kw.pop('salary')
+        if 'currency' in kw and not kw['currency']:
+            kw.pop('currency')
         v = Value(**kw)
         v.save()
 
+        # update SalesCycle
         self.real_value = v
         self.status = 'C'
         self.save()
+
+        # create 'close' Activity
+        activity = Activity(
+            sales_cycle=self,
+            owner=self.owner,
+            description=_('Closed. Real Value is %(amount)s') % {'amount': v.amount}
+            )
+        activity.save()
+        activity.set_feedback_status('$', save_feedback=True)
+
+        return [self, activity]
 
     @classmethod
     def upd_lst_activity_on_create(cls, sender,
@@ -908,20 +924,21 @@ class Activity(SubscriptionObject):
     def contact(self):
         return self.sales_cycle.contact.id
 
-    # @property
-    # def feedback(self):
-    #     return Feedback.objects.get(activity=self)
-
-    # @feedback.setter
-    # def feedback(self, feedback_obj):
-    #     feedback_obj.activity = self
-    #     feedback_obj.save()
-
     def set_feedback(self, feedback_obj, save=False):
         """Set feedback to activity instance. Saves if `save` is set(True)."""
         feedback_obj.activity = self
         if save:
             feedback_obj.save()
+
+    def set_feedback_status(self, status, save_feedback=False):
+        if not hasattr(self, 'feedback'):
+            self.feedback = Feedback(
+                activity=self,
+                owner=self.owner
+                )
+        self.feedback.status = status
+        if save_feedback:
+            self.feedback.save()
 
     @classmethod
     def get_activities_by_contact(cls, contact_id):
@@ -1079,7 +1096,7 @@ class Feedback(SubscriptionObject):
     owner = models.ForeignKey(CRMUser, related_name='feedback_owner')
 
     def __unicode__(self):
-        return self.feedback
+        return self.feedback or ''
 
     def save(self, **kwargs):
         self.date_edited = timezone.now()
@@ -1101,7 +1118,6 @@ class Mention(SubscriptionObject):
     @property
     def author(self):
         return self.owner
-
 
     @classmethod
     def build_new(cls, user_id, content_class=None,

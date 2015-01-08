@@ -546,6 +546,41 @@ class SalesCycleTestCase(TestCase):
         ret = SalesCycle.get_salescycles_by_contact(1)
         self.assertEqual(list(ret.values_list('pk', flat=True)), [1, 2, 3, 4])
 
+    def test_close_sales_cycle(self):
+        self.assertNotEqual(self.sc1.status, 'C')
+        real_value = {
+            'amount': 1000,
+            'salary': None,
+            'currency': None
+        }
+        activities_count = Activity.objects.count()
+
+        ret = self.sc1.close(**real_value)
+
+        self.assertIsInstance(ret, list)
+        self.assertIsInstance(ret[0], SalesCycle)
+        self.assertIsInstance(ret[1], Activity)
+        self.assertEqual(self.sc1.status, 'C')
+        self.assertEqual(self.sc1.real_value.amount, real_value['amount'])
+        self.assertEqual(Activity.objects.count(), activities_count + 1)
+        self.assertEqual(Activity.objects.last().feedback.status, '$')
+
+    def test_close_sales_cycle_amount_as_string(self):
+        self.assertNotEqual(self.sc1.status, 'C')
+        real_value = {
+            'amount': '1000',
+            'salary': None,
+            'currency': None
+        }
+
+        ret = self.sc1.close(**real_value)
+        self.assertIsInstance(ret[0], SalesCycle)
+        self.assertIsInstance(ret[1], Activity)
+        self.assertEqual(self.sc1.status, 'C')
+        sales_cycle = SalesCycle.objects.get(id=self.sc1.id)
+        self.assertEqual(sales_cycle.real_value.amount,
+                         int(real_value['amount']))
+
 
 class ContactListTestCase(TestCase):
     fixtures = ['crmusers.json', 'contactlist.json', 'users.json']
@@ -818,23 +853,23 @@ class SalesCycleResourceTest(ResourceTestMixin, ResourceTestCase):
         # verify that one sales_cycle has been deleted.
         self.assertEqual(SalesCycle.objects.count(), count - 1)
 
-    def test_finish_sales_cycle(self):
+    def test_close_sales_cycle(self):
         put_data = {
             'value': 1000
         }
 
         resp = self.api_client.put(
-            self.api_path_sales_cycle+str(self.sales_cycle.pk)+'/finish/',
+            self.api_path_sales_cycle+str(self.sales_cycle.pk)+'/close/',
             format='json', data=put_data)
+
         self.assertHttpAccepted(resp)
-
-        updated_data = self.get_des_res(str(self.sales_cycle.pk)+'/')
-        sales_cycle = SalesCycle.objects.get(pk=self.sales_cycle.pk)
-
-        self.assertTrue(sales_cycle.real_value is not None)
-        self.assertEqual(sales_cycle.real_value.amount, put_data.get('value'))
-        self.assertEqual(updated_data['real_value']['value'],
-                         put_data.get('value'))
+        resp = self.deserialize(resp)
+        self.assertTrue('activity' in resp)
+        self.assertTrue('sales_cycle' in resp)
+        self.assertEqual(resp['sales_cycle']['status'], 'C')
+        self.assertEqual(resp['activity']['feedback'], '$')
+        self.assertEqual(resp['sales_cycle']['real_value']['value'],
+                         put_data['value'])
 
 
 class ActivityResourceTest(ResourceTestMixin, ResourceTestCase):

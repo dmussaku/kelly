@@ -75,6 +75,14 @@ class CRMServiceModelResource(ModelResource):
             objects.append(bundle)
         return objects
 
+    def get_bundle_detail(self, obj, request):
+        '''
+        receives a object and returns a bundle
+        '''
+        bundle = self.build_bundle(obj=obj, request=request)
+        bundle = self.full_dehydrate(bundle)
+        return bundle
+
     @classmethod
     def get_crm_subscription(cls, request):
         user_env = request.user_env
@@ -1074,61 +1082,32 @@ class SalesCycleResource(CRMServiceModelResource):
     def prepend_urls(self):
         return [
             url(
-                r"^(?P<resource_name>%s)/(?P<id>\d+)/finish%s$" %
+                r"^(?P<resource_name>%s)/(?P<id>\d+)/close%s$" %
                 (self._meta.resource_name, trailing_slash()),
-                self.wrap_view('finish'),
-                name='api_finish'
+                self.wrap_view('close'),
+                name='api_close'
             ),
         ]
 
-    def finish(self, request, **kwargs):
+    def close(self, request, **kwargs):
         '''
         PUT METHOD
-        I{URL}:  U{alma.net/api/v1/sales_cycle/finish/}
+        I{URL}:  U{alma.net/api/v1/sales_cycle/:id/close/}
 
         B{Description}:
-        finish SalesCycle by
-        setting real_value and update status to 'C' ('Completed')
+        close SalesCycle by set real_value
+        and update status to 'C'('Completed')
 
-        @type  amount: number
-        @param amount: Amount of real_value
+        @type  value: number
+        @param value: Amount of real_value
         @type  salary: string (optional)
         @param salary: Salary type of real_value: [monthly|annualy|instant]
         @type  currency: string (optional)
         @param currency: Currency type of real_value: [KZT|USD|RUB]
 
 
-        @return: updated SalesCycle
+        @return: updated SalesCycle and close Activity
 
-        >>> {
-        ...     'id': 1,
-        ...     'resource_uri': '/api/v1/sales_cycle/1/'
-        ...     'status': 'C',
-        ...     'real_value': {
-        ...         'salary': 'monthly',
-        ...         'currency': 'KZT',
-        ...         'amount': 1000,
-        ...         'subscription_id': 1,
-        ...         'id': 8,
-        ...         'resource_uri': '/api/v1/sales_cycle/value/8/'
-        ...     },
-        ...     'projected_value': {
-        ...         'salary': 'monthly',
-        ...         'currency': 'KZT',
-        ...         'amount': 100000,
-        ...         'subscription_id': 1,
-        ...         'id': 1,
-        ...         'resource_uri': '/api/v1/sales_cycle/value/1/'
-        ...     },
-        ...     'activities': [],
-        ...     'contact': '/api/v1/contact/1/',
-        ...     'from_date': '2014-09-10T00:00:00',
-        ...     'to_date': '2014-09-10T00:00:00',
-        ...     'owner': {...}
-        ...     'date_created': u'2014-09-10T00:00:00',
-        ...     'subscription_id': 1,
-        ...     'followers': []
-        ... }
         '''
         self.method_check(request, allowed=['put'])
 
@@ -1151,27 +1130,25 @@ class SalesCycleResource(CRMServiceModelResource):
             format=request.META.get('CONTENT_TYPE', 'application/json'))
         deserialized = self.alter_deserialized_list_data(request, deserialized)
 
-        if deserialized.get('value', False):
+        if deserialized.get('value'):
             real_value = {
                 'amount': deserialized.get('value'),
                 'salary': deserialized.get('salary'),
                 'currency': deserialized.get('currency')
                 }
-
             # backend function to set real_value and update status
-            bundle.obj.finish(**real_value)
+            sales_cycle, activity = bundle.obj.close(**real_value)
         else:
             return http.HttpBadRequest(
                 content="must be provided 'value' value of 'real_value'",
                 content_type='text/plain')
 
-        if not hasattr(self.Meta, 'always_return_data') or \
-                not self.Meta.always_return_data:
-            return http.HttpNoContent()
-        else:
-            bundle = self.full_dehydrate(bundle)
-            bundle = self.alter_detail_data_to_serialize(request, bundle)
-            return self.create_response(request, bundle)
+        return self.create_response(
+            request, {
+                'sales_cycle': SalesCycleResource().get_bundle_detail(sales_cycle, request),
+                'activity': ActivityResource().get_bundle_detail(activity, request)
+            },
+            response_class=http.HttpAccepted)
 
 
 class ActivityResource(CRMServiceModelResource):
