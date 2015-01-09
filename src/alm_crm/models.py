@@ -700,7 +700,7 @@ class SalesCycle(SubscriptionObject):
     # Adds mentions to a current class, takes a lsit of user_ids as an input
     # and then runs through the list and calls the function build_new which
     # is declared in Mention class
-    
+
     @classmethod
     def on_subscribtion_reconn(cls, sender, **kwargs):
         service = kwargs.get('service')
@@ -711,7 +711,7 @@ class SalesCycle(SubscriptionObject):
             service_user.owned_sales_cycles.get(is_global=True)
         except SalesCycle.DoesNotExist:
             cls.create_globalcycle(owner=service_user)
-        
+
     @classmethod
     def create_globalcycle(cls, **kwargs):
         global_cycle = cls(is_global=True, title=GLOBAL_CYCLE_TITLE, description=GLOBAL_CYCLE_DESCRIPTION, **kwargs)
@@ -1012,7 +1012,7 @@ class Activity(SubscriptionObject):
     @classmethod
     def get_user_activities(cls, user):
         return cls.objects.filter(owner=user).order_by('-date_created')
-        
+
 
     @classmethod
     def get_activities_by_salescycle(cls, sales_cycle_id):
@@ -1164,7 +1164,11 @@ class Feedback(SubscriptionObject):
     owner = models.ForeignKey(CRMUser, related_name='feedback_owner')
 
     def __unicode__(self):
-        return '%s: %s' % (self.activity, self.status)
+        return u"%s: %s" % (self.activity, self.status)
+
+    def statusHuman(self):
+        statuses = filter(lambda x: x[0] == self.status, self.STATUS_OPTIONS)
+        return len(statuses) > 0 and statuses[0] or None
 
     def save(self, **kwargs):
         self.date_edited = timezone.now()
