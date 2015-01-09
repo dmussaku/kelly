@@ -13,26 +13,22 @@ def vcard_rel_dehydrate(bundle):
         bundle.data['vcard'] = bundle.obj.vcard.id
     return bundle
 
-class BaseVCardResource(ModelResource):
 
-    class Meta:
-        list_allowed_methods = ['get', 'post']
-        detail_allowed_methods = ['get', 'post', 'put', 'delete']
-        authentication = MultiAuthentication(BasicAuthentication(),
-                                             SessionAuthentication())
-        authorization = Authorization()
+class CommonMeta:
+    list_allowed_methods = ['get', 'post']
+    detail_allowed_methods = ['get', 'post', 'put', 'delete']
+    authentication = MultiAuthentication(BasicAuthentication(),
+                                         SessionAuthentication())
+    authorization = Authorization()
 
-    # def full_dehydrate(self, bundle, for_list=False):
-    #     bundle = super(self.__class__, self).full_dehydrate(bundle, for_list=True)
-    #     return bundle
 
-class VCardResource(BaseVCardResource):
+class VCardResource(ModelResource):
     """
-    GET Method 
+    GET Method
     I{URL}:  U{alma.net:8000/api/v1/vcard/}
-    
+
     Description
-    Api for VCard model 
+    Api for VCard model
     """
     emails = fields.ToManyField('alm_vcard.api.VCardEmailResource',
                                 'email_set', related_name='vcard', null=True,
@@ -68,7 +64,7 @@ class VCardResource(BaseVCardResource):
     urls = fields.ToManyField('alm_vcard.api.VCardUrlResource', 'url_set',
                               related_name='vcard', null=True, full=True)
 
-    class Meta(BaseVCardResource.Meta):
+    class Meta(CommonMeta):
         queryset = VCard.objects.all()
         resource_name = 'vcard'
 
@@ -76,213 +72,137 @@ class VCardResource(BaseVCardResource):
         print "i was here"
         return super(self.__class__, self).obj_delete(bundle, **kwargs)
 
-class VCardEmailResource(BaseVCardResource):
+
+class VCardRelatedResource(ModelResource):
     vcard = fields.ForeignKey(VCardResource, 'vcard')
 
-    class Meta(BaseVCardResource.Meta):
+    def dehydrate_vcard(self, bundle):
+        return bundle.obj.vcard_id
+
+
+class VCardEmailResource(VCardRelatedResource):
+    vcard = fields.ForeignKey(VCardResource, 'vcard')
+
+    class Meta(CommonMeta):
         queryset = Email.objects.all()
         resource_name = 'vcard_email'
 
-    def full_dehydrate(self, bundle, for_list=True):
-        bundle = super(self.__class__, self).full_dehydrate(bundle)
-        bundle = vcard_rel_dehydrate(bundle)
-        return bundle
 
-    # def full_dehydrate(self, bundle, for_list=True):
-    #     bundle = super(self.__class__, self).full_dehydrate(bundle)
-    #     bundle = vcard_rel_dehydrate(bundle)
-    #     return bundle
-
-class VCardTelResource(BaseVCardResource):
+class VCardTelResource(VCardRelatedResource):
     vcard = fields.ForeignKey('alm_vcard.api.VCardResource', 'vcard')
 
-    class Meta(BaseVCardResource.Meta):
+    class Meta(CommonMeta):
         queryset = Tel.objects.all()
         resource_name = 'vcard_tel'
 
-    def full_dehydrate(self, bundle, for_list=True):
-        bundle = super(self.__class__, self).full_dehydrate(bundle)
-        bundle = vcard_rel_dehydrate(bundle)
-        return bundle
 
-
-class VCardOrgResource(BaseVCardResource):
+class VCardOrgResource(VCardRelatedResource):
     vcard = fields.ForeignKey('alm_vcard.api.VCardResource', 'vcard')
 
-    class Meta(BaseVCardResource.Meta):
+    class Meta(CommonMeta):
         queryset = Org.objects.all()
         resource_name = 'vcard_org'
 
-    def full_dehydrate(self, bundle, for_list=True):
-        bundle = super(self.__class__, self).full_dehydrate(bundle)
-        bundle = vcard_rel_dehydrate(bundle)
-        return bundle
 
-
-class VCardGeoResource(BaseVCardResource):
+class VCardGeoResource(VCardRelatedResource):
     vcard = fields.ForeignKey('alm_vcard.api.VCardResource', 'vcard')
 
-    class Meta(BaseVCardResource.Meta):
+    class Meta(CommonMeta):
         queryset = Geo.objects.all()
         resource_name = 'vcard_geo'
 
-    def full_dehydrate(self, bundle, for_list=True):
-        bundle = super(self.__class__, self).full_dehydrate(bundle)
-        bundle = vcard_rel_dehydrate(bundle)
-        return bundle
 
-
-class VCardAdrResource(BaseVCardResource):
+class VCardAdrResource(VCardRelatedResource):
     vcard = fields.ForeignKey('alm_vcard.api.VCardResource', 'vcard')
 
-    class Meta(BaseVCardResource.Meta):
+    class Meta(CommonMeta):
         queryset = Adr.objects.all()
         resource_name = 'vcard_adr'
 
-    def full_dehydrate(self, bundle, for_list=True):
-        bundle = super(self.__class__, self).full_dehydrate(bundle)
-        bundle = vcard_rel_dehydrate(bundle)
-        return bundle
 
-
-class VCardAgentResource(BaseVCardResource):
+class VCardAgentResource(VCardRelatedResource):
     vcard = fields.ForeignKey('alm_vcard.api.VCardResource', 'vcard')
 
-    class Meta(BaseVCardResource.Meta):
+    class Meta(CommonMeta):
         queryset = Agent.objects.all()
         resource_name = 'vcard_agent'
 
-    def full_dehydrate(self, bundle, for_list=True):
-        bundle = super(self.__class__, self).full_dehydrate(bundle)
-        bundle = vcard_rel_dehydrate(bundle)
-        return bundle
 
-
-class VCardCategoryResource(BaseVCardResource):
+class VCardCategoryResource(VCardRelatedResource):
     vcard = fields.ForeignKey('alm_vcard.api.VCardResource', 'vcard')
 
-    class Meta(BaseVCardResource.Meta):
+    class Meta(CommonMeta):
         queryset = Category.objects.all()
         resource_name = 'vcard_category'
 
-    def full_dehydrate(self, bundle, for_list=True):
-        bundle = super(self.__class__, self).full_dehydrate(bundle)
-        bundle = vcard_rel_dehydrate(bundle)
-        return bundle
 
-
-class VCardKeyResource(BaseVCardResource):
+class VCardKeyResource(VCardRelatedResource):
     vcard = fields.ForeignKey('alm_vcard.api.VCardResource', 'vcard')
 
-    class Meta(BaseVCardResource.Meta):
+    class Meta(CommonMeta):
         queryset = Key.objects.all()
         resource_name = 'vcard_key'
 
-    def full_dehydrate(self, bundle, for_list=True):
-        bundle = super(self.__class__, self).full_dehydrate(bundle)
-        bundle = vcard_rel_dehydrate(bundle)
-        return bundle
 
-
-class VCardLabelResource(BaseVCardResource):
+class VCardLabelResource(VCardRelatedResource):
     vcard = fields.ForeignKey('alm_vcard.api.VCardResource', 'vcard')
 
-    class Meta(BaseVCardResource.Meta):
+    class Meta(CommonMeta):
         queryset = Label.objects.all()
         resource_name = 'vcard_label'
 
-    def full_dehydrate(self, bundle, for_list=True):
-        bundle = super(self.__class__, self).full_dehydrate(bundle)
-        bundle = vcard_rel_dehydrate(bundle)
-        return bundle
 
-
-class VCardMailerResource(BaseVCardResource):
+class VCardMailerResource(VCardRelatedResource):
     vcard = fields.ForeignKey('alm_vcard.api.VCardResource', 'vcard')
 
-    class Meta(BaseVCardResource.Meta):
+    class Meta(CommonMeta):
         queryset = Mailer.objects.all()
         resource_name = 'vcard_mailer'
 
-    def full_dehydrate(self, bundle, for_list=True):
-        bundle = super(self.__class__, self).full_dehydrate(bundle)
-        bundle = vcard_rel_dehydrate(bundle)
-        return bundle
 
-
-class VCardNicknameResource(BaseVCardResource):
+class VCardNicknameResource(VCardRelatedResource):
     vcard = fields.ForeignKey('alm_vcard.api.VCardResource', 'vcard')
 
-    class Meta(BaseVCardResource.Meta):
+    class Meta(CommonMeta):
         queryset = Nickname.objects.all()
         resource_name = 'vcard_nickname'
 
-    def full_dehydrate(self, bundle, for_list=True):
-        bundle = super(self.__class__, self).full_dehydrate(bundle)
-        bundle = vcard_rel_dehydrate(bundle)
-        return bundle
 
-
-class VCardNoteResource(BaseVCardResource):
+class VCardNoteResource(VCardRelatedResource):
     vcard = fields.ForeignKey('alm_vcard.api.VCardResource', 'vcard')
 
-    class Meta(BaseVCardResource.Meta):
+    class Meta(CommonMeta):
         queryset = Note.objects.all()
         resource_name = 'vcard_note'
 
-    def full_dehydrate(self, bundle, for_list=True):
-        bundle = super(self.__class__, self).full_dehydrate(bundle)
-        bundle = vcard_rel_dehydrate(bundle)
-        return bundle
 
-
-class VCardRoleResource(BaseVCardResource):
+class VCardRoleResource(VCardRelatedResource):
     vcard = fields.ForeignKey('alm_vcard.api.VCardResource', 'vcard')
 
-    class Meta(BaseVCardResource.Meta):
+    class Meta(CommonMeta):
         queryset = Role.objects.all()
         resource_name = 'vcard_role'
 
-    def full_dehydrate(self, bundle, for_list=True):
-        bundle = super(self.__class__, self).full_dehydrate(bundle)
-        bundle = vcard_rel_dehydrate(bundle)
-        return bundle
 
-
-class VCardTitleResource(BaseVCardResource):
+class VCardTitleResource(VCardRelatedResource):
     vcard = fields.ForeignKey('alm_vcard.api.VCardResource', 'vcard')
 
-    class Meta(BaseVCardResource.Meta):
+    class Meta(CommonMeta):
         queryset = Title.objects.all()
         resource_name = 'vcard_title'
 
-    def full_dehydrate(self, bundle, for_list=True):
-        bundle = super(self.__class__, self).full_dehydrate(bundle)
-        bundle = vcard_rel_dehydrate(bundle)
-        return bundle
 
-
-class VCardTzResource(BaseVCardResource):
+class VCardTzResource(VCardRelatedResource):
     vcard = fields.ForeignKey('alm_vcard.api.VCardResource', 'vcard')
 
-    class Meta(BaseVCardResource.Meta):
+    class Meta(CommonMeta):
         queryset = Tz.objects.all()
         resource_name = 'vcard_tz'
 
-    def full_dehydrate(self, bundle, for_list=True):
-        bundle = super(self.__class__, self).full_dehydrate(bundle)
-        bundle = vcard_rel_dehydrate(bundle)
-        return bundle
 
-
-class VCardUrlResource(BaseVCardResource):
+class VCardUrlResource(VCardRelatedResource):
     vcard = fields.ForeignKey('alm_vcard.api.VCardResource', 'vcard')
 
-    class Meta(BaseVCardResource.Meta):
+    class Meta(CommonMeta):
         queryset = Url.objects.all()
         resource_name = 'vcard_url'
-
-    def full_dehydrate(self, bundle, for_list=True):
-        bundle = super(self.__class__, self).full_dehydrate(bundle)
-        bundle = vcard_rel_dehydrate(bundle)
-        return bundle

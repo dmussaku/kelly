@@ -1,1 +1,0 @@
-/home/devishot/Documents/AlmaCloud/work/almanet-frontend/js/bundle.js
