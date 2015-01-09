@@ -1169,6 +1169,12 @@ class SalesCycleResource(CRMServiceModelResource):
                 self.wrap_view('close'),
                 name='api_close'
             ),
+            url(
+                r"^(?P<resource_name>%s)/(?P<id>\d+)/close_cycle%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('close_cycle'),
+                name='api_close_cycle'
+            ),
         ]
 
     def close(self, request, **kwargs):
@@ -1224,6 +1230,47 @@ class SalesCycleResource(CRMServiceModelResource):
             return http.HttpBadRequest(
                 content="must be provided 'value' value of 'real_value'",
                 content_type='text/plain')
+
+        return self.create_response(
+            request, {
+                'sales_cycle': SalesCycleResource().get_bundle_detail(sales_cycle, request),
+                'activity': ActivityResource().get_bundle_detail(activity, request)
+            },
+            response_class=http.HttpAccepted)
+
+    def close_cycle(self, request, **kwargs):
+        '''
+        PUT METHOD
+        I{URL}:  U{alma.net/api/v1/sales_cycle/:id/close_cycle/}
+
+        B{Description}:
+        close SalesCycle, set value of SalesCycleProductStat 
+        update status to 'C'('Completed')
+
+        @return: updated SalesCycle and close Activity
+
+        '''
+        self.method_check(request, allowed=['put'])
+
+        basic_bundle = self.build_bundle(request=request)
+
+        # get sales_cycle
+        try:
+            obj = self.cached_obj_get(bundle=basic_bundle,
+                                      **self.remove_api_resource_names(kwargs))
+        except ObjectDoesNotExist:
+            return http.HttpNotFound()
+        except MultipleObjectsReturned:
+            return http.HttpMultipleChoices(
+                "More than one resource is found at this URI.")
+        bundle = self.build_bundle(obj=obj, request=request)
+
+        # get PUT's data from request.body
+        deserialized = self.deserialize(
+            request, request.body,
+            format=request.META.get('CONTENT_TYPE', 'application/json'))
+        deserialized = self.alter_deserialized_list_data(request, deserialized)
+        sales_cycle, activity = bundle.obj.close_cycle(products_with_values=deserialized)
 
         return self.create_response(
             request, {

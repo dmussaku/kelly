@@ -663,7 +663,7 @@ class SalesCycle(SubscriptionObject):
     title = models.CharField(max_length=100)
     description = models.CharField(max_length=500)
     products = models.ManyToManyField(Product, related_name='sales_cycles',
-                                      null=True, blank=True)
+                                      null=True, blank=True, through='SalesCycleProductStat')
     owner = models.ForeignKey(CRMUser, related_name='owned_sales_cycles')
     followers = models.ManyToManyField(
         CRMUser, related_name='follow_sales_cycles',
@@ -769,7 +769,13 @@ class SalesCycle(SubscriptionObject):
         products = Product.objects.filter(pk__in=product_ids)
         if not products:
             return False
-        self.products.add(*products)
+        for product in products:
+            try:
+                SalesCycleProductStat.objects.get(sales_cycle=self, product=product)
+            except SalesCycleProductStat.DoesNotExist:
+                s = SalesCycleProductStat(sales_cycle=self, product=product)
+                s.save()
+
         return True
 
     def remove_products(self, product_ids):
@@ -779,8 +785,17 @@ class SalesCycle(SubscriptionObject):
         products = Product.objects.filter(pk__in=product_ids)
         if not products:
             return False
-        self.products.remove(*products)
+        for product in products:
+            try:
+                s = SalesCycleProductStat.objects.get(sales_cycle=self, product=product)
+                s.delete()
+            except SalesCycleProductStat.DoesNotExist:
+                continue
         return True
+
+    def remove_product(self, product_id, **kw):
+        """TEST Assigns products to salescycle"""
+        return self.remove_products([product_id], **kw)
 
     def set_result(self, value_obj, save=False):
         """TEST Set salescycle.real_value to value_obj. Saves the salescycle
@@ -841,6 +856,27 @@ class SalesCycle(SubscriptionObject):
         activity.set_feedback_status('$', save_feedback=True)
 
         return [self, activity]
+
+    def close_cycle(self, products_with_values):
+        amount = 0
+        for product, value in products_with_values.iteritems():
+            amount += value
+            s = SalesCycleProductStat.objects.get(sales_cycle=self, product=Product.objects.get(id=product))
+            s.value = value
+            s.save()
+
+        self.status = 'C'
+        self.save()
+
+        activity = Activity(
+            sales_cycle=self,
+            owner=self.owner,
+            description=_('Closed. Amount Value is %(amount)s') % {'amount': amount}
+            )
+        activity.save()
+        activity.set_feedback_status('$', save_feedback=True)
+        return [self, activity]
+
 
     @classmethod
     def upd_lst_activity_on_create(cls, sender,
@@ -1388,3 +1424,20 @@ class ContactList(SubscriptionObject):
 
 from almanet import signals
 signals.subscription_reconn.connect(SalesCycle.on_subscribtion_reconn)
+
+class SalesCycleProductStat(SubscriptionObject):
+    sales_cycle = models.ForeignKey(SalesCycle)
+    product = models.ForeignKey(Product)
+    value = models.IntegerField(default=0)
+
+    class Meta:
+        verbose_name = _('sales_cycle_product_stat')
+        db_table = settings.DB_PREFIX.format('cycle_prod_stat')
+
+    def __unicode__(self):
+        return ' %s | %s | %s'%(self.sales_cycle, self.product, self.value)
+
+    def save(self, **kwargs):
+        if not self.subscription_id:
+            self.subscription_id = self.sales_cycle.owner.subscription_id
+        super(SalesCycleProductStat, self).save(**kwargs)
