@@ -158,8 +158,8 @@ class ContactResource(CRMServiceModelResource):
         'alm_crm.api.ContactResource', 'parent',
         null=True, full=False
         )
-    shares = fields.ToManyField(
-        'alm_crm.api.ShareResource', 'shares',
+    share = fields.ToOneField(
+        'alm_crm.api.ShareResource', 'share',
         null=True, full=True
         )
 
@@ -337,10 +337,13 @@ class ContactResource(CRMServiceModelResource):
     def full_hydrate(self, bundle, **kwargs):
         t1 = time.time()
         contact_id = kwargs.get('id', None)
+        subscription_id = self.get_crm_subscription(bundle.request)
         if contact_id:
             bundle.obj = Contact.objects.get(id=int(contact_id))
+            bundle.obj.subscription_id = subscription_id
         else:
             bundle.obj = self._meta.object_class()
+            bundle.obj.subscription_id = subscription_id
             # bundle.obj.owner_id = bundle.request.user.get_crmuser().id
             bundle.obj.save()
         '''
@@ -350,18 +353,16 @@ class ContactResource(CRMServiceModelResource):
         i got in a json. If its missing then i just delete it.
 
         '''
-        if bundle.data.get('is_company',""):
-            if bundle.data['is_company']==1:
-                bundle.obj.tp='co'
-            else:
-                bundle.obj.tp='user'
-        if bundle.data.get('author_id',""):
-            bundle.obj.owner_id = int(bundle.data['author_id'])
+        if bundle.data.get('user_id',""):
+            bundle.obj.owner_id = int(bundle.data['user_id'])
         if bundle.data.get('parent_id',""):
             bundle.obj.parent_id = int(bundle.data['parent_id'])
         for field_name in bundle.obj._meta.get_all_field_names():
-            if bundle.data.get(field_name, None):
-                field_object = ast.literal_eval(str(bundle.data.get(field_name, None)))
+            if bundle.data.get(str(field_name), None):
+                try:
+                    field_object = ast.literal_eval(str(bundle.data.get(str(field_name), None)))
+                except ValueError:
+                    field_object = bundle.data.get(field_name)
                 if isinstance(field_object, str):
                     bundle.obj.__setattr__(field_name, field_object)
                 elif isinstance(field_object, list):
@@ -373,19 +374,22 @@ class ContactResource(CRMServiceModelResource):
                     self.vcard_full_hydrate(bundle)
                     t3 = time.time() - t2
                     print "Time to finish vcard hydration = %s seconds" % t2
+        
         bundle.obj.save()
         if bundle.data.get('note') and not kwargs.get('id'):
             share = Share(
                     description=bundle.data.get('note'),
-                    share_to_id=int(bundle.data['author_id']),
-                    share_from_id=int(bundle.data['author_id']),
-                    contact_id=bundle.obj.id
+                    share_to_id=int(bundle.data['user_id']),
+                    share_from_id=int(bundle.data['user_id']),
+                    contact_id=bundle.obj.id,
+                    subscription_id=subscription_id
                     )
             share.save()
         return bundle
 
     def vcard_full_hydrate(self, bundle):
         field_object = bundle.data.get('vcard',{})
+        subscription_id = self.get_crm_subscription(bundle.request)
         if bundle.obj.vcard:
             vcard = bundle.obj.vcard
         else:
@@ -448,6 +452,7 @@ class ContactResource(CRMServiceModelResource):
                         for key, value in obj.viewitems():
                             vcard_obj.__setattr__(key, value)
                         vcard_obj.vcard = vcard
+                        vcard_obj.subscription_id = subscription_id
                         vcard_obj.save()
                         id_list.append(vcard_obj.id)
                     for obj in queryset:
@@ -456,6 +461,7 @@ class ContactResource(CRMServiceModelResource):
                 else:
                     for obj in model.objects.filter(vcard=vcard):
                         obj.delete()
+        vcard.subscription_id = subscription_id
         vcard.save()
 
     def save(self, bundle, skip_errors=False):

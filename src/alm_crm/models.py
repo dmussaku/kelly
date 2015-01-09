@@ -1170,9 +1170,7 @@ class Comment(SubscriptionObject):
 
 class Share(SubscriptionObject):
     is_read = models.BooleanField(default=False, blank=False)
-    contact = models.ForeignKey(
-        Contact, related_name='shares',
-        on_delete=models.SET_DEFAULT, default=None)
+    contact = models.OneToOneField(Contact, blank=True, null=True)
     share_to = models.ForeignKey(CRMUser, related_name='in_shares')
     share_from = models.ForeignKey(CRMUser, related_name='owned_shares')
     date_created = models.DateTimeField(blank=True, auto_now_add=True)
