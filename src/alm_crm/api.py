@@ -1543,6 +1543,7 @@ class ActivityResource(CRMServiceModelResource):
         feedback = None
         if bundle.data.get('feedback_status'):
             status = bundle.data['feedback_status']
+            bundle.data.pop('feedback_status')
         if bundle.request.method == 'PUT' or bundle.request.method == 'PATCH':
             feedback = Feedback.objects.get(activity = bundle.obj)
             feedback.status = status
@@ -2154,20 +2155,17 @@ class AppStateObject(object):
 
     def get_constants(self):
         return {
-            'salescycle': {'statuses': map(lambda s: {s[0]: s[1]},
-                                           SalesCycle.STATUS_OPTIONS)},
-            'feedback': {'statuses': map(lambda s: {s[0]: s[1]},
-                                         Feedback.STATUS_OPTIONS)},
+            'salescycle': {'statuses': SalesCycle.STATUS_OPTIONS},
+            'activity': {'feedback': Feedback.STATUS_OPTIONS},
             'contacts': {
-                'statuses': map(lambda s: {s[0]: s[1]}, Contact.STATUS_CODES),
-                'tp': map(lambda t: {t[0]: t[1]}, Contact.TYPES_WITH_CAPS)
+                'statuses': Contact.STATUS_CODES,
+                'tp': Contact.TYPES_WITH_CAPS
             },
-            'vcard__email': {'types': map(lambda s: {s[0]: s[1]},
-                                          Email.TYPE_CHOICES)},
-            'vcard__adr': {'types': map(lambda s: {s[0]: s[1]},
-                                        Adr.TYPE_CHOICES)},
-            'vcard__phone': {'types': map(lambda s: {s[0]: s[1]},
-                                          Tel.TYPE_CHOICES)},
+            'vcard': {
+                'email': {'types': Email.TYPE_CHOICES},
+                'adr': {'types': Adr.TYPE_CHOICES},
+                'phone': {'types': Tel.TYPE_CHOICES}
+            }
         }
 
     def get_session(self):
