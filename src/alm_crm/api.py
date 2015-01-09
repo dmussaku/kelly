@@ -1388,7 +1388,7 @@ class ActivityResource(CRMServiceModelResource):
             bundle.data['salescycle_id'] = sales_cycle
         else:
             bundle.data['salescycle_id'] = SalesCycle.objects.get(subscription_id=CRMServiceModelResource.\
-                                            get_crm_subscription(bundle.request).pk, is_global=True)
+                                            get_crm_subscription(bundle.request), is_global=True)
         return bundle
 
     def hydrate_feedback(self, bundle):
