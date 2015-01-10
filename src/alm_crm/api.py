@@ -27,6 +27,7 @@ from .models import (
     Feedback,
     Comment,
     Mention,
+    SalesCycleProductStat
     )
 from alm_vcard.models import *
 from almanet.models import Subscription, Service
@@ -1387,8 +1388,8 @@ class ActivityResource(CRMServiceModelResource):
             sales_cycle = SalesCycle.objects.get(id = bundle.data['salescycle_id'])
             bundle.data['salescycle_id'] = sales_cycle
         else:
-            bundle.data['salescycle_id'] = SalesCycle.objects.get(subscription_id=CRMServiceModelResource.\
-                                            get_crm_subscription(bundle.request), is_global=True)
+            bundle.data['salescycle_id'] = SalesCycle.get_global(subscription_id=CRMServiceModelResource.\
+                                            get_crm_subscription(bundle.request))
         return bundle
 
     def hydrate_feedback(self, bundle):
@@ -2335,3 +2336,15 @@ class AppStateResource(Resource):
                 'sales_cycles': SalesCycleResource().get_bundle_list(sales_cycles, request),
                 'activities': ActivityResource().get_bundle_list(activities, request)
             })
+
+
+class SalesCycleProductStatResource(CRMServiceModelResource):
+    sales_cycle = fields.ToOneField('alm_crm.api.SalesCycleResource',
+                                        'sales_cycle', null=False,
+                                        full=False)
+
+    class Meta(CommonMeta):
+        queryset = SalesCycleProductStat.objects.all()
+        resource_name = 'cycle_product_stat'
+
+
