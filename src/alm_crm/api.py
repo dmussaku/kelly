@@ -1280,6 +1280,27 @@ class SalesCycleResource(CRMServiceModelResource):
             },
             response_class=http.HttpAccepted)
 
+    def save_m2m(self, bundle):
+        for field_name, field_object in self.fields.items():
+            if not getattr(field_object, 'is_m2m', False):
+                continue
+            if not field_object.attribute:
+                continue
+
+            before = bundle.obj.products.all()
+            now = []
+            for field in bundle.data[field_name]:
+                kwargs = {'sales_cycle':SalesCycle.objects.get(pk=bundle.obj.id), 'product':field.obj}
+                try:
+                    SalesCycleProductStat.objects.get_or_create(**kwargs)
+                    now.append(field.obj)
+                except Exception: 
+                    continue
+
+            before_products =  filter(lambda x: x not in now, before)
+            SalesCycleProductStat.objects.filter(sales_cycle=bundle.obj, product__in=before_products).delete()
+
+
 
 class ActivityResource(CRMServiceModelResource):
     """
@@ -2339,12 +2360,30 @@ class AppStateResource(Resource):
 
 
 class SalesCycleProductStatResource(CRMServiceModelResource):
-    sales_cycle = fields.ToOneField('alm_crm.api.SalesCycleResource',
-                                        'sales_cycle', null=False,
-                                        full=False)
+    product_id = fields.ToOneField(
+        'alm_crm.api.ProductResource', 'product', null=False, full=False)
+    sales_cycle = fields.ToOneField(
+        'alm_crm.api.SalesCycleResource', 'sales_cycle', null=False, full=False)
 
     class Meta(CommonMeta):
         queryset = SalesCycleProductStat.objects.all()
         resource_name = 'cycle_product_stat'
+
+    
+    def dehydrate_product_id(self, bundle):
+        return bundle.obj.product.id
+
+    def hydrate_product_id(self, bundle):
+        product = Product.objects.get(id=bundle.data['product_id'])
+        bundle.data['product_id'] = product
+        return bundle
+
+    def dehydrate_sales_cycle(self, bundle):
+        return bundle.obj.product.id
+
+    def hydrate_sales_cycle(self, bundle):
+        sales_cycle = SalesCycle.objects.get(id=bundle.data['sales_cycle'])
+        bundle.data['sales_cycle'] = sales_cycle
+        return bundle
 
 

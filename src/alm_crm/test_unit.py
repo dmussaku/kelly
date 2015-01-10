@@ -816,7 +816,7 @@ class SalesCycleResourceTest(ResourceTestMixin, ResourceTestCase):
 
     def test_patch_sales_cycle_with_products(self):
         patch_data = {
-            'product_ids': [3]
+            'product_ids': [1, 2, 3]
         }
         before = self.sales_cycle.products.count()
 
