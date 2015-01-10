@@ -2200,7 +2200,7 @@ class AppStateObject(object):
 
     def get_constants(self):
         return {
-            'salescycle': {'statuses': SalesCycle.STATUS_OPTIONS},
+            'sales_cycle': {'statuses': SalesCycle.STATUS_OPTIONS},
             'activity': {'feedback': Feedback.STATUS_OPTIONS},
             'contacts': {
                 'statuses': Contact.STATUS_CODES,
