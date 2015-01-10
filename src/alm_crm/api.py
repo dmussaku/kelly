@@ -1290,7 +1290,7 @@ class SalesCycleResource(CRMServiceModelResource):
             before = bundle.obj.products.all()
             now = []
             for field in bundle.data[field_name]:
-                kwargs = {'sales_cycle':SalesCycle.objects.get(pk=bundle.obj.id), 'product':field.obj}
+                kwargs = {'sales_cycle':bundle.obj, 'product':field.obj}
                 try:
                     SalesCycleProductStat.objects.get_or_create(**kwargs)
                     now.append(field.obj)
@@ -1594,6 +1594,28 @@ class ProductResource(CRMServiceModelResource):
     class Meta(CommonMeta):
         queryset = Product.objects.all()
         resource_name = 'product'
+
+    def save_m2m(self, bundle):
+        for field_name, field_object in self.fields.items():
+            if not getattr(field_object, 'is_m2m', False):
+                continue
+            if not field_object.attribute:
+                continue
+
+            before = bundle.obj.sales_cycles.all()
+            now = []
+            for field in bundle.data[field_name]:
+                kwargs = {'product':bundle.obj, 'sales_cycle':field.obj}
+                try:
+                    SalesCycleProductStat.objects.get_or_create(**kwargs)
+                    now.append(field.obj)
+                except Exception: 
+                    continue
+
+            before_sales_cycles =  filter(lambda x: x not in now, before)
+            SalesCycleProductStat.objects.filter(product=bundle.obj, sales_cycle__in=before_sales_cycles).delete()
+
+
 
 
 class ValueResource(CRMServiceModelResource):
