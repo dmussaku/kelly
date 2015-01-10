@@ -691,6 +691,10 @@ class SalesCycle(SubscriptionObject):
         verbose_name = 'sales_cycle'
         db_table = settings.DB_PREFIX.format('sales_cycle')
 
+    @classmethod
+    def get_global(cls, subscription_id):
+        return SalesCycle.objects.get(subscription_id=subscription_id, is_global=True)
+
     def find_latest_activity(self):
         return self.rel_activities.order_by('-date_created').first()
 
