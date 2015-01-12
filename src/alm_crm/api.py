@@ -316,8 +316,11 @@ class ContactResource(CRMServiceModelResource):
     def dehydrate_sales_cycles(self, bundle):
         return [sc.pk for sc in bundle.obj.sales_cycles.all()]
 
+    def dehydrate_owner(self, bundle):
+        return bundle.obj.owner.id
+
     def full_hydrate(self, bundle, **kwargs):
-        t1 = time.time()
+        # t1 = time.time()
         contact_id = kwargs.get('id', None)
         subscription_id = self.get_crm_subscription(bundle.request)
         if contact_id:
@@ -340,22 +343,24 @@ class ContactResource(CRMServiceModelResource):
         if bundle.data.get('parent_id',""):
             bundle.obj.parent_id = int(bundle.data['parent_id'])
         for field_name in bundle.obj._meta.get_all_field_names():
+            
             if bundle.data.get(str(field_name), None):
                 try:
-                    field_object = ast.literal_eval(str(bundle.data.get(str(field_name), None)))
-                except ValueError:
+                    field_object = ast.literal_eval(bundle.data.get(str(field_name), None))
+                except:
                     field_object = bundle.data.get(field_name)
-                if isinstance(field_object, str):
+                
+                if isinstance(field_object, unicode):                    
                     bundle.obj.__setattr__(field_name, field_object)
                 elif isinstance(field_object, list):
                     for obj in field_object:
                         bundle.obj.__getattribute__(field_name).add(int(obj))
                 elif isinstance(field_object, dict):
-                    t2 = time.time() - t1
-                    print "Time to finish contact hydration = %s seconds" % t2
+                    # t2 = time.time() - t1
+                    # print "Time to finish contact hydration = %s seconds" % t2
                     self.vcard_full_hydrate(bundle)
-                    t3 = time.time() - t2
-                    print "Time to finish vcard hydration = %s seconds" % t2
+                    # t3 = time.time() - t2
+                    # print "Time to finish vcard hydration = %s seconds" % t2
         
         bundle.obj.save()
         if bundle.data.get('note') and not kwargs.get('id'):
@@ -428,12 +433,16 @@ class ContactResource(CRMServiceModelResource):
                     for obj in json_objects:
                         if obj.get('id',None):
                             vcard_obj = model.objects.get(id=int(obj.get('id',None)))
+                            vcard_obj.vcard = vcard
                             del obj['id']
                         else:
                             vcard_obj = model()
+                            vcard_obj.vcard = vcard
                         for key, value in obj.viewitems():
-                            vcard_obj.__setattr__(key, value)
-                        vcard_obj.vcard = vcard
+                            if key=='vcard':
+                                vcard_obj.vcard = VCard.objects.get(id=value)
+                            else:
+                                vcard_obj.__setattr__(key, value)
                         vcard_obj.subscription_id = subscription_id
                         vcard_obj.save()
                         id_list.append(vcard_obj.id)
@@ -2076,51 +2085,19 @@ class AppStateObject(object):
             self.current_crmuser.pk, owned=True, assigned=True, followed=True,
             in_shares=True)
 
-        def _get_vcard(vcard):
-            data = {}
-            data.update({
-                'fn': vcard.fn,
-                'org': {
-                    'id': None,  # TODO
-                    'value': vcard.org_set.first() and
-                        vcard.org_set.first().organization_name},
-                'emails': map(lambda e: model_to_dict(
-                    e, fields=['id', 'type', 'value']), vcard.email_set.all()),
-                'phones': map(lambda p: model_to_dict(
-                    p, fields=['id', 'type', 'value']), vcard.tel_set.all()),
-                'urls': map(lambda u: model_to_dict(
-                    u, fields=['id', 'type', 'value']), vcard.url_set.all()),
-                'adrs': map(lambda a: model_to_dict(
-                    a, fields=['id', 'type', 'street_address', 'region',
-                               'locality', 'country_name', 'postal_code']
-                    ), vcard.adr_set.all()),
-                })
-            return data
-
-        def _map(contact):
-            data = model_to_dict(contact, fields=['id', 'status', 'tp'])
-            parent_id = contact.parent and contact.parent.pk
-            data.update({
-                'parent_id': parent_id,
-                'vcard': _get_vcard(contact.vcard),
-                'owner_id': contact.owner.pk,
-                'date_created': contact.date_created.strftime('%Y-%m-%d %H:%M')
-                })
-            return data
-
-        return map(_map, contacts)
+        return ContactResource().get_bundle_list(contacts, self.request)
 
     def get_sales_cycles(self):
         sales_cycles = SalesCycle.get_salescycles_by_last_activity_date(
             self.current_crmuser.pk, all=True, include_activities=False)
 
-        return SalesCycleResource().get_bundle_list(sales_cycles, self.request)
+        return [] #SalesCycleResource().get_bundle_list(sales_cycles, self.request)
 
     def get_activities(self):
         activities = Activity.get_activities_by_date_created(
             self.current_crmuser.pk, all=True, include_sales_cycles=False)
 
-        return ActivityResource().get_bundle_list(activities, self.request)
+        return [] #ActivityResource().get_bundle_list(activities, self.request)
 
     def get_products(self):
         products = Product.get_products()
@@ -2136,17 +2113,7 @@ class AppStateObject(object):
     def get_shares(self):
         shares = Share.get_shares_owned_for(self.current_crmuser.pk)
 
-        def _map(share):
-            data = model_to_dict(share,
-                                 fields=['id', 'share_to', 'share_from'])
-            data.update({
-                'note': None,  # TODO
-                'contact_id': share.contact.pk,
-                'date_created': share.date_created.strftime('%Y-%m-%d %H:%M'),
-                })
-            return data
-
-        return map(_map, shares)
+        return ShareResource().get_bundle_list(shares, self.request)
 
     def get_constants(self):
         return {
