@@ -31,6 +31,7 @@ from .models import (
     )
 from alm_vcard.models import *
 from almanet.models import Subscription, Service
+from alm_user.api import UserResource
 from almanet.settings import DEFAULT_SERVICE
 import ast
 from django.core.files.temp import NamedTemporaryFile
@@ -1620,6 +1621,7 @@ class CRMUserResource(CRMServiceModelResource):
 
     @undocumented: Meta
     '''
+    user = fields.ToOneField('alm_user.api.UserResource', 'user', null=True, full=True)
     unfollow_list = fields.ToManyField(ContactResource, 'unfollow_list', null=True, full=False)
 
     class Meta(CommonMeta):
@@ -1628,6 +1630,14 @@ class CRMUserResource(CRMServiceModelResource):
 
     def dehydrate_unfollow_list(self, bundle):
         return [contact.id for contact in bundle.obj.unfollow_list.all()]
+
+    def full_dehydrate(self, bundle, for_list=False):
+        bundle = super(self.__class__, self).full_dehydrate(bundle, for_list=True)
+        user = bundle.obj.get_billing_user()
+        bundle.data['user'] = UserResource().full_dehydrate(
+                UserResource().build_bundle(obj=user)
+            ).data
+        return bundle 
 
     def prepend_urls(self):
         return [

@@ -7,6 +7,7 @@ from timezone_field import TimeZoneField
 from almanet import signals
 from almanet.models import Subscription
 from almanet.settings import DEFAULT_SERVICE
+from alm_vcard.models import VCard
 
 
 class UserManager(contrib_user_manager):
@@ -36,6 +37,8 @@ class User(AbstractBaseUser):
                                      related_name='users')
     is_admin = models.BooleanField(default=False)
 
+    vcard = models.OneToOneField(VCard, blank=True, null=True)
+    
     class Meta:
         verbose_name = _('user')
         db_table = settings.DB_PREFIX.format('user')
