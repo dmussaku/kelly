@@ -321,7 +321,7 @@ class ContactResource(CRMServiceModelResource):
 
     def full_hydrate(self, bundle, **kwargs):
         # t1 = time.time()
-        contact_id = kwargs.get('id', None)
+        contact_id = kwargs.get('pk', None)
         subscription_id = self.get_crm_subscription(bundle.request)
         if contact_id:
             bundle.obj = Contact.objects.get(id=int(contact_id))
@@ -357,10 +357,8 @@ class ContactResource(CRMServiceModelResource):
                         bundle.obj.__getattribute__(field_name).add(int(obj))
                 elif isinstance(field_object, dict):
                     # t2 = time.time() - t1
-                    # print "Time to finish contact hydration = %s seconds" % t2
                     self.vcard_full_hydrate(bundle)
                     # t3 = time.time() - t2
-                    # print "Time to finish vcard hydration = %s seconds" % t2
         
         bundle.obj.save()
         if bundle.data.get('note') and not kwargs.get('id'):
@@ -714,7 +712,6 @@ class ContactResource(CRMServiceModelResource):
             followed=followed,
             limit=limit+20,
             offset=offset)
-        print "Len of contacts =%s" % len(contacts)
         if not include_activities:
             return self.create_response(
                 request,
