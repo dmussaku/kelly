@@ -9,6 +9,7 @@ from tastypie.authentication import (
     SessionAuthentication,
     BasicAuthentication,
     )
+from tastypie.paginator import Paginator
 from django.conf.urls import url
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.core.files.temp import NamedTemporaryFile
@@ -51,7 +52,6 @@ from django.http import HttpResponse
 import json
 import datetime
 import time
-
 
 class CommonMeta:
     list_allowed_methods = ['get', 'post', 'patch']
@@ -176,14 +176,18 @@ class ContactResource(CRMServiceModelResource):
         'alm_crm.api.ContactResource', 'parent',
         null=True, full=False
         )
-    shares = fields.ToManyField(
-        'alm_crm.api.ShareResource', 'shares',
+    share = fields.ToOneField(
+        'alm_crm.api.ShareResource', 'share',
         null=True, full=True
         )
 
     class Meta(CommonMeta):
         queryset = Contact.objects.all()
         resource_name = 'contact'
+        filtering={
+            'status':['exact'],
+            'tp':['exact']
+        }
 
     def post_list(self, request, **kwargs):
         '''
@@ -213,6 +217,32 @@ class ContactResource(CRMServiceModelResource):
 
         '''
         return super(self.__class__, self).post_list(request, **kwargs)
+
+    def get_meta_dict(self, limit, offset, count, url):
+        obj_dict={}
+        obj_dict['limit'] = limit
+        obj_dict['offset'] = offset
+        obj_dict['url'] = url
+
+
+        obj_dict['next'] = self.get_next(limit, offset, count, url)
+        obj_dict['previous'] = self.get_previous(limit, offset, url)
+
+        return obj_dict
+
+    def get_previous(self, limit, offset, url):
+        if offset-limit<0:
+            return None
+        if not url[len(url)-1]=='/':
+            url+'/'
+        return url+'?limit=%s&offset=%s' % (limit, offset-limit)
+            
+    def get_next(self, limit, offset, count, url):
+        if offset + limit >= count:
+            return None
+        if not url[len(url)-1]=='/':
+            url+'/'
+        return url+'?limit=%s&offset=%s' % (limit, offset+limit)
 
     def obj_create(self, bundle, **kwargs):
         """
@@ -287,15 +317,25 @@ class ContactResource(CRMServiceModelResource):
     def dehydrate_sales_cycles(self, bundle):
         return [sc.pk for sc in bundle.obj.sales_cycles.all()]
 
+    def dehydrate_owner(self, bundle):
+        return bundle.obj.owner.id
+
     def full_hydrate(self, bundle, **kwargs):
-        t1 = time.time()
-        contact_id = kwargs.get('id', None)
+        # t1 = time.time()
+        print bundle.request
+        contact_id = kwargs.get('pk', None)
+        subscription_id = self.get_crm_subscription(bundle.request)
         if contact_id:
             bundle.obj = Contact.objects.get(id=int(contact_id))
+            bundle.obj.subscription_id = subscription_id
         else:
             bundle.obj = self._meta.object_class()
+            bundle.obj.subscription_id = subscription_id
             # bundle.obj.owner_id = bundle.request.user.get_crmuser().id
             bundle.obj.save()
+            for user in CRMUser.objects.filter(subscription_id=subscription_id):
+                bundle.obj.followers.add(user)
+            
         '''
         Go through all field names in the Contact Model and check with
         the json that has been submitted. So if the attribute is there
@@ -303,42 +343,44 @@ class ContactResource(CRMServiceModelResource):
         i got in a json. If its missing then i just delete it.
 
         '''
-        if bundle.data.get('is_company',""):
-            if bundle.data['is_company']==1:
-                bundle.obj.tp='co'
-            else:
-                bundle.obj.tp='user'
-        if bundle.data.get('author_id',""):
-            bundle.obj.owner_id = int(bundle.data['author_id'])
+        if bundle.data.get('user_id',""):
+            bundle.obj.owner_id = int(bundle.data['user_id'])
         if bundle.data.get('parent_id',""):
             bundle.obj.parent_id = int(bundle.data['parent_id'])
         for field_name in bundle.obj._meta.get_all_field_names():
-            if bundle.data.get(field_name, None):
-                field_object = ast.literal_eval(str(bundle.data.get(field_name, None)))
-                if isinstance(field_object, str):
+            if bundle.data.get(str(field_name), None):
+                try:
+                    field_object = ast.literal_eval(bundle.data.get(str(field_name), None))
+                except:
+                    field_object = bundle.data.get(field_name)
+                if field_name=='followers':
+                    print 'passed on followers'
+                    pass
+                elif isinstance(field_object, unicode):                    
                     bundle.obj.__setattr__(field_name, field_object)
                 elif isinstance(field_object, list):
                     for obj in field_object:
                         bundle.obj.__getattribute__(field_name).add(int(obj))
                 elif isinstance(field_object, dict):
-                    t2 = time.time() - t1
-                    print "Time to finish contact hydration = %s seconds" % t2
+                    # t2 = time.time() - t1
                     self.vcard_full_hydrate(bundle)
-                    t3 = time.time() - t2
-                    print "Time to finish vcard hydration = %s seconds" % t2
+                    # t3 = time.time() - t2
+        
         bundle.obj.save()
         if bundle.data.get('note') and not kwargs.get('id'):
             share = Share(
                     description=bundle.data.get('note'),
-                    share_to_id=int(bundle.data['author_id']),
-                    share_from_id=int(bundle.data['author_id']),
-                    contact_id=bundle.obj.id
+                    share_to_id=int(bundle.data['user_id']),
+                    share_from_id=int(bundle.data['user_id']),
+                    contact_id=bundle.obj.id,
+                    subscription_id=subscription_id
                     )
             share.save()
         return bundle
 
     def vcard_full_hydrate(self, bundle):
         field_object = bundle.data.get('vcard',{})
+        subscription_id = self.get_crm_subscription(bundle.request)
         if bundle.obj.vcard:
             vcard = bundle.obj.vcard
         else:
@@ -395,12 +437,17 @@ class ContactResource(CRMServiceModelResource):
                     for obj in json_objects:
                         if obj.get('id',None):
                             vcard_obj = model.objects.get(id=int(obj.get('id',None)))
+                            vcard_obj.vcard = vcard
                             del obj['id']
                         else:
                             vcard_obj = model()
+                            vcard_obj.vcard = vcard
                         for key, value in obj.viewitems():
-                            vcard_obj.__setattr__(key, value)
-                        vcard_obj.vcard = vcard
+                            if key=='vcard':
+                                vcard_obj.vcard = VCard.objects.get(id=value)
+                            else:
+                                vcard_obj.__setattr__(key, value)
+                        vcard_obj.subscription_id = subscription_id
                         vcard_obj.save()
                         id_list.append(vcard_obj.id)
                     for obj in queryset:
@@ -409,6 +456,7 @@ class ContactResource(CRMServiceModelResource):
                 else:
                     for obj in model.objects.filter(vcard=vcard):
                         obj.delete()
+        vcard.subscription_id = subscription_id
         vcard.save()
 
     def save(self, bundle, skip_errors=False):
@@ -453,6 +501,24 @@ class ContactResource(CRMServiceModelResource):
     def prepend_urls(self):
         return [
             url(
+                r"^(?P<resource_name>%s)/(?P<contact_id>\d+)/assign_company_contact/(?P<company_contact_id>\d+)%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('assign_company_contact'),
+                name='api_assign_company_contact'
+            ),
+            url(
+                r"^(?P<resource_name>%s)/follow/(?P<contact_ids>\w+)%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('follow_contacts'),
+                name='api_follow_contacts'
+            ),
+            url(
+                r"^(?P<resource_name>%s)/unfollow/(?P<contact_ids>\w+)%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('unfollow_contacts'),
+                name='api_unfollow_contacts'
+            ),
+            url(
                 r"^(?P<resource_name>%s)/recent%s$" %
                 (self._meta.resource_name, trailing_slash()),
                 self.wrap_view('get_last_contacted'),
@@ -475,18 +541,6 @@ class ContactResource(CRMServiceModelResource):
                 (self._meta.resource_name, trailing_slash()),
                 self.wrap_view('search'),
                 name='api_search'
-            ),
-            url(
-                r"^(?P<resource_name>%s)/assign_contact%s$" %
-                (self._meta.resource_name, trailing_slash()),
-                self.wrap_view('assign_contact'),
-                name='api_assign_contact'
-            ),
-            url(
-                r"^(?P<resource_name>%s)/assign_contacts%s$" %
-                (self._meta.resource_name, trailing_slash()),
-                self.wrap_view('assign_contacts'),
-                name='api_assign_contacts'
             ),
             url(
                 r"^(?P<resource_name>%s)/(?P<id>\d+)/products%s$" %
@@ -525,6 +579,81 @@ class ContactResource(CRMServiceModelResource):
                 name='api_export_contacts_to_vcard'
             ),
         ]
+    def follow_contacts(self, request, **kwargs):
+        print 'following'
+        if kwargs.get('contact_ids'):
+            try:
+                contact_ids = ast.literal_eval(
+                    kwargs.get('contact_ids'))
+            except:
+                return self.create_response(
+                    request, {'success':False, 'message':'Pass a list as a parameter'}
+                    )
+        crmuser = request.user.get_crmuser()
+        for contact_id in contact_ids:
+            try:
+                crmuser.unfollow_list.remove(
+                    Contact.objects.get(id=contact_id))
+            except DoesNotExist:
+                return self.create_response(
+                    request, {'success':False, 'message':'Contact with a given id does not exist'}
+                    )
+        crmuser.save()
+        return self.create_response(
+                    request, {'success':True, 'message':'You successfully followed %s' % contact}
+                    )
+
+    def unfollow_contacts(self, request, **kwargs):
+        if kwargs.get('contact_ids'):
+            try:
+                contact_ids = ast.literal_eval(
+                    kwargs.get('contact_ids'))
+            except:
+                return self.create_response(
+                    request, {'success':False, 'message':'Pass a list as a parameter'}
+                    )
+        crmuser = request.user.get_crmuser()
+        for contact_id in contact_ids:
+            try:
+                crmuser.unfollow_list.add(
+                    Contact.objects.get(id=contact_id))
+            except DoesNotExist:
+                return self.create_response(
+                    request, {'success':False, 'message':'Contact with a given id does not exist'}
+                    )
+        crmuser.save()
+        return self.create_response(
+                    request, {'success':True, 'message':'You successfully followed %s' % contact}
+                    )
+
+    def assign_company_contact(self, request, **kwargs):
+        if kwargs.get('contact_id'):
+            try:
+                contact = Contact.objects.get(
+                    id=int(kwargs.get('contact_id'))
+                    )
+            except:
+                return self.create_response(
+                    request, {'success':False, 'message':'Contact with such id does not exist'}
+                    )
+        if kwargs.get('company_contact_id'):
+            try:
+                company_contact = Contact.objects.get(
+                    id=int(kwargs.get('company_contact_id'))
+                    )
+                if company_contact.tp == 'user':
+                    return self.create_response(
+                        request, {'success':False, 'message':'Company Contact with such id is not of company type'}
+                        )
+            except:
+                return self.create_response(
+                    request, {'success':False, 'message':'Company Contact with such id does not exist'}
+                    )
+        contact.parent_id = company_contact.id
+        contact.save()
+        return self.create_response(
+                    request, {'success':True, 'message':'Contact has been assigned to a Company Contact'}
+                    )
 
     def get_last_contacted(self, request, **kwargs):
         '''
@@ -588,12 +717,14 @@ class ContactResource(CRMServiceModelResource):
             owned=owned,
             assigned=assigned,
             followed=followed,
-            limit=limit,
+            limit=limit+20,
             offset=offset)
         if not include_activities:
             return self.create_response(
                 request,
-                {'objects': self.get_bundle_list(contacts, request)}
+                {
+                'meta':self.get_meta_dict(limit, offset, len(contacts), 'api/v1/contact/'),
+                'objects': self.get_bundle_list(contacts, request)}
                 )
         else:
             '''
@@ -879,82 +1010,6 @@ class ContactResource(CRMServiceModelResource):
                 'offset': offset
             },
             'objects': self.get_bundle_list(contacts, request)}
-            )
-
-    def assign_contact(self, request, **kwargs):
-        '''
-        GET METHOD
-        I{URL}:  U{alma.net/api/v1/contact/assign_contact/}
-
-        Description
-        Assign a signle user to a signle contact
-
-        @type  user_id: number
-        @param user_id: user id
-        @type  contact_id: number
-        @param contact_id: contact id
-
-
-        @return: json.
-
-        >>>
-        ... {
-        ...     'success':True
-        ... },
-        '''
-        user_id = int(request.GET.get('user_id', 0))
-        if not user_id:
-            return self.create_response(
-                request,
-                {'success': False, 'error_string': 'User id is not set'}
-                )
-        contact_id = int(request.GET.get('contact_id', 0))
-        if not contact_id:
-            return self.create_response(
-                request,
-                {'success': False, 'error_string': 'Contact id is not set'}
-                )
-        return self.create_response(
-            request,
-            {'success': Contact.assign_user_to_contact(user_id, contact_id)}
-            )
-
-    def assign_contacts(self, request, **kwargs):
-        '''
-        GET METHOD
-        I{URL}:  U{alma.net/api/v1/contact/assign_contacts/}
-
-        Description
-        Assign a single user to multiple contacts
-
-        @type  user_id: number
-        @param user_id: user id
-        @type  contact_ids: list
-        @param contact_ids: List of contact ids, [1,2,3]
-
-
-        @return: json.
-
-        >>>
-        ... {
-        ...     'success':True
-        ... },
-        '''
-        user_id = int(request.GET.get('user_id', 0))
-        if not user_id:
-            return self.create_response(
-                request,
-                {'success': False, 'error_string': 'User id is not set'}
-                )
-        contact_ids = ast.literal_eval(request.GET.get('contact_ids', []))
-        if not contact_ids:
-            return self.create_response(
-                request,
-                {'success': False, 'error_string': 'Contact ids are not set'}
-                )
-        return self.create_response(
-            request,
-            {'success': Contact.assign_user_to_contacts(user_id, contact_ids)}
             )
 
     def share_contact(self, request, **kwargs):
@@ -1710,10 +1765,55 @@ class CRMUserResource(CRMServiceModelResource):
 
     @undocumented: Meta
     '''
+    unfollow_list = fields.ToManyField(ContactResource, 'unfollow_list', null=True, full=False)
 
     class Meta(CommonMeta):
         queryset = CRMUser.objects.all()
         resource_name = 'crmuser'
+
+    def dehydrate_unfollow_list(self, bundle):
+        return [contact.id for contact in bundle.obj.unfollow_list.all()]
+
+    def prepend_urls(self):
+        return [
+            url(
+                r"^(?P<resource_name>%s)/follow_unfollow%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('follow_unfollow'),
+                name='api_follow_unfollow'
+            ),
+        ]
+    def follow_unfollow(self, request, **kwargs):
+        data = self.deserialize(request, request.body, format=request.META.get('CONTENT_TYPE', 'application/json'))
+        contact_ids = data.get('contact_ids', None)
+        if contact_ids:
+            if type(contact_ids)!=list:
+                return self.create_response(
+                    request, {'success':False, 'message':'Pass a list as a parameter'}
+                    )
+        else:
+            return self.create_response(
+                    request, {'success':False, 'message':'Must pass a contact_ids parameter'}
+                    )
+        crmuser = request.user.get_crmuser()
+        unfollow_list = [contact.id for contact in crmuser.unfollow_list.all()]
+        for contact_id in contact_ids:
+            if contact_id in unfollow_list:
+                crmuser.unfollow_list.remove(contact_id) 
+            else:
+                crmuser.unfollow_list.add(contact_id) 
+        crmuser.save()
+        raise ImmediateHttpResponse(
+            HttpResponse(
+                content=Serializer().to_json(
+                    self.full_dehydrate(
+                        self.build_bundle(
+                            obj=crmuser)
+                        )
+                    ),
+                content_type='application/json; charset=utf-8', status=200
+                )
+            )
 
 
 class ShareResource(CRMServiceModelResource):
@@ -2178,51 +2278,19 @@ class AppStateObject(object):
             self.current_crmuser.pk, owned=True, assigned=True, followed=True,
             in_shares=True)
 
-        def _get_vcard(vcard):
-            data = {}
-            data.update({
-                'fn': vcard.fn,
-                'org': {
-                    'id': None,  # TODO
-                    'value': vcard.org_set.first() and
-                        vcard.org_set.first().organization_name},
-                'emails': map(lambda e: model_to_dict(
-                    e, fields=['id', 'type', 'value']), vcard.email_set.all()),
-                'phones': map(lambda p: model_to_dict(
-                    p, fields=['id', 'type', 'value']), vcard.tel_set.all()),
-                'urls': map(lambda u: model_to_dict(
-                    u, fields=['id', 'type', 'value']), vcard.url_set.all()),
-                'adrs': map(lambda a: model_to_dict(
-                    a, fields=['id', 'type', 'street_address', 'region',
-                               'locality', 'country_name', 'postal_code']
-                    ), vcard.adr_set.all()),
-                })
-            return data
-
-        def _map(contact):
-            data = model_to_dict(contact, fields=['id', 'status', 'tp'])
-            parent_id = contact.parent and contact.parent.pk
-            data.update({
-                'parent_id': parent_id,
-                'vcard': _get_vcard(contact.vcard),
-                'owner_id': contact.owner.pk,
-                'date_created': contact.date_created.strftime('%Y-%m-%d %H:%M')
-                })
-            return data
-
-        return map(_map, contacts)
+        return ContactResource().get_bundle_list(contacts, self.request)
 
     def get_sales_cycles(self):
         sales_cycles = SalesCycle.get_salescycles_by_last_activity_date(
             self.current_crmuser.pk, all=True, include_activities=False)
 
-        return SalesCycleResource().get_bundle_list(sales_cycles, self.request)
+        return [] #SalesCycleResource().get_bundle_list(sales_cycles, self.request)
 
     def get_activities(self):
         activities = Activity.get_activities_by_date_created(
             self.current_crmuser.pk, all=True, include_sales_cycles=False)
 
-        return ActivityResource().get_bundle_list(activities, self.request)
+        return [] #ActivityResource().get_bundle_list(activities, self.request)
 
     def get_products(self):
         products = Product.get_products()
@@ -2238,17 +2306,7 @@ class AppStateObject(object):
     def get_shares(self):
         shares = Share.get_shares_owned_for(self.current_crmuser.pk)
 
-        def _map(share):
-            data = model_to_dict(share,
-                                 fields=['id', 'share_to', 'share_from'])
-            data.update({
-                'note': None,  # TODO
-                'contact_id': share.contact.pk,
-                'date_created': share.date_created.strftime('%Y-%m-%d %H:%M'),
-                })
-            return data
-
-        return map(_map, shares)
+        return ShareResource().get_bundle_list(shares, self.request)
 
     def get_constants(self):
         return {
