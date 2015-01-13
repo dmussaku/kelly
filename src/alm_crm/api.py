@@ -1236,10 +1236,10 @@ class SalesCycleResource(CRMServiceModelResource):
                 name='api_close_cycle'
             ),
             url(
-                r"^(?P<resource_name>%s)/(?P<id>\d+)/replace_products%s$" %
+                r"^(?P<resource_name>%s)/(?P<id>\d+)/product_ids%s$" %
                 (self._meta.resource_name, trailing_slash()),
-                self.wrap_view('replace_products'),
-                name='api_replace_products'
+                self.wrap_view('product_ids'),
+                name='api_product_ids'
             ),
         ]
 
@@ -1343,7 +1343,7 @@ class SalesCycleResource(CRMServiceModelResource):
             },
             response_class=http.HttpAccepted)
 
-    def replace_products(self, request, **kwargs):
+    def product_ids(self, request, **kwargs):
         # {'products': [1,2,3,45]}
         # self.obj.products.clear()
         # products = Product.objects.filter(pk__in=products)
@@ -1360,6 +1360,11 @@ class SalesCycleResource(CRMServiceModelResource):
                 "More than one resource is found at this URI.")
         bundle = self.build_bundle(obj=obj, request=request)
 
+        get_product_ids = lambda: list(obj.products.values_list('pk', flat=True))
+
+        if request.method == 'GET':
+            return self.create_response(request, get_product_ids())
+
         # get PUT's data from request.body
         deserialized = self.deserialize(
             request, request.body,
@@ -1368,9 +1373,12 @@ class SalesCycleResource(CRMServiceModelResource):
 
         obj.products.clear()
         obj.add_products(deserialized['product_ids'])
-        obj_dict = {}
-        obj_dict['success'] = obj
-        return self.create_response(request, obj_dict, response_class=http.HttpAccepted)
+
+        if not self._meta.always_return_data:
+            return http.HttpAccepted(location=location)
+        else:
+            return self.create_response(request, get_product_ids(),
+                                        response_class=http.HttpAccepted)
 
     # def save_m2m(self, bundle):
     #     for field_name, field_object in self.fields.items():

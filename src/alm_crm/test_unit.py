@@ -811,29 +811,40 @@ class SalesCycleResourceTest(ResourceTestMixin, ResourceTestCase):
             self.user.get_subscr_user(sales_cycle.subscription_id)
             )
 
-    # def test_patch_sales_cycle_with_products(self):
-    #     patch_data = {
-    #         'product_ids': [1, 2, 3]
-    #     }
-    #     before = self.sales_cycle.products.count()
+    @skipIf(True, "Resource needs in overwrite save_m2m() to create with M2M-relations")
+    def test_patch_sales_cycle_with_products(self):
+        patch_data = {
+            'product_ids': [1, 2, 3]
+        }
+        before = self.sales_cycle.products.count()
 
-    #     resp = self.api_client.patch(
-    #         self.api_path_sales_cycle+str(self.sales_cycle.pk)+'/',
-    #         format='json',
-    #         data=patch_data)
-    #     self.assertHttpAccepted(resp)
-    #     self.assertNotEqual(before, self.sales_cycle.products.count())
+        resp = self.api_client.patch(
+            self.api_path_sales_cycle+str(self.sales_cycle.pk)+'/',
+            format='json',
+            data=patch_data)
+        self.assertHttpAccepted(resp)
+        self.assertNotEqual(before, self.sales_cycle.products.count())
 
-    def test_replace_products(self):
-        post_data = {
+    def test_get_product_ids(self):
+        resp = self.api_client.get(
+            self.api_path_sales_cycle+str(self.sales_cycle.pk)+'/product_ids/',
+            format='json')
+        resp = self.deserialize(resp)
+        self.assertIsInstance(resp, list)
+        self.assertEqual(len(resp), self.sales_cycle.products.count())
+
+    def test_update_product_ids(self):
+        put_data = {
             "product_ids": [1, 2, 3]
         }
         before = self.sales_cycle.products.count()
-        resp = self.api_client.post(
-            self.api_path_sales_cycle+str(self.sales_cycle.pk)+'/replace_products/',
-            format='json', data=post_data)
+        resp = self.api_client.put(
+            self.api_path_sales_cycle+str(self.sales_cycle.pk)+'/product_ids/',
+            format='json', data=put_data)
         self.assertHttpAccepted(resp)
+        resp = self.deserialize(resp)
         self.assertNotEqual(before, self.sales_cycle.products.count())
+        self.assertEqual(len(resp), self.sales_cycle.products.count())
 
     @skipIf(True, "now, activities is not presented in SalesCycleResource")
     def test_create_sales_cycle_with_activity(self):
@@ -1715,7 +1726,7 @@ class ShareResourceTest(ResourceTestMixin, ResourceTestCase):
         self.assertEqual(share_from.owned_shares.count(), count_owned_shares+1)
         self.assertEqual(contact.shares.count(), count_contact_shares+1)
         # verify that subscription_id was set
-        self.assertIsInstance(Share.objects.last().subscription_id, int)        
+        self.assertIsInstance(Share.objects.last().subscription_id, int)
         # verify that owner was set
         self.assertIsInstance(Share.objects.last().share_to, CRMUser)
         self.assertIsInstance(Share.objects.last().share_from, CRMUser)
@@ -1760,13 +1771,13 @@ class TestCreationGlobalSalesCycle(TestCase):
 
     def test_connect_service(self):
         crm_user = self.user.get_crmuser()
-        
+
         with self.assertRaises(SalesCycle.DoesNotExist):
-            SalesCycle.objects.get(owner=crm_user, is_global=True) 
-        
+            SalesCycle.objects.get(owner=crm_user, is_global=True)
+
         self.user.connect_service(service=Service.objects.first())
         self.assertIsInstance(crm_user, CRMUser)
         self.assertTrue(SalesCycle.objects.get(owner=crm_user, is_global=True))
         self.assertEqual(SalesCycle.objects.get(owner=crm_user, is_global=True).title, GLOBAL_CYCLE_TITLE)
-        
+
 
