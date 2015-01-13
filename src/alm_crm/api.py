@@ -1186,9 +1186,9 @@ class SalesCycleResource(CRMServiceModelResource):
     # activities = fields.ToManyField(
     #     'alm_crm.api.ActivityResource', 'rel_activities',
     #     related_name='sales_cycle', null=True, full=True)
-    products = fields.ToManyField(
-        'alm_crm.api.ProductResource', 'products',
-        related_name='sales_cycles', null=True, full=False, readonly=True)
+    # products = fields.ToManyField(
+    #     'alm_crm.api.ProductResource', 'products',
+    #     related_name='sales_cycles', null=True, full=False, readonly=True)
     # product_ids = fields.ToManyField(
     #     'alm_crm.api.ProductResource', 'products',
     #     related_name='sales_cycles', null=True, full=False)
@@ -1210,7 +1210,7 @@ class SalesCycleResource(CRMServiceModelResource):
         always_return_data = True
 
     def dehydrate(self, bundle):
-        bundle.data['product_ids'] = [p.pk for p in bundle.obj.products.all()]
+        # bundle.data['product_ids'] = [p.pk for p in bundle.obj.products.all()]
         return bundle
 
     # def dehydrate_products(self, bundle):
@@ -1391,7 +1391,6 @@ class SalesCycleResource(CRMServiceModelResource):
 
     #         before_products =  filter(lambda x: x not in now, before)
     #         SalesCycleProductStat.objects.filter(sales_cycle=bundle.obj, product__in=before_products).delete()
-
 
 
 class ActivityResource(CRMServiceModelResource):
@@ -2251,6 +2250,7 @@ class AppStateObject(object):
             'sales_cycles': self.get_sales_cycles(),
             'activities': self.get_activities(),
             'products': self.get_products(),
+            'sales_cycles_to_products_map': self.get_sales_cycle2products_map()
         }
         self.constants = self.get_constants()
         self.session = self.get_session()
@@ -2301,6 +2301,16 @@ class AppStateObject(object):
             return data
 
         return map(_map, products)
+
+    def get_sales_cycle2products_map(self):
+        sales_cycles = SalesCycle.get_salescycles_by_last_activity_date(
+            self.current_crmuser.pk, all=True, include_activities=False)
+
+        data = {}
+        for sc in sales_cycles:
+            data[sc.id] = list(sc.products.values_list('pk', flat=True))
+
+        return data
 
     def get_shares(self):
         shares = Share.get_shares_owned_for(self.current_crmuser.pk)
