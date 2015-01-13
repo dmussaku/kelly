@@ -76,6 +76,12 @@ class VCardResource(ModelResource):
 class VCardRelatedResource(ModelResource):
     vcard = fields.ForeignKey(VCardResource, 'vcard')
 
+    def hydrate_vcard(self, bundle):
+        vcard_id = bundle.data.get('vcard',"")
+        if (vcard and type(vcard_id)==int):
+            bundle.obj.vcard = VCard.objects.get(id=vcard_id)
+        return bundle
+
     def dehydrate_vcard(self, bundle):
         return bundle.obj.vcard_id
 
