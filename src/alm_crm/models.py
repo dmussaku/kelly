@@ -39,7 +39,7 @@ class CRMUser(SubscriptionObject):
     organization_id = models.IntegerField(_('organization id'))
     is_supervisor = models.BooleanField(_('is supervisor'), default=False)
     unfollow_list = models.ManyToManyField(
-        'Contact', related_name='unfollowers', 
+        'Contact', related_name='unfollowers',
         null=True, blank=True
         )
 
@@ -116,14 +116,14 @@ class Contact(SubscriptionObject):
         'Activity', on_delete=models.SET_NULL,
         related_name='contact_latest_activity', null=True)
     mentions = generic.GenericRelation('Mention')
-    comments = generic.GenericRelation('Comment')    
+    comments = generic.GenericRelation('Comment')
     followers = models.ManyToManyField(
         CRMUser, related_name='following_contacts',
         null=True, blank=True)
     assignees = models.ManyToManyField(
         CRMUser, related_name='assigned_contacts',
         null=True, blank=True)
-    
+
 
     class Meta:
         verbose_name = _('contact')
@@ -499,8 +499,8 @@ class Contact(SubscriptionObject):
     @classmethod
     def get_contacts_by_last_activity_date(
             cls, user_id, owned=True, assigned=False,
-            followed=False, in_shares=False, include_activities=False,
-            limit=20, offset=0):
+            followed=False, in_shares=False, all=False,
+            include_activities=False):
         """TEST Returns list of contacts ordered by last activity date.
             Returns:
                 Queryset<Contact>
@@ -522,21 +522,24 @@ class Contact(SubscriptionObject):
         # SECOND IMPL
         # contact_activity_map follows structure suggested by Askhat.
         q = Q()
-        if owned:
-            q |= Q(owner_id=user_id)
-        if assigned:
-            q |= Q(assignees__user_id=user_id)
-        if followed:
-            q |= Q(followers__user_id=user_id)
-        if in_shares:
-            crmuser = CRMUser.objects.get(pk=user_id)
-            shares = crmuser.in_shares
-            q |= Q(id__in=set(shares.values_list('contact_id', flat=True)))
-        if len(q.children) == 0:
+        if all:
+            q |= Q()
+        else:
+            if owned:
+                q |= Q(owner_id=user_id)
+            if assigned:
+                q |= Q(assignees__user_id=user_id)
+            if followed:
+                q |= Q(followers__user_id=user_id)
+            if in_shares:
+                crmuser = CRMUser.objects.get(pk=user_id)
+                shares = crmuser.in_shares
+                q |= Q(id__in=set(shares.values_list('contact_id', flat=True)))
+        if not all and len(q.children) == 0:
             contacts = cls.objects.none()
         else:
             contacts = cls.objects.filter(q).order_by(
-                '-latest_activity__date_created')[offset:offset + limit]
+                '-latest_activity__date_created')
         if not include_activities:
             return contacts
         contact_activity_map = dict()

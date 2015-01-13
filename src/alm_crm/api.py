@@ -236,7 +236,7 @@ class ContactResource(CRMServiceModelResource):
         if not url[len(url)-1]=='/':
             url+'/'
         return url+'?limit=%s&offset=%s' % (limit, offset-limit)
-            
+
     def get_next(self, limit, offset, count, url):
         if offset + limit >= count:
             return None
@@ -335,7 +335,7 @@ class ContactResource(CRMServiceModelResource):
             bundle.obj.save()
             for user in CRMUser.objects.filter(subscription_id=subscription_id):
                 bundle.obj.followers.add(user)
-            
+
         '''
         Go through all field names in the Contact Model and check with
         the json that has been submitted. So if the attribute is there
@@ -356,7 +356,7 @@ class ContactResource(CRMServiceModelResource):
                 if field_name=='followers':
                     print 'passed on followers'
                     pass
-                elif isinstance(field_object, unicode):                    
+                elif isinstance(field_object, unicode):
                     bundle.obj.__setattr__(field_name, field_object)
                 elif isinstance(field_object, list):
                     for obj in field_object:
@@ -365,7 +365,7 @@ class ContactResource(CRMServiceModelResource):
                     # t2 = time.time() - t1
                     self.vcard_full_hydrate(bundle)
                     # t3 = time.time() - t2
-        
+
         bundle.obj.save()
         if bundle.data.get('note') and not kwargs.get('id'):
             share = Share(
@@ -1310,7 +1310,7 @@ class SalesCycleResource(CRMServiceModelResource):
         I{URL}:  U{alma.net/api/v1/sales_cycle/:id/close_cycle/}
 
         B{Description}:
-        close SalesCycle, set value of SalesCycleProductStat 
+        close SalesCycle, set value of SalesCycleProductStat
         update status to 'C'('Completed')
 
         @return: updated SalesCycle and close Activity
@@ -1343,7 +1343,7 @@ class SalesCycleResource(CRMServiceModelResource):
             },
             response_class=http.HttpAccepted)
 
-    def replace_products(self, request, **kwargs):    
+    def replace_products(self, request, **kwargs):
         # {'products': [1,2,3,45]}
         # self.obj.products.clear()
         # products = Product.objects.filter(pk__in=products)
@@ -1365,7 +1365,7 @@ class SalesCycleResource(CRMServiceModelResource):
             request, request.body,
             format=request.META.get('CONTENT_TYPE', 'application/json'))
         deserialized = self.alter_deserialized_list_data(request, deserialized)
-        
+
         obj.products.clear()
         obj.add_products(deserialized['product_ids'])
         obj_dict = {}
@@ -1386,7 +1386,7 @@ class SalesCycleResource(CRMServiceModelResource):
     #             try:
     #                 SalesCycleProductStat.objects.get_or_create(**kwargs)
     #                 now.append(field.obj)
-    #             except Exception: 
+    #             except Exception:
     #                 continue
 
     #         before_products =  filter(lambda x: x not in now, before)
@@ -1697,7 +1697,7 @@ class ProductResource(CRMServiceModelResource):
             ),
         ]
 
-    def replace_cycles(self, request, **kwargs):    
+    def replace_cycles(self, request, **kwargs):
         # {'products': [1,2,3,45]}
         # self.obj.products.clear()
         # products = Product.objects.filter(pk__in=products)
@@ -1799,9 +1799,9 @@ class CRMUserResource(CRMServiceModelResource):
         unfollow_list = [contact.id for contact in crmuser.unfollow_list.all()]
         for contact_id in contact_ids:
             if contact_id in unfollow_list:
-                crmuser.unfollow_list.remove(contact_id) 
+                crmuser.unfollow_list.remove(contact_id)
             else:
-                crmuser.unfollow_list.add(contact_id) 
+                crmuser.unfollow_list.add(contact_id)
         crmuser.save()
         raise ImmediateHttpResponse(
             HttpResponse(
@@ -2275,8 +2275,7 @@ class AppStateObject(object):
 
     def get_contacts(self):
         contacts = Contact.get_contacts_by_last_activity_date(
-            self.current_crmuser.pk, owned=True, assigned=True, followed=True,
-            in_shares=True)
+            self.current_crmuser.pk, all=True)
 
         return ContactResource().get_bundle_list(contacts, self.request)
 
@@ -2284,13 +2283,13 @@ class AppStateObject(object):
         sales_cycles = SalesCycle.get_salescycles_by_last_activity_date(
             self.current_crmuser.pk, all=True, include_activities=False)
 
-        return [] #SalesCycleResource().get_bundle_list(sales_cycles, self.request)
+        return SalesCycleResource().get_bundle_list(sales_cycles, self.request)
 
     def get_activities(self):
         activities = Activity.get_activities_by_date_created(
             self.current_crmuser.pk, all=True, include_sales_cycles=False)
 
-        return [] #ActivityResource().get_bundle_list(activities, self.request)
+        return ActivityResource().get_bundle_list(activities, self.request)
 
     def get_products(self):
         products = Product.get_products()
@@ -2501,7 +2500,7 @@ class SalesCycleProductStatResource(CRMServiceModelResource):
         queryset = SalesCycleProductStat.objects.all()
         resource_name = 'cycle_product_stat'
 
-    
+
     def dehydrate_product_id(self, bundle):
         return bundle.obj.product.id
 
