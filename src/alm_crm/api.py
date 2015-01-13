@@ -321,6 +321,7 @@ class ContactResource(CRMServiceModelResource):
 
     def full_hydrate(self, bundle, **kwargs):
         # t1 = time.time()
+        print bundle.request
         contact_id = kwargs.get('pk', None)
         subscription_id = self.get_crm_subscription(bundle.request)
         if contact_id:
@@ -331,6 +332,9 @@ class ContactResource(CRMServiceModelResource):
             bundle.obj.subscription_id = subscription_id
             # bundle.obj.owner_id = bundle.request.user.get_crmuser().id
             bundle.obj.save()
+            for user in CRMUser.objects.filter(subscription_id=subscription_id):
+                bundle.obj.followers.add(user)
+            
         '''
         Go through all field names in the Contact Model and check with
         the json that has been submitted. So if the attribute is there
@@ -343,14 +347,15 @@ class ContactResource(CRMServiceModelResource):
         if bundle.data.get('parent_id',""):
             bundle.obj.parent_id = int(bundle.data['parent_id'])
         for field_name in bundle.obj._meta.get_all_field_names():
-            
             if bundle.data.get(str(field_name), None):
                 try:
                     field_object = ast.literal_eval(bundle.data.get(str(field_name), None))
                 except:
                     field_object = bundle.data.get(field_name)
-                
-                if isinstance(field_object, unicode):                    
+                if field_name=='followers':
+                    print 'passed on followers'
+                    pass
+                elif isinstance(field_object, unicode):                    
                     bundle.obj.__setattr__(field_name, field_object)
                 elif isinstance(field_object, list):
                     for obj in field_object:
@@ -574,6 +579,7 @@ class ContactResource(CRMServiceModelResource):
             ),
         ]
     def follow_contacts(self, request, **kwargs):
+        print 'following'
         if kwargs.get('contact_ids'):
             try:
                 contact_ids = ast.literal_eval(
@@ -1614,10 +1620,47 @@ class CRMUserResource(CRMServiceModelResource):
 
     @undocumented: Meta
     '''
+    unfollow_list = fields.ToManyField(ContactResource, 'unfollow_list', null=True, full=False)
 
     class Meta(CommonMeta):
         queryset = CRMUser.objects.all()
         resource_name = 'crmuser'
+
+    def dehydrate_unfollow_list(self, bundle):
+        return [contact.id for contact in bundle.obj.unfollow_list.all()]
+
+    def prepend_urls(self):
+        return [
+            url(
+                r"^(?P<resource_name>%s)/follow_unfollow%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('follow_unfollow'),
+                name='api_follow_unfollow'
+            ),
+        ]
+    def follow_unfollow(self, request, **kwargs):
+        data = self.deserialize(request, request.body, format=request.META.get('CONTENT_TYPE', 'application/json'))
+        contact_ids = data.get('contact_ids', None)
+        if contact_ids:
+            if type(contact_ids)!=list:
+                return self.create_response(
+                    request, {'success':False, 'message':'Pass a list as a parameter'}
+                    )
+        else:
+            return self.create_response(
+                    request, {'success':False, 'message':'Must pass a contact_ids parameter'}
+                    )
+        crmuser = request.user.get_crmuser()
+        unfollow_list = [contact.id for contact in crmuser.unfollow_list.all()]
+        for contact_id in contact_ids:
+            if contact_id in unfollow_list:
+                crmuser.unfollow_list.remove(contact_id) 
+            else:
+                crmuser.unfollow_list.add(contact_id) 
+        crmuser.save()
+        return self.create_response(
+                    request, {'success':True, 'message':'You successfully followed contacts'}
+                    )
 
 
 class ShareResource(CRMServiceModelResource):
