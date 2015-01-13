@@ -1658,9 +1658,17 @@ class CRMUserResource(CRMServiceModelResource):
             else:
                 crmuser.unfollow_list.add(contact_id) 
         crmuser.save()
-        return self.create_response(
-                    request, {'success':True, 'message':'You successfully followed contacts'}
-                    )
+        raise ImmediateHttpResponse(
+            HttpResponse(
+                content=Serializer().to_json(
+                    self.full_dehydrate(
+                        self.build_bundle(
+                            obj=crmuser)
+                        )
+                    ),
+                content_type='application/json; charset=utf-8', status=200
+                )
+            )
 
 
 class ShareResource(CRMServiceModelResource):
