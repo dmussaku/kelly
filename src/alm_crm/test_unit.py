@@ -793,8 +793,7 @@ class SalesCycleResourceTest(ResourceTestMixin, ResourceTestCase):
     def test_create_sales_cycle(self):
         post_data = {
             'title': 'new SalesCycle from test_unit',
-            'contact_id': Contact.objects.last().pk,
-            'product_ids': [1, 2]
+            'contact_id': Contact.objects.last().pk
         }
 
         count = SalesCycle.objects.count()
@@ -811,19 +810,28 @@ class SalesCycleResourceTest(ResourceTestMixin, ResourceTestCase):
             sales_cycle.owner,
             self.user.get_subscr_user(sales_cycle.subscription_id)
             )
-        # verify products
-        self.assertEqual(sales_cycle.products.count(), 2)
 
-    def test_patch_sales_cycle_with_products(self):
-        patch_data = {
-            'product_ids': [1, 2, 3]
+    # def test_patch_sales_cycle_with_products(self):
+    #     patch_data = {
+    #         'product_ids': [1, 2, 3]
+    #     }
+    #     before = self.sales_cycle.products.count()
+
+    #     resp = self.api_client.patch(
+    #         self.api_path_sales_cycle+str(self.sales_cycle.pk)+'/',
+    #         format='json',
+    #         data=patch_data)
+    #     self.assertHttpAccepted(resp)
+    #     self.assertNotEqual(before, self.sales_cycle.products.count())
+
+    def test_replace_products(self):
+        post_data = {
+            "product_ids": [1, 2, 3]
         }
         before = self.sales_cycle.products.count()
-
-        resp = self.api_client.patch(
-            self.api_path_sales_cycle+str(self.sales_cycle.pk)+'/',
-            format='json',
-            data=patch_data)
+        resp = self.api_client.post(
+            self.api_path_sales_cycle+str(self.sales_cycle.pk)+'/replace_products/',
+            format='json', data=post_data)
         self.assertHttpAccepted(resp)
         self.assertNotEqual(before, self.sales_cycle.products.count())
 
@@ -1129,16 +1137,13 @@ class ProductResourceTest(ResourceTestMixin, ResourceTestCase):
             'name': 'new product',
             'description': 'new product by test_unit',
             'price': 100,
-            'sales_cycles': [{'pk': sales_cycle.pk}]
         }
 
         count = sales_cycle.products.count()
         self.assertHttpCreated(self.api_client.post(
             self.api_path_product, format='json', data=post_data))
-        product = sales_cycle.products.last()
-        # verify that new one has been added.
-        self.assertEqual(sales_cycle.products.count(), count + 1)
-        # verify that subscription_id was set
+        product = Product.objects.last()
+        self.assertEqual(product.name, 'new product')
         self.assertIsInstance(product.subscription_id, int)
         # verify that owner was set
         self.assertIsInstance(product.owner, CRMUser)
@@ -1180,6 +1185,17 @@ class ProductResourceTest(ResourceTestMixin, ResourceTestCase):
                               format='json', data={'name': product_name})
         # check
         self.assertEqual(self.get_detail_des(p.pk)['name'], product_name)
+
+    def test_replace_products(self):
+        post_data = {
+            "sales_cycle_ids": [1, 2, 3]
+        }
+        before = self.product.sales_cycles.count()
+        resp = self.api_client.post(
+            self.api_path_product+str(self.product.pk)+'/replace_cycles/',
+            format='json', data=post_data)
+        self.assertHttpAccepted(resp)
+        self.assertNotEqual(before, self.product.sales_cycles.count())
 
 class ContactResourceTest(ResourceTestMixin, ResourceTestCase):
 

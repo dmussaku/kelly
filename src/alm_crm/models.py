@@ -643,6 +643,28 @@ class Product(SubscriptionObject):
     def __unicode__(self):
         return self.name
 
+    def add_sales_cycle(self, sales_cycle_id, **kw):
+        """TEST Assigns products to salescycle"""
+        return self.add_sales_cycles([sales_cycle_id], **kw)
+
+    def add_sales_cycles(self, sales_cycle_ids):
+        """TEST Assigns products to salescycle"""
+        if isinstance(sales_cycle_ids, int):
+            sales_cycle_ids = [sales_cycle_ids]
+        assert isinstance(sales_cycle_ids, (tuple, list)), "must be a list"
+        sales_cycles = SalesCycle.objects.filter(pk__in=sales_cycle_ids)
+        if not sales_cycles:
+            return False
+        for sales_cycle in sales_cycles:
+            try:
+                SalesCycleProductStat.objects.get(sales_cycle=sales_cycle, product=self)
+            except SalesCycleProductStat.DoesNotExist:
+                s = SalesCycleProductStat(sales_cycle=sales_cycle, product=self)
+                s.save()
+
+        return True
+
+
     def save(self, **kwargs):
         if not self.subscription_id and self.owner:
             self.subscription_id = self.owner.subscription_id

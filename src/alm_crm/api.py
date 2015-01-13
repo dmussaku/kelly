@@ -1131,9 +1131,12 @@ class SalesCycleResource(CRMServiceModelResource):
     # activities = fields.ToManyField(
     #     'alm_crm.api.ActivityResource', 'rel_activities',
     #     related_name='sales_cycle', null=True, full=True)
-    product_ids = fields.ToManyField(
+    products = fields.ToManyField(
         'alm_crm.api.ProductResource', 'products',
-        related_name='sales_cycles', null=True, full=False)
+        related_name='sales_cycles', null=True, full=False, readonly=True)
+    # product_ids = fields.ToManyField(
+    #     'alm_crm.api.ProductResource', 'products',
+    #     related_name='sales_cycles', null=True, full=False)
     # owner = fields.ToOneField('alm_crm.api.CRMUserResource', 'owner', null=True, full=True)
     author_id = fields.IntegerField(attribute='owner_id')
     # followers = fields.ToManyField('alm_crm.api.CRMUserResource',
@@ -1145,22 +1148,23 @@ class SalesCycleResource(CRMServiceModelResource):
                                    'real_value', null=True, full=True)
 
     class Meta(CommonMeta):
-        queryset = SalesCycle.objects.all()
+        queryset = SalesCycle.objects.all().prefetch_related('products')
         resource_name = 'sales_cycle'
         excludes = ['from_date', 'to_date']
         detail_allowed_methods = ['get', 'post', 'put', 'patch', 'delete']
         always_return_data = True
 
-    def dehydrate_product_ids(self, bundle):
-        return list(bundle.obj.products.values_list('pk', flat=True))
-
-    def hydrate_product_ids(self, bundle):
-        ids = bundle.data.get('product_ids', [])
-        # check to prevent second run, because hydrate runs twice
-        if len(ids) > 0 and type(ids[0]) == int:
-            ids = map(int, ids)
-            bundle.data['product_ids'] = Product.objects.filter(id__in=ids)
+    def dehydrate(self, bundle):
+        bundle.data['product_ids'] = [p.pk for p in bundle.obj.products.all()]
         return bundle
+
+    # def dehydrate_products(self, bundle):
+    #     return list(bundle.obj.products.values_list('pk', flat=True))
+
+    # def hydrate_products(self, bundle):
+    #     ids = map(int, bundle.data.get('products', []))
+    #     bundle.data['products'] = self._meta.queryset.filter(id__in=ids)
+    #     return bundle
 
     def prepend_urls(self):
         return [
@@ -1175,6 +1179,12 @@ class SalesCycleResource(CRMServiceModelResource):
                 (self._meta.resource_name, trailing_slash()),
                 self.wrap_view('close_cycle'),
                 name='api_close_cycle'
+            ),
+            url(
+                r"^(?P<resource_name>%s)/(?P<id>\d+)/replace_products%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('replace_products'),
+                name='api_replace_products'
             ),
         ]
 
@@ -1251,10 +1261,8 @@ class SalesCycleResource(CRMServiceModelResource):
         @return: updated SalesCycle and close Activity
 
         '''
-        self.method_check(request, allowed=['put'])
 
         basic_bundle = self.build_bundle(request=request)
-
         # get sales_cycle
         try:
             obj = self.cached_obj_get(bundle=basic_bundle,
@@ -1280,25 +1288,54 @@ class SalesCycleResource(CRMServiceModelResource):
             },
             response_class=http.HttpAccepted)
 
-    def save_m2m(self, bundle):
-        for field_name, field_object in self.fields.items():
-            if not getattr(field_object, 'is_m2m', False):
-                continue
-            if not field_object.attribute:
-                continue
+    def replace_products(self, request, **kwargs):    
+        # {'products': [1,2,3,45]}
+        # self.obj.products.clear()
+        # products = Product.objects.filter(pk__in=products)
+        # self.add_products(products)
+        basic_bundle = self.build_bundle(request=request)
+        # get sales_cycle
+        try:
+            obj = self.cached_obj_get(bundle=basic_bundle,
+                                      **self.remove_api_resource_names(kwargs))
+        except ObjectDoesNotExist:
+            return http.HttpNotFound()
+        except MultipleObjectsReturned:
+            return http.HttpMultipleChoices(
+                "More than one resource is found at this URI.")
+        bundle = self.build_bundle(obj=obj, request=request)
 
-            before = bundle.obj.products.all()
-            now = []
-            for field in bundle.data[field_name]:
-                kwargs = {'sales_cycle':bundle.obj, 'product':field.obj}
-                try:
-                    SalesCycleProductStat.objects.get_or_create(**kwargs)
-                    now.append(field.obj)
-                except Exception: 
-                    continue
+        # get PUT's data from request.body
+        deserialized = self.deserialize(
+            request, request.body,
+            format=request.META.get('CONTENT_TYPE', 'application/json'))
+        deserialized = self.alter_deserialized_list_data(request, deserialized)
+        
+        obj.products.clear()
+        obj.add_products(deserialized['product_ids'])
+        obj_dict = {}
+        obj_dict['success'] = obj
+        return self.create_response(request, obj_dict, response_class=http.HttpAccepted)
 
-            before_products =  filter(lambda x: x not in now, before)
-            SalesCycleProductStat.objects.filter(sales_cycle=bundle.obj, product__in=before_products).delete()
+    # def save_m2m(self, bundle):
+    #     for field_name, field_object in self.fields.items():
+    #         if not getattr(field_object, 'is_m2m', False):
+    #             continue
+    #         if not field_object.attribute:
+    #             continue
+
+    #         before = bundle.obj.products.all()
+    #         now = []
+    #         for field in bundle.data[field_name]:
+    #             kwargs = {'sales_cycle':bundle.obj, 'product':field.obj}
+    #             try:
+    #                 SalesCycleProductStat.objects.get_or_create(**kwargs)
+    #                 now.append(field.obj)
+    #             except Exception: 
+    #                 continue
+
+    #         before_products =  filter(lambda x: x not in now, before)
+    #         SalesCycleProductStat.objects.filter(sales_cycle=bundle.obj, product__in=before_products).delete()
 
 
 
@@ -1589,34 +1626,49 @@ class ProductResource(CRMServiceModelResource):
 
     @undocumented: Meta
     '''
-    sales_cycles = fields.ToManyField(SalesCycleResource, 'sales_cycles')
+    sales_cycles = fields.ToManyField(SalesCycleResource, 'sales_cycles', readonly=True)
 
     class Meta(CommonMeta):
         queryset = Product.objects.all()
         resource_name = 'product'
 
-    def save_m2m(self, bundle):
-        for field_name, field_object in self.fields.items():
-            if not getattr(field_object, 'is_m2m', False):
-                continue
-            if not field_object.attribute:
-                continue
+    def prepend_urls(self):
+        return [
+            url(
+                r"^(?P<resource_name>%s)/(?P<id>\d+)/replace_cycles%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('replace_cycles'),
+                name='api_replace_cycles'
+            ),
+        ]
 
-            before = bundle.obj.sales_cycles.all()
-            now = []
-            for field in bundle.data[field_name]:
-                kwargs = {'product':bundle.obj, 'sales_cycle':field.obj}
-                try:
-                    SalesCycleProductStat.objects.get_or_create(**kwargs)
-                    now.append(field.obj)
-                except Exception: 
-                    continue
+    def replace_cycles(self, request, **kwargs):    
+        # {'products': [1,2,3,45]}
+        # self.obj.products.clear()
+        # products = Product.objects.filter(pk__in=products)
+        # self.add_products(products)
+        basic_bundle = self.build_bundle(request=request)
+        # get sales_cycle
+        try:
+            obj = self.cached_obj_get(bundle=basic_bundle,
+                                      **self.remove_api_resource_names(kwargs))
+        except ObjectDoesNotExist:
+            return http.HttpNotFound()
+        except MultipleObjectsReturned:
+            return http.HttpMultipleChoices(
+                "More than one resource is found at this URI.")
+        bundle = self.build_bundle(obj=obj, request=request)
 
-            before_sales_cycles =  filter(lambda x: x not in now, before)
-            SalesCycleProductStat.objects.filter(product=bundle.obj, sales_cycle__in=before_sales_cycles).delete()
-
-
-
+        # get PUT's data from request.body
+        deserialized = self.deserialize(
+            request, request.body,
+            format=request.META.get('CONTENT_TYPE', 'application/json'))
+        deserialized = self.alter_deserialized_list_data(request, deserialized)
+        obj.sales_cycles.clear()
+        obj.add_sales_cycles(deserialized['sales_cycle_ids'])
+        obj_dict = {}
+        obj_dict['success'] = obj
+        return self.create_response(request, obj_dict, response_class=http.HttpAccepted)
 
 class ValueResource(CRMServiceModelResource):
     '''
