@@ -1847,7 +1847,7 @@ class ShareResource(CRMServiceModelResource):
     class Meta(CommonMeta):
         queryset = Share.objects.all()
         resource_name = 'share'
-        excludes = ['is_read', 'subscription_id', 'description']
+        excludes = ['subscription_id', 'description']
 
     def prepend_urls(self):
         return [
@@ -1862,6 +1862,12 @@ class ShareResource(CRMServiceModelResource):
                 (self._meta.resource_name, trailing_slash()),
                 self.wrap_view('share_multiple'),
                 name='api_share_multiple'
+            ),
+            url(
+                r"^(?P<resource_name>%s)/read%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('read'),
+                name='api_read'
             ),
         ]
 
@@ -1878,6 +1884,15 @@ class ShareResource(CRMServiceModelResource):
             )
 
     def share_multiple(self, request, **kwargs):
+        '''
+        Post example   
+        {
+         "note": "sadasdasd",
+          "contact": 10,
+          "share_from": 1,
+          "share_to":[1,2,3]
+        }
+        '''
         share_list = []
         deserialized = self.deserialize(
             request, request.body,
@@ -1899,6 +1914,29 @@ class ShareResource(CRMServiceModelResource):
             {
             'objects': self.get_bundle_list(share_list, request)}
             )
+
+    def read(self, request, **kwargs):
+        '''
+        POST example
+        {'share_ids':[1,2,3]}
+        '''
+        share_list = []
+        deserialized = self.deserialize(
+            request, request.body,
+            format=request.META.get('CONTENT_TYPE', 'application/json'))
+        share_ids = deserialized.get('share_ids')
+        if share_ids and type(share_ids)==list:
+            for share_id in share_ids:
+                share = Share.objects.get(id=share_id)
+                share.is_read = True
+                share.save()
+                share_list.append(share)
+        return self.create_response(
+            request,
+            {
+            'objects': self.get_bundle_list(share_list, request)}
+            )    
+
 
     def dehydrate_contact(self, bundle):
         return bundle.obj.contact.id
