@@ -28,6 +28,7 @@ from .models import (
     Feedback,
     Comment,
     Mention,
+    SalesCycleProductStat
     )
 from alm_vcard.models import *
 from almanet.models import Subscription, Service
@@ -228,7 +229,7 @@ class ContactResource(CRMServiceModelResource):
         if not url[len(url)-1]=='/':
             url+'/'
         return url+'?limit=%s&offset=%s' % (limit, offset-limit)
-            
+
     def get_next(self, limit, offset, count, url):
         if offset + limit >= count:
             return None
@@ -326,7 +327,7 @@ class ContactResource(CRMServiceModelResource):
             bundle.obj.save()
             for user in CRMUser.objects.filter(subscription_id=subscription_id):
                 bundle.obj.followers.add(user)
-            
+
         '''
         Go through all field names in the Contact Model and check with
         the json that has been submitted. So if the attribute is there
@@ -347,7 +348,7 @@ class ContactResource(CRMServiceModelResource):
                 if field_name=='followers':
                     print 'passed on followers'
                     pass
-                elif isinstance(field_object, unicode):                    
+                elif isinstance(field_object, unicode):
                     bundle.obj.__setattr__(field_name, field_object)
                 elif isinstance(field_object, list):
                     for obj in field_object:
@@ -356,7 +357,7 @@ class ContactResource(CRMServiceModelResource):
                     # t2 = time.time() - t1
                     self.vcard_full_hydrate(bundle)
                     # t3 = time.time() - t2
-        
+
         bundle.obj.save()
         if bundle.data.get('note') and not kwargs.get('id'):
             share = Share(
@@ -1177,9 +1178,12 @@ class SalesCycleResource(CRMServiceModelResource):
     # activities = fields.ToManyField(
     #     'alm_crm.api.ActivityResource', 'rel_activities',
     #     related_name='sales_cycle', null=True, full=True)
-    product_ids = fields.ToManyField(
-        'alm_crm.api.ProductResource', 'products',
-        related_name='sales_cycles', null=True, full=False)
+    # products = fields.ToManyField(
+    #     'alm_crm.api.ProductResource', 'products',
+    #     related_name='sales_cycles', null=True, full=False, readonly=True)
+    # product_ids = fields.ToManyField(
+    #     'alm_crm.api.ProductResource', 'products',
+    #     related_name='sales_cycles', null=True, full=False)
     # owner = fields.ToOneField('alm_crm.api.CRMUserResource', 'owner', null=True, full=True)
     author_id = fields.IntegerField(attribute='owner_id')
     # followers = fields.ToManyField('alm_crm.api.CRMUserResource',
@@ -1191,22 +1195,23 @@ class SalesCycleResource(CRMServiceModelResource):
                                    'real_value', null=True, full=True)
 
     class Meta(CommonMeta):
-        queryset = SalesCycle.objects.all()
+        queryset = SalesCycle.objects.all().prefetch_related('products')
         resource_name = 'sales_cycle'
         excludes = ['from_date', 'to_date']
         detail_allowed_methods = ['get', 'post', 'put', 'patch', 'delete']
         always_return_data = True
 
-    def dehydrate_product_ids(self, bundle):
-        return list(bundle.obj.products.values_list('pk', flat=True))
-
-    def hydrate_product_ids(self, bundle):
-        ids = bundle.data.get('product_ids', [])
-        # check to prevent second run, because hydrate runs twice
-        if len(ids) > 0 and type(ids[0]) == int:
-            ids = map(int, ids)
-            bundle.data['product_ids'] = Product.objects.filter(id__in=ids)
+    def dehydrate(self, bundle):
+        # bundle.data['product_ids'] = [p.pk for p in bundle.obj.products.all()]
         return bundle
+
+    # def dehydrate_products(self, bundle):
+    #     return list(bundle.obj.products.values_list('pk', flat=True))
+
+    # def hydrate_products(self, bundle):
+    #     ids = map(int, bundle.data.get('products', []))
+    #     bundle.data['products'] = self._meta.queryset.filter(id__in=ids)
+    #     return bundle
 
     def prepend_urls(self):
         return [
@@ -1215,6 +1220,18 @@ class SalesCycleResource(CRMServiceModelResource):
                 (self._meta.resource_name, trailing_slash()),
                 self.wrap_view('close'),
                 name='api_close'
+            ),
+            url(
+                r"^(?P<resource_name>%s)/(?P<id>\d+)/close_cycle%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('close_cycle'),
+                name='api_close_cycle'
+            ),
+            url(
+                r"^(?P<resource_name>%s)/(?P<id>\d+)/product_ids%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('product_ids'),
+                name='api_product_ids'
             ),
         ]
 
@@ -1278,6 +1295,102 @@ class SalesCycleResource(CRMServiceModelResource):
                 'activity': ActivityResource().get_bundle_detail(activity, request)
             },
             response_class=http.HttpAccepted)
+
+    def close_cycle(self, request, **kwargs):
+        '''
+        PUT METHOD
+        I{URL}:  U{alma.net/api/v1/sales_cycle/:id/close_cycle/}
+
+        B{Description}:
+        close SalesCycle, set value of SalesCycleProductStat
+        update status to 'C'('Completed')
+
+        @return: updated SalesCycle and close Activity
+
+        '''
+
+        basic_bundle = self.build_bundle(request=request)
+        # get sales_cycle
+        try:
+            obj = self.cached_obj_get(bundle=basic_bundle,
+                                      **self.remove_api_resource_names(kwargs))
+        except ObjectDoesNotExist:
+            return http.HttpNotFound()
+        except MultipleObjectsReturned:
+            return http.HttpMultipleChoices(
+                "More than one resource is found at this URI.")
+        bundle = self.build_bundle(obj=obj, request=request)
+
+        # get PUT's data from request.body
+        deserialized = self.deserialize(
+            request, request.body,
+            format=request.META.get('CONTENT_TYPE', 'application/json'))
+        deserialized = self.alter_deserialized_list_data(request, deserialized)
+        sales_cycle, activity = bundle.obj.close_cycle(products_with_values=deserialized)
+
+        return self.create_response(
+            request, {
+                'sales_cycle': SalesCycleResource().get_bundle_detail(sales_cycle, request),
+                'activity': ActivityResource().get_bundle_detail(activity, request)
+            },
+            response_class=http.HttpAccepted)
+
+    def product_ids(self, request, **kwargs):
+        # {'products': [1,2,3,45]}
+        # self.obj.products.clear()
+        # products = Product.objects.filter(pk__in=products)
+        # self.add_products(products)
+        basic_bundle = self.build_bundle(request=request)
+        # get sales_cycle
+        try:
+            obj = self.cached_obj_get(bundle=basic_bundle,
+                                      **self.remove_api_resource_names(kwargs))
+        except ObjectDoesNotExist:
+            return http.HttpNotFound()
+        except MultipleObjectsReturned:
+            return http.HttpMultipleChoices(
+                "More than one resource is found at this URI.")
+        bundle = self.build_bundle(obj=obj, request=request)
+
+        get_product_ids = lambda: list(obj.products.values_list('pk', flat=True))
+
+        if request.method == 'GET':
+            return self.create_response(request, get_product_ids())
+
+        # get PUT's data from request.body
+        deserialized = self.deserialize(
+            request, request.body,
+            format=request.META.get('CONTENT_TYPE', 'application/json'))
+        deserialized = self.alter_deserialized_list_data(request, deserialized)
+
+        obj.products.clear()
+        obj.add_products(deserialized['product_ids'])
+
+        if not self._meta.always_return_data:
+            return http.HttpAccepted(location=location)
+        else:
+            return self.create_response(request, get_product_ids(),
+                                        response_class=http.HttpAccepted)
+
+    # def save_m2m(self, bundle):
+    #     for field_name, field_object in self.fields.items():
+    #         if not getattr(field_object, 'is_m2m', False):
+    #             continue
+    #         if not field_object.attribute:
+    #             continue
+
+    #         before = bundle.obj.products.all()
+    #         now = []
+    #         for field in bundle.data[field_name]:
+    #             kwargs = {'sales_cycle':bundle.obj, 'product':field.obj}
+    #             try:
+    #                 SalesCycleProductStat.objects.get_or_create(**kwargs)
+    #                 now.append(field.obj)
+    #             except Exception:
+    #                 continue
+
+    #         before_products =  filter(lambda x: x not in now, before)
+    #         SalesCycleProductStat.objects.filter(sales_cycle=bundle.obj, product__in=before_products).delete()
 
 
 class ActivityResource(CRMServiceModelResource):
@@ -1387,7 +1500,8 @@ class ActivityResource(CRMServiceModelResource):
             sales_cycle = SalesCycle.objects.get(id = bundle.data['salescycle_id'])
             bundle.data['salescycle_id'] = sales_cycle
         else:
-            bundle.data['salescycle_id'] = SalesCycle.objects.get(owner=bundle.request.user.get_crmuser(), is_global=True)
+            bundle.data['salescycle_id'] = SalesCycle.get_global(subscription_id=CRMServiceModelResource.\
+                                            get_crm_subscription(bundle.request))
         return bundle
 
     def hydrate_feedback(self, bundle):
@@ -1543,6 +1657,7 @@ class ActivityResource(CRMServiceModelResource):
         feedback = None
         if bundle.data.get('feedback_status'):
             status = bundle.data['feedback_status']
+            bundle.data.pop('feedback_status')
         if bundle.request.method == 'PUT' or bundle.request.method == 'PATCH':
             feedback = Feedback.objects.get(activity = bundle.obj)
             feedback.status = status
@@ -1565,12 +1680,49 @@ class ProductResource(CRMServiceModelResource):
 
     @undocumented: Meta
     '''
-    sales_cycles = fields.ToManyField(SalesCycleResource, 'sales_cycles')
+    sales_cycles = fields.ToManyField(SalesCycleResource, 'sales_cycles', readonly=True)
 
     class Meta(CommonMeta):
         queryset = Product.objects.all()
         resource_name = 'product'
 
+    def prepend_urls(self):
+        return [
+            url(
+                r"^(?P<resource_name>%s)/(?P<id>\d+)/replace_cycles%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('replace_cycles'),
+                name='api_replace_cycles'
+            ),
+        ]
+
+    def replace_cycles(self, request, **kwargs):
+        # {'products': [1,2,3,45]}
+        # self.obj.products.clear()
+        # products = Product.objects.filter(pk__in=products)
+        # self.add_products(products)
+        basic_bundle = self.build_bundle(request=request)
+        # get sales_cycle
+        try:
+            obj = self.cached_obj_get(bundle=basic_bundle,
+                                      **self.remove_api_resource_names(kwargs))
+        except ObjectDoesNotExist:
+            return http.HttpNotFound()
+        except MultipleObjectsReturned:
+            return http.HttpMultipleChoices(
+                "More than one resource is found at this URI.")
+        bundle = self.build_bundle(obj=obj, request=request)
+
+        # get PUT's data from request.body
+        deserialized = self.deserialize(
+            request, request.body,
+            format=request.META.get('CONTENT_TYPE', 'application/json'))
+        deserialized = self.alter_deserialized_list_data(request, deserialized)
+        obj.sales_cycles.clear()
+        obj.add_sales_cycles(deserialized['sales_cycle_ids'])
+        obj_dict = {}
+        obj_dict['success'] = obj
+        return self.create_response(request, obj_dict, response_class=http.HttpAccepted)
 
 class ValueResource(CRMServiceModelResource):
     '''
@@ -1655,9 +1807,9 @@ class CRMUserResource(CRMServiceModelResource):
         unfollow_list = [contact.id for contact in crmuser.unfollow_list.all()]
         for contact_id in contact_ids:
             if contact_id in unfollow_list:
-                crmuser.unfollow_list.remove(contact_id) 
+                crmuser.unfollow_list.remove(contact_id)
             else:
-                crmuser.unfollow_list.add(contact_id) 
+                crmuser.unfollow_list.add(contact_id)
         crmuser.save()
         raise ImmediateHttpResponse(
             HttpResponse(
@@ -2107,6 +2259,7 @@ class AppStateObject(object):
             'sales_cycles': self.get_sales_cycles(),
             'activities': self.get_activities(),
             'products': self.get_products(),
+            'sales_cycles_to_products_map': self.get_sales_cycle2products_map()
         }
         self.constants = self.get_constants()
         self.session = self.get_session()
@@ -2131,8 +2284,7 @@ class AppStateObject(object):
 
     def get_contacts(self):
         contacts = Contact.get_contacts_by_last_activity_date(
-            self.current_crmuser.pk, owned=True, assigned=True, followed=True,
-            in_shares=True)
+            self.current_crmuser.pk, all=True)
 
         return ContactResource().get_bundle_list(contacts, self.request)
 
@@ -2140,13 +2292,13 @@ class AppStateObject(object):
         sales_cycles = SalesCycle.get_salescycles_by_last_activity_date(
             self.current_crmuser.pk, all=True, include_activities=False)
 
-        return [] #SalesCycleResource().get_bundle_list(sales_cycles, self.request)
+        return SalesCycleResource().get_bundle_list(sales_cycles, self.request)
 
     def get_activities(self):
         activities = Activity.get_activities_by_date_created(
             self.current_crmuser.pk, all=True, include_sales_cycles=False)
 
-        return [] #ActivityResource().get_bundle_list(activities, self.request)
+        return ActivityResource().get_bundle_list(activities, self.request)
 
     def get_products(self):
         products = Product.get_products()
@@ -2159,6 +2311,16 @@ class AppStateObject(object):
 
         return map(_map, products)
 
+    def get_sales_cycle2products_map(self):
+        sales_cycles = SalesCycle.get_salescycles_by_last_activity_date(
+            self.current_crmuser.pk, all=True, include_activities=False)
+
+        data = {}
+        for sc in sales_cycles:
+            data[sc.id] = list(sc.products.values_list('pk', flat=True))
+
+        return data
+
     def get_shares(self):
         shares = Share.get_shares_owned_for(self.current_crmuser.pk)
 
@@ -2166,20 +2328,17 @@ class AppStateObject(object):
 
     def get_constants(self):
         return {
-            'salescycle': {'statuses': map(lambda s: {s[0]: s[1]},
-                                           SalesCycle.STATUS_OPTIONS)},
-            'feedback': {'statuses': map(lambda s: {s[0]: s[1]},
-                                         Feedback.STATUS_OPTIONS)},
+            'sales_cycle': {'statuses': SalesCycle.STATUS_OPTIONS},
+            'activity': {'feedback': Feedback.STATUS_OPTIONS},
             'contacts': {
-                'statuses': map(lambda s: {s[0]: s[1]}, Contact.STATUS_CODES),
-                'tp': map(lambda t: {t[0]: t[1]}, Contact.TYPES_WITH_CAPS)
+                'statuses': Contact.STATUS_CODES,
+                'tp': Contact.TYPES_WITH_CAPS
             },
-            'vcard__email': {'types': map(lambda s: {s[0]: s[1]},
-                                          Email.TYPE_CHOICES)},
-            'vcard__adr': {'types': map(lambda s: {s[0]: s[1]},
-                                        Adr.TYPE_CHOICES)},
-            'vcard__phone': {'types': map(lambda s: {s[0]: s[1]},
-                                          Tel.TYPE_CHOICES)},
+            'vcard': {
+                'email': {'types': Email.TYPE_CHOICES},
+                'adr': {'types': Adr.TYPE_CHOICES},
+                'phone': {'types': Tel.TYPE_CHOICES}
+            }
         }
 
     def get_session(self):
@@ -2348,3 +2507,33 @@ class AppStateResource(Resource):
                 'sales_cycles': SalesCycleResource().get_bundle_list(sales_cycles, request),
                 'activities': ActivityResource().get_bundle_list(activities, request)
             })
+
+
+class SalesCycleProductStatResource(CRMServiceModelResource):
+    product_id = fields.ToOneField(
+        'alm_crm.api.ProductResource', 'product', null=False, full=False)
+    sales_cycle = fields.ToOneField(
+        'alm_crm.api.SalesCycleResource', 'sales_cycle', null=False, full=False)
+
+    class Meta(CommonMeta):
+        queryset = SalesCycleProductStat.objects.all()
+        resource_name = 'cycle_product_stat'
+
+
+    def dehydrate_product_id(self, bundle):
+        return bundle.obj.product.id
+
+    def hydrate_product_id(self, bundle):
+        product = Product.objects.get(id=bundle.data['product_id'])
+        bundle.data['product_id'] = product
+        return bundle
+
+    def dehydrate_sales_cycle(self, bundle):
+        return bundle.obj.product.id
+
+    def hydrate_sales_cycle(self, bundle):
+        sales_cycle = SalesCycle.objects.get(id=bundle.data['sales_cycle'])
+        bundle.data['sales_cycle'] = sales_cycle
+        return bundle
+
+

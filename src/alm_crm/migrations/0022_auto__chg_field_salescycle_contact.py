@@ -67,6 +67,7 @@ class Migration(SchemaMigration):
             'is_supervisor': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'organization_id': ('django.db.models.fields.IntegerField', [], {}),
             'subscription_id': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
+            'unfollow_list': ('django.db.models.fields.related.ManyToManyField', [], {'blank': 'True', 'related_name': "'unfollowers'", 'null': 'True', 'symmetrical': 'False', 'to': u"orm['alm_crm.Contact']"}),
             'user_id': ('django.db.models.fields.IntegerField', [], {})
         },
         u'alm_crm.feedback': {
