@@ -1,5 +1,6 @@
 from tastypie import fields, http
 from tastypie.contrib.contenttypes.fields import GenericForeignKeyField
+from django.contrib.contenttypes.models import ContentType
 from tastypie.constants import ALL, ALL_WITH_RELATIONS
 from tastypie.resources import Resource, ModelResource
 from tastypie.authorization import Authorization
@@ -1341,7 +1342,20 @@ class SalesCycleResource(CRMServiceModelResource):
             },
             response_class=http.HttpAccepted)
 
-    def replace_products(self, request, **kwargs):    
+    def replace_products(self, request, **kwargs):
+        '''
+        PUT METHOD
+        I{URL}:  U{alma.net/api/v1/sales_cycle/:id/replace_products/}
+
+        B{Description}:
+        replace products of the sales cycle
+        @type  product_ids: list
+        @param product_ids: product_ids which should be set, for instace [1,2,3]
+
+        @return: updated SalesCycle
+
+        '''
+    
         basic_bundle = self.build_bundle(request=request)
         try:
             obj = self.cached_obj_get(bundle=basic_bundle,
@@ -1454,8 +1468,8 @@ class ActivityResource(CRMServiceModelResource):
             url(
                 r"^(?P<resource_name>%s)/(?P<id>\d+)/comments%s$" %
                 (self._meta.resource_name, trailing_slash()),
-                self.wrap_view('get_comments'),
-                name='api_get_comments'
+                self.wrap_view('comments'),
+                name='api_comments'
             ),
             url(
                 r"^(?P<resource_name>%s)/my_activities%s$" %
@@ -1591,9 +1605,9 @@ class ActivityResource(CRMServiceModelResource):
                     request, {'success':False, 'error_string':'the contact does not exists'}
                 )
 
-    def get_comments(self, request, **kwargs):
+    def comments(self, request, **kwargs):
         '''
-        GET METHOD
+        PUT, POST, GET METHODS
         I{URL}:  U{alma.net/api/v1/activity/:id/comments}
 
         Description:
@@ -1603,17 +1617,27 @@ class ActivityResource(CRMServiceModelResource):
         >>> "objects": [
         ...     {
         ...         "comment": "Test comment 1",
-        ...         "content_object": "/api/v1/activity/1/",
+        ...         "activity_id": 1,
         ...         "date_created": "2014-09-10T00:00:00",
         ...         "date_edited": "2014-12-29T09:45:24.166720",
         ...         "id": 1,
-        ...         "object_id": 1,
         ...         "resource_uri": "",
         ...         "subscription_id": 1
         ...         }
         ...     ]
 
         '''
+        basic_bundle = self.build_bundle(request=request)
+        # get sales_cycle
+        try:
+            obj = self.cached_obj_get(bundle=basic_bundle,
+                                      **self.remove_api_resource_names(kwargs))
+        except ObjectDoesNotExist:
+            return http.HttpNotFound()
+        except MultipleObjectsReturned:
+            return http.HttpMultipleChoices(
+                "More than one resource is found at this URI.")
+        bundle = self.build_bundle(obj=obj, request=request)
 
         try:
             activity = Activity.objects.get(id=kwargs.get('id'))
@@ -1622,12 +1646,36 @@ class ActivityResource(CRMServiceModelResource):
             obj_dict = {}
             obj_dict['objects'] = comment_resource.get_bundle_list(comments,
                                                                    request)
-            return self.create_response(request, obj_dict)
         except Activity.DoesNotExist:
             return self.create_response(
                 request,
                 {'success':False, 'error_string':'Activity does not exists'}
                 )
+
+        if request.method == 'GET':
+            return self.create_response(request, obj_dict)
+
+        # get PUT's data from request.body
+        deserialized = self.deserialize(
+            request, request.body,
+            format=request.META.get('CONTENT_TYPE', 'application/json'))
+        deserialized = self.alter_deserialized_list_data(request, deserialized)
+
+        # TODO: use CommentResource as create for PUT and POST methods
+        comment = Comment.build_new(user_id=request.user.id, content_class=Activity, object_id=deserialized['activity_id'])
+        comment.comment = deserialized['comment']
+        comment.save()
+
+        comments = activity.comments.all()
+        comment_resource = CommentResource()
+        obj_dict = {}
+        obj_dict['objects'] = comment_resource.get_bundle_list(comments,
+                                                               request)
+        if not self._meta.always_return_data:
+            return http.HttpAccepted(location=location)
+        else:
+            return self.create_response(request, obj_dict,
+                                        response_class=http.HttpAccepted)
 
     def post_list(self, request, **kwargs):
         '''
@@ -1697,11 +1745,19 @@ class ProductResource(CRMServiceModelResource):
             ),
         ]
 
-    def replace_cycles(self, request, **kwargs):
-        # {'products': [1,2,3,45]}
-        # self.obj.products.clear()
-        # products = Product.objects.filter(pk__in=products)
-        # self.add_products(products)
+    def replace_cycles(self, request, **kwargs):    
+        '''
+        PUT METHOD
+        I{URL}:  U{alma.net/api/v1/product/:id/replace_cycles/}
+
+        B{Description}:
+        replace sales_cycles of the product
+        @type  sales_cycle_ids: list
+        @param sales_cycle_ids: sales_cycle_ids which should be set, for instace [1,2,3]
+
+        @return: updated Product
+
+        '''
         basic_bundle = self.build_bundle(request=request)
         # get sales_cycle
         try:
@@ -2006,15 +2062,24 @@ class CommentResource(CRMServiceModelResource):
         Feedback: FeedbackResource
     }, 'content_object')
 
-    def dehydrate_date_created(self, bundle):
-        return bundle.obj.date_created.strftime('%Y-%m-%d %H:%M')
+    def dehydrate(self, bundle):
+        class_name = bundle.obj.content_object.__class__.__name__.lower()
+        bundle.data[class_name+'_id'] = bundle.obj.content_object.id
+        bundle.data.pop('content_object')
+        return bundle
 
-    def dehydrate_date_edited(self, bundle):
-        return bundle.obj.date_edited.strftime('%Y-%m-%d %H:%M')
+    def hydrate(self, bundle):
+        class_name_lower = filter(lambda k: k[-3:]=='_id' and k[:-3]!='subscription', bundle.data)[0]
+        obj_class = ContentType.objects.get(app_label='alm_crm', model=class_name_lower).model_class()
+        obj = obj_class.objects.get(id=bundle.data[class_name_lower+'_id'])
+        bundle.data['content_object'] = obj        
+        return bundle
+
 
     class Meta(CommonMeta):
         queryset = Comment.objects.all()
         resource_name = 'comment'
+        excludes = ['object_id']
 
 
 class MentionResource(CRMServiceModelResource):
@@ -2042,6 +2107,15 @@ class MentionResource(CRMServiceModelResource):
 
 
 class ContactListResource(CRMServiceModelResource):
+    '''
+    ALL Method
+    I{URL}:  U{alma.net/api/v1/contact_list/}
+
+    B{Description}:
+    API resource to manage ContactList
+
+    @undocumented: Meta
+    '''
     users = fields.ToManyField('alm_crm.api.CRMUserResource', 'users',
                                related_name='contact_list', null=True,
                                full=False)
@@ -2583,6 +2657,15 @@ class AppStateResource(Resource):
 
 
 class SalesCycleProductStatResource(CRMServiceModelResource):
+    '''
+    ALL Method
+    I{URL}:  U{alma.net/api/v1/cycle_product_stat/}
+
+    B{Description}:
+    API resource to manage SalesCycleProductStatResource
+
+    @undocumented: Meta
+    '''
     product_id = fields.ToOneField(
         'alm_crm.api.ProductResource', 'product', null=False, full=False)
     sales_cycle = fields.ToOneField(
@@ -2610,6 +2693,15 @@ class SalesCycleProductStatResource(CRMServiceModelResource):
         return bundle
 
 class FilterResource(CRMServiceModelResource):
+    '''
+    ALL Method
+    I{URL}:  U{alma.net/api/v1/filter/}
+
+    B{Description}:
+    API resource to manage Filter
+
+    @undocumented: Meta
+    '''
     author_id = fields.IntegerField(attribute='owner_id')
 
     class Meta(CommonMeta):
