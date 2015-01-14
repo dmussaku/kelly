@@ -98,7 +98,7 @@ class Contact(SubscriptionObject):
     date_created = models.DateTimeField(blank=True, auto_now_add=True)
     vcard = models.OneToOneField('alm_vcard.VCard', blank=True, null=True)
     parent = models.ForeignKey(
-        'Contact', blank=True, null=True, related_name='user_contacts')
+        'Contact', blank=True, null=True, related_name='children')
     owner = models.ForeignKey(
         CRMUser, related_name='owned_contacts',
         null=True, blank=True)
