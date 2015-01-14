@@ -2055,6 +2055,8 @@ class CommentResource(CRMServiceModelResource):
 
     @undocumented: Meta
     '''
+
+    author_id = fields.IntegerField(attribute='owner_id')
     content_object = GenericForeignKeyField({
         Activity: ActivityResource,
         Contact: ContactResource,
