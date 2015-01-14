@@ -3,7 +3,7 @@ import datetime
 from datetime import *
 from time import *
 import re
-from django.db import models
+from django.db import models, transaction as tx
 import vobject
 from vobject.vcard import *
 from django.utils.translation import ugettext as _
@@ -103,13 +103,13 @@ class VCard(SubscriptionObject):
         super(self.__class__, self).save(**kwargs)
 
     @classmethod
-    def importFrom(cls, type, data):
+    def importFrom(cls, tp, data):
         """
         The contact sets its properties as specified in the argument 'data'
         according to the specification given in the string passed as
-        argument 'type'
+        argument 'tp'
 
-        'type' can be either 'vCard' or 'vObject'
+        'tp' can be either 'vCard' or 'vObject'
 
         'vCard' is a string containing containing contact information
         formatted according to the vCard specification
@@ -118,32 +118,32 @@ class VCard(SubscriptionObject):
 
         It returns a Contact object.
         """
-        if type == "vCard":
+        if tp.lower() == "vcard":
             return cls.fromVCard(data)
 
-        if type == "vObject":
+        if tp.lower() == "vobject":
             return cls.fromVObject(data)
 
-    def exportTo(self, type):
+    def exportTo(self, tp):
         """
         The contact returns an object with its properties in a format as
-        defined by the argument type.
+        defined by the argument tp.
 
-        'type' can be either 'vCard' or 'vObject'
+        'tp' can be either 'vCard' or 'vObject'
 
         'vCard' is a string containing containing contact information
         formatted according to the vCard specification
 
         'vObject' is a vobject containing vcard contact information
         """
-        if type == "vCard":
+        if tp.lower() == "vcard":
             return self.toVCard()
 
-        if type == "vObject":
+        if tp.lower() == "vobject":
             return self.toVObject()
 
     @classmethod
-    def fromVObject(cls, vObject):
+    def fromVObject(cls, vObject, autocommit=False):
         """
         Contact sets its properties as specified by the supplied
         vObject. Returns a contact object.
@@ -163,6 +163,7 @@ class VCard(SubscriptionObject):
 
         for property in properties:
             # ----------- REQUIRED PROPERTIES --------------
+            print property.name.upper()
             if property.name.upper() == "FN":
 
                 try:
@@ -479,13 +480,6 @@ class VCard(SubscriptionObject):
 
                 continue
 
-            # if property.name.upper() == "SOUND":
-
-            #    sound = Sound()
-            #    sound.data = property.value
-
-            #    contact.childModels.append(sound)
-
             if property.name.upper() == "TITLE":
                 try:
 
@@ -499,7 +493,7 @@ class VCard(SubscriptionObject):
 
                 continue
 
-            if property.name.upper() == "URL":
+            if property.name.upper() == "X-URL":
                 try:
 
                     url = Url()
@@ -514,28 +508,20 @@ class VCard(SubscriptionObject):
 
                 continue
 
-            # if property.name.upper() == "LOGO":
-
-            #    logo = Logo()
-            #    logo.data = property.value
-
-            #    contact.childModels.append( logo)
-
             if property.name.upper() == "VERSION":
                 continue
 
             contact.errorList.append(property.name.upper())
-
-        # nObject.save()
-
-        # contact.n = nObject
+        if autocommit:
+            contact.commit()
         return contact
 
     def commit(self):
-        self.save()
-        for m in self.childModels:
-            m.vcard = self
-            m.save()
+        with tx.atomic():
+            self.save()
+            for m in self.childModels:
+                m.vcard = self
+                m.save()
 
     @classmethod
     def fromVCard(cls, vCardString):
@@ -691,7 +677,7 @@ class VCard(SubscriptionObject):
             i.value = j.data
 
         for j in self.url_set.all():
-            i = v.add('url')
+            i = v.add('x-url')
             i.value = j.data
 
         return v
