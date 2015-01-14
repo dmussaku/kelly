@@ -1843,7 +1843,6 @@ class ShareResource(CRMServiceModelResource):
                                  full=True, null=True)
     share_from = fields.ForeignKey(CRMUserResource, 'share_from',
                                    full=True, null=True)
-    note = fields.CharField(attribute='description', null = True)
 
     class Meta(CommonMeta):
         queryset = Share.objects.all()
@@ -1857,6 +1856,12 @@ class ShareResource(CRMServiceModelResource):
                 (self._meta.resource_name, trailing_slash()),
                 self.wrap_view('get_last_shares'),
                 name='api_last_shares'
+            ),
+            url(
+                r"^(?P<resource_name>%s)/share_multiple%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('share_multiple'),
+                name='api_share_multiple'
             ),
         ]
 
@@ -1872,6 +1877,28 @@ class ShareResource(CRMServiceModelResource):
             {'objects': self.get_bundle_list(shares, request)}
             )
 
+    def share_multiple(self, request, **kwargs):
+        share_list = []
+        deserialized = self.deserialize(
+            request, request.body,
+            format=request.META.get('CONTENT_TYPE', 'application/json'))
+        if type(deserialized.get('share_to',"")) == list:
+            for user_id in deserialized.get('share_to', None):
+                share_from=deserialized.get('share_from', "")
+                contact = deserialized.get('contact', "")
+                s = Share(
+                        note=deserialized.get('note', ""),
+                        share_from=CRMUser.objects.get(id=share_from),
+                        contact=Contact.objects.get(id=contact),
+                        share_to = CRMUser.objects.get(id=user_id)
+                    )
+                s.save()
+                share_list.append(s)
+        return self.create_response(
+            request,
+            {
+            'objects': self.get_bundle_list(share_list, request)}
+            )
 
     def dehydrate_contact(self, bundle):
         return bundle.obj.contact.id
@@ -1892,7 +1919,7 @@ class ShareResource(CRMServiceModelResource):
         bundle.data['share_from'] = share_from
         return bundle
 
-    def hydrate_share_to(self, bundle):
+    def hydrate_share_to(self, bundle):   
         share_to = CRMUser.objects.get(id=bundle.data['share_to'])
         bundle.data['share_to'] = share_to
         return bundle

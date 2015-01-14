@@ -1317,7 +1317,7 @@ class Share(SubscriptionObject):
     share_from = models.ForeignKey(CRMUser, related_name='owned_shares')
     date_created = models.DateTimeField(blank=True, auto_now_add=True)
     comments = generic.GenericRelation('Comment')
-    description = models.CharField(max_length=500, null=True)
+    note = models.CharField(max_length=500, null=True)
 
     class Meta:
         verbose_name = 'share'
@@ -1344,6 +1344,7 @@ class Share(SubscriptionObject):
     def get_shares_owned_for(cls, user_id):
         return cls.objects.filter(share_from__pk=user_id)\
             .order_by('-date_created')
+
 
     # @classmethod
     # def delete_share_on_delete(cls):
