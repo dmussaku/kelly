@@ -32,6 +32,7 @@ from .models import (
     )
 from alm_vcard.models import *
 from almanet.models import Subscription, Service
+from alm_vcard.api import VCardResource
 from alm_user.api import UserResource
 from alm_user.models import User
 from almanet.settings import DEFAULT_SERVICE
@@ -1770,6 +1771,7 @@ class CRMUserResource(CRMServiceModelResource):
     '''
     user = fields.ToOneField('alm_user.api.UserResource', 'user', null=True, full=True)
     unfollow_list = fields.ToManyField(ContactResource, 'unfollow_list', null=True, full=False)
+    vcard = fields.ToOneField('alm_vcard.api.VCardResource', 'vcard', null=True, full=True)
 
     class Meta(CommonMeta):
         queryset = CRMUser.objects.all()
@@ -1781,9 +1783,18 @@ class CRMUserResource(CRMServiceModelResource):
     def full_dehydrate(self, bundle, for_list=False):
         bundle = super(self.__class__, self).full_dehydrate(bundle, for_list=True)
         user = bundle.obj.get_billing_user()
-        bundle.data['user'] = UserResource().full_dehydrate(
-                UserResource().build_bundle(obj=user)
-            ).data
+        try:
+            VCard.objects.get(id=user.vcard.id)
+            bundle.data['vcard'] = VCardResource().full_dehydrate(
+                            VCardResource().build_bundle(
+                                obj=VCard.objects.get(id=user.vcard.id))
+                            )
+        except:
+            bundle.data['vcard'] = None
+        # bundle.data['user'] = UserResource().full_dehydrate(
+        #         UserResource().build_bundle(obj=user)
+        #     ).data
+        bundle.data['user'] = user.id
         return bundle 
 
     def prepend_urls(self):
@@ -2335,14 +2346,14 @@ class AppStateObject(object):
 
     def get_users(self):
         crmusers, users = CRMUser.get_crmusers(with_users=True)
+        return CRMUserResource().get_bundle_list(crmusers, self.request)
+        # def _map(crmuser):
+        #     data = model_to_dict(users.get(pk=crmuser.user_id), fields=[
+        #         'email', 'first_name', 'last_name', 'is_admin'])
+        #     data.update({'id': crmuser.pk, 'company_id': self.company.pk})
+        #     return data
 
-        def _map(crmuser):
-            data = model_to_dict(users.get(pk=crmuser.user_id), fields=[
-                'email', 'first_name', 'last_name', 'is_admin'])
-            data.update({'id': crmuser.pk, 'company_id': self.company.pk})
-            return data
-
-        return map(_map, crmusers)
+        # return map(_map, crmusers)
 
     def get_company(self):
         data = model_to_dict(self.company, fields=['name', 'subdomain', 'id'])

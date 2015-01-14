@@ -9,6 +9,7 @@ from django.conf.urls import url
 from tastypie.utils import trailing_slash
 from alm_vcard.models import *
 from alm_crm.models import Contact
+
 from .models import User
 from tastypie.authentication import (
     MultiAuthentication,
