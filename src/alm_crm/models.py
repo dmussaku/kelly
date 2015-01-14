@@ -1471,3 +1471,27 @@ class SalesCycleProductStat(SubscriptionObject):
         if not self.subscription_id:
             self.subscription_id = self.sales_cycle.owner.subscription_id
         super(SalesCycleProductStat, self).save(**kwargs)
+
+class Filter(SubscriptionObject):
+    BASE_OPTIONS = (
+        ('AL', _('all')),
+        ('RT', _('recent')),
+        ('CD', _('cold')),
+        ('LD', _('lead')))
+    title = models.CharField(max_length=100)
+    filter_text = models.CharField(max_length=500)
+    owner = models.ForeignKey(CRMUser, related_name='owned_filter')
+    base = models.CharField(max_length=6, choices=BASE_OPTIONS, default='all')
+    date_created = models.DateTimeField(blank=True, auto_now_add=True)
+
+    class Meta:
+        verbose_name = _('filter')
+        db_table = settings.DB_PREFIX.format('filter')
+
+    def __unicode__(self):
+        return u'%s: %s'%(self.title, self.base)
+
+    def save(self, **kwargs):
+        if not self.subscription_id and self.owner:
+            self.subscription_id = self.owner.subscription_id
+        super(self.__class__, self).save(**kwargs)
