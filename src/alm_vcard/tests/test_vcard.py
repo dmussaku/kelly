@@ -52,6 +52,12 @@ class VCardTestCase(TestCase):
                 actual = get(vcard, accessor)
                 self.assertEqual(actual, expected[i][j])
 
+    def test_importHugeList(self):
+        file_name = 'vcard_huge.vcf'
+        raw_data = self.load_file(file_name)
+        vcards = list(VCard.importFromVCardMultiple(raw_data, autocommit=True))
+        self.assertEqual(len(vcards), 863)
+
     def test_autocommit(self):
         file_name = 'vcard_test_multi.vcf'
         raw_data = self.load_file(file_name)
