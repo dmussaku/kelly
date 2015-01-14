@@ -104,7 +104,13 @@ class VCard(SubscriptionObject):
 
     @classmethod
     def importFromVCardMultiple(cls, data, autocommit=False):
+        """Return imported vcard objects as generator"""
         return cls.fromVCard(data, multiple=True, autocommit=autocommit)
+
+    @classmethod
+    def exportToVCardMultiple(cls, vcards):
+        """Return exported vcards as generator"""
+        return (vcard.toVCard() for vcard in vcards)
 
     # @classmethod
     # def importFrom(cls, tp, data, multiple=False, autocommit=False):
@@ -569,6 +575,7 @@ class VCard(SubscriptionObject):
             jcode     = j.postal_code if j.postal_code else ''
             jcountry  = j.country_name if j.country_name else ''
             jextended = j.extended_address if j.extended_address else ''
+            jcity = j.locality if j.locality else ''
 
             i.type_param = j.type
             i.value = vobject.vcard.Address(
@@ -577,7 +584,8 @@ class VCard(SubscriptionObject):
                      street = jstreet,
                      region = jregion,
                      code = jcode,
-                     country = jcountry)
+                     country = jcountry,
+                     city=jcity)
 
         for j in self.org_set.all():
             i = v.add('org')
@@ -794,6 +802,12 @@ class Org(SubscriptionObject):
         verbose_name = _("organization")
         verbose_name_plural = _("organizations")
 
+    def __eq__(self, r):
+        l = self
+        return (
+            l.organization_name == r.organization_name and
+            l.organization_unit == r.organization_unit)
+
     @property
     def name(self):
         return self.organization_name
@@ -827,6 +841,17 @@ class Adr(SubscriptionObject):
     class Meta:
         verbose_name = _("address")
         verbose_name_plural = _("addresses")
+
+    def __eq__(self, r):
+        l = self
+        return (
+            l.post_office_box == r.post_office_box and
+            l.extended_address == r.extended_address and
+            l.street_address == r.street_address and
+            l.region == r.region and
+            l.postal_code == r.postal_code and
+            l.country_name == r.country_name and
+            l.type == r.type)
 
 
 class Agent(SubscriptionObject):
@@ -1004,6 +1029,10 @@ class Title(SubscriptionObject):
     class Meta:
         verbose_name = _("title")
         verbose_name_plural = _("titles")
+
+    def __eq__(self, r):
+        l = self
+        return l.data == r.data
 
 
 class Tz(SubscriptionObject):

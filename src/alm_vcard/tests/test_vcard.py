@@ -62,6 +62,35 @@ class VCardTestCase(TestCase):
             actual = vcard.title_set.all()[0].data
             self.assertEqual(actual, expected[i])
 
+    def test_exportToVCard(self):
+        file_name = 'vcard_test_single.vcf'
+        raw_data = self.load_file(file_name)
+        expected = VCard.fromVCard(raw_data, autocommit=True)
+        actual = VCard.fromVCard(expected.toVCard(), autocommit=True)
+        self.assertEqual(expected.fn, actual.fn)
+        self.assertEqual(expected.family_name, actual.family_name)
+        self.assertEqual(expected.org_set.all()[0].organization_name,
+                         actual.org_set.all()[0].organization_name)
+
+    def test_exportToVCardMulti(self):
+        file_name = 'vcard_test_multi.vcf'
+        raw_data = self.load_file(file_name)
+        expected = list(VCard.importFromVCardMultiple(
+            raw_data, autocommit=True))
+        new_raw_data = ''.join(VCard.exportToVCardMultiple(expected))
+        actual = list(VCard.importFromVCardMultiple(
+            new_raw_data, autocommit=True))
+        self.assertEqual(len(expected), len(actual))
+        for exp, act in zip(expected, actual):
+            self.assertEqual(exp.fn, act.fn)
+            self.assertEqual(exp.family_name, act.family_name)
+            self.assertEqual(exp.org_set.all()[0],
+                             act.org_set.all()[0])
+            self.assertEqual(exp.title_set.all()[0],
+                             act.title_set.all()[0])
+
+            self.assertEqual(exp.adr_set.first(), act.adr_set.first())
+
     def load_file(self, name):
         path = pj(CURRENT_MODULE, 'fixtures', name)
         try:

@@ -208,7 +208,7 @@ class Contact(SubscriptionObject):
         return exporter(**options)
 
     def to_vcard(self, locale='ru_RU'):
-        return self.vcard.exportTo('vCard')
+        return self.vcard.exportTo('vcard')
 
     def to_html(self, locale='ru_RU'):
         tpl_name = 'vcard/_detail.%s.html' % locale
