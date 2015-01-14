@@ -1911,9 +1911,9 @@ class ShareResource(CRMServiceModelResource):
         for json_obj in deserialized['shares']:
             s = Share(
                 note=json_obj.get('note', ""),
-                share_from=CRMUser.objects.get(id=json_obj.get('share_from')),
-                contact=Contact.objects.get(id=json_obj.get('contact')),
-                share_to = CRMUser.objects.get(id=json_obj.get('share_to'))
+                share_from=CRMUser.objects.get(id=int(json_obj.get('share_from'))),
+                contact=Contact.objects.get(id=int(json_obj.get('contact'))),
+                share_to = CRMUser.objects.get(id=int(json_obj.get('share_to')))
                 )
             s.save()
             share_list.append(s)
