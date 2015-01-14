@@ -38,15 +38,7 @@ from django.core.files.temp import NamedTemporaryFile
 from django.core.servers.basehttp import FileWrapper
 from tastypie.serializers import Serializer
 from django.db import models
-# try:
-#     from django.views.decorators.csrf import csrf_exempt
-# except ImportError:
-#     def csrf_exempt(func):
-#         return func
-# from tastypie.exceptions import NotFound, BadRequest, InvalidFilterError, HydrationError, InvalidSortError, ImmediateHttpResponse, Unauthorized
 from tastypie.exceptions import ImmediateHttpResponse, NotFound
-# from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned, ValidationError
-# from django.utils.cache import patch_cache_control, patch_vary_headers
 from tastypie.http import HttpNotFound
 from django.http import HttpResponse
 import json
@@ -322,7 +314,6 @@ class ContactResource(CRMServiceModelResource):
 
     def full_hydrate(self, bundle, **kwargs):
         # t1 = time.time()
-        print bundle.request
         contact_id = kwargs.get('pk', None)
         subscription_id = self.get_crm_subscription(bundle.request)
         if contact_id:
