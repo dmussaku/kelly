@@ -299,8 +299,7 @@ class ContactResource(CRMServiceModelResource):
         '''Custom representation of followers, assignees etc.'''
         bundle = super(self.__class__, self).full_dehydrate(
             bundle, for_list=True)
-        bundle.data['author_id'] = bundle.obj.owner_id
-        bundle.data['parent_id'] = bundle.obj.parent_id
+        bundle.data['owner_id'] = bundle.obj.owner_id
         bundle.data['children'] = [contact.id for contact in bundle.obj.children.all()]
         return bundle
 
@@ -327,6 +326,7 @@ class ContactResource(CRMServiceModelResource):
     def full_hydrate(self, bundle, **kwargs):
         # t1 = time.time()
         contact_id = kwargs.get('pk', None)
+        crmuser = bundle.request.user.get_crmuser()
         subscription_id = self.get_crm_subscription(bundle.request)
         if contact_id:
             bundle.obj = Contact.objects.get(id=int(contact_id))
@@ -344,10 +344,7 @@ class ContactResource(CRMServiceModelResource):
         i got in a json. If its missing then i just delete it.
 
         '''
-        if bundle.data.get('user_id',""):
-            bundle.obj.owner_id = int(bundle.data['user_id'])
-        if bundle.data.get('parent_id',""):
-            bundle.obj.parent_id = int(bundle.data['parent_id'])
+        bundle.obj.owner = crmuser
         # if bundle.data.get('children',""):
         #     for child_id in bundle.data.get('children'):
         #         bundle.obj.children.add(Contact.objects.get(id=int(child_id)))
