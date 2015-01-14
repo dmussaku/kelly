@@ -1,0 +1,26 @@
+[
+{
+    "pk": 1, 
+    "model": "alm_crm.filter", 
+    "fields": {
+        "title": "filter", 
+        "filter_text": "annn", 
+        "base": "all", 
+        "owner": 1, 
+        "date_created": "2015-01-14T05:33:34.602Z", 
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 2, 
+    "model": "alm_crm.filter", 
+    "fields": {
+        "title": "Filter", 
+        "filter_text": "alll", 
+        "base": "cold", 
+        "owner": 1, 
+        "date_created": "2015-01-14T05:35:16.925Z", 
+        "subscription_id": 1
+    }
+}
+]

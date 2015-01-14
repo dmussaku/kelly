@@ -28,7 +28,8 @@ from .models import (
     Feedback,
     Comment,
     Mention,
-    SalesCycleProductStat
+    SalesCycleProductStat,
+    Filter
     )
 from alm_vcard.models import *
 from almanet.models import Subscription, Service
@@ -1343,13 +1344,8 @@ class SalesCycleResource(CRMServiceModelResource):
             },
             response_class=http.HttpAccepted)
 
-    def product_ids(self, request, **kwargs):
-        # {'products': [1,2,3,45]}
-        # self.obj.products.clear()
-        # products = Product.objects.filter(pk__in=products)
-        # self.add_products(products)
+    def replace_products(self, request, **kwargs):    
         basic_bundle = self.build_bundle(request=request)
-        # get sales_cycle
         try:
             obj = self.cached_obj_get(bundle=basic_bundle,
                                       **self.remove_api_resource_names(kwargs))
@@ -2535,4 +2531,10 @@ class SalesCycleProductStatResource(CRMServiceModelResource):
         bundle.data['sales_cycle'] = sales_cycle
         return bundle
 
+class FilterResource(CRMServiceModelResource):
+    author_id = fields.IntegerField(attribute='owner_id')
+
+    class Meta(CommonMeta):
+        queryset = Filter.objects.all()
+        resource_name = 'filter'
 
