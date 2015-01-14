@@ -1,0 +1,28 @@
+BEGIN:VCARD
+VERSION:3.0
+REV:20150114T111326Z
+TITLE;CHARSET=UTF-8:Менеджер
+ORG;CHARSET=UTF-8:Алмаклауд;;
+N;CHARSET=UTF-8:Пупкин;Вася;;;
+X-CUSTOMER-ID:123
+EMAIL;TYPE=WORK,INTERNET:r.kamun@gmail.com
+EMAIL;TYPE=HOME,INTERNET:r.kamun@gmail.com
+X-REFERRED-BY:2225
+X-LINKEDIN-URL:http\://https\://www.linkedin.com/profile/public-profile-
+ settings?trk=prof-edit-edit-public_profile
+FN;CHARSET=UTF-8:Вася Пупкин
+ADR;CHARSET=UTF-8;TYPE=WORK:;;Толеби 19;Алматы;
+ Казахстан;050001;Kazakhstan
+X-SKYPE;TYPE=WORK:rusatskype
+TEL;TYPE=WORK:77772952190
+TEL;TYPE=CELL:77777777777
+END:VCARD
+BEGIN:VCARD
+VERSION:3.0
+REV:20150114T111326Z
+TITLE;CHARSET=UTF-8:ЛОХ
+ORG;CHARSET=UTF-8:Алмаклауд;;
+N;CHARSET=UTF-8:Ернар;Майлюбаев;;;
+NOTE;CHARSET=UTF-8:Крутой адрес
+FN;CHARSET=UTF-8:Майлюбаев Ернар
+END:VCARD

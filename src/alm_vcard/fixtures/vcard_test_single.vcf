@@ -1,0 +1,19 @@
+BEGIN:VCARD
+VERSION:3.0
+REV:20150114T094744Z
+TITLE;CHARSET=UTF-8:Менеджер
+X-CUSTOMER-ID:123
+ADR;CHARSET=UTF-8;TYPE=WORK:;;Толеби 19;Алматы;
+ Казахстан;050001;Kazakhstan
+FN;CHARSET=UTF-8:Вася Пупкин
+TEL;TYPE=WORK:77772952190
+TEL;TYPE=CELL:77777777777
+N;CHARSET=UTF-8:Пупкин;Вася;;;
+X-LINKEDIN-URL:http\://https\://www.linkedin.com/profile/public-profile-
+ settings?trk=prof-edit-edit-public_profile
+X-SKYPE;TYPE=WORK:rusatskype
+EMAIL;TYPE=WORK,INTERNET:r.kamun@gmail.com
+EMAIL;TYPE=HOME,INTERNET:r.kamun@gmail.com
+ORG;CHARSET=UTF-8:Алмаклауд;;
+X-REFERRED-BY:2225
+END:VCARD

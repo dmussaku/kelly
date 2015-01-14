@@ -103,26 +103,30 @@ class VCard(SubscriptionObject):
         super(self.__class__, self).save(**kwargs)
 
     @classmethod
-    def importFrom(cls, tp, data):
-        """
-        The contact sets its properties as specified in the argument 'data'
-        according to the specification given in the string passed as
-        argument 'tp'
+    def importFromVCardMultiple(cls, data, autocommit=False):
+        return cls.fromVCard(data, multiple=True, autocommit=autocommit)
 
-        'tp' can be either 'vCard' or 'vObject'
+    # @classmethod
+    # def importFrom(cls, tp, data, multiple=False, autocommit=False):
+    #     """
+    #     The contact sets its properties as specified in the argument 'data'
+    #     according to the specification given in the string passed as
+    #     argument 'tp'
 
-        'vCard' is a string containing containing contact information
-        formatted according to the vCard specification
+    #     'tp' can be either 'vCard' or 'vObject'
 
-        'vObject' is a vobject containing vcard contact information
+    #     'vCard' is a string containing containing contact information
+    #     formatted according to the vCard specification
 
-        It returns a Contact object.
-        """
-        if tp.lower() == "vcard":
-            return cls.fromVCard(data)
+    #     'vObject' is a vobject containing vcard contact information
 
-        if tp.lower() == "vobject":
-            return cls.fromVObject(data)
+    #     It returns a Contact object.
+    #     """
+    #     if tp.lower() == "vcard":
+    #         return cls.fromVCard(data, multiple=multiple)
+
+    #     if tp.lower() == "vobject":
+    #         return cls.fromVObject(data)
 
     def exportTo(self, tp):
         """
@@ -163,7 +167,6 @@ class VCard(SubscriptionObject):
 
         for property in properties:
             # ----------- REQUIRED PROPERTIES --------------
-            print property.name.upper()
             if property.name.upper() == "FN":
 
                 try:
@@ -522,16 +525,20 @@ class VCard(SubscriptionObject):
             for m in self.childModels:
                 m.vcard = self
                 m.save()
+        return self
 
     @classmethod
-    def fromVCard(cls, vCardString):
+    def fromVCard(cls, vCardString, multiple=False, autocommit=False):
         """
         Contact sets its properties as specified by the supplied
         string. The string is in vCard format. Returns a Contact object.
         """
+        if multiple:
+            return (cls.fromVObject(vObject, autocommit=autocommit)
+                    for vObject in vobject.readComponents(vCardString))
         vObject = vobject.readOne(vCardString)
 
-        return cls.fromVObject(vObject)
+        return cls.fromVObject(vObject, autocommit=autocommit)
 
     def toVObject(self):
         """
@@ -542,11 +549,11 @@ class VCard(SubscriptionObject):
         n = v.add('n')
 
         n.value = vobject.vcard.Name(
-               given = self.given_name,
-               family = self.family_name,
-               additional = self.additional_name,
-               prefix = self.honorific_prefix,
-               suffix = self.honorific_suffix)
+            given = self.given_name,
+            family = self.family_name,
+            additional = self.additional_name,
+            prefix = self.honorific_prefix,
+            suffix = self.honorific_suffix)
 
         fn = v.add('fn')
 

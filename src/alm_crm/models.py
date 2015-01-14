@@ -240,7 +240,7 @@ class Contact(SubscriptionObject):
         except CRMUser.DoesNotExist:
             return False
 
-    
+
 
 
     @classmethod
@@ -461,8 +461,7 @@ class Contact(SubscriptionObject):
     def _upload_contacts_by_vcard(cls, vcard_obj):
         """Extracts contacts from vcard string. Returns Queryset<Contact>."""
         contact = cls()
-        vcard = VCard.importFrom('vCard', vcard_obj)
-        vcard.commit()
+        vcard = VCard.fromVCard(vcard_obj, autocommit=True)
         contact.vcard = vcard
         return contact
 
