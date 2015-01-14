@@ -182,6 +182,80 @@
 
 
     {
+        "pk": 11,
+        "model": "alm_vcard.vcard",
+        "fields": {
+            "family_name": "Wayne",
+            "uid": null,
+            "honorific_suffix": "",
+            "additional_name": "Black Knight",
+            "rev": null,
+            "honorific_prefix": "",
+            "bday": null,
+            "given_name": "Bruce",
+            "sort_string": null,
+            "classP": null,
+            "subscription_id": 1,
+            "fn": "Bruce Wayne"
+        }
+    },
+    {
+        "pk": 12,
+        "model": "alm_vcard.vcard",
+        "fields": {
+            "family_name": "Abiken",
+            "uid": null,
+            "honorific_suffix": "",
+            "additional_name": "acm_nerd",
+            "rev": null,
+            "honorific_prefix": "",
+            "bday": null,
+            "given_name": "Nurlan",
+            "sort_string": null,
+            "classP": null,
+            "subscription_id": 1,
+            "fn": "Nurlan Abiken"
+        }
+    },
+    {
+        "pk": 13,
+        "model": "alm_vcard.vcard",
+        "fields": {
+            "family_name": "Mussakulov",
+            "uid": null,
+            "honorific_suffix": "",
+            "additional_name": "25",
+            "rev": null,
+            "honorific_prefix": "",
+            "bday": null,
+            "given_name": "Daniyar",
+            "sort_string": null,
+            "classP": null,
+            "subscription_id": 1,
+            "fn": "Daniyar Mussakulov"
+        }
+    },
+    {
+        "pk": 14,
+        "model": "alm_vcard.vcard",
+        "fields": {
+            "family_name": "Stamkulov",
+            "uid": null,
+            "honorific_suffix": "",
+            "additional_name": "don't worry",
+            "rev": null,
+            "honorific_prefix": "",
+            "bday": null,
+            "given_name": "Satter",
+            "sort_string": null,
+            "classP": null,
+            "subscription_id": 1,
+            "fn": "Satter Stamkulov"
+        }
+    },
+
+
+    {
         "pk": 1,
         "model": "alm_vcard.tel",
         "fields": {
