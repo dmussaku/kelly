@@ -1908,18 +1908,15 @@ class ShareResource(CRMServiceModelResource):
         deserialized = self.deserialize(
             request, request.body,
             format=request.META.get('CONTENT_TYPE', 'application/json'))
-        if type(deserialized.get('share_to',"")) == list:
-            for user_id in deserialized.get('share_to', None):
-                share_from=deserialized.get('share_from', "")
-                contact = deserialized.get('contact', "")
-                s = Share(
-                        note=deserialized.get('note', ""),
-                        share_from=CRMUser.objects.get(id=share_from),
-                        contact=Contact.objects.get(id=contact),
-                        share_to = CRMUser.objects.get(id=user_id)
-                    )
-                s.save()
-                share_list.append(s)
+        for json_obj in deserialized['shares']:
+            s = Share(
+                note=json_obj.get('note', ""),
+                share_from=CRMUser.objects.get(id=json_obj.get('share_from')),
+                contact=Contact.objects.get(id=json_obj.get('contact')),
+                share_to = CRMUser.objects.get(id=json_obj.get('share_to'))
+                )
+            s.save()
+            share_list.append(s)
         return self.create_response(
             request,
             {
