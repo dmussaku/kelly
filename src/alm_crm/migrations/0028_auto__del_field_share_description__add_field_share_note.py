@@ -90,6 +90,16 @@ class Migration(SchemaMigration):
             'subscription_id': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'value': ('django.db.models.fields.related.OneToOneField', [], {'to': u"orm['alm_crm.Value']", 'unique': 'True', 'null': 'True', 'blank': 'True'})
         },
+        u'alm_crm.filter': {
+            'Meta': {'object_name': 'Filter', 'db_table': "'alma_filter'"},
+            'base': ('django.db.models.fields.CharField', [], {'default': "'all'", 'max_length': '6'}),
+            'date_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
+            'filter_text': ('django.db.models.fields.CharField', [], {'max_length': '500'}),
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'owner': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'owned_filter'", 'to': u"orm['alm_crm.CRMUser']"}),
+            'subscription_id': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
+            'title': ('django.db.models.fields.CharField', [], {'max_length': '100'})
+        },
         u'alm_crm.mention': {
             'Meta': {'object_name': 'Mention'},
             'content_type': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['contenttypes.ContentType']"}),

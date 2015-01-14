@@ -2071,7 +2071,8 @@ class CommentResource(CRMServiceModelResource):
         return bundle
 
     def hydrate(self, bundle):
-        class_name_lower = filter(lambda k: k[-3:]=='_id' and k[:-3]!='subscription', bundle.data)[0]
+        generics = ['activity', 'contact', 'share', 'feedback']
+        class_name_lower = filter(lambda k: k[-3:]=='_id' and k[:-3] in generics, bundle.data)[0]
         obj_class = ContentType.objects.get(app_label='alm_crm', model=class_name_lower).model_class()
         obj = obj_class.objects.get(id=bundle.data[class_name_lower+'_id'])
         bundle.data['content_object'] = obj        

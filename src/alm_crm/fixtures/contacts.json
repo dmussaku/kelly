@@ -6,11 +6,7 @@
         "status": 1,
         "latest_activity": 1,
         "tp": "user",
-        "assignees": [
-            1
-        ],
         "parent": null,
-        "followers": [],
         "owner": 1,
         "date_created": "2014-09-10T00:00:00Z",
         "subscription_id": 1,
@@ -24,11 +20,7 @@
         "status": 0,
         "latest_activity": null,
         "tp": "user",
-        "assignees": [
-            1
-        ],
         "parent": null,
-        "followers": [],
         "owner": 1,
         "date_created": "2014-09-10T00:00:00Z",
         "subscription_id": 1,
@@ -42,11 +34,7 @@
         "status": 2,
         "latest_activity": null,
         "tp": "user",
-        "assignees": [
-            1
-        ],
         "parent": null,
-        "followers": [],
         "owner": 1,
         "date_created": "2014-09-10T00:00:00Z",
         "subscription_id": 1,
@@ -60,11 +48,7 @@
         "status": 3,
         "latest_activity": null,
         "tp": "user",
-        "assignees": [
-            1
-        ],
         "parent": null,
-        "followers": [],
         "owner": 1,
         "date_created": "2014-09-10T00:00:00Z",
         "subscription_id": 1,
