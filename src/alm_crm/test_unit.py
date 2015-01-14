@@ -1051,6 +1051,15 @@ class ActivityResourceTest(ResourceTestMixin, ResourceTestCase):
         # verify that owner was set
         self.assertIsInstance(activity.owner, CRMUser)
 
+    def test_create_comment(self):
+        post_data = {
+            'activity_id': self.activity.id,
+            'comment': 'activity comment'
+        }
+        resp = self.api_client.put(self.api_path_activity + '%s/comments/' % (self.activity.pk),
+                            format='json', data=post_data)
+        self.assertHttpAccepted(resp)
+
     def test_create_activity_without_feedback(self):
         owner = CRMUser.objects.last()
         sales_cycle = SalesCycle.objects.first()
