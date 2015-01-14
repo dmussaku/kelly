@@ -33,21 +33,16 @@ from .models import (
     )
 from alm_vcard.models import *
 from almanet.models import Subscription, Service
+from alm_vcard.api import VCardResource
+from alm_user.api import UserResource
+from alm_user.models import User
 from almanet.settings import DEFAULT_SERVICE
 import ast
 from django.core.files.temp import NamedTemporaryFile
 from django.core.servers.basehttp import FileWrapper
 from tastypie.serializers import Serializer
 from django.db import models
-# try:
-#     from django.views.decorators.csrf import csrf_exempt
-# except ImportError:
-#     def csrf_exempt(func):
-#         return func
-# from tastypie.exceptions import NotFound, BadRequest, InvalidFilterError, HydrationError, InvalidSortError, ImmediateHttpResponse, Unauthorized
 from tastypie.exceptions import ImmediateHttpResponse, NotFound
-# from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned, ValidationError
-# from django.utils.cache import patch_cache_control, patch_vary_headers
 from tastypie.http import HttpNotFound
 from django.http import HttpResponse
 import json
@@ -166,10 +161,10 @@ class ContactResource(CRMServiceModelResource):
                               null=True, full=True)
     owner = fields.ToOneField('alm_crm.api.CRMUserResource', 'owner',
                               null=True, full=False)
-    followers = fields.ToManyField('alm_crm.api.CRMUserResource', 'followers',
-                                   null=True, full=False)
-    assignees = fields.ToManyField('alm_crm.api.CRMUserResource', 'assignees',
-                                   null=True, full=False)
+    # followers = fields.ToManyField('alm_crm.api.CRMUserResource', 'followers',
+    #                                null=True, full=False)
+    # assignees = fields.ToManyField('alm_crm.api.CRMUserResource', 'assignees',
+    #                                null=True, full=False)
     sales_cycles = fields.ToManyField(
         'alm_crm.api.SalesCycleResource', 'sales_cycles',
         related_name='contact', null=True, full=False)
@@ -177,8 +172,8 @@ class ContactResource(CRMServiceModelResource):
         'alm_crm.api.ContactResource', 'parent',
         null=True, full=False
         )
-    share = fields.ToOneField(
-        'alm_crm.api.ShareResource', 'share',
+    shares = fields.ToManyField(
+        'alm_crm.api.ShareResource', 'shares',
         null=True, full=True
         )
 
@@ -309,11 +304,19 @@ class ContactResource(CRMServiceModelResource):
         bundle.data['parent_id'] = bundle.obj.parent_id
         return bundle
 
-    def dehydrate_assignees(self, bundle):
-        return [assignee.pk for assignee in bundle.obj.assignees.all()]
+    # def dehydrate_assignees(self, bundle):
+    #     return [assignee.pk for assignee in bundle.obj.assignees.all()]
 
-    def dehydrate_followers(self, bundle):
-        return [follower.pk for follower in bundle.obj.followers.all()]
+    # def dehydrate_followers(self, bundle):
+    #     return [follower.pk for follower in bundle.obj.followers.all()]
+    def serialize_share(self, resource, obj):
+        return resource().full_dehydrate(
+                    resource().build_bundle(
+                        obj=obj)
+                    )
+
+    def dehydrate_shares(self, bundle):
+        return [self.serialize_share(ShareResource, share) for share in bundle.obj.share_set.all()]
 
     def dehydrate_sales_cycles(self, bundle):
         return [sc.pk for sc in bundle.obj.sales_cycles.all()]
@@ -323,7 +326,6 @@ class ContactResource(CRMServiceModelResource):
 
     def full_hydrate(self, bundle, **kwargs):
         # t1 = time.time()
-        print bundle.request
         contact_id = kwargs.get('pk', None)
         subscription_id = self.get_crm_subscription(bundle.request)
         if contact_id:
@@ -334,8 +336,6 @@ class ContactResource(CRMServiceModelResource):
             bundle.obj.subscription_id = subscription_id
             # bundle.obj.owner_id = bundle.request.user.get_crmuser().id
             bundle.obj.save()
-            for user in CRMUser.objects.filter(subscription_id=subscription_id):
-                bundle.obj.followers.add(user)
 
         '''
         Go through all field names in the Contact Model and check with
@@ -354,10 +354,7 @@ class ContactResource(CRMServiceModelResource):
                     field_object = ast.literal_eval(bundle.data.get(str(field_name), None))
                 except:
                     field_object = bundle.data.get(field_name)
-                if field_name=='followers':
-                    print 'passed on followers'
-                    pass
-                elif isinstance(field_object, unicode):
+                if isinstance(field_object, unicode):
                     bundle.obj.__setattr__(field_name, field_object)
                 elif isinstance(field_object, list):
                     for obj in field_object:
@@ -368,7 +365,7 @@ class ContactResource(CRMServiceModelResource):
                     # t3 = time.time() - t2
 
         bundle.obj.save()
-        if bundle.data.get('note') and not kwargs.get('id'):
+        if bundle.data.get('note') and not kwargs.get('pk'):
             share = Share(
                     description=bundle.data.get('note'),
                     share_to_id=int(bundle.data['user_id']),
@@ -387,6 +384,7 @@ class ContactResource(CRMServiceModelResource):
         else:
             vcard = VCard()
             vcard.save()
+            vcard.subscription_id = subscription_id
             vcard.contact = bundle.obj
         vcard_fields = list(VCard._meta.get_fields_with_model())
         for vcard_field in vcard_fields:
@@ -422,41 +420,40 @@ class ContactResource(CRMServiceModelResource):
         3) if models are missing then delete the missing values
         '''
         vcard_rel_fields = vcard._meta.get_all_related_objects()
-
+        vcard_rel_fields.reverse()
+        del vcard_rel_fields[0]
+        del vcard_rel_fields[0]
         for vcard_field in vcard_rel_fields:
-            if vcard_field.model == Contact:
-                pass
-            else:
-                field_value = vcard_field.var_name+'s'
-                obj_list = ast.literal_eval(str(field_object.get(vcard_field.var_name+'s','None')))
-                vcard_field_name = vcard_field.var_name+'_set'
-                model = vcard.__getattribute__(vcard_field_name).model
-                if obj_list:
-                    queryset = vcard.__getattribute__(vcard_field_name).all()
-                    json_objects = obj_list
-                    id_list = []
-                    for obj in json_objects:
-                        if obj.get('id',None):
-                            vcard_obj = model.objects.get(id=int(obj.get('id',None)))
-                            vcard_obj.vcard = vcard
-                            del obj['id']
+            field_value = vcard_field.var_name+'s'
+            obj_list = ast.literal_eval(str(field_object.get(vcard_field.var_name+'s','None')))
+            vcard_field_name = vcard_field.var_name+'_set'
+            model = vcard.__getattribute__(vcard_field_name).model
+            if obj_list:
+                queryset = vcard.__getattribute__(vcard_field_name).all()
+                json_objects = obj_list
+                id_list = []
+                for obj in json_objects:
+                    if obj.get('id',None):
+                        vcard_obj = model.objects.get(id=int(obj.get('id',None)))
+                        vcard_obj.vcard = vcard
+                        del obj['id']
+                    else:
+                        vcard_obj = model()
+                        vcard_obj.vcard = vcard
+                    for key, value in obj.viewitems():
+                        if key=='vcard':
+                            vcard_obj.vcard = VCard.objects.get(id=value)
                         else:
-                            vcard_obj = model()
-                            vcard_obj.vcard = vcard
-                        for key, value in obj.viewitems():
-                            if key=='vcard':
-                                vcard_obj.vcard = VCard.objects.get(id=value)
-                            else:
-                                vcard_obj.__setattr__(key, value)
-                        vcard_obj.subscription_id = subscription_id
-                        vcard_obj.save()
-                        id_list.append(vcard_obj.id)
-                    for obj in queryset:
-                        if not obj.id in id_list:
-                            obj.delete()
-                else:
-                    for obj in model.objects.filter(vcard=vcard):
+                            vcard_obj.__setattr__(key, value)
+                    vcard_obj.subscription_id = subscription_id
+                    vcard_obj.save()
+                    id_list.append(vcard_obj.id)
+                for obj in queryset:
+                    if not obj.id in id_list:
                         obj.delete()
+            else:
+                for obj in model.objects.filter(vcard=vcard):
+                    obj.delete()
         vcard.subscription_id = subscription_id
         vcard.save()
 
@@ -1768,7 +1765,9 @@ class CRMUserResource(CRMServiceModelResource):
 
     @undocumented: Meta
     '''
+    user = fields.ToOneField('alm_user.api.UserResource', 'user', null=True, full=True)
     unfollow_list = fields.ToManyField(ContactResource, 'unfollow_list', null=True, full=False)
+    vcard = fields.ToOneField('alm_vcard.api.VCardResource', 'vcard', null=True, full=True)
 
     class Meta(CommonMeta):
         queryset = CRMUser.objects.all()
@@ -1776,6 +1775,23 @@ class CRMUserResource(CRMServiceModelResource):
 
     def dehydrate_unfollow_list(self, bundle):
         return [contact.id for contact in bundle.obj.unfollow_list.all()]
+
+    def full_dehydrate(self, bundle, for_list=False):
+        bundle = super(self.__class__, self).full_dehydrate(bundle, for_list=True)
+        user = bundle.obj.get_billing_user()
+        try:
+            VCard.objects.get(id=user.vcard.id)
+            bundle.data['vcard'] = VCardResource().full_dehydrate(
+                            VCardResource().build_bundle(
+                                obj=VCard.objects.get(id=user.vcard.id))
+                            )
+        except:
+            bundle.data['vcard'] = None
+        # bundle.data['user'] = UserResource().full_dehydrate(
+        #         UserResource().build_bundle(obj=user)
+        #     ).data
+        bundle.data['user'] = user.id
+        return bundle 
 
     def prepend_urls(self):
         return [
@@ -1834,12 +1850,11 @@ class ShareResource(CRMServiceModelResource):
                                  full=True, null=True)
     share_from = fields.ForeignKey(CRMUserResource, 'share_from',
                                    full=True, null=True)
-    note = fields.CharField(attribute='description', null = True)
 
     class Meta(CommonMeta):
         queryset = Share.objects.all()
         resource_name = 'share'
-        excludes = ['is_read', 'subscription_id', 'description']
+        excludes = ['subscription_id', 'description']
 
     def prepend_urls(self):
         return [
@@ -1848,6 +1863,18 @@ class ShareResource(CRMServiceModelResource):
                 (self._meta.resource_name, trailing_slash()),
                 self.wrap_view('get_last_shares'),
                 name='api_last_shares'
+            ),
+            url(
+                r"^(?P<resource_name>%s)/share_multiple%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('share_multiple'),
+                name='api_share_multiple'
+            ),
+            url(
+                r"^(?P<resource_name>%s)/read%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('read'),
+                name='api_read'
             ),
         ]
 
@@ -1862,6 +1889,57 @@ class ShareResource(CRMServiceModelResource):
             request,
             {'objects': self.get_bundle_list(shares, request)}
             )
+
+    def share_multiple(self, request, **kwargs):
+        '''
+        Post example   
+        {
+         "note": "sadasdasd",
+          "contact": 10,
+          "share_from": 1,
+          "share_to":[1,2,3]
+        }
+        '''
+        share_list = []
+        deserialized = self.deserialize(
+            request, request.body,
+            format=request.META.get('CONTENT_TYPE', 'application/json'))
+        for json_obj in deserialized['shares']:
+            s = Share(
+                note=json_obj.get('note', ""),
+                share_from=CRMUser.objects.get(id=int(json_obj.get('share_from'))),
+                contact=Contact.objects.get(id=int(json_obj.get('contact'))),
+                share_to = CRMUser.objects.get(id=int(json_obj.get('share_to')))
+                )
+            s.save()
+            share_list.append(s)
+        return self.create_response(
+            request,
+            {
+            'objects': self.get_bundle_list(share_list, request)}
+            )
+
+    def read(self, request, **kwargs):
+        '''
+        POST example
+        {'share_ids':[1,2,3]}
+        '''
+        share_list = []
+        deserialized = self.deserialize(
+            request, request.body,
+            format=request.META.get('CONTENT_TYPE', 'application/json'))
+        share_ids = deserialized.get('share_ids')
+        if share_ids and type(share_ids)==list:
+            for share_id in share_ids:
+                share = Share.objects.get(id=share_id)
+                share.is_read = True
+                share.save()
+                share_list.append(share)
+        return self.create_response(
+            request,
+            {
+            'objects': self.get_bundle_list(share_list, request)}
+            )    
 
 
     def dehydrate_contact(self, bundle):
@@ -1883,7 +1961,7 @@ class ShareResource(CRMServiceModelResource):
         bundle.data['share_from'] = share_from
         return bundle
 
-    def hydrate_share_to(self, bundle):
+    def hydrate_share_to(self, bundle):   
         share_to = CRMUser.objects.get(id=bundle.data['share_to'])
         bundle.data['share_to'] = share_to
         return bundle
@@ -2261,14 +2339,14 @@ class AppStateObject(object):
 
     def get_users(self):
         crmusers, users = CRMUser.get_crmusers(with_users=True)
+        return CRMUserResource().get_bundle_list(crmusers, self.request)
+        # def _map(crmuser):
+        #     data = model_to_dict(users.get(pk=crmuser.user_id), fields=[
+        #         'email', 'first_name', 'last_name', 'is_admin'])
+        #     data.update({'id': crmuser.pk, 'company_id': self.company.pk})
+        #     return data
 
-        def _map(crmuser):
-            data = model_to_dict(users.get(pk=crmuser.user_id), fields=[
-                'email', 'first_name', 'last_name', 'is_admin'])
-            data.update({'id': crmuser.pk, 'company_id': self.company.pk})
-            return data
-
-        return map(_map, crmusers)
+        # return map(_map, crmusers)
 
     def get_company(self):
         data = model_to_dict(self.company, fields=['name', 'subdomain', 'id'])
