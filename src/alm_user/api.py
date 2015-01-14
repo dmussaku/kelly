@@ -185,43 +185,40 @@ class UserResource(ModelResource):
         3) if models are missing then delete the missing values
         '''
         vcard_rel_fields = vcard._meta.get_all_related_objects()
-
+        vcard_rel_fields.reverse()
+        del vcard_rel_fields[0]
+        del vcard_rel_fields[0]
         for vcard_field in vcard_rel_fields:
-            if vcard_field.model == User:
-                pass
-            elif vcard_field.model == Contact:
-                pass
-            else:
-                field_value = vcard_field.var_name+'s'
-                obj_list = ast.literal_eval(str(field_object.get(vcard_field.var_name+'s','None')))
-                vcard_field_name = vcard_field.var_name+'_set'
-                model = vcard.__getattribute__(vcard_field_name).model
-                if obj_list:
-                    queryset = vcard.__getattribute__(vcard_field_name).all()
-                    json_objects = obj_list
-                    id_list = []
-                    for obj in json_objects:
-                        if obj.get('id',None):
-                            vcard_obj = model.objects.get(id=int(obj.get('id',None)))
-                            vcard_obj.vcard = vcard
-                            del obj['id']
+            field_value = vcard_field.var_name+'s'
+            obj_list = ast.literal_eval(str(field_object.get(vcard_field.var_name+'s','None')))
+            vcard_field_name = vcard_field.var_name+'_set'
+            model = vcard.__getattribute__(vcard_field_name).model
+            if obj_list:
+                queryset = vcard.__getattribute__(vcard_field_name).all()
+                json_objects = obj_list
+                id_list = []
+                for obj in json_objects:
+                    if obj.get('id',None):
+                        vcard_obj = model.objects.get(id=int(obj.get('id',None)))
+                        vcard_obj.vcard = vcard
+                        del obj['id']
+                    else:
+                        vcard_obj = model()
+                        vcard_obj.vcard = vcard
+                    for key, value in obj.viewitems():
+                        if key=='vcard':
+                            vcard_obj.vcard = VCard.objects.get(id=value)
                         else:
-                            vcard_obj = model()
-                            vcard_obj.vcard = vcard
-                        for key, value in obj.viewitems():
-                            if key=='vcard':
-                                vcard_obj.vcard = VCard.objects.get(id=value)
-                            else:
-                                vcard_obj.__setattr__(key, value)
-                        vcard_obj.subscription_id = subscription_id
-                        vcard_obj.save()
-                        id_list.append(vcard_obj.id)
-                    for obj in queryset:
-                        if not obj.id in id_list:
-                            obj.delete()
-                else:
-                    for obj in model.objects.filter(vcard=vcard):
+                            vcard_obj.__setattr__(key, value)
+                    vcard_obj.subscription_id = subscription_id
+                    vcard_obj.save()
+                    id_list.append(vcard_obj.id)
+                for obj in queryset:
+                    if not obj.id in id_list:
                         obj.delete()
+            else:
+                for obj in model.objects.filter(vcard=vcard):
+                    obj.delete()
         vcard.subscription_id = subscription_id
         vcard.save()
 

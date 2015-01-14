@@ -117,12 +117,12 @@ class Contact(SubscriptionObject):
         related_name='contact_latest_activity', null=True)
     mentions = generic.GenericRelation('Mention')
     comments = generic.GenericRelation('Comment')
-    followers = models.ManyToManyField(
-        CRMUser, related_name='following_contacts',
-        null=True, blank=True)
-    assignees = models.ManyToManyField(
-        CRMUser, related_name='assigned_contacts',
-        null=True, blank=True)
+    # followers = models.ManyToManyField(
+    #     CRMUser, related_name='following_contacts',
+    #     null=True, blank=True)
+    # assignees = models.ManyToManyField(
+    #     CRMUser, related_name='assigned_contacts',
+    #     null=True, blank=True)
 
 
     class Meta:
@@ -134,6 +134,11 @@ class Contact(SubscriptionObject):
             return "%s %s" % (self.vcard.fn, self.tp)
         except:
             return "No name %s " %(self.tp)
+
+    def delete(self):
+        if self.vcard:
+            self.vcard.delete()
+        super(self.__class__, self).delete()
 
     def save(self, **kwargs):
         is_new = self.pk is None
