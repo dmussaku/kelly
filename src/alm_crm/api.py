@@ -173,10 +173,10 @@ class ContactResource(CRMServiceModelResource):
         'alm_crm.api.ContactResource', 'parent',
         null=True, full=False
         )
-    shares = fields.ToManyField(
-        'alm_crm.api.ShareResource', 'shares',
-        null=True, full=True
-        )
+    # shares = fields.ToManyField(
+    #     'alm_crm.api.ShareResource', 'shares',
+    #     null=True, full=True
+    #     )
 
     class Meta(CommonMeta):
         queryset = Contact.objects.all()
@@ -302,6 +302,7 @@ class ContactResource(CRMServiceModelResource):
         bundle = super(self.__class__, self).full_dehydrate(
             bundle, for_list=True)
         bundle.data['owner_id'] = bundle.obj.owner_id
+        bundle.data['share'] = self.serialize_share(ShareResource, bundle.obj.share_set.first())
         bundle.data['children'] = [contact.id for contact in bundle.obj.children.all()]
         return bundle
 
@@ -311,13 +312,15 @@ class ContactResource(CRMServiceModelResource):
     # def dehydrate_followers(self, bundle):
     #     return [follower.pk for follower in bundle.obj.followers.all()]
     def serialize_share(self, resource, obj):
+        if obj == None:
+            return None
         return resource().full_dehydrate(
                     resource().build_bundle(
                         obj=obj)
                     )
 
-    def dehydrate_shares(self, bundle):
-        return [self.serialize_share(ShareResource, share) for share in bundle.obj.share_set.all()]
+    # def dehydrate_shares(self, bundle):
+    #     return [self.serialize_share(ShareResource, share) for share in bundle.obj.share_set.all()]
 
     def dehydrate_sales_cycles(self, bundle):
         return [sc.pk for sc in bundle.obj.sales_cycles.all()]
@@ -350,7 +353,9 @@ class ContactResource(CRMServiceModelResource):
         # if bundle.data.get('children',""):
         #     for child_id in bundle.data.get('children'):
         #         bundle.obj.children.add(Contact.objects.get(id=int(child_id)))
-        for field_name in bundle.obj._meta.get_all_field_names():
+        field_list = bundle.obj._meta.get_all_field_names()
+        field_list.remove('owner')
+        for field_name in field_list:
             if bundle.data.get(str(field_name), None):
                 try:
                     field_object = ast.literal_eval(bundle.data.get(str(field_name), None))
@@ -370,7 +375,7 @@ class ContactResource(CRMServiceModelResource):
         bundle.obj.save()
         if bundle.data.get('note') and not kwargs.get('pk'):
             share = Share(
-                    description=bundle.data.get('note'),
+                    note=bundle.data.get('note'),
                     share_to_id=int(bundle.data['user_id']),
                     share_from_id=int(bundle.data['user_id']),
                     contact_id=bundle.obj.id,
@@ -581,7 +586,6 @@ class ContactResource(CRMServiceModelResource):
             ),
         ]
     def follow_contacts(self, request, **kwargs):
-        print 'following'
         if kwargs.get('contact_ids'):
             try:
                 contact_ids = ast.literal_eval(
@@ -2402,7 +2406,6 @@ class AppStateObject(object):
         self.company = self.subscription.organization
         self.current_crmuser = \
             request.user.get_subscr_user(self.subscription.pk)
-
         self.objects = {
             'users': self.get_users(),
             'company': self.get_company(),
@@ -2437,19 +2440,16 @@ class AppStateObject(object):
     def get_contacts(self):
         contacts = Contact.get_contacts_by_last_activity_date(
             self.current_crmuser.pk, all=True)
-
         return ContactResource().get_bundle_list(contacts, self.request)
 
     def get_sales_cycles(self):
         sales_cycles = SalesCycle.get_salescycles_by_last_activity_date(
             self.current_crmuser.pk, all=True, include_activities=False)
-
         return SalesCycleResource().get_bundle_list(sales_cycles, self.request)
 
     def get_activities(self):
         activities = Activity.get_activities_by_date_created(
             self.current_crmuser.pk, all=True, include_sales_cycles=False)
-
         return ActivityResource().get_bundle_list(activities, self.request)
 
     def get_products(self):
@@ -2460,7 +2460,6 @@ class AppStateObject(object):
                 fields=['id', 'name', 'description', 'price', 'currency'])
             data.update({'owner_id': p.owner.pk})
             return data
-
         return map(_map, products)
 
     def get_sales_cycle2products_map(self):
@@ -2475,7 +2474,6 @@ class AppStateObject(object):
 
     def get_shares(self):
         shares = Share.get_shares_owned_for(self.current_crmuser.pk)
-
         return ShareResource().get_bundle_list(shares, self.request)
 
     def get_constants(self):
