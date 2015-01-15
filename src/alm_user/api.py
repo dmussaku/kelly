@@ -143,6 +143,11 @@ class UserResource(ModelResource):
         
         return bundle
 
+    def full_dehydrate(self, bundle, for_list=False):
+        bundle = super(self.__class__, self).full_dehydrate(bundle, for_list=True)
+        bundle.data['unfollow_list'] = [contact.id for contact in bundle.obj.get_crmuser().unfollow_list.all()]
+        return bundle
+
     def vcard_full_hydrate(self, bundle):
         field_object = bundle.data.get('vcard',{})
         subscription_id = self.get_crm_subscription(bundle.request)
