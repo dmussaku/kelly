@@ -11,7 +11,6 @@ from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
 from django.utils import timezone
 import datetime
-# from dateutil.relativedelta import relativedelta
 
 
 STATUSES_CAPS = (
@@ -103,27 +102,11 @@ class Contact(SubscriptionObject):
         CRMUser, related_name='owned_contacts',
         null=True, blank=True)
 
-    # Commented by Rustem K
-    # first_name = models.CharField(max_length=31,
-    #                               null=False, blank=False)
-    # last_name = models.CharField(max_length=30, blank=False)
-    # company_name = models.CharField(max_length=50, blank=True)
-    # phone = models.CharField(max_length=12, blank=True)
-    # email = models.EmailField(unique=True, blank=False)
-
-    # job_address = AddressField(_('job address'), max_length=200, blank=True)
     latest_activity = models.OneToOneField(
         'Activity', on_delete=models.SET_NULL,
         related_name='contact_latest_activity', null=True)
     mentions = generic.GenericRelation('Mention')
     comments = generic.GenericRelation('Comment')
-    # followers = models.ManyToManyField(
-    #     CRMUser, related_name='following_contacts',
-    #     null=True, blank=True)
-    # assignees = models.ManyToManyField(
-    #     CRMUser, related_name='assigned_contacts',
-    #     null=True, blank=True)
-
 
     class Meta:
         verbose_name = _('contact')
@@ -133,26 +116,12 @@ class Contact(SubscriptionObject):
         try:
             return "%s %s" % (self.vcard.fn, self.tp)
         except:
-            return "No name %s " %(self.tp)
+            return "No name %s " % self.tp
 
     def delete(self):
         if self.vcard:
             self.vcard.delete()
         super(self.__class__, self).delete()
-
-    def save(self, **kwargs):
-        is_new = self.pk is None
-        try:
-            comment = kwargs['comment']
-            del kwargs['comment']
-        except KeyError:
-            comment = None
-        if not self.subscription_id and self.owner:
-            self.subscription_id = self.owner.subscription_id
-        super(self.__class__, self).save(**kwargs)
-        if is_new:
-            # self.share_contact(self.owner.id, self.owner.id, self.pk, comment)
-            pass
 
     @property
     def last_contacted(self):
@@ -322,7 +291,6 @@ class Contact(SubscriptionObject):
         except:
             return False
 
-
     @classmethod
     def upd_lst_activity_on_create(cls, sender, created=False,
                                    instance=None, **kwargs):
@@ -411,8 +379,6 @@ class Contact(SubscriptionObject):
         for key,value in params.viewitems():
             query_dict = {'vcard__'+str(key):str(value)}
             contacts = contacts|Contact.objects.filter(**query_dict)
-        #vcards = VCard.objects.filter(**params)
-        #contacts = [vcard.contact for vcard in vcards][offset:offset + limit]
         assert isinstance(order_by, list), "Must be a list"
         if order_by:
             if order_by[1]=='asc':
@@ -513,8 +479,6 @@ class Contact(SubscriptionObject):
             in this case return value is always instance of dict, so it is easier to process it
             at the same time, list of contacts always available through rv.keys()
         """
-        # SECOND IMPL
-        # contact_activity_map follows structure suggested by Askhat.
         q = Q()
         if all:
             q |= Q()
@@ -550,35 +514,6 @@ class Contact(SubscriptionObject):
             contact_pk = sales_cycle_contact_map[activity.sales_cycle.pk]
             contact_activity_map.setdefault(contact_pk, []).append(activity.pk)
         return (contacts, activities, contact_activity_map)
-        # FIRST IMPL
-        # try:
-        #     activities = []
-        #     contacts = []
-        #     contact_activity_map = {}
-        #     user = CRMUser.objects.get(user_id=user_id)
-        # user's sales cycles through owned_sales_cycle related_name from Sales Cycle model
-        #     user_sc = user.owned_sales_cycles.objects.all()
-        # contacts = [sc.contact for sc in user_sc]
-        # get every single sales cycle
-        #     for sc in user_sc:
-        # get every single activity from every sales cycle and put them into the activities list
-        #         for activity in sc.rel_activities.objects.all():
-        # activities.append(activity) # now we have a list of all acitivities. not sorted though
-        # sort activities by date. latest being first
-        #     activities = activities.order_by('-date_created')[offset:offset+limit]
-        # do for all activities.
-        #     for activity in activities:
-        # get contact via activity's sales cycle
-        #         contact = activity.sales_cycle.contact
-        #         contact_activity_map[contact].append(activity)
-        #         if contact not in contacts:
-        #             contacts.append(contact)
-        #     if include_activities:
-        #         return (contacts, activities, contact_activity_map)
-        #     return contacts
-
-        # except CRMUser.DoesNotExist:
-        #     return None
 
     @classmethod
     def get_cold_base(cls, limit=20, offset=0):
@@ -620,11 +555,6 @@ class Value(SubscriptionObject):
     def __unicode__(self):
         return "%s %s %s" % (self.amount, self.currency, self.salary)
 
-    def save(self, **kwargs):
-        if not self.subscription_id and self.owner:
-            self.subscription_id = self.owner.subscription_id
-        super(Value, self).save(**kwargs)
-
 
 class Product(SubscriptionObject):
     name = models.CharField(_('product name'), max_length=100, blank=False)
@@ -654,20 +584,12 @@ class Product(SubscriptionObject):
         sales_cycles = SalesCycle.objects.filter(pk__in=sales_cycle_ids)
         if not sales_cycles:
             return False
-        for sales_cycle in sales_cycles:
-            try:
-                SalesCycleProductStat.objects.get(sales_cycle=sales_cycle, product=self)
-            except SalesCycleProductStat.DoesNotExist:
-                s = SalesCycleProductStat(sales_cycle=sales_cycle, product=self)
-                s.save()
+        with transaction.atomic():
+            for sales_cycle in sales_cycles:
+                SalesCycleProductStat.objects.get_or_create(
+                    sales_cycle=sales_cycle, product=self)
 
         return True
-
-
-    def save(self, **kwargs):
-        if not self.subscription_id and self.owner:
-            self.subscription_id = self.owner.subscription_id
-        super(Product, self).save(**kwargs)
 
     @classmethod
     def get_products(cls):
@@ -739,7 +661,10 @@ class SalesCycle(SubscriptionObject):
 
     @classmethod
     def create_globalcycle(cls, **kwargs):
-        global_cycle = cls(is_global=True, title=GLOBAL_CYCLE_TITLE, description=GLOBAL_CYCLE_DESCRIPTION, **kwargs)
+        global_cycle = cls(
+            is_global=True,
+            title=GLOBAL_CYCLE_TITLE,
+            description=GLOBAL_CYCLE_DESCRIPTION, **kwargs)
         global_cycle.save()
         return global_cycle
 
@@ -902,7 +827,6 @@ class SalesCycle(SubscriptionObject):
         activity.set_feedback_status('$', save_feedback=True)
         return [self, activity]
 
-
     @classmethod
     def upd_lst_activity_on_create(cls, sender,
                                    created=False, instance=None, **kwargs):
@@ -974,11 +898,6 @@ class SalesCycle(SubscriptionObject):
             .order_by('-latest_activity__date_created')
         return sales_cycles
 
-    def save(self, **kwargs):
-        if not self.subscription_id and self.owner:
-            self.subscription_id = self.owner.subscription_id
-        super(SalesCycle, self).save(**kwargs)
-
 
 class Activity(SubscriptionObject):
     title = models.CharField(max_length=100, null=True, blank=True)
@@ -986,7 +905,8 @@ class Activity(SubscriptionObject):
     date_created = models.DateTimeField(blank=True, null=True,
                                         auto_now_add=True)
     date_edited = models.DateTimeField(blank=True, null=True, auto_now=True)
-    sales_cycle = models.ForeignKey(SalesCycle, related_name='rel_activities', null=True, blank=True)
+    sales_cycle = models.ForeignKey(SalesCycle, related_name='rel_activities',
+                                    null=True, blank=True)
     owner = models.ForeignKey(CRMUser, related_name='activity_owner')
     mentions = generic.GenericRelation('Mention', null=True)
     comments = generic.GenericRelation('Comment', null=True)
@@ -1038,13 +958,9 @@ class Activity(SubscriptionObject):
     def get_user_activities(cls, user):
         return cls.objects.filter(owner=user).order_by('-date_created')
 
-
     @classmethod
     def get_activities_by_salescycle(cls, sales_cycle_id):
-        #try:
         sales_cycle = SalesCycle.objects.get(id=sales_cycle_id)
-        # except SalesCycle.DoesNotExist:
-        #     return SalesCycle.DoesNotExist
         return cls.objects.filter(sales_cycle=sales_cycle).order_by('-date_created')
 
     @classmethod
@@ -1160,13 +1076,17 @@ class Activity(SubscriptionObject):
                 s2a_map[sc.id] = sc.rel_activities.values_list('pk', flat=True)
             return (activities, sales_cycles, s2a_map)
 
-    # @classmethod
-    # def assign_sales_cycle(cls, activity_id, sales_cycle_id):
 
-    def save(self, **kwargs):
-        if not self.subscription_id and self.owner:
-            self.subscription_id = self.owner.subscription_id
-        super(Activity, self).save(**kwargs)
+class ActivityRecipient(SubscriptionObject):
+    activity = models.ForeignKey(Activity, related_name='recipients')
+    user = models.ForeignKey(CRMUser, related_name='activities')
+    has_read = models.BooleanField(default=False)
+
+    class Meta:
+        db_table = settings.DB_PREFIX.format('activity_recipient')
+
+    def __unicode__(self):
+        return u'Activity: %s' % self.pk or 'Unknown'
 
 
 class Feedback(SubscriptionObject):
@@ -1196,9 +1116,8 @@ class Feedback(SubscriptionObject):
         return len(statuses) > 0 and statuses[0] or None
 
     def save(self, **kwargs):
-        self.date_edited = timezone.now()
-        if not self.subscription_id and self.owner:
-            self.subscription_id = self.owner.subscription_id
+        if self.date_created:
+            self.date_edited = timezone.now()
         super(Feedback, self).save(**kwargs)
 
 
@@ -1233,13 +1152,7 @@ class Mention(SubscriptionObject):
         ----------
             Queryset<Mention>
         """
-        # Alibek
         return Mention.objects.filter(user_id=user_id)
-
-    def save(self, **kwargs):
-        if not self.subscription_id and self.owner:
-            self.subscription_id = self.owner.subscription_id
-        super(Mention, self).save(**kwargs)
 
 
 class Comment(SubscriptionObject):
@@ -1262,8 +1175,6 @@ class Comment(SubscriptionObject):
     def save(self, **kwargs):
         if self.date_created:
             self.date_edited = timezone.now()
-        if not self.subscription_id and self.owner:
-            self.subscription_id = self.owner.subscription_id
         super(Comment, self).save(**kwargs)
 
     def add_mention(self, user_ids=None):
@@ -1334,18 +1245,8 @@ class Share(SubscriptionObject):
         return cls.objects.filter(share_from__pk=user_id)\
             .order_by('-date_created')
 
-
-    # @classmethod
-    # def delete_share_on_delete(cls):
-    #     cls.delete()
-
     def __unicode__(self):
         return '%s : %s -> %s' % (self.contact, self.share_from, self.share_to)
-
-    def save(self, **kwargs):
-        if not self.subscription_id and self.owner:
-            self.subscription_id = self.owner.subscription_id
-        super(Share, self).save(**kwargs)
 
 
 signals.post_save.connect(
@@ -1354,8 +1255,6 @@ signals.post_save.connect(
     Contact.upd_status_when_first_activity_created, sender=Activity)
 signals.post_save.connect(
     SalesCycle.upd_lst_activity_on_create, sender=Activity)
-# signals.pre_delete.connect(
-#     Share.delete_share_on_delete, sender=Contact)
 
 
 def on_activity_delete(sender, instance=None, **kwargs):
@@ -1368,11 +1267,6 @@ def on_activity_delete(sender, instance=None, **kwargs):
     contact.save()
 
 signals.post_delete.connect(on_activity_delete, sender=Activity)
-
-
-# signals.post_save.connect(
-#     Contact.create_contact_on_vcard_create, sender=VCard)
-
 
 '''
 Function to get mentions by 3 of optional parameters:
@@ -1387,11 +1281,10 @@ def get_mentions(user_id=None, content_class=None, object_id=None):
                                   object_id=object_id)
 
 
-
 class ContactList(SubscriptionObject):
     title = models.CharField(max_length=150)
     users = models.ManyToManyField(CRMUser, related_name='contact_list',
-                                                 null=True, blank=True)
+                                   null=True, blank=True)
 
     class Meta:
         verbose_name = _('contact_list')
@@ -1403,13 +1296,12 @@ class ContactList(SubscriptionObject):
     def check_user(self, user_id):
         try:
             crm_user = self.users.get(user_id=user_id)
-            if  crm_user != None:
+            if not crm_user is None:
                 return True
             else:
                 return False
         except CRMUser.DoesNotExist:
             return False
-
 
     def get_contact_list_users(self, limit=20, offset=0):
         return self.users.all()[offset:offset + limit]
@@ -1420,7 +1312,7 @@ class ContactList(SubscriptionObject):
         for user_id in user_ids:
             try:
                 crm_user = CRMUser.objects.get(id=user_id)
-                if self.check_user(user_id=user_id) == False:
+                if not self.check_user(user_id=user_id):
                     self.users.add(crm_user)
                     status.append(True)
                 else:
@@ -1446,13 +1338,13 @@ class ContactList(SubscriptionObject):
 
         return status
 
-
     def count(self):
         return self.users.count()
 
 
 from almanet import signals
 signals.subscription_reconn.connect(SalesCycle.on_subscribtion_reconn)
+
 
 class SalesCycleProductStat(SubscriptionObject):
     sales_cycle = models.ForeignKey(SalesCycle)
@@ -1464,12 +1356,8 @@ class SalesCycleProductStat(SubscriptionObject):
         db_table = settings.DB_PREFIX.format('cycle_prod_stat')
 
     def __unicode__(self):
-        return ' %s | %s | %s'%(self.sales_cycle, self.product, self.value)
+        return ' %s | %s | %s' % (self.sales_cycle, self.product, self.value)
 
-    def save(self, **kwargs):
-        if not self.subscription_id:
-            self.subscription_id = self.sales_cycle.owner.subscription_id
-        super(SalesCycleProductStat, self).save(**kwargs)
 
 class Filter(SubscriptionObject):
     BASE_OPTIONS = (
@@ -1488,9 +1376,4 @@ class Filter(SubscriptionObject):
         db_table = settings.DB_PREFIX.format('filter')
 
     def __unicode__(self):
-        return u'%s: %s'%(self.title, self.base)
-
-    def save(self, **kwargs):
-        if not self.subscription_id and self.owner:
-            self.subscription_id = self.owner.subscription_id
-        super(self.__class__, self).save(**kwargs)
+        return u'%s: %s' % (self.title, self.base)

@@ -1294,25 +1294,11 @@ class ActivityResource(CRMServiceModelResource):
     sales_cycle = fields.ForeignKey(SalesCycleResource, 'sales_cycle')
     feedback = fields.ToOneField('alm_crm.api.FeedbackResource', 'feedback', null=True, blank=True)
 
-
-    # comments = fields.ToManyField(
-    #     'alm_crm.api.CommentResource',
-    #     attribute=lambda bundle: Comment.objects.filter(
-    #         content_type=ContentType.objects.get_for_model(bundle.obj),
-    #         object_id=bundle.obj.id
-    #         ),
-    #     null=True, full=True
-    #     )
-    # mention_users = fields.ToManyField(
-    #     'alm_crm.api.CRMUserResource',
-    #     attribute=lambda bundle: CRMUser.objects.filter(
-    #         pk__in=Mention.objects.filter(
-    #             content_type=ContentType.objects.get_for_model(bundle.obj),
-    #             object_id=bundle.obj.id
-    #         ).values_list('user_id', flat=True).distinct()
-    #         ),
-    #     null=True, full=False
-    #     )
+    class Meta(CommonMeta):
+        queryset = Activity.objects.all()
+        resource_name = 'activity'
+        excludes = ['date_edited', 'subscription_id', 'title']
+        always_return_data = True
 
     def prepend_urls(self):
         return [
@@ -1323,7 +1309,6 @@ class ActivityResource(CRMServiceModelResource):
                 name='api_get_comments'
             )
         ]
-
 
     def dehydrate_sales_cycle(self, bundle):
         return bundle.obj.sales_cycle.id
@@ -1411,12 +1396,6 @@ class ActivityResource(CRMServiceModelResource):
         feedback.save()
         bundle.data['feedback'] = feedback
         return bundle
-
-    class Meta(CommonMeta):
-        queryset = Activity.objects.all()
-        resource_name = 'activity'
-        excludes = ['date_edited', 'subscription_id', 'title']
-        always_return_data = True
 
     def post_list(self, request, **kwargs):
         '''
