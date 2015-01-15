@@ -1054,8 +1054,13 @@ class Url(SubscriptionObject):
     """
     A Url associted with a contact.
     """
+    TYPE_CHOICES = (
+        ('website', _(u"website")),
+        ('github', _(u"github")),
+    )
     vcard = models.ForeignKey(VCard)
-    data = models.URLField()
+    type = models.CharField(max_length=40, verbose_name=_("type"), choices=TYPE_CHOICES)
+    value = models.URLField()
 
     class Meta:
         verbose_name = _("url")

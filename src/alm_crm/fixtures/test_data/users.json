@@ -11,7 +11,8 @@
             "is_admin": false,
             "timezone": "Asia/Almaty",
             "password": "pbkdf2_sha256$12000$RfGiFmGJSeoz$063rfBSPM0AsFi1prglD5BW8qD1ElMYxBpRr5tO1M08=",
-            "email": "b.wayne@batman.bat"
+            "email": "b.wayne@batman.bat",
+            "vcard": 11
         }
     },
     {
@@ -26,7 +27,8 @@
             "is_admin": false,
             "timezone": "Asia/Almaty",
             "password": "pbkdf2_sha256$12000$RfGiFmGJSeoz$063rfBSPM0AsFi1prglD5BW8qD1ElMYxBpRr5tO1M08=",
-            "email": "abyken.nurlan@gmail.com"
+            "email": "abyken.nurlan@gmail.com",
+            "vcard": 12
         }
     },
     {
@@ -41,7 +43,8 @@
             "is_admin": false,
             "timezone": "Asia/Almaty",
             "password": "pbkdf2_sha256$12000$RfGiFmGJSeoz$063rfBSPM0AsFi1prglD5BW8qD1ElMYxBpRr5tO1M08=",
-            "email": "dmussaku@gmail.com"
+            "email": "dmussaku@gmail.com",
+            "vcard": 13
         }
     },
     {
@@ -56,7 +59,8 @@
             "is_admin": false,
             "timezone": "Asia/Almaty",
             "password": "pbkdf2_sha256$12000$RfGiFmGJSeoz$063rfBSPM0AsFi1prglD5BW8qD1ElMYxBpRr5tO1M08=",
-            "email": "sattar94@outlook.com"
+            "email": "sattar94@outlook.com",
+            "vcard": 14
         }
     }
 ]

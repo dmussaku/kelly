@@ -3,6 +3,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from django.utils.text import slugify
 from almanet.url_resolvers import reverse as almanet_reverse
+from django.db.models import signals
 
 
 class Service(models.Model):
@@ -26,7 +27,7 @@ class Service(models.Model):
 
 
 class Subscription(models.Model):
-
+    # global_sales_cycle_id = models.IntegerField(_('sales_cycle_id'), null=True, blank=True)
     service = models.ForeignKey(Service, related_name='subscriptions')
     user = models.ForeignKey('alm_user.User', related_name='subscriptions')
     organization = models.ForeignKey(

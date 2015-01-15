@@ -7,7 +7,24 @@ from tastypie.exceptions import NotFound, BadRequest
 from django.contrib.auth import login, logout, authenticate
 from django.conf.urls import url
 from tastypie.utils import trailing_slash
+from alm_vcard.models import *
+from alm_crm.models import Contact
+
 from .models import User
+from tastypie.authentication import (
+    MultiAuthentication,
+    SessionAuthentication,
+    BasicAuthentication,
+    )
+from tastypie.authorization import Authorization
+from tastypie.exceptions import ImmediateHttpResponse, NotFound
+from tastypie.http import HttpNotFound
+from tastypie.serializers import Serializer
+from django.http import HttpResponse
+from almanet.settings import DEFAULT_SERVICE
+import json
+import datetime
+import ast
 
 
 class UserSession(object):
@@ -61,13 +78,155 @@ class UserResource(ModelResource):
 
     @undocumented: Meta
     '''
+    vcard = fields.ToOneField('alm_vcard.api.VCardResource', 'vcard', null=True, full=True)
 
     class Meta:
         queryset = User.objects.all()
         excludes = ['password', 'is_admin']
-        list_allowed_methods = ['get']
-        detail_allowed_methods = ['get']
+        list_allowed_methods = ['get', 'patch']
+        detail_allowed_methods = ['get', 'patch']
         resource_name = 'user'
+        authentication = MultiAuthentication(BasicAuthentication(),
+                                             SessionAuthentication())
+        authorization = Authorization()
+
+    def get_crm_subscription(self, request):
+        user_env = request.user_env
+        subscription_pk = None
+        if 'subscriptions' in user_env:
+            subscription_pk = filter(
+                lambda x: user_env['subscription_{}'.format(x)]['slug'] == DEFAULT_SERVICE,
+                user_env['subscriptions']
+                )[0]
+        return subscription_pk
+
+    def obj_update(self, bundle, skip_errors=False, **kwargs):
+        """
+        A ORM-specific implementation of ``obj_update``.
+        """
+        if not bundle.obj or not self.get_bundle_detail_data(bundle):
+            try:
+                lookup_kwargs = self.lookup_kwargs_with_identifiers(bundle, kwargs)
+            except:
+                # if there is trouble hydrating the data, fall back to just
+                # using kwargs by itself (usually it only contains a "pk" key
+                # and this will work fine.
+                lookup_kwargs = kwargs
+
+            try:
+                bundle.obj = self.obj_get(bundle=bundle, **lookup_kwargs)
+            except ObjectDoesNotExist:
+                raise NotFound("A model instance matching the provided arguments could not be found.")
+
+        bundle = self.full_hydrate(bundle, **kwargs)
+        #return self.save(bundle, skip_errors=skip_errors)
+        raise ImmediateHttpResponse(
+            HttpResponse(
+                content=Serializer().to_json(
+                    self.full_dehydrate(
+                        self.build_bundle(
+                            obj=User.objects.get(id=bundle.obj.id))
+                        )
+                    ),
+                content_type='application/json; charset=utf-8', status=200
+                )
+            )
+        return bundle
+
+
+    def full_hydrate(self, bundle, **kwargs):
+        user_id = kwargs.get('pk', None)
+        if user_id:
+            if bundle.data.get('vcard', ""):
+                self.vcard_full_hydrate(bundle)
+                bundle.obj.save()
+        
+        return bundle
+
+    def full_dehydrate(self, bundle, for_list=False):
+        bundle = super(self.__class__, self).full_dehydrate(bundle, for_list=True)
+        bundle.data['unfollow_list'] = [contact.id for contact in bundle.obj.get_crmuser().unfollow_list.all()]
+        return bundle
+
+    def vcard_full_hydrate(self, bundle):
+        field_object = bundle.data.get('vcard',{})
+        subscription_id = self.get_crm_subscription(bundle.request)
+        if bundle.obj.vcard:
+            vcard = bundle.obj.vcard
+        else:
+            vcard = VCard()
+            vcard.save()
+            vcard.user = bundle.obj
+        vcard_fields = list(VCard._meta.get_fields_with_model())
+        for vcard_field in vcard_fields:
+            if vcard_field[0].__class__==models.fields.AutoField:
+                pass
+            elif vcard_field[0].__class__==models.fields.IntegerField:
+                pass
+            elif vcard_field[0].__class__==models.fields.DateField:
+                attname = vcard_field[0].attname
+                bday = field_object.get(attname, "")
+                '''
+                format = yyyy-mm-dd
+                '''
+                if bday:
+                    bday = datetime.datetime.strptime(bday, '%Y-%m-%d').date()
+                    vcard.__setattr__(attname, bday)
+            elif vcard_field[0].__class__==models.fields.DateTimeField:
+                attname = vcard_field[0].attname
+                rev = field_object.get(attname, "")
+                if rev:
+                    rev = datetime.datetime.strptime(date, "%Y-%m-%dT%H:%M:%S.%f")
+                    vcard.__setattr__(attname, bday)
+            elif vcard_field[0].__class__==models.fields.CharField:
+                attname = vcard_field[0].attname
+                vcard.__setattr__(attname,
+                    field_object.get(attname, ""))
+        '''
+        Now i need to go over the list of vcard keys
+        check their model names, go through each and every
+        model and check for three things
+        1) if id is set, then change the values in json
+        2) if id is not set, then create
+        3) if models are missing then delete the missing values
+        '''
+        vcard_rel_fields = vcard._meta.get_all_related_objects()
+        vcard_rel_fields.reverse()
+        del vcard_rel_fields[0]
+        del vcard_rel_fields[0]
+        for vcard_field in vcard_rel_fields:
+            field_value = vcard_field.var_name+'s'
+            obj_list = ast.literal_eval(str(field_object.get(vcard_field.var_name+'s','None')))
+            vcard_field_name = vcard_field.var_name+'_set'
+            model = vcard.__getattribute__(vcard_field_name).model
+            if obj_list:
+                queryset = vcard.__getattribute__(vcard_field_name).all()
+                json_objects = obj_list
+                id_list = []
+                for obj in json_objects:
+                    if obj.get('id',None):
+                        vcard_obj = model.objects.get(id=int(obj.get('id',None)))
+                        vcard_obj.vcard = vcard
+                        del obj['id']
+                    else:
+                        vcard_obj = model()
+                        vcard_obj.vcard = vcard
+                    for key, value in obj.viewitems():
+                        if key=='vcard':
+                            vcard_obj.vcard = VCard.objects.get(id=value)
+                        else:
+                            vcard_obj.__setattr__(key, value)
+                    vcard_obj.subscription_id = subscription_id
+                    vcard_obj.save()
+                    id_list.append(vcard_obj.id)
+                for obj in queryset:
+                    if not obj.id in id_list:
+                        obj.delete()
+            else:
+                for obj in model.objects.filter(vcard=vcard):
+                    obj.delete()
+        vcard.subscription_id = subscription_id
+        vcard.save()
 
     def prepend_urls(self):
         return [
