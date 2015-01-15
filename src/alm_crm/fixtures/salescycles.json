@@ -25,7 +25,7 @@
     "fields": {
         "status": "N", 
         "is_global": false, 
-        "latest_activity": null, 
+        "latest_activity": 5, 
         "description": "New SalesCycle Description", 
         "title": "New SalesCycle", 
         "real_value": null, 
@@ -44,7 +44,7 @@
     "model": "alm_crm.SalesCycle",
     "fields": {
         "status": "N", 
-        "latest_activity": 7, 
+        "latest_activity": 4, 
         "description": "", 
         "title": "Sale 1C online 3", 
         "real_value": null, 
@@ -64,7 +64,7 @@
     "model": "alm_crm.SalesCycle",
     "fields": {
         "status": "N", 
-        "latest_activity": null, 
+        "latest_activity": 6, 
         "description": "", 
         "title": "Sale 1C online 3",
         "real_value": null, 

@@ -1235,10 +1235,10 @@ class SalesCycleResource(CRMServiceModelResource):
                 name='api_close_cycle'
             ),
             url(
-                r"^(?P<resource_name>%s)/(?P<id>\d+)/product_ids%s$" %
+                r"^(?P<resource_name>%s)/(?P<id>\d+)/products%s$" %
                 (self._meta.resource_name, trailing_slash()),
-                self.wrap_view('product_ids'),
-                name='api_product_ids'
+                self.wrap_view('products'),
+                name='api_products'
             ),
         ]
 
@@ -1342,10 +1342,10 @@ class SalesCycleResource(CRMServiceModelResource):
             },
             response_class=http.HttpAccepted)
 
-    def product_ids(self, request, **kwargs):
+    def products(self, request, **kwargs):
         '''
         PUT METHOD
-        I{URL}:  U{alma.net/api/v1/sales_cycle/:id/replace_products/}
+        I{URL}:  U{alma.net/api/v1/sales_cycle/:id/products/}
 
         B{Description}:
         replace products of the sales cycle
@@ -1355,7 +1355,6 @@ class SalesCycleResource(CRMServiceModelResource):
         @return: updated SalesCycle
 
         '''
-    
         basic_bundle = self.build_bundle(request=request)
         try:
             obj = self.cached_obj_get(bundle=basic_bundle,
@@ -1367,7 +1366,7 @@ class SalesCycleResource(CRMServiceModelResource):
                 "More than one resource is found at this URI.")
         bundle = self.build_bundle(obj=obj, request=request)
 
-        get_product_ids = lambda: list(obj.products.values_list('pk', flat=True))
+        get_product_ids = lambda: {'object_ids': list(obj.products.values_list('pk', flat=True))}
 
         if request.method == 'GET':
             return self.create_response(request, get_product_ids())
@@ -1745,7 +1744,7 @@ class ProductResource(CRMServiceModelResource):
             ),
         ]
 
-    def replace_cycles(self, request, **kwargs):    
+    def replace_cycles(self, request, **kwargs):
         '''
         PUT METHOD
         I{URL}:  U{alma.net/api/v1/product/:id/replace_cycles/}
@@ -1847,7 +1846,7 @@ class CRMUserResource(CRMServiceModelResource):
         #         UserResource().build_bundle(obj=user)
         #     ).data
         bundle.data['user'] = user.id
-        return bundle 
+        return bundle
 
     def prepend_urls(self):
         return [
@@ -1948,7 +1947,7 @@ class ShareResource(CRMServiceModelResource):
 
     def share_multiple(self, request, **kwargs):
         '''
-        Post example   
+        Post example
         {
          "note": "sadasdasd",
           "contact": 10,
@@ -1995,7 +1994,7 @@ class ShareResource(CRMServiceModelResource):
             request,
             {
             'objects': self.get_bundle_list(share_list, request)}
-            )    
+            )
 
 
     def dehydrate_contact(self, bundle):
@@ -2017,7 +2016,7 @@ class ShareResource(CRMServiceModelResource):
         bundle.data['share_from'] = share_from
         return bundle
 
-    def hydrate_share_to(self, bundle):   
+    def hydrate_share_to(self, bundle):
         share_to = CRMUser.objects.get(id=bundle.data['share_to'])
         bundle.data['share_to'] = share_to
         return bundle
@@ -2067,6 +2066,7 @@ class CommentResource(CRMServiceModelResource):
     class Meta(CommonMeta):
         queryset = Comment.objects.all()
         resource_name = 'comment'
+        always_return_data = True
 
     def dehydrate(self, bundle):
         class_name = bundle.obj.content_object.__class__.__name__.lower()
@@ -2085,8 +2085,6 @@ class CommentResource(CRMServiceModelResource):
         bundle.data['content_object'] = obj_class.objects.get(id=obj_id)
         bundle.data.pop(model_name)
         return bundle
-
-
 
 
 class MentionResource(CRMServiceModelResource):

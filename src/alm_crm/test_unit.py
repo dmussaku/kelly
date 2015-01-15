@@ -855,11 +855,10 @@ class SalesCycleResourceTest(ResourceTestMixin, ResourceTestCase):
 
     def test_get_product_ids(self):
         resp = self.api_client.get(
-            self.api_path_sales_cycle+str(self.sales_cycle.pk)+'/product_ids/',
+            self.api_path_sales_cycle+str(self.sales_cycle.pk)+'/products/',
             format='json')
         resp = self.deserialize(resp)
-        self.assertIsInstance(resp, list)
-        self.assertEqual(len(resp), self.sales_cycle.products.count())
+        self.assertEqual(len(resp['object_ids']), self.sales_cycle.products.count())
 
     def test_update_product_ids(self):
         put_data = {
@@ -867,12 +866,12 @@ class SalesCycleResourceTest(ResourceTestMixin, ResourceTestCase):
         }
         before = self.sales_cycle.products.count()
         resp = self.api_client.put(
-            self.api_path_sales_cycle+str(self.sales_cycle.pk)+'/product_ids/',
+            self.api_path_sales_cycle+str(self.sales_cycle.pk)+'/products/',
             format='json', data=put_data)
         self.assertHttpAccepted(resp)
         resp = self.deserialize(resp)
         self.assertNotEqual(before, self.sales_cycle.products.count())
-        self.assertEqual(len(resp), self.sales_cycle.products.count())
+        self.assertEqual(len(resp['object_ids']), self.sales_cycle.products.count())
 
     @skipIf(True, "now, activities is not presented in SalesCycleResource")
     def test_create_sales_cycle_with_activity(self):
