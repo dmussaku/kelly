@@ -1391,7 +1391,8 @@ class ActivityResource(CRMServiceModelResource):
             new_sc_id = bundle.data.get('sales_cycle_id')
             if bundle.obj.sales_cycle_id != new_sc_id:
                 sales_cycle = SalesCycle.objects.get(pk=new_sc_id)
-                sales_cycle.rel_activities.add(bundle.obj)
+                bundle.obj.sales_cycle = sales_cycle
+                bundle.obj.save()
         return bundle
 
 
