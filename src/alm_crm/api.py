@@ -51,7 +51,6 @@ import datetime
 import time
 
 
-
 class CRMServiceModelResource(ModelResource):
 
     def hydrate(self, bundle):
@@ -100,8 +99,8 @@ class CRMServiceModelResource(ModelResource):
     class Meta:
         list_allowed_methods = ['get', 'post']
         detail_allowed_methods = ['get', 'post', 'put', 'delete']
-        authentication = MultiAuthentication(BasicAuthentication(),
-                                             SessionAuthentication())
+        authentication = MultiAuthentication(SessionAuthentication(),
+                                             BasicAuthentication())
         authorization = Authorization()
 
 
@@ -531,9 +530,9 @@ class ContactResource(CRMServiceModelResource):
                 name='api_share_contacts'
             ),
             url(
-                r"^(?P<resource_name>%s)/import_contacts_from_vcard%s$" %
+                r"^(?P<resource_name>%s)/import%s$" %
                 (self._meta.resource_name, trailing_slash()),
-                self.wrap_view('import_contacts_from_vcard'),
+                self.wrap_view('import_contacts'),
                 name='api_import_contacts_from_vcard'
             ),
             url(
@@ -1068,7 +1067,7 @@ class ContactResource(CRMServiceModelResource):
                 Contact.share_contacts(share_from, share_to, contact_ids)}
             )
 
-    def import_contacts_from_vcard(self, request, **kwargs):
+    def import_contacts(self, request, **kwargs):
         '''
         POST METHOD
         I{URL}:  U{alma.net/api/v1/contact/import_contacts_from_vcard/}
@@ -1092,11 +1091,22 @@ class ContactResource(CRMServiceModelResource):
         ... },
 
         '''
-        if request.method == 'POST':
-            return self.create_response(
-                request,
-                Contact.import_contacts_from_vcard(request.FILES['myfile'])
-                )
+        objects = []
+        contact_resource = ContactResource()
+        self.method_check(request, allowed=['post'])
+        self.is_authenticated(request)
+        self.throttle_check(request)
+        data = self.deserialize(
+            request, request.body,
+            format=request.META.get('CONTENT_TYPE', 'application/json'))
+        for contact in Contact.import_from_vcard(data['uploaded_file']):
+            _bundle = contact_resource.build_bundle(
+                obj=contact, request=request)
+            objects.append(contact_resource.full_dehydrate(
+                _bundle, for_list=True))
+        print len(objects), 'json'
+        self.log_throttled_access(request)
+        return self.create_response(request, {'success': objects})
 
     def export_contacts_to_vcard(self, request, **kwargs):
         '''
@@ -1943,7 +1953,7 @@ class AppStateObject(object):
     def __init__(self, service_slug=None, request=None):
         if service_slug is None:
             return
-        service = Service.objects.get(pk=service_slug)
+        service = Service.objects.get(slug=service_slug)
 
         self.request = request
         self.current_user = request.user

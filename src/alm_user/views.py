@@ -39,7 +39,6 @@ def login(request, template_name='registration/login.html',
     if request.method == "POST":
         form = authentication_form(request, data=request.POST)
         if form.is_valid():
-
             # Ensure the user-originating redirection url is safe.
             if not is_safe_url(url=redirect_to, host=request.get_host()):
                 redirect_to = resolve_url(settings.LOGIN_REDIRECT_URL)
@@ -48,7 +47,7 @@ def login(request, template_name='registration/login.html',
             if request.user:
                 subscr = request.user.get_subscriptions().first()
                 if not subscr is None:
-                    return HttpResponseRedirect(subscr.backend.get_home_url())
+                    return HttpResponseRedirect('/')
             return HttpResponseRedirect(redirect_to)
     else:
         form = authentication_form(request)
