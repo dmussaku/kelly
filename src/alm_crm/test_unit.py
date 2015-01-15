@@ -1005,7 +1005,7 @@ class ActivityResourceTest(ResourceTestMixin, ResourceTestCase):
 
         self.assertEqual(resp_activity['description'], self.activity.description)
         self.assertEqual(resp_activity['author_id'], self.activity.owner.id)
-        self.assertEqual(resp_activity['feedback'], self.activity.feedback.status)
+        self.assertEqual(resp_activity['feedback_status'], self.activity.feedback.status)
 
     def test_create_activity_with_feedback(self):
         owner = CRMUser.objects.last()
@@ -1013,14 +1013,14 @@ class ActivityResourceTest(ResourceTestMixin, ResourceTestCase):
         post_data = {
             'author_id': owner.id,
             'description': 'new activity, test_unit',
-            'salescycle_id': sales_cycle.id,
-            'feedback': "$"
+            'sales_cycle_id': sales_cycle.id,
+            'feedback_status': "$"
         }
         count = Activity.objects.all().count()
         count2 = sales_cycle.rel_activities.count()
         resp = self.api_client.post(self.api_path_activity, format='json', data=post_data)
         self.assertHttpCreated(resp)
-        self.assertEqual(Activity.objects.all().count(), count+1)
+        self.assertEqual(Activity.objects.all().count(), count + 1)
         # verify that new one has been added.
         self.assertEqual(sales_cycle.rel_activities.count(), count2 + 1)
         activity = sales_cycle.rel_activities.last()
@@ -1051,22 +1051,13 @@ class ActivityResourceTest(ResourceTestMixin, ResourceTestCase):
         # verify that owner was set
         self.assertIsInstance(activity.owner, CRMUser)
 
-    def test_create_comment(self):
-        post_data = {
-            'activity_id': self.activity.id,
-            'comment': 'activity comment'
-        }
-        resp = self.api_client.put(self.api_path_activity + '%s/comments/' % (self.activity.pk),
-                            format='json', data=post_data)
-        self.assertHttpAccepted(resp)
-
     def test_create_activity_without_feedback(self):
         owner = CRMUser.objects.last()
         sales_cycle = SalesCycle.objects.first()
         post_data = {
             'author_id': owner.id,
             'description': 'new activity, test_unit',
-            'salescycle_id': sales_cycle.id
+            'sales_cycle_id': sales_cycle.id
         }
         count = Activity.objects.all().count()
         count2 = sales_cycle.rel_activities.count()
@@ -1098,8 +1089,8 @@ class ActivityResourceTest(ResourceTestMixin, ResourceTestCase):
         # update it
         t = '_UPDATED!'
         activity_data['description'] += t
-        activity_data['feedback'] = new_feedback
-        activity_data['salescycle_id'] = sales_cycle_id
+        activity_data['feedback_status'] = new_feedback
+        activity_data['sales_cycle_id'] = sales_cycle_id
         # PUT it
         self.api_client.put(self.api_path_activity + '%s/' % (activity.pk),
                             format='json', data=activity_data)
@@ -1109,35 +1100,10 @@ class ActivityResourceTest(ResourceTestMixin, ResourceTestCase):
         self.assertEqual(self.get_detail_des(activity.pk)['description'], activity.description + t)
 
         self.assertEqual(activity_last.feedback.status, new_feedback)
-        self.assertEqual(self.get_detail_des(activity.pk)['feedback'], new_feedback)
+        self.assertEqual(self.get_detail_des(activity.pk)['feedback_status'], new_feedback)
 
         activity_last = Activity.objects.last()
-        self.assertEqual(self.get_detail_des(activity.pk)['salescycle_id'], sales_cycle_id)
-        self.assertEqual(sales_cycle_id, activity_last.sales_cycle.id)
-
-    def test_update_activity_via_patch(self):
-        activity = Activity.objects.last()
-        activity_data = {}
-        sales_cycle_id = SalesCycle.objects.last().id
-        new_feedback = "5"
-        t = '_UPDATED!'
-        activity_data['salescycle_id'] = sales_cycle_id
-        new_description = self.get_detail_des(activity.pk)['description']+t
-
-        self.api_client.patch(self.api_path_activity + '%s/' % (activity.pk),
-                            format='json', data={'salescycle_id': sales_cycle_id})
-        self.api_client.patch(self.api_path_activity + '%s/' % (activity.pk),
-                            format='json', data={'feedback': new_feedback, 'description': new_description})
-
-        activity_last = Activity.objects.last()
-        self.assertEqual(activity_last.description, activity.description + t)
-        self.assertEqual(self.get_detail_des(activity.pk)['description'], activity.description + t)
-
-        self.assertEqual(activity_last.feedback.status, new_feedback)
-        self.assertEqual(self.get_detail_des(activity.pk)['feedback'], new_feedback)
-
-        activity_last = Activity.objects.last()
-        self.assertEqual(self.get_detail_des(activity.pk)['salescycle_id'], sales_cycle_id)
+        self.assertEqual(self.get_detail_des(activity.pk)['sales_cycle_id'], sales_cycle_id)
         self.assertEqual(sales_cycle_id, activity_last.sales_cycle.id)
 
 
@@ -1888,7 +1854,7 @@ class FilterResourceTest(ResourceTestMixin, ResourceTestCase):
         self.assertEqual(filter_obj.base, 'cold')
         self
         self.assertIsInstance(filter_obj.subscription_id, int)
-        
+
 
     def test_delete_filter(self):
         before = Filter.objects.all().count()

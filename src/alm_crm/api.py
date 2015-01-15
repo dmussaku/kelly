@@ -26,6 +26,8 @@ from .models import (
     Feedback,
     Comment,
     Mention,
+    SalesCycleProductStat,
+    Filter
     )
 from alm_vcard.models import *
 from almanet.models import Subscription, Service
@@ -49,6 +51,29 @@ from django.http import HttpResponse
 import json
 import datetime
 import time
+from contextlib import contextmanager
+
+
+@contextmanager
+def RequestContext(self, request, allowed_methods=None):
+    allowed_methods = allowed_methods or []
+    self.method_check(request, allowed=allowed_methods)
+    self.is_authenticated(request)
+    self.throttle_check(request)
+    yield
+    self.log_throttled_access(request)
+
+
+def get_crm_subscription(request):
+    user_env = request.user_env
+    subscription_pk = None
+    if 'subscriptions' in user_env:
+        subscription_pk = filter(
+            lambda x: user_env['subscription_{}'.format(x)]['slug'] == DEFAULT_SERVICE,
+            user_env['subscriptions']
+            )[0]
+    return subscription_pk
+
 
 class CommonMeta:
     list_allowed_methods = ['get', 'post']
@@ -85,19 +110,8 @@ class CRMServiceModelResource(ModelResource):
         return objects
 
     @classmethod
-    def get_crm_subscription(cls, request):
-        user_env = request.user_env
-        subscription_pk = None
-        if 'subscriptions' in user_env:
-            subscription_pk = filter(
-                lambda x: user_env['subscription_{}'.format(x)]['slug'] == DEFAULT_SERVICE,
-                user_env['subscriptions']
-                )[0]
-        return subscription_pk
-
-    @classmethod
     def get_crmuser(cls, request):
-        subscription_pk = cls.get_crm_subscription(request)
+        subscription_pk = get_crm_subscription(request)
         crmuser = None
         if subscription_pk:
             crmuser = request.user.get_subscr_user(subscription_pk)
@@ -175,80 +189,80 @@ class ContactResource(CRMServiceModelResource):
         resource_name = 'contact'
 
         def prepend_urls(self):
-        return [
-            url(
-                r"^(?P<resource_name>%s)/recent%s$" %
-                (self._meta.resource_name, trailing_slash()),
-                self.wrap_view('get_last_contacted'),
-                name='api_last_contacted'
-            ),
-            url(
-                r"^(?P<resource_name>%s)/cold_base%s$" %
-                (self._meta.resource_name, trailing_slash()),
-                self.wrap_view('get_cold_base'),
-                name='api_cold_base'
-            ),
-            url(
-                r"^(?P<resource_name>%s)/leads%s$" %
-                (self._meta.resource_name, trailing_slash()),
-                self.wrap_view('get_leads'),
-                name='api_leads'
-            ),
-            url(
-                r"^(?P<resource_name>%s)/search%s$" %
-                (self._meta.resource_name, trailing_slash()),
-                self.wrap_view('search'),
-                name='api_search'
-            ),
-            url(
-                r"^(?P<resource_name>%s)/assign_contact%s$" %
-                (self._meta.resource_name, trailing_slash()),
-                self.wrap_view('assign_contact'),
-                name='api_assign_contact'
-            ),
-            url(
-                r"^(?P<resource_name>%s)/assign_contacts%s$" %
-                (self._meta.resource_name, trailing_slash()),
-                self.wrap_view('assign_contacts'),
-                name='api_assign_contacts'
-            ),
-            url(
-                r"^(?P<resource_name>%s)/(?P<id>\d+)/products%s$" %
-                (self._meta.resource_name, trailing_slash()),
-                self.wrap_view('get_products'),
-                name='api_get_products'
-            ),
-            url(
-                r"^(?P<resource_name>%s)/(?P<id>\d+)/activities%s$" %
-                (self._meta.resource_name, trailing_slash()),
-                self.wrap_view('get_activities'),
-                name='api_get_activities'
-            ),
-            url(
-                r"^(?P<resource_name>%s)/share_contact%s$" %
-                (self._meta.resource_name, trailing_slash()),
-                self.wrap_view('share_contact'),
-                name='api_share_contact'
-            ),
-            url(
-                r"^(?P<resource_name>%s)/share_contacts%s$" %
-                (self._meta.resource_name, trailing_slash()),
-                self.wrap_view('share_contacts'),
-                name='api_share_contacts'
-            ),
-            url(
-                r"^(?P<resource_name>%s)/import%s$" %
-                (self._meta.resource_name, trailing_slash()),
-                self.wrap_view('import_contacts'),
-                name='api_import_contacts_from_vcard'
-            ),
-            url(
-                r"^(?P<resource_name>%s)/export_contacts_to_vcard%s$" %
-                (self._meta.resource_name, trailing_slash()),
-                self.wrap_view('export_contacts_to_vcard'),
-                name='api_export_contacts_to_vcard'
-            ),
-        ]
+            return [
+                url(
+                    r"^(?P<resource_name>%s)/recent%s$" %
+                    (self._meta.resource_name, trailing_slash()),
+                    self.wrap_view('get_last_contacted'),
+                    name='api_last_contacted'
+                ),
+                url(
+                    r"^(?P<resource_name>%s)/cold_base%s$" %
+                    (self._meta.resource_name, trailing_slash()),
+                    self.wrap_view('get_cold_base'),
+                    name='api_cold_base'
+                ),
+                url(
+                    r"^(?P<resource_name>%s)/leads%s$" %
+                    (self._meta.resource_name, trailing_slash()),
+                    self.wrap_view('get_leads'),
+                    name='api_leads'
+                ),
+                url(
+                    r"^(?P<resource_name>%s)/search%s$" %
+                    (self._meta.resource_name, trailing_slash()),
+                    self.wrap_view('search'),
+                    name='api_search'
+                ),
+                url(
+                    r"^(?P<resource_name>%s)/assign_contact%s$" %
+                    (self._meta.resource_name, trailing_slash()),
+                    self.wrap_view('assign_contact'),
+                    name='api_assign_contact'
+                ),
+                url(
+                    r"^(?P<resource_name>%s)/assign_contacts%s$" %
+                    (self._meta.resource_name, trailing_slash()),
+                    self.wrap_view('assign_contacts'),
+                    name='api_assign_contacts'
+                ),
+                url(
+                    r"^(?P<resource_name>%s)/(?P<id>\d+)/products%s$" %
+                    (self._meta.resource_name, trailing_slash()),
+                    self.wrap_view('get_products'),
+                    name='api_get_products'
+                ),
+                url(
+                    r"^(?P<resource_name>%s)/(?P<id>\d+)/activities%s$" %
+                    (self._meta.resource_name, trailing_slash()),
+                    self.wrap_view('get_activities'),
+                    name='api_get_activities'
+                ),
+                url(
+                    r"^(?P<resource_name>%s)/share_contact%s$" %
+                    (self._meta.resource_name, trailing_slash()),
+                    self.wrap_view('share_contact'),
+                    name='api_share_contact'
+                ),
+                url(
+                    r"^(?P<resource_name>%s)/share_contacts%s$" %
+                    (self._meta.resource_name, trailing_slash()),
+                    self.wrap_view('share_contacts'),
+                    name='api_share_contacts'
+                ),
+                url(
+                    r"^(?P<resource_name>%s)/import%s$" %
+                    (self._meta.resource_name, trailing_slash()),
+                    self.wrap_view('import_contacts'),
+                    name='api_import_contacts_from_vcard'
+                ),
+                url(
+                    r"^(?P<resource_name>%s)/export_contacts_to_vcard%s$" %
+                    (self._meta.resource_name, trailing_slash()),
+                    self.wrap_view('export_contacts_to_vcard'),
+                    name='api_export_contacts_to_vcard'
+                ),
+            ]
 
     def post_list(self, request, **kwargs):
         '''
@@ -1291,14 +1305,22 @@ class ActivityResource(CRMServiceModelResource):
     """
     author_id = fields.IntegerField(attribute='author_id', null=True)
     description = fields.CharField(attribute='description')
-    sales_cycle = fields.ForeignKey(SalesCycleResource, 'sales_cycle')
-    feedback = fields.ToOneField('alm_crm.api.FeedbackResource', 'feedback', null=True, blank=True)
+    sales_cycle_id = fields.IntegerField(null=True)
+    feedback_status = fields.CharField(null=True)
 
     class Meta(CommonMeta):
         queryset = Activity.objects.all()
         resource_name = 'activity'
         excludes = ['date_edited', 'subscription_id', 'title']
         always_return_data = True
+
+    def dehydrate_sales_cycle_id(self, bundle):
+        return bundle.obj.sales_cycle_id
+
+    def dehydrate_feedback_status(self, bundle):
+        if hasattr(bundle.obj, 'feedback'):
+            return bundle.obj.feedback.status
+        return None
 
     def prepend_urls(self):
         return [
@@ -1309,38 +1331,6 @@ class ActivityResource(CRMServiceModelResource):
                 name='api_get_comments'
             )
         ]
-
-    def dehydrate_sales_cycle(self, bundle):
-        return bundle.obj.sales_cycle.id
-
-    def dehydrate_feedback(self, bundle):
-        return hasattr(bundle.obj, 'feedback') and bundle.obj.feedback.status or None
-
-    def hydrate_sales_cycle(self, bundle):
-        sales_cycle = SalesCycle.objects.get(id = bundle.data['sales_cycle'])
-        bundle.data['sales_cycle'] = sales_cycle
-        return bundle
-
-    def hydrate_feedback(self, bundle):
-        # feedback = Feedback()
-        # if bundle.request.method == "PUT":
-        #     feedback = Activity.objects.get(id=bundle.data['id']).feedback
-        #     feedback.status = bundle.data['feedback']
-        # elif bundle.request.method == "POST" and bundle.data.get('feedback', None):
-        #     feedback.status = bundle.data['feedback']
-        #     feedback.owner = CRMUser.objects.get(id=bundle.data['author_id'])
-        # else:
-        #      feedback.owner = CRMUser.objects.get(id=bundle.data['author_id'])
-        #      feedback.status = 'W'
-
-        # bundle.data['feedback'] = feedback
-        # feedback.save()
-
-        if bundle.data.get('feedback'):
-            bundle.data['feedback_status'] = bundle.data['feedback']
-            bundle.data['feedback'] = None
-
-        return bundle
 
     def get_comments(self, request, **kwargs):
         '''
@@ -1365,60 +1355,44 @@ class ActivityResource(CRMServiceModelResource):
         ...     ]
 
         '''
+        with RequestContext(self, request):
+            activity = Activity.objects.get(
+                pk=kwargs.get('id')).prefetch_related('comments')
+            comments = CommentResource().get_bundle_list(
+                activity.comments, request)
+        return self.create_response(
+            request, {'objects': comments})
 
-        try:
-            activity = Activity.objects.get(id=kwargs.get('id'))
-            comments = activity.comments.all()
-            comment_resource = CommentResource()
-            obj_dict = {}
-            obj_dict['objects'] = comment_resource.get_bundle_list(comments,
-                                                                   request)
-            return self.create_response(request, obj_dict)
-        except ContactList.DoesNotExist:
-            return self.create_response(
-                    request, {'success':False, 'error_string':'Has no any comments'}
-                )
-
-
-    def save(self, bundle, skip_errors=False):
-        bundle = super(self.__class__, self).save(bundle, skip_errors)
-        status = 'W'
-        feedback = None
-        if bundle.data.get('feedback_status', None):
-            status = bundle.data['feedback_status']
-        if bundle.request.method == 'PUT':
-            feedback = Feedback.objects.get(activity = bundle.obj)
-            feedback.status = status
+    def obj_create(self, bundle, **kwargs):
+        act = bundle.obj = self._meta.object_class()
+        act.author_id = bundle.data.get('author_id')
+        act.description = bundle.data.get('description')
+        if bundle.data.get('sales_cycle_id', None):
+            act.sales_cycle_id = bundle.data.get('sales_cycle_id')
         else:
-            feedback = Feedback(owner = bundle.obj.owner,
-                                activity = bundle.obj,
-                                 status = status)
-        feedback.save()
-        bundle.data['feedback'] = feedback
+            _subscr_id = get_crm_subscription(bundle.request)
+            act.sales_cycle_id = SalesCycle.get_global(_subscr_id).pk
+        act.save()
+        if bundle.data.get('feedback_status'):
+            act.feedback = Feedback(
+                status=bundle.data.get('feedback_status', None),
+                owner_id=act.author_id)
+            act.feedback.save()
+        bundle = self.full_hydrate(bundle)
         return bundle
 
-    def post_list(self, request, **kwargs):
-        '''
-        POST METHOD
-        I{URL}:  U{alma.net/api/v1/activity/}
-
-        Description
-        API standart function to Create new Activity
-
-        @type  mention_user_ids: list[id]
-        @param mention_user_ids: The list of crmuser ids,
-        to add them as mentioned users of new activity
-
-        @return: HTTP status code back (201) and a Location header,
-        which gives us the URI to our newly created resource.
-
-        >>> HTTP/1.0 201 CREATED
-        ... Date: Fri, 11 Nov 2014 06:48:36 GMT
-        ... Server: WSGIServer/0.1 Python/2.7
-        ... Content-Type: text/html; charset=utf-8
-        ... Location: http://alma.net/api/v1/activity/1/
-        '''
-        return super(self.__class__, self).post_list(request, **kwargs)
+    def save(self, bundle, **kwargs):
+        bundle = super(ActivityResource, self).save(bundle, **kwargs)
+        if bundle.data.get('feedback_status', None):
+            if bundle.obj.feedback.status != bundle.data['feedback_status']:
+                bundle.obj.feedback.status = bundle.data['feedback_status']
+                bundle.obj.feedback.save()
+        if bundle.data.get('sales_cycle_id', None):
+            new_sc_id = bundle.data.get('sales_cycle_id')
+            if bundle.obj.sales_cycle_id != new_sc_id:
+                sales_cycle = SalesCycle.objects.get(pk=new_sc_id)
+                sales_cycle.rel_activities.add(bundle.obj)
+        return bundle
 
 
 class ProductResource(CRMServiceModelResource):
@@ -2237,3 +2211,52 @@ class AppStateResource(Resource):
             {'sales_cycles': sales_cycles, 'activities': activities}
             # {'objects': self.get_bundle_list(shares, request)}
             )
+
+
+class SalesCycleProductStatResource(CRMServiceModelResource):
+    '''
+    ALL Method
+    I{URL}:  U{alma.net/api/v1/cycle_product_stat/}
+    B{Description}:
+    API resource to manage SalesCycleProductStatResource
+    @undocumented: Meta
+    '''
+    product_id = fields.ToOneField(
+        'alm_crm.api.ProductResource', 'product', null=False, full=False)
+    sales_cycle = fields.ToOneField(
+        'alm_crm.api.SalesCycleResource', 'sales_cycle', null=False, full=False)
+
+    class Meta(CommonMeta):
+        queryset = SalesCycleProductStat.objects.all()
+        resource_name = 'cycle_product_stat'
+
+    def dehydrate_product_id(self, bundle):
+        return bundle.obj.product.id
+
+    def hydrate_product_id(self, bundle):
+        product = Product.objects.get(id=bundle.data['product_id'])
+        bundle.data['product_id'] = product
+        return bundle
+
+    def dehydrate_sales_cycle(self, bundle):
+        return bundle.obj.product.id
+
+    def hydrate_sales_cycle(self, bundle):
+        sales_cycle = SalesCycle.objects.get(id=bundle.data['sales_cycle'])
+        bundle.data['sales_cycle'] = sales_cycle
+        return bundle
+
+
+class FilterResource(CRMServiceModelResource):
+    '''
+    ALL Method
+    I{URL}:  U{alma.net/api/v1/filter/}
+    B{Description}:
+    API resource to manage Filter
+    @undocumented: Meta
+    '''
+    author_id = fields.IntegerField(attribute='owner_id')
+
+    class Meta(CommonMeta):
+        queryset = Filter.objects.all()
+        resource_name = 'filter'
