@@ -701,7 +701,7 @@ class FilterTestCase(TestCase):
 
 
 class ResourceTestMixin(object):
-    fixtures = ['companies.json', 'services.json', 'users.json',
+    fixtures = ['contenttypes.json','companies.json', 'services.json', 'users.json',
                 'subscriptions.json', 'comments.json',
                 'crmusers.json', 'vcards.json', 'contacts.json',
                 'salescycles.json', 'activities.json', 'products.json',
