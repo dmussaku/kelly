@@ -301,8 +301,8 @@ class ContactResource(CRMServiceModelResource):
         '''Custom representation of followers, assignees etc.'''
         bundle = super(self.__class__, self).full_dehydrate(
             bundle, for_list=True)
-        bundle.data['author_id'] = bundle.obj.owner_id
-        bundle.data['parent_id'] = bundle.obj.parent_id
+        bundle.data['owner_id'] = bundle.obj.owner_id
+        bundle.data['children'] = [contact.id for contact in bundle.obj.children.all()]
         return bundle
 
     # def dehydrate_assignees(self, bundle):
@@ -328,6 +328,7 @@ class ContactResource(CRMServiceModelResource):
     def full_hydrate(self, bundle, **kwargs):
         # t1 = time.time()
         contact_id = kwargs.get('pk', None)
+        crmuser = bundle.request.user.get_crmuser()
         subscription_id = self.get_crm_subscription(bundle.request)
         if contact_id:
             bundle.obj = Contact.objects.get(id=int(contact_id))
@@ -345,10 +346,10 @@ class ContactResource(CRMServiceModelResource):
         i got in a json. If its missing then i just delete it.
 
         '''
-        if bundle.data.get('user_id',""):
-            bundle.obj.owner_id = int(bundle.data['user_id'])
-        if bundle.data.get('parent_id',""):
-            bundle.obj.parent_id = int(bundle.data['parent_id'])
+        bundle.obj.owner = crmuser
+        # if bundle.data.get('children',""):
+        #     for child_id in bundle.data.get('children'):
+        #         bundle.obj.children.add(Contact.objects.get(id=int(child_id)))
         for field_name in bundle.obj._meta.get_all_field_names():
             if bundle.data.get(str(field_name), None):
                 try:
@@ -358,8 +359,9 @@ class ContactResource(CRMServiceModelResource):
                 if isinstance(field_object, unicode):
                     bundle.obj.__setattr__(field_name, field_object)
                 elif isinstance(field_object, list):
+                    model = bundle.obj.__getattribute__(field_name).model
                     for obj in field_object:
-                        bundle.obj.__getattribute__(field_name).add(int(obj))
+                        bundle.obj.__getattribute__(field_name).add(model.objects.get(id=int(obj)))
                 elif isinstance(field_object, dict):
                     # t2 = time.time() - t1
                     self.vcard_full_hydrate(bundle)
