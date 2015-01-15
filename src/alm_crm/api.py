@@ -1355,7 +1355,7 @@ class ActivityResource(CRMServiceModelResource):
         ...     ]
 
         '''
-        with RequestContext(self, request):
+        with RequestContext(self, request, allowed_methods=['post']):
             activity = Activity.objects.get(
                 pk=kwargs.get('id')).prefetch_related('comments')
             comments = CommentResource().get_bundle_list(
@@ -2222,7 +2222,7 @@ class SalesCycleProductStatResource(CRMServiceModelResource):
     API resource to manage SalesCycleProductStatResource
     @undocumented: Meta
     '''
-    product_id = fields.ToOneField(
+    product = fields.ToOneField(
         'alm_crm.api.ProductResource', 'product', null=False, full=False)
     sales_cycle = fields.ToOneField(
         'alm_crm.api.SalesCycleResource', 'sales_cycle', null=False, full=False)
@@ -2235,8 +2235,7 @@ class SalesCycleProductStatResource(CRMServiceModelResource):
         return bundle.obj.product.id
 
     def hydrate_product_id(self, bundle):
-        product = Product.objects.get(id=bundle.data['product_id'])
-        bundle.data['product_id'] = product
+        bundle.data['product'] = Product.objects.get(id=bundle.data['product'])
         return bundle
 
     def dehydrate_sales_cycle(self, bundle):
