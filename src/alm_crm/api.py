@@ -26,6 +26,8 @@ from .models import (
     Feedback,
     Comment,
     Mention,
+    SalesCycleProductStat,
+    Filter
     )
 from alm_vcard.models import *
 from almanet.models import Subscription, Service
@@ -174,7 +176,7 @@ class ContactResource(CRMServiceModelResource):
         queryset = Contact.objects.all()
         resource_name = 'contact'
 
-        def prepend_urls(self):
+    def prepend_urls(self):
         return [
             url(
                 r"^(?P<resource_name>%s)/recent%s$" %
@@ -1616,16 +1618,28 @@ class CommentResource(CRMServiceModelResource):
         Feedback: FeedbackResource
     }, 'content_object')
 
-    def dehydrate_date_created(self, bundle):
-        return bundle.obj.date_created.strftime('%Y-%m-%d %H:%M')
-
-    def dehydrate_date_edited(self, bundle):
-        return bundle.obj.date_edited.strftime('%Y-%m-%d %H:%M')
 
     class Meta(CommonMeta):
         queryset = Comment.objects.all()
         resource_name = 'comment'
 
+    def dehydrate(self, bundle):
+        class_name = bundle.obj.content_object.__class__.__name__.lower()
+        bundle.data[class_name+'_id'] = bundle.obj.content_object.id
+        return bundle
+
+    def hydrate(self, bundle):
+        if bundle.data.get('id'):
+            return bundle
+
+        generics = ['activity_id', 'contact_id', 'share_id', 'feedback_id']
+        model_name = filter(lambda k: k in generics, bundle.data.keys())[0]
+        obj_class = ContentType.objects.get(app_label='alm_crm', model=model_name[:-3]).model_class()
+        obj_id = bundle.data[model_name]
+        bundle.data['object_id'] = obj_id
+        bundle.data['content_object'] = obj_class.objects.get(id=obj_id)
+        bundle.data.pop(model_name)
+        return bundle
 
 class MentionResource(CRMServiceModelResource):
     '''

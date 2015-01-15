@@ -5,7 +5,7 @@
     "fields": {
         "comment": "Test comment 1", 
         "object_id": 1, 
-        "content_type": 33, 
+        "content_type": 37, 
         "owner": 1, 
         "date_created": "2014-09-10T00:00:00Z", 
         "subscription_id": 1, 
@@ -18,7 +18,7 @@
     "fields": {
         "comment": "Test comment 2", 
         "object_id": 1, 
-        "content_type": 33, 
+        "content_type": 37, 
         "owner": 1, 
         "date_created": "2014-09-10T00:00:00Z", 
         "subscription_id": 2, 
@@ -31,7 +31,7 @@
     "fields": {
         "comment": "Test comment 3", 
         "object_id": 2, 
-        "content_type": 33, 
+        "content_type": 37, 
         "owner": 1, 
         "date_created": "2014-09-10T00:00:00Z", 
         "subscription_id": 1, 
@@ -44,7 +44,7 @@
     "fields": {
         "comment": "Test comment 4", 
         "object_id": 3, 
-        "content_type": 33, 
+        "content_type": 37, 
         "owner": 1, 
         "date_created": "2014-09-10T00:00:00Z", 
         "subscription_id": 1, 
@@ -52,6 +52,4 @@
     }
 }
 ]
-
-
 
