@@ -1879,7 +1879,7 @@ class FilterResourceTest(ResourceTestMixin, ResourceTestCase):
         self.assertIsInstance(filter_obj.subscription_id, int)
         
 
-    def test_delete_product(self):
+    def test_delete_filter(self):
         before = Filter.objects.all().count()
         self.assertHttpAccepted(self.api_client.delete(
             self.api_path_filter + '%s/' % self.filter.pk, format='json'))
@@ -1887,7 +1887,7 @@ class FilterResourceTest(ResourceTestMixin, ResourceTestCase):
         # verify that one sales_cycle has been deleted.
         self.assertEqual(after, before - 1)
 
-    def test_update_product_via_put(self):
+    def test_update_filter_via_put(self):
         # get exist product data
         filter_data = self.get_detail_des(self.filter.pk)
         # update it
@@ -1899,7 +1899,7 @@ class FilterResourceTest(ResourceTestMixin, ResourceTestCase):
         # check
         self.assertEqual(self.get_detail_des(self.filter.pk)['title'], self.filter.title + t)
 
-    def test_update_product_via_patch(self):
+    def test_update_filter_via_patch(self):
         # get exist product data
         filter_title = self.get_detail_des(self.filter.pk)['title']
         # update it
@@ -1910,4 +1910,110 @@ class FilterResourceTest(ResourceTestMixin, ResourceTestCase):
                               format='json', data={'title': filter_title})
         # check
         self.assertEqual(self.get_detail_des(self.filter.pk)['title'], filter_title)
+
+
+class CommentResourceTest(ResourceTestMixin, ResourceTestCase):
+
+    def setUp(self):
+        super(self.__class__, self).setUp()
+
+        # login user
+        self.get_credentials()
+
+        self.api_path_comment = '/api/v1/comment/'
+
+        # get_list
+        self.get_list_resp = self.api_client.get(self.api_path_comment,
+                                                 format='json',
+                                                 HTTP_HOST='localhost')
+        self.get_list_des = self.deserialize(self.get_list_resp)
+
+        # get_detail(pk)
+        self.get_detail_resp = \
+            lambda pk: self.api_client.get(self.api_path_comment+str(pk)+'/',
+                                           format='json',
+                                           HTTP_HOST='localhost')
+        self.get_detail_des = \
+            lambda pk: self.deserialize(self.get_detail_resp(pk))
+
+        self.comment = Comment.objects.first()
+
+    def test_get_list_valid_json(self):
+        print self.get_list_resp
+        self.assertValidJSONResponse(self.get_list_resp)
+
+    def test_get_list_non_empty(self):
+        self.assertTrue(self.get_list_des['meta']['total_count'] > 0)
+
+    def test_get_detail(self):
+        self.assertEqual(
+            self.get_detail_des(self.comment.pk)['comment'],
+            self.comment.comment
+            )
+
+    # def test_create_filter(self):
+    #     crmuser = CRMUser.objects.last()
+    #     post_data={
+    #         'title': 'Filter Resource',
+    #         'filter_text': 'Filter Resource text',
+    #         'author_id': crmuser.pk
+    #     }
+    #     self.assertHttpCreated(self.api_client.post(
+    #         self.api_path_filter, format='json', data=post_data))
+    #     filter_obj = Filter.objects.last()
+    #     self.assertEqual(filter_obj.title, 'Filter Resource')
+    #     self.assertEqual(filter_obj.owner, crmuser)
+    #     self.assertEqual(filter_obj.base, 'all')
+    #     self
+    #     self.assertIsInstance(filter_obj.subscription_id, int)
+
+    # def test_create_filter_with_base(self):
+    #     crmuser = CRMUser.objects.last()
+    #     post_data={
+    #         'title': 'Filter Resource',
+    #         'filter_text': 'Filter Resource text',
+    #         'author_id': crmuser.pk,
+    #         'base': 'cold'
+    #     }
+    #     self.assertHttpCreated(self.api_client.post(
+    #         self.api_path_filter, format='json', data=post_data))
+    #     filter_obj = Filter.objects.last()
+    #     self.assertEqual(filter_obj.title, 'Filter Resource')
+    #     self.assertEqual(filter_obj.owner, crmuser)
+    #     self.assertEqual(filter_obj.base, 'cold')
+    #     self
+    #     self.assertIsInstance(filter_obj.subscription_id, int)
+        
+
+    # def test_delete_filter(self):
+    #     before = Filter.objects.all().count()
+    #     self.assertHttpAccepted(self.api_client.delete(
+    #         self.api_path_filter + '%s/' % self.filter.pk, format='json'))
+    #     after = Filter.objects.all().count()
+    #     # verify that one sales_cycle has been deleted.
+    #     self.assertEqual(after, before - 1)
+
+    # def test_update_filter_via_put(self):
+    #     # get exist product data
+    #     filter_data = self.get_detail_des(self.filter.pk)
+    #     # update it
+    #     t = '_UPDATED!'
+    #     filter_data['title'] += t
+    #     # PUT it
+    #     self.api_client.put(self.api_path_filter + '%s/' % (self.filter.pk),
+    #                         format='json', data=filter_data)
+    #     # check
+    #     self.assertEqual(self.get_detail_des(self.filter.pk)['title'], self.filter.title + t)
+
+    # def test_update_filter_via_patch(self):
+    #     # get exist product data
+    #     filter_title = self.get_detail_des(self.filter.pk)['title']
+    #     # update it
+    #     t = 'TITLE_UPDATED!'
+    #     filter_title += t
+    #     # PATCH it
+    #     self.api_client.patch(self.api_path_filter + '%s/' % (self.filter.pk),
+    #                           format='json', data={'title': filter_title})
+    #     # check
+    #     self.assertEqual(self.get_detail_des(self.filter.pk)['title'], filter_title)
 

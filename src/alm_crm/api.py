@@ -1879,24 +1879,27 @@ class CommentResource(CRMServiceModelResource):
         Feedback: FeedbackResource
     }, 'content_object')
 
-    def dehydrate(self, bundle):
-        class_name = bundle.obj.content_object.__class__.__name__.lower()
-        bundle.data[class_name+'_id'] = bundle.obj.content_object.id
-        bundle.data.pop('content_object')
-        return bundle
-
-    def hydrate(self, bundle):
-        class_name_lower = filter(lambda k: k[-3:]=='_id' and k[:-3]!='subscription', bundle.data)[0]
-        obj_class = ContentType.objects.get(app_label='alm_crm', model=class_name_lower).model_class()
-        obj = obj_class.objects.get(id=bundle.data[class_name_lower+'_id'])
-        bundle.data['content_object'] = obj        
-        return bundle
-
-
     class Meta(CommonMeta):
         queryset = Comment.objects.all()
         resource_name = 'comment'
-        excludes = ['object_id']
+        #excludes = ['object_id']
+
+    def dehydrate(self, bundle):
+        class_name = bundle.obj.content_object.__class__.__name__.lower()
+        bundle.data[class_name+'_id'] = bundle.obj.content_object.id
+        bundle.data.pop('object_id')
+        return bundle
+
+    def hydrate(self, bundle):
+        generics = ['activity', 'contact', 'share', 'feedback']
+        class_name_lower = filter(lambda k: k[-3:]=='_id' and k[:-3] in generics, bundle.data)[0][:-3]
+        #obj_class = ContentType.objects.get(app_label='alm_crm', model=class_name_lower).model_class()
+        obj_id = bundle.data[class_name_lower+'_id']
+        bundle.data['object_id'] = obj_id
+        bundle.data.pop(class_name_lower+'_id')
+        return bundle
+
+
 
 
 class MentionResource(CRMServiceModelResource):

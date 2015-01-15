@@ -1,0 +1,1135 @@
+[
+{
+    "pk": 1, 
+    "model": "contenttypes.contenttype", 
+    "fields": {
+        "model": "logentry", 
+        "name": "log entry", 
+        "app_label": "admin"
+    }
+},
+{
+    "pk": 2, 
+    "model": "contenttypes.contenttype", 
+    "fields": {
+        "model": "contenttype", 
+        "name": "content type", 
+        "app_label": "contenttypes"
+    }
+},
+{
+    "pk": 3, 
+    "model": "contenttypes.contenttype", 
+    "fields": {
+        "model": "session", 
+        "name": "session", 
+        "app_label": "sessions"
+    }
+},
+{
+    "pk": 4, 
+    "model": "contenttypes.contenttype", 
+    "fields": {
+        "model": "migrationhistory", 
+        "name": "migration history", 
+        "app_label": "south"
+    }
+},
+{
+    "pk": 5, 
+    "model": "contenttypes.contenttype", 
+    "fields": {
+        "model": "service", 
+        "name": "service", 
+        "app_label": "almanet"
+    }
+},
+{
+    "pk": 6, 
+    "model": "contenttypes.contenttype", 
+    "fields": {
+        "model": "subscription", 
+        "name": "subscription", 
+        "app_label": "almanet"
+    }
+},
+{
+    "pk": 7, 
+    "model": "contenttypes.contenttype", 
+    "fields": {
+        "model": "user", 
+        "name": "user", 
+        "app_label": "alm_user"
+    }
+},
+{
+    "pk": 8, 
+    "model": "contenttypes.contenttype", 
+    "fields": {
+        "model": "company", 
+        "name": "company", 
+        "app_label": "alm_company"
+    }
+},
+{
+    "pk": 9, 
+    "model": "contenttypes.contenttype", 
+    "fields": {
+        "model": "category", 
+        "name": "category", 
+        "app_label": "alm_vcard"
+    }
+},
+{
+    "pk": 10, 
+    "model": "contenttypes.contenttype", 
+    "fields": {
+        "model": "tel", 
+        "name": "telephone number", 
+        "app_label": "alm_vcard"
+    }
+},
+{
+    "pk": 11, 
+    "model": "contenttypes.contenttype", 
+    "fields": {
+        "model": "adr", 
+        "name": "address", 
+        "app_label": "alm_vcard"
+    }
+},
+{
+    "pk": 12, 
+    "model": "contenttypes.contenttype", 
+    "fields": {
+        "model": "title", 
+        "name": "title", 
+        "app_label": "alm_vcard"
+    }
+},
+{
+    "pk": 13, 
+    "model": "contenttypes.contenttype", 
+    "fields": {
+        "model": "url", 
+        "name": "url", 
+        "app_label": "alm_vcard"
+    }
+},
+{
+    "pk": 14, 
+    "model": "contenttypes.contenttype", 
+    "fields": {
+        "model": "nickname", 
+        "name": "nickname", 
+        "app_label": "alm_vcard"
+    }
+},
+{
+    "pk": 15, 
+    "model": "contenttypes.contenttype", 
+    "fields": {
+        "model": "mailer", 
+        "name": "mailer", 
+        "app_label": "alm_vcard"
+    }
+},
+{
+    "pk": 16, 
+    "model": "contenttypes.contenttype", 
+    "fields": {
+        "model": "agent", 
+        "name": "agent", 
+        "app_label": "alm_vcard"
+    }
+},
+{
+    "pk": 17, 
+    "model": "contenttypes.contenttype", 
+    "fields": {
+        "model": "email", 
+        "name": "email", 
+        "app_label": "alm_vcard"
+    }
+},
+{
+    "pk": 18, 
+    "model": "contenttypes.contenttype", 
+    "fields": {
+        "model": "note", 
+        "name": "note", 
+        "app_label": "alm_vcard"
+    }
+},
+{
+    "pk": 19, 
+    "model": "contenttypes.contenttype", 
+    "fields": {
+        "model": "role", 
+        "name": "role", 
+        "app_label": "alm_vcard"
+    }
+},
+{
+    "pk": 20, 
+    "model": "contenttypes.contenttype", 
+    "fields": {
+        "model": "key", 
+        "name": "key", 
+        "app_label": "alm_vcard"
+    }
+},
+{
+    "pk": 21, 
+    "model": "contenttypes.contenttype", 
+    "fields": {
+        "model": "org", 
+        "name": "organization", 
+        "app_label": "alm_vcard"
+    }
+},
+{
+    "pk": 22, 
+    "model": "contenttypes.contenttype", 
+    "fields": {
+        "model": "label", 
+        "name": "label", 
+        "app_label": "alm_vcard"
+    }
+},
+{
+    "pk": 23, 
+    "model": "contenttypes.contenttype", 
+    "fields": {
+        "model": "geo", 
+        "name": "geographic uri", 
+        "app_label": "alm_vcard"
+    }
+},
+{
+    "pk": 24, 
+    "model": "contenttypes.contenttype", 
+    "fields": {
+        "model": "vcard", 
+        "name": "vcard", 
+        "app_label": "alm_vcard"
+    }
+},
+{
+    "pk": 25, 
+    "model": "contenttypes.contenttype", 
+    "fields": {
+        "model": "tz", 
+        "name": "time zone", 
+        "app_label": "alm_vcard"
+    }
+},
+{
+    "pk": 26, 
+    "model": "contenttypes.contenttype", 
+    "fields": {
+        "model": "comment", 
+        "name": "comment", 
+        "app_label": "alm_crm"
+    }
+},
+{
+    "pk": 27, 
+    "model": "contenttypes.contenttype", 
+    "fields": {
+        "model": "salescycleproductstat", 
+        "name": "sales_cycle_product_stat", 
+        "app_label": "alm_crm"
+    }
+},
+{
+    "pk": 28, 
+    "model": "contenttypes.contenttype", 
+    "fields": {
+        "model": "product", 
+        "name": "product", 
+        "app_label": "alm_crm"
+    }
+},
+{
+    "pk": 29, 
+    "model": "contenttypes.contenttype", 
+    "fields": {
+        "model": "feedback", 
+        "name": "feedback", 
+        "app_label": "alm_crm"
+    }
+},
+{
+    "pk": 30, 
+    "model": "contenttypes.contenttype", 
+    "fields": {
+        "model": "crmuser", 
+        "name": "crm user", 
+        "app_label": "alm_crm"
+    }
+},
+{
+    "pk": 31, 
+    "model": "contenttypes.contenttype", 
+    "fields": {
+        "model": "contactlist", 
+        "name": "contact_list", 
+        "app_label": "alm_crm"
+    }
+},
+{
+    "pk": 32, 
+    "model": "contenttypes.contenttype", 
+    "fields": {
+        "model": "share", 
+        "name": "share", 
+        "app_label": "alm_crm"
+    }
+},
+{
+    "pk": 33, 
+    "model": "contenttypes.contenttype", 
+    "fields": {
+        "model": "value", 
+        "name": "value", 
+        "app_label": "alm_crm"
+    }
+},
+{
+    "pk": 34, 
+    "model": "contenttypes.contenttype", 
+    "fields": {
+        "model": "filter", 
+        "name": "filter", 
+        "app_label": "alm_crm"
+    }
+},
+{
+    "pk": 35, 
+    "model": "contenttypes.contenttype", 
+    "fields": {
+        "model": "mention", 
+        "name": "mention", 
+        "app_label": "alm_crm"
+    }
+},
+{
+    "pk": 36, 
+    "model": "contenttypes.contenttype", 
+    "fields": {
+        "model": "contact", 
+        "name": "contact", 
+        "app_label": "alm_crm"
+    }
+},
+{
+    "pk": 37, 
+    "model": "contenttypes.contenttype", 
+    "fields": {
+        "model": "activity", 
+        "name": "activity", 
+        "app_label": "alm_crm"
+    }
+},
+{
+    "pk": 38, 
+    "model": "contenttypes.contenttype", 
+    "fields": {
+        "model": "salescycle", 
+        "name": "sales_cycle", 
+        "app_label": "alm_crm"
+    }
+},
+{
+    "pk": 39, 
+    "model": "contenttypes.contenttype", 
+    "fields": {
+        "model": "apiaccess", 
+        "name": "api access", 
+        "app_label": "tastypie"
+    }
+},
+{
+    "pk": 1, 
+    "model": "south.migrationhistory", 
+    "fields": {
+        "applied": "2015-01-14T07:22:31.051Z", 
+        "app_name": "almanet", 
+        "migration": "0001_initial"
+    }
+},
+{
+    "pk": 2, 
+    "model": "south.migrationhistory", 
+    "fields": {
+        "applied": "2015-01-14T07:22:32.921Z", 
+        "app_name": "almanet", 
+        "migration": "0002_auto__del_product__add_service__del_field_subscription_product__add_fi"
+    }
+},
+{
+    "pk": 3, 
+    "model": "south.migrationhistory", 
+    "fields": {
+        "applied": "2015-01-14T07:22:33.750Z", 
+        "app_name": "almanet", 
+        "migration": "0003_auto__chg_field_subscription_service"
+    }
+},
+{
+    "pk": 4, 
+    "model": "south.migrationhistory", 
+    "fields": {
+        "applied": "2015-01-14T07:22:34.612Z", 
+        "app_name": "almanet", 
+        "migration": "0004_auto__add_field_subscription_global_sales_cycle_id"
+    }
+},
+{
+    "pk": 5, 
+    "model": "south.migrationhistory", 
+    "fields": {
+        "applied": "2015-01-14T07:22:35.420Z", 
+        "app_name": "almanet", 
+        "migration": "0005_auto__del_field_subscription_global_sales_cycle_id"
+    }
+},
+{
+    "pk": 6, 
+    "model": "south.migrationhistory", 
+    "fields": {
+        "applied": "2015-01-14T07:22:36.419Z", 
+        "app_name": "alm_user", 
+        "migration": "0001_initial"
+    }
+},
+{
+    "pk": 7, 
+    "model": "south.migrationhistory", 
+    "fields": {
+        "applied": "2015-01-14T07:22:36.968Z", 
+        "app_name": "alm_user", 
+        "migration": "0002_auto__add_field_user_username"
+    }
+},
+{
+    "pk": 8, 
+    "model": "south.migrationhistory", 
+    "fields": {
+        "applied": "2015-01-14T07:22:37.549Z", 
+        "app_name": "alm_user", 
+        "migration": "0003_auto__del_field_user_username"
+    }
+},
+{
+    "pk": 9, 
+    "model": "south.migrationhistory", 
+    "fields": {
+        "applied": "2015-01-14T07:22:38.603Z", 
+        "app_name": "alm_company", 
+        "migration": "0001_initial"
+    }
+},
+{
+    "pk": 10, 
+    "model": "south.migrationhistory", 
+    "fields": {
+        "applied": "2015-01-14T07:22:43.834Z", 
+        "app_name": "alm_vcard", 
+        "migration": "0001_initial"
+    }
+},
+{
+    "pk": 11, 
+    "model": "south.migrationhistory", 
+    "fields": {
+        "applied": "2015-01-14T07:22:54.549Z", 
+        "app_name": "alm_vcard", 
+        "migration": "0002_auto__add_field_nickname_subscription_id__add_field_category_subscript"
+    }
+},
+{
+    "pk": 12, 
+    "model": "south.migrationhistory", 
+    "fields": {
+        "applied": "2015-01-14T07:22:56.598Z", 
+        "app_name": "alm_vcard", 
+        "migration": "0003_auto__del_field_url_data__add_field_url_type__add_field_url_value"
+    }
+},
+{
+    "pk": 13, 
+    "model": "south.migrationhistory", 
+    "fields": {
+        "applied": "2015-01-14T07:23:02.218Z", 
+        "app_name": "alm_crm", 
+        "migration": "0001_initial"
+    }
+},
+{
+    "pk": 14, 
+    "model": "south.migrationhistory", 
+    "fields": {
+        "applied": "2015-01-14T07:23:03.261Z", 
+        "app_name": "alm_crm", 
+        "migration": "0002_auto__chg_field_contact_vcard__add_unique_contact_vcard"
+    }
+},
+{
+    "pk": 15, 
+    "model": "south.migrationhistory", 
+    "fields": {
+        "applied": "2015-01-14T07:23:10.335Z", 
+        "app_name": "alm_crm", 
+        "migration": "0003_auto__chg_field_crmuser_subscription_id__del_field_product_user_id__de"
+    }
+},
+{
+    "pk": 16, 
+    "model": "south.migrationhistory", 
+    "fields": {
+        "applied": "2015-01-14T07:23:11.308Z", 
+        "app_name": "alm_crm", 
+        "migration": "0004_auto__add_field_contact_owner"
+    }
+},
+{
+    "pk": 17, 
+    "model": "south.migrationhistory", 
+    "fields": {
+        "applied": "2015-01-14T07:23:11.925Z", 
+        "app_name": "alm_crm", 
+        "migration": "0005_auto__add_field_value_owner"
+    }
+},
+{
+    "pk": 18, 
+    "model": "south.migrationhistory", 
+    "fields": {
+        "applied": "2015-01-14T07:23:12.831Z", 
+        "app_name": "alm_crm", 
+        "migration": "0006_auto__add_field_salescycle_title"
+    }
+},
+{
+    "pk": 19, 
+    "model": "south.migrationhistory", 
+    "fields": {
+        "applied": "2015-01-14T07:23:13.637Z", 
+        "app_name": "alm_crm", 
+        "migration": "0007_auto__add_share"
+    }
+},
+{
+    "pk": 20, 
+    "model": "south.migrationhistory", 
+    "fields": {
+        "applied": "2015-01-14T07:23:15.955Z", 
+        "app_name": "alm_crm", 
+        "migration": "0008_auto__del_field_mention_user_id__add_field_mention_user__add_field_men"
+    }
+},
+{
+    "pk": 21, 
+    "model": "south.migrationhistory", 
+    "fields": {
+        "applied": "2015-01-14T07:23:19.661Z", 
+        "app_name": "alm_crm", 
+        "migration": "0009_auto__del_field_mention_author__add_field_mention_owner__del_field_com"
+    }
+},
+{
+    "pk": 22, 
+    "model": "south.migrationhistory", 
+    "fields": {
+        "applied": "2015-01-14T07:23:20.311Z", 
+        "app_name": "alm_crm", 
+        "migration": "0010_auto__add_field_feedback_owner"
+    }
+},
+{
+    "pk": 23, 
+    "model": "south.migrationhistory", 
+    "fields": {
+        "applied": "2015-01-14T07:23:21.372Z", 
+        "app_name": "alm_crm", 
+        "migration": "0011_auto__add_field_share_is_read"
+    }
+},
+{
+    "pk": 24, 
+    "model": "south.migrationhistory", 
+    "fields": {
+        "applied": "2015-01-14T07:23:22.326Z", 
+        "app_name": "alm_crm", 
+        "migration": "0012_auto__add_contactlist"
+    }
+},
+{
+    "pk": 25, 
+    "model": "south.migrationhistory", 
+    "fields": {
+        "applied": "2015-01-14T07:23:23.245Z", 
+        "app_name": "alm_crm", 
+        "migration": "0013_auto__add_field_salescycle_description"
+    }
+},
+{
+    "pk": 26, 
+    "model": "south.migrationhistory", 
+    "fields": {
+        "applied": "2015-01-14T07:23:24.297Z", 
+        "app_name": "alm_crm", 
+        "migration": "0014_auto__add_field_share_note"
+    }
+},
+{
+    "pk": 27, 
+    "model": "south.migrationhistory", 
+    "fields": {
+        "applied": "2015-01-14T07:23:25.070Z", 
+        "app_name": "alm_crm", 
+        "migration": "0015_auto__chg_field_activity_title"
+    }
+},
+{
+    "pk": 28, 
+    "model": "south.migrationhistory", 
+    "fields": {
+        "applied": "2015-01-14T07:23:25.897Z", 
+        "app_name": "alm_crm", 
+        "migration": "0016_auto__chg_field_activity_sales_cycle"
+    }
+},
+{
+    "pk": 29, 
+    "model": "south.migrationhistory", 
+    "fields": {
+        "applied": "2015-01-14T07:23:27.677Z", 
+        "app_name": "alm_crm", 
+        "migration": "0017_auto__add_field_share_description__chg_field_activity_sales_cycle"
+    }
+},
+{
+    "pk": 30, 
+    "model": "south.migrationhistory", 
+    "fields": {
+        "applied": "2015-01-14T07:23:29.188Z", 
+        "app_name": "alm_crm", 
+        "migration": "0018_auto__del_field_contact_company_contact__add_field_contact_parent"
+    }
+},
+{
+    "pk": 31, 
+    "model": "south.migrationhistory", 
+    "fields": {
+        "applied": "2015-01-14T07:23:29.881Z", 
+        "app_name": "alm_crm", 
+        "migration": "0019_auto__chg_field_feedback_feedback"
+    }
+},
+{
+    "pk": 32, 
+    "model": "south.migrationhistory", 
+    "fields": {
+        "applied": "2015-01-14T07:23:32.189Z", 
+        "app_name": "alm_crm", 
+        "migration": "0020_auto__del_field_contact_company_contact__add_field_contact_parent__add"
+    }
+},
+{
+    "pk": 33, 
+    "model": "south.migrationhistory", 
+    "fields": {
+        "applied": "2015-01-14T07:23:33.362Z", 
+        "app_name": "alm_crm", 
+        "migration": "0021_auto__del_field_share_note"
+    }
+},
+{
+    "pk": 34, 
+    "model": "south.migrationhistory", 
+    "fields": {
+        "applied": "2015-01-14T07:23:34.169Z", 
+        "app_name": "alm_crm", 
+        "migration": "0022_auto"
+    }
+},
+{
+    "pk": 35, 
+    "model": "south.migrationhistory", 
+    "fields": {
+        "applied": "2015-01-14T07:23:35.142Z", 
+        "app_name": "alm_crm", 
+        "migration": "0022_auto__chg_field_salescycle_contact"
+    }
+},
+{
+    "pk": 36, 
+    "model": "south.migrationhistory", 
+    "fields": {
+        "applied": "2015-01-14T07:23:35.926Z", 
+        "app_name": "alm_crm", 
+        "migration": "0023_auto__chg_field_activity_sales_cycle"
+    }
+},
+{
+    "pk": 37, 
+    "model": "south.migrationhistory", 
+    "fields": {
+        "applied": "2015-01-14T07:23:37.523Z", 
+        "app_name": "alm_crm", 
+        "migration": "0023_auto__chg_field_share_contact__add_unique_share_contact"
+    }
+},
+{
+    "pk": 38, 
+    "model": "south.migrationhistory", 
+    "fields": {
+        "applied": "2015-01-14T07:23:38.365Z", 
+        "app_name": "alm_crm", 
+        "migration": "0024_auto__add_field_salescycle_is_global"
+    }
+},
+{
+    "pk": 39, 
+    "model": "south.migrationhistory", 
+    "fields": {
+        "applied": "2015-01-14T07:23:39.831Z", 
+        "app_name": "alm_crm", 
+        "migration": "0025_auto__add_salescycleproductstat__chg_field_share_contact"
+    }
+},
+{
+    "pk": 40, 
+    "model": "south.migrationhistory", 
+    "fields": {
+        "applied": "2015-01-14T07:23:41.812Z", 
+        "app_name": "alm_crm", 
+        "migration": "0026_auto__chg_field_share_contact__del_unique_share_contact"
+    }
+},
+{
+    "pk": 41, 
+    "model": "south.migrationhistory", 
+    "fields": {
+        "applied": "2015-01-14T07:23:42.280Z", 
+        "app_name": "alm_crm", 
+        "migration": "0027_auto__add_filter"
+    }
+},
+{
+    "pk": 42, 
+    "model": "south.migrationhistory", 
+    "fields": {
+        "applied": "2015-01-14T07:23:42.976Z", 
+        "app_name": "tastypie", 
+        "migration": "0001_initial"
+    }
+},
+{
+    "pk": 43, 
+    "model": "south.migrationhistory", 
+    "fields": {
+        "applied": "2015-01-14T07:23:43.321Z", 
+        "app_name": "tastypie", 
+        "migration": "0002_add_apikey_index"
+    }
+},
+{
+    "pk": 44, 
+    "model": "south.migrationhistory", 
+    "fields": {
+        "applied": "2015-01-14T07:23:43.706Z", 
+        "app_name": "django_extensions", 
+        "migration": "0001_empty"
+    }
+},
+{
+    "pk": 45, 
+    "model": "south.migrationhistory", 
+    "fields": {
+        "applied": "2015-01-14T11:43:03.581Z", 
+        "app_name": "alm_crm", 
+        "migration": "0027_auto"
+    }
+},
+{
+    "pk": 46, 
+    "model": "south.migrationhistory", 
+    "fields": {
+        "applied": "2015-01-14T11:43:05.575Z", 
+        "app_name": "alm_crm", 
+        "migration": "0028_auto__del_field_share_description__add_field_share_note"
+    }
+},
+{
+    "pk": 47, 
+    "model": "south.migrationhistory", 
+    "fields": {
+        "applied": "2015-01-14T11:44:35.921Z", 
+        "app_name": "alm_user", 
+        "migration": "0004_auto__add_field_user_vcard"
+    }
+},
+{
+    "pk": 1, 
+    "model": "almanet.service", 
+    "fields": {
+        "slug": "crm", 
+        "description": "CRM module by ALMACloud", 
+        "title": "CRM"
+    }
+},
+{
+    "pk": 1, 
+    "model": "alm_user.user", 
+    "fields": {
+        "first_name": "Bruce", 
+        "last_name": "Wayne", 
+        "company": [
+            1
+        ], 
+        "is_active": true, 
+        "last_login": "2014-11-11T07:51:02.253Z", 
+        "is_admin": false, 
+        "timezone": "Asia/Almaty", 
+        "password": "pbkdf2_sha256$12000$RfGiFmGJSeoz$063rfBSPM0AsFi1prglD5BW8qD1ElMYxBpRr5tO1M08=", 
+        "email": "b.wayne@batman.bat"
+    }
+},
+{
+    "pk": 2, 
+    "model": "alm_user.user", 
+    "fields": {
+        "first_name": "Nurlan", 
+        "last_name": "Abiken", 
+        "company": [
+            1
+        ], 
+        "is_active": true, 
+        "last_login": "2014-11-11T10:08:02.503Z", 
+        "is_admin": false, 
+        "timezone": "Asia/Almaty", 
+        "password": "pbkdf2_sha256$12000$RfGiFmGJSeoz$063rfBSPM0AsFi1prglD5BW8qD1ElMYxBpRr5tO1M08=", 
+        "email": "abyken.nurlan@gmail.com"
+    }
+},
+{
+    "pk": 3, 
+    "model": "alm_user.user", 
+    "fields": {
+        "first_name": "Daniyar", 
+        "last_name": "Mussakulov", 
+        "company": [
+            1
+        ], 
+        "is_active": true, 
+        "last_login": "2014-11-11T10:08:02.503Z", 
+        "is_admin": false, 
+        "timezone": "Asia/Almaty", 
+        "password": "pbkdf2_sha256$12000$RfGiFmGJSeoz$063rfBSPM0AsFi1prglD5BW8qD1ElMYxBpRr5tO1M08=", 
+        "email": "dmussaku@gmail.com"
+    }
+},
+{
+    "pk": 4, 
+    "model": "alm_user.user", 
+    "fields": {
+        "first_name": "Sattar", 
+        "last_name": "Stamkulov", 
+        "company": [
+            1
+        ], 
+        "is_active": true, 
+        "last_login": "2014-11-11T10:08:02.503Z", 
+        "is_admin": false, 
+        "timezone": "Asia/Almaty", 
+        "password": "pbkdf2_sha256$12000$RfGiFmGJSeoz$063rfBSPM0AsFi1prglD5BW8qD1ElMYxBpRr5tO1M08=", 
+        "email": "sattar94@outlook.com"
+    }
+},
+{
+    "pk": 1, 
+    "model": "alm_company.company", 
+    "fields": {
+        "owner": [
+            [
+                "Bruce Wayne"
+            ]
+        ], 
+        "subdomain": "almacloud", 
+        "name": "ALMACloud"
+    }
+},
+{
+    "pk": 1, 
+    "model": "alm_vcard.vcard", 
+    "fields": {
+        "family_name": "Kamun", 
+        "uid": null, 
+        "honorific_suffix": "", 
+        "additional_name": "", 
+        "rev": null, 
+        "honorific_prefix": "", 
+        "bday": null, 
+        "given_name": "Rustem", 
+        "sort_string": null, 
+        "classP": null, 
+        "subscription_id": 1, 
+        "fn": "Rustem Kamun"
+    }
+},
+{
+    "pk": 2, 
+    "model": "alm_vcard.vcard", 
+    "fields": {
+        "family_name": "Heisenberg", 
+        "uid": null, 
+        "honorific_suffix": "", 
+        "additional_name": "Mett", 
+        "rev": null, 
+        "honorific_prefix": "", 
+        "bday": null, 
+        "given_name": "Nurlan", 
+        "sort_string": null, 
+        "classP": null, 
+        "subscription_id": 1, 
+        "fn": "Nurlan Heisenberg"
+    }
+},
+{
+    "pk": 3, 
+    "model": "alm_vcard.vcard", 
+    "fields": {
+        "family_name": "Mussina", 
+        "uid": null, 
+        "honorific_suffix": "", 
+        "additional_name": "", 
+        "rev": null, 
+        "honorific_prefix": "", 
+        "bday": null, 
+        "given_name": "Aliya", 
+        "sort_string": null, 
+        "classP": null, 
+        "subscription_id": 1, 
+        "fn": "Aliya Mussina"
+    }
+},
+{
+    "pk": 4, 
+    "model": "alm_vcard.vcard", 
+    "fields": {
+        "family_name": "Mussakulov", 
+        "uid": null, 
+        "honorific_suffix": "", 
+        "additional_name": "", 
+        "rev": null, 
+        "honorific_prefix": "", 
+        "bday": null, 
+        "given_name": "Daniyar", 
+        "sort_string": null, 
+        "classP": null, 
+        "subscription_id": 1, 
+        "fn": "Daniyar Mussakulov"
+    }
+},
+{
+    "pk": 5, 
+    "model": "alm_vcard.vcard", 
+    "fields": {
+        "family_name": "Kotov", 
+        "uid": null, 
+        "honorific_suffix": "", 
+        "additional_name": "", 
+        "rev": null, 
+        "honorific_prefix": "", 
+        "bday": null, 
+        "given_name": "Vadim", 
+        "sort_string": null, 
+        "classP": null, 
+        "subscription_id": 1, 
+        "fn": "Kotov Vadim"
+    }
+},
+{
+    "pk": 6, 
+    "model": "alm_vcard.vcard", 
+    "fields": {
+        "family_name": "Lusto", 
+        "uid": null, 
+        "honorific_suffix": "", 
+        "additional_name": "", 
+        "rev": null, 
+        "honorific_prefix": "", 
+        "bday": null, 
+        "given_name": "Stass", 
+        "sort_string": null, 
+        "classP": null, 
+        "subscription_id": 1, 
+        "fn": "Lusto Stass"
+    }
+},
+{
+    "pk": 7, 
+    "model": "alm_vcard.vcard", 
+    "fields": {
+        "family_name": "Mailubayev", 
+        "uid": null, 
+        "honorific_suffix": "", 
+        "additional_name": "", 
+        "rev": null, 
+        "honorific_prefix": "", 
+        "bday": null, 
+        "given_name": "Yernar", 
+        "sort_string": null, 
+        "classP": null, 
+        "subscription_id": 1, 
+        "fn": "Yernar Mailubayev"
+    }
+},
+{
+    "pk": 8, 
+    "model": "alm_vcard.vcard", 
+    "fields": {
+        "family_name": "Baitursynov", 
+        "uid": null, 
+        "honorific_suffix": "", 
+        "additional_name": "", 
+        "rev": null, 
+        "honorific_prefix": "", 
+        "bday": null, 
+        "given_name": "Dauren", 
+        "sort_string": null, 
+        "classP": null, 
+        "subscription_id": 1, 
+        "fn": "Dauren Baitursynov"
+    }
+},
+{
+    "pk": 9, 
+    "model": "alm_vcard.vcard", 
+    "fields": {
+        "family_name": "Omarov", 
+        "uid": null, 
+        "honorific_suffix": "", 
+        "additional_name": "", 
+        "rev": null, 
+        "honorific_prefix": "", 
+        "bday": null, 
+        "given_name": "Ashat", 
+        "sort_string": null, 
+        "classP": null, 
+        "subscription_id": 1, 
+        "fn": "Ashat Omarov"
+    }
+},
+{
+    "pk": 10, 
+    "model": "alm_vcard.vcard", 
+    "fields": {
+        "family_name": "Abiken", 
+        "uid": null, 
+        "honorific_suffix": "", 
+        "additional_name": "acm_nerd", 
+        "rev": null, 
+        "honorific_prefix": "", 
+        "bday": null, 
+        "given_name": "Nurlan", 
+        "sort_string": null, 
+        "classP": null, 
+        "subscription_id": 1, 
+        "fn": "Nurlan Abiken"
+    }
+},
+{
+    "pk": 1, 
+    "model": "alm_vcard.tel", 
+    "fields": {
+        "subscription_id": 1, 
+        "type": "CELL", 
+        "vcard": 3, 
+        "value": "87753591453"
+    }
+},
+{
+    "pk": 2, 
+    "model": "alm_vcard.tel", 
+    "fields": {
+        "subscription_id": 1, 
+        "type": "HOME", 
+        "vcard": 7, 
+        "value": "87078887722"
+    }
+},
+{
+    "pk": 3, 
+    "model": "alm_vcard.tel", 
+    "fields": {
+        "subscription_id": 1, 
+        "type": "CELL", 
+        "vcard": 2, 
+        "value": "87077776633"
+    }
+},
+{
+    "pk": 1, 
+    "model": "alm_vcard.email", 
+    "fields": {
+        "subscription_id": 1, 
+        "type": "INTERNET", 
+        "vcard": 1, 
+        "value": "r.kamun@gmail.com"
+    }
+},
+{
+    "pk": 2, 
+    "model": "alm_vcard.email", 
+    "fields": {
+        "subscription_id": 1, 
+        "type": "INTERNET", 
+        "vcard": 4, 
+        "value": "dmussaku@gmail.com"
+    }
+},
+{
+    "pk": 3, 
+    "model": "alm_vcard.email", 
+    "fields": {
+        "subscription_id": 1, 
+        "type": "INTERNET", 
+        "vcard": 5, 
+        "value": "igeeko@gmail.com"
+    }
+},
+{
+    "pk": 4, 
+    "model": "alm_vcard.email", 
+    "fields": {
+        "subscription_id": 1, 
+        "type": "INTERNET", 
+        "vcard": 6, 
+        "value": "sta3@me.com"
+    }
+},
+{
+    "pk": 5, 
+    "model": "alm_vcard.email", 
+    "fields": {
+        "subscription_id": 1, 
+        "type": "INTERNET", 
+        "vcard": 7, 
+        "value": "mafioso@gmail.com"
+    }
+},
+{
+    "pk": 6, 
+    "model": "alm_vcard.email", 
+    "fields": {
+        "subscription_id": 1, 
+        "type": "INTERNET", 
+        "vcard": 10, 
+        "value": "nurlan.abiken@gmail.com"
+    }
+}
