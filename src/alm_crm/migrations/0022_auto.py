@@ -8,14 +8,20 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
+        # Adding M2M table for field unfollow_list on 'CRMUser'
+        m2m_table_name = db.shorten_name(u'alm_crm_crmuser_unfollow_list')
+        db.create_table(m2m_table_name, (
+            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
+            ('crmuser', models.ForeignKey(orm[u'alm_crm.crmuser'], null=False)),
+            ('contact', models.ForeignKey(orm[u'alm_crm.contact'], null=False))
+        ))
+        db.create_unique(m2m_table_name, ['crmuser_id', 'contact_id'])
 
-        # Changing field 'Activity.sales_cycle'
-        db.alter_column('alma_activity', 'sales_cycle_id', self.gf('django.db.models.fields.related.ForeignKey')(null=True, to=orm['alm_crm.SalesCycle']))
 
     def backwards(self, orm):
+        # Removing M2M table for field unfollow_list on 'CRMUser'
+        db.delete_table(db.shorten_name(u'alm_crm_crmuser_unfollow_list'))
 
-        # Changing field 'Activity.sales_cycle'
-        db.alter_column('alma_activity', 'sales_cycle_id', self.gf('django.db.models.fields.related.ForeignKey')(default=None, to=orm['alm_crm.SalesCycle']))
 
     models = {
         u'alm_crm.activity': {
@@ -25,7 +31,7 @@ class Migration(SchemaMigration):
             'description': ('django.db.models.fields.CharField', [], {'max_length': '500'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'owner': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'activity_owner'", 'to': u"orm['alm_crm.CRMUser']"}),
-            'sales_cycle': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'rel_activities'", 'null': 'True', 'to': u"orm['alm_crm.SalesCycle']"}),
+            'sales_cycle': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'rel_activities'", 'to': u"orm['alm_crm.SalesCycle']"}),
             'subscription_id': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'title': ('django.db.models.fields.CharField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'})
         },
@@ -103,7 +109,7 @@ class Migration(SchemaMigration):
         },
         u'alm_crm.salescycle': {
             'Meta': {'object_name': 'SalesCycle', 'db_table': "'alma_sales_cycle'"},
-            'contact': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'sales_cycles'", 'on_delete': 'models.SET_DEFAULT', 'default': 'None', 'to': u"orm['alm_crm.Contact']", 'blank': 'True', 'null': 'True'}),
+            'contact': ('django.db.models.fields.related.ForeignKey', [], {'default': 'None', 'related_name': "'sales_cycles'", 'on_delete': 'models.SET_DEFAULT', 'to': u"orm['alm_crm.Contact']"}),
             'date_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'description': ('django.db.models.fields.CharField', [], {'max_length': '500'}),
             'followers': ('django.db.models.fields.related.ManyToManyField', [], {'blank': 'True', 'related_name': "'follow_sales_cycles'", 'null': 'True', 'symmetrical': 'False', 'to': u"orm['alm_crm.CRMUser']"}),

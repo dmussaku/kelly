@@ -92,6 +92,7 @@ class Migration(SchemaMigration):
             'is_supervisor': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'organization_id': ('django.db.models.fields.IntegerField', [], {}),
             'subscription_id': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
+            'unfollow_list': ('django.db.models.fields.related.ManyToManyField', [], {'blank': 'True', 'related_name': "'unfollowers'", 'null': 'True', 'symmetrical': 'False', 'to': u"orm['alm_crm.Contact']"}),
             'user_id': ('django.db.models.fields.IntegerField', [], {})
         },
         u'alm_crm.feedback': {
@@ -154,7 +155,7 @@ class Migration(SchemaMigration):
         },
         u'alm_crm.share': {
             'Meta': {'object_name': 'Share', 'db_table': "'alma_share'"},
-            'contact': ('django.db.models.fields.related.ForeignKey', [], {'default': 'None', 'related_name': "'shares'", 'to': u"orm['alm_crm.Contact']"}),
+            'contact': ('django.db.models.fields.related.OneToOneField', [], {'to': u"orm['alm_crm.Contact']", 'unique': 'True', 'null': 'True', 'blank': 'True'}),
             'date_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'description': ('django.db.models.fields.CharField', [], {'max_length': '500', 'null': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),

@@ -38,6 +38,10 @@ class CRMUser(SubscriptionObject):
     user_id = models.IntegerField(_('user id'))
     organization_id = models.IntegerField(_('organization id'))
     is_supervisor = models.BooleanField(_('is supervisor'), default=False)
+    unfollow_list = models.ManyToManyField(
+        'Contact', related_name='unfollowers',
+        null=True, blank=True
+        )
 
     def __unicode__(self):
         u = self.get_billing_user()
@@ -98,12 +102,6 @@ class Contact(SubscriptionObject):
     owner = models.ForeignKey(
         CRMUser, related_name='owned_contacts',
         null=True, blank=True)
-    followers = models.ManyToManyField(
-        CRMUser, related_name='following_contacts',
-        null=True, blank=True)
-    assignees = models.ManyToManyField(
-        CRMUser, related_name='assigned_contacts',
-        null=True, blank=True)
 
     # Commented by Rustem K
     # first_name = models.CharField(max_length=31,
@@ -119,6 +117,13 @@ class Contact(SubscriptionObject):
         related_name='contact_latest_activity', null=True)
     mentions = generic.GenericRelation('Mention')
     comments = generic.GenericRelation('Comment')
+    # followers = models.ManyToManyField(
+    #     CRMUser, related_name='following_contacts',
+    #     null=True, blank=True)
+    # assignees = models.ManyToManyField(
+    #     CRMUser, related_name='assigned_contacts',
+    #     null=True, blank=True)
+
 
     class Meta:
         verbose_name = _('contact')
@@ -129,6 +134,11 @@ class Contact(SubscriptionObject):
             return "%s %s" % (self.vcard.fn, self.tp)
         except:
             return "No name %s " %(self.tp)
+
+    def delete(self):
+        if self.vcard:
+            self.vcard.delete()
+        super(self.__class__, self).delete()
 
     def save(self, **kwargs):
         is_new = self.pk is None
@@ -246,9 +256,6 @@ class Contact(SubscriptionObject):
             return True
         except CRMUser.DoesNotExist:
             return False
-
-
-
 
     @classmethod
     def assign_user_to_contact(cls, user_id, contact_id):
@@ -497,8 +504,8 @@ class Contact(SubscriptionObject):
     @classmethod
     def get_contacts_by_last_activity_date(
             cls, user_id, owned=True, assigned=False,
-            followed=False, in_shares=False, include_activities=False,
-            limit=20, offset=0):
+            followed=False, in_shares=False, all=False,
+            include_activities=False):
         """TEST Returns list of contacts ordered by last activity date.
             Returns:
                 Queryset<Contact>
@@ -520,21 +527,24 @@ class Contact(SubscriptionObject):
         # SECOND IMPL
         # contact_activity_map follows structure suggested by Askhat.
         q = Q()
-        if owned:
-            q |= Q(owner_id=user_id)
-        if assigned:
-            q |= Q(assignees__user_id=user_id)
-        if followed:
-            q |= Q(followers__user_id=user_id)
-        if in_shares:
-            crmuser = CRMUser.objects.get(pk=user_id)
-            shares = crmuser.in_shares
-            q |= Q(id__in=set(shares.values_list('contact_id', flat=True)))
-        if len(q.children) == 0:
+        if all:
+            q |= Q()
+        else:
+            if owned:
+                q |= Q(owner_id=user_id)
+            if assigned:
+                q |= Q(assignees__user_id=user_id)
+            if followed:
+                q |= Q(followers__user_id=user_id)
+            if in_shares:
+                crmuser = CRMUser.objects.get(pk=user_id)
+                shares = crmuser.in_shares
+                q |= Q(id__in=set(shares.values_list('contact_id', flat=True)))
+        if not all and len(q.children) == 0:
             contacts = cls.objects.none()
         else:
             contacts = cls.objects.filter(q).order_by(
-                '-latest_activity__date_created')[offset:offset + limit]
+                '-latest_activity__date_created')
         if not include_activities:
             return contacts
         contact_activity_map = dict()
@@ -1302,13 +1312,12 @@ class Comment(SubscriptionObject):
 
 class Share(SubscriptionObject):
     is_read = models.BooleanField(default=False, blank=False)
-    contact = models.ForeignKey(
-        Contact, related_name='shares', default=None)
+    contact = models.ForeignKey(Contact, blank=True, null=True)
     share_to = models.ForeignKey(CRMUser, related_name='in_shares')
     share_from = models.ForeignKey(CRMUser, related_name='owned_shares')
     date_created = models.DateTimeField(blank=True, auto_now_add=True)
     comments = generic.GenericRelation('Comment')
-    description = models.CharField(max_length=500, null=True)
+    note = models.CharField(max_length=500, null=True)
 
     class Meta:
         verbose_name = 'share'
@@ -1335,6 +1344,7 @@ class Share(SubscriptionObject):
     def get_shares_owned_for(cls, user_id):
         return cls.objects.filter(share_from__pk=user_id)\
             .order_by('-date_created')
+
 
     # @classmethod
     # def delete_share_on_delete(cls):

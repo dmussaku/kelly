@@ -701,7 +701,7 @@ class FilterTestCase(TestCase):
 
 
 class ResourceTestMixin(object):
-    fixtures = ['contenttypes.json','companies.json', 'services.json', 'users.json',
+    fixtures = ['companies.json', 'services.json', 'users.json',
                 'subscriptions.json', 'comments.json',
                 'crmusers.json', 'vcards.json', 'contacts.json',
                 'salescycles.json', 'activities.json', 'products.json',
@@ -839,29 +839,40 @@ class SalesCycleResourceTest(ResourceTestMixin, ResourceTestCase):
             self.user.get_subscr_user(sales_cycle.subscription_id)
             )
 
-    # def test_patch_sales_cycle_with_products(self):
-    #     patch_data = {
-    #         'product_ids': [1, 2, 3]
-    #     }
-    #     before = self.sales_cycle.products.count()
+    @skipIf(True, "Resource needs in overwrite save_m2m() to create with M2M-relations")
+    def test_patch_sales_cycle_with_products(self):
+        patch_data = {
+            'product_ids': [1, 2, 3]
+        }
+        before = self.sales_cycle.products.count()
 
-    #     resp = self.api_client.patch(
-    #         self.api_path_sales_cycle+str(self.sales_cycle.pk)+'/',
-    #         format='json',
-    #         data=patch_data)
-    #     self.assertHttpAccepted(resp)
-    #     self.assertNotEqual(before, self.sales_cycle.products.count())
+        resp = self.api_client.patch(
+            self.api_path_sales_cycle+str(self.sales_cycle.pk)+'/',
+            format='json',
+            data=patch_data)
+        self.assertHttpAccepted(resp)
+        self.assertNotEqual(before, self.sales_cycle.products.count())
 
-    def test_replace_products(self):
-        post_data = {
+    def test_get_product_ids(self):
+        resp = self.api_client.get(
+            self.api_path_sales_cycle+str(self.sales_cycle.pk)+'/product_ids/',
+            format='json')
+        resp = self.deserialize(resp)
+        self.assertIsInstance(resp, list)
+        self.assertEqual(len(resp), self.sales_cycle.products.count())
+
+    def test_update_product_ids(self):
+        put_data = {
             "product_ids": [1, 2, 3]
         }
         before = self.sales_cycle.products.count()
-        resp = self.api_client.post(
-            self.api_path_sales_cycle+str(self.sales_cycle.pk)+'/replace_products/',
-            format='json', data=post_data)
+        resp = self.api_client.put(
+            self.api_path_sales_cycle+str(self.sales_cycle.pk)+'/product_ids/',
+            format='json', data=put_data)
         self.assertHttpAccepted(resp)
+        resp = self.deserialize(resp)
         self.assertNotEqual(before, self.sales_cycle.products.count())
+        self.assertEqual(len(resp), self.sales_cycle.products.count())
 
     @skipIf(True, "now, activities is not presented in SalesCycleResource")
     def test_create_sales_cycle_with_activity(self):
@@ -1752,7 +1763,7 @@ class ShareResourceTest(ResourceTestMixin, ResourceTestCase):
         self.assertEqual(share_from.owned_shares.count(), count_owned_shares+1)
         self.assertEqual(contact.shares.count(), count_contact_shares+1)
         # verify that subscription_id was set
-        self.assertIsInstance(Share.objects.last().subscription_id, int)        
+        self.assertIsInstance(Share.objects.last().subscription_id, int)
         # verify that owner was set
         self.assertIsInstance(Share.objects.last().share_to, CRMUser)
         self.assertIsInstance(Share.objects.last().share_from, CRMUser)
@@ -1797,10 +1808,10 @@ class TestCreationGlobalSalesCycle(TestCase):
 
     def test_connect_service(self):
         crm_user = self.user.get_crmuser()
-        
+
         with self.assertRaises(SalesCycle.DoesNotExist):
-            SalesCycle.objects.get(owner=crm_user, is_global=True) 
-        
+            SalesCycle.objects.get(owner=crm_user, is_global=True)
+
         self.user.connect_service(service=Service.objects.first())
         self.assertIsInstance(crm_user, CRMUser)
         self.assertTrue(SalesCycle.objects.get(owner=crm_user, is_global=True))
@@ -1939,7 +1950,6 @@ class CommentResourceTest(ResourceTestMixin, ResourceTestCase):
         self.comment = Comment.objects.first()
 
     def test_get_list_valid_json(self):
-        print self.get_list_resp
         self.assertValidJSONResponse(self.get_list_resp)
 
     def test_get_list_non_empty(self):
@@ -1951,69 +1961,107 @@ class CommentResourceTest(ResourceTestMixin, ResourceTestCase):
             self.comment.comment
             )
 
-    # def test_create_filter(self):
-    #     crmuser = CRMUser.objects.last()
-    #     post_data={
-    #         'title': 'Filter Resource',
-    #         'filter_text': 'Filter Resource text',
-    #         'author_id': crmuser.pk
-    #     }
-    #     self.assertHttpCreated(self.api_client.post(
-    #         self.api_path_filter, format='json', data=post_data))
-    #     filter_obj = Filter.objects.last()
-    #     self.assertEqual(filter_obj.title, 'Filter Resource')
-    #     self.assertEqual(filter_obj.owner, crmuser)
-    #     self.assertEqual(filter_obj.base, 'all')
-    #     self
-    #     self.assertIsInstance(filter_obj.subscription_id, int)
+    def test_create_comment_for_activity(self):
+        activity = Activity.objects.last()
+        crmuser = CRMUser.objects.last()
+        post_data={
+            'comment': 'new test comment',
+            'author_id': crmuser.pk,
+            'activity_id': activity.pk
+        }
+        self.assertHttpCreated(self.api_client.post(
+            self.api_path_comment, format='json', data=post_data))
+        comment = Comment.objects.last()
+        self.assertEqual(comment.comment, 'new test comment')
+        self.assertEqual(comment.owner, crmuser)
+        self.assertEqual(comment.object_id, activity.id)
+        self.assertEqual(comment.content_object.__class__, Activity)
+        self.assertEqual(comment.content_object, activity)
+        self.assertIsInstance(comment.subscription_id, int)
 
-    # def test_create_filter_with_base(self):
-    #     crmuser = CRMUser.objects.last()
-    #     post_data={
-    #         'title': 'Filter Resource',
-    #         'filter_text': 'Filter Resource text',
-    #         'author_id': crmuser.pk,
-    #         'base': 'cold'
-    #     }
-    #     self.assertHttpCreated(self.api_client.post(
-    #         self.api_path_filter, format='json', data=post_data))
-    #     filter_obj = Filter.objects.last()
-    #     self.assertEqual(filter_obj.title, 'Filter Resource')
-    #     self.assertEqual(filter_obj.owner, crmuser)
-    #     self.assertEqual(filter_obj.base, 'cold')
-    #     self
-    #     self.assertIsInstance(filter_obj.subscription_id, int)
-        
+    def test_create_comment_for_feedback(self):
+        feedback = Feedback.objects.last()
+        crmuser = CRMUser.objects.last()
+        post_data={
+            'comment': 'new test comment',
+            'author_id': crmuser.pk,
+            'feedback_id': feedback.pk
+        }
+        self.assertHttpCreated(self.api_client.post(
+            self.api_path_comment, format='json', data=post_data))
+        comment = Comment.objects.last()
+        self.assertEqual(comment.comment, 'new test comment')
+        self.assertEqual(comment.owner, crmuser)
+        self.assertEqual(comment.object_id, feedback.id)
+        self.assertEqual(comment.content_object.__class__, Feedback)
+        self.assertEqual(comment.content_object, feedback)
+        self.assertIsInstance(comment.subscription_id, int)
 
-    # def test_delete_filter(self):
-    #     before = Filter.objects.all().count()
-    #     self.assertHttpAccepted(self.api_client.delete(
-    #         self.api_path_filter + '%s/' % self.filter.pk, format='json'))
-    #     after = Filter.objects.all().count()
-    #     # verify that one sales_cycle has been deleted.
-    #     self.assertEqual(after, before - 1)
+    def test_create_comment_for_contact(self):
+        contact = Contact.objects.last()
+        crmuser = CRMUser.objects.last()
+        post_data={
+            'comment': 'new test comment',
+            'author_id': crmuser.pk,
+            'contact_id': contact.pk
+        }
+        self.assertHttpCreated(self.api_client.post(
+            self.api_path_comment, format='json', data=post_data))
+        comment = Comment.objects.last()
+        self.assertEqual(comment.comment, 'new test comment')
+        self.assertEqual(comment.owner, crmuser)
+        self.assertEqual(comment.object_id, contact.id)
+        self.assertEqual(comment.content_object.__class__, Contact)
+        self.assertEqual(comment.content_object, contact)
+        self.assertIsInstance(comment.subscription_id, int)
 
-    # def test_update_filter_via_put(self):
-    #     # get exist product data
-    #     filter_data = self.get_detail_des(self.filter.pk)
-    #     # update it
-    #     t = '_UPDATED!'
-    #     filter_data['title'] += t
-    #     # PUT it
-    #     self.api_client.put(self.api_path_filter + '%s/' % (self.filter.pk),
-    #                         format='json', data=filter_data)
-    #     # check
-    #     self.assertEqual(self.get_detail_des(self.filter.pk)['title'], self.filter.title + t)
+    def test_create_comment_for_share(self):
+        share = Share.objects.last()
+        crmuser = CRMUser.objects.last()
+        post_data={
+            'comment': 'new test comment',
+            'author_id': crmuser.pk,
+            'share_id': share.pk
+        }
+        self.assertHttpCreated(self.api_client.post(
+            self.api_path_comment, format='json', data=post_data))
+        comment = Comment.objects.last()
+        self.assertEqual(comment.comment, 'new test comment')
+        self.assertEqual(comment.owner, crmuser)
+        self.assertEqual(comment.object_id, share.id)
+        self.assertEqual(comment.content_object.__class__, Share)
+        self.assertEqual(comment.content_object, share)
+        self.assertIsInstance(comment.subscription_id, int)
+      
+    def test_delete_comment(self):
+        before = Comment.objects.all().count()
+        self.assertHttpAccepted(self.api_client.delete(
+            self.api_path_comment + '%s/' % self.comment.pk, format='json'))
+        after = Comment.objects.all().count()
+        # verify that one sales_cycle has been deleted.
+        self.assertEqual(after, before - 1)
 
-    # def test_update_filter_via_patch(self):
-    #     # get exist product data
-    #     filter_title = self.get_detail_des(self.filter.pk)['title']
-    #     # update it
-    #     t = 'TITLE_UPDATED!'
-    #     filter_title += t
-    #     # PATCH it
-    #     self.api_client.patch(self.api_path_filter + '%s/' % (self.filter.pk),
-    #                           format='json', data={'title': filter_title})
-    #     # check
-    #     self.assertEqual(self.get_detail_des(self.filter.pk)['title'], filter_title)
+    def test_update_comment_via_put(self):
+        # get exist product data
+        comment_data = self.get_detail_des(self.comment.pk)
+        # update it
+        t = '_UPDATED!'
+        comment_data['comment'] += t
+        # PUT it
+        self.api_client.put(self.api_path_comment + '%s/' % (self.comment.pk),
+                            format='json', data=comment_data)
+        # check
+        self.assertEqual(self.get_detail_des(self.comment.pk)['comment'], self.comment.comment + t)
+
+    def test_update_comment_via_patch(self):
+        # get exist product data
+        comment_comment = self.get_detail_des(self.comment.pk)['comment']
+        # update it
+        t = 'comment_UPDATED!'
+        comment_comment += t
+        # PATCH it
+        self.api_client.patch(self.api_path_comment + '%s/' % (self.comment.pk),
+                              format='json', data={'comment': comment_comment})
+        # check
+        self.assertEqual(self.get_detail_des(self.comment.pk)['comment'], comment_comment)
 

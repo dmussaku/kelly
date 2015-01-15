@@ -8,22 +8,31 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Adding model 'Filter'
-        db.create_table('alma_filter', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('subscription_id', self.gf('django.db.models.fields.IntegerField')(null=True, blank=True)),
-            ('title', self.gf('django.db.models.fields.CharField')(max_length=100)),
-            ('filter_text', self.gf('django.db.models.fields.CharField')(max_length=500)),
-            ('owner', self.gf('django.db.models.fields.related.ForeignKey')(related_name='owned_filter', to=orm['alm_crm.CRMUser'])),
-            ('base', self.gf('django.db.models.fields.CharField')(default='all', max_length=6)),
-            ('date_created', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
-        ))
-        db.send_create_signal(u'alm_crm', ['Filter'])
+        # Removing M2M table for field assignees on 'Contact'
+        db.delete_table(db.shorten_name('alma_contact_assignees'))
+
+        # Removing M2M table for field followers on 'Contact'
+        db.delete_table(db.shorten_name('alma_contact_followers'))
 
 
     def backwards(self, orm):
-        # Deleting model 'Filter'
-        db.delete_table('alma_filter')
+        # Adding M2M table for field assignees on 'Contact'
+        m2m_table_name = db.shorten_name('alma_contact_assignees')
+        db.create_table(m2m_table_name, (
+            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
+            ('contact', models.ForeignKey(orm[u'alm_crm.contact'], null=False)),
+            ('crmuser', models.ForeignKey(orm[u'alm_crm.crmuser'], null=False))
+        ))
+        db.create_unique(m2m_table_name, ['contact_id', 'crmuser_id'])
+
+        # Adding M2M table for field followers on 'Contact'
+        m2m_table_name = db.shorten_name('alma_contact_followers')
+        db.create_table(m2m_table_name, (
+            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
+            ('contact', models.ForeignKey(orm[u'alm_crm.contact'], null=False)),
+            ('crmuser', models.ForeignKey(orm[u'alm_crm.crmuser'], null=False))
+        ))
+        db.create_unique(m2m_table_name, ['contact_id', 'crmuser_id'])
 
 
     models = {
@@ -51,9 +60,7 @@ class Migration(SchemaMigration):
         },
         u'alm_crm.contact': {
             'Meta': {'object_name': 'Contact', 'db_table': "'alma_contact'"},
-            'assignees': ('django.db.models.fields.related.ManyToManyField', [], {'blank': 'True', 'related_name': "'assigned_contacts'", 'null': 'True', 'symmetrical': 'False', 'to': u"orm['alm_crm.CRMUser']"}),
             'date_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            'followers': ('django.db.models.fields.related.ManyToManyField', [], {'blank': 'True', 'related_name': "'following_contacts'", 'null': 'True', 'symmetrical': 'False', 'to': u"orm['alm_crm.CRMUser']"}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'latest_activity': ('django.db.models.fields.related.OneToOneField', [], {'related_name': "'contact_latest_activity'", 'unique': 'True', 'null': 'True', 'on_delete': 'models.SET_NULL', 'to': u"orm['alm_crm.Activity']"}),
             'owner': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'owned_contacts'", 'null': 'True', 'to': u"orm['alm_crm.CRMUser']"}),
@@ -76,6 +83,7 @@ class Migration(SchemaMigration):
             'is_supervisor': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'organization_id': ('django.db.models.fields.IntegerField', [], {}),
             'subscription_id': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
+            'unfollow_list': ('django.db.models.fields.related.ManyToManyField', [], {'blank': 'True', 'related_name': "'unfollowers'", 'null': 'True', 'symmetrical': 'False', 'to': u"orm['alm_crm.Contact']"}),
             'user_id': ('django.db.models.fields.IntegerField', [], {})
         },
         u'alm_crm.feedback': {
@@ -89,16 +97,6 @@ class Migration(SchemaMigration):
             'status': ('django.db.models.fields.CharField', [], {'default': "'W'", 'max_length': '1'}),
             'subscription_id': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'value': ('django.db.models.fields.related.OneToOneField', [], {'to': u"orm['alm_crm.Value']", 'unique': 'True', 'null': 'True', 'blank': 'True'})
-        },
-        u'alm_crm.filter': {
-            'Meta': {'object_name': 'Filter', 'db_table': "'alma_filter'"},
-            'base': ('django.db.models.fields.CharField', [], {'default': "'AL'", 'max_length': '2'}),
-            'date_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            'filter_text': ('django.db.models.fields.CharField', [], {'max_length': '500'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'owner': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'owned_filter'", 'to': u"orm['alm_crm.CRMUser']"}),
-            'subscription_id': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
-            'title': ('django.db.models.fields.CharField', [], {'max_length': '100'})
         },
         u'alm_crm.mention': {
             'Meta': {'object_name': 'Mention'},
@@ -148,7 +146,7 @@ class Migration(SchemaMigration):
         },
         u'alm_crm.share': {
             'Meta': {'object_name': 'Share', 'db_table': "'alma_share'"},
-            'contact': ('django.db.models.fields.related.ForeignKey', [], {'default': 'None', 'related_name': "'shares'", 'to': u"orm['alm_crm.Contact']"}),
+            'contact': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['alm_crm.Contact']", 'null': 'True', 'blank': 'True'}),
             'date_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'description': ('django.db.models.fields.CharField', [], {'max_length': '500', 'null': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),

@@ -3,7 +3,6 @@
     "pk": 1, 
     "model": "alm_crm.share", 
     "fields": {
-        "description": "Share description", 
         "share_from": 1, 
         "share_to": 1, 
         "is_read": false, 
@@ -16,7 +15,6 @@
     "pk": 2, 
     "model": "alm_crm.share", 
     "fields": {
-        "description": null, 
         "share_from": 1, 
         "share_to": 2, 
         "is_read": false, 
@@ -29,7 +27,6 @@
     "pk": 3, 
     "model": "alm_crm.share", 
     "fields": {
-        "description": "We have meeting at 3 PM", 
         "share_from": 3, 
         "share_to": 1, 
         "is_read": false, 
