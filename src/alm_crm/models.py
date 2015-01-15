@@ -1505,3 +1505,7 @@ class Filter(SubscriptionObject):
         if not self.subscription_id and self.owner:
             self.subscription_id = self.owner.subscription_id
         super(self.__class__, self).save(**kwargs)
+
+    @classmethod
+    def get_filters_by_crmuser(cls, crmuser_id):
+        return Filter.objects.filter(owner=crmuser_id)

@@ -2414,6 +2414,7 @@ class AppStateObject(object):
             'sales_cycles': self.get_sales_cycles(),
             'activities': self.get_activities(),
             'products': self.get_products(),
+            'filters': self.get_filters(),
             'sales_cycles_to_products_map': self.get_sales_cycle2products_map()
         }
         self.constants = self.get_constants()
@@ -2451,6 +2452,11 @@ class AppStateObject(object):
         activities = Activity.get_activities_by_date_created(
             self.current_crmuser.pk, all=True, include_sales_cycles=False)
         return ActivityResource().get_bundle_list(activities, self.request)
+
+    def get_filters(self):
+        filters = Filter.get_filters_by_crmuser(
+            self.current_crmuser.pk)
+        return FilterResource().get_bundle_list(filters, self.request)
 
     def get_products(self):
         products = Product.get_products()
