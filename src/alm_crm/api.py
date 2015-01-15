@@ -2716,4 +2716,5 @@ class FilterResource(CRMServiceModelResource):
     class Meta(CommonMeta):
         queryset = Filter.objects.all()
         resource_name = 'filter'
+        always_return_data = True
 
