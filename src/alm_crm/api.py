@@ -1342,7 +1342,7 @@ class SalesCycleResource(CRMServiceModelResource):
             },
             response_class=http.HttpAccepted)
 
-    def replace_products(self, request, **kwargs):
+    def product_ids(self, request, **kwargs):
         '''
         PUT METHOD
         I{URL}:  U{alma.net/api/v1/sales_cycle/:id/replace_products/}

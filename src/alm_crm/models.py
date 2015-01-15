@@ -917,7 +917,7 @@ class SalesCycle(SubscriptionObject):
     @classmethod
     def upd_lst_activity_on_create(cls, sender,
                                    created=False, instance=None, **kwargs):
-        if not created:
+        if not created or not instance.sales_cycle.is_global:
             return
         sales_cycle = instance.sales_cycle
         sales_cycle.latest_activity = sales_cycle.find_latest_activity()
