@@ -3,7 +3,7 @@ import datetime
 from datetime import *
 from time import *
 import re
-from django.db import models
+from django.db import models, transaction as tx
 import vobject
 from vobject.vcard import *
 from django.utils.translation import ugettext as _
@@ -103,47 +103,57 @@ class VCard(SubscriptionObject):
         super(self.__class__, self).save(**kwargs)
 
     @classmethod
-    def importFrom(cls, type, data):
-        """
-        The contact sets its properties as specified in the argument 'data'
-        according to the specification given in the string passed as
-        argument 'type'
+    def importFromVCardMultiple(cls, data, autocommit=False):
+        """Return imported vcard objects as generator"""
+        return cls.fromVCard(data, multiple=True, autocommit=autocommit)
 
-        'type' can be either 'vCard' or 'vObject'
+    @classmethod
+    def exportToVCardMultiple(cls, vcards):
+        """Return exported vcards as generator"""
+        return (vcard.toVCard() for vcard in vcards)
 
-        'vCard' is a string containing containing contact information
-        formatted according to the vCard specification
+    # @classmethod
+    # def importFrom(cls, tp, data, multiple=False, autocommit=False):
+    #     """
+    #     The contact sets its properties as specified in the argument 'data'
+    #     according to the specification given in the string passed as
+    #     argument 'tp'
 
-        'vObject' is a vobject containing vcard contact information
+    #     'tp' can be either 'vCard' or 'vObject'
 
-        It returns a Contact object.
-        """
-        if type == "vCard":
-            return cls.fromVCard(data)
+    #     'vCard' is a string containing containing contact information
+    #     formatted according to the vCard specification
 
-        if type == "vObject":
-            return cls.fromVObject(data)
+    #     'vObject' is a vobject containing vcard contact information
 
-    def exportTo(self, type):
+    #     It returns a Contact object.
+    #     """
+    #     if tp.lower() == "vcard":
+    #         return cls.fromVCard(data, multiple=multiple)
+
+    #     if tp.lower() == "vobject":
+    #         return cls.fromVObject(data)
+
+    def exportTo(self, tp):
         """
         The contact returns an object with its properties in a format as
-        defined by the argument type.
+        defined by the argument tp.
 
-        'type' can be either 'vCard' or 'vObject'
+        'tp' can be either 'vCard' or 'vObject'
 
         'vCard' is a string containing containing contact information
         formatted according to the vCard specification
 
         'vObject' is a vobject containing vcard contact information
         """
-        if type == "vCard":
+        if tp.lower() == "vcard":
             return self.toVCard()
 
-        if type == "vObject":
+        if tp.lower() == "vobject":
             return self.toVObject()
 
     @classmethod
-    def fromVObject(cls, vObject):
+    def fromVObject(cls, vObject, autocommit=False):
         """
         Contact sets its properties as specified by the supplied
         vObject. Returns a contact object.
@@ -479,13 +489,6 @@ class VCard(SubscriptionObject):
 
                 continue
 
-            # if property.name.upper() == "SOUND":
-
-            #    sound = Sound()
-            #    sound.data = property.value
-
-            #    contact.childModels.append(sound)
-
             if property.name.upper() == "TITLE":
                 try:
 
@@ -499,7 +502,7 @@ class VCard(SubscriptionObject):
 
                 continue
 
-            if property.name.upper() == "URL":
+            if property.name.upper() == "X-URL":
                 try:
 
                     url = Url()
@@ -514,38 +517,34 @@ class VCard(SubscriptionObject):
 
                 continue
 
-            # if property.name.upper() == "LOGO":
-
-            #    logo = Logo()
-            #    logo.data = property.value
-
-            #    contact.childModels.append( logo)
-
             if property.name.upper() == "VERSION":
                 continue
 
             contact.errorList.append(property.name.upper())
-
-        # nObject.save()
-
-        # contact.n = nObject
+        if autocommit:
+            contact.commit()
         return contact
 
     def commit(self):
-        self.save()
-        for m in self.childModels:
-            m.vcard = self
-            m.save()
+        with tx.atomic():
+            self.save()
+            for m in self.childModels:
+                m.vcard = self
+                m.save()
+        return self
 
     @classmethod
-    def fromVCard(cls, vCardString):
+    def fromVCard(cls, vCardString, multiple=False, autocommit=False):
         """
         Contact sets its properties as specified by the supplied
         string. The string is in vCard format. Returns a Contact object.
         """
+        if multiple:
+            return (cls.fromVObject(vObject, autocommit=autocommit)
+                    for vObject in vobject.readComponents(vCardString))
         vObject = vobject.readOne(vCardString)
 
-        return cls.fromVObject(vObject)
+        return cls.fromVObject(vObject, autocommit=autocommit)
 
     def toVObject(self):
         """
@@ -556,11 +555,11 @@ class VCard(SubscriptionObject):
         n = v.add('n')
 
         n.value = vobject.vcard.Name(
-               given = self.given_name,
-               family = self.family_name,
-               additional = self.additional_name,
-               prefix = self.honorific_prefix,
-               suffix = self.honorific_suffix)
+            given = self.given_name,
+            family = self.family_name,
+            additional = self.additional_name,
+            prefix = self.honorific_prefix,
+            suffix = self.honorific_suffix)
 
         fn = v.add('fn')
 
@@ -576,6 +575,7 @@ class VCard(SubscriptionObject):
             jcode     = j.postal_code if j.postal_code else ''
             jcountry  = j.country_name if j.country_name else ''
             jextended = j.extended_address if j.extended_address else ''
+            jcity = j.locality if j.locality else ''
 
             i.type_param = j.type
             i.value = vobject.vcard.Address(
@@ -584,7 +584,8 @@ class VCard(SubscriptionObject):
                      street = jstreet,
                      region = jregion,
                      code = jcode,
-                     country = jcountry)
+                     country = jcountry,
+                     city=jcity)
 
         for j in self.org_set.all():
             i = v.add('org')
@@ -691,7 +692,7 @@ class VCard(SubscriptionObject):
             i.value = j.data
 
         for j in self.url_set.all():
-            i = v.add('url')
+            i = v.add('x-url')
             i.value = j.data
 
         return v
@@ -801,6 +802,12 @@ class Org(SubscriptionObject):
         verbose_name = _("organization")
         verbose_name_plural = _("organizations")
 
+    def __eq__(self, r):
+        l = self
+        return (
+            l.organization_name == r.organization_name and
+            l.organization_unit == r.organization_unit)
+
     @property
     def name(self):
         return self.organization_name
@@ -834,6 +841,17 @@ class Adr(SubscriptionObject):
     class Meta:
         verbose_name = _("address")
         verbose_name_plural = _("addresses")
+
+    def __eq__(self, r):
+        l = self
+        return (
+            l.post_office_box == r.post_office_box and
+            l.extended_address == r.extended_address and
+            l.street_address == r.street_address and
+            l.region == r.region and
+            l.postal_code == r.postal_code and
+            l.country_name == r.country_name and
+            l.type == r.type)
 
 
 class Agent(SubscriptionObject):
@@ -1011,6 +1029,10 @@ class Title(SubscriptionObject):
     class Meta:
         verbose_name = _("title")
         verbose_name_plural = _("titles")
+
+    def __eq__(self, r):
+        l = self
+        return l.data == r.data
 
 
 class Tz(SubscriptionObject):

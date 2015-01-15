@@ -1,5 +1,5 @@
 import functools
-from django.db import models
+from django.db import models, transaction
 from django.utils.translation import ugettext_lazy as _
 from almanet import settings
 from almanet.models import SubscriptionObject
@@ -208,7 +208,7 @@ class Contact(SubscriptionObject):
         return exporter(**options)
 
     def to_vcard(self, locale='ru_RU'):
-        return self.vcard.exportTo('vCard')
+        return self.vcard.exportTo('vcard')
 
     def to_html(self, locale='ru_RU'):
         tpl_name = 'vcard/_detail.%s.html' % locale
@@ -461,31 +461,21 @@ class Contact(SubscriptionObject):
     def _upload_contacts_by_vcard(cls, vcard_obj):
         """Extracts contacts from vcard string. Returns Queryset<Contact>."""
         contact = cls()
-        vcard = VCard.importFrom('vCard', vcard_obj)
-        vcard.commit()
+        vcard = VCard.fromVCard(vcard_obj, autocommit=True)
         contact.vcard = vcard
         return contact
 
-    # @classmethod
-    # def _upload_contacts_by_csv(cls, file_obj):
-    #     """Extracts contacts from csv. Returns Queryset<Contact>.
-    #         What is the structure of csv file ???
-    #     """
-    #     pass
     @classmethod
-    def import_contacts_from_vcard(cls, vcard_file):
-        try:
-            data_list = vcard_file.read().split('END:VCARD')[:-1]
-            contact_ids = []
-            for i in range(0, len(data_list)):
-                data_list[i] += 'END:VCARD'
-                #c = cls.upload_contacts('vcard', data_list[i], save=True)
-                c = cls._upload_contacts_by_vcard(data_list[i])
-                contact_ids.append({'contact_id': c.id, 'name': c.name})
-                #contact_ids.append(Contact.upload_contacts('vcard', data_list[i], save=True).id)
-            return {'success': True, 'contact_ids': contact_ids}
-        except:
-            return {'success': False, 'contact_ids': None}
+    def import_from_vcard(cls, vcard_file):
+        rv = []
+        vcards = VCard.importFromVCardMultiple(vcard_file, autocommit=True)
+        with transaction.atomic():
+            for vcard in vcards:
+                c = cls(vcard=vcard)
+                c.save()
+                rv.append(c)
+        print len(rv), 'contacts'
+        return rv
 
     @classmethod
     def get_contacts_by_last_activity_date(
@@ -509,7 +499,6 @@ class Contact(SubscriptionObject):
             in this case return value is always instance of dict, so it is easier to process it
             at the same time, list of contacts always available through rv.keys()
         """
-        pass
         # SECOND IMPL
         # contact_activity_map follows structure suggested by Askhat.
         q = Q()

@@ -50,7 +50,6 @@ import json
 import datetime
 import time
 
-
 class CommonMeta:
     list_allowed_methods = ['get', 'post']
     detail_allowed_methods = ['get', 'post', 'put', 'delete']
@@ -103,6 +102,13 @@ class CRMServiceModelResource(ModelResource):
         if subscription_pk:
             crmuser = request.user.get_subscr_user(subscription_pk)
         return crmuser
+
+    class Meta:
+        list_allowed_methods = ['get', 'post']
+        detail_allowed_methods = ['get', 'post', 'put', 'delete']
+        authentication = MultiAuthentication(SessionAuthentication(),
+                                             BasicAuthentication())
+        authorization = Authorization()
 
 
 class ContactResource(CRMServiceModelResource):
@@ -167,6 +173,82 @@ class ContactResource(CRMServiceModelResource):
     class Meta(CommonMeta):
         queryset = Contact.objects.all()
         resource_name = 'contact'
+
+        def prepend_urls(self):
+        return [
+            url(
+                r"^(?P<resource_name>%s)/recent%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('get_last_contacted'),
+                name='api_last_contacted'
+            ),
+            url(
+                r"^(?P<resource_name>%s)/cold_base%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('get_cold_base'),
+                name='api_cold_base'
+            ),
+            url(
+                r"^(?P<resource_name>%s)/leads%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('get_leads'),
+                name='api_leads'
+            ),
+            url(
+                r"^(?P<resource_name>%s)/search%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('search'),
+                name='api_search'
+            ),
+            url(
+                r"^(?P<resource_name>%s)/assign_contact%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('assign_contact'),
+                name='api_assign_contact'
+            ),
+            url(
+                r"^(?P<resource_name>%s)/assign_contacts%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('assign_contacts'),
+                name='api_assign_contacts'
+            ),
+            url(
+                r"^(?P<resource_name>%s)/(?P<id>\d+)/products%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('get_products'),
+                name='api_get_products'
+            ),
+            url(
+                r"^(?P<resource_name>%s)/(?P<id>\d+)/activities%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('get_activities'),
+                name='api_get_activities'
+            ),
+            url(
+                r"^(?P<resource_name>%s)/share_contact%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('share_contact'),
+                name='api_share_contact'
+            ),
+            url(
+                r"^(?P<resource_name>%s)/share_contacts%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('share_contacts'),
+                name='api_share_contacts'
+            ),
+            url(
+                r"^(?P<resource_name>%s)/import%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('import_contacts'),
+                name='api_import_contacts_from_vcard'
+            ),
+            url(
+                r"^(?P<resource_name>%s)/export_contacts_to_vcard%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('export_contacts_to_vcard'),
+                name='api_export_contacts_to_vcard'
+            ),
+        ]
 
     def post_list(self, request, **kwargs):
         '''
@@ -432,82 +514,6 @@ class ContactResource(CRMServiceModelResource):
         m2m_bundle = self.hydrate_m2m(bundle)
         self.save_m2m(m2m_bundle)
         return bundle
-
-    def prepend_urls(self):
-        return [
-            url(
-                r"^(?P<resource_name>%s)/recent%s$" %
-                (self._meta.resource_name, trailing_slash()),
-                self.wrap_view('get_last_contacted'),
-                name='api_last_contacted'
-            ),
-            url(
-                r"^(?P<resource_name>%s)/cold_base%s$" %
-                (self._meta.resource_name, trailing_slash()),
-                self.wrap_view('get_cold_base'),
-                name='api_cold_base'
-            ),
-            url(
-                r"^(?P<resource_name>%s)/leads%s$" %
-                (self._meta.resource_name, trailing_slash()),
-                self.wrap_view('get_leads'),
-                name='api_leads'
-            ),
-            url(
-                r"^(?P<resource_name>%s)/search%s$" %
-                (self._meta.resource_name, trailing_slash()),
-                self.wrap_view('search'),
-                name='api_search'
-            ),
-            url(
-                r"^(?P<resource_name>%s)/assign_contact%s$" %
-                (self._meta.resource_name, trailing_slash()),
-                self.wrap_view('assign_contact'),
-                name='api_assign_contact'
-            ),
-            url(
-                r"^(?P<resource_name>%s)/assign_contacts%s$" %
-                (self._meta.resource_name, trailing_slash()),
-                self.wrap_view('assign_contacts'),
-                name='api_assign_contacts'
-            ),
-            url(
-                r"^(?P<resource_name>%s)/(?P<id>\d+)/products%s$" %
-                (self._meta.resource_name, trailing_slash()),
-                self.wrap_view('get_products'),
-                name='api_get_products'
-            ),
-            url(
-                r"^(?P<resource_name>%s)/(?P<id>\d+)/activities%s$" %
-                (self._meta.resource_name, trailing_slash()),
-                self.wrap_view('get_activities'),
-                name='api_get_activities'
-            ),
-            url(
-                r"^(?P<resource_name>%s)/share_contact%s$" %
-                (self._meta.resource_name, trailing_slash()),
-                self.wrap_view('share_contact'),
-                name='api_share_contact'
-            ),
-            url(
-                r"^(?P<resource_name>%s)/share_contacts%s$" %
-                (self._meta.resource_name, trailing_slash()),
-                self.wrap_view('share_contacts'),
-                name='api_share_contacts'
-            ),
-            url(
-                r"^(?P<resource_name>%s)/import_contacts_from_vcard%s$" %
-                (self._meta.resource_name, trailing_slash()),
-                self.wrap_view('import_contacts_from_vcard'),
-                name='api_import_contacts_from_vcard'
-            ),
-            url(
-                r"^(?P<resource_name>%s)/export_contacts_to_vcard%s$" %
-                (self._meta.resource_name, trailing_slash()),
-                self.wrap_view('export_contacts_to_vcard'),
-                name='api_export_contacts_to_vcard'
-            ),
-        ]
 
     def get_last_contacted(self, request, **kwargs):
         '''
@@ -1033,7 +1039,7 @@ class ContactResource(CRMServiceModelResource):
                 Contact.share_contacts(share_from, share_to, contact_ids)}
             )
 
-    def import_contacts_from_vcard(self, request, **kwargs):
+    def import_contacts(self, request, **kwargs):
         '''
         POST METHOD
         I{URL}:  U{alma.net/api/v1/contact/import_contacts_from_vcard/}
@@ -1057,11 +1063,22 @@ class ContactResource(CRMServiceModelResource):
         ... },
 
         '''
-        if request.method == 'POST':
-            return self.create_response(
-                request,
-                Contact.import_contacts_from_vcard(request.FILES['myfile'])
-                )
+        objects = []
+        contact_resource = ContactResource()
+        self.method_check(request, allowed=['post'])
+        self.is_authenticated(request)
+        self.throttle_check(request)
+        data = self.deserialize(
+            request, request.body,
+            format=request.META.get('CONTENT_TYPE', 'application/json'))
+        for contact in Contact.import_from_vcard(data['uploaded_file']):
+            _bundle = contact_resource.build_bundle(
+                obj=contact, request=request)
+            objects.append(contact_resource.full_dehydrate(
+                _bundle, for_list=True))
+        print len(objects), 'json'
+        self.log_throttled_access(request)
+        return self.create_response(request, {'success': objects})
 
     def export_contacts_to_vcard(self, request, **kwargs):
         '''
@@ -1908,7 +1925,7 @@ class AppStateObject(object):
     def __init__(self, service_slug=None, request=None):
         if service_slug is None:
             return
-        service = Service.objects.get(pk=service_slug)
+        service = Service.objects.get(slug=service_slug)
 
         self.request = request
         self.current_user = request.user
