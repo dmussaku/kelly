@@ -11,6 +11,7 @@ from almanet.views import (
     ServiceUpdateView,
     ServiceDeleteView,
     ServiceDetailView,
+    RedirectHomeView
     )
 from tastypie.api import Api
 from alm_vcard import api as vcard_api
@@ -60,8 +61,7 @@ v1_api.register(CommentResource())
 
 urlpatterns = patterns(
     '',
-    url(r'^$', TemplateView.as_view(template_name='frontend.index.html'), name="frontend"),
-
+    url(r'^$', RedirectHomeView.as_view()),
     url(r'^auth/', include('alm_user.urls')),
     # TODO: temp, needs to be deleted
     url(r'^crm/', include('alm_crm.urls')),

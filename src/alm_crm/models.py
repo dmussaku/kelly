@@ -446,12 +446,18 @@ class Contact(SubscriptionObject):
         return contact
 
     @classmethod
-    def import_from_vcard(cls, vcard_file):
+    def import_from_vcard(cls, raw_vcard, creator):
+        """
+        Parameters
+        ----------
+            raw_vcard - serialized repr of vcard
+            creator - crm user who owns created objects
+        """
         rv = []
-        vcards = VCard.importFromVCardMultiple(vcard_file, autocommit=True)
+        vcards = VCard.importFromVCardMultiple(raw_vcard, autocommit=True)
         with transaction.atomic():
             for vcard in vcards:
-                c = cls(vcard=vcard)
+                c = cls(vcard=vcard, owner=creator)
                 c.save()
                 rv.append(c)
         print len(rv), 'contacts'
@@ -1362,6 +1368,10 @@ class SalesCycleProductStat(SubscriptionObject):
     product = models.ForeignKey(Product)
     value = models.IntegerField(default=0)
 
+    @property
+    def owner(self):
+        return self.sales_cycle.owner
+
     class Meta:
         verbose_name = _('sales_cycle_product_stat')
         db_table = settings.DB_PREFIX.format('cycle_prod_stat')
@@ -1392,3 +1402,12 @@ class Filter(SubscriptionObject):
 
     def __unicode__(self):
         return u'%s: %s' % (self.title, self.base)
+
+    def save(self, **kwargs):
+        if not self.subscription_id and self.owner:
+            self.subscription_id = self.owner.subscription_id
+        super(self.__class__, self).save(**kwargs)
+
+    @classmethod
+    def get_filters_by_crmuser(cls, crmuser_id):
+        return Filter.objects.filter(owner=crmuser_id)

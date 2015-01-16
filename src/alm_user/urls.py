@@ -1,14 +1,14 @@
 from django.conf.urls import patterns, url
 from django.core.urlresolvers import reverse_lazy
+from django.contrib.auth.views import (
+    logout as django_logout,
+    password_reset as django_password_reset,
+    password_reset_done as django_password_reset_done,)
+
 from alm_user.forms import PasswordResetForm
 from alm_user.views import UserListView, UserRegistrationView
 from alm_user.views import login, password_reset_confirm
 from alm_user.models import User
-from django.contrib.auth.views import (
-    #login as django_login,
-    logout as django_logout,
-    password_reset as django_password_reset,
-    password_reset_done as django_password_reset_done,)
 
 login_url = reverse_lazy('user_login')
 

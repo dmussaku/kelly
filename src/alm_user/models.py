@@ -8,6 +8,7 @@ from almanet import signals
 from almanet.models import Subscription
 from almanet.settings import DEFAULT_SERVICE
 from alm_vcard.models import VCard
+from alm_company.models import Company
 
 
 class UserManager(contrib_user_manager):
