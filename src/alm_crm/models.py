@@ -1389,13 +1389,16 @@ class SalesCycleProductStat(SubscriptionObject):
     product = models.ForeignKey(Product)
     value = models.IntegerField(default=0)
 
+    @property
+    def owner(self):
+        return self.sales_cycle.owner
+
     class Meta:
         verbose_name = _('sales_cycle_product_stat')
         db_table = settings.DB_PREFIX.format('cycle_prod_stat')
 
     def __unicode__(self):
         return ' %s | %s | %s' % (self.sales_cycle, self.product, self.value)
-
 
 class Filter(SubscriptionObject):
     BASE_OPTIONS = (

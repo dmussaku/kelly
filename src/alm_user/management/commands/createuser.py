@@ -25,7 +25,7 @@ class Command(BaseCommand):
         password = options.get('password', None)
 
         try:
-            User.objects.get(email=email,)
+            User.objects.get(email=email)
         except (User.DoesNotExist, KeyError):
             UserManager().create_user(first_name, last_name, email, password)
         else:

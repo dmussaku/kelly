@@ -52,3 +52,13 @@ class Company(models.Model):
         if rco is None:
             return False
         return lco.pk == rco.pk
+
+    @classmethod
+    def build_company(cls, name, owner):
+        subdomain = Company.generate_subdomain(name)
+        company = Company(name=name, subdomain=subdomain)
+        company.save()
+        company.owner.add(owner)
+        owner.is_admin = True
+        owner.save()
+        return company
