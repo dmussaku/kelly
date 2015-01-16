@@ -2479,7 +2479,7 @@ class AppStateObject(object):
         return data
 
     def get_shares(self):
-        shares = Share.get_shares_owned_for(self.current_crmuser.pk)
+        shares = Share.get_shares_in_for(self.current_crmuser.pk)
         return ShareResource().get_bundle_list(shares, self.request)
 
     def get_constants(self):
