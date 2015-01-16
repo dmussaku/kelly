@@ -496,27 +496,24 @@ class SalesCycleTestCase(TestCase):
 
     def test_get_salescycles_by_last_activity_date(self):
         user_id = 1
-        ret = SalesCycle.get_salescycles_by_last_activity_date(user_id)
-        self.assertEqual(list(ret[0].values_list('pk', flat=True)), [3, 2, 1])
-        self.assertEqual(list(ret[1].values_list('pk', flat=True)),
-                         range(1, 8))
+        ret = SalesCycle.get_salescycles_by_last_activity_date(user_id, include_activities=True)
+        self.assertEqual(list(ret[0].values_list('pk', flat=True)).sort(), [1, 2, 3])
+        self.assertEqual(list(ret[1].values_list('pk', flat=True)).sort(), range(1, 8))
         self.assertItemsEqual(ret[2], {1: [1, 3], 2: [2], 3: []})
 
     def test_get_salescycles_by_last_activity_date_with_mentioned(self):
         user_id = 1
-        ret = SalesCycle.get_salescycles_by_last_activity_date(user_id,
-                                                               mentioned=True)
-        self.assertEqual(list(ret[0].values_list('pk', flat=True)),
-                         [3, 2, 1, 4])
-        self.assertEqual(list(ret[1].values_list('pk', flat=True)),
-                         range(1, 8))
+        ret = SalesCycle.get_salescycles_by_last_activity_date(user_id, mentioned=True,
+                                                               include_activities=True)
+        self.assertEqual(sorted(list(ret[0].values_list('pk', flat=True))), [1, 2, 3, 4])
+        self.assertEqual(sorted(list(ret[1].values_list('pk', flat=True))), range(1, 8))
         self.assertItemsEqual(ret[2], {1: [1, 3], 2: [2], 3: [], 4: []})
 
     def test_get_salescycles_by_last_activity_date_only_mentioned(self):
         user_id = 1
-        ret = SalesCycle.get_salescycles_by_last_activity_date(user_id,
-                                                               owned=False,
-                                                               mentioned=True)
+        ret = SalesCycle.get_salescycles_by_last_activity_date(user_id, owned=False,
+                                                               mentioned=True,
+                                                               include_activities=True)
         self.assertEqual(list(ret[0].values_list('pk', flat=True)), [4])
         self.assertEqual(list(ret[1].values_list('pk', flat=True)), [])
         self.assertItemsEqual(ret[2], {4: []})
@@ -526,7 +523,8 @@ class SalesCycleTestCase(TestCase):
         ret = SalesCycle.get_salescycles_by_last_activity_date(user_id,
                                                                owned=False,
                                                                mentioned=False,
-                                                               followed=True)
+                                                               followed=True,
+                                                               include_activities=True)
         self.assertEqual(list(ret[0].values_list('pk', flat=True)), [3])
         self.assertEqual(list(ret[1].values_list('pk', flat=True)), [7])
         self.assertItemsEqual(ret[2], {3: [7]})
@@ -555,57 +553,30 @@ class SalesCycleTestCase(TestCase):
         ret = SalesCycle.get_salescycles_by_contact(1)
         self.assertEqual(list(ret.values_list('pk', flat=True)), [1, 2, 3, 4])
 
-    def test_close_sales_cycle(self):
-        self.assertNotEqual(self.sc1.status, 'C')
-        real_value = {
-            'amount': 1000,
-            'salary': None,
-            'currency': None
-        }
-        activities_count = Activity.objects.count()
-
-        ret = self.sc1.close(**real_value)
-
-        self.assertIsInstance(ret, list)
-        self.assertIsInstance(ret[0], SalesCycle)
-        self.assertIsInstance(ret[1], Activity)
-        self.assertEqual(self.sc1.status, 'C')
-        self.assertEqual(self.sc1.real_value.amount, real_value['amount'])
-        self.assertEqual(Activity.objects.count(), activities_count + 1)
-        self.assertEqual(Activity.objects.last().feedback.status, '$')
-
-    def test_close_sales_cycle_amount_as_string(self):
-        self.assertNotEqual(self.sc1.status, 'C')
-        real_value = {
-            'amount': '1000',
-            'salary': None,
-            'currency': None
-        }
-
-        ret = self.sc1.close(**real_value)
-        self.assertIsInstance(ret[0], SalesCycle)
-        self.assertIsInstance(ret[1], Activity)
-        self.assertEqual(self.sc1.status, 'C')
-        sales_cycle = SalesCycle.objects.get(id=self.sc1.id)
-        self.assertEqual(sales_cycle.real_value.amount,
-                         int(real_value['amount']))
-
-    def test_close_cycle(self):
+    def test_close_salescycle(self):
         self.assertNotEqual(self.sc1.status, 'C')
         products_with_values = {
-                "1": 15000,
-                "2": 13500
+            "1": 15000,
+            "2": 13500
         }
 
-        ret = self.sc1.close_cycle(products_with_values)
+        ret = self.sc1.close(products_with_values)
         self.assertIsInstance(ret[0], SalesCycle)
         self.assertIsInstance(ret[1], Activity)
         self.assertEqual(self.sc1.status, 'C')
-        stat1 = SalesCycleProductStat.objects.get(sales_cycle=self.sc1, product=Product.objects.get(id=1)).value
-        stat2 = SalesCycleProductStat.objects.get(sales_cycle=self.sc1, product=Product.objects.get(id=2)).value
+        self.assertEqual(self.sc1.real_value.amount,
+                         sum(products_with_values.values()))
+        stat1 = SalesCycleProductStat.objects.get(sales_cycle=self.sc1,
+                                                  product=Product.objects.get(id=1)).value
+        stat2 = SalesCycleProductStat.objects.get(sales_cycle=self.sc1,
+                                                  product=Product.objects.get(id=2)).value
         self.assertEqual(stat1, 15000)
         self.assertEqual(stat2, 13500)
 
+    def test_set_result_by_amount(self):
+        amount = 5000
+        self.sc1.set_result_by_amount(amount)
+        self.assertEqual(self.get_sc(pk=1).real_value.amount, amount)
 
 
 class ContactListTestCase(TestCase):
@@ -855,24 +826,25 @@ class SalesCycleResourceTest(ResourceTestMixin, ResourceTestCase):
 
     def test_get_product_ids(self):
         resp = self.api_client.get(
-            self.api_path_sales_cycle+str(self.sales_cycle.pk)+'/product_ids/',
+            self.api_path_sales_cycle+str(self.sales_cycle.pk)+'/products/',
             format='json')
         resp = self.deserialize(resp)
-        self.assertIsInstance(resp, list)
-        self.assertEqual(len(resp), self.sales_cycle.products.count())
+        self.assertTrue('object_ids' in resp)
+        self.assertIsInstance(resp['object_ids'], list)
+        self.assertEqual(len(resp['object_ids']), self.sales_cycle.products.count())
 
     def test_update_product_ids(self):
         put_data = {
-            "product_ids": [1, 2, 3]
+            'object_ids': [1, 2, 3]
         }
         before = self.sales_cycle.products.count()
         resp = self.api_client.put(
-            self.api_path_sales_cycle+str(self.sales_cycle.pk)+'/product_ids/',
+            self.api_path_sales_cycle+str(self.sales_cycle.pk)+'/products/',
             format='json', data=put_data)
         self.assertHttpAccepted(resp)
-        resp = self.deserialize(resp)
         self.assertNotEqual(before, self.sales_cycle.products.count())
-        self.assertEqual(len(resp), self.sales_cycle.products.count())
+        resp = self.deserialize(resp)
+        self.assertEqual(len(resp['object_ids']), self.sales_cycle.products.count())
 
     @skipIf(True, "now, activities is not presented in SalesCycleResource")
     def test_create_sales_cycle_with_activity(self):
@@ -926,10 +898,11 @@ class SalesCycleResourceTest(ResourceTestMixin, ResourceTestCase):
         self.assertEqual(SalesCycle.objects.count(), count - 1)
 
     def test_close_sales_cycle(self):
+        self.assertNotEqual(self.sales_cycle.status, 'C')
         put_data = {
-            'value': 1000
+            "1": 15000,
+            "2": 13500
         }
-
         resp = self.api_client.put(
             self.api_path_sales_cycle+str(self.sales_cycle.pk)+'/close/',
             format='json', data=put_data)
@@ -938,33 +911,17 @@ class SalesCycleResourceTest(ResourceTestMixin, ResourceTestCase):
         resp = self.deserialize(resp)
         self.assertTrue('activity' in resp)
         self.assertTrue('sales_cycle' in resp)
+
         self.assertEqual(resp['sales_cycle']['status'], 'C')
-        self.assertEqual(resp['activity']['feedback'], '$')
         self.assertEqual(resp['sales_cycle']['real_value']['value'],
-                         put_data['value'])
-
-    def test_close_cycle(self):
-        self.assertNotEqual(self.sales_cycle.status, 'C')
-        put_data = {
-            "1": 15000,
-            "2": 13500
-        }
-        resp = self.api_client.put(
-            self.api_path_sales_cycle+str(self.sales_cycle.pk)+'/close_cycle/',
-            format='json', data=put_data)
-
-        self.assertHttpAccepted(resp)
-        resp = self.deserialize(resp)
-        self.assertTrue('activity' in resp)
-        self.assertTrue('sales_cycle' in resp)
-
-        self.assertEqual(resp['sales_cycle']['status'], 'C')
+                         sum(put_data.values()))
         self.assertEqual(resp['activity']['feedback'], '$')
-        stat1 = SalesCycleProductStat.objects.get(sales_cycle=self.sales_cycle, product=Product.objects.get(id=1)).value
-        stat2 = SalesCycleProductStat.objects.get(sales_cycle=self.sales_cycle, product=Product.objects.get(id=2)).value
+        stat1 = SalesCycleProductStat.objects.get(sales_cycle=self.sales_cycle,
+                                                  product=Product.objects.get(id=1)).value
+        stat2 = SalesCycleProductStat.objects.get(sales_cycle=self.sales_cycle,
+                                                  product=Product.objects.get(id=2)).value
         self.assertEqual(stat1, 15000)
         self.assertEqual(stat2, 13500)
-
 
 
 class ActivityResourceTest(ResourceTestMixin, ResourceTestCase):
@@ -1029,7 +986,8 @@ class ActivityResourceTest(ResourceTestMixin, ResourceTestCase):
         # verify that owner was set
         self.assertIsInstance(activity.owner, CRMUser)
         self.assertIsInstance(activity.feedback, Feedback)
-        self.assertEqual(Activity.objects.last().feedback, Feedback.objects.last())
+        self.assertEqual(Activity.objects.last().feedback,
+                         Feedback.objects.last())
 
     def test_create_activity_without_sales_cycle(self):
         owner = CRMUser.objects.first()
@@ -1056,8 +1014,9 @@ class ActivityResourceTest(ResourceTestMixin, ResourceTestCase):
             'activity_id': self.activity.id,
             'comment': 'activity comment'
         }
-        resp = self.api_client.put(self.api_path_activity + '%s/comments/' % (self.activity.pk),
-                            format='json', data=post_data)
+        resp = self.api_client.put(
+            self.api_path_activity + '%s/comments/' % (self.activity.pk),
+            format='json', data=post_data)
         self.assertHttpAccepted(resp)
 
     def test_create_activity_without_feedback(self):
@@ -1083,9 +1042,9 @@ class ActivityResourceTest(ResourceTestMixin, ResourceTestCase):
 
     def test_delete_activity(self):
         count = Activity.objects.count()
-        activity = Activity.objects.get(id = 2)
-        self.assertHttpAccepted(self.api_client.delete(
-        self.api_path_activity + '%s/' % activity.pk, format='json'))
+        activity = Activity.objects.get(id=2)
+        self.assertHttpAccepted(
+            self.api_client.delete(self.api_path_activity + '%s/' % activity.pk, format='json'))
         # verify that one sales_cycle has been deleted.
         self.assertEqual(Activity.objects.count(), count - 1)
 
@@ -1888,7 +1847,7 @@ class FilterResourceTest(ResourceTestMixin, ResourceTestCase):
         self.assertEqual(filter_obj.base, 'cold')
         self
         self.assertIsInstance(filter_obj.subscription_id, int)
-        
+
 
     def test_delete_filter(self):
         before = Filter.objects.all().count()

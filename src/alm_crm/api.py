@@ -1229,12 +1229,6 @@ class SalesCycleResource(CRMServiceModelResource):
                 name='api_close'
             ),
             url(
-                r"^(?P<resource_name>%s)/(?P<id>\d+)/close_cycle%s$" %
-                (self._meta.resource_name, trailing_slash()),
-                self.wrap_view('close_cycle'),
-                name='api_close_cycle'
-            ),
-            url(
                 r"^(?P<resource_name>%s)/(?P<id>\d+)/products%s$" %
                 (self._meta.resource_name, trailing_slash()),
                 self.wrap_view('products'),
@@ -1246,67 +1240,6 @@ class SalesCycleResource(CRMServiceModelResource):
         '''
         PUT METHOD
         I{URL}:  U{alma.net/api/v1/sales_cycle/:id/close/}
-
-        B{Description}:
-        close SalesCycle by set real_value
-        and update status to 'C'('Completed')
-
-        @type  value: number
-        @param value: Amount of real_value
-        @type  salary: string (optional)
-        @param salary: Salary type of real_value: [monthly|annualy|instant]
-        @type  currency: string (optional)
-        @param currency: Currency type of real_value: [KZT|USD|RUB]
-
-
-        @return: updated SalesCycle and close Activity
-
-        '''
-        self.method_check(request, allowed=['put'])
-
-        basic_bundle = self.build_bundle(request=request)
-
-        # get sales_cycle
-        try:
-            obj = self.cached_obj_get(bundle=basic_bundle,
-                                      **self.remove_api_resource_names(kwargs))
-        except ObjectDoesNotExist:
-            return http.HttpNotFound()
-        except MultipleObjectsReturned:
-            return http.HttpMultipleChoices(
-                "More than one resource is found at this URI.")
-        bundle = self.build_bundle(obj=obj, request=request)
-
-        # get PUT's data from request.body
-        deserialized = self.deserialize(
-            request, request.body,
-            format=request.META.get('CONTENT_TYPE', 'application/json'))
-        deserialized = self.alter_deserialized_list_data(request, deserialized)
-
-        if deserialized.get('value'):
-            real_value = {
-                'amount': deserialized.get('value'),
-                'salary': deserialized.get('salary'),
-                'currency': deserialized.get('currency')
-                }
-            # backend function to set real_value and update status
-            sales_cycle, activity = bundle.obj.close(**real_value)
-        else:
-            return http.HttpBadRequest(
-                content="must be provided 'value' value of 'real_value'",
-                content_type='text/plain')
-
-        return self.create_response(
-            request, {
-                'sales_cycle': SalesCycleResource().get_bundle_detail(sales_cycle, request),
-                'activity': ActivityResource().get_bundle_detail(activity, request)
-            },
-            response_class=http.HttpAccepted)
-
-    def close_cycle(self, request, **kwargs):
-        '''
-        PUT METHOD
-        I{URL}:  U{alma.net/api/v1/sales_cycle/:id/close_cycle/}
 
         B{Description}:
         close SalesCycle, set value of SalesCycleProductStat
@@ -1333,7 +1266,7 @@ class SalesCycleResource(CRMServiceModelResource):
             request, request.body,
             format=request.META.get('CONTENT_TYPE', 'application/json'))
         deserialized = self.alter_deserialized_list_data(request, deserialized)
-        sales_cycle, activity = bundle.obj.close_cycle(products_with_values=deserialized)
+        sales_cycle, activity = bundle.obj.close(products_with_values=deserialized)
 
         return self.create_response(
             request, {
@@ -1378,7 +1311,7 @@ class SalesCycleResource(CRMServiceModelResource):
         deserialized = self.alter_deserialized_list_data(request, deserialized)
 
         obj.products.clear()
-        obj.add_products(deserialized['product_ids'])
+        obj.add_products(deserialized['object_ids'])
 
         if not self._meta.always_return_data:
             return http.HttpAccepted(location=location)
@@ -2082,7 +2015,6 @@ class CommentResource(CRMServiceModelResource):
         obj = obj_class.objects.get(id=bundle.data[class_name_lower+'_id'])
         bundle.data['content_object'] = obj
         return bundle
-
 
 
 class MentionResource(CRMServiceModelResource):
