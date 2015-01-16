@@ -8,6 +8,7 @@ from tastypie.authentication import (
     SessionAuthentication,
     BasicAuthentication,
     )
+from django.db import transaction
 from django.conf.urls import url
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.core.files.temp import NamedTemporaryFile
@@ -1309,10 +1310,19 @@ class ActivityResource(CRMServiceModelResource):
     feedback_status = fields.CharField(null=True)
 
     class Meta(CommonMeta):
-        queryset = Activity.objects.all()
+        queryset = Activity.objects.all().prefetch_related('recipients')
         resource_name = 'activity'
         excludes = ['date_edited', 'subscription_id', 'title']
         always_return_data = True
+
+    def dehydrate(self, bundle):
+        recip = bundle.obj.recipients.filter(
+            user__pk=bundle.obj.owner_id).first()
+        if not recip or recip.has_read:
+            bundle.data['has_read'] = True
+        else:
+            bundle.data['has_read'] = False
+        return bundle
 
     def dehydrate_sales_cycle_id(self, bundle):
         return bundle.obj.sales_cycle_id
@@ -1329,7 +1339,13 @@ class ActivityResource(CRMServiceModelResource):
                 (self._meta.resource_name, trailing_slash()),
                 self.wrap_view('get_comments'),
                 name='api_get_comments'
-            )
+            ),
+            url(
+                r"^(?P<resource_name>%s)/read%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('mark_as_read'),
+                name='api_mark_as_ready'
+            ),
         ]
 
     def get_comments(self, request, **kwargs):
@@ -1363,6 +1379,18 @@ class ActivityResource(CRMServiceModelResource):
         return self.create_response(
             request, {'objects': comments})
 
+    def mark_as_read(self, request, **kwargs):
+        rv = 0
+        with RequestContext(self, request, allowed_methods=['post']):
+            data = self.deserialize(
+                request, request.body,
+                format=request.META.get('CONTENT_TYPE', 'application/json'))
+            for act_id in data:
+                Activity.mark_as_read(request.user.pk, act_id)
+            rv = len(data)
+        return self.create_response(
+            request, {'success': rv})
+
     def obj_create(self, bundle, **kwargs):
         act = bundle.obj = self._meta.object_class()
         act.author_id = bundle.data.get('author_id')
@@ -1378,6 +1406,7 @@ class ActivityResource(CRMServiceModelResource):
                 status=bundle.data.get('feedback_status', None),
                 owner_id=act.author_id)
             act.feedback.save()
+        act.spray()
         bundle = self.full_hydrate(bundle)
         return bundle
 

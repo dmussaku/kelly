@@ -1006,6 +1006,96 @@ class ActivityResourceTest(ResourceTestMixin, ResourceTestCase):
         self.assertEqual(resp_activity['description'], self.activity.description)
         self.assertEqual(resp_activity['author_id'], self.activity.owner.id)
         self.assertEqual(resp_activity['feedback_status'], self.activity.feedback.status)
+        self.assertTrue('has_read' in resp_activity)
+
+    def test_spray_activity(self):
+        owner = CRMUser.objects.last()
+        sales_cycle = SalesCycle.objects.first()
+        post_data = {
+            'author_id': owner.id,
+            'description': 'new activity',
+            'sales_cycle_id': sales_cycle.id,
+            'feedback_status': '$'
+        }
+        unfollowers = [
+            unfollow.id for unfollow in sales_cycle.contact.unfollowers.all()]
+        universe = CRMUser.objects.all().values_list('id', flat=True)
+
+        expected_objects = len(set(universe) - set(unfollowers))
+        self.api_client.post(self.api_path_activity,
+                             format='json', data=post_data)
+        actual_objects = Activity.objects.last().recipients.count()
+        self.assertEqual(actual_objects, expected_objects)
+
+    def test_spray_activityWithUnfollower(self):
+        owner = CRMUser.objects.last()
+        sales_cycle = SalesCycle.objects.first()
+        post_data = {
+            'author_id': owner.id,
+            'description': 'new activity',
+            'sales_cycle_id': sales_cycle.id,
+            'feedback_status': '$'
+        }
+        unfollowers = [
+            unfollow.id for unfollow in sales_cycle.contact.unfollowers.all()]
+        universe = CRMUser.objects.all().values_list('id', flat=True)
+        for user_id in universe:
+            if not user_id in unfollowers:
+                user = CRMUser.objects.get(pk=user_id)
+                user.unfollow_list.add(sales_cycle.contact)
+                break
+        expected_objects = len(set(universe) - set(unfollowers))
+        # if no more user
+        if expected_objects:
+            expected_objects -= 1
+        self.api_client.post(self.api_path_activity,
+                             format='json', data=post_data)
+        actual_objects = Activity.objects.last().recipients.count()
+        self.assertEqual(actual_objects, expected_objects)
+
+    def test_markZeroActivitiesAsRead(self):
+        import json
+        post_data = []
+        response = self.api_client.post(
+            self.api_path_activity + 'read/', format='json', data=post_data)
+        response = json.loads(response.content)
+        self.assertEqual(response['success'], 0)
+
+    def test_markOneActivityAsRead(self):
+        import json
+        self.test_spray_activity()
+        act = Activity.objects.last()
+
+        expected = act.recipients.count() - 1
+        post_data = [act.pk]
+        response = self.api_client.post(
+            self.api_path_activity + 'read/', format='json', data=post_data)
+        response = json.loads(response.content)
+        act = Activity.objects.last()
+        actual = act.recipients.filter(has_read=False).count()
+        self.assertEqual(response['success'], 1)
+        self.assertEqual(expected, actual)
+
+    def test_markTwoActivitiesAsRead(self):
+        import json
+        expected, actual = [], []
+        self.test_spray_activity()
+        self.test_spray_activity()
+        acts = list(Activity.objects.all())[-2:]
+        for act in acts:
+            expected.append(act.recipients.count() - 1)
+        post_data = map(lambda act: act.pk, acts)
+        response = self.api_client.post(
+            self.api_path_activity + 'read/', format='json', data=post_data)
+        response = json.loads(response.content)
+
+        acts = list(Activity.objects.all())[-2:]
+        for act in acts:
+            actual.append(act.recipients.filter(has_read=False).count())
+
+        self.assertEqual(response['success'], 2)
+        for _act, _exp in zip(actual, expected):
+            self.assertEqual(_act, _exp)
 
     def test_create_activity_with_feedback(self):
         owner = CRMUser.objects.last()

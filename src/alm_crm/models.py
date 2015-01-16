@@ -950,6 +950,32 @@ class Activity(SubscriptionObject):
         if save_feedback:
             self.feedback.save()
 
+    def spray(self):
+        unfollow_set = {
+            unfollower.id for unfollower
+            in self.sales_cycle.contact.unfollowers.all()}
+        university_set = set(CRMUser.objects.all().values_list(
+                             'id', flat=True))
+        followers = CRMUser.objects.filter(
+            pk__in=(university_set - unfollow_set))
+
+        with transaction.atomic():
+            for follower in followers:
+                act_recip = ActivityRecipient(user=follower, activity=self)
+                act_recip.save()
+
+    @classmethod
+    def mark_as_read(cls, user_id, act_id):
+        try:
+            act = ActivityRecipient.objects.get(
+                user__id=user_id, activity__id=act_id)
+        except ActivityRecipient.DoesNotExist:
+            pass
+        else:
+            act.has_read = True
+            act.save()
+        return True
+
     @classmethod
     def get_activities_by_contact(cls, contact_id):
         return Activity.objects.filter(sales_cycle__contact_id=contact_id)
@@ -1081,6 +1107,10 @@ class ActivityRecipient(SubscriptionObject):
     activity = models.ForeignKey(Activity, related_name='recipients')
     user = models.ForeignKey(CRMUser, related_name='activities')
     has_read = models.BooleanField(default=False)
+
+    @property
+    def owner(self):
+        return self.activity.owner
 
     class Meta:
         db_table = settings.DB_PREFIX.format('activity_recipient')
