@@ -77,8 +77,8 @@ def get_crm_subscription(request):
 class CommonMeta:
     list_allowed_methods = ['get', 'post', 'patch']
     detail_allowed_methods = ['get', 'post', 'put', 'delete', 'patch']
-    authentication = MultiAuthentication(BasicAuthentication(),
-                                         SessionAuthentication())
+    authentication = MultiAuthentication(SessionAuthentication(),
+                                         BasicAuthentication())
     authorization = Authorization()
 
 
