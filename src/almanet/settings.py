@@ -118,6 +118,7 @@ class BaseConfiguration(SubdomainConfiguration, Configuration):
         'alm_company',
         'alm_vcard',
         'alm_crm',
+        'corsheaders',
         'tastypie',
         'tastypie_swagger',
         'django_extensions',
@@ -126,6 +127,7 @@ class BaseConfiguration(SubdomainConfiguration, Configuration):
     MIDDLEWARE_CLASSES = (
         'django.contrib.sessions.middleware.SessionMiddleware',
         'django.middleware.common.CommonMiddleware',
+        'corsheaders.middleware.CorsMiddleware',
         'django.middleware.csrf.CsrfViewMiddleware',
         'django.contrib.auth.middleware.AuthenticationMiddleware',
         'django.contrib.messages.middleware.MessageMiddleware',
@@ -277,6 +279,11 @@ class DevConfiguration(FileSettings('~/.almanet/almanet.conf.py'), BaseConfigura
     #SITE_DOMAIN = PARENT_HOST
     DEBUG = True
     TEMPLATE_DEBUG = DEBUG
+
+    CORS_ORIGIN_WHITELIST = (
+        'alma.net:8000',
+        'almacloud.alma.net:8000'
+    )
 
 
 class TestConfiguration(FileSettings('~/.almanet/almanet.conf.py'), BaseConfiguration):

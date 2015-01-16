@@ -446,12 +446,18 @@ class Contact(SubscriptionObject):
         return contact
 
     @classmethod
-    def import_from_vcard(cls, vcard_file):
+    def import_from_vcard(cls, raw_vcard, creator):
+        """
+        Parameters
+        ----------
+            raw_vcard - serialized repr of vcard
+            creator - crm user who owns created objects
+        """
         rv = []
-        vcards = VCard.importFromVCardMultiple(vcard_file, autocommit=True)
+        vcards = VCard.importFromVCardMultiple(raw_vcard, autocommit=True)
         with transaction.atomic():
             for vcard in vcards:
-                c = cls(vcard=vcard)
+                c = cls(vcard=vcard, owner=creator)
                 c.save()
                 rv.append(c)
         print len(rv), 'contacts'

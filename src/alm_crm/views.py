@@ -37,19 +37,12 @@ from alm_vcard.models import VCard
 from alm_vcard.forms import VCardForm
 
 
-class DashboardView(View):
+class CRMWelcomeView(TemplateView):
 
     def get_context_data(self, **kwargs):
-        context = super(DashboardView, self).get_context_data(**kwargs)
+        context = super(CRMWelcomeView, self).get_context_data(**kwargs)
         context['subdomain'] = self.request.user_env['subdomain']
         return context
-
-    def get(self, request, *a, **kw):
-        return HttpResponseRedirect(almanet_reverse(
-            'feed',
-            kwargs={'service_slug': settings.DEFAULT_SERVICE},
-            subdomain=request.user_env['subdomain'])
-        )
 
 
 class FeedView(TemplateView):

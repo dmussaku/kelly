@@ -267,12 +267,6 @@ class ContactResource(CRMServiceModelResource):
                 self.wrap_view('import_contacts'),
                 name='api_import_contacts_from_vcard'
             ),
-            url(
-                r"^(?P<resource_name>%s)/export_contacts_to_vcard%s$" %
-                (self._meta.resource_name, trailing_slash()),
-                self.wrap_view('export_contacts_to_vcard'),
-                name='api_export_contacts_to_vcard'
-            ),
         ]
 
     def post_list(self, request, **kwargs):
@@ -1112,19 +1106,15 @@ class ContactResource(CRMServiceModelResource):
                 Contact.share_contacts(share_from, share_to, contact_ids)}
             )
 
-    def import_contacts_from_vcard(self, request, **kwargs):
+    def import_contacts(self, request, **kwargs):
         '''
         POST METHOD
         I{URL}:  U{alma.net/api/v1/contact/import_contacts_from_vcard/}
-
         Description
         Import contacts from a vcard file
-
         @type  my_file: file
         @param my_file: A vcard file
-
         @return: json.
-
         >>>
         ... {
         ...    'success':True,
@@ -1134,48 +1124,23 @@ class ContactResource(CRMServiceModelResource):
         ...            93,
         ...        ],
         ... },
-
         '''
-        if request.method == 'POST':
-            return self.create_response(
-                request,
-                Contact.import_contacts_from_vcard(request.FILES['myfile'])
-                )
-
-    def export_contacts_to_vcard(self, request, **kwargs):
-        '''
-        GET METHOD
-        I{URL}:  U{alma.net:8000/api/v1/contact/export_contacts_to_vcard/}
-
-        Description
-        Export selected contacts to vcard.txt file
-
-        @type  contact_ids: list
-        @param contact_ids: A list of contact ids like so [1,2,3]
-
-        @return: file disposition.
-
-        >>> if list is empty returns
-        ... No contacts have been selected
-        ...
-        >>> if contact id doesn't exist returns:
-        ... Contact with id=contact_id does not exist
-
-        '''
-        contact_ids = ast.literal_eval(request.GET.get('contact_ids', []))
-        if contact_ids:
-            temp = NamedTemporaryFile()
-            response = HttpResponse(FileWrapper(temp), mimetype='application/force-download')
-            response['Content-Disposition'] = 'attachment; filename="%s.txt"' % 'vcard'
-            for contact_id in contact_ids:
-                try:
-                    vcard = Contact.objects.get(id=contact_id).vcard
-                    response.write(vcard.exportTo('vCard'))
-                except:
-                    return HttpResponse('Contact with id=%s does not exist' % contact_id)
-            return response
-        else:
-            return HttpResponse('No contacts have been selected')
+        objects = []
+        contact_resource = ContactResource()
+        self.method_check(request, allowed=['post'])
+        self.is_authenticated(request)
+        self.throttle_check(request)
+        data = self.deserialize(
+            request, request.body,
+            format=request.META.get('CONTENT_TYPE', 'application/json'))
+        for contact in Contact.import_from_vcard(
+                data['uploaded_file'], request.user.get_crmuser()):
+            _bundle = contact_resource.build_bundle(
+                obj=contact, request=request)
+            objects.append(contact_resource.full_dehydrate(
+                _bundle, for_list=True))
+        self.log_throttled_access(request)
+        return self.create_response(request, {'success': objects})
 
 
 class SalesCycleResource(CRMServiceModelResource):
@@ -2521,6 +2486,7 @@ class AppStateResource(Resource):
         ... }
 
         '''
+        print bundle.request.user
         return AppStateObject(service_slug=kwargs['pk'],
                               request=bundle.request)
 
@@ -2576,6 +2542,7 @@ class SalesCycleProductStatResource(CRMServiceModelResource):
         sales_cycle = SalesCycle.objects.get(id=bundle.data['sales_cycle'])
         bundle.data['sales_cycle'] = sales_cycle
         return bundle
+
 
 class FilterResource(CRMServiceModelResource):
     '''
