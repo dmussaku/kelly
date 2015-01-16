@@ -754,6 +754,13 @@ class SalesCycle(SubscriptionObject):
         if save:
             self.save()
 
+    def set_result_by_amount(self, amount):
+        v = Value(amount=amount, owner=self.owner)
+        v.save()
+
+        self.real_value = v
+        self.save()
+
     def add_follower(self, user_id, **kw):
         """TEST Set follower to salescycle"""
         return self.add_followers([user_id], **kw)[0]
@@ -771,51 +778,17 @@ class SalesCycle(SubscriptionObject):
                 status.append(False)
         return status
 
-    def close(self, **kw):
-        """
-        1. set real_value by
-        given amount(, salary, currency) field values of Value
-        2. update status to 'C' ('Completed')
-        """
-        assert 'amount' in kw, 'must be provided amount of real_value'
-
-        if self.projected_value:
-            if 'salary' not in kw or not kw['salary']:
-                kw['salary'] = self.projected_value.salary
-            if 'currency' not in kw or not kw['currency']:
-                kw['currency'] = self.projected_value.currency
-        if 'salary' in kw and not kw['salary']:
-            kw.pop('salary')
-        if 'currency' in kw and not kw['currency']:
-            kw.pop('currency')
-        v = Value(**kw)
-        v.save()
-
-        # update SalesCycle
-        self.real_value = v
-        self.status = 'C'
-        self.save()
-
-        # create 'close' Activity
-        activity = Activity(
-            sales_cycle=self,
-            owner=self.owner,
-            description=_('Closed. Real Value is %(amount)s') % {'amount': v.amount}
-            )
-        activity.save()
-        activity.set_feedback_status('$', save_feedback=True)
-
-        return [self, activity]
-
-    def close_cycle(self, products_with_values):
+    def close(self, products_with_values):
         amount = 0
         for product, value in products_with_values.iteritems():
             amount += value
-            s = SalesCycleProductStat.objects.get(sales_cycle=self, product=Product.objects.get(id=product))
+            s = SalesCycleProductStat.objects.get(sales_cycle=self,
+                                                  product=Product.objects.get(id=product))
             s.value = value
             s.save()
 
         self.status = 'C'
+        self.set_result_by_amount(amount)
         self.save()
 
         activity = Activity(
@@ -1122,7 +1095,7 @@ class ActivityRecipient(SubscriptionObject):
 class Feedback(SubscriptionObject):
     STATUS_OPTIONS = (
         ('W', _('waiting')),
-        ('$', _('1000')),
+        ('$', _('outcome')),
         ('1', _('Client is happy')),
         ('2', _('Client is OK')),
         ('3', _('Client is neutral')),
@@ -1395,6 +1368,10 @@ class SalesCycleProductStat(SubscriptionObject):
 
     def __unicode__(self):
         return ' %s | %s | %s' % (self.sales_cycle, self.product, self.value)
+
+    @property
+    def owner(self):
+        return self.sales_cycle.owner
 
 
 class Filter(SubscriptionObject):
