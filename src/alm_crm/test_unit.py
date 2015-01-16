@@ -1743,13 +1743,16 @@ class AppStateResourceTest(ResourceTestMixin, ResourceTestCase):
 
     def test_get(self):
         app_state = self.get_detail_des(self.subscription_id)
-        self.assertTrue('objects' in app_state)
+        # self.assertTrue('objects' in app_state)
         self.assertTrue('users' in app_state['objects'])
         self.assertTrue('company' in app_state['objects'])
         self.assertTrue('contacts' in app_state['objects'])
         self.assertTrue('sales_cycles' in app_state['objects'])
         self.assertTrue('shares' in app_state['objects'])
         self.assertTrue('activities' in app_state['objects'])
+
+        for activity in app_state['objects']['activities']:
+            self.assertTrue('is_read' in activity)
 
 
 class ShareResourceTest(ResourceTestMixin, ResourceTestCase):

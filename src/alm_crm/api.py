@@ -2208,12 +2208,15 @@ class AppStateResource(Resource):
                 feedback_status = a.feedback.status
             except Feedback.DoesNotExist:
                 feedback_status = None
+            recip = a.recipients.filter(user=request.user).first()
+            is_read = not recip and True or recip.has_read
             data.update({
                 'salescycle_id': a.sales_cycle.pk,
                 'author_id': a.owner.pk,
                 'feedback': feedback_status,
-                'date_created': a.date_created.strftime('%Y-%m-%d %H:%M')
-                })
+                'date_created': a.date_created.strftime('%Y-%m-%d %H:%M'),
+                'is_read': is_read
+            })
             return data
 
         def _map_sales_cycle(sc):
