@@ -2257,6 +2257,7 @@ class AppStateObject(object):
             'sales_cycles': self.get_sales_cycles(),
             'activities': self.get_activities(),
             'products': self.get_products(),
+            'filters': self.get_filters(),
             'sales_cycles_to_products_map': self.get_sales_cycle2products_map()
         }
         self.constants = self.get_constants()
@@ -2298,6 +2299,11 @@ class AppStateObject(object):
 
         return ActivityResource().get_bundle_list(activities, self.request)
 
+    def get_filters(self):
+        filters = Filter.get_filters_by_crmuser(
+            self.current_crmuser.pk)
+        return FilterResource().get_bundle_list(filters, self.request)
+
     def get_products(self):
         products = Product.get_products()
 
@@ -2320,8 +2326,7 @@ class AppStateObject(object):
         return data
 
     def get_shares(self):
-        shares = Share.get_shares_owned_for(self.current_crmuser.pk)
-
+        shares = Share.get_shares_in_for(self.current_crmuser.pk)
         return ShareResource().get_bundle_list(shares, self.request)
 
     def get_constants(self):
@@ -2559,3 +2564,4 @@ class FilterResource(CRMServiceModelResource):
     class Meta(CommonMeta):
         queryset = Filter.objects.all()
         resource_name = 'filter'
+        always_return_data = True

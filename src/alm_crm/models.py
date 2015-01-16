@@ -1406,6 +1406,7 @@ class SalesCycleProductStat(SubscriptionObject):
     def __unicode__(self):
         return ' %s | %s | %s' % (self.sales_cycle, self.product, self.value)
 
+
 class Filter(SubscriptionObject):
     BASE_OPTIONS = (
         ('AL', _('all')),
@@ -1424,3 +1425,12 @@ class Filter(SubscriptionObject):
 
     def __unicode__(self):
         return u'%s: %s' % (self.title, self.base)
+
+    def save(self, **kwargs):
+        if not self.subscription_id and self.owner:
+            self.subscription_id = self.owner.subscription_id
+        super(self.__class__, self).save(**kwargs)
+
+    @classmethod
+    def get_filters_by_crmuser(cls, crmuser_id):
+        return Filter.objects.filter(owner=crmuser_id)
