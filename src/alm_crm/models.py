@@ -830,7 +830,7 @@ class SalesCycle(SubscriptionObject):
     @classmethod
     def upd_lst_activity_on_create(cls, sender,
                                    created=False, instance=None, **kwargs):
-        if not created:
+        if not created or not instance.sales_cycle.is_global:
             return
         sales_cycle = instance.sales_cycle
         sales_cycle.latest_activity = sales_cycle.find_latest_activity()
@@ -1289,7 +1289,15 @@ signals.post_save.connect(
 
 def on_activity_delete(sender, instance=None, **kwargs):
     sales_cycle = instance.sales_cycle
-    sales_cycle.latest_activity = sales_cycle.find_latest_activity()
+    act = sales_cycle.find_latest_activity()
+    # todo(xepa4ep): this should imply rather then patch
+    try:
+        sales_cycle.latest_activity = sales_cycle.find_latest_activity()
+    except Activity.DoesNotExist:
+        wrong_cycles = SalesCycle.objects.filter(latest_activity=act)
+        for cycle in wrong_cycles:
+            cycle.latest_activity = cycle.find_latest_activity()
+            cycle.save()
     sales_cycle.save()
 
     contact = sales_cycle.contact
