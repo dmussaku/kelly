@@ -284,7 +284,7 @@ class DevConfiguration(FileSettings('~/.almanet/almanet.conf.py'), BaseConfigura
         'alma.net:8000',
         'almacloud.alma.net:8000'
     )
-
+    CSRF_COOKIE_DOMAIN = '.alma.net'
 
 class TestConfiguration(FileSettings('~/.almanet/almanet.conf.py'), BaseConfiguration):
     SELENIUM_TESTSERVER_HOST = 'http://10.8.0.18'
