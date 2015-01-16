@@ -1,4 +1,4 @@
-from django.views.generic import TemplateView, ListView, DetailView
+from django.views.generic import TemplateView, ListView, DetailView, RedirectView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.http import Http404, HttpResponseRedirect
 from django.core.urlresolvers import reverse_lazy
@@ -6,11 +6,23 @@ from almanet.url_resolvers import reverse_lazy as almanet_reverse_lazy
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from alm_company.models import Company
+from alm_user.models import User
 from .models import Service
 from .forms import ServiceCreateForm
 
-# TODO: this needs to be deleted
 
+class RedirectHomeView(RedirectView):
+
+    def get(self, request, *a, **kw):
+        if request.user.is_authenticated():
+            subscr = request.user.get_subscriptions().first()
+            return HttpResponseRedirect(subscr.get_home_url())
+        else:
+            return HttpResponseRedirect(
+                almanet_reverse_lazy('user_login', subdomain=None))
+
+
+# TODO: this needs to be deleted
 
 class TestView1(TemplateView):
 
