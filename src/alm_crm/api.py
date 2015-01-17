@@ -1,7 +1,7 @@
 from tastypie import fields, http
 from tastypie.contrib.contenttypes.fields import GenericForeignKeyField
 from django.contrib.contenttypes.models import ContentType
-from tastypie.constants import ALL, ALL_WITH_RELATIONS
+from tastypie.constants import ALL_WITH_RELATIONS
 from tastypie.resources import Resource, ModelResource
 from tastypie.authorization import Authorization
 from tastypie.utils import trailing_slash
@@ -10,12 +10,8 @@ from tastypie.authentication import (
     SessionAuthentication,
     BasicAuthentication,
     )
-from django.db import transaction
-from tastypie.paginator import Paginator
 from django.conf.urls import url
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
-from django.core.files.temp import NamedTemporaryFile
-from django.core.servers.basehttp import FileWrapper
 from django.forms.models import model_to_dict
 from django.utils import translation
 from .models import (
@@ -34,33 +30,15 @@ from .models import (
     Filter
     )
 from alm_vcard.models import *
-from almanet.models import Subscription, Service
-from alm_vcard.api import VCardResource
-from alm_user.api import UserResource
-from alm_user.models import User
+from almanet.models import Service
 from almanet.settings import DEFAULT_SERVICE
+from almanet.utils.api import RequestContext
 import ast
-from django.core.files.temp import NamedTemporaryFile
-from django.core.servers.basehttp import FileWrapper
 from tastypie.serializers import Serializer
 from django.db import models
 from tastypie.exceptions import ImmediateHttpResponse, NotFound
-from tastypie.http import HttpNotFound
 from django.http import HttpResponse
-import json
 import datetime
-import time
-from contextlib import contextmanager
-
-
-@contextmanager
-def RequestContext(self, request, allowed_methods=None):
-    allowed_methods = allowed_methods or []
-    self.method_check(request, allowed=allowed_methods)
-    self.is_authenticated(request)
-    self.throttle_check(request)
-    yield
-    self.log_throttled_access(request)
 
 
 def get_crm_subscription(request):
@@ -127,8 +105,8 @@ class CRMServiceModelResource(ModelResource):
     class Meta:
         list_allowed_methods = ['get', 'post', 'patch']
         detail_allowed_methods = ['get', 'post', 'put', 'delete', 'patch']
-        authentication = MultiAuthentication(BasicAuthentication(),
-                                             SessionAuthentication())
+        authentication = MultiAuthentication(SessionAuthentication(),
+                                             BasicAuthentication())
         authorization = Authorization()
 
 
@@ -411,7 +389,7 @@ class ContactResource(CRMServiceModelResource):
     def full_hydrate(self, bundle, **kwargs):
         # t1 = time.time()
         contact_id = kwargs.get('pk', None)
-        subscription_id = self.get_crm_subscription(bundle.request)
+        subscription_id = get_crm_subscription(bundle.request)
         if contact_id:
             bundle.obj = Contact.objects.get(id=int(contact_id))
             bundle.obj.subscription_id = subscription_id
@@ -451,18 +429,18 @@ class ContactResource(CRMServiceModelResource):
         bundle.obj.save()
         if bundle.data.get('note') and not kwargs.get('pk'):
             share = Share(
-                    description=bundle.data.get('note'),
-                    share_to_id=int(bundle.data['user_id']),
-                    share_from_id=int(bundle.data['user_id']),
-                    contact_id=bundle.obj.id,
-                    subscription_id=subscription_id
-                    )
+                note=bundle.data.get('note'),
+                share_to_id=int(bundle.data['user_id']),
+                share_from_id=int(bundle.data['user_id']),
+                contact_id=bundle.obj.id,
+                subscription_id=subscription_id
+            )
             share.save()
         return bundle
 
     def vcard_full_hydrate(self, bundle):
         field_object = bundle.data.get('vcard',{})
-        subscription_id = self.get_crm_subscription(bundle.request)
+        subscription_id = get_crm_subscription(bundle.request)
         if bundle.obj.vcard:
             vcard = bundle.obj.vcard
         else:

@@ -30,7 +30,7 @@ from alm_crm.api import (
     FilterResource,
     CommentResource
     )
-from alm_user.api import UserSessionResource, UserResource
+from alm_user.api import UserResource
 from tastypie.resources import ModelResource
 from django.views.generic.base import TemplateView
 
@@ -50,7 +50,6 @@ v1_api.register(ShareResource())
 v1_api.register(ValueResource())
 v1_api.register(FeedbackResource())
 v1_api.register(CRMUserResource())
-v1_api.register(UserSessionResource())
 v1_api.register(UserResource())
 v1_api.register(ContactListResource())
 v1_api.register(AppStateResource())
