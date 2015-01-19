@@ -311,13 +311,13 @@ class TestConfiguration(FileSettings('~/.almanet/almanet.conf.py'), BaseConfigur
 
 class DemoConfiguration(FileSettings('~/.almanet/almanet.conf.py'), BaseConfiguration):
     DEBUG = False
-    PARENT_HOST = 'almacloud.kz'
-    HOSTCONF_REGEX = r'almacloud\.kz'
+    PARENT_HOST = 'almasales.kz'
+    HOSTCONF_REGEX = r'almasales\.kz'
 
-    SITE_NAME = 'almacloud.kz'
-    SITE_DOMAIN = 'http://almacloud.kz'
-    CSRF_COOKIE_DOMAIN = '.almacloud.kz'
-    SESSION_COOKIE_DOMAIN = '.almacloud.kz'
+    SITE_NAME = 'almasales.kz'
+    SITE_DOMAIN = 'http://almasales.kz'
+    CSRF_COOKIE_DOMAIN = '.almasales.kz'
+    SESSION_COOKIE_DOMAIN = '.almasales.kz'
     # CORS_ORIGIN_WHITELIST = (
     #     'alma.net:8000',
     #     'almacloud.alma.net:8000'
@@ -344,4 +344,3 @@ class DemoConfiguration(FileSettings('~/.almanet/almanet.conf.py'), BaseConfigur
 
     MEDIA_ROOT = os.path.expanduser('~/.almanet/media/')
     STATIC_ROOT = os.path.expanduser('~/.almanet/static/')
-
