@@ -158,3 +158,18 @@ class User(AbstractBaseUser):
     def get_crmuser(self):
         from alm_crm.models import CRMUser
         return CRMUser.objects.get(user_id=self.pk)
+
+
+
+class Referral(models.Model):
+    email = models.EmailField()
+    date_created = models.DateTimeField(blank=True, auto_now_add=True)
+    referer = models.CharField(max_length=2000, blank=True, null=True) 
+
+    class Meta:
+        verbose_name = _('referral')
+        db_table = settings.DB_PREFIX.format('referral')
+
+    def __unicode__(self):
+        return u'%s'%self.email
+
