@@ -334,6 +334,14 @@ class DemoConfiguration(FileSettings('~/.almanet/almanet.conf.py'), BaseConfigur
             'PORT': '5432'
         }
     }
+
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.memcached.PyLibMCCache',
+            'LOCATION': 'db.mobiliuz.com:11211'
+        }
+    }
+
     MEDIA_ROOT = os.path.expanduser('~/.almanet/media/')
     STATIC_ROOT = os.path.expanduser('~/.almanet/static/')
 
