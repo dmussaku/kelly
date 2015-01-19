@@ -316,6 +316,12 @@ class DemoConfiguration(FileSettings('~/.almanet/almanet.conf.py'), BaseConfigur
 
     SITE_NAME = 'almacloud.kz'
     SITE_DOMAIN = 'http://almacloud.kz'
+    CSRF_COOKIE_DOMAIN = '.almacloud.kz'
+    SESSION_COOKIE_DOMAIN = '.almacloud.kz'
+    # CORS_ORIGIN_WHITELIST = (
+    #     'alma.net:8000',
+    #     'almacloud.alma.net:8000'
+    # )
 
     DATABASES = {
         'default': {
@@ -330,3 +336,4 @@ class DemoConfiguration(FileSettings('~/.almanet/almanet.conf.py'), BaseConfigur
     }
     MEDIA_ROOT = os.path.expanduser('~/.almanet/media/')
     STATIC_ROOT = os.path.expanduser('~/.almanet/static/')
+
