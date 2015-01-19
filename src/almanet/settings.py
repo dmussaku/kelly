@@ -338,7 +338,7 @@ class DemoConfiguration(FileSettings('~/.almanet/almanet.conf.py'), BaseConfigur
     CACHES = {
         'default': {
             'BACKEND': 'django.core.cache.backends.memcached.PyLibMCCache',
-            'LOCATION': 'db.mobiliuz.com:11211'
+            'LOCATION': 'db.alma.net:11211'
         }
     }
 
