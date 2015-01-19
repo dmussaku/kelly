@@ -460,7 +460,6 @@ class Contact(SubscriptionObject):
                 c = cls(vcard=vcard, owner=creator)
                 c.save()
                 rv.append(c)
-        print len(rv), 'contacts'
         return rv
 
     @classmethod

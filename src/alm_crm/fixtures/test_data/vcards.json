@@ -13,7 +13,6 @@
             "given_name": "Rustem",
             "sort_string": null,
             "classP": null,
-            "subscription_id": 1,
             "fn": "Rustem Kamun"
         }
     },
@@ -31,7 +30,6 @@
             "given_name": "Nurlan",
             "sort_string": null,
             "classP": null,
-            "subscription_id": 1,
             "fn": "Nurlan Heisenberg"
         }
     },
@@ -49,7 +47,6 @@
             "given_name": "Aliya",
             "sort_string": null,
             "classP": null,
-            "subscription_id": 1,
             "fn": "Aliya Mussina"
         }
     },
@@ -67,7 +64,6 @@
             "given_name": "Daniyar",
             "sort_string": null,
             "classP": null,
-            "subscription_id": 1,
             "fn": "Daniyar Mussakulov"
         }
     },
@@ -85,7 +81,6 @@
             "given_name": "Vadim",
             "sort_string": null,
             "classP": null,
-            "subscription_id": 1,
             "fn": "Kotov Vadim"
         }
     },
@@ -103,7 +98,6 @@
             "given_name": "Stass",
             "sort_string": null,
             "classP": null,
-            "subscription_id": 1,
             "fn": "Lusto Stass"
         }
     },
@@ -121,7 +115,6 @@
             "given_name": "Yernar",
             "sort_string": null,
             "classP": null,
-            "subscription_id": 1,
             "fn": "Yernar Mailubayev"
         }
     },
@@ -139,7 +132,6 @@
             "given_name": "Dauren",
             "sort_string": null,
             "classP": null,
-            "subscription_id": 1,
             "fn": "Dauren Baitursynov"
         }
     },
@@ -157,7 +149,6 @@
             "given_name": "Ashat",
             "sort_string": null,
             "classP": null,
-            "subscription_id": 1,
             "fn": "Ashat Omarov"
         }
     },
@@ -175,7 +166,6 @@
             "given_name": "Nurlan",
             "sort_string": null,
             "classP": null,
-            "subscription_id": 1,
             "fn": "Nurlan Abiken"
         }
     },
@@ -195,7 +185,6 @@
             "given_name": "Bruce",
             "sort_string": null,
             "classP": null,
-            "subscription_id": 1,
             "fn": "Bruce Wayne"
         }
     },
@@ -213,7 +202,6 @@
             "given_name": "Nurlan",
             "sort_string": null,
             "classP": null,
-            "subscription_id": 1,
             "fn": "Nurlan Abiken"
         }
     },
@@ -231,7 +219,6 @@
             "given_name": "Daniyar",
             "sort_string": null,
             "classP": null,
-            "subscription_id": 1,
             "fn": "Daniyar Mussakulov"
         }
     },
@@ -249,7 +236,6 @@
             "given_name": "Satter",
             "sort_string": null,
             "classP": null,
-            "subscription_id": 1,
             "fn": "Satter Stamkulov"
         }
     },
@@ -259,7 +245,6 @@
         "pk": 1,
         "model": "alm_vcard.tel",
         "fields": {
-            "subscription_id": 1,
             "type": "CELL",
             "vcard": 3,
             "value": "87753591453"
@@ -269,7 +254,6 @@
         "pk": 2,
         "model": "alm_vcard.tel",
         "fields": {
-            "subscription_id": 1,
             "type": "HOME",
             "vcard": 7,
             "value": "87078887722"
@@ -279,7 +263,6 @@
         "pk": 3,
         "model": "alm_vcard.tel",
         "fields": {
-            "subscription_id": 1,
             "type": "CELL",
             "vcard": 2,
             "value": "87077776633"
@@ -290,7 +273,6 @@
         "pk": 1,
         "model": "alm_vcard.email",
         "fields": {
-            "subscription_id": 1,
             "type": "INTERNET",
             "vcard": 1,
             "value": "r.kamun@gmail.com"
@@ -300,7 +282,6 @@
         "pk": 2,
         "model": "alm_vcard.email",
         "fields": {
-            "subscription_id": 1,
             "type": "INTERNET",
             "vcard": 4,
             "value": "dmussaku@gmail.com"
@@ -310,7 +291,6 @@
         "pk": 3,
         "model": "alm_vcard.email",
         "fields": {
-            "subscription_id": 1,
             "type": "INTERNET",
             "vcard": 5,
             "value": "igeeko@gmail.com"
@@ -320,7 +300,6 @@
         "pk": 4,
         "model": "alm_vcard.email",
         "fields": {
-            "subscription_id": 1,
             "type": "INTERNET",
             "vcard": 6,
             "value": "sta3@me.com"
@@ -330,7 +309,6 @@
         "pk": 5,
         "model": "alm_vcard.email",
         "fields": {
-            "subscription_id": 1,
             "type": "INTERNET",
             "vcard": 7,
             "value": "mafioso@gmail.com"
@@ -340,7 +318,6 @@
         "pk": 6,
         "model": "alm_vcard.email",
         "fields": {
-            "subscription_id": 1,
             "type": "INTERNET",
             "vcard": 10,
             "value": "nurlan.abiken@gmail.com"

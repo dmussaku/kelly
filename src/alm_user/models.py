@@ -39,7 +39,7 @@ class User(AbstractBaseUser):
     is_admin = models.BooleanField(default=False)
 
     vcard = models.OneToOneField(VCard, blank=True, null=True)
-    
+
     class Meta:
         verbose_name = _('user')
         db_table = settings.DB_PREFIX.format('user')

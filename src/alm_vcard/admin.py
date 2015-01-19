@@ -148,10 +148,6 @@ class VCardAdmin(admin.ModelAdmin):
                 newContactList.append(vc)
 
         except Exception as e:
-            print type(e)
-            print e.args
-            print e
-
             for i in newContactList:
                 i.delete()
 
@@ -161,7 +157,7 @@ class VCardAdmin(admin.ModelAdmin):
 
         errorCount = 0
 
-        for i in newContactList :
+        for i in newContactList:
             if len(i.errorList) > 0:
                 errorCount += 1
 

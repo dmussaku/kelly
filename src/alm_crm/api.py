@@ -559,7 +559,6 @@ class ContactResource(CRMServiceModelResource):
         return bundle
 
     def follow_contacts(self, request, **kwargs):
-        print 'following'
         if kwargs.get('contact_ids'):
             try:
                 contact_ids = ast.literal_eval(
@@ -2402,7 +2401,6 @@ class AppStateResource(Resource):
         ... }
 
         '''
-        print bundle.request.user
         return AppStateObject(service_slug=kwargs['pk'],
                               request=bundle.request)
 
