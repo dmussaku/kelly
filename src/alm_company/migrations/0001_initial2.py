@@ -7,6 +7,11 @@ from django.db import models
 
 class Migration(SchemaMigration):
 
+    depends_on = (
+        ("alm_user", "0001_initial"),
+    )
+
+
     def forwards(self, orm):
         m2m_table_name = db.shorten_name('alma_company_owner')
         db.create_table(m2m_table_name, (
