@@ -325,7 +325,7 @@ class DemoConfiguration(FileSettings('~/.almanet/almanet.conf.py'), BaseConfigur
 
     DATABASES = {
         'default': {
-            'ENGINE': 'django.contrib.gis.db.backends.postgis',
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
             'NAME': 'almanet',
             'TEST_NAME': 'test_almanet',
             'USER': 'xepa4ep',
