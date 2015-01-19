@@ -392,7 +392,7 @@ class ContactResource(CRMServiceModelResource):
         return bundle.obj.owner.id
 
     def hydrate_sales_cycles(self, bundle):
-        for sales_cycle in bundle.data['sales_cycles']:
+        for sales_cycle in bundle.data.get('sales_cycles', []):
             bundle.obj.sales_cycles.add(SalesCycle.objects.get(id=int(sales_cycle)))
         return bundle
 
