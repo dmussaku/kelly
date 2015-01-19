@@ -109,7 +109,11 @@
       }
     });
     </script>
+    {% if settings.DEBUG %}
     <script type="text/javascript" src="{% static 'js/bundle.js' %}"></script>
+    {% else %}
+    <script type="text/javascript" src="{% static 'js/bundle.min.js' %}"></script>
+    {% endif %}
 
   </body>
 </html>

@@ -66,7 +66,7 @@ def FileSettings(path):
                     original_value = getattr(self, name)
                     if isinstance(original_value, (tuple, list)):
                         if value.startswith('+'):
-                            value = tuple(original_value) + tuple([value[1:]])
+                            value = tuple(original_value) + tuple(value[1:].split(','))
                         else:
                             value = tuple([value])
                 setattr(self, name, value)
@@ -286,6 +286,7 @@ class DevConfiguration(FileSettings('~/.almanet/almanet.conf.py'), BaseConfigura
     )
     CSRF_COOKIE_DOMAIN = '.alma.net'
 
+
 class TestConfiguration(FileSettings('~/.almanet/almanet.conf.py'), BaseConfiguration):
     SELENIUM_TESTSERVER_HOST = 'http://10.8.0.18'
 
@@ -307,3 +308,39 @@ class TestConfiguration(FileSettings('~/.almanet/almanet.conf.py'), BaseConfigur
 
     DEBUG = True
 
+
+class DemoConfiguration(FileSettings('~/.almanet/almanet.conf.py'), BaseConfiguration):
+    DEBUG = False
+    PARENT_HOST = 'almasales.kz'
+    HOSTCONF_REGEX = r'almasales\.kz'
+
+    SITE_NAME = 'almasales.kz'
+    SITE_DOMAIN = 'http://almasales.kz'
+    CSRF_COOKIE_DOMAIN = '.almasales.kz'
+    SESSION_COOKIE_DOMAIN = '.almasales.kz'
+    # CORS_ORIGIN_WHITELIST = (
+    #     'alma.net:8000',
+    #     'almacloud.alma.net:8000'
+    # )
+
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'NAME': 'almanet',
+            'TEST_NAME': 'test_almanet',
+            'USER': 'xepa4ep',
+            'PASSWORD': 'f1b0nacc1',
+            'HOST': 'db.alma.net',
+            'PORT': '5432'
+        }
+    }
+
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.memcached.PyLibMCCache',
+            'LOCATION': 'db.alma.net:11211'
+        }
+    }
+
+    MEDIA_ROOT = os.path.expanduser('~/.almanet/media/')
+    STATIC_ROOT = os.path.expanduser('~/.almanet/static/')

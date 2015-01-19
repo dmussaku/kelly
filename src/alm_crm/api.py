@@ -30,6 +30,7 @@ from .models import (
     Filter
     )
 from alm_vcard.models import *
+from alm_vcard.api import VCardResource
 from almanet.models import Service
 from almanet.settings import DEFAULT_SERVICE
 from almanet.utils.api import RequestContext
@@ -164,10 +165,10 @@ class ContactResource(CRMServiceModelResource):
         'alm_crm.api.ContactResource', 'parent',
         null=True, full=False
         )
-    shares = fields.ToManyField(
-        'alm_crm.api.ShareResource', 'shares',
-        null=True, full=True
-        )
+    # shares = fields.ToManyField(
+    #     'alm_crm.api.ShareResource', 'shares',
+    #     null=True, full=True
+    #     )
 
     class Meta(CommonMeta):
         queryset = Contact.objects.all()
@@ -362,6 +363,8 @@ class ContactResource(CRMServiceModelResource):
         '''Custom representation of followers, assignees etc.'''
         bundle = super(self.__class__, self).full_dehydrate(
             bundle, for_list=True)
+        bundle.data['share'] = self.serialize_share(ShareResource, bundle.obj.share_set.first())
+        bundle.data['children'] = [contact.id for contact in bundle.obj.children.all()]
         bundle.data['author_id'] = bundle.obj.owner_id
         bundle.data['parent_id'] = bundle.obj.parent_id
         return bundle
@@ -372,19 +375,38 @@ class ContactResource(CRMServiceModelResource):
     # def dehydrate_followers(self, bundle):
     #     return [follower.pk for follower in bundle.obj.followers.all()]
     def serialize_share(self, resource, obj):
+        if not obj:
+            return None
         return resource().full_dehydrate(
                     resource().build_bundle(
                         obj=obj)
                     )
 
-    def dehydrate_shares(self, bundle):
-        return [self.serialize_share(ShareResource, share) for share in bundle.obj.share_set.all()]
+    # def dehydrate_shares(self, bundle):
+    #     return [self.serialize_share(ShareResource, share) for share in bundle.obj.share_set.all()]
 
     def dehydrate_sales_cycles(self, bundle):
         return [sc.pk for sc in bundle.obj.sales_cycles.all()]
 
     def dehydrate_owner(self, bundle):
         return bundle.obj.owner.id
+
+    def hydrate_sales_cycles(self, bundle):
+        for sales_cycle in bundle.data.get('sales_cycles', []):
+            bundle.obj.sales_cycles.add(SalesCycle.objects.get(id=int(sales_cycle)))
+        return bundle
+
+    def hydrate_parent(self, bundle):
+        parent_id = bundle.data.get('parent_id', "")
+        if bundle.data.get('parent_id', ""):
+            bundle.obj.parent = Contact.objects.get(id=int(parent_id))
+        else:
+            bundle.obj.parent=None
+        children = bundle.data.get('children', [])
+        bundle.obj.children.clear()
+        for child in children:
+            bundle.obj.children.add(Contact.objects.get(id=child))
+        return bundle
 
     def full_hydrate(self, bundle, **kwargs):
         # t1 = time.time()
@@ -406,11 +428,18 @@ class ContactResource(CRMServiceModelResource):
         i got in a json. If its missing then i just delete it.
 
         '''
+        bundle = self.hydrate_sales_cycles(bundle)
+        bundle = self.hydrate_parent(bundle)
         if bundle.data.get('user_id',""):
             bundle.obj.owner_id = int(bundle.data['user_id'])
-        if bundle.data.get('parent_id',""):
-            bundle.obj.parent_id = int(bundle.data['parent_id'])
-        for field_name in bundle.obj._meta.get_all_field_names():
+        # if bundle.data.get('parent_id',""):
+        #     bundle.obj.parent_id = int(bundle.data['parent_id'])
+        print bundle.obj._meta.get_all_field_names()
+        field_names = bundle.obj._meta.get_all_field_names()
+        field_names.remove('parent')
+        field_names.remove('children')
+        field_names.remove('sales_cycles')
+        for field_name in field_names:
             if bundle.data.get(str(field_name), None):
                 try:
                     field_object = ast.literal_eval(bundle.data.get(str(field_name), None))
@@ -1591,17 +1620,6 @@ class CRMUserResource(CRMServiceModelResource):
     def full_dehydrate(self, bundle, for_list=False):
         bundle = super(self.__class__, self).full_dehydrate(bundle, for_list=True)
         user = bundle.obj.get_billing_user()
-        try:
-            VCard.objects.get(id=user.vcard.id)
-            bundle.data['vcard'] = VCardResource().full_dehydrate(
-                            VCardResource().build_bundle(
-                                obj=VCard.objects.get(id=user.vcard.id))
-                            )
-        except:
-            bundle.data['vcard'] = None
-        # bundle.data['user'] = UserResource().full_dehydrate(
-        #         UserResource().build_bundle(obj=user)
-        #     ).data
         bundle.data['user'] = user.id
         return bundle
 
@@ -1614,6 +1632,16 @@ class CRMUserResource(CRMServiceModelResource):
                 name='api_follow_unfollow'
             ),
         ]
+    def dehydrate_vcard(self, bundle):
+        try:
+            user = bundle.obj.get_billing_user()
+            return VCardResource().full_dehydrate(
+                            VCardResource().build_bundle(
+                                obj=VCard.objects.get(id=user.vcard.id))
+                            )
+        except:
+            return None
+
     def follow_unfollow(self, request, **kwargs):
         data = self.deserialize(request, request.body, format=request.META.get('CONTENT_TYPE', 'application/json'))
         contact_ids = data.get('contact_ids', None)
