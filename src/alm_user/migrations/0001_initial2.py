@@ -7,25 +7,25 @@ from django.db import models
 
 class Migration(SchemaMigration):
 
+    depends_on = (
+        ("alm_company", "0001_initial"),
+    )
+
     def forwards(self, orm):
-        # Adding model 'User'
-        db.create_table('alma_user', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('password', self.gf('django.db.models.fields.CharField')(max_length=128)),
-            ('last_login', self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime.now)),
-            ('first_name', self.gf('django.db.models.fields.CharField')(max_length=31)),
-            ('last_name', self.gf('django.db.models.fields.CharField')(max_length=30)),
-            ('email', self.gf('django.db.models.fields.EmailField')(unique=True, max_length=75)),
-            ('is_active', self.gf('django.db.models.fields.BooleanField')(default=True)),
-            ('timezone', self.gf('timezone_field.fields.TimeZoneField')(default='Asia/Almaty')),
-            ('is_admin', self.gf('django.db.models.fields.BooleanField')(default=False)),
+        # Adding M2M table for field company on 'User'
+        m2m_table_name = db.shorten_name('alma_user_company')
+        db.create_table(m2m_table_name, (
+            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
+            ('user', models.ForeignKey(orm[u'alm_user.user'], null=True)),
+            ('company', models.ForeignKey(orm[u'alm_company.company'], null=True))
         ))
-        db.send_create_signal(u'alm_user', ['User'])
+        db.create_unique(m2m_table_name, ['user_id', 'company_id'])
 
 
     def backwards(self, orm):
-        # Deleting model 'User'
-        db.delete_table('alma_user')
+        # Removing M2M table for field company on 'User'
+        db.delete_table(db.shorten_name('alma_user_company'))
+
 
     models = {
         u'alm_company.company': {
