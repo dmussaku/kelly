@@ -66,7 +66,7 @@ def FileSettings(path):
                     original_value = getattr(self, name)
                     if isinstance(original_value, (tuple, list)):
                         if value.startswith('+'):
-                            value = tuple(original_value) + tuple([value[1:]])
+                            value = tuple(original_value) + tuple(value[1:].split(','))
                         else:
                             value = tuple([value])
                 setattr(self, name, value)
