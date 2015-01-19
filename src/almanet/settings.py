@@ -286,6 +286,7 @@ class DevConfiguration(FileSettings('~/.almanet/almanet.conf.py'), BaseConfigura
     )
     CSRF_COOKIE_DOMAIN = '.alma.net'
 
+
 class TestConfiguration(FileSettings('~/.almanet/almanet.conf.py'), BaseConfiguration):
     SELENIUM_TESTSERVER_HOST = 'http://10.8.0.18'
 
@@ -307,3 +308,25 @@ class TestConfiguration(FileSettings('~/.almanet/almanet.conf.py'), BaseConfigur
 
     DEBUG = True
 
+
+class DemoConfiguration(FileSettings('~/.almanet/almanet.conf.py'), BaseConfiguration):
+    DEBUG = False
+    PARENT_HOST = 'almacloud.kz'
+    HOSTCONF_REGEX = r'almacloud\.kz'
+
+    SITE_NAME = 'almacloud.kz'
+    SITE_DOMAIN = 'http://almacloud.kz'
+
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.contrib.gis.db.backends.postgis',
+            'NAME': 'almanet',
+            'TEST_NAME': 'test_almanet',
+            'USER': 'xepa4ep',
+            'PASSWORD': 'f1b0nacc1',
+            'HOST': 'db.alma.net',
+            'PORT': '5432'
+        }
+    }
+    MEDIA_ROOT = os.path.expanduser('~/.almanet/media/')
+    STATIC_ROOT = os.path.expanduser('~/.almanet/static/')
