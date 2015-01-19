@@ -1514,11 +1514,13 @@ class ProductResource(CRMServiceModelResource):
 
     @undocumented: Meta
     '''
+    author_id = fields.IntegerField(attribute='author_id', null=True)
     sales_cycles = fields.ToManyField(SalesCycleResource, 'sales_cycles', readonly=True)
 
     class Meta(CommonMeta):
         queryset = Product.objects.all()
         resource_name = 'product'
+        always_return_data = True
 
     def prepend_urls(self):
         return [
@@ -1565,6 +1567,7 @@ class ProductResource(CRMServiceModelResource):
         obj_dict = {}
         obj_dict['success'] = obj
         return self.create_response(request, obj_dict, response_class=http.HttpAccepted)
+
 
 class ValueResource(CRMServiceModelResource):
     '''
