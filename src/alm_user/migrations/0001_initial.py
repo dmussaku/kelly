@@ -22,23 +22,10 @@ class Migration(SchemaMigration):
         ))
         db.send_create_signal(u'alm_user', ['User'])
 
-        # Adding M2M table for field company on 'User'
-        m2m_table_name = db.shorten_name('alma_user_company')
-        db.create_table(m2m_table_name, (
-            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
-            ('user', models.ForeignKey(orm[u'alm_user.user'], null=False)),
-            ('company', models.ForeignKey(orm[u'alm_company.company'], null=False))
-        ))
-        db.create_unique(m2m_table_name, ['user_id', 'company_id'])
-
 
     def backwards(self, orm):
         # Deleting model 'User'
         db.delete_table('alma_user')
-
-        # Removing M2M table for field company on 'User'
-        db.delete_table(db.shorten_name('alma_user_company'))
-
 
     models = {
         u'alm_company.company': {

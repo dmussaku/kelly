@@ -7,19 +7,25 @@ from django.db import models
 
 class Migration(SchemaMigration):
 
+    depends_on = (
+        ("alm_user", "0001_initial"),
+    )
+
+
     def forwards(self, orm):
-        # Adding model 'Company'
-        db.create_table('alma_company', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('name', self.gf('django.db.models.fields.CharField')(max_length=100)),
-            ('subdomain', self.gf('django.db.models.fields.CharField')(unique=True, max_length=300)),
+        m2m_table_name = db.shorten_name('alma_company_owner')
+        db.create_table(m2m_table_name, (
+            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
+            ('company', models.ForeignKey(orm[u'alm_company.company'], null=False)),
+            ('user', models.ForeignKey(orm[u'alm_user.user'], null=False))
         ))
-        db.send_create_signal(u'alm_company', ['Company'])
+        db.create_unique(m2m_table_name, ['company_id', 'user_id'])
 
 
     def backwards(self, orm):
-        # Deleting model 'Company'
-        db.delete_table('alma_company')
+
+        # Removing M2M table for field owner on 'Company'
+        db.delete_table(db.shorten_name('alma_company_owner'))
 
 
     models = {
