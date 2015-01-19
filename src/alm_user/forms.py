@@ -158,7 +158,7 @@ class ReferralForm(ModelForm):
 
     def __init__(self, request=None, *args, **kwargs):
         if kwargs.get('data', None):
-            kwargs['data'].get('referer', None)
+            self.referer = kwargs['data'].get('referer', None)
+
         self.request = request
         super(self.__class__, self).__init__(*args, **kwargs)
-

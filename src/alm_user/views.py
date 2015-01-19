@@ -172,7 +172,10 @@ def referral(request, template_name='user/login-registration.html',
             form = referral_form(request, data=data)
         else:
             form = referral_form(request, data=request.POST)
-        return HttpResponseRedirect('complete/')
+
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect(reverse_lazy('referral_complete'))
     else:
         form = referral_form(request)
 
@@ -183,5 +186,4 @@ def referral(request, template_name='user/login-registration.html',
 
 
 def referral_complete(request, template_name='user/referral-complete.html'):
-    context = {}
-    return TemplateResponse(request, template_name, context)
+    return TemplateResponse(request, template_name)

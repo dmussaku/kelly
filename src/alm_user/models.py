@@ -170,3 +170,6 @@ class Referral(models.Model):
         verbose_name = _('referral')
         db_table = settings.DB_PREFIX.format('referral')
 
+    def __unicode__(self):
+        return u'%s'%self.email
+
