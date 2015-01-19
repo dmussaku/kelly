@@ -6,8 +6,8 @@ from django.contrib.auth.views import (
     password_reset_done as django_password_reset_done,)
 
 from alm_user.forms import PasswordResetForm
-from alm_user.views import UserListView, UserRegistrationView
-from alm_user.views import login, password_reset_confirm
+from alm_user.views import UserListView, UserRegistrationView 
+from alm_user.views import login, password_reset_confirm, referral, referral_complete
 from alm_user.models import User
 
 login_url = reverse_lazy('user_login')
@@ -23,6 +23,11 @@ urlpatterns = patterns(
     url(r'^signin/$',
         login, {'template_name': 'user/user_login.html'},
         name='user_login'),
+    url(r'^referral/$',
+        referral, {'template_name': 'user/login-register.html'},
+        name='user_referral'),
+    url(r'^referral/complete/$', referral_complete, {'template_name': 'user/referral-complete.html'}, 
+        name='referral_complete'),
     url(r'^password-reset/$', django_password_reset, {
         'template_name': 'user/password_reset.html',
         'password_reset_form': PasswordResetForm,
