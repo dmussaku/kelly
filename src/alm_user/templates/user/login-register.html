@@ -9,7 +9,7 @@
         <a href="{% url 'user_login' %}" class="login-switcher-button">Log-in</a>
         <a href="{% url 'user_referral' %}" class="login-switcher-button active">Register</a>
       </div>
-
+      <div class="login-form">
       <form name="login-form" action="" method="post">{% csrf_token %}
         <p class="login-form-p">The registration is now closed. To learn more or participate in beta, leave your email below.</p>
         <div class="login-fieldset">
@@ -22,18 +22,14 @@
           </figure>
 
           </label>
-          <input class="login-input" id="login-email" name="email" type="email" placeholder="E-mail">
-          {% if form.non_field_errors %}
-            {% for error in form.non_field_errors %}
-             <div class="login-error">{{ error }}</div>
-            {% endfor %}
-          {% endif %}
+          <input class="login-input" id="login-email" name="email" type="email" placeholder="E-mail" required>
         </div>
 
         <div class="login-fieldset">
           <button class="login-submit login-submit--reset" type="submit">{{ _("Participate in beta") }}</button>
         </div>
       </form>
+      </div>
     </div>
 
   </div>

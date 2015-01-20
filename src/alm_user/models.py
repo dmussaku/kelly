@@ -40,6 +40,8 @@ class User(AbstractBaseUser):
 
     vcard = models.OneToOneField(VCard, blank=True, null=True)
 
+    userpic = models.ImageField(upload_to='userpics')
+    
     class Meta:
         verbose_name = _('user')
         db_table = settings.DB_PREFIX.format('user')

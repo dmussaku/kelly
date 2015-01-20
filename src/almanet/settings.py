@@ -219,7 +219,6 @@ class BaseConfiguration(SubdomainConfiguration, Configuration):
     STATIC_ROOT = rel('../..', 'static')
     STATICFILES_DIRS = (
         rel('static'),
-
     )
     STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.CachedStaticFilesStorage'
 
@@ -228,12 +227,13 @@ class BaseConfiguration(SubdomainConfiguration, Configuration):
     EMAIL_HOST_USER = 'adm@v3na.com'
     EMAIL_HOST_PASSWORD = ''
     EMAIL_SUBJECT_PREFIX = '[alma.net] '
-    SERVER_EMAIL = u'alma1.net services <r.kamun@gmail.com>'
-    DEFAULT_FROM_EMAIL = u'alma1.net services <r.kamun@gmail.com>'
-
+    SERVER_EMAIL = u'Almasales <r.kamun@gmail.com>'
+    DEFAULT_FROM_EMAIL = u'Almasales <r.kamun@gmail.com>'
+    SUPPORT_EMAIL = 'support@v3na.com'
     EMAIL_BACKEND = 'djrill.mail.backends.djrill.DjrillBackend'
-    MANDRILL_API_KEY = 'pMC2w0tuVIuYRZiAjbu8mA'
-    ADMINS = (('Rustem', 'adm+r.kamun@v3na.com'),)
+    MANDRILL_API_KEY = 'RcETDKfvxER6iYnJ70DuyA'
+    ADMINS = (('Rustem', 'r.kamun@gmail.com'),
+              ('Yernar', 'mailubai@gmail.com'))
     MANAGERS = ADMINS
     BCC_EMAILS = ()
 
@@ -272,6 +272,30 @@ class BaseConfiguration(SubdomainConfiguration, Configuration):
     DEFAULT_SERVICE = 'crm'
 
     TASTYPIE_DEFAULT_FORMATS = ['json']
+
+    LOGGING = {
+        'version': 1,
+        'disable_existing_loggers': False,
+        'filters': {
+            'require_debug_false': {
+                '()': 'django.utils.log.RequireDebugFalse'
+            }
+        },
+        'handlers': {
+            'mail_admins': {
+                'level': 'ERROR',
+                'filters': ['require_debug_false'],
+                'class': 'django.utils.log.AdminEmailHandler'
+            }
+        },
+        'loggers': {
+            'django.request': {
+                'handlers': ['mail_admins'],
+                'level': 'ERROR',
+                'propagate': True,
+            },
+        }
+    }
 
 
 class DevConfiguration(FileSettings('~/.almanet/almanet.conf.py'), BaseConfiguration):
