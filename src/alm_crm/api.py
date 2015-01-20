@@ -1180,6 +1180,9 @@ class SalesCycleResource(CRMServiceModelResource):
     real_value = fields.ToOneField('alm_crm.api.ValueResource',
                                    'real_value', null=True, full=True)
 
+    stat = fields.ToManyField('alm_crm.api.SalesCycleProductStatResource','products', 
+                                null=True, blank=True,readonly=True, full=True)
+
     class Meta(CommonMeta):
         queryset = SalesCycle.objects.all().prefetch_related('products')
         resource_name = 'sales_cycle'
