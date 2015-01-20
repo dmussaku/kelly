@@ -232,7 +232,8 @@ class BaseConfiguration(SubdomainConfiguration, Configuration):
     SUPPORT_EMAIL = 'support@v3na.com'
     EMAIL_BACKEND = 'djrill.mail.backends.djrill.DjrillBackend'
     MANDRILL_API_KEY = 'RcETDKfvxER6iYnJ70DuyA'
-    ADMINS = (('Rustem', 'almanet+r.kamun@gmail.com'),)
+    ADMINS = (('Rustem', 'r.kamun@gmail.com'),
+              ('Yernar', 'mailubai@gmail.com'))
     MANAGERS = ADMINS
     BCC_EMAILS = ()
 
