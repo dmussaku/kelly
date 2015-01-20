@@ -233,7 +233,7 @@ class BaseConfiguration(SubdomainConfiguration, Configuration):
 
     EMAIL_BACKEND = 'djrill.mail.backends.djrill.DjrillBackend'
     MANDRILL_API_KEY = 'pMC2w0tuVIuYRZiAjbu8mA'
-    ADMINS = (('Rustem', 'adm+r.kamun@v3na.com'),)
+    ADMINS = (('Rustem', 'almanet+r.kamun@gmail.com'),)
     MANAGERS = ADMINS
     BCC_EMAILS = ()
 
@@ -272,6 +272,30 @@ class BaseConfiguration(SubdomainConfiguration, Configuration):
     DEFAULT_SERVICE = 'crm'
 
     TASTYPIE_DEFAULT_FORMATS = ['json']
+
+    LOGGING = {
+        'version': 1,
+        'disable_existing_loggers': False,
+        'filters': {
+            'require_debug_false': {
+                '()': 'django.utils.log.RequireDebugFalse'
+            }
+        },
+        'handlers': {
+            'mail_admins': {
+                'level': 'ERROR',
+                'filters': ['require_debug_false'],
+                'class': 'django.utils.log.AdminEmailHandler'
+            }
+        },
+        'loggers': {
+            'django.request': {
+                'handlers': ['mail_admins'],
+                'level': 'ERROR',
+                'propagate': True,
+            },
+        }
+    }
 
 
 class DevConfiguration(FileSettings('~/.almanet/almanet.conf.py'), BaseConfiguration):
