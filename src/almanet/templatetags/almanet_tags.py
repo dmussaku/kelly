@@ -286,3 +286,7 @@ def connect_disconnect_button(user, service):
         'connected': user.is_service_connected(service)
     }
 
+
+@register.assignment_tag
+def settings_value(name):
+    return getattr(settings, name, "")
