@@ -1,12 +1,13 @@
 {% extends "user/base.html" %}
 {% load i18n %}
-{% block head_title %} Register &mdash; Almanet {% endblock %}
+{% block head_title %} Complete &mdash; Almanet {% endblock %}
 {% block content %}
+  {{message}}
   <div class="login">
     <div class="login-body">
-      <div name="login-form">
-        <p class="login-form-p">Thank you! Our managers will contact with you.</p>
+      <div name="login-form" action="" method="post">{% csrf_token %}
+        <p class="login-form-p" style='text-align: center;'>Thank you! Our managers will contact with you.</p>
       </div>
     </div>
   </div>
-{% endblock %}
+  {% endblock %}
