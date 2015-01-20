@@ -1444,11 +1444,9 @@ class ActivityResource(CRMServiceModelResource):
         ...     ]
 
         '''
-        with RequestContext(self, request, allowed_methods=['post']):
-            activity = Activity.objects.get(
-                pk=kwargs.get('id')).prefetch_related('comments')
-            comments = CommentResource().get_bundle_list(
-                activity.comments, request)
+        with RequestContext(self, request, allowed_methods=['post', 'get']):
+            activity = Activity.objects.get(pk=kwargs.get('id'))
+            comments = CommentResource().get_bundle_list(activity.comments.all(), request)
         return self.create_response(
             request, {'objects': comments})
 
@@ -2247,14 +2245,7 @@ class AppStateObject(object):
 
     def get_products(self):
         products = Product.get_products()
-
-        def _map(p):
-            data = model_to_dict(p,
-                fields=['id', 'name', 'description', 'price', 'currency'])
-            data.update({'owner_id': p.owner.pk})
-            return data
-
-        return map(_map, products)
+        return ProductResource().get_bundle_list(products, self.request)
 
     def get_sales_cycle2products_map(self):
         sales_cycles = SalesCycle.get_salescycles_by_last_activity_date(
@@ -2274,7 +2265,7 @@ class AppStateObject(object):
         return {
             'sales_cycle': {'statuses': SalesCycle.STATUS_OPTIONS},
             'activity': {'feedback': Feedback.STATUS_OPTIONS},
-            'contacts': {
+            'contact': {
                 'statuses': Contact.STATUS_CODES,
                 'tp': Contact.TYPES_WITH_CAPS
             },
