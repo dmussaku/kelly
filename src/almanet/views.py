@@ -109,22 +109,3 @@ def disconnect_service(request, slug, *args, **kwargs):
             return HttpResponseRedirect(
                 almanet_reverse_lazy('user_profile_url',
                                      subdomain=settings.MY_SD))
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

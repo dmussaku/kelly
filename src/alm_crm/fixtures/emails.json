@@ -3,7 +3,6 @@
     "pk": 1, 
     "model": "alm_vcard.email", 
     "fields": {
-        "subscription_id": 1, 
         "type": "WORK", 
         "vcard": 1, 
         "value": "akerke.akerke@gmail.com"
@@ -13,7 +12,6 @@
     "pk": 2, 
     "model": "alm_vcard.email", 
     "fields": {
-        "subscription_id": 1, 
         "type": "INTERNET", 
         "vcard": 2, 
         "value": "heisenberg.nurlan@gmail.com"
@@ -23,7 +21,6 @@
     "pk": 3, 
     "model": "alm_vcard.email", 
     "fields": {
-        "subscription_id": 1, 
         "type": "INTERNET", 
         "vcard": 3, 
         "value": "mussina.aliya@gmail.com"
@@ -33,7 +30,6 @@
     "pk": 4, 
     "model": "alm_vcard.email", 
     "fields": {
-        "subscription_id": 1, 
         "type": "INTERNET", 
         "vcard": 4, 
         "value": "mussakulov.daniyar@gmail.com"

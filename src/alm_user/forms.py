@@ -4,7 +4,7 @@ from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.hashers import check_password
 from django.contrib.auth.tokens import default_token_generator
-from alm_user.models import User
+from alm_user.models import User, Referral
 from alm_user.emails import UserResetPasswordEmail, UserRegistrationEmail
 from alm_company.models import Company
 
@@ -149,3 +149,16 @@ class UserPasswordSettingsForm(forms.Form):
         self.user.set_password(self.cleaned_data['password'])
         self.user.save()
         return self.user
+
+
+class ReferralForm(ModelForm):
+
+    class Meta:
+        model = Referral
+
+    def __init__(self, request=None, *args, **kwargs):
+        if kwargs.get('data', None):
+            self.referer = kwargs['data'].get('referer', None)
+
+        self.request = request
+        super(self.__class__, self).__init__(*args, **kwargs)

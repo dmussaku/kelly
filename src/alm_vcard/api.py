@@ -69,7 +69,6 @@ class VCardResource(ModelResource):
         resource_name = 'vcard'
 
     def obj_delete(self, bundle, **kwargs):
-        print "i was here"
         return super(self.__class__, self).obj_delete(bundle, **kwargs)
 
 

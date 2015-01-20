@@ -232,7 +232,6 @@ class ContactUpdateView(UpdateView):
         context['emails'] = v.email_set.all()
         context['tels'] = v.tel_set.all()
         context['orgs'] = v.org_set.all()
-        print context
         return context
 
     def get_success_url(self):

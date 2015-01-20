@@ -460,7 +460,6 @@ class Contact(SubscriptionObject):
                 c = cls(vcard=vcard, owner=creator)
                 c.save()
                 rv.append(c)
-        print len(rv), 'contacts'
         return rv
 
     @classmethod
@@ -577,6 +576,18 @@ class Product(SubscriptionObject):
 
     def __unicode__(self):
         return self.name
+
+    @property
+    def author(self):
+        return self.owner
+
+    @property
+    def author_id(self):
+        return self.owner.id
+
+    @author_id.setter
+    def author_id(self, author_id):
+        self.owner = CRMUser.objects.get(id=author_id)
 
     def add_sales_cycle(self, sales_cycle_id, **kw):
         """TEST Assigns products to salescycle"""
