@@ -1622,6 +1622,8 @@ class CRMUserResource(CRMServiceModelResource):
         bundle = super(self.__class__, self).full_dehydrate(bundle, for_list=True)
         user = bundle.obj.get_billing_user()
         bundle.data['user'] = user.id
+        if user.userpic:
+            bundle.data['userpic'] = user.userpic.url
         return bundle
 
     def prepend_urls(self):
