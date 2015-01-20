@@ -22,12 +22,7 @@
           </figure>
 
           </label>
-          <input class="login-input" id="login-email" name="email" type="email" placeholder="E-mail">
-          {% if form.non_field_errors %}
-            {% for error in form.non_field_errors %}
-             <div class="login-error">{{ error }}</div>
-            {% endfor %}
-          {% endif %}
+          <input class="login-input" id="login-email" name="email" type="email" placeholder="E-mail" required>
         </div>
 
         <div class="login-fieldset">
