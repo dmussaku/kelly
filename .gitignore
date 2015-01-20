@@ -8,3 +8,5 @@ venv
 api_docs/*
 src/static/js/bundle.js
 src/static/css/app.min.css
+pids
+logs
