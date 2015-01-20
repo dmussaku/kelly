@@ -121,5 +121,16 @@
         {% block js_content %}
 
         {% endblock %}
+  <script type="text/javascript" src="{% static 'js/webfont.min.js' %}"></script>
+  <script>
+    WebFont.load({
+      google: { families: [ 'Roboto:400,700:latin,cyrillic', 'Roboto+Condensed::latin,cyrillic' ] },
+      active: function(familyName, fvd) {
+      }
+    });
+  </script>
+  <script type="text/javascript" src="{% static 'js/vendor.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'js/bundle.min.js' %}"></script>
+  <script>document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1"></' + 'script>')</script>
     </body>
 </html>
