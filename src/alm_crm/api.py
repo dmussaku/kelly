@@ -1180,9 +1180,6 @@ class SalesCycleResource(CRMServiceModelResource):
     real_value = fields.ToOneField('alm_crm.api.ValueResource',
                                    'real_value', null=True, full=True)
 
-    stat = fields.ToManyField('alm_crm.api.SalesCycleProductStatResource','products', 
-                                null=True, blank=True,readonly=True, full=True)
-
     class Meta(CommonMeta):
         queryset = SalesCycle.objects.all().prefetch_related('products')
         resource_name = 'sales_cycle'
@@ -1192,6 +1189,11 @@ class SalesCycleResource(CRMServiceModelResource):
 
     def dehydrate(self, bundle):
         # bundle.data['product_ids'] = [p.pk for p in bundle.obj.products.all()]
+        stat_objs = SalesCycleProductStat.objects.filter(sales_cycle=bundle.obj)
+        stat={}
+        for obj in stat_objs:
+            stat[str(obj.pk)] = obj.value 
+        bundle.data['stat'] = stat
         return bundle
 
     # def dehydrate_products(self, bundle):
