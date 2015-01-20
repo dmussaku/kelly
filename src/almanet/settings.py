@@ -227,9 +227,9 @@ class BaseConfiguration(SubdomainConfiguration, Configuration):
     EMAIL_HOST_USER = 'adm@v3na.com'
     EMAIL_HOST_PASSWORD = ''
     EMAIL_SUBJECT_PREFIX = '[alma.net] '
-    SERVER_EMAIL = u'alma.net services <r.kamun@gmail.com>'
-    DEFAULT_FROM_EMAIL = u'alma.net services <r.kamun@gmail.com>'
-
+    SERVER_EMAIL = u'Almasales <r.kamun@gmail.com>'
+    DEFAULT_FROM_EMAIL = u'Almasales <r.kamun@gmail.com>'
+    SUPPORT_EMAIL = 'support@v3na.com'
     EMAIL_BACKEND = 'djrill.mail.backends.djrill.DjrillBackend'
     MANDRILL_API_KEY = 'RcETDKfvxER6iYnJ70DuyA'
     ADMINS = (('Rustem', 'almanet+r.kamun@gmail.com'),)
