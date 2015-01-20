@@ -1180,8 +1180,9 @@ class SalesCycleResource(CRMServiceModelResource):
     real_value = fields.ToOneField('alm_crm.api.ValueResource',
                                    'real_value', null=True, full=True)
 
-    stat = fields.ToManyField('alm_crm.api.SalesCycleProductStatResource','products', 
-                                null=True, blank=True,readonly=True, full=True)
+    stat = fields.ToManyField('alm_crm.api.SalesCycleProductStatResource',
+        attribute=lambda bundle: SalesCycleProductStat.objects.filter(sales_cycle=bundle.obj),
+        null=True, blank=True, readonly=True, full=True)
 
     class Meta(CommonMeta):
         queryset = SalesCycle.objects.all().prefetch_related('products')
@@ -2210,13 +2211,6 @@ class AppStateObject(object):
     def get_users(self):
         crmusers, users = CRMUser.get_crmusers(with_users=True)
         return CRMUserResource().get_bundle_list(crmusers, self.request)
-        # def _map(crmuser):
-        #     data = model_to_dict(users.get(pk=crmuser.user_id), fields=[
-        #         'email', 'first_name', 'last_name', 'is_admin'])
-        #     data.update({'id': crmuser.pk, 'company_id': self.company.pk})
-        #     return data
-
-        # return map(_map, crmusers)
 
     def get_company(self):
         data = model_to_dict(self.company, fields=['name', 'subdomain', 'id'])
