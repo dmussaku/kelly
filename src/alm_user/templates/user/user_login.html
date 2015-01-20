@@ -9,6 +9,7 @@
                 <a href="{% url 'user_login' %}" class="login-switcher-button active">Log-in</a>
                 <a href="{% url 'user_referral' %}" class="login-switcher-button">Register</a>
             </div>
+            <div class="login-form">
             <form name="login-form" action="" method="post">
                 {% csrf_token %}
                 <div class="login-fieldset {% if form.username.errors or form.non_field_errors %}has-error{% endif %}">
@@ -19,6 +20,7 @@
                           </svg>
                         </figure>
                     </label>
+
                     <input class="login-input" id="login-email" name="username" type="email" placeholder="E-mail">
                     {% if form.username.errors %}
                     <div class="login-error">{{ form.username.errors }}</div>
@@ -41,12 +43,14 @@
                     {% if form.password.errors %}
                     <div class="login-error">Error message here!</div>
                     {% endif %}
-                </div>
-
-                <div class="login-fieldset">
-                  <button class="login-submit" type="submit">{{ _("Login") }}</button>
-                </div>
-            </form>
+        <div class="login-fieldset">
+          <button class="login-submit" type="submit">Login</button>
         </div>
-    </div>
+      </div>
+    </form>
+            </div>
+
+  </div>
+
+  </div>
 {% endblock %}

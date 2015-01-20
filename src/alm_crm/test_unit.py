@@ -700,7 +700,6 @@ class ResourceTestMixin(object):
 class UserSessionResourceTest(ResourceTestMixin, ResourceTestCase):
     def setUp(self):
         super(self.__class__, self).setUp()
-
         self.api_path_user_session = '/api/v1/user_session/'
 
     def test_get_detail_valid_json(self):
@@ -2081,4 +2080,148 @@ class CommentResourceTest(ResourceTestMixin, ResourceTestCase):
                               format='json', data={'comment': comment_comment})
         # check
         self.assertEqual(self.get_detail_des(self.comment.pk)['comment'], comment_comment)
+
+
+class UserResourceTest(ResourceTestMixin, ResourceTestCase):
+
+    def setUp(self):
+        super(self.__class__, self).setUp()
+
+        # login user
+        self.get_credentials()
+
+        self.api_path_comment = '/api/v1/user/'
+
+        # get_list
+        self.get_list_resp = self.api_client.get(self.api_path_comment,
+                                                 format='json',
+                                                 HTTP_HOST='localhost')
+        self.get_list_des = self.deserialize(self.get_list_resp)
+
+        # get_detail(pk)
+        self.get_detail_resp = \
+            lambda pk: self.api_client.get(self.api_path_comment+str(pk)+'/',
+                                           format='json',
+                                           HTTP_HOST='localhost')
+        self.get_detail_des = \
+            lambda pk: self.deserialize(self.get_detail_resp(pk))
+
+        self.comment = Comment.objects.first()
+
+    # def test_get_list_valid_json(self):
+    #     self.assertValidJSONResponse(self.get_list_resp)
+
+    # def test_get_list_non_empty(self):
+    #     self.assertTrue(self.get_list_des['meta']['total_count'] > 0)
+
+    # def test_get_detail(self):
+    #     self.assertEqual(
+    #         self.get_detail_des(self.comment.pk)['comment'],
+    #         self.comment.comment
+    #         )
+
+    # def test_create_comment_for_activity(self):
+    #     activity = Activity.objects.last()
+    #     crmuser = CRMUser.objects.last()
+    #     post_data={
+    #         'comment': 'new test comment',
+    #         'author_id': crmuser.pk,
+    #         'activity_id': activity.pk
+    #     }
+    #     self.assertHttpCreated(self.api_client.post(
+    #         self.api_path_comment, format='json', data=post_data))
+    #     comment = Comment.objects.last()
+    #     self.assertEqual(comment.comment, 'new test comment')
+    #     self.assertEqual(comment.owner, crmuser)
+    #     self.assertEqual(comment.object_id, activity.id)
+    #     self.assertEqual(comment.content_object.__class__, Activity)
+    #     self.assertEqual(comment.content_object, activity)
+    #     self.assertIsInstance(comment.subscription_id, int)
+
+    # def test_create_comment_for_feedback(self):
+    #     feedback = Feedback.objects.last()
+    #     crmuser = CRMUser.objects.last()
+    #     post_data={
+    #         'comment': 'new test comment',
+    #         'author_id': crmuser.pk,
+    #         'feedback_id': feedback.pk
+    #     }
+    #     self.assertHttpCreated(self.api_client.post(
+    #         self.api_path_comment, format='json', data=post_data))
+    #     comment = Comment.objects.last()
+    #     self.assertEqual(comment.comment, 'new test comment')
+    #     self.assertEqual(comment.owner, crmuser)
+    #     self.assertEqual(comment.object_id, feedback.id)
+    #     self.assertEqual(comment.content_object.__class__, Feedback)
+    #     self.assertEqual(comment.content_object, feedback)
+    #     self.assertIsInstance(comment.subscription_id, int)
+
+    # def test_create_comment_for_contact(self):
+    #     contact = Contact.objects.last()
+    #     crmuser = CRMUser.objects.last()
+    #     post_data={
+    #         'comment': 'new test comment',
+    #         'author_id': crmuser.pk,
+    #         'contact_id': contact.pk
+    #     }
+    #     self.assertHttpCreated(self.api_client.post(
+    #         self.api_path_comment, format='json', data=post_data))
+    #     comment = Comment.objects.last()
+    #     self.assertEqual(comment.comment, 'new test comment')
+    #     self.assertEqual(comment.owner, crmuser)
+    #     self.assertEqual(comment.object_id, contact.id)
+    #     self.assertEqual(comment.content_object.__class__, Contact)
+    #     self.assertEqual(comment.content_object, contact)
+    #     self.assertIsInstance(comment.subscription_id, int)
+
+    # def test_create_comment_for_share(self):
+    #     share = Share.objects.last()
+    #     crmuser = CRMUser.objects.last()
+    #     post_data={
+    #         'comment': 'new test comment',
+    #         'author_id': crmuser.pk,
+    #         'share_id': share.pk
+    #     }
+    #     self.assertHttpCreated(self.api_client.post(
+    #         self.api_path_comment, format='json', data=post_data))
+    #     comment = Comment.objects.last()
+    #     self.assertEqual(comment.comment, 'new test comment')
+    #     self.assertEqual(comment.owner, crmuser)
+    #     self.assertEqual(comment.object_id, share.id)
+    #     self.assertEqual(comment.content_object.__class__, Share)
+    #     self.assertEqual(comment.content_object, share)
+    #     self.assertIsInstance(comment.subscription_id, int)
+
+    # def test_delete_comment(self):
+    #     before = Comment.objects.all().count()
+    #     self.assertHttpAccepted(self.api_client.delete(
+    #         self.api_path_comment + '%s/' % self.comment.pk, format='json'))
+    #     after = Comment.objects.all().count()
+    #     # verify that one sales_cycle has been deleted.
+    #     self.assertEqual(after, before - 1)
+
+    # def test_update_comment_via_put(self):
+    #     # get exist product data
+    #     comment_data = self.get_detail_des(self.comment.pk)
+    #     # update it
+    #     t = '_UPDATED!'
+    #     comment_data['comment'] += t
+    #     # PUT it
+    #     self.api_client.put(self.api_path_comment + '%s/' % (self.comment.pk),
+    #                         format='json', data=comment_data)
+    #     # check
+    #     self.assertEqual(self.get_detail_des(self.comment.pk)['comment'], self.comment.comment + t)
+
+    # def test_update_comment_via_patch(self):
+    #     # get exist product data
+    #     comment_comment = self.get_detail_des(self.comment.pk)['comment']
+    #     # update it
+    #     t = 'comment_UPDATED!'
+    #     comment_comment += t
+    #     # PATCH it
+    #     self.api_client.patch(self.api_path_comment + '%s/' % (self.comment.pk),
+    #                           format='json', data={'comment': comment_comment})
+    #     # check
+    #     self.assertEqual(self.get_detail_des(self.comment.pk)['comment'], comment_comment)
+
 
