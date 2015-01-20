@@ -1,5 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+import base64
 from tastypie import fields
 from tastypie.bundle import Bundle
 from tastypie.resources import Resource, ModelResource
@@ -8,7 +9,7 @@ from django.contrib.auth import login, logout, authenticate
 from django.conf.urls import url
 from tastypie.utils import trailing_slash
 from alm_vcard.models import *
-from alm_crm.models import Contact
+from alm_crm.models import Contact, CRMUser
 
 from .models import User
 from tastypie.authentication import (
@@ -23,6 +24,7 @@ from tastypie.serializers import Serializer
 from django.http import HttpResponse
 from almanet.settings import DEFAULT_SERVICE
 from almanet.utils.api import RequestContext
+from alm_crm.api import CRMUserResource
 import json
 import datetime
 import ast
@@ -105,7 +107,33 @@ class UserResource(ModelResource):
                 self.wrap_view('get_current_user'),
                 name='api_current_user'
             ),
+            url(
+                r"^(?P<resource_name>%s)/upload_userpic%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('upload_userpic'),
+                name='api_upload_userpic'
+            ),
         ]
+
+    def upload_userpic(self, request, **kwargs):
+        with RequestContext(self, request, allowed_methods=['post']):
+            data = self.deserialize(request, request.body, format=request.META.get('CONTENT_TYPE', 'application/json'))
+
+            from django.core.files.uploadedfile import SimpleUploadedFile
+            file_contents = SimpleUploadedFile("%s" %(data['name']), base64.b64decode(data['pic']), content_type='image')
+            print data['pic'].encode('utf-8')
+            request.user.userpic.save(data['name'], file_contents, True)
+            raise ImmediateHttpResponse(
+            HttpResponse(
+                content=Serializer().to_json(
+                    CRMUserResource().full_dehydrate(
+                        CRMUserResource().build_bundle(
+                            obj=CRMUser.objects.get(id=request.user.get_crmuser().id))
+                        )
+                    ),
+                content_type='application/json; charset=utf-8', status=200
+                )
+            )
 
     def get_current_user(self, request, **kwargs):
         with RequestContext(self, request, allowed_methods=['get']):
