@@ -131,9 +131,11 @@ class BaseConfiguration(SubdomainConfiguration, Configuration):
         'django.middleware.csrf.CsrfViewMiddleware',
         'django.contrib.auth.middleware.AuthenticationMiddleware',
         'django.contrib.messages.middleware.MessageMiddleware',
+        'almanet.middleware.ForceDefaultLanguageMiddleware',
+        'django.middleware.locale.LocaleMiddleware',
         # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
         'django_hosts.middleware.HostsMiddleware',
-        'almanet.middleware.XsSharingMiddleware',
+        #'almanet.middleware.XsSharingMiddleware',
         'almanet.middleware.GetSubdomainMiddleware',
         'almanet.middleware.UserEnvMiddleware'
     )
@@ -173,7 +175,12 @@ class BaseConfiguration(SubdomainConfiguration, Configuration):
     # Internationalization
     # https://docs.djangoproject.com/en/1.6/topics/i18n/
 
-    LANGUAGE_CODE = 'en-us'
+    LANGUAGE_CODE = 'ru'
+
+    LANGUAGES = (
+        ('ru', lambda: 'Russian'),
+        ('en', lambda: 'English'),
+    )
 
     TIME_ZONE = 'UTC'
 
@@ -222,6 +229,9 @@ class BaseConfiguration(SubdomainConfiguration, Configuration):
     STATIC_ROOT = rel('../..', 'static')
     STATICFILES_DIRS = (
         rel('static'),
+    )
+    LOCALE_PATHS = (
+        rel('locale'),
     )
     STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.CachedStaticFilesStorage'
 
@@ -312,6 +322,7 @@ class DevConfiguration(FileSettings('~/.almanet/almanet.conf.py'), BaseConfigura
         'almacloud.alma.net:8000'
     )
     CSRF_COOKIE_DOMAIN = '.alma.net'
+    CORS_ALLOW_CREDENTIALS = True
 
 
 class TestConfiguration(FileSettings('~/.almanet/almanet.conf.py'), BaseConfiguration):
@@ -349,6 +360,7 @@ class DemoConfiguration(FileSettings('~/.almanet/almanet.conf.py'), BaseConfigur
         'almasales.kz',
         'almacloud.almasales.kz'
     )
+    CORS_ALLOW_CREDENTIALS = True
 
     DATABASES = {
         'default': {

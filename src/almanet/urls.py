@@ -61,6 +61,7 @@ v1_api.register(CommentResource())
 urlpatterns = patterns(
     '',
     url(r'^$', RedirectHomeView.as_view()),
+    url(r'^admin/', include(admin.site.urls)),
     url(r'^auth/', include('alm_user.urls')),
     # TODO: temp, needs to be deleted
     url(r'^crm/', include('alm_crm.urls')),
