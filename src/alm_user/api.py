@@ -121,18 +121,16 @@ class UserResource(ModelResource):
 
             from django.core.files.uploadedfile import SimpleUploadedFile
             file_contents = SimpleUploadedFile("%s" %(data['name']), base64.b64decode(data['pic']), content_type='image')
-            print data['pic'].encode('utf-8')
             request.user.userpic.save(data['name'], file_contents, True)
             raise ImmediateHttpResponse(
-            HttpResponse(
-                content=Serializer().to_json(
-                    CRMUserResource().full_dehydrate(
-                        CRMUserResource().build_bundle(
-                            obj=CRMUser.objects.get(id=request.user.get_crmuser().id))
-                        )
-                    ),
-                content_type='application/json; charset=utf-8', status=200
-                )
+                HttpResponse(
+                    content=Serializer().to_json(
+                        CRMUserResource().full_dehydrate(
+                            CRMUserResource().build_bundle(
+                                obj=CRMUser.objects.get(id=request.user.get_crmuser().id))
+                            )
+                        ),
+                    content_type='application/json; charset=utf-8', status=200)
             )
 
     def get_current_user(self, request, **kwargs):
