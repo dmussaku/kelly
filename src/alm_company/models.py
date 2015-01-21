@@ -16,6 +16,9 @@ class Company(models.Model):
         verbose_name = _('company')
         db_table = settings.DB_PREFIX.format('company')
 
+    def __unicode__(self):
+        return u'%s'%self.name
+        
     @classmethod
     def generate_subdomain(self, subdomain):
         sd = re.sub('[\W]', '', subdomain).lower()
