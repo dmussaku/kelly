@@ -2,12 +2,12 @@
 {% load i18n %}
 {% block head_title %} Login page {% endblock %}
 {% block content %}
-    {{message}}
+    {{ message }}
     <div class="login">
         <div class="login-body">
             <div class="login-switcher">
-                <a href="{% url 'user_login' %}" class="login-switcher-button active">Log-in</a>
-                <a href="{% url 'user_referral' %}" class="login-switcher-button">Register</a>
+                <a href="{% url 'user_login' %}" class="login-switcher-button active">{{ _("Sign in") }}</a>
+                <a href="{% url 'user_referral' %}" class="login-switcher-button">{{ _("Register") }}</a>
             </div>
             <div class="login-form">
             <form name="login-form" action="" method="post">
@@ -44,7 +44,7 @@
                     <div class="login-error">Error message here!</div>
                     {% endif %}
         <div class="login-fieldset">
-          <button class="login-submit" type="submit">Login</button>
+          <button class="login-submit" type="submit">{{ _("Login") }}</button>
         </div>
       </div>
     </form>

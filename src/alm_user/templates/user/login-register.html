@@ -6,15 +6,14 @@
   <div class="login">
     <div class="login-body">
       <div class="login-switcher">
-        <a href="{% url 'user_login' %}" class="login-switcher-button">Log-in</a>
-        <a href="{% url 'user_referral' %}" class="login-switcher-button active">Register</a>
+        <a href="{% url 'user_login' %}" class="login-switcher-button">{{ _("Sign in") }}</a>
+        <a href="{% url 'user_referral' %}" class="login-switcher-button active">{{ _("Register") }}</a>
       </div>
       <div class="login-form">
       <form name="login-form" action="" method="post">{% csrf_token %}
-        <p class="login-form-p">The registration is now closed. To learn more or participate in beta, leave your email below.</p>
+        <p class="login-form-p">{{ _("The registration is now closed. To learn more or participate in beta, leave your email below.") }}</p>
         <div class="login-fieldset">
           <label class="login-fieldset-icon" for="login-email">
-                      
           <figure class="icon icon--mail">
             <svg version="1.1">
               <use xlink:href="#mail"></use>
@@ -24,7 +23,6 @@
           </label>
           <input class="login-input" id="login-email" name="email" type="email" placeholder="E-mail" required>
         </div>
-
         <div class="login-fieldset">
           <button class="login-submit login-submit--reset" type="submit">{{ _("Participate in beta") }}</button>
         </div>
