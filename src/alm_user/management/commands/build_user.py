@@ -39,13 +39,15 @@ class Command(BaseCommand):
         try:
             User.objects.get(email=email)
         except (User.DoesNotExist, KeyError):
-            user = UserManager().create_user(first_name, last_name, email, password)
+            user = UserManager().create_user(
+                first_name, last_name, email, password)
 
             if company_name:
                 try:
                     company = Company.objects.get(name=company_name)
                 except Company.DoesNotExist:
-                    company = Company.build_company(name=company_name, owner=user)
+                    company = Company.build_company(
+                        name=company_name, owner=user)
                     is_admin = True
                 user.company.add(company)
 

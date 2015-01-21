@@ -758,14 +758,15 @@ class Email(models.Model):
     """
     An email of a contact
     """
+    TYPES = INTERNET, X400, PREF = ('INTERNET', 'x400', 'pref')
     TYPE_CHOICES = (
-        ('INTERNET', _(u"internet")),
-        ('x400', _(u"x400")),
-        ('pref', _(u"pref")),
+        (INTERNET, _(u"internet")),
+        (X400, _(u"x400")),
+        (PREF, _(u"pref")),
     )
 
     vcard = models.ForeignKey(VCard)
-    type  = models.CharField(max_length=30, verbose_name=_("type of email"), choices=TYPE_CHOICES)
+    type = models.CharField(max_length=30, verbose_name=_("type of email"), choices=TYPE_CHOICES)
     value = models.EmailField(max_length=100, verbose_name=_("value"))
 
     class Meta:

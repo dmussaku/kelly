@@ -6,9 +6,7 @@ from django.conf import settings
 from timezone_field import TimeZoneField
 from almanet import signals
 from almanet.models import Subscription
-from almanet.settings import DEFAULT_SERVICE
-from alm_vcard.models import VCard
-from alm_company.models import Company
+from alm_vcard.models import VCard, Email
 
 
 class UserManager(contrib_user_manager):
@@ -41,7 +39,7 @@ class User(AbstractBaseUser):
     vcard = models.OneToOneField(VCard, blank=True, null=True)
 
     userpic = models.ImageField(upload_to='userpics')
-    
+
     class Meta:
         verbose_name = _('user')
         db_table = settings.DB_PREFIX.format('user')
@@ -57,6 +55,20 @@ class User(AbstractBaseUser):
     @property
     def is_superuser(self):
         return self.is_admin
+
+    def save(self, *a, **kw):
+        is_created = not hasattr(self, 'pk') or not self.pk
+        super(User, self).save(*a, **kw)
+        if is_created:
+            vc = VCard(
+                fn=self.first_name + " " + self.last_name,
+                family_name=self.last_name,
+                given_name=self.first_name)
+            vc.save()
+            email = Email(vcard=vc, type=Email.PREF, value=self.email)
+            email.save()
+            self.vcard = vc
+            self.save()
 
     def is_authenticated(self):
         return True
@@ -166,7 +178,7 @@ class User(AbstractBaseUser):
 class Referral(models.Model):
     email = models.EmailField()
     date_created = models.DateTimeField(blank=True, auto_now_add=True)
-    referer = models.CharField(max_length=2000, blank=True, null=True) 
+    referer = models.CharField(max_length=2000, blank=True, null=True)
 
     class Meta:
         verbose_name = _('referral')
