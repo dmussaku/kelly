@@ -87,21 +87,23 @@ class VCard(models.Model):
         db_table = settings.DB_PREFIX.format('vcard')
 
     def __unicode__(self):
-
-        if self.fn != "":
-            return self.fn
-
-        unicodeName = self.given_name + ' ' + self.family_name
-
-        if unicodeName != " ":
-            return unicodeName
-
-        return "name undefined"
+        return self.fn
 
     def save(self, **kwargs):
-        if self.given_name and self.family_name:
-            self.fn = self.given_name + ' ' + self.family_name
+        if not self.fn:
+            self.fill_fn()
         super(self.__class__, self).save(**kwargs)
+
+    def fill_fn(self):
+        if self.fn:
+            return
+        self.fn = ''
+        if self.given_name:
+            self.fn += self.given_name
+        if self.family_name:
+            self.fn += (' ' if self.fn else '') + self.family_name
+        if not self.fn and self.email_set.first():
+            self.fn = self.email_set.first().split('@')[0].replace('.', ' ')
 
     @classmethod
     def importFromVCardMultiple(cls, data, autocommit=False):
