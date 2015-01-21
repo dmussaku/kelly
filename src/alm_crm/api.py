@@ -1160,7 +1160,7 @@ class SalesCycleResource(CRMServiceModelResource):
     @undocumented: prepend_urls, Meta
     '''
     #contact = fields.ForeignKey(ContactResource, 'contact')
-    contact_id = fields.IntegerField(attribute='contact_id')
+    contact_id = fields.IntegerField(attribute='contact_id', null=True)
     # activities = fields.ToManyField(
     #     'alm_crm.api.ActivityResource', 'rel_activities',
     #     related_name='sales_cycle', null=True, full=True)
