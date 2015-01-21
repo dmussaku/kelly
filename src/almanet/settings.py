@@ -177,6 +177,9 @@ class BaseConfiguration(SubdomainConfiguration, Configuration):
 
     TIME_ZONE = 'UTC'
 
+    DATETIME_FORMAT = 'H:i, d N y'
+    DATETIME_FORMAT_NORMAL = '%H:%M, %d %b %y'
+
     USE_I18N = True
 
     USE_L10N = True

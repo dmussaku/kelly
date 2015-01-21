@@ -87,6 +87,8 @@ class Contact(SubscriptionObject):
     TYPES = (COMPANY_TP, USER_TP) = ('co', 'user')
     TYPES_WITH_CAPS = ((COMPANY_TP, _('company type')),
                        (USER_TP, _('user type')))
+    SHARE_IMPORTED_TEXT = _('Imported at ')
+
     status = models.IntegerField(
         _('contact status'),
         max_length=30,
@@ -291,6 +293,16 @@ class Contact(SubscriptionObject):
             return True
         except:
             return False
+
+    def create_share_to(self, user_id, note=None):
+        share = Share(
+            note=note or self.SHARE_IMPORTED_TEXT + self.date_created.strftime(settings.DATETIME_FORMAT_NORMAL),
+            share_to_id=user_id,
+            share_from_id=user_id,
+            contact_id=self.id
+        )
+        share.save()
+        return share
 
     @classmethod
     def upd_lst_activity_on_create(cls, sender, created=False,
@@ -1267,7 +1279,7 @@ class Share(SubscriptionObject):
             .order_by('-date_created')
 
     def __unicode__(self):
-        return '%s : %s -> %s' % (self.contact, self.share_from, self.share_to)
+        return u'%s : %s -> %s' % (self.contact, self.share_from, self.share_to)
 
 
 signals.post_save.connect(

@@ -248,41 +248,11 @@ class ContactResource(CRMServiceModelResource):
             ),
         ]
 
-    def post_list(self, request, **kwargs):
-        '''
-        POST METHOD
-        I{URL}:  U{alma.net:8000/api/v1/contact/}
-
-        Description
-        Api function for contact creation. It creates contact and vcard objects,
-        plust it creates a Share objects, so that the user could see that Contact
-        in his feed.
-
-        @type  vcard: dictionary object
-        @param vcard: Vcard resource object, look at /api/v1/vcard/ for variable
-            names
-
-        @return:  status 201
-
-        >>> example POST payload
-        ... {
-        ...  "owner": "/api/v1/crmuser/1/",
-        ...  "vcard": {
-        ...      "given_name":"Barry",
-        ...      "family_name":"Allen"
-        ...      },
-        ...  "comment": "Met this contact on conference"
-        ...  }
-
-        '''
-        return super(self.__class__, self).post_list(request, **kwargs)
-
     def get_meta_dict(self, limit, offset, count, url):
         obj_dict = {}
         obj_dict['limit'] = limit
         obj_dict['offset'] = offset
         obj_dict['url'] = url
-
 
         obj_dict['next'] = self.get_next(limit, offset, count, url)
         obj_dict['previous'] = self.get_previous(limit, offset, url)
@@ -290,16 +260,16 @@ class ContactResource(CRMServiceModelResource):
         return obj_dict
 
     def get_previous(self, limit, offset, url):
-        if offset-limit<0:
+        if offset-limit < 0:
             return None
-        if not url[len(url)-1]=='/':
+        if not url[len(url)-1] == '/':
             url+'/'
         return url+'?limit=%s&offset=%s' % (limit, offset-limit)
 
     def get_next(self, limit, offset, count, url):
         if offset + limit >= count:
             return None
-        if not url[len(url)-1]=='/':
+        if not url[len(url)-1] == '/':
             url+'/'
         return url+'?limit=%s&offset=%s' % (limit, offset+limit)
 
@@ -434,7 +404,6 @@ class ContactResource(CRMServiceModelResource):
             bundle.obj.owner_id = int(bundle.data['user_id'])
         # if bundle.data.get('parent_id',""):
         #     bundle.obj.parent_id = int(bundle.data['parent_id'])
-        print bundle.obj._meta.get_all_field_names()
         field_names = bundle.obj._meta.get_all_field_names()
         field_names.remove('parent')
         field_names.remove('children')
@@ -457,14 +426,9 @@ class ContactResource(CRMServiceModelResource):
 
         bundle.obj.save()
         if bundle.data.get('note') and not kwargs.get('pk'):
-            share = Share(
-                note=bundle.data.get('note'),
-                share_to_id=int(bundle.data['user_id']),
-                share_from_id=int(bundle.data['user_id']),
-                contact_id=bundle.obj.id,
-                subscription_id=subscription_id
-            )
-            share.save()
+            bundle.obj.create_share_to(bundle.request.user.get_crmuser().pk,
+                                       bundle.data.get('note'))
+
         return bundle
 
     def vcard_full_hydrate(self, bundle):
@@ -548,44 +512,44 @@ class ContactResource(CRMServiceModelResource):
         vcard.subscription_id = subscription_id
         vcard.save()
 
-    def save(self, bundle, skip_errors=False):
-        self.is_valid(bundle)
+    # def save(self, bundle, skip_errors=False):
+    #     self.is_valid(bundle)
 
-        if bundle.errors and not skip_errors:
-            raise ImmediateHttpResponse(response=self.error_response(bundle.request, bundle.errors))
+    #     if bundle.errors and not skip_errors:
+    #         raise ImmediateHttpResponse(response=self.error_response(bundle.request, bundle.errors))
 
-        # Check if they're authorized.
-        if bundle.obj.pk:
-            self.authorized_update_detail(self.get_object_list(bundle.request), bundle)
-        else:
-            self.authorized_create_detail(self.get_object_list(bundle.request), bundle)
+    #     # Check if they're authorized.
+    #     if bundle.obj.pk:
+    #         self.authorized_update_detail(self.get_object_list(bundle.request), bundle)
+    #     else:
+    #         self.authorized_create_detail(self.get_object_list(bundle.request), bundle)
 
-        # Save FKs just in case.
-        self.save_related(bundle)
+    #     # Save FKs just in case.
+    #     self.save_related(bundle)
 
-        #If Contact is saved with a small note/comment
-        # Save the main object.
+    #     #If Contact is saved with a small note/comment
+    #     # Save the main object.
 
-        if bundle.data['owner_id']:
-            bundle.obj.owner_id=int(bundle.data['owner_id'])
-        bundle.obj.save()
-        try:
-            if bundle.data['note']:
-                note = bundle.data['note']
-                share = Share(
-                    note=note,
-                    share_to_id=bundle.obj.owner.id,
-                    share_from_id=bundle.obj.owner.id,
-                    contact_id=bundle.obj.id
-                    )
-                share.save()
-        except KeyError:
-            bundle.obj.save()
-        bundle.objects_saved.add(self.create_identifier(bundle.obj))
-        # Now pick up the M2M bits.
-        m2m_bundle = self.hydrate_m2m(bundle)
-        self.save_m2m(m2m_bundle)
-        return bundle
+    #     if bundle.data['owner_id']:
+    #         bundle.obj.owner_id=int(bundle.data['owner_id'])
+    #     bundle.obj.save()
+    #     try:
+    #         if bundle.data['note']:
+    #             note = bundle.data['note']
+    #             share = Share(
+    #                 note=note,
+    #                 share_to_id=bundle.obj.owner.id,
+    #                 share_from_id=bundle.obj.owner.id,
+    #                 contact_id=bundle.obj.id
+    #                 )
+    #             share.save()
+    #     except KeyError:
+    #         bundle.obj.save()
+    #     bundle.objects_saved.add(self.create_identifier(bundle.obj))
+    #     # Now pick up the M2M bits.
+    #     m2m_bundle = self.hydrate_m2m(bundle)
+    #     self.save_m2m(m2m_bundle)
+    #     return bundle
 
     def follow_contacts(self, request, **kwargs):
         if kwargs.get('contact_ids'):
@@ -1139,8 +1103,13 @@ class ContactResource(CRMServiceModelResource):
         data = self.deserialize(
             request, request.body,
             format=request.META.get('CONTENT_TYPE', 'application/json'))
+
+        current_crmuser = request.user.get_crmuser()
         for contact in Contact.import_from_vcard(
-                data['uploaded_file'], request.user.get_crmuser()):
+                data['uploaded_file'], current_crmuser):
+
+            contact.create_share_to(current_crmuser.pk)
+
             _bundle = contact_resource.build_bundle(
                 obj=contact, request=request)
             objects.append(contact_resource.full_dehydrate(
