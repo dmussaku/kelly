@@ -20,7 +20,7 @@ class Command(BaseCommand):
     help = 'Create Subscription specifying his options.'
 
     def handle(self, *args, **options):
-        service = options.get('service', DEFAULT_SERVICE)
+        service_slug = options.get('service', DEFAULT_SERVICE).lower()
         user_email = options.get('user_email', None)
         is_active = options.get('is_active', True)
 
@@ -29,15 +29,5 @@ class Command(BaseCommand):
         except (User.DoesNotExist, KeyError):
             sys.stderr.write("Error: The user you entered does not exist, please enter exist one or create user using command build_account.\n")
         else:
-            try:
-                subscription = Subscription.objects.get(user=user, service=Service.objects.get(slug=DEFAULT_SERVICE))
-            except Subscription.DoesNotExist:
-                subscription = Subscription(user=User.objects.get(email=user_email),
-                                            service=Service.objects.get(slug=service),
-                                            is_active=is_active)
-                subscription.save()
-
-                print "Success: Subscription for %s %s"%(subscription.organization.name, user.get_full_name())
-            else:
-                sys.stderr.write('Subscription with data you entered exists.\n')
-
+            service = Service.objects.get(slug=service_slug)
+            user.connect_service(service)
