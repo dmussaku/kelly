@@ -342,10 +342,10 @@ class DemoConfiguration(FileSettings('~/.almanet/almanet.conf.py'), BaseConfigur
     SITE_DOMAIN = 'http://almasales.kz'
     CSRF_COOKIE_DOMAIN = '.almasales.kz'
     SESSION_COOKIE_DOMAIN = '.almasales.kz'
-    # CORS_ORIGIN_WHITELIST = (
-    #     'alma.net:8000',
-    #     'almacloud.alma.net:8000'
-    # )
+    CORS_ORIGIN_WHITELIST = (
+        'almasales.kz',
+        'almacloud.almasales.kz'
+    )
 
     DATABASES = {
         'default': {
