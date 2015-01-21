@@ -55,30 +55,49 @@ except AttributeError:
     XS_SHARING_ALLOWED_CREDENTIALS = 'true'
 
 
-class XsSharingMiddleware(object):
-    """
-    This middleware allows cross-domain XHR using the html5 postMessage API.
+# class XsSharingMiddleware(object):
+#     """
+#     This middleware allows cross-domain XHR using the html5 postMessage API.
 
-    Access-Control-Allow-Origin: http://foo.example
-    Access-Control-Allow-Methods: POST, GET, OPTIONS, PUT, DELETE
+#     Access-Control-Allow-Origin: http://foo.example
+#     Access-Control-Allow-Methods: POST, GET, OPTIONS, PUT, DELETE
 
-    Based off https://gist.github.com/426829
+#     Based off https://gist.github.com/426829
+#     """
+#     def process_request(self, request):
+#         if 'HTTP_ACCESS_CONTROL_REQUEST_METHOD' in request.META:
+#             response = http.HttpResponse()
+#             response['Access-Control-Allow-Origin']  = XS_SHARING_ALLOWED_ORIGINS
+#             response['Access-Control-Allow-Methods'] = ",".join( XS_SHARING_ALLOWED_METHODS )
+#             response['Access-Control-Allow-Headers'] = ",".join( XS_SHARING_ALLOWED_HEADERS )
+#             response['Access-Control-Allow-Credentials'] = XS_SHARING_ALLOWED_CREDENTIALS
+#             return response
+
+#         return None
+
+#     def process_response(self, request, response):
+#         response['Access-Control-Allow-Origin']  = XS_SHARING_ALLOWED_ORIGINS
+#         response['Access-Control-Allow-Methods'] = ",".join( XS_SHARING_ALLOWED_METHODS )
+#         response['Access-Control-Allow-Headers'] = ",".join( XS_SHARING_ALLOWED_HEADERS )
+#         response['Access-Control-Allow-Credentials'] = XS_SHARING_ALLOWED_CREDENTIALS
+
+#         return response
+
+
+class ForceDefaultLanguageMiddleware(object):
     """
+    Ignore Accept-Language HTTP headers
+
+    This will force the I18N machinery
+    to always choose settings.LANGUAGE_CODE
+    as the default initial language, unless
+    another one is set via sessions or cookies
+
+    Should be installed *before* any middleware that
+    checks request.META['HTTP_ACCEPT_LANGUAGE'],
+    namely django.middleware.locale.LocaleMiddleware
+    """
+
     def process_request(self, request):
-        if 'HTTP_ACCESS_CONTROL_REQUEST_METHOD' in request.META:
-            response = http.HttpResponse()
-            response['Access-Control-Allow-Origin']  = XS_SHARING_ALLOWED_ORIGINS
-            response['Access-Control-Allow-Methods'] = ",".join( XS_SHARING_ALLOWED_METHODS )
-            response['Access-Control-Allow-Headers'] = ",".join( XS_SHARING_ALLOWED_HEADERS )
-            response['Access-Control-Allow-Credentials'] = XS_SHARING_ALLOWED_CREDENTIALS
-            return response
-
-        return None
-
-    def process_response(self, request, response):
-        response['Access-Control-Allow-Origin']  = XS_SHARING_ALLOWED_ORIGINS
-        response['Access-Control-Allow-Methods'] = ",".join( XS_SHARING_ALLOWED_METHODS )
-        response['Access-Control-Allow-Headers'] = ",".join( XS_SHARING_ALLOWED_HEADERS )
-        response['Access-Control-Allow-Credentials'] = XS_SHARING_ALLOWED_CREDENTIALS
-
-        return response
+        if 'HTTP_ACCEPT_LANGUAGE' in request.META:
+            del request.META['HTTP_ACCEPT_LANGUAGE']
