@@ -960,9 +960,13 @@ class Activity(SubscriptionObject):
             self.feedback.save()
 
     def spray(self):
-        unfollow_set = {
-            unfollower.id for unfollower
-            in self.sales_cycle.contact.unfollowers.all()}
+        if self.sales_cycle.is_global:
+            unfollow_set = set([])
+        else:
+            unfollow_set = {
+                unfollower.id for unfollower
+                in self.sales_cycle.contact.unfollowers.all()}
+
         university_set = set(CRMUser.objects.all().values_list(
                              'id', flat=True))
         followers = CRMUser.objects.filter(
