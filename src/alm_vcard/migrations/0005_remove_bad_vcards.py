@@ -14,7 +14,7 @@ class Migration(DataMigration):
         bad_vcs = set([])
         for vcard in orm.VCard.objects.all():
             if not vcard.fn:
-                bad_vcs.add(vcard.pk)
+                bad_vcs.add(vcard.fn)
 
         orm.VCard.objects.filter(pk__in=bad_vcs).delete()
 
