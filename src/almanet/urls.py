@@ -32,9 +32,9 @@ from alm_crm.api import (
     )
 from alm_user.api import UserResource
 from tastypie.resources import ModelResource
-from django.views.generic.base import TemplateView
 
 admin.autodiscover()
+
 v1_api = Api(api_name='v1')
 for obj in vars(vcard_api).values():
     try:
