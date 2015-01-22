@@ -42,7 +42,7 @@ from django.http import HttpResponse
 import datetime
 
 
-def get_crm_subscription(request):
+def get_crm_subscription_id(request):
     user_env = request.user_env
     subscription_pk = None
     if 'subscriptions' in user_env:
@@ -97,7 +97,7 @@ class CRMServiceModelResource(ModelResource):
 
     @classmethod
     def get_crmuser(cls, request):
-        subscription_pk = get_crm_subscription(request)
+        subscription_pk = get_crm_subscription_id(request)
         crmuser = None
         if subscription_pk:
             crmuser = request.user.get_subscr_user(subscription_pk)
@@ -381,7 +381,7 @@ class ContactResource(CRMServiceModelResource):
     def full_hydrate(self, bundle, **kwargs):
         # t1 = time.time()
         contact_id = kwargs.get('pk', None)
-        subscription_id = get_crm_subscription(bundle.request)
+        subscription_id = get_crm_subscription_id(bundle.request)
         if contact_id:
             bundle.obj = Contact.objects.get(id=int(contact_id))
             bundle.obj.subscription_id = subscription_id
@@ -433,7 +433,7 @@ class ContactResource(CRMServiceModelResource):
 
     def vcard_full_hydrate(self, bundle):
         field_object = bundle.data.get('vcard',{})
-        subscription_id = get_crm_subscription(bundle.request)
+        subscription_id = get_crm_subscription_id(bundle.request)
         if bundle.obj.vcard:
             vcard = bundle.obj.vcard
         else:
@@ -1442,7 +1442,7 @@ class ActivityResource(CRMServiceModelResource):
         if bundle.data.get('sales_cycle_id', None):
             act.sales_cycle_id = bundle.data.get('sales_cycle_id')
         else:
-            _subscr_id = get_crm_subscription(bundle.request)
+            _subscr_id = get_crm_subscription_id(bundle.request)
             act.sales_cycle_id = SalesCycle.get_global(_subscr_id).pk
         act.save()
         if bundle.data.get('feedback_status'):
@@ -2178,7 +2178,7 @@ class AppStateObject(object):
         self.session = self.get_session()
 
     def get_users(self):
-        crmusers, users = CRMUser.get_crmusers(with_users=True)
+        crmusers, users = CRMUser.get_crmusers(self.subscription.id, with_users=True)
         return CRMUserResource().get_bundle_list(crmusers, self.request)
 
     def get_company(self):

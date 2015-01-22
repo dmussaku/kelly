@@ -7,5 +7,14 @@
             "subdomain": "almacloud",
             "name": "ALMACloud"
         }
+    },
+    {
+        "pk": 2,
+        "model": "alm_company.company",
+        "fields": {
+            "owner": [5],
+            "subdomain": "kazkom",
+            "name": "KazKom"
+        }
     }
 ]

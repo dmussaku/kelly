@@ -138,5 +138,62 @@
             "subscription_id": 1,
             "vcard": 10
         }
+    },
+
+    {
+        "pk": 11,
+        "model": "alm_crm.contact",
+        "fields": {
+            "status": 0,
+            "latest_activity": null,
+            "tp": "user",
+            "parent": null,
+            "owner": 5,
+            "date_created": "2014-09-10T00:00:00Z",
+            "subscription_id": 2,
+            "vcard": 20
+        }
+    },
+    {
+        "pk": 12,
+        "model": "alm_crm.contact",
+        "fields": {
+            "status": 0,
+            "latest_activity": null,
+            "tp": "user",
+            "parent": null,
+            "owner": 5,
+            "date_created": "2014-09-10T00:00:00Z",
+            "subscription_id": 2,
+            "vcard": 21
+        }
+    },
+    {
+        "pk": 13,
+        "model": "alm_crm.contact",
+        "fields": {
+            "status": 0,
+            "latest_activity": null,
+            "tp": "user",
+            "parent": null,
+            "owner": 5,
+            "date_created": "2014-09-10T00:00:00Z",
+            "subscription_id": 2,
+            "vcard": 22
+        }
+    },
+    {
+        "pk": 14,
+        "model": "alm_crm.contact",
+        "fields": {
+            "status": 0,
+            "latest_activity": null,
+            "tp": "user",
+            "parent": null,
+            "owner": 5,
+            "date_created": "2014-09-10T00:00:00Z",
+            "subscription_id": 2,
+            "vcard": 23
+        }
     }
 ]

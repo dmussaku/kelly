@@ -62,5 +62,22 @@
             "email": "sattar94@outlook.com",
             "vcard": 14
         }
+    },
+
+    {
+        "pk": 5,
+        "model": "alm_user.user",
+        "fields": {
+            "first_name": "Askar",
+            "last_name": "Akshabay",
+            "company": [2],
+            "is_active": true,
+            "last_login": "2015-01-22T10:10:03.205Z",
+            "is_admin": false,
+            "timezone": "Asia/Almaty",
+            "password": "pbkdf2_sha256$12000$RfGiFmGJSeoz$063rfBSPM0AsFi1prglD5BW8qD1ElMYxBpRr5tO1M08=",
+            "email": "askar.money@gmail.com",
+            "vcard": 15
+        }
     }
 ]

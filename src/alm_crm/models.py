@@ -64,7 +64,7 @@ class CRMUser(SubscriptionObject):
             self.save()
 
     @classmethod
-    def get_crmusers(cls, with_users=False):
+    def get_crmusers(cls, subscription_id, with_users=False):
         """TEST Returns list of crmusers on with
             Returns:
                 Queryset<CRMUser>
@@ -72,13 +72,17 @@ class CRMUser(SubscriptionObject):
                     Queryset<User>
             example: (crmusers, users)
         """
-        crmusers = cls.objects.all()
+        crmusers = cls.objects.filter(subscription_id=subscription_id)
         if with_users:
             users = User.objects.filter(
                 id__in=crmusers.values_list('user_id', flat=True))
             return (crmusers, users)
         else:
             return crmusers
+
+    @classmethod
+    def get_subscription_id(cls, user_id):
+        return cls.objects.get(id=user_id).subscription_id
 
 
 class Contact(SubscriptionObject):

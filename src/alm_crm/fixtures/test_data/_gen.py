@@ -26,6 +26,8 @@ for contact_id in range(1, 11):
     # 3 sales_cycle for ever contact
     for index_s in range(0, 3):
 
+        s_status = ('N', 'P', 'C')[randint(0, 2)]
+
         s = ''
         s += '{\n'
         s += '    "pk": %i,\n' % (id_sales_cycles)
@@ -37,10 +39,10 @@ for contact_id in range(1, 11):
         s += '        "owner":%i,\n' % (randint(1, 3))
         s += '        "followers":[],\n'
         s += '        "contact":%i,\n' % (contact_id)
-        s += '        "latest_activity":%i,\n' % (id_activities)
+        s += '        "latest_activity":%s,\n' % 'null'  #('null' if s_status=='N' else str(id_activities+1))
         s += '        "projected_value":%i,\n' % (id_values)
         s += '        "real_value":%i,\n' % (id_values + 1)
-        s += '        "status":"%s",\n' % (('N', 'P', 'C')[randint(0, 1)])
+        s += '        "status":"%s",\n' % (s_status)
         s += '        "date_created":"2014-%02i-10 00:00:00+00:00",\n' % \
             (index_s + 1)
         s += '        "from_date":"2014-%02i-10 00:00:00+00:00",\n' % \
@@ -62,7 +64,8 @@ for contact_id in range(1, 11):
             v += '    "fields": {\n'
             v += '        "salary":"monthly",\n'
             v += '        "amount":%i,\n' % (5000*randint(1, 10))
-            v += '        "currency":"KZT"\n'
+            v += '        "currency":"KZT",\n'
+            v += '        "subscription_id":1\n'
             v += '    }\n'
             v += '},\n'
             id_values += 1
@@ -70,6 +73,10 @@ for contact_id in range(1, 11):
 
         # 10 activities
         for index_a in range(0, 10):
+            # skip if SalesCycle is NEW, mean without Activities
+            if s_status == 'N':
+                continue
+
             a = ''
             a += '{\n'
             a += '    "pk": %i,\n' % (id_activities)
@@ -82,14 +89,15 @@ for contact_id in range(1, 11):
             a += '        "date_created":"2014-%02i-%02i 00:00:00+00:00",\n' %\
                 (index_s + 1, index_a*2 + 1)
             a += '        "sales_cycle":%i,\n' % (id_sales_cycles - 1)
-            a += '        "owner":%i\n' % (randint(1, 4))
+            a += '        "owner":%i,\n' % (randint(1, 4))
+            a += '        "subscription_id":1\n'
             a += '    }\n'
             a += '},\n'
             id_activities += 1
             fixture_activities += a
 
             # 3-10 comments on activity
-            for index_c in range(0, randint(3, 10)):
+            for index_c in range(1, randint(3, 10)):
                 c_owner = randint(1, 3)
                 c_date = '2014-%02i-%02iT%02i:%02i:00.827Z' % (
                     index_s + 1, index_a*2 + 1, index_c + 1, randint(0, 59))
@@ -108,7 +116,110 @@ for contact_id in range(1, 11):
                 c += '        "date_created":"%s",\n' % (c_date)
                 c += '        "date_edited":"%s",\n' % (c_date)
                 c += '        "object_id":%i,\n' % (id_activities - 1)
-                c += '        "content_type":["alm_crm", "activity"]\n'
+                c += '        "content_type":["alm_crm", "activity"],\n'
+                c += '        "subscription_id":1\n'
+                c += '    }\n'
+                c += '},\n'
+                id_comments += 1
+                fixture_comments += c
+
+
+# for Second Company with another Subcription
+for contact_id in range(11, 15):
+    # 2 sales_cycle for ever contact
+    for index_s in range(0, 2):
+
+        s_status = ('N', 'P', 'C')[randint(0, 2)]
+
+        s = ''
+        s += '{\n'
+        s += '    "pk": %i,\n' % (id_sales_cycles)
+        s += '    "model": "alm_crm.SalesCycle",\n'
+        s += '    "fields": {\n'
+        s += '        "is_global":%s,\n' % ('true' if contact_id==12 else 'false')
+        s += '        "title":"SalesCycle #%i",\n' % (id_sales_cycles)
+        # s += '        "products":[%i],\n' % (randint(1, 4))
+        s += '        "owner":5,\n'
+        s += '        "followers":[],\n'
+        s += '        "contact":%i,\n' % (contact_id)
+        s += '        "latest_activity":%s,\n' % 'null'  #  ('null' if s_status=='N' else str(id_activities+1))
+        s += '        "projected_value":%i,\n' % (id_values)
+        s += '        "real_value":%i,\n' % (id_values + 1)
+        s += '        "status":"%s",\n' % (s_status)
+        s += '        "date_created":"2014-%02i-10 00:00:00+00:00",\n' % \
+            (index_s + 1)
+        s += '        "from_date":"2014-%02i-10 00:00:00+00:00",\n' % \
+            (index_s + 1)
+        s += '        "to_date":"2014-%02i-10 00:00:00+00:00",\n' % \
+            (index_s + 3)
+        s += '        "subscription_id":2\n'
+        s += '    }\n'
+        s += '},\n'
+        id_sales_cycles += 1
+        fixture_sales_cycles += s
+
+        # 2 values: real and projected
+        for index_v in range(0, 2):
+            v = ''
+            v += '{\n'
+            v += '    "pk": %i, \n' % (id_values)
+            v += '    "model": "alm_crm.Value", \n'
+            v += '    "fields": {\n'
+            v += '        "salary":"monthly",\n'
+            v += '        "amount":%i,\n' % (5000*randint(1, 10))
+            v += '        "currency":"KZT",\n'
+            v += '        "subscription_id":2\n'
+            v += '    }\n'
+            v += '},\n'
+            id_values += 1
+            fixture_values += v
+
+        # 7 activities
+        for index_a in range(1, 7):
+            # skip if SalesCycle is NEW, mean without Activities
+            if s_status == 'N':
+                continue
+
+            a = ''
+            a += '{\n'
+            a += '    "pk": %i,\n' % (id_activities)
+            a += '    "model": "alm_crm.Activity",\n'
+            a += '    "fields": {\n'
+            a += '        "title":"activity #%i of SalesCycle #%i",\n' % \
+                (index_a + 1, id_sales_cycles - 1)
+            a += '        "description":"activity #%i of SalesCycle #%i",\n' %\
+                (index_a + 1, id_sales_cycles - 1)
+            a += '        "date_created":"2014-%02i-%02i 00:00:00+00:00",\n' %\
+                (index_s + 1, index_a*2 + 1)
+            a += '        "sales_cycle":%i,\n' % (id_sales_cycles - 1)
+            a += '        "owner":5,\n'
+            a += '        "subscription_id":2\n'
+            a += '    }\n'
+            a += '},\n'
+            id_activities += 1
+            fixture_activities += a
+
+            # 2-5 comments on activity
+            for index_c in range(0, randint(2, 5)):
+                c_date = '2014-%02i-%02iT%02i:%02i:00.827Z' % (
+                    index_s + 1, index_a*2 + 1, index_c + 1, randint(0, 59))
+
+                c = ''
+                c += '{\n'
+                c += '    "pk": %i,\n' % (id_comments)
+                c += '    "model": "alm_crm.Comment",\n'
+                c += '    "fields": {\n'
+                c += '        "comment":"%s - (by cmruser #%i, on activity #%i of sales_cycle #%i)",\n' % \
+                    (comments[randint(0, 7)],
+                     5,
+                     id_activities - 1,
+                     id_sales_cycles - 1)
+                c += '        "owner":5,\n'
+                c += '        "date_created":"%s",\n' % (c_date)
+                c += '        "date_edited":"%s",\n' % (c_date)
+                c += '        "object_id":%i,\n' % (id_activities - 1)
+                c += '        "content_type":["alm_crm", "activity"],\n'
+                c += '        "subscription_id":2\n'
                 c += '    }\n'
                 c += '},\n'
                 id_comments += 1

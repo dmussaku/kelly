@@ -239,7 +239,87 @@
             "fn": "Satter Stamkulov"
         }
     },
+    {
+        "pk": 15,
+        "model": "alm_vcard.vcard",
+        "fields": {
+            "family_name": "Akshabayev",
+            "uid": null,
+            "honorific_suffix": "",
+            "additional_name": "don't worry",
+            "rev": null,
+            "honorific_prefix": "",
+            "bday": null,
+            "given_name": "Askar",
+            "sort_string": null,
+            "classP": null
+        }
+    },
 
+    {
+        "pk": 20,
+        "model": "alm_vcard.vcard",
+        "fields": {
+            "family_name": "Daniyar",
+            "uid": null,
+            "honorific_suffix": "",
+            "additional_name": "don't worry",
+            "rev": null,
+            "honorific_prefix": "",
+            "bday": null,
+            "given_name": "Kozhakhmetov",
+            "sort_string": null,
+            "classP": null
+        }
+    },
+    {
+        "pk": 21,
+        "model": "alm_vcard.vcard",
+        "fields": {
+            "family_name": "Toktar",
+            "uid": null,
+            "honorific_suffix": "",
+            "additional_name": "don't worry",
+            "rev": null,
+            "honorific_prefix": "",
+            "bday": null,
+            "given_name": "Smaginov",
+            "sort_string": null,
+            "classP": null
+        }
+    },
+    {
+        "pk": 22,
+        "model": "alm_vcard.vcard",
+        "fields": {
+            "family_name": "Eroslav",
+            "uid": null,
+            "honorific_suffix": "",
+            "additional_name": "don't worry",
+            "rev": null,
+            "honorific_prefix": "",
+            "bday": null,
+            "given_name": "Zhalpakov",
+            "sort_string": null,
+            "classP": null
+        }
+    },
+    {
+        "pk": 23,
+        "model": "alm_vcard.vcard",
+        "fields": {
+            "family_name": "Mucho",
+            "uid": null,
+            "honorific_suffix": "",
+            "additional_name": "don't worry",
+            "rev": null,
+            "honorific_prefix": "",
+            "bday": null,
+            "given_name": "Gusto",
+            "sort_string": null,
+            "classP": null
+        }
+    },
 
     {
         "pk": 1,
@@ -322,7 +402,15 @@
             "vcard": 10,
             "value": "nurlan.abiken@gmail.com"
         }
+    },
+    {
+        "pk": 7,
+        "model": "alm_vcard.email",
+        "fields": {
+            "type": "INTERNET",
+            "vcard": 15,
+            "value": "askar.money@gmail.com"
+        }
     }
-
 
 ]

@@ -8,7 +8,6 @@ import vobject
 from vobject.vcard import *
 from django.utils.translation import ugettext as _
 from django.conf import settings
-from almanet.models import SubscriptionObject
 
 
 class VObjectImportException(Exception):
@@ -711,23 +710,6 @@ class VCard(models.Model):
         returns a cast of the Contact to a string in vCard format.
         """
         return self.toVObject().serialize()
-
-"""
-class N(SubscriptionObject):
-    contact = models.ForeignKey(Contact, unique=True)
-    family_name = models.CharField(max_length = 1024, verbose_name = _("Family Name"))
-    given_name = models.CharField(max_length = 1024, verbose_name = _("Given Name"))
-    additional_name  = models.CharField(max_length = 1024, verbose_name = _("Additional Name"))
-    honorific_prefix = models.CharField(max_length = 1024, verbose_name = _("Honorific Prefix"))
-    honorific_suffix = models.CharField(max_length = 1024, verbose_name = _("Honorific Suffix"))
-
-    class Meta:
-        verbose_name = _("name")
-        verbose_name_plural = _("names")
-
-    def __unicode__(self):
-        return '' + self.given_name + ' ' + self.family_name
-"""
 
 
 class Tel(models.Model):
