@@ -133,6 +133,10 @@ class UserResource(ModelResource):
                     content_type='application/json; charset=utf-8', status=200)
             )
 
+    def dehydrate(self, bundle):
+        bundle.data['crm_user_id'] = bundle.obj.get_crmuser().pk
+        return bundle
+
     def get_current_user(self, request, **kwargs):
         with RequestContext(self, request, allowed_methods=['get']):
             bundle = self.build_bundle(obj=request.user, request=request)
