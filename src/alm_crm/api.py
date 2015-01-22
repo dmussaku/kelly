@@ -438,9 +438,6 @@ class ContactResource(CRMServiceModelResource):
             vcard = bundle.obj.vcard
         else:
             vcard = VCard()
-            vcard.save()
-            vcard.subscription_id = subscription_id
-            vcard.contact = bundle.obj
         vcard_fields = list(VCard._meta.get_fields_with_model())
         for vcard_field in vcard_fields:
             if vcard_field[0].__class__==models.fields.AutoField:
@@ -466,6 +463,10 @@ class ContactResource(CRMServiceModelResource):
                 attname = vcard_field[0].attname
                 vcard.__setattr__(attname,
                     field_object.get(attname, ""))
+
+        vcard.save()
+        vcard.subscription_id = subscription_id
+        vcard.contact = bundle.obj
         '''
         Now i need to go over the list of vcard keys
         check their model names, go through each and every
@@ -496,7 +497,7 @@ class ContactResource(CRMServiceModelResource):
                         vcard_obj = model()
                         vcard_obj.vcard = vcard
                     for key, value in obj.viewitems():
-                        if key=='vcard':
+                        if key == 'vcard':
                             vcard_obj.vcard = VCard.objects.get(id=value)
                         else:
                             vcard_obj.__setattr__(key, value)
