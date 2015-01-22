@@ -317,7 +317,7 @@ class Contact(SubscriptionObject):
     @classmethod
     def upd_status_when_first_activity_created(cls, sender, created=False,
                                                instance=None, **kwargs):
-        if not created:
+        if not created or instance.sales_cycle.is_global:
             return
         c = instance.sales_cycle.contact
         if c.status == NEW:
