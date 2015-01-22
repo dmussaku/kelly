@@ -308,7 +308,7 @@ class Contact(SubscriptionObject):
     @classmethod
     def upd_lst_activity_on_create(cls, sender, created=False,
                                    instance=None, **kwargs):
-        if not created or not instance.sales_cycle.is_global:
+        if not created or instance.sales_cycle.is_global:
             return
         c = instance.sales_cycle.contact
         c.latest_activity = instance
