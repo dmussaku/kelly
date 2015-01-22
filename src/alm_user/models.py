@@ -101,7 +101,7 @@ class User(AbstractBaseUser):
 
     def get_subscriptions(self, flat=False):
         subscriptions = list(self.subscriptions.all())
-        subscriptions += list(self.company.subscriptions.all())
+        subscriptions += list(self.company.first().subscriptions.all())
         if not flat:
             return subscriptions
         else:
