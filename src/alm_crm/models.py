@@ -98,7 +98,8 @@ class Contact(SubscriptionObject):
         max_length=30,
         choices=TYPES_WITH_CAPS, default=USER_TP)
     date_created = models.DateTimeField(blank=True, auto_now_add=True)
-    vcard = models.OneToOneField('alm_vcard.VCard', blank=True, null=True)
+    vcard = models.OneToOneField('alm_vcard.VCard', blank=True, null=True,
+                                 on_delete=models.SET_NULL,)
     parent = models.ForeignKey(
         'Contact', blank=True, null=True, related_name='children')
     owner = models.ForeignKey(
