@@ -23,6 +23,10 @@ class AttributeImportException(Exception):
         self.message = "Could not load " + attribute
 
 
+class BadVCardError(Exception):
+    pass
+
+
 class VCard(models.Model):
     """
     import export functionality is done via vobject
@@ -104,6 +108,8 @@ class VCard(models.Model):
             self.fn += (' ' if self.fn else '') + self.family_name
         if not self.fn and self.email_set.first():
             self.fn = self.email_set.first().value.split('@')[0].replace('.', ' ')
+        if not self.fn:
+            raise BadVCardError('This is bad vcard since user does not know anything about this contact.')
 
     @classmethod
     def importFromVCardMultiple(cls, data, autocommit=False):

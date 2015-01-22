@@ -4,7 +4,7 @@ from django.utils.translation import ugettext_lazy as _
 from almanet import settings
 from almanet import signals as almanet_signals
 from almanet.models import SubscriptionObject
-from alm_vcard.models import VCard
+from alm_vcard.models import VCard, BadVCardError
 from alm_user.models import User
 from django.template.loader import render_to_string
 from django.db.models import signals, Q
@@ -467,9 +467,14 @@ class Contact(SubscriptionObject):
             creator - crm user who owns created objects
         """
         rv = []
-        vcards = VCard.importFromVCardMultiple(raw_vcard, autocommit=True)
+        vcards = VCard.importFromVCardMultiple(raw_vcard, autocommit=False)
         with transaction.atomic():
             for vcard in vcards:
+                try:
+                    vcard.commit()
+                except BadVCardError as e:
+                    print e
+                    continue
                 c = cls(vcard=vcard, owner=creator)
                 c.save()
                 rv.append(c)
