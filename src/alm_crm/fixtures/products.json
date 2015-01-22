@@ -7,7 +7,8 @@
             "description":"p1_d",
             "price":143,
             "currency":"KZT",
-            "owner": 1
+            "owner": 1,
+            "subscription_id": 1
         }
     },
     {
@@ -18,7 +19,8 @@
             "description":"1C Online - monthly subscription",
             "price":3000,
             "currency":"KZT",
-            "owner": 1
+            "owner": 1,
+            "subscription_id": 1
         }
     },
     {
@@ -29,7 +31,8 @@
             "description":"1C Online - monthly subscription 33",
             "price":5000,
             "currency":"KZT",
-            "owner": 1
+            "owner": 1,
+            "subscription_id": 1
         }
     }
 ]

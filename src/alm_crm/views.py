@@ -509,7 +509,7 @@ class SalesCycleDetailView(DetailView):
         context['first_activity_date'] = sales_cycle.get_first_activity_date()
 
         # activities of the sales_cycle
-        context['activities'] = sales_cycle.get_activities(limit=100)
+        context['activities'] = sales_cycle.get_activities()
 
         # add new activity to current salescycle
         context['activity_form'] = ActivityForm(
@@ -535,8 +535,8 @@ class SalesCycleDetailView(DetailView):
             context['value_form'] = ValueForm(instance=sales_cycle.real_value)
 
         # add products to current salescycle
-        context['product_datums'] = json.dumps(list(Product.get_products()
-                                               .values('pk', 'name')))
+        context['product_datums'] = json.dumps(
+            list(Product.get_products(self.request.user.get_crmuser().id).values('pk', 'name')))
         context['sales_cycle_products'] = sales_cycle.products.all()
 
         # mentions, add mentions(followers) to sales_cycle:

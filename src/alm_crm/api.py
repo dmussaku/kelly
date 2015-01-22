@@ -1658,7 +1658,8 @@ class ShareResource(CRMServiceModelResource):
         '''
         limit = int(request.GET.get('limit', 20))
         offset = int(request.GET.get('offset', 0))
-        shares = Share().get_shares(limit=limit, offset=offset)
+
+        shares = Share.get_shares(request.user.get_crmuser().id)
         return self.create_response(
             request,
             {'objects': self.get_bundle_list(shares, request)}
@@ -1683,15 +1684,14 @@ class ShareResource(CRMServiceModelResource):
                 note=json_obj.get('note', ""),
                 share_from=CRMUser.objects.get(id=int(json_obj.get('share_from'))),
                 contact=Contact.objects.get(id=int(json_obj.get('contact'))),
-                share_to = CRMUser.objects.get(id=int(json_obj.get('share_to')))
+                share_to=CRMUser.objects.get(id=int(json_obj.get('share_to')))
                 )
             s.save()
             share_list.append(s)
         return self.create_response(
-            request,
-            {
-            'objects': self.get_bundle_list(share_list, request)}
-            )
+            request, {
+                'objects': self.get_bundle_list(share_list, request)
+            })
 
     def read(self, request, **kwargs):
         '''
@@ -2170,7 +2170,7 @@ class AppStateObject(object):
         return FilterResource().get_bundle_list(filters, self.request)
 
     def get_products(self):
-        products = Product.get_products()
+        products = Product.get_products(self.current_crmuser.pk)
         return ProductResource().get_bundle_list(products, self.request)
 
     def get_sales_cycle2products_map(self):

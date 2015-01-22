@@ -235,17 +235,19 @@ class ValueTestCase(TestCase):
 
 
 class ProductTestCase(TestCase):
-    fixtures=['products.json']
+    fixtures = ['products.json', 'crmusers.json']
 
     def setUp(self):
         super(ProductTestCase, self).setUp()
         self.product = Product.objects.get(pk=1)
+        self.crmuser = self.product.owner
 
     def test_unicode(self):
         self.assertEqual(self.product.__unicode__(), 'p1')
 
     def test_get_products(self):
-        self.assertEqual(len(Product.objects.all()), len(Product.get_products()))
+        self.assertEqual(len(Product.objects.all()),
+                         len(Product.get_products(self.crmuser.id)))
 
 
 class ActivityTestCase(TestCase):
@@ -288,7 +290,7 @@ class ActivityTestCase(TestCase):
 
     def test_get_activities_by_salescycle(self):
         all_activities = self.salescycle1.rel_activities.all()
-        activities = Activity.get_activities_by_salescycle(1, 0, 0)
+        activities = Activity.get_activities_by_salescycle(1)
         if (len(all_activities) == len(activities)):
             self.assertEqual(len(set(all_activities).intersection(activities)),
                              len(activities))
@@ -433,6 +435,7 @@ class SalesCycleTestCase(TestCase):
     def setUp(self):
         super(SalesCycleTestCase, self).setUp()
         self.sc1 = SalesCycle.objects.get(pk=1)
+        self.crmusers = self.sc1.owner
 
     def get_sc(self, pk):
         return SalesCycle.objects.get(pk=pk)
@@ -492,8 +495,8 @@ class SalesCycleTestCase(TestCase):
     def test_get_salescycles_by_last_activity_date(self):
         user_id = 1
         ret = SalesCycle.get_salescycles_by_last_activity_date(user_id, include_activities=True)
-        self.assertEqual(list(ret[0].values_list('pk', flat=True)).sort(), [1, 2, 3])
-        self.assertEqual(list(ret[1].values_list('pk', flat=True)).sort(), range(1, 8))
+        self.assertEqual(sorted(list(ret[0].values_list('pk', flat=True))), [1, 2, 3])
+        self.assertEqual(sorted(list(ret[1].values_list('pk', flat=True))), range(1, 8))
         self.assertItemsEqual(ret[2], {1: [1, 3], 2: [2], 3: []})
 
     def test_get_salescycles_by_last_activity_date_with_mentioned(self):

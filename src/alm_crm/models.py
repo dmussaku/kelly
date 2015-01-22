@@ -326,7 +326,7 @@ class Contact(SubscriptionObject):
         q = Q(subscription_id=CRMUser.get_subscription_id(user_id))
         q &= Q(date_created__range=(from_dt, to_dt))
         activities = crm_user.activity_owner.filter(q)
-        contact_ids = activities.values_list('sales_cycle__contact', flat=True)
+        contact_ids = activities.values_list('sales_cycle__contact_id', flat=True)
         return Contact.objects.filter(id__in=contact_ids)
 
     @classmethod
@@ -596,12 +596,12 @@ class Product(SubscriptionObject):
             for sales_cycle in sales_cycles:
                 SalesCycleProductStat.objects.get_or_create(
                     sales_cycle=sales_cycle, product=self)
-
         return True
 
     @classmethod
-    def get_products(cls):
-        return cls.objects.all()
+    def get_products(cls, user_id):
+        q = Q(subscription_id=CRMUser.get_subscription_id(user_id))
+        return cls.objects.filter(q)
 
 
 class SalesCycle(SubscriptionObject):
@@ -697,14 +697,12 @@ class SalesCycle(SubscriptionObject):
         except CRMUser.DoesNotExist:
             return False
 
-    def get_activities(self, limit=20, offset=0):
+    def get_activities(self):
         """TEST Returns list of activities ordered by date."""
-        return self.rel_activities.order_by(
-            '-date_created')[offset:offset + limit]
+        return self.rel_activities.order_by('-date_created')
 
-    def get_mentioned_users(self, limit=20, offset=0):
-        user_ids = self.mentions.all()[offset:offset + limit]\
-            .values_list('user_id', flat=True)
+    def get_mentioned_users(self):
+        user_ids = self.mentions.values_list('user_id', flat=True)
         return CRMUser.objects.filter(pk__in=user_ids)
 
     def get_first_activity_date(self):
@@ -841,10 +839,9 @@ class SalesCycle(SubscriptionObject):
         except CRMUser.DoesNotExist:
             raise CRMUser.DoesNotExist
 
+        q0 = Q(subscription_id=CRMUser.get_subscription_id(user_id))
         q = Q()
-        if all:
-            q |= Q()
-        else:
+        if not all:
             if owned:
                 q |= Q(owner_id=user_id)
             if mentioned:
@@ -854,7 +851,7 @@ class SalesCycle(SubscriptionObject):
         if not all and len(q.children) == 0:
             sales_cycles = SalesCycle.objects.none()
         else:
-            sales_cycles = SalesCycle.objects.filter(q).order_by(
+            sales_cycles = SalesCycle.objects.filter(q0 & q).order_by(
                 '-latest_activity__date_created')
 
         if not include_activities:
@@ -869,7 +866,7 @@ class SalesCycle(SubscriptionObject):
             return (sales_cycles, activities, sales_cycle_activity_map)
 
     @classmethod
-    def get_salescycles_by_contact(cls, contact_id, limit=20, offset=0):
+    def get_salescycles_by_contact(cls, contact_id):
         """Returns queryset of sales cycles by contact"""
         return SalesCycle.objects.filter(contact_id=contact_id)
 
@@ -971,8 +968,7 @@ class Activity(SubscriptionObject):
 
     @classmethod
     def get_activities_by_salescycle(cls, sales_cycle_id):
-        sales_cycle = SalesCycle.objects.get(id=sales_cycle_id)
-        return cls.objects.filter(sales_cycle=sales_cycle).order_by('-date_created')
+        return cls.objects.filter(sales_cycle_id=sales_cycle_id).order_by('-date_created')
 
     @classmethod
     def get_activities_by_subscription(cls, subscription_id):
@@ -1022,7 +1018,7 @@ class Activity(SubscriptionObject):
     def get_number_of_activities_by_day(cls, user_id,
                                         from_dt=None, to_dt=None):
         try:
-            user = CRMUser.objects.get(id=user_id)
+            crmuser = CRMUser.objects.get(id=user_id)
         except CRMUser.DoesNotExist:
             return False
         '''
@@ -1032,7 +1028,7 @@ class Activity(SubscriptionObject):
         if (type(from_dt) and type(to_dt) == datetime.datetime):
             pass
         activity_queryset = Activity.objects.filter(
-            date_created__gte=from_dt, date_created__lte=to_dt, owner=user)
+            date_created__gte=from_dt, date_created__lte=to_dt, owner=crmuser)
         date_counts = {}
         for act in activity_queryset:
             date = str(act.date_created.date())
@@ -1066,6 +1062,7 @@ class Activity(SubscriptionObject):
         except CRMUser.DoesNotExist:
             raise CRMUser.DoesNotExist
 
+        q0 = Q(subscription_id=CRMUser.get_subscription_id(user_id))
         q = Q()
         if not all:
             if owned:
@@ -1075,7 +1072,7 @@ class Activity(SubscriptionObject):
         if not all and len(q.children) == 0:
             activities = Activity.objects.none()
         else:
-            activities = Activity.objects.filter(q).order_by('-date_created')
+            activities = Activity.objects.filter(q & q0).order_by('-date_created')
 
         if not include_sales_cycles:
             return activities
@@ -1214,15 +1211,14 @@ class Comment(SubscriptionObject):
 
     '''---done---'''
     @classmethod
-    def get_comments_by_context(cls, context_object_id, context_class,
-                                limit=20, offset=0):
+    def get_comments_by_context(cls, context_object_id, context_class):
         try:
             cttype = ContentType.objects.get_for_model(context_class)
         except ContentType.DoesNotExist:
             return False
         return cls.objects.filter(
             object_id=context_object_id,
-            content_type=cttype)[offset:offset + limit]
+            content_type=cttype)
 
 
 class Share(SubscriptionObject):
@@ -1247,8 +1243,9 @@ class Share(SubscriptionObject):
         self.share_from = owner_object
 
     @classmethod
-    def get_shares(cls, limit=20, offset=0):
-        return cls.objects.order_by('-date_created')[offset:offset + limit]
+    def get_shares(cls, user_id):
+        q = Q(subscription_id=CRMUser.get_subscription_id(user_id))
+        return cls.objects.filter(q).order_by('-date_created')
 
     @classmethod
     def get_shares_in_for(cls, user_id):
@@ -1326,8 +1323,8 @@ class ContactList(SubscriptionObject):
         except CRMUser.DoesNotExist:
             return False
 
-    def get_contact_list_users(self, limit=20, offset=0):
-        return self.users.all()[offset:offset + limit]
+    def get_contact_list_users(self):
+        return self.users
 
     def add_users(self, user_ids):
         assert isinstance(user_ids, (tuple, list)), 'must be a list'
@@ -1382,7 +1379,7 @@ class SalesCycleProductStat(SubscriptionObject):
         db_table = settings.DB_PREFIX.format('cycle_prod_stat')
 
     def __unicode__(self):
-        return ' %s | %s | %s' % (self.sales_cycle, self.product, self.value)
+        return u'%s | %s | %s' % (self.sales_cycle, self.product, self.value)
 
 
 class Filter(SubscriptionObject):
