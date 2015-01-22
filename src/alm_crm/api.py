@@ -37,7 +37,7 @@ from almanet.utils.api import RequestContext
 import ast
 from tastypie.serializers import Serializer
 from django.db import models
-from tastypie.exceptions import ImmediateHttpResponse, NotFound
+from tastypie.exceptions import ImmediateHttpResponse, NotFound, Unauthorized
 from django.http import HttpResponse
 import datetime
 
@@ -438,9 +438,6 @@ class ContactResource(CRMServiceModelResource):
             vcard = bundle.obj.vcard
         else:
             vcard = VCard()
-            vcard.save()
-            vcard.subscription_id = subscription_id
-            vcard.contact = bundle.obj
         vcard_fields = list(VCard._meta.get_fields_with_model())
         for vcard_field in vcard_fields:
             if vcard_field[0].__class__==models.fields.AutoField:
@@ -466,6 +463,10 @@ class ContactResource(CRMServiceModelResource):
                 attname = vcard_field[0].attname
                 vcard.__setattr__(attname,
                     field_object.get(attname, ""))
+
+        vcard.save()
+        vcard.subscription_id = subscription_id
+        vcard.contact = bundle.obj
         '''
         Now i need to go over the list of vcard keys
         check their model names, go through each and every
@@ -496,7 +497,7 @@ class ContactResource(CRMServiceModelResource):
                         vcard_obj = model()
                         vcard_obj.vcard = vcard
                     for key, value in obj.viewitems():
-                        if key=='vcard':
+                        if key == 'vcard':
                             vcard_obj.vcard = VCard.objects.get(id=value)
                         else:
                             vcard_obj.__setattr__(key, value)
@@ -1160,18 +1161,6 @@ class SalesCycleResource(CRMServiceModelResource):
         detail_allowed_methods = ['get', 'post', 'put', 'patch', 'delete']
         always_return_data = True
 
-    def dehydrate(self, bundle):
-        # bundle.data['product_ids'] = [p.pk for p in bundle.obj.products.all()]
-        return bundle
-
-    # def dehydrate_products(self, bundle):
-    #     return list(bundle.obj.products.values_list('pk', flat=True))
-
-    # def hydrate_products(self, bundle):
-    #     ids = map(int, bundle.data.get('products', []))
-    #     bundle.data['products'] = self._meta.queryset.filter(id__in=ids)
-    #     return bundle
-
     def prepend_urls(self):
         return [
             url(
@@ -1211,6 +1200,9 @@ class SalesCycleResource(CRMServiceModelResource):
         except MultipleObjectsReturned:
             return http.HttpMultipleChoices(
                 "More than one resource is found at this URI.")
+        if obj.is_global:
+            raise ImmediateHttpResponse(response=http.HttpUnauthorized(
+                                        'Could not close global sales cycle'))
         bundle = self.build_bundle(obj=obj, request=request)
 
         # get PUT's data from request.body
@@ -1270,27 +1262,6 @@ class SalesCycleResource(CRMServiceModelResource):
         else:
             return self.create_response(request, get_product_ids(),
                                         response_class=http.HttpAccepted)
-
-    # def save_m2m(self, bundle):
-    #     for field_name, field_object in self.fields.items():
-    #         if not getattr(field_object, 'is_m2m', False):
-    #             continue
-    #         if not field_object.attribute:
-    #             continue
-
-    #         before = bundle.obj.products.all()
-    #         now = []
-    #         for field in bundle.data[field_name]:
-    #             kwargs = {'sales_cycle':bundle.obj, 'product':field.obj}
-    #             try:
-    #                 SalesCycleProductStat.objects.get_or_create(**kwargs)
-    #                 now.append(field.obj)
-    #             except Exception:
-    #                 continue
-
-    #         before_products =  filter(lambda x: x not in now, before)
-    #         SalesCycleProductStat.objects.filter(sales_cycle=bundle.obj, product__in=before_products).delete()
-
 
 class ActivityResource(CRMServiceModelResource):
     """
