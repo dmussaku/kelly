@@ -178,7 +178,6 @@ class User(AbstractBaseUser):
         return CRMUser.objects.get(user_id=self.pk)
 
 
-
 class Referral(models.Model):
     email = models.EmailField()
     date_created = models.DateTimeField(blank=True, auto_now_add=True)

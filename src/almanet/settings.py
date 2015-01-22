@@ -358,7 +358,8 @@ class DemoConfiguration(FileSettings('~/.almanet/almanet.conf.py'), BaseConfigur
     SESSION_COOKIE_DOMAIN = '.almasales.kz'
     CORS_ORIGIN_WHITELIST = (
         'almasales.kz',
-        'almacloud.almasales.kz'
+        'almacloud.almasales.kz',
+        'arta.almasales.kz'
     )
     CORS_ALLOW_CREDENTIALS = True
 
