@@ -20,7 +20,7 @@ class Migration(DataMigration):
             if vcard.family_name:
                 fn += (' ' if fn else '') + vcard.family_name
             if not fn and vcard.email_set.first():
-                fn = vcard.email_set.first().split('@')[0].replace('.', ' ')
+                fn = vcard.email_set.first().value.split('@')[0].replace('.', ' ')
             vcard.fn = fn
             vcard.save()
 

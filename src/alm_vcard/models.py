@@ -103,7 +103,7 @@ class VCard(models.Model):
         if self.family_name:
             self.fn += (' ' if self.fn else '') + self.family_name
         if not self.fn and self.email_set.first():
-            self.fn = self.email_set.first().split('@')[0].replace('.', ' ')
+            self.fn = self.email_set.first().value.split('@')[0].replace('.', ' ')
 
     @classmethod
     def importFromVCardMultiple(cls, data, autocommit=False):
