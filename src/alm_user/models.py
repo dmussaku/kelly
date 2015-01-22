@@ -100,7 +100,8 @@ class User(AbstractBaseUser):
         return self.owned_company.first()
 
     def get_subscriptions(self, flat=False):
-        subscriptions = self.subscriptions.all()
+        subscriptions = list(self.subscriptions.all())
+        subscriptions += list(self.company.subscriptions.all())
         if not flat:
             return subscriptions
         else:
