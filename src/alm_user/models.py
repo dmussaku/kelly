@@ -123,10 +123,12 @@ class User(AbstractBaseUser):
         return service in self.connected_services()
 
     def connect_service(self, service):
+        co = self.company.first()
         try:
-            s = Subscription.objects.get(service=service, user=self)
+            s = Subscription.objects.get(
+                service=service, organization=co)
         except Subscription.DoesNotExist:
-            s = Subscription(service=service, user=self)
+            s = Subscription(service=service, user=self, organization=co)
         finally:
             s.is_active = True
             s.save()
@@ -146,7 +148,8 @@ class User(AbstractBaseUser):
             s.save()
 
     def get_subscr_by_service(self, service):
-        return Subscription.objects.get(service=service, user=self)
+        return Subscription.objects.get(
+            service=service, organization=self.company.first())
 
     def create_crmuser(self, subscription_pk, organization_pk):
         from alm_crm.models import CRMUser
