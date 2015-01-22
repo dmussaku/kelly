@@ -225,38 +225,6 @@ class Contact(SubscriptionObject):
         self.mentions = map(build_single_mention, user_ids)
         self.save()
 
-    def assign_user(self, user_id):
-        """Assign user to contact."""
-        try:
-            user = CRMUser.objects.get(user_id=user_id)
-            self.assignees.add(user)
-            return True
-        except CRMUser.DoesNotExist:
-            return False
-
-    @classmethod
-    def assign_user_to_contact(cls, user_id, contact_id):
-        """Assign user with `user_id` to contact with `contact_id`"""
-        return cls.assign_user_to_contacts(user_id, [contact_id])
-
-    @classmethod
-    def assign_user_to_contacts(cls, user_id, contact_ids):
-        """Assign user `user_id` to set of contacts
-        defined by `contact_ids`."""
-        assert isinstance(contact_ids, (list, tuple)), 'Must be a list'
-        try:
-            user = CRMUser.objects.get(user_id=user_id)
-            for contact_id in contact_ids:
-                try:
-                    contact = cls.objects.get(pk=contact_id)
-                    contact.assignees.add(user)
-                    contact.save()
-                except cls.DoesNotExist:
-                    pass
-            return True
-        except CRMUser.DoesNotExist:
-            return False
-
     @classmethod
     def share_contact(cls, share_from, share_to, contact_id, comment=None):
         return cls.share_contacts(share_from, share_to, [contact_id], comment)
@@ -272,8 +240,8 @@ class Contact(SubscriptionObject):
         try:
             share_from = CRMUser.objects.get(id=share_from)
             share_to = CRMUser.objects.get(id=share_to)
-            contacts = [Contact.objects.get(id=contact_id) for contact_id in contact_ids]
-            share_list=[]
+            contacts = Contact.objects.filter(id__in=contact_ids)
+            share_list = []
             for contact in contacts:
                 share = Share(
                         share_from=share_from,
@@ -329,8 +297,10 @@ class Contact(SubscriptionObject):
             c.save()
 
     @classmethod
-    def get_contacts_by_status(cls, status, limit=10, offset=0):
-        return Contact.objects.filter(status=status)[offset:offset + limit]
+    def get_contacts_by_status(cls, user_id, status):
+        q = Q(subscription_id=CRMUser.get_subscription_id(user_id))
+        q &= Q(status=status)
+        return Contact.objects.filter(q).order_by('-date_created')
 
     @classmethod
     def get_contacts_for_last_activity_period(
@@ -352,14 +322,16 @@ class Contact(SubscriptionObject):
         Queryset of Contacts with whom `user_id` get contacted for that period.
         """
         crm_user = CRMUser.objects.get(id=user_id)
-        activities = crm_user.activity_owner.filter(
-            date_created__range=(from_dt, to_dt))
-        return Contact.objects.filter(
-            id__in=activities.values_list('sales_cycle__contact', flat=True))
+
+        q = Q(subscription_id=CRMUser.get_subscription_id(user_id))
+        q &= Q(date_created__range=(from_dt, to_dt))
+        activities = crm_user.activity_owner.filter(q)
+        contact_ids = activities.values_list('sales_cycle__contact', flat=True)
+        return Contact.objects.filter(id__in=contact_ids)
 
     @classmethod
-    def filter_contacts_by_vcard(cls, search_text, search_params=None,
-                                 limit=20, offset=0, order_by=None):
+    def filter_contacts_by_vcard(cls, user_id, search_text,
+                                 search_params=None, order_by=None):
         r"""TODO Make a search query for contacts by their vcard.
         Important! Search params have one of the following formats:
             - name of vcard field, if simple field
@@ -386,28 +358,28 @@ class Contact(SubscriptionObject):
             for param in search_params:
                 if isinstance(param, tuple):
                     if param[1] not in POSSIBLE_MODIFIERS:
-                        raise Exception, _('incorrect modifier')
+                        raise Exception(_('incorrect modifier'))
                     rv['%s__%s' % param] = search_text
                 else:
                     rv[param] = search_text
             return rv
 
         params = build_params(search_text, search_params)
-        contacts=Contact.objects.none()
-        for key,value in params.viewitems():
-            query_dict = {'vcard__'+str(key):str(value)}
-            contacts = contacts|Contact.objects.filter(**query_dict)
+        contacts = Contact.objects.none()
+
+        for key, value in params.viewitems():
+            query_dict = {'vcard__'+str(key): str(value)}
+            q = Q(subscription_id=CRMUser.get_subscription_id(user_id))
+            q &= Q(**query_dict)
+            contacts = contacts | Contact.objects.filter(q)
+
         assert isinstance(order_by, list), "Must be a list"
         if order_by:
-            if order_by[1]=='asc':
+            if order_by[1] == 'asc':
                 return contacts.order_by('vcard__'+str(order_by[0]))
             else:
                 return contacts.order_by('-vcard__'+str(order_by[0]))
         return contacts
-
-        '''
-
-        '''
 
     @classmethod
     def get_contact_detail(cls, contact_id, with_vcard=False):
@@ -419,25 +391,22 @@ class Contact(SubscriptionObject):
         return c.first()
 
     @classmethod
-    def get_contact_products(cls, contact_id, limit=20, offset=0):
+    def get_contact_products(cls, contact_id):
         """
             TEST Returns contact products by `contact_id`
             get it from salescycles by contact
         """
         c = Contact.objects.get(pk=contact_id)
         sales_cycle_ids = c.sales_cycles.values_list('pk', flat=True)
-
-        return Product.objects.filter(sales_cycles__pk__in=sales_cycle_ids)[
-            offset:offset + limit]
+        return Product.objects.filter(sales_cycles__pk__in=sales_cycle_ids)
 
     @classmethod
-    def get_contact_activities(cls, contact_id, limit=20, offset=0):
+    def get_contact_activities(cls, contact_id):
         """TEST Returns list of activities ordered by date."""
         c = Contact.objects.get(pk=contact_id)
         sales_cycle_ids = c.sales_cycles.values_list('pk', flat=True)
-
         return Activity.objects.filter(sales_cycle_id__in=sales_cycle_ids)\
-            .order_by('-date_created')[offset:offset + limit]
+            .order_by('-date_created')
 
     @classmethod
     def upload_contacts(cls, upload_type, file_obj, save=False):
@@ -487,8 +456,7 @@ class Contact(SubscriptionObject):
 
     @classmethod
     def get_contacts_by_last_activity_date(
-            cls, user_id, owned=True, assigned=False,
-            followed=False, in_shares=False, all=False,
+            cls, user_id, owned=True, mentioned=False, in_shares=False, all=False,
             include_activities=False):
         """TEST Returns list of contacts ordered by last activity date.
             Returns:
@@ -507,16 +475,13 @@ class Contact(SubscriptionObject):
             in this case return value is always instance of dict, so it is easier to process it
             at the same time, list of contacts always available through rv.keys()
         """
+        q0 = Q(subscription_id=CRMUser.get_subscription_id(user_id))
         q = Q()
-        if all:
-            q |= Q()
-        else:
+        if not all:
             if owned:
                 q |= Q(owner_id=user_id)
-            if assigned:
-                q |= Q(assignees__user_id=user_id)
-            if followed:
-                q |= Q(followers__user_id=user_id)
+            if mentioned:
+                q |= Q(mentions__user_id=user_id)
             if in_shares:
                 crmuser = CRMUser.objects.get(pk=user_id)
                 shares = crmuser.in_shares
@@ -524,15 +489,16 @@ class Contact(SubscriptionObject):
         if not all and len(q.children) == 0:
             contacts = cls.objects.none()
         else:
-            contacts = cls.objects.filter(q).order_by(
+            contacts = cls.objects.filter(q0 & q).order_by(
                 '-latest_activity__date_created')
+
         if not include_activities:
             return contacts
+
         contact_activity_map = dict()
         sales_cycle_contact_map, sales_cycles_pks = dict(), set([])
         for contact in contacts:
-            current_scycles_pks = contact.sales_cycles.values_list('pk',
-                                                                   flat=True)
+            current_scycles_pks = contact.sales_cycles.values_list('pk', flat=True)
             sales_cycles_pks |= set(current_scycles_pks)
             for current_cycle_pk in current_scycles_pks:
                 sales_cycle_contact_map[current_cycle_pk] = contact.pk
@@ -544,12 +510,14 @@ class Contact(SubscriptionObject):
         return (contacts, activities, contact_activity_map)
 
     @classmethod
-    def get_cold_base(cls, limit=20, offset=0):
+    def get_cold_base(cls, user_id):
         """Returns list of contacts that are considered cold.
         Cold contacts should satisfy two conditions:
             1. no assignee for contact
             2. status is NEW"""
-        return cls.objects.filter(status=NEW).order_by('-date_created')[offset:offset + limit]
+        q = Q(subscription_id=CRMUser.get_subscription_id(user_id))
+        q &= Q(status=NEW)
+        return cls.objects.filter(q).order_by('-date_created')
 
     @classmethod
     def create_contact_on_vcard_create(cls, sender, created=False,

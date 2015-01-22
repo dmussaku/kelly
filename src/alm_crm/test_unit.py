@@ -54,40 +54,23 @@ class CRMUserTestCase(TestCase):
 
 class ContactTestCase(TestCase):
     fixtures = ['crmusers.json', 'vcards.json', 'contacts.json',
-                'salescycles.json', 'activities.json', 'feedbacks.json', 'emails.json',
-                 'organizations.json', 'users.json', 'vcards.json']
+                'salescycles.json', 'activities.json', 'feedbacks.json',
+                'emails.json', 'organizations.json', 'users.json',
+                'vcards.json']
 
     def setUp(self):
         super(ContactTestCase, self).setUp()
         self.contact1 = Contact.objects.get(pk=1)
-
-    def test_assign_user(self):
-        self.assertEqual(len(self.contact1.assignees.all()), 1)
-        self.assertTrue(self.contact1.assign_user(user_id=2))
-        self.assertEqual(len(self.contact1.assignees.all()), 2)
-        self.assertFalse(self.contact1.assign_user(user_id=110))
-
-    def test_assign_user_to_contacts(self):
-        for pk in range(1, 4):
-            self.assertEqual(
-                len(Contact.objects.get(pk=pk).assignees.all()), 1)
-        self.assertTrue(
-            Contact.assign_user_to_contacts(user_id=2, contact_ids=[1, 2]))
-        self.assertTrue(
-            Contact.assign_user_to_contacts(user_id=2, contact_ids=(3, 4)))
-        for pk in range(1, 4):
-            c = Contact.objects.get(pk=pk)
-            self.assertEqual(len(c.assignees.all()), 2)
-
-        self.assertFalse(Contact.assign_user_to_contacts(user_id=100, contact_ids=[2,3,4]))
+        self.crmuser = self.contact1.owner
 
     def test_get_contacts_by_status(self):
-        self.assertEqual(len(Contact.get_contacts_by_status(status=1)), 1)
-        self.assertEqual(
-            len(Contact.get_contacts_by_status(status=1, limit=1)), 1)
+        contacts = Contact.get_contacts_by_status(self.crmuser.id, status=1)
+        self.assertEqual(len(contacts), 2)
 
     def test_get_cold_base(self):
-        self.assertEqual(len(Contact.get_cold_base()), 1)
+        crmuser = CRMUser.objects.first()
+        cold_contacts = Contact.get_cold_base(crmuser.id)
+        self.assertEqual(len(cold_contacts), 1)
 
     def test_change_status_without_save(self):
         self.assertEqual(self.contact1.status, 1)
@@ -125,20 +108,25 @@ class ContactTestCase(TestCase):
         self.assertNotEqual(contact.name, "Unknown")
 
     def test_filter_contacts_by_vcard(self):
-        cs = Contact.filter_contacts_by_vcard(search_text='Akerke Akerke',
-                                              search_params=[('fn')], order_by=[])
+        cs = Contact.filter_contacts_by_vcard(self.crmuser.id,
+                                              search_text='Akerke Akerke',
+                                              search_params=[('fn')],
+                                              order_by=[])
         self.assertEqual(len(cs), 1)
-        cs = Contact.filter_contacts_by_vcard(search_text='Akerke',
-                                              search_params=[('fn',
-                                                               'icontains')], order_by=[])
+        cs = Contact.filter_contacts_by_vcard(self.crmuser.id,
+                                              search_text='Akerke',
+                                              search_params=[('fn', 'icontains')],
+                                              order_by=[])
         self.assertEqual(len(cs), 1)
-        cs = Contact.filter_contacts_by_vcard(search_text='359',
-                                              search_params=[('tel__value',
-                                                              'icontains')], order_by=[])
+        cs = Contact.filter_contacts_by_vcard(self.crmuser.id,
+                                              search_text='359',
+                                              search_params=[('tel__value', 'icontains')],
+                                              order_by=[])
         self.assertEqual(len(cs), 1)
-        cs = Contact.filter_contacts_by_vcard(search_text='359',
-                                              search_params=[('fn',
-                                                              'icontains')], order_by=[])
+        cs = Contact.filter_contacts_by_vcard(self.crmuser.id,
+                                              search_text='359',
+                                              search_params=[('fn', 'icontains')],
+                                              order_by=[])
         self.assertEqual(len(cs), 0)
 
     def test_get_contacts_by_last_activity_date_without_activities(self):
@@ -146,27 +134,27 @@ class ContactTestCase(TestCase):
         self.assertEqual(len(contacts), 0)
 
     def test_get_contacts_by_last_activity_date(self):
-        user_id = 1
-        self.contact1.assign_user(user_id=1)
-        response = Contact.get_contacts_by_last_activity_date(user_id=1)
-        self.assertEqual(list(response.all()), [self.contact1])
+        crmuser = CRMUser.objects.first()
+        contacts = Contact.get_contacts_by_last_activity_date(user_id=crmuser.id, all=True)
+        subscr_contacts = Contact.objects.filter(subscription_id=crmuser.subscription_id)
+        self.assertEqual(contacts.count(), subscr_contacts.count())
 
     def test_export_to(self):
         self.assertFalse(self.contact1.export_to(tp='doc'))
         vcard = self.contact1.export_to(tp='vcard')
         tel = 'TEL;TYPE=CELL:%s' % self.contact1.tel()
-        self.assertTrue( tel in vcard )
+        self.assertTrue(tel in vcard)
 
     def test_properties(self):
         contact2 = Contact.objects.get(pk=2)
         contact2.vcard = None
-        self.assertEqual(contact2.name, 'Unknown')
+        self.assertEqual(contact2.name(), 'Unknown')
         self.assertEqual(contact2.tel(), 'Unknown')
         self.assertEqual(contact2.mobile(), 'Unknown')
         self.assertEqual(contact2.email(), 'Unknown')
         self.assertEqual(contact2.company(), 'Unknown organization')
-        self.assertEqual(Contact.objects.get(pk=3).company(), 'Unknown organization')
-
+        self.assertEqual(Contact.objects.get(pk=3).company(),
+                         'Unknown organization')
         self.assertEqual(self.contact1.tel(), Tel.objects.get(vcard=self.contact1.vcard).value)
         self.assertEqual(self.contact1.mobile(), Tel.objects.get(vcard=self.contact1.vcard).value)
         self.assertEqual(self.contact1.email(), Email.objects.get(vcard=self.contact1.vcard).value)
@@ -178,52 +166,59 @@ class ContactTestCase(TestCase):
 
     def test_to_html(self):
         html = self.contact1.to_html()
-        email = '%s<br />'%self.contact1.email()
+        email = '%s<br />' % self.contact1.email()
         self.assertTrue(email in html)
 
     def test_add_mentions(self):
         count = Mention.objects.all().count()
         self.contact1.add_mention(user_ids=1)
         self.assertEqual(Mention.objects.all().count(), count+1)
-        self.assertEqual(self.contact1.mentions.get(pk=1), Mention.objects.last())
+        self.assertEqual(self.contact1.mentions.get(pk=1),
+                         Mention.objects.last())
 
     def test_share_contacts(self):
         share_to = CRMUser.objects.get(id=1)
-        share_from = CRMUser.objects.get(id = 2)
-        self.assertFalse(Contact.share_contacts(share_from = share_from, share_to = share_to, contact_ids=[]))
+        share_from = CRMUser.objects.get(id=2)
+        shares = Contact.share_contacts(share_from=share_from,
+                                        share_to=share_to,
+                                        contact_ids=[])
+        self.assertFalse(shares)
 
     def test_get_contact_detail(self):
         self.assertEqual(Contact.get_contact_detail(1), self.contact1)
         self.assertEqual(Contact.get_contact_detail(1, True), self.contact1)
 
-    def test_import_contacts_from_vcard(self):
-        count  = Contact.objects.all().count()
+    def test_import_from_vcard(self):
+        count = Contact.objects.all().count()
         file_path = os.path.join(os.path.dirname(os.path.dirname(__file__)),
                                  'alm_crm/fixtures/nurlan.vcf')
-        contacts = Contact.import_contacts_from_vcard(open(file_path, "r"))
+        contacts = Contact.import_from_vcard(open(file_path, "r"))
 
-        contact1 =  Contact.filter_contacts_by_vcard(search_text='Aslan',
-                                              search_params=[('fn',
-                                                               'icontains')], order_by=[])
-        contact2 =  Contact.filter_contacts_by_vcard(search_text='Serik',
-                                              search_params=[('fn',
-                                                               'icontains')], order_by=[])
-        contact3 =  Contact.filter_contacts_by_vcard(search_text='Almat',
-                                              search_params=[('fn',
-                                                               'icontains')], order_by=[])
-        contact4 =  Contact.filter_contacts_by_vcard(search_text='Mukatayev',
-                                              search_params=[('fn',
-                                                               'icontains')], order_by=[])
+        contact1 = Contact.filter_contacts_by_vcard(self.crmuser.id,
+                                                    search_text='Aslan',
+                                                    search_params=[('fn', 'icontains')],
+                                                    order_by=[])
+        contact2 = Contact.filter_contacts_by_vcard(self.crmuser.id,
+                                                    search_text='Serik',
+                                                    search_params=[('fn', 'icontains')],
+                                                    order_by=[])
+        contact3 = Contact.filter_contacts_by_vcard(self.crmuser.id,
+                                                    search_text='Almat',
+                                                    search_params=[('fn', 'icontains')],
+                                                    order_by=[])
+        contact4 = Contact.filter_contacts_by_vcard(self.crmuser.id,
+                                                    search_text='Mukatayev',
+                                                    search_params=[('fn', 'icontains')],
+                                                    order_by=[])
         self.assertEqual(len(Contact.objects.all()), count+3)
         self.assertEqual(len(contact4), 3)
         self.assertTrue(contact1.first() in Contact.objects.all())
         self.assertTrue(contact2.first() in Contact.objects.all())
         self.assertTrue(contact3.first() in Contact.objects.all())
 
-
     def test_get_tp(self):
         tp_unicode = unicode(self.contact1.get_tp())
-        contact_tp =  self.contact1.tp + ' type'
+        contact_tp = self.contact1.tp + ' type'
         self.assertEqual(tp_unicode, contact_tp)
 
 
@@ -1274,6 +1269,7 @@ class ProductResourceTest(ResourceTestMixin, ResourceTestCase):
         self.assertHttpAccepted(resp)
         self.assertNotEqual(before, self.product.sales_cycles.count())
 
+
 class ContactResourceTest(ResourceTestMixin, ResourceTestCase):
 
     def setUp(self):
@@ -1332,6 +1328,7 @@ class ContactResourceTest(ResourceTestMixin, ResourceTestCase):
             lambda pk: self.deserialize(self.get_detail_resp(pk))
 
         self.contact = Contact.objects.first()
+        self.crmuser = self.contact.owner
 
     def test_get_list_valid_json(self):
         self.assertValidJSONResponse(self.get_list_resp)
@@ -1358,7 +1355,6 @@ class ContactResourceTest(ResourceTestMixin, ResourceTestCase):
                 len(a['comments'])
                 )
 
-
     def test_get_list_non_empty(self):
         self.assertTrue(self.get_list_des['meta']['total_count'] > 0)
 
@@ -1372,7 +1368,7 @@ class ContactResourceTest(ResourceTestMixin, ResourceTestCase):
         post_data = {
             'status': 1,
             'tp': 'user',
-            'assignees':[],
+            'assignees': [],
         }
 
         count = Contact.objects.count()
@@ -1395,59 +1391,23 @@ class ContactResourceTest(ResourceTestMixin, ResourceTestCase):
         # verify that one contact been deleted.
         self.assertEqual(Contact.objects.count(), count - 1)
 
-
     def test_get_last_contacted(self):
         recent = Contact.get_contacts_by_last_activity_date(1)
-        self.assertEqual(
-            len(self.get_list_recent_des['objects']),
-            len(recent)
-            )
+        self.assertEqual(len(self.get_list_recent_des['objects']),
+                         len(recent))
 
     def test_get_cold_base(self):
-        cold_base = Contact.get_cold_base()
+        cold_base = Contact.get_cold_base(self.crmuser.id)
         self.assertEqual(
             len(self.get_list_cold_base_des['objects']),
             len(cold_base)
             )
 
-
     def test_get_leads(self):
         STATUS_LEAD = 1
-        leads = Contact.get_contacts_by_status(STATUS_LEAD)
-        self.assertEqual(
-            len(self.get_list_leads_des['objects']),
-            len(leads)
-            )
-
-
-    def test_assign_contact(self):
-        count = self.contact.assignees.count()
-
-        self.assertHttpOK(self.api_client.get(
-            self.api_path_contact+'assign_contact/?user_id=1&contact_id=1'))
-
-        self.assertEqual(self.contact.assignees.count(), count)
-
-        self.assertHttpOK(self.api_client.get(
-            self.api_path_contact+'assign_contact/?user_id=2&contact_id=1'))
-
-        self.assertEqual(self.contact.assignees.count(), count+1)
-
-    def test_assign_contacts(self):
-        contact1 = Contact.objects.get(pk=2)
-        contact2 = Contact.objects.get(pk=3)
-        contact3 = Contact.objects.get(pk=4)
-
-        count1 = contact1.assignees.count()
-        count2 = contact2.assignees.count()
-        count3 = contact3.assignees.count()
-
-        self.assertHttpOK(self.api_client.get(
-            self.api_path_contact+'assign_contacts/?contact_ids=%5B2%2C3%2C4%5D&user_id=2'))
-
-        self.assertEqual(contact1.assignees.count(), count1+1)
-        self.assertEqual(contact2.assignees.count(), count2+1)
-        self.assertEqual(contact3.assignees.count(), count3+1)
+        leads = Contact.get_contacts_by_status(self.crmuser.id, STATUS_LEAD)
+        self.assertEqual(len(self.get_list_leads_des['objects']),
+                         len(leads))
 
     def test_share_contact(self):
         count = Share.objects.count()
@@ -1463,7 +1423,6 @@ class ContactResourceTest(ResourceTestMixin, ResourceTestCase):
         self.assertEqual(share_from, CRMUser.objects.get(pk=1))
         self.assertEqual(share_to, CRMUser.objects.get(pk=2))
 
-
     def test_share_contacts(self):
         count = Share.objects.count()
 
@@ -1472,22 +1431,29 @@ class ContactResourceTest(ResourceTestMixin, ResourceTestCase):
 
         self.assertEqual(Share.objects.count(), count+3)
 
-        share_to = CRMUser.objects.get(id = Share.objects.get(id=1).share_to.id)
-        share_from = CRMUser.objects.get(id = Share.objects.get(id=1).share_from.id)
-        comment = 'comment'
+        share_to = CRMUser.objects.get(id=Share.objects.get(id=1).share_to.id)
+        share_from = CRMUser.objects.get(id=Share.objects.get(id=1).share_from.id)
 
         self.assertEqual(share_from, CRMUser.objects.get(pk=1))
         self.assertEqual(share_to, CRMUser.objects.get(pk=2))
 
     def test_search(self):
-        search_text_A = Contact.filter_contacts_by_vcard(search_text='A', search_params=[('fn', 'startswith')],
-                                                             order_by=[])
-        srch_tx_A_ord_dc = Contact.filter_contacts_by_vcard(search_text='A', search_params=[('fn', 'startswith')],
-                                                             order_by=['fn','desc'])
-        srch_by_bday = Contact.filter_contacts_by_vcard(search_text='1991-09-10', search_params=['bday'],
-                                                             order_by=[])
-        srch_by_email = Contact.filter_contacts_by_vcard(search_text='mus', search_params=[('email__value','startswith')],
-                                                             order_by=[])
+        search_text_A = Contact.filter_contacts_by_vcard(self.crmuser.id,
+                                                         search_text='A',
+                                                         search_params=[('fn', 'startswith')],
+                                                         order_by=[])
+        srch_tx_A_ord_dc = Contact.filter_contacts_by_vcard(self.crmuser.id,
+                                                            search_text='A',
+                                                            search_params=[('fn', 'startswith')],
+                                                            order_by=['fn', 'desc'])
+        srch_by_bday = Contact.filter_contacts_by_vcard(self.crmuser.id,
+                                                        search_text='1991-09-10',
+                                                        search_params=['bday'],
+                                                        order_by=[])
+        srch_by_email = Contact.filter_contacts_by_vcard(self.crmuser.id,
+                                                         search_text='mus',
+                                                         search_params=[('email__value', 'startswith')],
+                                                         order_by=[])
 
 
         get_list_search_resp = self.api_client.get(self.api_path_contact+
@@ -1509,8 +1475,6 @@ class ContactResourceTest(ResourceTestMixin, ResourceTestCase):
                                             "search/?search_params=%5B('email__value'%2C+'startswith')%5D&search_text=mus",
                                             format='json',
                                             HTTP_HOST='localhost')
-
-
 
         get_list_search_des = self.deserialize(get_list_search_resp)
         get_list_search_ord_dc_des = self.deserialize(get_list_search_ord_dc_resp)

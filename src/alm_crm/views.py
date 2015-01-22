@@ -177,13 +177,15 @@ class ContactSearchListView(ListView):
     def get_context_data(self, **kwargs):
         context = super(self.__class__, self).get_context_data(**kwargs)
         try:
-            context['contacts'] = Contact().filter_contacts_by_vcard(
+            context['contacts'] = Contact.filter_contacts_by_vcard(
+                self.request.user.get_crmuser().id,
                 self.request.GET['query'],
-                [('given_name','startswith'),
-                ('family_name','startswith'),
-                ('email__value','icontains'),
-                ('tel__value','icontains'),
-                ('org__organization_name','startswith')
+                [
+                    ('given_name', 'startswith'),
+                    ('family_name', 'startswith'),
+                    ('email__value', 'icontains'),
+                    ('tel__value', 'icontains'),
+                    ('org__organization_name', 'startswith')
                 ]
                 ).order_by('vcard__given_name')
         except:

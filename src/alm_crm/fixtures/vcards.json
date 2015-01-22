@@ -75,5 +75,23 @@
             "vcard": 1,
             "value": "87753591453"
         }
+    },
+
+    {
+        "pk": 5,
+        "model": "alm_vcard.vcard",
+        "fields": {
+            "family_name": "Altel",
+            "uid": null,
+            "honorific_suffix": "",
+            "additional_name": "",
+            "rev": null,
+            "honorific_prefix": "",
+            "bday": "1999-09-09",
+            "given_name": "Tumar",
+            "sort_string": null,
+            "classP": null,
+            "fn": "Tumar Altel"
+        }
     }
 ]

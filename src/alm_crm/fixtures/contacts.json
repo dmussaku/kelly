@@ -54,5 +54,19 @@
         "subscription_id": 1,
         "vcard": 4
     }
+},
+{
+    "pk": 5,
+    "model": "alm_crm.contact",
+    "fields": {
+        "status": 1,
+        "latest_activity": null,
+        "tp": "user",
+        "parent": null,
+        "owner": 1,
+        "date_created": "2014-12-27T09:50:00Z",
+        "subscription_id": 1,
+        "vcard": 5
+    }
 }
 ]

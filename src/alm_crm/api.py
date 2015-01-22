@@ -754,16 +754,17 @@ class ContactResource(CRMServiceModelResource):
         '''
         limit = int(request.GET.get('limit', 20))
         offset = int(request.GET.get('offset', 0))
-        contacts = Contact.get_cold_base(limit, offset)
+
+        contacts = Contact.get_cold_base(request.user.get_crm.id)
         return self.create_response(
             request,
             {
-            'meta':{
-                'limit': limit,
-                'offset': offset
-            },
-            'objects': self.get_bundle_list(contacts, request)}
-            )
+                'meta': {
+                    'limit': limit,
+                    'offset': offset
+                },
+                'objects': self.get_bundle_list(contacts, request)
+            })
 
     def get_leads(self, request, **kwargs):
         '''
@@ -803,19 +804,16 @@ class ContactResource(CRMServiceModelResource):
         ... ]
 
         '''
-        STATUS_LEAD = 1
         limit = int(request.GET.get('limit', 20))
         offset = int(request.GET.get('offset', 0))
-        contacts = Contact.get_contacts_by_status(STATUS_LEAD, limit, offset)
+
+        STATUS_LEAD = 1
+        crmuser = request.user.get_crmuser()
+        contacts = Contact.get_contacts_by_status(crmuser.id, STATUS_LEAD)
         return self.create_response(
-            request,
-            {
-            'meta':{
-                'limit': limit,
-                'offset': offset
-            },
-            'objects': self.get_bundle_list(contacts, request)}
-            )
+            request, {
+                'objects': self.get_bundle_list(contacts, request)
+            })
 
     def get_products(self, request, **kwargs):
         '''
@@ -858,17 +856,14 @@ class ContactResource(CRMServiceModelResource):
         contact_id = kwargs.get('id')
         limit = int(request.GET.get('limit', 20))
         offset = int(request.GET.get('offset', 0))
-        products = Contact.get_contact_products(contact_id, limit=limit,
-                                                offset=offset)
+        products = Contact.get_contact_products(contact_id)
 
-        product_resource = ProductResource()
         obj_dict = {}
-        obj_dict['meta'] ={
+        obj_dict['meta'] = {
                 'limit': limit,
                 'offset': offset
             },
-        obj_dict['objects'] = product_resource.get_bundle_list(products,
-                                                               request)
+        obj_dict['objects'] = ProductResource().get_bundle_list(products, request)
         return self.create_response(request, obj_dict)
 
     def get_activities(self, request, **kwargs):
@@ -904,17 +899,14 @@ class ContactResource(CRMServiceModelResource):
         contact_id = kwargs.get('id')
         limit = int(request.GET.get('limit', 20))
         offset = int(request.GET.get('offset', 0))
-        activities = Contact.get_contact_activities(contact_id, limit=limit,
-                                                    offset=offset)
 
-        activity_resource = ActivityResource()
+        activities = Contact.get_contact_activities(contact_id)
         obj_dict = {}
-        obj_dict['meta'] ={
+        obj_dict['meta'] = {
                 'limit': limit,
                 'offset': offset
             },
-        obj_dict['objects'] = activity_resource.get_bundle_list(activities,
-                                                                request)
+        obj_dict['objects'] = ActivityResource().get_bundle_list(activities, request)
         return self.create_response(request, obj_dict)
 
     def search(self, request, **kwargs):
@@ -964,25 +956,20 @@ class ContactResource(CRMServiceModelResource):
         '''
         limit = int(request.GET.get('limit', 20))
         offset = int(request.GET.get('offset', 0))
+
         search_text = request.GET.get('search_text', '').encode('utf-8')
         search_params = ast.literal_eval(
             request.GET.get('search_params', "[('fn', 'startswith')]"))
         order_by = ast.literal_eval(request.GET.get('order_by', "['fn','asc']"))
         contacts = Contact.filter_contacts_by_vcard(
+            user_id=request.user.get_crmuser().id,
             search_text=search_text,
             search_params=search_params,
-            order_by=order_by,
-            limit=limit,
-            offset=offset)
+            order_by=order_by)
         return self.create_response(
-            request,
-            {
-            'meta':{
-                'limit': limit,
-                'offset': offset
-            },
-            'objects': self.get_bundle_list(contacts, request)}
-            )
+            request, {
+                'objects': self.get_bundle_list(contacts, request)
+            })
 
     def share_contact(self, request, **kwargs):
         '''
