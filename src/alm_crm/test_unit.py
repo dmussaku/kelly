@@ -897,6 +897,8 @@ class SalesCycleResourceTest(ResourceTestMixin, ResourceTestCase):
         self.assertEqual(SalesCycle.objects.count(), count - 1)
 
     def test_close_sales_cycle(self):
+        self.sales_cycle.is_global = False
+        self.sales_cycle.save()
         self.assertNotEqual(self.sales_cycle.status, 'C')
         put_data = {
             "1": 15000,
@@ -921,6 +923,20 @@ class SalesCycleResourceTest(ResourceTestMixin, ResourceTestCase):
                                                   product=Product.objects.get(id=2)).value
         self.assertEqual(stat1, 15000)
         self.assertEqual(stat2, 13500)
+        self.sales_cycle.is_global = True
+        self.sales_cycle.save()
+
+    def test_closeGlobalCycleRaiseError(self):
+        owner = CRMUser.objects.first()
+        sales_cycle = SalesCycle.objects.get(owner=owner, is_global=True)
+        put_data = {
+            '1': 10000,
+            '2': 3000
+        }
+        resp = self.api_client.put(
+            self.api_path_sales_cycle + str(sales_cycle.pk) + '/close/',
+            format='json', data=put_data)
+        self.assertHttpUnauthorized(resp)
 
 
 class ActivityResourceTest(ResourceTestMixin, ResourceTestCase):
