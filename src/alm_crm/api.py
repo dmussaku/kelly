@@ -42,17 +42,6 @@ from django.http import HttpResponse
 import datetime
 
 
-# def get_crmsubscr_id(request):
-#     user_env = request.user_env
-#     subscription_pk = None
-#     if 'subscriptions' in user_env:
-#         subscription_pk = filter(
-#             lambda x: user_env['subscription_{}'.format(x)]['slug'] == DEFAULT_SERVICE,
-#             user_env['subscriptions']
-#             )[0]
-#     return subscription_pk
-
-
 class CommonMeta:
     list_allowed_methods = ['get', 'post', 'patch']
     detail_allowed_methods = ['get', 'post', 'put', 'delete', 'patch']
@@ -814,9 +803,8 @@ class ContactResource(CRMServiceModelResource):
         limit = int(request.GET.get('limit', 20))
         offset = int(request.GET.get('offset', 0))
 
-        STATUS_LEAD = 1
         contacts = Contact.get_contacts_by_status(self.get_crmsubscr_id(request),
-                                                  STATUS_LEAD)
+                                                  Contact.LEAD)
         return self.create_response(
             request, {
                 'objects': self.get_bundle_list(contacts, request)
@@ -2193,14 +2181,19 @@ class AppStateObject(object):
 
     def get_constants(self):
         return {
-            'sales_cycle': {'statuses': SalesCycle.STATUS_OPTIONS},
+            'sales_cycle': {
+                'statuses': SalesCycle.STATUSES_OPTIONS,
+                'statuses_hash': SalesCycle.STATUSES_DICT
+            },
             'activity': {
-                'feedback_options': Feedback.STATUS_OPTIONS,
-                'feedback_hash': Feedback.STATUSES_HASH
+                'feedback_options': Feedback.STATUSES_OPTIONS,
+                'feedback_hash': Feedback.STATUSES_DICT
             },
             'contact': {
-                'statuses': Contact.STATUS_CODES,
-                'tp': Contact.TYPES_WITH_CAPS
+                'statuses': Contact.STATUSES_OPTIONS,
+                'statuses_hash': Contact.STATUSES_DICT,
+                'tp': Contact.TYPES_OPTIONS,
+                'tp_hash': Contact.TYPES_DICT
             },
             'vcard': {
                 'email': {'types': Email.TYPE_CHOICES},
