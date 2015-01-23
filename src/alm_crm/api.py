@@ -2194,7 +2194,10 @@ class AppStateObject(object):
     def get_constants(self):
         return {
             'sales_cycle': {'statuses': SalesCycle.STATUS_OPTIONS},
-            'activity': {'feedback': Feedback.STATUS_OPTIONS},
+            'activity': {
+                'feedback_options': Feedback.STATUS_OPTIONS,
+                'feedback_hash': Feedback.STATUSES_HASH
+            },
             'contact': {
                 'statuses': Contact.STATUS_CODES,
                 'tp': Contact.TYPES_WITH_CAPS
