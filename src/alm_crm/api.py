@@ -93,7 +93,7 @@ class CRMServiceModelResource(ModelResource):
 
     @classmethod
     def get_crmuser(cls, request):
-        subscription_pk = get_crm_subscription_id(request)
+        subscription_pk = cls.get_crmsubscr_id(request)
         crmuser = None
         if subscription_pk:
             crmuser = request.user.get_subscr_user(subscription_pk)
@@ -377,7 +377,7 @@ class ContactResource(CRMServiceModelResource):
     def full_hydrate(self, bundle, **kwargs):
         # t1 = time.time()
         contact_id = kwargs.get('pk', None)
-        subscription_id = get_crm_subscription_id(bundle.request)
+        subscription_id = self.get_crmsubscr_id(bundle.request)
         if contact_id:
             bundle.obj = Contact.objects.get(id=int(contact_id))
             bundle.obj.subscription_id = subscription_id
@@ -396,7 +396,7 @@ class ContactResource(CRMServiceModelResource):
         '''
         bundle = self.hydrate_sales_cycles(bundle)
         bundle = self.hydrate_parent(bundle)
-        if bundle.data.get('user_id',""):
+        if bundle.data.get('user_id', ""):
             bundle.obj.owner_id = int(bundle.data['user_id'])
         # if bundle.data.get('parent_id',""):
         #     bundle.obj.parent_id = int(bundle.data['parent_id'])
@@ -429,7 +429,7 @@ class ContactResource(CRMServiceModelResource):
 
     def vcard_full_hydrate(self, bundle):
         field_object = bundle.data.get('vcard',{})
-        subscription_id = get_crm_subscription_id(bundle.request)
+        subscription_id = self.get_crmsubscr_id(bundle.request)
         if bundle.obj.vcard:
             vcard = bundle.obj.vcard
         else:
@@ -1395,7 +1395,7 @@ class ActivityResource(CRMServiceModelResource):
         if bundle.data.get('sales_cycle_id', None):
             act.sales_cycle_id = bundle.data.get('sales_cycle_id')
         else:
-            _subscr_id = get_crm_subscription_id(bundle.request)
+            _subscr_id = self.get_crmsubscr_id(bundle.request)
             act.sales_cycle_id = SalesCycle.get_global(_subscr_id).pk
         act.save()
         if bundle.data.get('feedback_status'):
