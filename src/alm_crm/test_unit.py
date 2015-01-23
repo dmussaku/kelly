@@ -276,7 +276,7 @@ class ActivityTestCase(TestCase):
         a.save()
         self.assertEqual(a, Activity.objects.get(id=a.id))
         self.assertEqual(0, len(Feedback.objects.filter(id=a.id)))
-        f = Feedback(feedback='feedback8', status="W",
+        f = Feedback(feedback='feedback8', status=Feedback.WAITING,
                      date_created=timezone.now(), date_edited=timezone.now(),
                      activity=a, owner_id=1)
         f.save()
@@ -924,7 +924,7 @@ class SalesCycleResourceTest(ResourceTestMixin, ResourceTestCase):
         self.assertEqual(resp['sales_cycle']['status'], 'C')
         self.assertEqual(resp['sales_cycle']['real_value']['value'],
                          sum(put_data.values()))
-        self.assertEqual(resp['activity']['feedback_status'], '$')
+        self.assertEqual(resp['activity']['feedback_status'], Feedback.OUTCOME)
         stat1 = SalesCycleProductStat.objects.get(sales_cycle=self.sales_cycle,
                                                   product=Product.objects.get(id=1)).value
         stat2 = SalesCycleProductStat.objects.get(sales_cycle=self.sales_cycle,
@@ -995,7 +995,7 @@ class ActivityResourceTest(ResourceTestMixin, ResourceTestCase):
             'author_id': owner.id,
             'description': 'new activity',
             'sales_cycle_id': sales_cycle.id,
-            'feedback_status': '$'
+            'feedback_status': Feedback.OUTCOME
         }
         unfollowers = [
             unfollow.id for unfollow in sales_cycle.contact.unfollowers.all()]
@@ -1014,7 +1014,7 @@ class ActivityResourceTest(ResourceTestMixin, ResourceTestCase):
             'author_id': owner.id,
             'description': 'new activity',
             'sales_cycle_id': sales_cycle.id,
-            'feedback_status': '$'
+            'feedback_status': Feedback.OUTCOME
         }
         unfollowers = [
             unfollow.id for unfollow in sales_cycle.contact.unfollowers.all()]
@@ -1417,8 +1417,7 @@ class ContactResourceTest(ResourceTestMixin, ResourceTestCase):
             )
 
     def test_get_leads(self):
-        STATUS_LEAD = 1
-        leads = Contact.get_contacts_by_status(self.crm_subscr_id, STATUS_LEAD)
+        leads = Contact.get_contacts_by_status(self.crm_subscr_id, Contact.LEAD)
         self.assertEqual(len(self.get_list_leads_des['objects']),
                          len(leads))
 

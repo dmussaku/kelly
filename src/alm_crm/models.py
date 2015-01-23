@@ -14,13 +14,6 @@ from django.utils import timezone
 import datetime
 
 
-STATUSES_CAPS = (
-    _('new_contact'),
-    _('lead_contact'),
-    _('opportunity_contact'),
-    _('client_contact'))
-STATUSES = (NEW, LEAD, OPPORTUNITY, CLIENT) = range(len(STATUSES_CAPS))
-
 ALLOWED_TIME_PERIODS = ['week', 'month', 'year']
 
 CURRENCY_OPTIONS = (
@@ -86,21 +79,30 @@ class CRMUser(SubscriptionObject):
 
 
 class Contact(SubscriptionObject):
+    STATUSES_CAPS = (
+        _('new_contact'),
+        _('lead_contact'),
+        _('opportunity_contact'),
+        _('client_contact'))
+    STATUSES = (NEW, LEAD, OPPORTUNITY, CLIENT) = range(len(STATUSES_CAPS))
+    STATUSES_OPTIONS = zip(STATUSES, STATUSES_CAPS)
+    STATUSES_DICT = dict(zip(('NEW', 'LEAD', 'OPPORTUNITY', 'CLIENT'), STATUSES))
 
-    STATUS_CODES = zip(STATUSES, STATUSES_CAPS)
     TYPES = (COMPANY_TP, USER_TP) = ('co', 'user')
-    TYPES_WITH_CAPS = ((COMPANY_TP, _('company type')),
+    TYPES_OPTIONS = ((COMPANY_TP, _('company type')),
                        (USER_TP, _('user type')))
+    TYPES_DICT = dict(zip(('COMPANY', 'USER'), TYPES))
+
     SHARE_IMPORTED_TEXT = _('Imported at ')
 
     status = models.IntegerField(
         _('contact status'),
         max_length=30,
-        choices=STATUS_CODES, default=NEW)
+        choices=STATUSES_OPTIONS, default=NEW)
     tp = models.CharField(
         _('contact type'),
         max_length=30,
-        choices=TYPES_WITH_CAPS, default=USER_TP)
+        choices=TYPES_OPTIONS, default=USER_TP)
     date_created = models.DateTimeField(blank=True, auto_now_add=True)
     vcard = models.OneToOneField('alm_vcard.VCard', blank=True, null=True,
                                  on_delete=models.SET_NULL,)
@@ -170,19 +172,19 @@ class Contact(SubscriptionObject):
         return org.name
 
     def get_tp(self):
-        return dict(self.TYPES_WITH_CAPS).get(self.tp, None)
+        return dict(self.TYPES_OPTIONS).get(self.tp, None)
 
     def is_new(self):
-        return self.status == NEW
+        return self.status == self.NEW
 
     def is_lead(self):
-        return self.status == LEAD
+        return self.status == self.LEAD
 
     def is_opportunity(self):
-        return self.status == OPPORTUNITY
+        return self.status == self.OPPORTUNITY
 
     def is_client(self):
-        return self.status == CLIENT
+        return self.status == self.CLIENT
 
     def change_status(self, new_status, save=False):
         """TODO Set status to contact. Return instance (self)"""
@@ -295,8 +297,8 @@ class Contact(SubscriptionObject):
         if not created or instance.sales_cycle.is_global:
             return
         c = instance.sales_cycle.contact
-        if c.status == NEW:
-            c.status = LEAD
+        if c.status == cls.NEW:
+            c.status = cls.LEAD
             c.save()
 
     @classmethod
@@ -519,7 +521,7 @@ class Contact(SubscriptionObject):
             1. no assignee for contact
             2. status is NEW"""
         q = Q(subscription_id=subscription_id)
-        q &= Q(status=NEW)
+        q &= Q(status=cls.NEW)
         return cls.objects.filter(q).order_by('-date_created')
 
 
@@ -605,11 +607,14 @@ class Product(SubscriptionObject):
 
 
 class SalesCycle(SubscriptionObject):
-    STATUS_OPTIONS = (
-        ('N', 'New'),
-        ('P', 'Pending'),
-        ('C', 'Completed'),
-    )
+    STATUSES_CAPS = (
+        _('New'),
+        _('Pending'),
+        _('Completed'))
+    STATUSES = (NEW, PENDING, COMPLETED) = ('N', 'P', 'C')
+    STATUSES_OPTIONS = zip(STATUSES, STATUSES_CAPS)
+    STATUSES_DICT = dict(zip(('NEW', 'PENDING', 'COMPLETED'), STATUSES))
+
     is_global = models.BooleanField(default=False)
     title = models.CharField(max_length=100)
     description = models.CharField(max_length=500)
@@ -632,7 +637,7 @@ class SalesCycle(SubscriptionObject):
         Value, related_name='sales_cycle_as_real',
         null=True, blank=True,)
     status = models.CharField(max_length=2,
-                              choices=STATUS_OPTIONS, default='N')
+                              choices=STATUSES_OPTIONS, default=NEW)
     date_created = models.DateTimeField(blank=True, auto_now_add=True)
     from_date = models.DateTimeField(blank=False, auto_now_add=True)
     to_date = models.DateTimeField(blank=False, auto_now_add=True)
@@ -795,7 +800,7 @@ class SalesCycle(SubscriptionObject):
             s.value = value
             s.save()
 
-        self.status = 'C'
+        self.status = self.COMPLETED
         self.set_result_by_amount(amount)
         self.save()
 
@@ -805,7 +810,7 @@ class SalesCycle(SubscriptionObject):
             description=_('Closed. Amount Value is %(amount)s') % {'amount': amount}
             )
         activity.save()
-        activity.set_feedback_status('$', save_feedback=True)
+        activity.set_feedback_status(Feedback.OUTCOME, save_feedback=True)
         return [self, activity]
 
     @classmethod
@@ -1092,24 +1097,19 @@ class ActivityRecipient(SubscriptionObject):
 
 
 class Feedback(SubscriptionObject):
-    STATUS_OPTIONS = (
-        ('W', _('Waiting')),
-        ('$', _('Outcome')),
-        ('1', _('Client is happy')),
-        ('2', _('Client is ok')),
-        ('3', _('Client is angry'))
-        )
-    # uses in frontend, include icons
-    STATUSES_HASH = {
-        'WAITING':  'W',
-        'OUTCOME':  '$',
-        'POSITIVE': '1',
-        'NEUTRAL':  '2',
-        'NEGATIVE': '3'
-    }
+    STATUSES_CAPS = (
+        _('Waiting'),
+        _('Outcome'),
+        _('Client is happy'),
+        _('Client is OK'),
+        _('Client is angry'))
+    STATUSES = (WAITING, OUTCOME, POSITIVE, NEUTRAL, NEGATIVE) = ('W', '$', '1', '2', '3')
+    STATUSES_OPTIONS = zip(STATUSES, STATUSES_CAPS)
+    STATUSES_DICT = dict(zip(('WAITING', 'OUTCOME', 'POSITIVE', 'NEUTRAL', 'NEGATIVE'),
+                         STATUSES))
 
     feedback = models.CharField(max_length=300, null=True)
-    status = models.CharField(max_length=1, choices=STATUS_OPTIONS, default='W')
+    status = models.CharField(max_length=1, choices=STATUSES_OPTIONS, default=WAITING)
     date_created = models.DateTimeField(blank=True, auto_now_add=True)
     date_edited = models.DateTimeField(blank=True, auto_now_add=True)
     activity = models.OneToOneField(Activity, blank=False)
@@ -1122,7 +1122,7 @@ class Feedback(SubscriptionObject):
         return u"%s: %s" % (self.activity, self.status)
 
     def statusHuman(self):
-        statuses = filter(lambda x: x[0] == self.status, self.STATUS_OPTIONS)
+        statuses = filter(lambda x: x[0] == self.status, self.STATUSES_OPTIONS)
         return len(statuses) > 0 and statuses[0] or None
 
     def save(self, **kwargs):
