@@ -1093,13 +1093,21 @@ class ActivityRecipient(SubscriptionObject):
 
 class Feedback(SubscriptionObject):
     STATUS_OPTIONS = (
-        ('W', _('waiting')),
-        ('$', _('outcome')),
+        ('W', _('Waiting')),
+        ('$', _('Outcome')),
         ('1', _('Client is happy')),
-        ('2', _('Client is OK')),
-        ('3', _('Client is neutral')),
-        ('4', _('Client is disappointed')),
-        ('5', _('Client is angry')))
+        ('2', _('Client is ok')),
+        ('3', _('Client is angry'))
+        )
+    # uses in frontend, include icons
+    STATUSES_HASH = {
+        'WAITING':  'W',
+        'OUTCOME':  '$',
+        'POSITIVE': '1',
+        'NEUTRAL':  '2',
+        'NEGATIVE': '3'
+    }
+
     feedback = models.CharField(max_length=300, null=True)
     status = models.CharField(max_length=1, choices=STATUS_OPTIONS, default='W')
     date_created = models.DateTimeField(blank=True, auto_now_add=True)
