@@ -313,10 +313,11 @@ class BaseConfiguration(SubdomainConfiguration, Configuration):
         }
     }
 
+    USE_PROFILER = False   # degbug toolbar on/off
 
-class DevConfiguration(FileSettings('~/.almanet/almanet.conf.py'), BaseConfiguration):
-    #PARENT_HOST = 'alma.net:8000'
-    #SITE_DOMAIN = PARENT_HOST
+
+class DevConfiguration(
+        FileSettings('~/.almanet/almanet.conf.py'), BaseConfiguration):
     DEBUG = True
     TEMPLATE_DEBUG = DEBUG
 
@@ -328,7 +329,29 @@ class DevConfiguration(FileSettings('~/.almanet/almanet.conf.py'), BaseConfigura
     CORS_ALLOW_CREDENTIALS = True
 
 
-class TestConfiguration(FileSettings('~/.almanet/almanet.conf.py'), BaseConfiguration):
+class QAConfiguration(DevConfiguration):
+    USE_PROFILER = True
+
+    @classmethod
+    def pre_setup(cls):
+        cls.INSTALLED_APPS += ('debug_toolbar', 'debug_panel',)
+        cls.MIDDLEWARE_CLASSES += (
+            'debug_panel.middleware.DebugPanelMiddleware',)
+
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': rel('../..', 'qadb.sqlite3'),
+        },
+        'test': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': rel('../..', 'test_qadb.sqlite3'),
+        },
+    }
+
+
+class TestConfiguration(
+        FileSettings('~/.almanet/almanet.conf.py'), BaseConfiguration):
     SELENIUM_TESTSERVER_HOST = 'http://10.8.0.18'
 
     #PARENT_HOST = 'alma.net:8000'

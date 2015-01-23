@@ -96,3 +96,11 @@ if settings.DEBUG:
     urlpatterns += patterns(
         '',
         url(r'^email-previews', view=site.urls))
+
+
+if settings.USE_PROFILER:
+    import debug_toolbar
+    urlpatterns += patterns(
+        '',
+        url(r'^__debug__/', include(debug_toolbar.urls)),
+    )

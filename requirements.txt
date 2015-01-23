@@ -34,3 +34,5 @@ vobject==0.8.1c
 wsgiref==0.1.2
 psycopg2==2.5.4
 pillow==2.7.0
+django-debug-panel==0.8.0
+django-debug-toolbar==1.2.2
