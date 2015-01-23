@@ -37,7 +37,7 @@ def deploy():
     # make a backup
     with open(db_backup_filename, 'w') as f:
         management.call_command('dumpdata', database=main_database, stdout=f,
-                                exclude=['contenttypes'])
+                                exclude=['contenttypes', 'corsheaders'])
     load_fixtures()
 
 

@@ -456,8 +456,8 @@ class Contact(SubscriptionObject):
 
     @classmethod
     def get_contacts_by_last_activity_date(
-            cls, user_id, owned=True, mentioned=False, in_shares=False, all=False,
-            include_activities=False):
+            cls, subscription_id, user_id=None, owned=True, mentioned=False,
+            in_shares=False, all=False, include_activities=False):
         """TEST Returns list of contacts ordered by last activity date.
             Returns:
                 Queryset<Contact>
@@ -475,7 +475,7 @@ class Contact(SubscriptionObject):
             in this case return value is always instance of dict, so it is easier to process it
             at the same time, list of contacts always available through rv.keys()
         """
-        q0 = Q(subscription_id=CRMUser.get_subscription_id(user_id))
+        q0 = Q(subscription_id=subscription_id)
         q = Q()
         if not all:
             if owned:
@@ -817,8 +817,8 @@ class SalesCycle(SubscriptionObject):
 
     @classmethod
     def get_salescycles_by_last_activity_date(
-        cls, user_id, owned=True, mentioned=False, followed=False, all=False,
-            include_activities=False):
+        cls, subscription_id, user_id=None, owned=True, mentioned=False,
+        followed=False, all=False, include_activities=False):
         """Returns sales_cycles where user is owner, mentioned or followed
             ordered by last activity date.
 
@@ -833,13 +833,7 @@ class SalesCycle(SubscriptionObject):
             Raises:
                 User.DoesNotExist
         """
-
-        try:
-            CRMUser.objects.get(pk=user_id)
-        except CRMUser.DoesNotExist:
-            raise CRMUser.DoesNotExist
-
-        q0 = Q(subscription_id=CRMUser.get_subscription_id(user_id))
+        q0 = Q(subscription_id=subscription_id)
         q = Q()
         if not all:
             if owned:
@@ -1040,8 +1034,8 @@ class Activity(SubscriptionObject):
 
     @classmethod
     def get_activities_by_date_created(
-        cls, user_id, owned=True, mentioned=False, all=False,
-            include_sales_cycles=False):
+        cls, subscription_id, user_id=None, owned=True,
+        mentioned=False, all=False, include_sales_cycles=False):
         """Returns activities where crmuser is owner or mentioned
             ordered by created date.
 
@@ -1056,13 +1050,7 @@ class Activity(SubscriptionObject):
             Raises:
                 User.DoesNotExist
         """
-
-        try:
-            CRMUser.objects.get(pk=user_id)
-        except CRMUser.DoesNotExist:
-            raise CRMUser.DoesNotExist
-
-        q0 = Q(subscription_id=CRMUser.get_subscription_id(user_id))
+        q0 = Q(subscription_id=subscription_id)
         q = Q()
         if not all:
             if owned:
@@ -1388,7 +1376,7 @@ class Filter(SubscriptionObject):
         ('RT', _('recent')),
         ('CD', _('cold')),
         ('LD', _('lead')))
-    title = models.CharField(max_length=100)
+    title = models.CharField(max_length=100, default='')
     filter_text = models.CharField(max_length=500)
     owner = models.ForeignKey(CRMUser, related_name='owned_filter')
     base = models.CharField(max_length=6, choices=BASE_OPTIONS, default='all')
