@@ -1376,7 +1376,7 @@ class Filter(SubscriptionObject):
         ('RT', _('recent')),
         ('CD', _('cold')),
         ('LD', _('lead')))
-    title = models.CharField(max_length=100)
+    title = models.CharField(max_length=100, default='')
     filter_text = models.CharField(max_length=500)
     owner = models.ForeignKey(CRMUser, related_name='owned_filter')
     base = models.CharField(max_length=6, choices=BASE_OPTIONS, default='all')
