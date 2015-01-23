@@ -924,7 +924,7 @@ class Activity(SubscriptionObject):
         if save_feedback:
             self.feedback.save()
 
-    def spray(self):
+    def spray(self, subscription_id):
         if self.sales_cycle.is_global:
             unfollow_set = set([])
         else:
@@ -932,7 +932,8 @@ class Activity(SubscriptionObject):
                 unfollower.id for unfollower
                 in self.sales_cycle.contact.unfollowers.all()}
 
-        university_set = set(CRMUser.objects.all().values_list(
+        q = Q(subscription_id=subscription_id)
+        university_set = set(CRMUser.objects.filter(q).values_list(
                              'id', flat=True))
         followers = CRMUser.objects.filter(
             pk__in=(university_set - unfollow_set))
