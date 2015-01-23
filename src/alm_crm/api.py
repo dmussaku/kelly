@@ -34,6 +34,7 @@ from alm_vcard.api import VCardResource
 from almanet.models import Service
 from almanet.settings import DEFAULT_SERVICE
 from almanet.utils.api import RequestContext
+from almanet.utils.env import get_subscr_id
 import ast
 from tastypie.serializers import Serializer
 from django.db import models
@@ -2112,14 +2113,12 @@ class AppStateObject(object):
     def __init__(self, service_slug=None, request=None):
         if service_slug is None:
             return
-        service = Service.objects.get(slug=service_slug)
-
         self.request = request
         self.current_user = request.user
-        self.subscription = self.current_user.get_subscr_by_service(service)
-        self.company = self.subscription.organization
+        self.subscription_id = get_subscr_id(request.user_env, service_slug)
+        self.company = request.user.get_company()
         self.current_crmuser = \
-            request.user.get_subscr_user(self.subscription.pk)
+            request.user.get_subscr_user(self.subscription_id)
 
         self.objects = {
             'users': self.get_users(),
@@ -2136,37 +2135,37 @@ class AppStateObject(object):
         self.session = self.get_session()
 
     def get_users(self):
-        crmusers, users = CRMUser.get_crmusers(self.subscription.id, with_users=True)
+        crmusers, users = CRMUser.get_crmusers(
+            self.subscription_id, with_users=True)
         return CRMUserResource().get_bundle_list(crmusers, self.request)
 
     def get_company(self):
         data = model_to_dict(self.company, fields=['name', 'subdomain', 'id'])
         crmuser = \
-            self.company.owner.first().get_subscr_user(self.subscription.pk)
+            self.company.owner.first().get_subscr_user(self.subscription_id)
         data.update({'owner_id': crmuser.pk})
         return [data]
 
     def get_contacts(self):
         contacts = Contact.get_contacts_by_last_activity_date(
-            self.current_crmuser.pk, all=True)
+            self.subscription_id, all=True)
 
         return ContactResource().get_bundle_list(contacts, self.request)
 
     def get_sales_cycles(self):
         sales_cycles = SalesCycle.get_salescycles_by_last_activity_date(
-            self.current_crmuser.pk, all=True, include_activities=False)
+            self.subscription_id, all=True, include_activities=False)
 
         return SalesCycleResource().get_bundle_list(sales_cycles, self.request)
 
     def get_activities(self):
         activities = Activity.get_activities_by_date_created(
-            self.current_crmuser.pk, all=True, include_sales_cycles=False)
+            self.subscription_id, all=True, include_sales_cycles=False)
 
         return ActivityResource().get_bundle_list(activities, self.request)
 
     def get_filters(self):
-        filters = Filter.get_filters_by_crmuser(
-            self.current_crmuser.pk)
+        filters = Filter.get_filters_by_crmuser(self.subscription_id)
         return FilterResource().get_bundle_list(filters, self.request)
 
     def get_products(self):
@@ -2175,12 +2174,10 @@ class AppStateObject(object):
 
     def get_sales_cycle2products_map(self):
         sales_cycles = SalesCycle.get_salescycles_by_last_activity_date(
-            self.current_crmuser.pk, all=True, include_activities=False)
-
+            self.subscription_id, all=True, include_activities=False)
         data = {}
         for sc in sales_cycles:
             data[sc.id] = list(sc.products.values_list('pk', flat=True))
-
         return data
 
     def get_shares(self):
