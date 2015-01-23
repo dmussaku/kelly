@@ -246,7 +246,10 @@ class BaseConfiguration(SubdomainConfiguration, Configuration):
     EMAIL_BACKEND = 'djrill.mail.backends.djrill.DjrillBackend'
     MANDRILL_API_KEY = 'RcETDKfvxER6iYnJ70DuyA'
     ADMINS = (('Rustem', 'r.kamun@gmail.com'),
-              ('Yernar', 'mailubai@gmail.com'))
+              ('Yernar', 'mailubai@gmail.com'),
+              ('Askhat', 'askhat.omarov91@gmail.com'),
+              ('Sattar', 'sattar.stamkul@gmail.com'),
+              ('Danik', 'dmussaku@gmail.com'),)
     MANAGERS = ADMINS
     BCC_EMAILS = ()
 
