@@ -63,6 +63,9 @@ class CommonMeta:
 
 class CRMServiceModelResource(ModelResource):
 
+    def apply_authorization_limits(self, request, object_list):
+        return object_list.filter(subscription_id=self.get_crmsubscr_id(request))
+
     def hydrate(self, bundle):
         """
         bundle.request.user_env is empty dict{}
@@ -1293,23 +1296,6 @@ class ActivityResource(CRMServiceModelResource):
             'owner': ALL_WITH_RELATIONS,
             'sales_cycle': ALL_WITH_RELATIONS}
 
-    def dehydrate(self, bundle):
-        recip = bundle.obj.recipients.filter(
-            user__pk=bundle.obj.owner_id).first()
-        if not recip or recip.has_read:
-            bundle.data['has_read'] = True
-        else:
-            bundle.data['has_read'] = False
-        return bundle
-
-    def dehydrate_sales_cycle_id(self, bundle):
-        return bundle.obj.sales_cycle_id
-
-    def dehydrate_feedback_status(self, bundle):
-        if hasattr(bundle.obj, 'feedback'):
-            return bundle.obj.feedback.status
-        return None
-
     def prepend_urls(self):
         return [
             url(
@@ -1343,6 +1329,23 @@ class ActivityResource(CRMServiceModelResource):
                 name='api_contact_activities'
             ),
         ]
+
+    def dehydrate(self, bundle):
+        recip = bundle.obj.recipients.filter(
+            user__pk=bundle.obj.owner_id).first()
+        if not recip or recip.has_read:
+            bundle.data['has_read'] = True
+        else:
+            bundle.data['has_read'] = False
+        return bundle
+
+    def dehydrate_sales_cycle_id(self, bundle):
+        return bundle.obj.sales_cycle_id
+
+    def dehydrate_feedback_status(self, bundle):
+        if hasattr(bundle.obj, 'feedback'):
+            return bundle.obj.feedback.status
+        return None
 
     def build_filters(self, filters=None):
         filters = super(self.__class__, self).build_filters(filters=filters)
@@ -1412,7 +1415,7 @@ class ActivityResource(CRMServiceModelResource):
                 status=bundle.data.get('feedback_status', None),
                 owner_id=act.author_id)
             act.feedback.save()
-        act.spray()
+        act.spray(self.get_crmsubscr_id(bundle.request))
         bundle = self.full_hydrate(bundle)
         return bundle
 
@@ -1527,11 +1530,9 @@ class ValueResource(CRMServiceModelResource):
     value = fields.IntegerField(attribute='amount')
 
     class Meta(CommonMeta):
+        queryset = Value.objects.all()
         resource_name = 'sales_cycle/value'
         excludes = ['amount']
-
-    def apply_authorization_limits(self, request, object_list):
-        return object_list.filter(subscription_id=self.get_crmsubscr_id(request))
 
 
 class CRMUserResource(CRMServiceModelResource):
@@ -1552,17 +1553,6 @@ class CRMUserResource(CRMServiceModelResource):
         queryset = CRMUser.objects.all()
         resource_name = 'crmuser'
 
-    def dehydrate_unfollow_list(self, bundle):
-        return [contact.id for contact in bundle.obj.unfollow_list.all()]
-
-    def full_dehydrate(self, bundle, for_list=False):
-        bundle = super(self.__class__, self).full_dehydrate(bundle, for_list=True)
-        user = bundle.obj.get_billing_user()
-        bundle.data['user'] = user.id
-        if user.userpic:
-            bundle.data['userpic'] = user.userpic.url
-        return bundle
-
     def prepend_urls(self):
         return [
             url(
@@ -1572,6 +1562,10 @@ class CRMUserResource(CRMServiceModelResource):
                 name='api_follow_unfollow'
             ),
         ]
+
+    def dehydrate_unfollow_list(self, bundle):
+        return [contact.id for contact in bundle.obj.unfollow_list.all()]
+
     def dehydrate_vcard(self, bundle):
         try:
             user = bundle.obj.get_billing_user()
@@ -1581,6 +1575,14 @@ class CRMUserResource(CRMServiceModelResource):
                             )
         except:
             return None
+
+    def full_dehydrate(self, bundle, for_list=False):
+        bundle = super(self.__class__, self).full_dehydrate(bundle, for_list=True)
+        user = bundle.obj.get_billing_user()
+        bundle.data['user'] = user.id
+        if user.userpic:
+            bundle.data['userpic'] = user.userpic.url
+        return bundle
 
     def follow_unfollow(self, request, **kwargs):
         data = self.deserialize(request, request.body, format=request.META.get('CONTENT_TYPE', 'application/json'))
@@ -2358,11 +2360,10 @@ class AppStateResource(Resource):
         '''
         pass limit and offset with GET request
         '''
-        current_crmuser = CRMServiceModelResource.get_crmuser(request)
-
-        activities, sales_cycles, s2a_map = Activity.get_activities_by_date_created(
-            self.get_crmsubscr_id(request), owned=True, mentioned=True,
-            include_sales_cycles=True)
+        activities, sales_cycles, s2a_map = \
+            Activity.get_activities_by_date_created(self.get_crmsubscr_id(request),
+                                                    owned=True, mentioned=True,
+                                                    include_sales_cycles=True)
 
         return self.create_response(
             request,
