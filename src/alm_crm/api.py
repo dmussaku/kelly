@@ -31,7 +31,6 @@ from .models import (
     )
 from alm_vcard.models import *
 from alm_vcard.api import VCardResource
-from almanet.models import Service
 from almanet.settings import DEFAULT_SERVICE
 from almanet.utils.api import RequestContext
 from almanet.utils.env import get_subscr_id
@@ -43,15 +42,15 @@ from django.http import HttpResponse
 import datetime
 
 
-def get_crm_subscription_id(request):
-    user_env = request.user_env
-    subscription_pk = None
-    if 'subscriptions' in user_env:
-        subscription_pk = filter(
-            lambda x: user_env['subscription_{}'.format(x)]['slug'] == DEFAULT_SERVICE,
-            user_env['subscriptions']
-            )[0]
-    return subscription_pk
+# def get_crmsubscr_id(request):
+#     user_env = request.user_env
+#     subscription_pk = None
+#     if 'subscriptions' in user_env:
+#         subscription_pk = filter(
+#             lambda x: user_env['subscription_{}'.format(x)]['slug'] == DEFAULT_SERVICE,
+#             user_env['subscriptions']
+#             )[0]
+#     return subscription_pk
 
 
 class CommonMeta:
@@ -95,6 +94,10 @@ class CRMServiceModelResource(ModelResource):
         bundle = self.build_bundle(obj=obj, request=request)
         bundle = self.full_dehydrate(bundle)
         return bundle
+
+    @classmethod
+    def get_crmsubscr_id(cls, request):
+        return get_subscr_id(request.user_env, DEFAULT_SERVICE)
 
     @classmethod
     def get_crmuser(cls, request):
@@ -756,7 +759,7 @@ class ContactResource(CRMServiceModelResource):
         limit = int(request.GET.get('limit', 20))
         offset = int(request.GET.get('offset', 0))
 
-        contacts = Contact.get_cold_base(request.user.get_crm.id)
+        contacts = Contact.get_cold_base(self.get_crmsubscr_id(request))
         return self.create_response(
             request,
             {
@@ -809,8 +812,8 @@ class ContactResource(CRMServiceModelResource):
         offset = int(request.GET.get('offset', 0))
 
         STATUS_LEAD = 1
-        crmuser = request.user.get_crmuser()
-        contacts = Contact.get_contacts_by_status(crmuser.id, STATUS_LEAD)
+        contacts = Contact.get_contacts_by_status(self.get_crmsubscr_id(request),
+                                                  STATUS_LEAD)
         return self.create_response(
             request, {
                 'objects': self.get_bundle_list(contacts, request)
@@ -963,7 +966,7 @@ class ContactResource(CRMServiceModelResource):
             request.GET.get('search_params', "[('fn', 'startswith')]"))
         order_by = ast.literal_eval(request.GET.get('order_by', "['fn','asc']"))
         contacts = Contact.filter_contacts_by_vcard(
-            user_id=request.user.get_crmuser().id,
+            subscription_id=self.get_crmsubscr_id(request),
             search_text=search_text,
             search_params=search_params,
             order_by=order_by)
@@ -1524,9 +1527,11 @@ class ValueResource(CRMServiceModelResource):
     value = fields.IntegerField(attribute='amount')
 
     class Meta(CommonMeta):
-        queryset = Value.objects.all()
         resource_name = 'sales_cycle/value'
         excludes = ['amount']
+
+    def apply_authorization_limits(self, request, object_list):
+        return object_list.filter(subscription_id=self.get_crmsubscr_id(request))
 
 
 class CRMUserResource(CRMServiceModelResource):
@@ -1660,7 +1665,7 @@ class ShareResource(CRMServiceModelResource):
         limit = int(request.GET.get('limit', 20))
         offset = int(request.GET.get('offset', 0))
 
-        shares = Share.get_shares(request.user.get_crmuser().id)
+        shares = Share.get_shares(self.get_crmsubscr_id(request))
         return self.create_response(
             request,
             {'objects': self.get_bundle_list(shares, request)}
@@ -2169,7 +2174,7 @@ class AppStateObject(object):
         return FilterResource().get_bundle_list(filters, self.request)
 
     def get_products(self):
-        products = Product.get_products(self.current_crmuser.pk)
+        products = Product.get_products(self.subscription_id)
         return ProductResource().get_bundle_list(products, self.request)
 
     def get_sales_cycle2products_map(self):
@@ -2181,7 +2186,7 @@ class AppStateObject(object):
         return data
 
     def get_shares(self):
-        shares = Share.get_shares_in_for(self.current_crmuser.pk)
+        shares = Share.get_shares_in_for(self.subscription_id)
         return ShareResource().get_bundle_list(shares, self.request)
 
     def get_constants(self):
@@ -2356,7 +2361,7 @@ class AppStateResource(Resource):
         current_crmuser = CRMServiceModelResource.get_crmuser(request)
 
         activities, sales_cycles, s2a_map = Activity.get_activities_by_date_created(
-            current_crmuser.pk, owned=True, mentioned=True,
+            self.get_crmsubscr_id(request), owned=True, mentioned=True,
             include_sales_cycles=True)
 
         return self.create_response(

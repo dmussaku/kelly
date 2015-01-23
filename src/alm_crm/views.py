@@ -3,11 +3,8 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.contenttypes.models import ContentType
 from django.shortcuts import render, get_object_or_404
 from django.db.models import Q
-from django.utils import timezone
-from datetime import timedelta
 from django.views.generic import ListView, DetailView, TemplateView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
-from django.views.generic.base import View
 from almanet.url_resolvers import reverse_lazy, reverse as almanet_reverse
 from almanet import settings
 from models import (
@@ -21,6 +18,7 @@ from models import (
     Product,
     Share
     )
+from alm_vcard.models import VCard
 from forms import (
     ContactForm,
     SalesCycleForm,
@@ -31,10 +29,13 @@ from forms import (
     ShareForm,
     ValueForm,
     )
-from alm_vcard.forms import VCardUploadForm
+from alm_vcard.forms import VCardUploadForm, VCardForm
 from django.shortcuts import render_to_response
-from alm_vcard.models import VCard
-from alm_vcard.forms import VCardForm
+from almanet.utils.env import get_subscr_id
+
+
+def get_crmsubscr_id(request):
+    get_subscr_id(request.user_env, settings.DEFAULT_SERVICE)
 
 
 class CRMWelcomeView(TemplateView):
@@ -52,7 +53,8 @@ class FeedView(TemplateView):
 
         crmuser_id = self.request.user.get_crmuser().id
         sales_cycles_data = SalesCycle.get_salescycles_by_last_activity_date(
-            crmuser_id, owned=False, mentioned=True, followed=True)
+            get_crmsubscr_id(self.request), crmuser_id, owned=False,
+            mentioned=True, followed=True)
         context['feed_activities'] = sales_cycles_data[1]
 
         return context
@@ -178,7 +180,7 @@ class ContactSearchListView(ListView):
         context = super(self.__class__, self).get_context_data(**kwargs)
         try:
             context['contacts'] = Contact.filter_contacts_by_vcard(
-                self.request.user.get_crmuser().id,
+                get_crmsubscr_id(self.request),
                 self.request.GET['query'],
                 [
                     ('given_name', 'startswith'),

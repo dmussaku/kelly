@@ -25,17 +25,18 @@ from alm_crm.models import GLOBAL_CYCLE_TITLE
 
 
 class CRMUserTestCase(TestCase):
-    fixtures=['crmusers.json', 'users.json']
+    fixtures = ['crmusers.json', 'users.json']
 
     def setUp(self):
         super(CRMUserTestCase, self).setUp()
-        self.crmuser=CRMUser.objects.first()
+        self.crmuser = CRMUser.objects.first()
 
     def test_unicode(self):
         self.assertEqual(str(self.crmuser), 'Bruce Wayne')
 
     def test_get_billing_user(self):
-        self.assertEqual(self.crmuser.get_billing_user(), User.objects.get(pk=self.crmuser.user_id))
+        self.assertEqual(self.crmuser.get_billing_user(),
+                         User.objects.get(pk=self.crmuser.user_id))
 
     def test_set_supervisor(self):
         self.crmuser.set_supervisor()
@@ -62,14 +63,14 @@ class ContactTestCase(TestCase):
         super(ContactTestCase, self).setUp()
         self.contact1 = Contact.objects.get(pk=1)
         self.crmuser = self.contact1.owner
+        self.crm_subscr_id = CRMUser.get_subscription_id(self.crmuser.id)
 
     def test_get_contacts_by_status(self):
-        contacts = Contact.get_contacts_by_status(self.crmuser.id, status=1)
+        contacts = Contact.get_contacts_by_status(self.crm_subscr_id, status=1)
         self.assertEqual(len(contacts), 2)
 
     def test_get_cold_base(self):
-        crmuser = CRMUser.objects.first()
-        cold_contacts = Contact.get_cold_base(crmuser.id)
+        cold_contacts = Contact.get_cold_base(self.crm_subscr_id)
         self.assertEqual(len(cold_contacts), 1)
 
     def test_change_status_without_save(self):
@@ -108,35 +109,35 @@ class ContactTestCase(TestCase):
         self.assertNotEqual(contact.name, "Unknown")
 
     def test_filter_contacts_by_vcard(self):
-        cs = Contact.filter_contacts_by_vcard(self.crmuser.id,
+        cs = Contact.filter_contacts_by_vcard(self.crm_subscr_id,
                                               search_text='Akerke Akerke',
                                               search_params=[('fn')],
                                               order_by=[])
         self.assertEqual(len(cs), 1)
-        cs = Contact.filter_contacts_by_vcard(self.crmuser.id,
+        cs = Contact.filter_contacts_by_vcard(self.crm_subscr_id,
                                               search_text='Akerke',
                                               search_params=[('fn', 'icontains')],
                                               order_by=[])
         self.assertEqual(len(cs), 1)
-        cs = Contact.filter_contacts_by_vcard(self.crmuser.id,
+        cs = Contact.filter_contacts_by_vcard(self.crm_subscr_id,
                                               search_text='359',
                                               search_params=[('tel__value', 'icontains')],
                                               order_by=[])
         self.assertEqual(len(cs), 1)
-        cs = Contact.filter_contacts_by_vcard(self.crmuser.id,
+        cs = Contact.filter_contacts_by_vcard(self.crm_subscr_id,
                                               search_text='359',
                                               search_params=[('fn', 'icontains')],
                                               order_by=[])
         self.assertEqual(len(cs), 0)
 
     def test_get_contacts_by_last_activity_date_without_activities(self):
-        contacts = Contact.get_contacts_by_last_activity_date(user_id=3)
+        contacts = Contact.get_contacts_by_last_activity_date(subscription_id=1)
         self.assertEqual(len(contacts), 0)
 
     def test_get_contacts_by_last_activity_date(self):
-        crmuser = CRMUser.objects.first()
-        contacts = Contact.get_contacts_by_last_activity_date(user_id=crmuser.id, all=True)
-        subscr_contacts = Contact.objects.filter(subscription_id=crmuser.subscription_id)
+        contacts = Contact.get_contacts_by_last_activity_date(self.crm_subscr_id,
+                                                              all=True)
+        subscr_contacts = Contact.objects.filter(subscription_id=self.crm_subscr_id)
         self.assertEqual(contacts.count(), subscr_contacts.count())
 
     def test_export_to(self):
@@ -194,19 +195,19 @@ class ContactTestCase(TestCase):
                                  'alm_crm/fixtures/nurlan.vcf')
         contacts = Contact.import_from_vcard(open(file_path, "r"))
 
-        contact1 = Contact.filter_contacts_by_vcard(self.crmuser.id,
+        contact1 = Contact.filter_contacts_by_vcard(self.crm_subscr_id,
                                                     search_text='Aslan',
                                                     search_params=[('fn', 'icontains')],
                                                     order_by=[])
-        contact2 = Contact.filter_contacts_by_vcard(self.crmuser.id,
+        contact2 = Contact.filter_contacts_by_vcard(self.crm_subscr_id,
                                                     search_text='Serik',
                                                     search_params=[('fn', 'icontains')],
                                                     order_by=[])
-        contact3 = Contact.filter_contacts_by_vcard(self.crmuser.id,
+        contact3 = Contact.filter_contacts_by_vcard(self.crm_subscr_id,
                                                     search_text='Almat',
                                                     search_params=[('fn', 'icontains')],
                                                     order_by=[])
-        contact4 = Contact.filter_contacts_by_vcard(self.crmuser.id,
+        contact4 = Contact.filter_contacts_by_vcard(self.crm_subscr_id,
                                                     search_text='Mukatayev',
                                                     search_params=[('fn', 'icontains')],
                                                     order_by=[])
@@ -240,14 +241,14 @@ class ProductTestCase(TestCase):
     def setUp(self):
         super(ProductTestCase, self).setUp()
         self.product = Product.objects.get(pk=1)
-        self.crmuser = self.product.owner
+        self.crm_subscr_id = 1
 
     def test_unicode(self):
         self.assertEqual(self.product.__unicode__(), 'p1')
 
     def test_get_products(self):
         self.assertEqual(len(Product.objects.all()),
-                         len(Product.get_products(self.crmuser.id)))
+                         len(Product.get_products(self.crm_subscr_id)))
 
 
 class ActivityTestCase(TestCase):
@@ -436,6 +437,7 @@ class SalesCycleTestCase(TestCase):
         super(SalesCycleTestCase, self).setUp()
         self.sc1 = SalesCycle.objects.get(pk=1)
         self.crmusers = self.sc1.owner
+        self.crm_subscr_id = 1
 
     def get_sc(self, pk):
         return SalesCycle.objects.get(pk=pk)
@@ -494,14 +496,18 @@ class SalesCycleTestCase(TestCase):
 
     def test_get_salescycles_by_last_activity_date(self):
         user_id = 1
-        ret = SalesCycle.get_salescycles_by_last_activity_date(user_id, include_activities=True)
+        ret = SalesCycle.get_salescycles_by_last_activity_date(self.crm_subscr_id,
+                                                               user_id,
+                                                               include_activities=True)
         self.assertEqual(sorted(list(ret[0].values_list('pk', flat=True))), [1, 2, 3])
         self.assertEqual(sorted(list(ret[1].values_list('pk', flat=True))), range(1, 8))
         self.assertItemsEqual(ret[2], {1: [1, 3], 2: [2], 3: []})
 
     def test_get_salescycles_by_last_activity_date_with_mentioned(self):
         user_id = 1
-        ret = SalesCycle.get_salescycles_by_last_activity_date(user_id, mentioned=True,
+        ret = SalesCycle.get_salescycles_by_last_activity_date(self.crm_subscr_id,
+                                                               user_id,
+                                                               mentioned=True,
                                                                include_activities=True)
         self.assertEqual(sorted(list(ret[0].values_list('pk', flat=True))), [1, 2, 3, 4])
         self.assertEqual(sorted(list(ret[1].values_list('pk', flat=True))), range(1, 8))
@@ -509,7 +515,9 @@ class SalesCycleTestCase(TestCase):
 
     def test_get_salescycles_by_last_activity_date_only_mentioned(self):
         user_id = 1
-        ret = SalesCycle.get_salescycles_by_last_activity_date(user_id, owned=False,
+        ret = SalesCycle.get_salescycles_by_last_activity_date(self.crm_subscr_id,
+                                                               user_id,
+                                                               owned=False,
                                                                mentioned=True,
                                                                include_activities=True)
         self.assertEqual(list(ret[0].values_list('pk', flat=True)), [4])
@@ -518,7 +526,8 @@ class SalesCycleTestCase(TestCase):
 
     def test_get_salescycles_by_last_activity_date_only_followed(self):
         user_id = 1
-        ret = SalesCycle.get_salescycles_by_last_activity_date(user_id,
+        ret = SalesCycle.get_salescycles_by_last_activity_date(self.crm_subscr_id,
+                                                               user_id,
                                                                owned=False,
                                                                mentioned=False,
                                                                followed=True,
@@ -539,7 +548,8 @@ class SalesCycleTestCase(TestCase):
             self.assertTrue(raised)
 
         try:
-            SalesCycle.get_salescycles_by_last_activity_date(user_id)
+            SalesCycle.get_salescycles_by_last_activity_date(self.crm_subscr_id,
+                                                             user_id)
         except CRMUser.DoesNotExist:
             raised = True
         else:
@@ -1331,7 +1341,7 @@ class ContactResourceTest(ResourceTestMixin, ResourceTestCase):
             lambda pk: self.deserialize(self.get_detail_resp(pk))
 
         self.contact = Contact.objects.first()
-        self.crmuser = self.contact.owner
+        self.crm_subscr_id = 1
 
     def test_get_list_valid_json(self):
         self.assertValidJSONResponse(self.get_list_resp)
@@ -1400,7 +1410,7 @@ class ContactResourceTest(ResourceTestMixin, ResourceTestCase):
                          len(recent))
 
     def test_get_cold_base(self):
-        cold_base = Contact.get_cold_base(self.crmuser.id)
+        cold_base = Contact.get_cold_base(self.crm_subscr_id)
         self.assertEqual(
             len(self.get_list_cold_base_des['objects']),
             len(cold_base)
@@ -1408,7 +1418,7 @@ class ContactResourceTest(ResourceTestMixin, ResourceTestCase):
 
     def test_get_leads(self):
         STATUS_LEAD = 1
-        leads = Contact.get_contacts_by_status(self.crmuser.id, STATUS_LEAD)
+        leads = Contact.get_contacts_by_status(self.crm_subscr_id, STATUS_LEAD)
         self.assertEqual(len(self.get_list_leads_des['objects']),
                          len(leads))
 
@@ -1441,19 +1451,19 @@ class ContactResourceTest(ResourceTestMixin, ResourceTestCase):
         self.assertEqual(share_to, CRMUser.objects.get(pk=2))
 
     def test_search(self):
-        search_text_A = Contact.filter_contacts_by_vcard(self.crmuser.id,
+        search_text_A = Contact.filter_contacts_by_vcard(self.crm_subscr_id,
                                                          search_text='A',
                                                          search_params=[('fn', 'startswith')],
                                                          order_by=[])
-        srch_tx_A_ord_dc = Contact.filter_contacts_by_vcard(self.crmuser.id,
+        srch_tx_A_ord_dc = Contact.filter_contacts_by_vcard(self.crm_subscr_id,
                                                             search_text='A',
                                                             search_params=[('fn', 'startswith')],
                                                             order_by=['fn', 'desc'])
-        srch_by_bday = Contact.filter_contacts_by_vcard(self.crmuser.id,
+        srch_by_bday = Contact.filter_contacts_by_vcard(self.crm_subscr_id,
                                                         search_text='1991-09-10',
                                                         search_params=['bday'],
                                                         order_by=[])
-        srch_by_email = Contact.filter_contacts_by_vcard(self.crmuser.id,
+        srch_by_email = Contact.filter_contacts_by_vcard(self.crm_subscr_id,
                                                          search_text='mus',
                                                          search_params=[('email__value', 'startswith')],
                                                          order_by=[])

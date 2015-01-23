@@ -122,9 +122,9 @@ class Contact(SubscriptionObject):
 
     def __unicode__(self):
         try:
-            return "%s %s" % (self.vcard.fn, self.tp)
+            return u"%s %s" % (self.vcard.fn, self.tp)
         except:
-            return "No name %s " % self.tp
+            return "No name %s" % self.tp
 
     def delete(self):
         if self.vcard:
@@ -192,7 +192,7 @@ class Contact(SubscriptionObject):
         return self
 
     def export_to(self, tp, **options):
-        if not tp in ('html', 'vcard'):
+        if tp not in ('html', 'vcard'):
             return False
         exporter = getattr(self, 'to_{}'.format(tp))
         return exporter(**options)
@@ -268,8 +268,11 @@ class Contact(SubscriptionObject):
             return False
 
     def create_share_to(self, user_id, note=None):
+        default_note = self.SHARE_IMPORTED_TEXT + \
+            self.date_created.strftime(settings.DATETIME_FORMAT_NORMAL)
+
         share = Share(
-            note=note or self.SHARE_IMPORTED_TEXT + self.date_created.strftime(settings.DATETIME_FORMAT_NORMAL),
+            note=note or default_note,
             share_to_id=user_id,
             share_from_id=user_id,
             contact_id=self.id
@@ -297,8 +300,8 @@ class Contact(SubscriptionObject):
             c.save()
 
     @classmethod
-    def get_contacts_by_status(cls, user_id, status):
-        q = Q(subscription_id=CRMUser.get_subscription_id(user_id))
+    def get_contacts_by_status(cls, subscription_id, status):
+        q = Q(subscription_id=subscription_id)
         q &= Q(status=status)
         return Contact.objects.filter(q).order_by('-date_created')
 
@@ -323,14 +326,14 @@ class Contact(SubscriptionObject):
         """
         crm_user = CRMUser.objects.get(id=user_id)
 
-        q = Q(subscription_id=CRMUser.get_subscription_id(user_id))
-        q &= Q(date_created__range=(from_dt, to_dt))
+        # there is no need in filter by subscription_id
+        q = Q(date_created__range=(from_dt, to_dt))
         activities = crm_user.activity_owner.filter(q)
         contact_ids = activities.values_list('sales_cycle__contact_id', flat=True)
         return Contact.objects.filter(id__in=contact_ids)
 
     @classmethod
-    def filter_contacts_by_vcard(cls, user_id, search_text,
+    def filter_contacts_by_vcard(cls, subscription_id, search_text,
                                  search_params=None, order_by=None):
         r"""TODO Make a search query for contacts by their vcard.
         Important! Search params have one of the following formats:
@@ -369,7 +372,7 @@ class Contact(SubscriptionObject):
 
         for key, value in params.viewitems():
             query_dict = {'vcard__'+str(key): str(value)}
-            q = Q(subscription_id=CRMUser.get_subscription_id(user_id))
+            q = Q(subscription_id=subscription_id)
             q &= Q(**query_dict)
             contacts = contacts | Contact.objects.filter(q)
 
@@ -510,23 +513,14 @@ class Contact(SubscriptionObject):
         return (contacts, activities, contact_activity_map)
 
     @classmethod
-    def get_cold_base(cls, user_id):
+    def get_cold_base(cls, subscription_id):
         """Returns list of contacts that are considered cold.
         Cold contacts should satisfy two conditions:
             1. no assignee for contact
             2. status is NEW"""
-        q = Q(subscription_id=CRMUser.get_subscription_id(user_id))
+        q = Q(subscription_id=subscription_id)
         q &= Q(status=NEW)
         return cls.objects.filter(q).order_by('-date_created')
-
-    @classmethod
-    def create_contact_on_vcard_create(cls, sender, created=False,
-                                       instance=None, **kwargs):
-        if not created:
-            return
-        vcard = instance
-        contact = cls(vcard=vcard, subscription_id=vcard.subscription_id)
-        contact.save()
 
 
 class Value(SubscriptionObject):
@@ -551,6 +545,11 @@ class Value(SubscriptionObject):
     def __unicode__(self):
         return "%s %s %s" % (self.amount, self.currency, self.salary)
 
+    @classmethod
+    def get_values(cls, subscription_id):
+        q = Q(subscription_id=subscription_id)
+        return cls.objects.filter(q)
+
 
 class Product(SubscriptionObject):
     name = models.CharField(_('product name'), max_length=100, blank=False)
@@ -560,6 +559,7 @@ class Product(SubscriptionObject):
                                 default='KZT')
     owner = models.ForeignKey('CRMUser', related_name='crm_products',
                               null=True, blank=True)
+    date_created = models.DateTimeField(blank=True, auto_now_add=True)
 
     class Meta:
         verbose_name = _('product')
@@ -599,9 +599,9 @@ class Product(SubscriptionObject):
         return True
 
     @classmethod
-    def get_products(cls, user_id):
-        q = Q(subscription_id=CRMUser.get_subscription_id(user_id))
-        return cls.objects.filter(q)
+    def get_products(cls, subscription_id):
+        q = Q(subscription_id=subscription_id)
+        return cls.objects.filter(q).order_by('-date_created')
 
 
 class SalesCycle(SubscriptionObject):
@@ -614,7 +614,8 @@ class SalesCycle(SubscriptionObject):
     title = models.CharField(max_length=100)
     description = models.CharField(max_length=500)
     products = models.ManyToManyField(Product, related_name='sales_cycles',
-                                      null=True, blank=True, through='SalesCycleProductStat')
+                                      null=True, blank=True,
+                                      through='SalesCycleProductStat')
     owner = models.ForeignKey(CRMUser, related_name='owned_sales_cycles')
     followers = models.ManyToManyField(
         CRMUser, related_name='follow_sales_cycles',
@@ -642,15 +643,16 @@ class SalesCycle(SubscriptionObject):
         verbose_name = 'sales_cycle'
         db_table = settings.DB_PREFIX.format('sales_cycle')
 
+    def __unicode__(self):
+        return '%s [%s %s]' % (self.title, self.contact, self.status)
+
     @classmethod
     def get_global(cls, subscription_id):
-        return SalesCycle.objects.get(subscription_id=subscription_id, is_global=True)
+        return SalesCycle.objects.get(subscription_id=subscription_id,
+                                      is_global=True)
 
     def find_latest_activity(self):
         return self.rel_activities.order_by('-date_created').first()
-
-    def __unicode__(self):
-        return '%s [%s %s]' % (self.title, self.contact, self.status)
 
     # Adds mentions to a current class, takes a lsit of user_ids as an input
     # and then runs through the list and calls the function build_new which
@@ -1007,7 +1009,6 @@ class Activity(SubscriptionObject):
             activity_detail['activity']['comments'] = activity.comments.all()
         return activity_detail
 
-    '''---DONE---'''
     @classmethod
     def get_number_of_activities_by_day(cls, user_id,
                                         from_dt=None, to_dt=None):
@@ -1127,6 +1128,7 @@ class Mention(SubscriptionObject):
     content_type = models.ForeignKey(ContentType)
     object_id = models.IntegerField()
     content_object = generic.GenericForeignKey('content_type', 'object_id')
+    date_created = models.DateTimeField(blank=True, auto_now_add=True)
 
     def __unicode__(self):
         return "%s %s" % (self.user, self.content_object)
@@ -1231,8 +1233,8 @@ class Share(SubscriptionObject):
         self.share_from = owner_object
 
     @classmethod
-    def get_shares(cls, user_id):
-        q = Q(subscription_id=CRMUser.get_subscription_id(user_id))
+    def get_shares(cls, subscription_id):
+        q = Q(subscription_id=subscription_id)
         return cls.objects.filter(q).order_by('-date_created')
 
     @classmethod
@@ -1274,7 +1276,9 @@ def on_activity_delete(sender, instance=None, **kwargs):
     contact.latest_activity = contact.find_latest_activity()
     contact.save()
 
+
 signals.post_delete.connect(on_activity_delete, sender=Activity)
+
 
 '''
 Function to get mentions by 3 of optional parameters:
@@ -1293,6 +1297,7 @@ class ContactList(SubscriptionObject):
     title = models.CharField(max_length=150)
     users = models.ManyToManyField(CRMUser, related_name='contact_list',
                                    null=True, blank=True)
+    date_created = models.DateTimeField(blank=True, auto_now_add=True)
 
     class Meta:
         verbose_name = _('contact_list')
@@ -1304,7 +1309,7 @@ class ContactList(SubscriptionObject):
     def check_user(self, user_id):
         try:
             crm_user = self.users.get(user_id=user_id)
-            if not crm_user is None:
+            if crm_user is not None:
                 return True
             else:
                 return False

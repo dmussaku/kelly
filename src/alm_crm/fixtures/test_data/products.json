@@ -7,6 +7,7 @@
             "description":"Microsoft Office 360 is your new Office in everyplace where you are.",
             "price":8900,
             "currency":"KZT",
+            "date_created": "2014-09-10T00:00:00Z",
             "owner": 1
         }
     },
@@ -18,6 +19,7 @@
             "description":"1C Online - monthly subscription",
             "price":3000,
             "currency":"KZT",
+            "date_created": "2014-09-10T00:00:00Z",
             "owner": 1
         }
     },
@@ -29,6 +31,7 @@
             "description":"1C Online - year subscription",
             "price":25000,
             "currency":"KZT",
+            "date_created": "2014-09-10T00:00:00Z",
             "owner": 1
         }
     },
@@ -40,6 +43,7 @@
             "description":"Paragraph Online is product for lawyers",
             "price":59000,
             "currency":"KZT",
+            "date_created": "2014-09-10T00:00:00Z",
             "owner": 1
         }
     }
