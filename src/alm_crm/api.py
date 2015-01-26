@@ -422,13 +422,13 @@ class ContactResource(CRMServiceModelResource):
 
         bundle.obj.save()
         if bundle.data.get('note') and not kwargs.get('pk'):
-            bundle.obj.create_share_to(bundle.request.user.get_crmuser().pk,
+            bundle.obj.create_share_to(self.get_crmuser(bundle.request).id,
                                        bundle.data.get('note'))
 
         return bundle
 
     def vcard_full_hydrate(self, bundle):
-        field_object = bundle.data.get('vcard',{})
+        field_object = bundle.data.get('vcard', {})
         subscription_id = self.get_crmsubscr_id(bundle.request)
         if bundle.obj.vcard:
             vcard = bundle.obj.vcard
@@ -1245,6 +1245,7 @@ class SalesCycleResource(CRMServiceModelResource):
             return self.create_response(request, get_product_ids(),
                                         response_class=http.HttpAccepted)
 
+
 class ActivityResource(CRMServiceModelResource):
     """
     GET Method
@@ -1325,6 +1326,13 @@ class ActivityResource(CRMServiceModelResource):
             bundle.data['has_read'] = True
         else:
             bundle.data['has_read'] = False
+
+        # send updated contact (status was changed to LEAD)
+        if bundle.data.get('obj_created'):
+            if len(Contact.get_contact_activities(bundle.obj.contact.id)) == 1:
+                bundle.data['contact'] = ContactResource().get_bundle_detail(bundle.obj.contact, bundle.request)
+            bundle.data.pop('obj_created')
+
         return bundle
 
     def dehydrate_sales_cycle_id(self, bundle):
@@ -1405,6 +1413,8 @@ class ActivityResource(CRMServiceModelResource):
             act.feedback.save()
         act.spray(self.get_crmsubscr_id(bundle.request))
         bundle = self.full_hydrate(bundle)
+
+        bundle.data['obj_created'] = True
         return bundle
 
     def save(self, bundle, **kwargs):

@@ -90,7 +90,7 @@ class Contact(SubscriptionObject):
 
     TYPES = (COMPANY_TP, USER_TP) = ('co', 'user')
     TYPES_OPTIONS = ((COMPANY_TP, _('company type')),
-                       (USER_TP, _('user type')))
+                     (USER_TP, _('user type')))
     TYPES_DICT = dict(zip(('COMPANY', 'USER'), TYPES))
 
     SHARE_IMPORTED_TEXT = _('Imported at ')
@@ -911,7 +911,7 @@ class Activity(SubscriptionObject):
 
     @property
     def contact(self):
-        return self.sales_cycle.contact.id
+        return self.sales_cycle.contact
 
     def set_feedback(self, feedback_obj, save=False):
         """Set feedback to activity instance. Saves if `save` is set(True)."""
