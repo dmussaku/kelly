@@ -5,10 +5,12 @@
     "fields": {
         "first_name": "Bruce", 
         "last_name": "Wayne", 
+        "userpic": "", 
         "company": [
             1
         ], 
         "is_active": true, 
+        "vcard": 11, 
         "last_login": "2014-11-11T07:51:02.253Z", 
         "is_admin": false, 
         "timezone": "Asia/Almaty", 
@@ -22,12 +24,16 @@
     "fields": {
         "first_name": "Nurlan", 
         "last_name": "Abiken", 
-        "company": [], 
+        "userpic": "", 
+        "company": [
+            1
+        ], 
         "is_active": true, 
+        "vcard": 12, 
         "last_login": "2014-11-11T10:08:02.503Z", 
         "is_admin": false, 
         "timezone": "Asia/Almaty", 
-        "password": "nurlan", 
+        "password": "pbkdf2_sha256$12000$RfGiFmGJSeoz$063rfBSPM0AsFi1prglD5BW8qD1ElMYxBpRr5tO1M08=", 
         "email": "abyken.nurlan@gmail.com"
     }
 },
@@ -35,15 +41,57 @@
     "pk": 3, 
     "model": "alm_user.user", 
     "fields": {
-        "first_name": "Sattar", 
-        "last_name": "Stamkulov", 
-        "company": [], 
+        "first_name": "Daniyar", 
+        "last_name": "Mussakulov", 
+        "userpic": "", 
+        "company": [
+            1
+        ], 
         "is_active": true, 
+        "vcard": 13, 
         "last_login": "2014-11-11T10:08:02.503Z", 
         "is_admin": false, 
         "timezone": "Asia/Almaty", 
-        "password": "sattar", 
-        "email": "stamkulov.sattar@gmail.com"
+        "password": "pbkdf2_sha256$12000$RfGiFmGJSeoz$063rfBSPM0AsFi1prglD5BW8qD1ElMYxBpRr5tO1M08=", 
+        "email": "dmussaku@gmail.com"
+    }
+},
+{
+    "pk": 4, 
+    "model": "alm_user.user", 
+    "fields": {
+        "first_name": "Sattar", 
+        "last_name": "Stamkulov", 
+        "userpic": "", 
+        "company": [
+            1
+        ], 
+        "is_active": true, 
+        "vcard": 14, 
+        "last_login": "2014-11-11T10:08:02.503Z", 
+        "is_admin": false, 
+        "timezone": "Asia/Almaty", 
+        "password": "pbkdf2_sha256$12000$RfGiFmGJSeoz$063rfBSPM0AsFi1prglD5BW8qD1ElMYxBpRr5tO1M08=", 
+        "email": "sattar94@outlook.com"
+    }
+},
+{
+    "pk": 5, 
+    "model": "alm_user.user", 
+    "fields": {
+        "first_name": "Askar", 
+        "last_name": "Akshabay", 
+        "userpic": "", 
+        "company": [
+            2
+        ], 
+        "is_active": true, 
+        "vcard": 15, 
+        "last_login": "2015-01-22T10:10:03.205Z", 
+        "is_admin": false, 
+        "timezone": "Asia/Almaty", 
+        "password": "pbkdf2_sha256$12000$RfGiFmGJSeoz$063rfBSPM0AsFi1prglD5BW8qD1ElMYxBpRr5tO1M08=", 
+        "email": "askar.money@gmail.com"
     }
 }
 ]
