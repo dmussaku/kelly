@@ -8,7 +8,8 @@
             "price":8900,
             "currency":"KZT",
             "date_created": "2014-09-10T00:00:00Z",
-            "owner": 1
+            "owner": 1,
+            "subscription_id": 1
         }
     },
     {
@@ -20,7 +21,8 @@
             "price":3000,
             "currency":"KZT",
             "date_created": "2014-09-10T00:00:00Z",
-            "owner": 1
+            "owner": 1,
+            "subscription_id": 1
         }
     },
     {
@@ -32,7 +34,8 @@
             "price":25000,
             "currency":"KZT",
             "date_created": "2014-09-10T00:00:00Z",
-            "owner": 1
+            "owner": 1,
+            "subscription_id": 1
         }
     },
     {
@@ -44,7 +47,22 @@
             "price":59000,
             "currency":"KZT",
             "date_created": "2014-09-10T00:00:00Z",
-            "owner": 1
+            "owner": 1,
+            "subscription_id": 1
+        }
+    },
+
+    {
+        "pk":5,
+        "model":"alm_crm.Product",
+        "fields": {
+            "name":"Facebook's OculusRift",
+            "description":"Technology of Virtual 3D",
+            "price":159000,
+            "currency":"KZT",
+            "date_created": "2015-01-01T00:00:00Z",
+            "owner": 5,
+            "subscription_id": 2
         }
     }
 ]
