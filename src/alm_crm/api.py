@@ -1171,28 +1171,28 @@ class SalesCycleResource(CRMServiceModelResource):
         @return: updated SalesCycle and close Activity
 
         '''
+        with RequestContext(self, request, allowed_methods=['post', 'get', 'put']):
+            basic_bundle = self.build_bundle(request=request)
+            # get sales_cycle
+            try:
+                obj = self.cached_obj_get(bundle=basic_bundle,
+                                          **self.remove_api_resource_names(kwargs))
+            except ObjectDoesNotExist:
+                return http.HttpNotFound()
+            except MultipleObjectsReturned:
+                return http.HttpMultipleChoices(
+                    "More than one resource is found at this URI.")
+            if obj.is_global:
+                raise ImmediateHttpResponse(response=http.HttpUnauthorized(
+                                            'Could not close global sales cycle'))
+            bundle = self.build_bundle(obj=obj, request=request)
 
-        basic_bundle = self.build_bundle(request=request)
-        # get sales_cycle
-        try:
-            obj = self.cached_obj_get(bundle=basic_bundle,
-                                      **self.remove_api_resource_names(kwargs))
-        except ObjectDoesNotExist:
-            return http.HttpNotFound()
-        except MultipleObjectsReturned:
-            return http.HttpMultipleChoices(
-                "More than one resource is found at this URI.")
-        if obj.is_global:
-            raise ImmediateHttpResponse(response=http.HttpUnauthorized(
-                                        'Could not close global sales cycle'))
-        bundle = self.build_bundle(obj=obj, request=request)
-
-        # get PUT's data from request.body
-        deserialized = self.deserialize(
-            request, request.body,
-            format=request.META.get('CONTENT_TYPE', 'application/json'))
-        deserialized = self.alter_deserialized_list_data(request, deserialized)
-        sales_cycle, activity = bundle.obj.close(products_with_values=deserialized)
+            # get PUT's data from request.body
+            deserialized = self.deserialize(
+                request, request.body,
+                format=request.META.get('CONTENT_TYPE', 'application/json'))
+            deserialized = self.alter_deserialized_list_data(request, deserialized)
+            sales_cycle, activity = bundle.obj.close(products_with_values=deserialized)
 
         return self.create_response(
             request, {
@@ -1214,36 +1214,37 @@ class SalesCycleResource(CRMServiceModelResource):
         @return: updated SalesCycle
 
         '''
-        basic_bundle = self.build_bundle(request=request)
-        try:
-            obj = self.cached_obj_get(bundle=basic_bundle,
-                                      **self.remove_api_resource_names(kwargs))
-        except ObjectDoesNotExist:
-            return http.HttpNotFound()
-        except MultipleObjectsReturned:
-            return http.HttpMultipleChoices(
-                "More than one resource is found at this URI.")
-        bundle = self.build_bundle(obj=obj, request=request)
+        with RequestContext(self, request, allowed_methods=['post', 'get', 'put']):
+            basic_bundle = self.build_bundle(request=request)
+            try:
+                obj = self.cached_obj_get(bundle=basic_bundle,
+                                          **self.remove_api_resource_names(kwargs))
+            except ObjectDoesNotExist:
+                return http.HttpNotFound()
+            except MultipleObjectsReturned:
+                return http.HttpMultipleChoices(
+                    "More than one resource is found at this URI.")
+            bundle = self.build_bundle(obj=obj, request=request)
 
-        get_product_ids = lambda: {'object_ids': list(obj.products.values_list('pk', flat=True))}
+            get_product_ids = lambda: {'object_ids': list(obj.products.values_list('pk', flat=True))}
 
-        if request.method == 'GET':
-            return self.create_response(request, get_product_ids())
+            if request.method == 'GET':
+                return self.create_response(request, get_product_ids())
 
-        # get PUT's data from request.body
-        deserialized = self.deserialize(
-            request, request.body,
-            format=request.META.get('CONTENT_TYPE', 'application/json'))
-        deserialized = self.alter_deserialized_list_data(request, deserialized)
+            # get PUT's data from request.body
+            deserialized = self.deserialize(
+                request, request.body,
+                format=request.META.get('CONTENT_TYPE', 'application/json'))
+            deserialized = self.alter_deserialized_list_data(request, deserialized)
 
-        obj.products.clear()
-        obj.add_products(deserialized['object_ids'])
+            obj.products.clear()
+            obj.add_products(deserialized['object_ids'])
 
-        if not self._meta.always_return_data:
-            return http.HttpAccepted(location=location)
-        else:
-            return self.create_response(request, get_product_ids(),
-                                        response_class=http.HttpAccepted)
+            if not self._meta.always_return_data:
+                return http.HttpAccepted(location=location)
+            else:
+                return self.create_response(request, get_product_ids(),
+                                            response_class=http.HttpAccepted)
 
 
 class ActivityResource(CRMServiceModelResource):

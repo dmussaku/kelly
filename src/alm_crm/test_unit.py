@@ -16,7 +16,7 @@ from alm_crm.models import (
     Share,
     ContactList,
     SalesCycleProductStat,
-    Filter
+    Filter,
     )
 from alm_vcard.models import VCard, Tel, Email, Org
 from alm_user.models import User
@@ -694,21 +694,21 @@ class ResourceTestMixin(object):
 
     def get_credentials(self):
         self.get_user()
+        self.api_client.client.login(username=self.user.email, password=self.user_password)
         return self.create_basic(self.user.email, self.user_password)
 
 
 class SalesCycleResourceTest(ResourceTestMixin, ResourceTestCase):
     def setUp(self):
         super(self.__class__, self).setUp()
-
+        self.get_credentials()
         self.api_path_sales_cycle = '/api/v1/sales_cycle/'
 
         self.get_resp = lambda path: self.api_client.get(
             self.api_path_sales_cycle + path,
             format='json',
-            HTTP_HOST='localhost', authentication=self.get_credentials())
+            HTTP_HOST='localhost')
         self.get_des_res = lambda path: self.deserialize(self.get_resp(path))
-
         self.sales_cycle = SalesCycle.objects.first()
 
     def test_get_list_valid_json(self):
@@ -765,7 +765,7 @@ class SalesCycleResourceTest(ResourceTestMixin, ResourceTestCase):
     def test_get_product_ids(self):
         resp = self.api_client.get(
             self.api_path_sales_cycle+str(self.sales_cycle.pk)+'/products/',
-            format='json', authentication=self.get_credentials())
+            format='json')
         resp = self.deserialize(resp)
         self.assertTrue('object_ids' in resp)
         self.assertIsInstance(resp['object_ids'], list)
@@ -778,7 +778,7 @@ class SalesCycleResourceTest(ResourceTestMixin, ResourceTestCase):
         before = self.sales_cycle.products.count()
         resp = self.api_client.put(
             self.api_path_sales_cycle+str(self.sales_cycle.pk)+'/products/',
-            format='json', data=put_data, authentication=self.get_credentials())
+            format='json', data=put_data)
         self.assertHttpAccepted(resp)
         self.assertNotEqual(before, self.sales_cycle.products.count())
         resp = self.deserialize(resp)
@@ -890,7 +890,7 @@ class ActivityResourceTest(ResourceTestMixin, ResourceTestCase):
         # get_list
         self.get_list_resp = self.api_client.get(self.api_path_activity,
                                                  format='json',
-                                                 HTTP_HOST='localhost', authentication=self.get_credentials())
+                                                 HTTP_HOST='localhost')
 
         self.get_list_des = self.deserialize(self.get_list_resp)
 
@@ -898,7 +898,7 @@ class ActivityResourceTest(ResourceTestMixin, ResourceTestCase):
         self.get_detail_resp = \
             lambda pk: self.api_client.get(self.api_path_activity+str(pk)+'/',
                                            format='json',
-                                           HTTP_HOST='localhost', authentication=self.get_credentials())
+                                           HTTP_HOST='localhost')
         self.get_detail_des = \
             lambda pk: self.deserialize(self.get_detail_resp(pk))
 
@@ -1121,14 +1121,14 @@ class ProductResourceTest(ResourceTestMixin, ResourceTestCase):
         # get_list
         self.get_list_resp = self.api_client.get(self.api_path_product,
                                                  format='json',
-                                                 HTTP_HOST='localhost', authentication=self.get_credentials())
+                                                 HTTP_HOST='localhost')
         self.get_list_des = self.deserialize(self.get_list_resp)
 
         # get_detail(pk)
         self.get_detail_resp = \
             lambda pk: self.api_client.get(self.api_path_product+str(pk)+'/',
                                            format='json',
-                                           HTTP_HOST='localhost', authentication=self.get_credentials())
+                                           HTTP_HOST='localhost')
         self.get_detail_des = \
             lambda pk: self.deserialize(self.get_detail_resp(pk))
 
@@ -1229,35 +1229,35 @@ class ContactResourceTest(ResourceTestMixin, ResourceTestCase):
         # get_list
         self.get_list_resp = self.api_client.get(self.api_path_contact,
                                                  format='json',
-                                                 HTTP_HOST='localhost', authentication=self.get_credentials())
+                                                 HTTP_HOST='localhost')
 
         self.get_list_des = self.deserialize(self.get_list_resp)
 
         #get list for cold base
         self.get_list_cold_base_resp = self.api_client.get(self.api_path_contact+'cold_base/',
                                                                             format='json',
-                                                                            HTTP_HOST='localhost', authentication=self.get_credentials())
+                                                                            HTTP_HOST='localhost')
 
         self.get_list_cold_base_des = self.deserialize(self.get_list_cold_base_resp)
 
         #get list for leads
         self.get_list_leads_resp = self.api_client.get(self.api_path_contact+'leads/',
                                                                             format='json',
-                                                                            HTTP_HOST='localhost', authentication=self.get_credentials())
+                                                                            HTTP_HOST='localhost')
 
         self.get_list_leads_des = self.deserialize(self.get_list_leads_resp)
 
         #get list for recent contacts
         self.get_list_recent_resp = self.api_client.get(self.api_path_contact+'recent/',
                                                                             format='json',
-                                                                            HTTP_HOST='localhost', authentication=self.get_credentials())
+                                                                            HTTP_HOST='localhost')
 
         self.get_list_recent_des = self.deserialize(self.get_list_recent_resp)
 
         #get list for assign contact
         self.get_list_assign_contact_resp = self.api_client.get(self.api_path_contact+'assign_contact/',
                                                                             format='json',
-                                                                            HTTP_HOST='localhost', authentication=self.get_credentials())
+                                                                            HTTP_HOST='localhost')
 
         self.get_list_assign_contact_des = self.deserialize(self.get_list_assign_contact_resp)
 
@@ -1265,7 +1265,7 @@ class ContactResourceTest(ResourceTestMixin, ResourceTestCase):
         self.get_detail_resp = \
             lambda pk: self.api_client.get(self.api_path_contact+str(pk)+'/',
                                            format='json',
-                                           HTTP_HOST='localhost', authentication=self.get_credentials())
+                                           HTTP_HOST='localhost')
 
         self.get_detail_des = \
             lambda pk: self.deserialize(self.get_detail_resp(pk))
@@ -1401,22 +1401,22 @@ class ContactResourceTest(ResourceTestMixin, ResourceTestCase):
         get_list_search_resp = self.api_client.get(self.api_path_contact+
                                             "search/?search_params=%5B('fn'%2C+'startswith')%5D&search_text=A",
                                             format='json',
-                                            HTTP_HOST='localhost', authentication=self.get_credentials())
+                                            HTTP_HOST='localhost')
 
         get_list_search_ord_dc_resp = self.api_client.get(self.api_path_contact+
                                             "search/?search_params=%5B('fn'%2C+'startswith')%5D&order_by=%5B'fn'%2C'desc'%5D&search_text=A",
                                             format='json',
-                                            HTTP_HOST='localhost', authentication=self.get_credentials())
+                                            HTTP_HOST='localhost')
 
         get_list_search_by_bday_resp = self.api_client.get(self.api_path_contact+
                                             "search/?search_params=%5B'bday'%5D&search_text=1991-09-10",
                                             format='json',
-                                            HTTP_HOST='localhost', authentication=self.get_credentials())
+                                            HTTP_HOST='localhost')
 
         get_list_search_by_email_resp = self.api_client.get(self.api_path_contact+
                                             "search/?search_params=%5B('email__value'%2C+'startswith')%5D&search_text=mus",
                                             format='json',
-                                            HTTP_HOST='localhost', authentication=self.get_credentials())
+                                            HTTP_HOST='localhost')
 
         get_list_search_des = self.deserialize(get_list_search_resp)
         get_list_search_ord_dc_des = self.deserialize(get_list_search_ord_dc_resp)
@@ -1468,14 +1468,14 @@ class ContactListResourceTest(ResourceTestMixin, ResourceTestCase):
         # get_list
         self.get_list_resp = self.api_client.get(self.api_path_contact_list,
                                                  format='json',
-                                                 HTTP_HOST='localhost', authentication=self.get_credentials())
+                                                 HTTP_HOST='localhost')
         self.get_list_des = self.deserialize(self.get_list_resp)
 
         # get_detail(pk)
         self.get_detail_resp = \
             lambda pk: self.api_client.get(self.api_path_contact_list+str(pk)+'/',
                                            format='json',
-                                           HTTP_HOST='localhost', authentication=self.get_credentials())
+                                           HTTP_HOST='localhost')
         self.get_detail_des = \
             lambda pk: self.deserialize(self.get_detail_resp(pk))
 
@@ -1567,7 +1567,7 @@ class ContactListResourceTest(ResourceTestMixin, ResourceTestCase):
 
         get_list_check_user_resp = self.api_client.get(api_path_check_user,
                                                                             format='json',
-                                                                            HTTP_HOST='localhost', authentication=self.get_credentials())
+                                                                            HTTP_HOST='localhost')
 
         get_list_check_user_des = self.deserialize(get_list_check_user_resp)
         self.assertTrue(get_list_check_user_des['success'])
@@ -1577,7 +1577,7 @@ class ContactListResourceTest(ResourceTestMixin, ResourceTestCase):
 
         get_list_check_user_resp = self.api_client.get(api_path_check_user,
                                                                             format='json',
-                                                                            HTTP_HOST='localhost', authentication=self.get_credentials())
+                                                                            HTTP_HOST='localhost')
 
         get_list_check_user_des = self.deserialize(get_list_check_user_resp)
         self.assertFalse(get_list_check_user_des['success'])
@@ -1590,7 +1590,7 @@ class ContactListResourceTest(ResourceTestMixin, ResourceTestCase):
 
         get_list_get_user_resp = self.api_client.get(api_path_get_user,
                                                                             format='json',
-                                                                            HTTP_HOST='localhost', authentication=self.get_credentials())
+                                                                            HTTP_HOST='localhost')
 
         get_list_get_user_des = self.deserialize(get_list_get_user_resp)
 
@@ -1614,7 +1614,7 @@ class AppStateResourceTest(ResourceTestMixin, ResourceTestCase):
             lambda pk: self.api_client.get(
                 self.api_path_app_state_list+str(pk)+'/',
                 format='json',
-                HTTP_HOST='localhost', authentication=self.get_credentials())
+                HTTP_HOST='localhost')
         self.get_detail_des = \
             lambda pk: self.deserialize(self.get_detail_resp(pk))
 
@@ -1647,14 +1647,14 @@ class ShareResourceTest(ResourceTestMixin, ResourceTestCase):
         # get_list
         self.get_list_resp = self.api_client.get(self.api_path_share,
                                                  format='json',
-                                                 HTTP_HOST='localhost', authentication=self.get_credentials())
+                                                 HTTP_HOST='localhost')
         self.get_list_des = self.deserialize(self.get_list_resp)
 
         # get_detail(pk)
         self.get_detail_resp = \
             lambda pk: self.api_client.get(self.api_path_share+str(pk)+'/',
                                            format='json',
-                                           HTTP_HOST='localhost', authentication=self.get_credentials())
+                                           HTTP_HOST='localhost')
         self.get_detail_des = \
             lambda pk: self.deserialize(self.get_detail_resp(pk))
 
@@ -1756,113 +1756,8 @@ class TestCreationGlobalSalesCycle(TestCase):
         self.assertEqual(SalesCycle.objects.get(owner=crm_user, is_global=True).title, GLOBAL_CYCLE_TITLE)
 
 
-class FilterResourceTest(ResourceTestMixin, ResourceTestCase):
-
-    def setUp(self):
-        super(self.__class__, self).setUp()
-
-        # login user
-        self.get_credentials()
-
-        self.api_path_filter = '/api/v1/filter/'
-
-        # get_list
-        self.get_list_resp = self.api_client.get(self.api_path_filter,
-                                                 format='json',
-                                                 HTTP_HOST='localhost', authentication=self.get_credentials())
-        self.get_list_des = self.deserialize(self.get_list_resp)
-
-        # get_detail(pk)
-        self.get_detail_resp = \
-            lambda pk: self.api_client.get(self.api_path_filter+str(pk)+'/',
-                                           format='json',
-                                           HTTP_HOST='localhost', authentication=self.get_credentials())
-        self.get_detail_des = \
-            lambda pk: self.deserialize(self.get_detail_resp(pk))
-
-        self.filter = Filter.objects.first()
-
-    def test_get_list_valid_json(self):
-        self.assertValidJSONResponse(self.get_list_resp)
-
-    def test_get_list_non_empty(self):
-        self.assertTrue(self.get_list_des['meta']['total_count'] > 0)
-
-    def test_get_detail(self):
-        self.assertEqual(
-            self.get_detail_des(self.filter.pk)['title'],
-            self.filter.title
-            )
-
-    def test_create_filter(self):
-        crmuser = CRMUser.objects.last()
-        post_data={
-            'title': 'Filter Resource',
-            'filter_text': 'Filter Resource text',
-            'author_id': crmuser.pk
-        }
-        self.assertHttpCreated(self.api_client.post(
-            self.api_path_filter, format='json', data=post_data))
-        filter_obj = Filter.objects.last()
-        self.assertEqual(filter_obj.title, 'Filter Resource')
-        self.assertEqual(filter_obj.owner, crmuser)
-        self.assertEqual(filter_obj.base, 'all')
-        self
-        self.assertIsInstance(filter_obj.subscription_id, int)
-
-    def test_create_filter_with_base(self):
-        crmuser = CRMUser.objects.last()
-        post_data={
-            'title': 'Filter Resource',
-            'filter_text': 'Filter Resource text',
-            'author_id': crmuser.pk,
-            'base': 'cold'
-        }
-        self.assertHttpCreated(self.api_client.post(
-            self.api_path_filter, format='json', data=post_data))
-        filter_obj = Filter.objects.last()
-        self.assertEqual(filter_obj.title, 'Filter Resource')
-        self.assertEqual(filter_obj.owner, crmuser)
-        self.assertEqual(filter_obj.base, 'cold')
-        self
-        self.assertIsInstance(filter_obj.subscription_id, int)
-
-
-    def test_delete_filter(self):
-        before = Filter.objects.all().count()
-        self.assertHttpAccepted(self.api_client.delete(
-            self.api_path_filter + '%s/' % self.filter.pk, format='json'))
-        after = Filter.objects.all().count()
-        # verify that one sales_cycle has been deleted.
-        self.assertEqual(after, before - 1)
-
-    def test_update_filter_via_put(self):
-        # get exist product data
-        filter_data = self.get_detail_des(self.filter.pk)
-        # update it
-        t = '_UPDATED!'
-        filter_data['title'] += t
-        # PUT it
-        self.api_client.put(self.api_path_filter + '%s/' % (self.filter.pk),
-                            format='json', data=filter_data)
-        # check
-        self.assertEqual(self.get_detail_des(self.filter.pk)['title'], self.filter.title + t)
-
-    def test_update_filter_via_patch(self):
-        # get exist product data
-        filter_title = self.get_detail_des(self.filter.pk)['title']
-        # update it
-        t = 'TITLE_UPDATED!'
-        filter_title += t
-        # PATCH it
-        self.api_client.patch(self.api_path_filter + '%s/' % (self.filter.pk),
-                              format='json', data={'title': filter_title})
-        # check
-        self.assertEqual(self.get_detail_des(self.filter.pk)['title'], filter_title)
-
-
 class CommentResourceTest(ResourceTestMixin, ResourceTestCase):
-
+   
     def setUp(self):
         super(self.__class__, self).setUp()
 
@@ -1874,14 +1769,14 @@ class CommentResourceTest(ResourceTestMixin, ResourceTestCase):
         # get_list
         self.get_list_resp = self.api_client.get(self.api_path_comment,
                                                  format='json',
-                                                 HTTP_HOST='localhost', authentication=self.get_credentials())
+                                                 HTTP_HOST='localhost')
         self.get_list_des = self.deserialize(self.get_list_resp)
 
         # get_detail(pk)
         self.get_detail_resp = \
             lambda pk: self.api_client.get(self.api_path_comment+str(pk)+'/',
                                            format='json',
-                                           HTTP_HOST='localhost', authentication=self.get_credentials())
+                                           HTTP_HOST='localhost')
         self.get_detail_des = \
             lambda pk: self.deserialize(self.get_detail_resp(pk))
 
@@ -2004,6 +1899,112 @@ class CommentResourceTest(ResourceTestMixin, ResourceTestCase):
         self.assertEqual(self.get_detail_des(self.comment.pk)['comment'], comment_comment)
 
 
+class FilterResourceTest(ResourceTestMixin, ResourceTestCase):
+
+    def setUp(self):
+        super(self.__class__, self).setUp()
+
+        # login user
+        self.get_credentials()
+
+        self.api_path_filter = '/api/v1/filter/'
+
+        # get_list
+        self.get_list_resp = self.api_client.get(self.api_path_filter,
+                                                 format='json',
+                                                 HTTP_HOST='localhost')
+        self.get_list_des = self.deserialize(self.get_list_resp)
+
+        # get_detail(pk)
+        self.get_detail_resp = \
+            lambda pk: self.api_client.get(self.api_path_filter+str(pk)+'/',
+                                           format='json',
+                                           HTTP_HOST='localhost')
+        self.get_detail_des = \
+            lambda pk: self.deserialize(self.get_detail_resp(pk))
+
+        self.filter = Filter.objects.first()
+
+    def test_get_list_valid_json(self):
+        self.assertValidJSONResponse(self.get_list_resp)
+
+    def test_get_list_non_empty(self):
+        self.assertTrue(self.get_list_des['meta']['total_count'] > 0)
+
+    def test_get_detail(self):
+        self.assertEqual(
+            self.get_detail_des(self.filter.pk)['title'],
+            self.filter.title
+            )
+
+    def test_create_filter(self):
+        crmuser = CRMUser.objects.last()
+        post_data={
+            'title': 'Filter Resource',
+            'filter_text': 'Filter Resource text',
+            'author_id': crmuser.pk
+        }
+        self.assertHttpCreated(self.api_client.post(
+            self.api_path_filter, format='json', data=post_data))
+        filter_obj = Filter.objects.last()
+        self.assertEqual(filter_obj.title, 'Filter Resource')
+        self.assertEqual(filter_obj.owner, crmuser)
+        self.assertEqual(filter_obj.base, 'all')
+        self
+        self.assertIsInstance(filter_obj.subscription_id, int)
+
+    def test_create_filter_with_base(self):
+        crmuser = CRMUser.objects.last()
+        post_data={
+            'title': 'Filter Resource',
+            'filter_text': 'Filter Resource text',
+            'author_id': crmuser.pk,
+            'base': 'cold'
+        }
+        self.assertHttpCreated(self.api_client.post(
+            self.api_path_filter, format='json', data=post_data))
+        filter_obj = Filter.objects.last()
+        self.assertEqual(filter_obj.title, 'Filter Resource')
+        self.assertEqual(filter_obj.owner, crmuser)
+        self.assertEqual(filter_obj.base, 'cold')
+        self
+        self.assertIsInstance(filter_obj.subscription_id, int)
+
+
+    def test_delete_filter(self):
+        before = Filter.objects.all().count()
+        self.assertHttpAccepted(self.api_client.delete(
+            self.api_path_filter + '%s/' % self.filter.pk, format='json'))
+        after = Filter.objects.all().count()
+        # verify that one sales_cycle has been deleted.
+        self.assertEqual(after, before - 1)
+
+    def test_update_filter_via_put(self):
+        # get exist product data
+        filter_data = self.get_detail_des(self.filter.pk)
+        # update it
+        t = '_UPDATED!'
+        filter_data['title'] += t
+        # PUT it
+        self.api_client.put(self.api_path_filter + '%s/' % (self.filter.pk),
+                            format='json', data=filter_data)
+        # check
+        self.assertEqual(self.get_detail_des(self.filter.pk)['title'], self.filter.title + t)
+
+    def test_update_filter_via_patch(self):
+        # get exist product data
+        filter_title = self.get_detail_des(self.filter.pk)['title']
+        # update it
+        t = 'TITLE_UPDATED!'
+        filter_title += t
+        # PATCH it
+        self.api_client.patch(self.api_path_filter + '%s/' % (self.filter.pk),
+                              format='json', data={'title': filter_title})
+        # check
+        self.assertEqual(self.get_detail_des(self.filter.pk)['title'], filter_title)
+
+
+
 class UserResourceTest(ResourceTestMixin, ResourceTestCase):
 
     def setUp(self):
@@ -2012,23 +2013,23 @@ class UserResourceTest(ResourceTestMixin, ResourceTestCase):
         # login user
         self.get_credentials()
 
-        self.api_path_comment = '/api/v1/user/'
+        self.api_path_user = '/api/v1/user/'
 
         # get_list
-        self.get_list_resp = self.api_client.get(self.api_path_comment,
+        self.get_list_resp = self.api_client.get(self.api_path_user,
                                                  format='json',
-                                                 HTTP_HOST='localhost', authentication=self.get_credentials())
+                                                 HTTP_HOST='localhost')
         self.get_list_des = self.deserialize(self.get_list_resp)
 
         # get_detail(pk)
         self.get_detail_resp = \
             lambda pk: self.api_client.get(self.api_path_comment+str(pk)+'/',
                                            format='json',
-                                           HTTP_HOST='localhost', authentication=self.get_credentials())
+                                           HTTP_HOST='localhost')
         self.get_detail_des = \
             lambda pk: self.deserialize(self.get_detail_resp(pk))
 
-        self.comment = Comment.objects.first()
+        self.user = User.objects.first()
 
     # def test_get_list_valid_json(self):
     #     self.assertValidJSONResponse(self.get_list_resp)

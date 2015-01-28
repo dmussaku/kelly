@@ -4,8 +4,18 @@
     "model": "almanet.subscription", 
     "fields": {
         "organization": 1, 
-        "is_active": false, 
+        "is_active": true, 
         "user": 1, 
+        "service": 1
+    }
+},
+{
+    "pk": 2, 
+    "model": "almanet.subscription", 
+    "fields": {
+        "organization": 2, 
+        "is_active": true, 
+        "user": 5, 
         "service": 1
     }
 }
