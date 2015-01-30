@@ -13,8 +13,8 @@ class UserManager(contrib_user_manager):
     """
     had to override just because of missing username field in model
     """
-    def create_user(self, first_name, last_name, email, password):
-        user = User(first_name=first_name, last_name=last_name, email=email)
+    def create_user(self, first_name, last_name, email, password, is_admin=False):
+        user = User(first_name=first_name, last_name=last_name, email=email, is_admin=is_admin)
         user.set_password(password)
         user.save()
         return user
