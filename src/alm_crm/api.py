@@ -279,14 +279,19 @@ class ContactResource(CRMServiceModelResource):
             setattr(bundle.obj, key, value)
 
         bundle = self.full_hydrate(bundle)
-        raise ImmediateHttpResponse(
-            HttpResponse(
-                content=Serializer().to_json(
-                    self.full_dehydrate(
+        new_bundle = self.full_dehydrate(
                         self.build_bundle(
                             obj=Contact.objects.get(id=bundle.obj.id))
                         )
-                    ),
+        new_bundle.data['global_cycle'] = SalesCycle().full_dehydrate(
+                SalesCycle().build_bundle(
+                    obj=SalesCycle.objects.get(contact_id=bundle.obj.id)
+                )
+            )
+        #return self.save(bundle, skip_errors=skip_errors)
+        raise ImmediateHttpResponse(
+            HttpResponse(
+                content=Serializer().to_json(new_bundle),
                 content_type='application/json; charset=utf-8', status=200
                 )
             )
@@ -359,7 +364,11 @@ class ContactResource(CRMServiceModelResource):
 
     def hydrate_sales_cycles(self, bundle):
         for sales_cycle in bundle.data.get('sales_cycles', []):
-            bundle.obj.sales_cycles.add(SalesCycle.objects.get(id=int(sales_cycle)))
+            bundle.obj.sales_cycles.add(
+                SalesCycle.objects.get(
+                    id=int(sales_cycle)
+                    )
+                )
         return bundle
 
     def hydrate_parent(self, bundle):
@@ -424,6 +433,13 @@ class ContactResource(CRMServiceModelResource):
         if bundle.data.get('note') and not kwargs.get('pk'):
             bundle.obj.create_share_to(self.get_crmuser(bundle.request).id,
                                        bundle.data.get('note'))
+        if not kwargs.get('pk'):
+            bundle.obj.create_globalcycle(
+                {'subscription_id':subscription_id,
+                 'owner_id':self.get_crmuser(bundle.request).id,
+                 'contact_id':bundle.obj.id
+                }
+            )
 
         return bundle
 
