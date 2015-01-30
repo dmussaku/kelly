@@ -283,7 +283,7 @@ class ContactResource(CRMServiceModelResource):
                         self.build_bundle(
                             obj=Contact.objects.get(id=bundle.obj.id))
                         )
-        new_bundle.data['global_cycle'] = SalesCycleResource().full_dehydrate(
+        new_bundle.data['global_sales_cycle'] = SalesCycleResource().full_dehydrate(
                 SalesCycleResource().build_bundle(
                     obj=SalesCycle.objects.get(contact_id=bundle.obj.id)
                 )
