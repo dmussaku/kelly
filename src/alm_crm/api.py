@@ -680,13 +680,10 @@ class ContactResource(CRMServiceModelResource):
         assigned = bool(request.GET.get('assigned', False))
         followed = bool(request.GET.get('followed', False))
         contacts = Contact.get_contacts_by_last_activity_date(
+            subscription_id = request.user.get_crmuser().subscription_id,
             user_id=request.user.id,
             include_activities=include_activities,
-            owned=owned,
-            assigned=assigned,
-            followed=followed,
-            limit=limit+20,
-            offset=offset)
+            )
         if not include_activities:
             return self.create_response(
                 request,
@@ -1111,7 +1108,7 @@ class SalesCycleResource(CRMServiceModelResource):
 
     @undocumented: prepend_urls, Meta
     '''
-    #contact = fields.ForeignKey(ContactResource, 'contact')
+    #contact = fields.ToOneField(ContactResource, 'contact')
     contact_id = fields.IntegerField(attribute='contact_id', null=True)
     # activities = fields.ToManyField(
     #     'alm_crm.api.ActivityResource', 'rel_activities',
@@ -1626,10 +1623,10 @@ class ShareResource(CRMServiceModelResource):
 
     @undocumented: prepend_urls, Meta
     '''
-    contact = fields.ForeignKey(ContactResource, 'contact')
-    share_to = fields.ForeignKey(CRMUserResource, 'share_to',
+    contact = fields.ToOneField(ContactResource, 'contact')
+    share_to = fields.ToOneField(CRMUserResource, 'share_to',
                                  full=True, null=True)
-    share_from = fields.ForeignKey(CRMUserResource, 'share_from',
+    share_from = fields.ToOneField(CRMUserResource, 'share_from',
                                    full=True, null=True)
 
     class Meta(CommonMeta):

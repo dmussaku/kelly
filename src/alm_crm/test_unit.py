@@ -460,7 +460,7 @@ class SalesCycleTestCase(TestCase):
     def test_get_activities(self):
         self.assertEqual(
             list(self.sc1.get_activities().values_list('id', flat=True)),
-            [4, 3, 2, 1])
+            [2, 4, 6, 1, 3, 5])
 
     def test_add_product(self):
         count = len(self.sc1.products.all())
@@ -495,9 +495,10 @@ class SalesCycleTestCase(TestCase):
         ret = SalesCycle.get_salescycles_by_last_activity_date(self.crm_subscr_id,
                                                                user_id,
                                                                include_activities=True)
-        self.assertEqual(sorted(list(ret[0].values_list('pk', flat=True))), [1, 2, 3])
-        self.assertEqual(sorted(list(ret[1].values_list('pk', flat=True))), range(1, 8))
-        self.assertItemsEqual(ret[2], {1: [1, 3], 2: [2], 3: []})
+        self.assertEqual(sorted(list(ret[0].values_list('pk', flat=True))), [1, 2, 3, 4])
+        self.assertEqual(sorted(list(ret[1].values_list('pk', flat=True))), range(1, 7))
+        self.assertItemsEqual(ret[2], {1: [1, 2, 3, 4, 5, 6], 2: [], 3: [], 4: []})
+
 
     def test_get_salescycles_by_last_activity_date_with_mentioned(self):
         user_id = 1
@@ -506,7 +507,7 @@ class SalesCycleTestCase(TestCase):
                                                                mentioned=True,
                                                                include_activities=True)
         self.assertEqual(sorted(list(ret[0].values_list('pk', flat=True))), [1, 2, 3, 4])
-        self.assertEqual(sorted(list(ret[1].values_list('pk', flat=True))), range(1, 8))
+        self.assertEqual(sorted(list(ret[1].values_list('pk', flat=True))), range(1, 7))
         self.assertItemsEqual(ret[2], {1: [1, 3], 2: [2], 3: [], 4: []})
 
     def test_get_salescycles_by_last_activity_date_only_mentioned(self):
@@ -529,23 +530,12 @@ class SalesCycleTestCase(TestCase):
                                                                followed=True,
                                                                include_activities=True)
         self.assertEqual(list(ret[0].values_list('pk', flat=True)), [3])
-        self.assertEqual(list(ret[1].values_list('pk', flat=True)), [7])
-        self.assertItemsEqual(ret[2], {3: [7]})
+
 
     def test_get_salescycles_by_last_activity_date_without_user_id(self):
-        user_id = 5
+        user_id = 10
         try:
             CRMUser.objects.get(pk=user_id)
-        except CRMUser.DoesNotExist:
-            raised = True
-        else:
-            raised = False
-        finally:
-            self.assertTrue(raised)
-
-        try:
-            SalesCycle.get_salescycles_by_last_activity_date(self.crm_subscr_id,
-                                                             user_id)
         except CRMUser.DoesNotExist:
             raised = True
         else:
@@ -1250,13 +1240,6 @@ class ContactResourceTest(ResourceTestMixin, ResourceTestCase):
 
         self.get_list_recent_des = self.deserialize(self.get_list_recent_resp)
 
-        #get list for assign contact
-        self.get_list_assign_contact_resp = self.api_client.get(self.api_path_contact+'assign_contact/',
-                                                                            format='json',
-                                                                            HTTP_HOST='localhost')
-
-        self.get_list_assign_contact_des = self.deserialize(self.get_list_assign_contact_resp)
-
         # get_detail(pk)
         self.get_detail_resp = \
             lambda pk: self.api_client.get(self.api_path_contact+str(pk)+'/',
@@ -1331,7 +1314,9 @@ class ContactResourceTest(ResourceTestMixin, ResourceTestCase):
         self.assertEqual(Contact.objects.count(), count - 1)
 
     def test_get_last_contacted(self):
-        recent = Contact.get_contacts_by_last_activity_date(1)
+        user = CRMUser.objects.first()
+        recent = Contact.get_contacts_by_last_activity_date(subscription_id = user.subscription_id, 
+                                                            user_id = user.id)
         self.assertEqual(len(self.get_list_recent_des['objects']),
                          len(recent))
 
@@ -1355,8 +1340,8 @@ class ContactResourceTest(ResourceTestMixin, ResourceTestCase):
 
         self.assertEqual(Share.objects.count(), count+1)
 
-        share_to = Share.objects.get(id=1).share_to
-        share_from = Share.objects.get(id=1).share_from
+        share_to = Share.objects.last().share_to
+        share_from = Share.objects.last().share_from
 
         self.assertEqual(share_from, CRMUser.objects.get(pk=1))
         self.assertEqual(share_to, CRMUser.objects.get(pk=2))
@@ -1369,8 +1354,8 @@ class ContactResourceTest(ResourceTestMixin, ResourceTestCase):
 
         self.assertEqual(Share.objects.count(), count+3)
 
-        share_to = CRMUser.objects.get(id=Share.objects.get(id=1).share_to.id)
-        share_from = CRMUser.objects.get(id=Share.objects.get(id=1).share_from.id)
+        share_to = CRMUser.objects.get(id=Share.objects.last().share_to.id)
+        share_from = CRMUser.objects.get(id=Share.objects.last().share_from.id)
 
         self.assertEqual(share_from, CRMUser.objects.get(pk=1))
         self.assertEqual(share_to, CRMUser.objects.get(pk=2))
@@ -1493,6 +1478,7 @@ class ContactListResourceTest(ResourceTestMixin, ResourceTestCase):
     def test_create_contact_list(self):
         user = CRMUser.objects.last()
         post_data = {
+            'owner': CRMUser.objects.first(),
             'title': 'Mobiliuz',
             'users': [{'pk':user.pk}]
         }
@@ -1668,7 +1654,7 @@ class ShareResourceTest(ResourceTestMixin, ResourceTestCase):
         self.assertEqual(resp_share['share_to'], self.share.share_to.id)
         self.assertEqual(resp_share['share_from'], self.share.share_from.id)
         self.assertEqual(resp_share['contact'], self.share.contact.id)
-        self.assertEqual(resp_share['note'], self.share.description)
+        self.assertEqual(resp_share['note'], self.share.note)
 
 
     def test_create_share(self):
@@ -1687,7 +1673,7 @@ class ShareResourceTest(ResourceTestMixin, ResourceTestCase):
         count = Share.objects.all().count()
         count_in_shares = share_to.in_shares.count()
         count_owned_shares = share_from.owned_shares.count()
-        count_contact_shares = contact.shares.count()
+        count_contact_shares = contact.share_set.count()
 
         self.assertHttpCreated(self.api_client.post(
              self.api_path_share, format='json', data=post_data))
@@ -1695,7 +1681,7 @@ class ShareResourceTest(ResourceTestMixin, ResourceTestCase):
         self.assertEqual(Share.objects.all().count(), count+1)
         self.assertEqual(share_to.in_shares.count(), count_in_shares+1)
         self.assertEqual(share_from.owned_shares.count(), count_owned_shares+1)
-        self.assertEqual(contact.shares.count(), count_contact_shares+1)
+        self.assertEqual(contact.share_set.count(), count_contact_shares+1)
         # verify that subscription_id was set
         self.assertIsInstance(Share.objects.last().subscription_id, int)
         # verify that owner was set
@@ -1708,14 +1694,14 @@ class ShareResourceTest(ResourceTestMixin, ResourceTestCase):
         count = Share.objects.all().count()
         count_in_shares = CRMUser.objects.first().in_shares.count()
         count_owned_shares = CRMUser.objects.first().owned_shares.count()
-        count_contact_shares = Contact.objects.first().shares.count()
+        count_contact_shares = Contact.objects.first().share_set.count()
         self.assertHttpAccepted(self.api_client.delete(
              self.api_path_share + '%s/' % self.share.pk, format='json'))
 
         self.assertEqual(Share.objects.all().count(), count-1)
         self.assertEqual(CRMUser.objects.first().in_shares.count(), count_in_shares-1)
         self.assertEqual(CRMUser.objects.first().owned_shares.count(), count_owned_shares-1)
-        self.assertEqual(Contact.objects.first().shares.count(), count_contact_shares-1)
+        self.assertEqual(Contact.objects.first().share_set.count(), count_contact_shares-1)
 
     def test_update_share_via_put(self):
         share = Share.objects.last()
@@ -1728,7 +1714,7 @@ class ShareResourceTest(ResourceTestMixin, ResourceTestCase):
                              format='json', data=share_data)
 
         share_last = Share.objects.last()
-        self.assertEqual(share_last.description, share.description + note_update)
+        self.assertEqual(share_last.note, share.note + note_update)
         self.assertEqual(share_last.share_to.id, 2)
         self.assertEqual(share_last.contact.id, 2)
 
@@ -1738,14 +1724,10 @@ class TestCreationGlobalSalesCycle(TestCase):
 
     def setUp(self):
         super(TestCreationGlobalSalesCycle, self).setUp()
-        self.user = User.objects.first()
+        self.user = User.objects.get(pk=2)
 
     def test_connect_service(self):
         crm_user = self.user.get_crmuser()
-
-        with self.assertRaises(SalesCycle.DoesNotExist):
-            SalesCycle.objects.get(owner=crm_user, is_global=True)
-
         self.user.connect_service(service=Service.objects.first())
         self.assertIsInstance(crm_user, CRMUser)
         self.assertTrue(SalesCycle.objects.get(owner=crm_user, is_global=True))
