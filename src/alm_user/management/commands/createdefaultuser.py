@@ -6,6 +6,7 @@ from django.utils.translation import ugettext as _
 from alm_user.models import User, UserManager
 from alm_company.models import Company
 from almanet.models import Service, Subscription
+from alm_crm.models import CRMUser
 
 class Command(BaseCommand):
     help = 'Create user with email b.wayne@batman.bat and password 123, also creates \
@@ -29,12 +30,17 @@ class Command(BaseCommand):
         subscription = Subscription()
         subscription.service = service
         try:
-            u = User.objects.get(email=email,)
+            u = User.objects.get(email=email)
         except (User.DoesNotExist, KeyError):
             try:
-                Company.objects.get(subdomain=subdomain)
+                c=Company.objects.get(subdomain=subdomain)
             except (Company.DoesNotExist, KeyError):
-                u = UserManager().create_user(first_name, last_name, email, password)
+                u = UserManager().create_user(
+                    first_name=first_name, 
+                    last_name=last_name, 
+                    email=email, 
+                    password=password,
+                    is_admin=True)
                 c = Company(name=name, subdomain=subdomain)
                 c.save()
                 c.users.add(u)
@@ -47,4 +53,8 @@ class Command(BaseCommand):
         subscription.user = u
         subscription.organization = u.get_company()
         subscription.is_active = True
-        subscription.save() 
+        subscription.save()
+        u.create_crmuser(
+            subscription_pk=subscription.pk,
+            organization_pk=c.pk
+            ) 

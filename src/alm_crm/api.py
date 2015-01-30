@@ -283,8 +283,8 @@ class ContactResource(CRMServiceModelResource):
                         self.build_bundle(
                             obj=Contact.objects.get(id=bundle.obj.id))
                         )
-        new_bundle.data['global_cycle'] = SalesCycle().full_dehydrate(
-                SalesCycle().build_bundle(
+        new_bundle.data['global_cycle'] = SalesCycleResource().full_dehydrate(
+                SalesCycleResource().build_bundle(
                     obj=SalesCycle.objects.get(contact_id=bundle.obj.id)
                 )
             )
@@ -393,7 +393,7 @@ class ContactResource(CRMServiceModelResource):
         else:
             bundle.obj = self._meta.object_class()
             bundle.obj.subscription_id = subscription_id
-            # bundle.obj.owner_id = bundle.request.user.get_crmuser().id
+            bundle.obj.owner_id = bundle.request.user.get_crmuser().id
             bundle.obj.save()
 
         '''
@@ -434,8 +434,8 @@ class ContactResource(CRMServiceModelResource):
             bundle.obj.create_share_to(self.get_crmuser(bundle.request).id,
                                        bundle.data.get('note'))
         if not kwargs.get('pk'):
-            bundle.obj.create_globalcycle(
-                {'subscription_id':subscription_id,
+            SalesCycle.create_globalcycle(
+                **{'subscription_id':subscription_id,
                  'owner_id':self.get_crmuser(bundle.request).id,
                  'contact_id':bundle.obj.id
                 }
