@@ -32,15 +32,16 @@ class Command(BaseCommand):
         try:
             u = User.objects.get(email=email)
         except (User.DoesNotExist, KeyError):
-            try:
-                c=Company.objects.get(subdomain=subdomain)
-            except (Company.DoesNotExist, KeyError):
-                u = UserManager().create_user(
+            u = UserManager().create_user(
                     first_name=first_name, 
                     last_name=last_name, 
                     email=email, 
                     password=password,
                     is_admin=True)
+            try:
+                c=Company.objects.get(subdomain=subdomain)
+                u.owned_company.add(c)
+            except (Company.DoesNotExist, KeyError):
                 c = Company(name=name, subdomain=subdomain)
                 c.save()
                 c.users.add(u)
@@ -50,11 +51,13 @@ class Command(BaseCommand):
                 sys.stderr.write("Error: bwayne subdomain is already taken. Did not created anything.\n")
         else:
             sys.stderr.write("Error: bwayne@batman.bat email is already taken.\n")
+        c=Company.objects.get(subdomain=subdomain)
         subscription.user = u
-        subscription.organization = u.get_company()
+        subscription.organization = c
         subscription.is_active = True
         subscription.save()
         u.create_crmuser(
             subscription_pk=subscription.pk,
             organization_pk=c.pk
             ) 
+        u.connect_service(service)

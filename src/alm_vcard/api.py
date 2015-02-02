@@ -7,6 +7,9 @@ from tastypie.authentication import (
     )
 from tastypie.authorization import Authorization
 from alm_vcard.models import *
+from django.db import transaction
+from django.core.exceptions import ObjectDoesNotExist
+from tastypie.exceptions import NotFound
 
 def vcard_rel_dehydrate(bundle):
     if bundle.data.get('vcard'):
@@ -68,6 +71,35 @@ class VCardResource(ModelResource):
         queryset = VCard.objects.all()
         resource_name = 'vcard'
 
+    @transaction.commit_on_success()
+    def obj_create(self, bundle, **kwargs):
+        return super(self.__class__, self).obj_create(bundle, **kwargs)
+
+    def obj_update(self, bundle, skip_errors=False, **kwargs):
+        if not bundle.obj or not self.get_bundle_detail_data(bundle):
+            try:
+                lookup_kwargs = self.lookup_kwargs_with_identifiers(bundle, kwargs)
+            except:
+                # if there is trouble hydrating the data, fall back to just
+                # using kwargs by itself (usually it only contains a "pk" key
+                # and this will work fine.
+                lookup_kwargs = kwargs
+            try:
+                # bundle.obj = self.obj_get(bundle=bundle, **lookup_kwargs)
+                # bundle.obj.delete()
+                bundle.obj = VCard.objects.get(contact=int(kwargs['pk']))
+                bundle.obj.delete()
+            except ObjectDoesNotExist:
+                raise NotFound("A model instance matching the provided arguments could not be found.")
+        bundle.obj = self._meta.object_class()
+        # bundle = self.full_hydrate(bundle)
+        with transaction.commit_on_success():  
+            bundle = self.full_hydrate(bundle)
+        return self.save(bundle, skip_errors=skip_errors)
+
+    def full_hydrate(self, bundle):
+        return super(self.__class__, self).full_hydrate(bundle)
+        
     def obj_delete(self, bundle, **kwargs):
         return super(self.__class__, self).obj_delete(bundle, **kwargs)
 
@@ -77,7 +109,7 @@ class VCardRelatedResource(ModelResource):
 
     def hydrate_vcard(self, bundle):
         vcard_id = bundle.data.get('vcard',"")
-        if (vcard and type(vcard_id)==int):
+        if (vcard_id and type(vcard_id)==int):
             bundle.obj.vcard = VCard.objects.get(id=vcard_id)
         return bundle
 
