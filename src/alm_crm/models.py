@@ -625,9 +625,7 @@ class SalesCycle(SubscriptionObject):
     followers = models.ManyToManyField(
         CRMUser, related_name='follow_sales_cycles',
         null=True, blank=True)
-    contact = models.ForeignKey(
-        Contact, related_name='sales_cycles',
-        on_delete=models.SET_DEFAULT, default=None, null=True, blank=True)
+    contact = models.ForeignKey(Contact, related_name='sales_cycles')
     latest_activity = models.OneToOneField('Activity',
                                            blank=True, null=True,
                                            on_delete=models.SET_NULL)
@@ -884,8 +882,7 @@ class Activity(SubscriptionObject):
     date_created = models.DateTimeField(blank=True, null=True,
                                         auto_now_add=True)
     date_edited = models.DateTimeField(blank=True, null=True, auto_now=True)
-    sales_cycle = models.ForeignKey(SalesCycle, related_name='rel_activities',
-                                    null=True, blank=True)
+    sales_cycle = models.ForeignKey(SalesCycle, related_name='rel_activities')
     owner = models.ForeignKey(CRMUser, related_name='activity_owner')
     mentions = generic.GenericRelation('Mention', null=True)
     comments = generic.GenericRelation('Comment', null=True)
@@ -1112,7 +1109,7 @@ class Feedback(SubscriptionObject):
     status = models.CharField(max_length=1, choices=STATUSES_OPTIONS, default=WAITING)
     date_created = models.DateTimeField(blank=True, auto_now_add=True)
     date_edited = models.DateTimeField(blank=True, auto_now_add=True)
-    activity = models.OneToOneField(Activity, blank=False)
+    activity = models.OneToOneField(Activity)
     value = models.OneToOneField(Value, blank=True, null=True)
     mentions = generic.GenericRelation('Mention')
     comments = generic.GenericRelation('Comment')
