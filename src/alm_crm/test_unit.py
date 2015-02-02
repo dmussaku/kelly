@@ -852,7 +852,7 @@ class SalesCycleResourceTest(ResourceTestMixin, ResourceTestCase):
 
     def test_closeGlobalCycleRaiseError(self):
         owner = CRMUser.objects.first()
-        sales_cycle = SalesCycle.objects.get(owner=owner, is_global=True)
+        sales_cycle = SalesCycle.objects.get(owner=owner, is_global=True, contact_id=1)
         put_data = {
             '1': 10000,
             '2': 3000
@@ -1237,26 +1237,6 @@ class ContactResourceTest(ResourceTestMixin, ResourceTestCase):
         self.assertValidJSONResponse(self.get_list_cold_base_resp)
         self.assertValidJSONResponse(self.get_list_leads_resp)
 
-    def test_get_activities_with_embedded_comments(self):
-        resp = self.api_client.get(
-            self.api_path_contact_activities_f % (self.contact.pk),
-            format='json',
-            HTTP_HOST='localhost'
-            )
-        activites = self.deserialize(resp)['objects']
-
-        self.assertEqual(len(activites),
-                         len(Contact.get_contact_activities(self.contact.pk)))
-
-        # exists at least one comment from activities
-        self.assertTrue(sum(len(a['comments']) for a in activites) > 0)
-
-        for a in activites:
-            self.assertEqual(
-                len(Activity.objects.get(pk=a['id']).comments.all()),
-                len(a['comments'])
-                )
-
     def test_get_list_non_empty(self):
         self.assertTrue(self.get_list_des['meta']['total_count'] > 0)
 
@@ -1268,30 +1248,29 @@ class ContactResourceTest(ResourceTestMixin, ResourceTestCase):
 
     def test_create_contact(self):
         post_data = {
-            'status': 1,
-            'tp': 'user',
-            'assignees': [],
+            'vcard': {"fn": "Nurlan Abiken"}
         }
-
         count = Contact.objects.count()
-        self.assertHttpCreated(self.api_client.post(
-            self.api_path_contact, format='json', data=post_data))
+        resp = self.api_client.post(
+            self.api_path_contact, format='json', data=post_data)
+        self.assertHttpOK(resp)
         # verify that new one has been added.
         self.assertEqual(Contact.objects.count(), count + 1)
+        created_contact = Contact.objects.last()
+        self.assertEqual(created_contact.sales_cycles.first().title, GLOBAL_CYCLE_TITLE)
 
     def test_delete_contact(self):
         count = Contact.objects.count()
 
-        sales_cycles = self.contact.sales_cycles.all()
-
-        for sales_cycle in sales_cycles:
-            self.assertHttpAccepted(self.api_client.delete(
-                '/api/v1/sales_cycle/' + '%s/' % sales_cycle.pk, format='json'))
+        count_related_sales_cycles = self.contact.sales_cycles.all().count()
+        count_all_sales_cycle = SalesCycle.objects.all().count()
 
         self.assertHttpAccepted(self.api_client.delete(
             self.api_path_contact + '%s/' % self.contact.pk, format='json'))
+        count_sales_cycle = SalesCycle.objects.all().count()
         # verify that one contact been deleted.
         self.assertEqual(Contact.objects.count(), count - 1)
+        self.assertEqual(count_sales_cycle, count_all_sales_cycle - count_related_sales_cycles)
 
     def test_get_last_contacted(self):
         user = CRMUser.objects.first()
