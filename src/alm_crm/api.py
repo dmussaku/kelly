@@ -448,7 +448,7 @@ class ContactResource(CRMServiceModelResource):
         t3=time.time()-t2
         print "Time to finish vcard hydration %s" % t3
         bundle.obj.save()
-        with transaction.atomic():
+        with transaction.commit_on_success():
             if bundle.data.get('note') and not kwargs.get('pk'):
                 bundle.obj.create_share_to(self.get_crmuser(bundle.request).id,
                                            bundle.data.get('note'))
