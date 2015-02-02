@@ -92,11 +92,12 @@ class VCardResource(ModelResource):
             except ObjectDoesNotExist:
                 raise NotFound("A model instance matching the provided arguments could not be found.")
         bundle.obj = self._meta.object_class()
-        # bundle = self.full_hydrate(bundle)
-        with transaction.commit_on_success():  
-            bundle = self.full_hydrate(bundle)
+        bundle = self.full_hydrate(bundle)
+        # with transaction.atomic():  
+        #     bundle = self.full_hydrate(bundle)
         return self.save(bundle, skip_errors=skip_errors)
 
+    @transaction.commit_on_success()
     def full_hydrate(self, bundle):
         return super(self.__class__, self).full_hydrate(bundle)
         
