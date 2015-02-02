@@ -138,7 +138,6 @@ class User(AbstractBaseUser):
                 create_user = getattr(self,
                                       'create_{}user'.format(service.slug))
                 service_user = create_user(s.pk, self.get_company().pk)
-            signals.subscription_reconn.send(self.__class__, service=service, service_user=service_user)
 
     def disconnect_service(self, service):
         s = self.subscriptions.filter(is_active=True, service=service).first()

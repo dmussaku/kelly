@@ -652,8 +652,8 @@ class SalesCycle(SubscriptionObject):
         return '%s [%s %s]' % (self.title, self.contact, self.status)
 
     @classmethod
-    def get_global(cls, subscription_id):
-        return SalesCycle.objects.get(subscription_id=subscription_id,
+    def get_global(cls, subscription_id, contact_id):
+        return SalesCycle.objects.get(subscription_id=subscription_id, contact_id=contact_id,
                                       is_global=True)
 
     def find_latest_activity(self):
@@ -662,17 +662,6 @@ class SalesCycle(SubscriptionObject):
     # Adds mentions to a current class, takes a lsit of user_ids as an input
     # and then runs through the list and calls the function build_new which
     # is declared in Mention class
-
-    @classmethod
-    def on_subscribtion_reconn(cls, sender, **kwargs):
-        service = kwargs.get('service')
-        service_user = kwargs.get('service_user')
-        if not service.slug == settings.DEFAULT_SERVICE:
-            return
-        try:
-            service_user.owned_sales_cycles.get(is_global=True)
-        except SalesCycle.DoesNotExist:
-            cls.create_globalcycle(owner=service_user)
 
     @classmethod
     def create_globalcycle(cls, **kwargs):
@@ -1362,9 +1351,6 @@ class ContactList(SubscriptionObject):
 
     def count(self):
         return self.users.count()
-
-
-almanet_signals.subscription_reconn.connect(SalesCycle.on_subscribtion_reconn)
 
 
 class SalesCycleProductStat(SubscriptionObject):

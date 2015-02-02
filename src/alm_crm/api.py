@@ -1315,11 +1315,12 @@ class ActivityResource(CRMServiceModelResource):
         act = bundle.obj = self._meta.object_class()
         act.author_id = bundle.data.get('author_id')
         act.description = bundle.data.get('description')
-        if bundle.data.get('sales_cycle_id', None):
-            act.sales_cycle_id = bundle.data.get('sales_cycle_id')
-        else:
-            _subscr_id = self.get_crmsubscr_id(bundle.request)
-            act.sales_cycle_id = SalesCycle.get_global(_subscr_id).pk
+        act.sales_cycle_id = bundle.data.get('sales_cycle_id')
+        # if bundle.data.get('sales_cycle_id', None):
+        #     act.sales_cycle_id = bundle.data.get('sales_cycle_id')
+        # else:
+        #     _subscr_id = self.get_crmsubscr_id(bundle.request)
+        #     act.sales_cycle_id = SalesCycle.get_global(_subscr_id).pk
         act.save()
         if bundle.data.get('feedback_status'):
             act.feedback = Feedback(
