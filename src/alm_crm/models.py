@@ -1211,7 +1211,7 @@ class Comment(SubscriptionObject):
 
 class Share(SubscriptionObject):
     is_read = models.BooleanField(default=False, blank=False)
-    contact = models.ForeignKey(Contact, blank=True, null=True)
+    contact = models.ForeignKey(Contact, related_name='share_set', blank=True, null=True)
     share_to = models.ForeignKey(CRMUser, related_name='in_shares')
     share_from = models.ForeignKey(CRMUser, related_name='owned_shares')
     date_created = models.DateTimeField(blank=True, auto_now_add=True)
@@ -1292,6 +1292,7 @@ def get_mentions(user_id=None, content_class=None, object_id=None):
 
 
 class ContactList(SubscriptionObject):
+    owner = models.ForeignKey(CRMUser, related_name='owned_list', blank=True, null=True)
     title = models.CharField(max_length=150)
     users = models.ManyToManyField(CRMUser, related_name='contact_list',
                                    null=True, blank=True)
