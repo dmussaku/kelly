@@ -4,7 +4,7 @@ from django.utils.translation import ugettext_lazy as _
 from almanet import settings
 from almanet import signals as almanet_signals
 from almanet.models import SubscriptionObject
-from alm_vcard.models import VCard, BadVCardError
+from alm_vcard.models import VCard, BadVCardError, Org, Title, Tel, Email
 from alm_user.models import User
 from django.template.loader import render_to_string
 from django.db.models import signals, Q
@@ -458,6 +458,79 @@ class Contact(SubscriptionObject):
                 c.save()
                 rv.append(c)
         return rv
+
+    @classmethod
+    def import_from_csv(cls, csv_file, creator):
+        raw_data = csv_file.read()
+        fields = raw_data[0].split(';')
+        data = []
+        for obj in raw_data[1:]:
+            data.append(obj.split(';'))
+        contact_list = []
+        for i in range(0, len(data)):
+            if len(fields)==len(data[i]):
+                c = Contact()
+                c.owner = creator.get_crmuser()
+                c.subscription_id = creator.get_crmuser().subscription_id
+                v = VCard()
+                v.given_name = data[i][0].decode('utf-8')
+                v.additional_name = data[i][1].decode('utf-8')
+                v.family_name = data[i][2].decode('utf-8')
+                v.fn = v.given_name+" "+v.family_name
+                if not v.fn:
+                    continue
+                v.save()
+                c.vcard = v
+                c.sales_cycles.add(SalesCycle().create_globalcycle())
+                c.save()
+                if data[i][5]:
+                    org = Org(vcard=v)
+                    org.organization_name = data[i][5].decode('utf-8')
+                    org.save()
+                if data[i][6]:
+                    title = Title(vcard=v)
+                    title.data = data[i][6].decode('utf-8')
+                    title.save()
+                if data[i][7]:
+                    tel = Tel(vcard=v, type='cell_phone')
+                    tel.value = data[i][7].decode('utf-8')
+                    tel.save()
+                if data[i][8]:
+                    tel = Tel(vcard=v, type='fax')
+                    tel.value = data[i][8].decode('utf-8')
+                    tel.save()
+                if data[i][9]:
+                    tel = Tel(vcard=v, type='home')
+                    tel.value = data[i][9].decode('utf-8')
+                    tel.save()
+                if data[i][10]:
+                    tel = Tel(vcard=v, type='pager')
+                    tel.value = data[i][10].decode('utf-8')
+                    tel.save()
+                if data[i][11]:
+                    tel = Tel(vcard=v, type='INTL')
+                    tel.value = data[i][11].decode('utf-8')
+                    tel.save()
+                if data[i][12]:
+                    email = Email(vcard=v, type='internet')
+                    email.value = data[i][12].decode('utf-8')
+                    email.save()
+                if data[i][13]:
+                    email = Email(vcard=v, type='x400')
+                    email.value = data[i][13].decode('utf-8')
+                    email.save()
+                if data[i][14]:
+                    tel = Tel(vcard=v, type='work')
+                    tel.value = data[i][14].decode('utf-8')
+                    tel.save()
+                if data[i][15]:
+                    email = Email(vcard=v, type='pref')
+                    email.value = data[i][15].decode('utf-8')
+                    email.save()
+                contact_list.append(c)
+        return contact_list
+
+
 
     @classmethod
     def get_contacts_by_last_activity_date(
