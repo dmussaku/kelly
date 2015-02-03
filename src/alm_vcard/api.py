@@ -114,11 +114,10 @@ class VCardEmailResource(VCardRelatedResource):
         excludes = ['id', 'vcard', 'resource_uri']
         resource_name = 'vcard_email'
 
-    # def full_dehydrate(self, bundle, for_list=True):
-    #     bundle = super(self.__class__, self).full_dehydrate(bundle, for_list=True)
-    #     del bundle.data['vcard']
-    #     del bundle.data['resource_uri']
-    #     return bundle
+    def full_dehydrate(self, bundle, for_list=True):
+        bundle = super(self.__class__, self).full_dehydrate(bundle, for_list=True)
+        del bundle.data['vcard']
+        return bundle
 
 
 class VCardTelResource(VCardRelatedResource):
@@ -129,11 +128,10 @@ class VCardTelResource(VCardRelatedResource):
         excludes = ['id', 'vcard', 'resource_uri']
         resource_name = 'vcard_tel'
 
-    # def full_dehydrate(self, bundle, for_list=True):
-    #     bundle = super(self.__class__, self).full_dehydrate(bundle, for_list=True)
-    #     del bundle.data['vcard']
-    #     del bundle.data['resource_uri']
-    #     return bundle
+    def full_dehydrate(self, bundle, for_list=True):
+        bundle = super(self.__class__, self).full_dehydrate(bundle, for_list=True)
+        del bundle.data['vcard']
+        return bundle
 
 
 class VCardOrgResource(VCardRelatedResource):
@@ -144,11 +142,10 @@ class VCardOrgResource(VCardRelatedResource):
         excludes = ['id', 'vcard', 'resource_uri']
         resource_name = 'vcard_org'
 
-    # def full_dehydrate(self, bundle, for_list=True):
-    #     bundle = super(self.__class__, self).full_dehydrate(bundle, for_list=True)
-    #     del bundle.data['vcard']
-    #     del bundle.data['resource_uri']
-    #     return bundle
+    def full_dehydrate(self, bundle, for_list=True):
+        bundle = super(self.__class__, self).full_dehydrate(bundle, for_list=True)
+        del bundle.data['vcard']
+        return bundle
 
 
 class VCardGeoResource(VCardRelatedResource):
@@ -159,11 +156,10 @@ class VCardGeoResource(VCardRelatedResource):
         excludes = ['id', 'vcard', 'resource_uri']
         resource_name = 'vcard_geo'
 
-    # def full_dehydrate(self, bundle, for_list=True):
-    #     bundle = super(self.__class__, self).full_dehydrate(bundle, for_list=True)
-    #     del bundle.data['vcard']
-    #     del bundle.data['resource_uri']
-    #     return bundle
+    def full_dehydrate(self, bundle, for_list=True):
+        bundle = super(self.__class__, self).full_dehydrate(bundle, for_list=True)
+        del bundle.data['vcard']
+        return bundle
 
 
 class VCardAdrResource(VCardRelatedResource):
@@ -174,11 +170,10 @@ class VCardAdrResource(VCardRelatedResource):
         excludes = ['id', 'vcard', 'resource_uri']
         resource_name = 'vcard_adr'
 
-    # def full_dehydrate(self, bundle, for_list=True):
-    #     bundle = super(self.__class__, self).full_dehydrate(bundle, for_list=True)
-    #     del bundle.data['vcard']
-    #     del bundle.data['resource_uri']
-    #     return bundle
+    def full_dehydrate(self, bundle, for_list=True):
+        bundle = super(self.__class__, self).full_dehydrate(bundle, for_list=True)
+        del bundle.data['vcard']
+        return bundle
 
 
 class VCardAgentResource(VCardRelatedResource):
@@ -189,11 +184,10 @@ class VCardAgentResource(VCardRelatedResource):
         excludes = ['id', 'vcard', 'resource_uri']
         resource_name = 'vcard_agent'
 
-    # def full_dehydrate(self, bundle, for_list=True):
-    #     bundle = super(self.__class__, self).full_dehydrate(bundle, for_list=True)
-    #     del bundle.data['vcard']
-    #     del bundle.data['resource_uri']
-    #     return bundle
+    def full_dehydrate(self, bundle, for_list=True):
+        bundle = super(self.__class__, self).full_dehydrate(bundle, for_list=True)
+        del bundle.data['vcard']
+        return bundle
 
 
 class VCardCategoryResource(VCardRelatedResource):
@@ -204,11 +198,10 @@ class VCardCategoryResource(VCardRelatedResource):
         excludes = ['id', 'vcard', 'resource_uri']
         resource_name = 'vcard_category'
 
-    # def full_dehydrate(self, bundle, for_list=True):
-    #     bundle = super(self.__class__, self).full_dehydrate(bundle, for_list=True)
-    #     del bundle.data['vcard']
-    #     del bundle.data['resource_uri']
-    #     return bundle
+    def full_dehydrate(self, bundle, for_list=True):
+        bundle = super(self.__class__, self).full_dehydrate(bundle, for_list=True)
+        del bundle.data['vcard']
+        return bundle
 
 
 class VCardKeyResource(VCardRelatedResource):
@@ -219,11 +212,10 @@ class VCardKeyResource(VCardRelatedResource):
         excludes = ['id', 'vcard', 'resource_uri']
         resource_name = 'vcard_key'
 
-    # def full_dehydrate(self, bundle, for_list=True):
-    #     bundle = super(self.__class__, self).full_dehydrate(bundle, for_list=True)
-    #     del bundle.data['vcard']
-    #     del bundle.data['resource_uri']
-    #     return bundle
+    def full_dehydrate(self, bundle, for_list=True):
+        bundle = super(self.__class__, self).full_dehydrate(bundle, for_list=True)
+        del bundle.data['vcard']
+        return bundle
 
 
 class VCardLabelResource(VCardRelatedResource):
@@ -234,11 +226,10 @@ class VCardLabelResource(VCardRelatedResource):
         excludes = ['id', 'vcard', 'resource_uri']
         resource_name = 'vcard_label'
 
-    # def full_dehydrate(self, bundle, for_list=True):
-    #     bundle = super(self.__class__, self).full_dehydrate(bundle, for_list=True)
-    #     del bundle.data['vcard']
-    #     del bundle.data['resource_uri']
-    #     return bundle
+    def full_dehydrate(self, bundle, for_list=True):
+        bundle = super(self.__class__, self).full_dehydrate(bundle, for_list=True)
+        del bundle.data['vcard']
+        return bundle
 
 
 class VCardMailerResource(VCardRelatedResource):
@@ -249,11 +240,10 @@ class VCardMailerResource(VCardRelatedResource):
         excludes = ['id', 'vcard', 'resource_uri']
         resource_name = 'vcard_mailer'
 
-    # def full_dehydrate(self, bundle, for_list=True):
-    #     bundle = super(self.__class__, self).full_dehydrate(bundle, for_list=True)
-    #     del bundle.data['vcard']
-    #     del bundle.data['resource_uri']
-    #     return bundle
+    def full_dehydrate(self, bundle, for_list=True):
+        bundle = super(self.__class__, self).full_dehydrate(bundle, for_list=True)
+        del bundle.data['vcard']
+        return bundle
 
 
 class VCardNicknameResource(VCardRelatedResource):
@@ -264,11 +254,10 @@ class VCardNicknameResource(VCardRelatedResource):
         excludes = ['id', 'vcard', 'resource_uri']
         resource_name = 'vcard_nickname'
 
-    # def full_dehydrate(self, bundle, for_list=True):
-    #     bundle = super(self.__class__, self).full_dehydrate(bundle, for_list=True)
-    #     del bundle.data['vcard']
-    #     del bundle.data['resource_uri']
-    #     return bundle
+    def full_dehydrate(self, bundle, for_list=True):
+        bundle = super(self.__class__, self).full_dehydrate(bundle, for_list=True)
+        del bundle.data['vcard']
+        return bundle
 
 
 class VCardNoteResource(VCardRelatedResource):
@@ -279,11 +268,10 @@ class VCardNoteResource(VCardRelatedResource):
         excludes = ['id', 'vcard', 'resource_uri']
         resource_name = 'vcard_note'
 
-    # def full_dehydrate(self, bundle, for_list=True):
-    #     bundle = super(self.__class__, self).full_dehydrate(bundle, for_list=True)
-    #     del bundle.data['vcard']
-    #     del bundle.data['resource_uri']
-    #     return bundle
+    def full_dehydrate(self, bundle, for_list=True):
+        bundle = super(self.__class__, self).full_dehydrate(bundle, for_list=True)
+        del bundle.data['vcard']
+        return bundle
 
 
 class VCardRoleResource(VCardRelatedResource):
@@ -294,11 +282,10 @@ class VCardRoleResource(VCardRelatedResource):
         excludes = ['id', 'vcard', 'resource_uri']
         resource_name = 'vcard_role'
 
-    # def full_dehydrate(self, bundle, for_list=True):
-    #     bundle = super(self.__class__, self).full_dehydrate(bundle, for_list=True)
-    #     del bundle.data['vcard']
-    #     del bundle.data['resource_uri']
-    #     return bundle
+    def full_dehydrate(self, bundle, for_list=True):
+        bundle = super(self.__class__, self).full_dehydrate(bundle, for_list=True)
+        del bundle.data['vcard']
+        return bundle
 
 
 class VCardTitleResource(VCardRelatedResource):
@@ -309,11 +296,10 @@ class VCardTitleResource(VCardRelatedResource):
         excludes = ['id', 'vcard', 'resource_uri']
         resource_name = 'vcard_title'
 
-    # def full_dehydrate(self, bundle, for_list=True):
-    #     bundle = super(self.__class__, self).full_dehydrate(bundle, for_list=True)
-    #     del bundle.data['vcard']
-    #     del bundle.data['resource_uri']
-    #     return bundle
+    def full_dehydrate(self, bundle, for_list=True):
+        bundle = super(self.__class__, self).full_dehydrate(bundle, for_list=True)
+        del bundle.data['vcard']
+        return bundle
 
 
 class VCardTzResource(VCardRelatedResource):
@@ -324,11 +310,10 @@ class VCardTzResource(VCardRelatedResource):
         excludes = ['id', 'vcard', 'resource_uri']
         resource_name = 'vcard_tz'
 
-    # def full_dehydrate(self, bundle, for_list=True):
-    #     bundle = super(self.__class__, self).full_dehydrate(bundle, for_list=True)
-    #     del bundle.data['vcard']
-    #     del bundle.data['resource_uri']
-    #     return bundle
+    def full_dehydrate(self, bundle, for_list=True):
+        bundle = super(self.__class__, self).full_dehydrate(bundle, for_list=True)
+        del bundle.data['vcard']
+        return bundle
 
 
 class VCardUrlResource(VCardRelatedResource):
@@ -340,8 +325,7 @@ class VCardUrlResource(VCardRelatedResource):
         resource_name = 'vcard_url'
 
 
-    # def full_dehydrate(self, bundle, for_list=True):
-    #     bundle = super(self.__class__, self).full_dehydrate(bundle, for_list=True)
-    #     del bundle.data['vcard']
-    #     del bundle.data['resource_uri']
-    #     return bundle
+    def full_dehydrate(self, bundle, for_list=True):
+        bundle = super(self.__class__, self).full_dehydrate(bundle, for_list=True)
+        del bundle.data['vcard']
+        return bundle
