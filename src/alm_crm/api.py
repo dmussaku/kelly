@@ -415,6 +415,7 @@ class ContactResource(CRMServiceModelResource):
         field_names.remove('parent')
         field_names.remove('children')
         field_names.remove('sales_cycles')
+        field_names.remove('share')
         for field_name in field_names:
             if bundle.data.get(str(field_name), None):
                 try:
@@ -426,7 +427,7 @@ class ContactResource(CRMServiceModelResource):
                 elif isinstance(field_object, list):
                     for obj in field_object:
                         bundle.obj.__getattribute__(field_name).add(int(obj))
-                elif isinstance(field_object, dict):
+                elif isinstance(field_object, dict) :
                     vcard_bundle = VCardResource().build_bundle(
                         data=field_object, 
                         request=bundle.request
