@@ -432,7 +432,8 @@ class ContactResource(CRMServiceModelResource):
                         request=bundle.request
                         )
                     if kwargs.get('pk', None):
-                        vcard_bundle = VCardResource().obj_update(
+                        print vcard_bundle
+                        vcard_bundle = VCardResource().obj_create(
                             bundle=vcard_bundle,
                             skip_errors=False,
                             **kwargs

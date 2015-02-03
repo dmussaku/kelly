@@ -74,29 +74,10 @@ class VCardResource(ModelResource):
 
     @transaction.commit_on_success()
     def obj_create(self, bundle, **kwargs):
+        if kwargs.get('pk'):
+            bundle.obj = VCard.objects.get(contact=int(kwargs['pk']))
+            bundle.obj.delete()
         return super(self.__class__, self).obj_create(bundle, **kwargs)
-
-    def obj_update(self, bundle, skip_errors=False, **kwargs):
-        if not bundle.obj or not self.get_bundle_detail_data(bundle):
-            try:
-                lookup_kwargs = self.lookup_kwargs_with_identifiers(bundle, kwargs)
-            except:
-                # if there is trouble hydrating the data, fall back to just
-                # using kwargs by itself (usually it only contains a "pk" key
-                # and this will work fine.
-                lookup_kwargs = kwargs
-            try:
-                # bundle.obj = self.obj_get(bundle=bundle, **lookup_kwargs)
-                # bundle.obj.delete()
-                bundle.obj = VCard.objects.get(contact=int(kwargs['pk']))
-                bundle.obj.delete()
-            except ObjectDoesNotExist:
-                raise NotFound("A model instance matching the provided arguments could not be found.")
-        bundle.obj = self._meta.object_class()
-        bundle = self.full_hydrate(bundle)
-        # with transaction.atomic():  
-        #     bundle = self.full_hydrate(bundle)
-        return self.save(bundle, skip_errors=skip_errors)
 
     @transaction.commit_on_success()
     def full_hydrate(self, bundle):
