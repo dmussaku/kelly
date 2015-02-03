@@ -1,19 +1,3 @@
-from tastypie import fields, http
-from tastypie.contrib.contenttypes.fields import GenericForeignKeyField
-from django.contrib.contenttypes.models import ContentType
-from tastypie.constants import ALL_WITH_RELATIONS
-from tastypie.resources import Resource, ModelResource
-from tastypie.authorization import Authorization
-from tastypie.utils import trailing_slash
-from tastypie.authentication import (
-    MultiAuthentication,
-    SessionAuthentication,
-    BasicAuthentication,
-    )
-from django.conf.urls import url
-from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
-from django.forms.models import model_to_dict
-from django.utils import translation
 from .models import (
     SalesCycle,
     Product,
@@ -29,17 +13,35 @@ from .models import (
     SalesCycleProductStat,
     Filter
     )
-from alm_vcard.models import *
 from alm_vcard.api import VCardResource
+from alm_vcard.models import *
 from almanet.settings import DEFAULT_SERVICE
 from almanet.utils.api import RequestContext
 from almanet.utils.env import get_subscr_id
-import ast
-from tastypie.serializers import Serializer
+from django.conf.urls import url
+from django.contrib.contenttypes.models import ContentType
+from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.db import models
-from tastypie.exceptions import ImmediateHttpResponse, NotFound, Unauthorized
+from django.db import transaction
+from django.forms.models import model_to_dict
 from django.http import HttpResponse
+from django.utils import translation
+from tastypie import fields, http
+from tastypie.authentication import (
+    MultiAuthentication,
+    SessionAuthentication,
+    BasicAuthentication,
+    )
+from tastypie.authorization import Authorization
+from tastypie.constants import ALL_WITH_RELATIONS
+from tastypie.contrib.contenttypes.fields import GenericForeignKeyField
+from tastypie.exceptions import ImmediateHttpResponse, NotFound, Unauthorized
+from tastypie.resources import Resource, ModelResource
+from tastypie.serializers import Serializer
+from tastypie.utils import trailing_slash
+import ast
 import datetime
+import time
 
 
 class CommonMeta:
@@ -279,14 +281,19 @@ class ContactResource(CRMServiceModelResource):
             setattr(bundle.obj, key, value)
 
         bundle = self.full_hydrate(bundle)
-        raise ImmediateHttpResponse(
-            HttpResponse(
-                content=Serializer().to_json(
-                    self.full_dehydrate(
+        new_bundle = self.full_dehydrate(
                         self.build_bundle(
                             obj=Contact.objects.get(id=bundle.obj.id))
                         )
-                    ),
+        new_bundle.data['global_sales_cycle'] = SalesCycleResource().full_dehydrate(
+                SalesCycleResource().build_bundle(
+                    obj=SalesCycle.objects.get(contact_id=bundle.obj.id)
+                )
+            )
+        #return self.save(bundle, skip_errors=skip_errors)
+        raise ImmediateHttpResponse(
+            HttpResponse(
+                content=Serializer().to_json(new_bundle),
                 content_type='application/json; charset=utf-8', status=200
                 )
             )
@@ -359,7 +366,11 @@ class ContactResource(CRMServiceModelResource):
 
     def hydrate_sales_cycles(self, bundle):
         for sales_cycle in bundle.data.get('sales_cycles', []):
-            bundle.obj.sales_cycles.add(SalesCycle.objects.get(id=int(sales_cycle)))
+            bundle.obj.sales_cycles.add(
+                SalesCycle.objects.get(
+                    id=int(sales_cycle)
+                    )
+                )
         return bundle
 
     def hydrate_parent(self, bundle):
@@ -375,7 +386,7 @@ class ContactResource(CRMServiceModelResource):
         return bundle
 
     def full_hydrate(self, bundle, **kwargs):
-        # t1 = time.time()
+        t1 = time.time()
         contact_id = kwargs.get('pk', None)
         subscription_id = self.get_crmsubscr_id(bundle.request)
         if contact_id:
@@ -384,7 +395,7 @@ class ContactResource(CRMServiceModelResource):
         else:
             bundle.obj = self._meta.object_class()
             bundle.obj.subscription_id = subscription_id
-            # bundle.obj.owner_id = bundle.request.user.get_crmuser().id
+            bundle.obj.owner_id = bundle.request.user.get_crmuser().id
             bundle.obj.save()
 
         '''
@@ -398,12 +409,13 @@ class ContactResource(CRMServiceModelResource):
         bundle = self.hydrate_parent(bundle)
         if bundle.data.get('user_id', ""):
             bundle.obj.owner_id = int(bundle.data['user_id'])
-        # if bundle.data.get('parent_id',""):
-        #     bundle.obj.parent_id = int(bundle.data['parent_id'])
+        if bundle.data.get('parent_id',""):
+            bundle.obj.parent_id = int(bundle.data['parent_id'])
         field_names = bundle.obj._meta.get_all_field_names()
         field_names.remove('parent')
         field_names.remove('children')
         field_names.remove('sales_cycles')
+        field_names.remove('share')
         for field_name in field_names:
             if bundle.data.get(str(field_name), None):
                 try:
@@ -415,138 +427,43 @@ class ContactResource(CRMServiceModelResource):
                 elif isinstance(field_object, list):
                     for obj in field_object:
                         bundle.obj.__getattribute__(field_name).add(int(obj))
-                elif isinstance(field_object, dict):
-                    # t2 = time.time() - t1
-                    self.vcard_full_hydrate(bundle)
-                    # t3 = time.time() - t2
-
-        bundle.obj.save()
-        if bundle.data.get('note') and not kwargs.get('pk'):
-            bundle.obj.create_share_to(self.get_crmuser(bundle.request).id,
-                                       bundle.data.get('note'))
-
-        return bundle
-
-    def vcard_full_hydrate(self, bundle):
-        field_object = bundle.data.get('vcard', {})
-        subscription_id = self.get_crmsubscr_id(bundle.request)
-        if bundle.obj.vcard:
-            vcard = bundle.obj.vcard
-        else:
-            vcard = VCard()
-        vcard_fields = list(VCard._meta.get_fields_with_model())
-        for vcard_field in vcard_fields:
-            if vcard_field[0].__class__==models.fields.AutoField:
-                pass
-            elif vcard_field[0].__class__==models.fields.IntegerField:
-                pass
-            elif vcard_field[0].__class__==models.fields.DateField:
-                attname = vcard_field[0].attname
-                bday = field_object.get(attname, "")
-                '''
-                format = yyyy-mm-dd
-                '''
-                if bday:
-                    bday = datetime.datetime.strptime(bday, '%Y-%m-%d').date()
-                    vcard.__setattr__(attname, bday)
-            elif vcard_field[0].__class__==models.fields.DateTimeField:
-                attname = vcard_field[0].attname
-                rev = field_object.get(attname, "")
-                if rev:
-                    rev = datetime.datetime.strptime(date, "%Y-%m-%dT%H:%M:%S.%f")
-                    vcard.__setattr__(attname, bday)
-            elif vcard_field[0].__class__==models.fields.CharField:
-                attname = vcard_field[0].attname
-                vcard.__setattr__(attname,
-                    field_object.get(attname, ""))
-
-        vcard.save()
-        vcard.subscription_id = subscription_id
-        vcard.contact = bundle.obj
-        '''
-        Now i need to go over the list of vcard keys
-        check their model names, go through each and every
-        model and check for three things
-        1) if id is set, then change the values in json
-        2) if id is not set, then create
-        3) if models are missing then delete the missing values
-        '''
-        vcard_rel_fields = vcard._meta.get_all_related_objects()
-        vcard_rel_fields.reverse()
-        del vcard_rel_fields[0]
-        del vcard_rel_fields[0]
-        for vcard_field in vcard_rel_fields:
-            field_value = vcard_field.var_name+'s'
-            obj_list = ast.literal_eval(str(field_object.get(vcard_field.var_name+'s','None')))
-            vcard_field_name = vcard_field.var_name+'_set'
-            model = vcard.__getattribute__(vcard_field_name).model
-            if obj_list:
-                queryset = vcard.__getattribute__(vcard_field_name).all()
-                json_objects = obj_list
-                id_list = []
-                for obj in json_objects:
-                    if obj.get('id',None):
-                        vcard_obj = model.objects.get(id=int(obj.get('id',None)))
-                        vcard_obj.vcard = vcard
-                        del obj['id']
+                elif isinstance(field_object, dict) :
+                    vcard_bundle = VCardResource().build_bundle(
+                        data=field_object, 
+                        request=bundle.request
+                        )
+                    if kwargs.get('pk', None):
+                        print vcard_bundle
+                        vcard_bundle = VCardResource().obj_create(
+                            bundle=vcard_bundle,
+                            skip_errors=False,
+                            **kwargs
+                            )
                     else:
-                        vcard_obj = model()
-                        vcard_obj.vcard = vcard
-                    for key, value in obj.viewitems():
-                        if key == 'vcard':
-                            vcard_obj.vcard = VCard.objects.get(id=value)
-                        else:
-                            vcard_obj.__setattr__(key, value)
-                    vcard_obj.subscription_id = subscription_id
-                    vcard_obj.save()
-                    id_list.append(vcard_obj.id)
-                for obj in queryset:
-                    if not obj.id in id_list:
-                        obj.delete()
-            else:
-                for obj in model.objects.filter(vcard=vcard):
-                    obj.delete()
-        vcard.subscription_id = subscription_id
-        vcard.save()
-
-    # def save(self, bundle, skip_errors=False):
-    #     self.is_valid(bundle)
-
-    #     if bundle.errors and not skip_errors:
-    #         raise ImmediateHttpResponse(response=self.error_response(bundle.request, bundle.errors))
-
-    #     # Check if they're authorized.
-    #     if bundle.obj.pk:
-    #         self.authorized_update_detail(self.get_object_list(bundle.request), bundle)
-    #     else:
-    #         self.authorized_create_detail(self.get_object_list(bundle.request), bundle)
-
-    #     # Save FKs just in case.
-    #     self.save_related(bundle)
-
-    #     #If Contact is saved with a small note/comment
-    #     # Save the main object.
-
-    #     if bundle.data['owner_id']:
-    #         bundle.obj.owner_id=int(bundle.data['owner_id'])
-    #     bundle.obj.save()
-    #     try:
-    #         if bundle.data['note']:
-    #             note = bundle.data['note']
-    #             share = Share(
-    #                 note=note,
-    #                 share_to_id=bundle.obj.owner.id,
-    #                 share_from_id=bundle.obj.owner.id,
-    #                 contact_id=bundle.obj.id
-    #                 )
-    #             share.save()
-    #     except KeyError:
-    #         bundle.obj.save()
-    #     bundle.objects_saved.add(self.create_identifier(bundle.obj))
-    #     # Now pick up the M2M bits.
-    #     m2m_bundle = self.hydrate_m2m(bundle)
-    #     self.save_m2m(m2m_bundle)
-    #     return bundle
+                        vcard_bundle = VCardResource().obj_create(
+                            bundle=vcard_bundle,
+                            **kwargs
+                            )
+        t2=time.time()-t1
+        print "Time to finish contact hydration %s" % t2
+        bundle.obj.vcard = vcard_bundle.obj
+        t3=time.time()-t2
+        print "Time to finish vcard hydration %s" % t3
+        bundle.obj.save()
+        with transaction.commit_on_success():
+            if bundle.data.get('note') and not kwargs.get('pk'):
+                bundle.obj.create_share_to(self.get_crmuser(bundle.request).id,
+                                           bundle.data.get('note'))
+            if not kwargs.get('pk'):
+                SalesCycle.create_globalcycle(
+                    **{'subscription_id':subscription_id,
+                     'owner_id':self.get_crmuser(bundle.request).id,
+                     'contact_id':bundle.obj.id
+                    }
+                )
+        t4=time.time()-t3
+        print "Time to finish creating share and sales_cycle objects %s" % t4
+        return bundle
 
     def follow_contacts(self, request, **kwargs):
         if kwargs.get('contact_ids'):
