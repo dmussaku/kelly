@@ -443,9 +443,10 @@ class SalesCycleTestCase(TestCase):
         owner = contact.owner
         subscription_id = owner.subscription_id
         count = SalesCycle.objects.all().count()
-        self.assertFalse(SalesCycle.create_globalcycle(**{'subscription_id': subscription_id,
+        self.assertEqual(SalesCycle.create_globalcycle(**{'subscription_id': subscription_id,
                                                          'owner_id': owner.id,
-                                                         'contact_id': contact.id}))
+                                                         'contact_id': contact.id}),
+                        contact.sales_cycles.get(is_global=True))
         actual_count = SalesCycle.objects.all().count()
         expected_count = count
         self.assertEqual(actual_count, expected_count)
@@ -1261,7 +1262,8 @@ class ContactResourceTest(ResourceTestMixin, ResourceTestCase):
 
     def test_create_contact(self):
         post_data = {
-            'vcard': {"fn": "Nurlan Abiken"}
+            'vcard': {"fn": "Nurlan Abiken"},
+            'note': 'some text'
         }
         count = Contact.objects.count()
         resp = self.api_client.post(

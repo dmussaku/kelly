@@ -415,7 +415,7 @@ class ContactResource(CRMServiceModelResource):
         field_names.remove('parent')
         field_names.remove('children')
         field_names.remove('sales_cycles')
-        field_names.remove('share')
+        field_names.remove('share_set')
         for field_name in field_names:
             if bundle.data.get(str(field_name), None):
                 try:
