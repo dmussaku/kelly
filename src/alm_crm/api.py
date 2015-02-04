@@ -597,13 +597,10 @@ class ContactResource(CRMServiceModelResource):
         assigned = bool(request.GET.get('assigned', False))
         followed = bool(request.GET.get('followed', False))
         contacts = Contact.get_contacts_by_last_activity_date(
+            subscription_id = request.user.get_crmuser().subscription_id,
             user_id=request.user.id,
             include_activities=include_activities,
-            owned=owned,
-            assigned=assigned,
-            followed=followed,
-            limit=limit+20,
-            offset=offset)
+            )
         if not include_activities:
             return self.create_response(
                 request,
@@ -1028,7 +1025,7 @@ class SalesCycleResource(CRMServiceModelResource):
 
     @undocumented: prepend_urls, Meta
     '''
-    #contact = fields.ForeignKey(ContactResource, 'contact')
+    #contact = fields.ToOneField(ContactResource, 'contact')
     contact_id = fields.IntegerField(attribute='contact_id', null=True)
     # activities = fields.ToManyField(
     #     'alm_crm.api.ActivityResource', 'rel_activities',
@@ -1088,28 +1085,28 @@ class SalesCycleResource(CRMServiceModelResource):
         @return: updated SalesCycle and close Activity
 
         '''
+        with RequestContext(self, request, allowed_methods=['post', 'get', 'put']):
+            basic_bundle = self.build_bundle(request=request)
+            # get sales_cycle
+            try:
+                obj = self.cached_obj_get(bundle=basic_bundle,
+                                          **self.remove_api_resource_names(kwargs))
+            except ObjectDoesNotExist:
+                return http.HttpNotFound()
+            except MultipleObjectsReturned:
+                return http.HttpMultipleChoices(
+                    "More than one resource is found at this URI.")
+            if obj.is_global:
+                raise ImmediateHttpResponse(response=http.HttpUnauthorized(
+                                            'Could not close global sales cycle'))
+            bundle = self.build_bundle(obj=obj, request=request)
 
-        basic_bundle = self.build_bundle(request=request)
-        # get sales_cycle
-        try:
-            obj = self.cached_obj_get(bundle=basic_bundle,
-                                      **self.remove_api_resource_names(kwargs))
-        except ObjectDoesNotExist:
-            return http.HttpNotFound()
-        except MultipleObjectsReturned:
-            return http.HttpMultipleChoices(
-                "More than one resource is found at this URI.")
-        if obj.is_global:
-            raise ImmediateHttpResponse(response=http.HttpUnauthorized(
-                                        'Could not close global sales cycle'))
-        bundle = self.build_bundle(obj=obj, request=request)
-
-        # get PUT's data from request.body
-        deserialized = self.deserialize(
-            request, request.body,
-            format=request.META.get('CONTENT_TYPE', 'application/json'))
-        deserialized = self.alter_deserialized_list_data(request, deserialized)
-        sales_cycle, activity = bundle.obj.close(products_with_values=deserialized)
+            # get PUT's data from request.body
+            deserialized = self.deserialize(
+                request, request.body,
+                format=request.META.get('CONTENT_TYPE', 'application/json'))
+            deserialized = self.alter_deserialized_list_data(request, deserialized)
+            sales_cycle, activity = bundle.obj.close(products_with_values=deserialized)
 
         return self.create_response(
             request, {
@@ -1131,36 +1128,37 @@ class SalesCycleResource(CRMServiceModelResource):
         @return: updated SalesCycle
 
         '''
-        basic_bundle = self.build_bundle(request=request)
-        try:
-            obj = self.cached_obj_get(bundle=basic_bundle,
-                                      **self.remove_api_resource_names(kwargs))
-        except ObjectDoesNotExist:
-            return http.HttpNotFound()
-        except MultipleObjectsReturned:
-            return http.HttpMultipleChoices(
-                "More than one resource is found at this URI.")
-        bundle = self.build_bundle(obj=obj, request=request)
+        with RequestContext(self, request, allowed_methods=['post', 'get', 'put']):
+            basic_bundle = self.build_bundle(request=request)
+            try:
+                obj = self.cached_obj_get(bundle=basic_bundle,
+                                          **self.remove_api_resource_names(kwargs))
+            except ObjectDoesNotExist:
+                return http.HttpNotFound()
+            except MultipleObjectsReturned:
+                return http.HttpMultipleChoices(
+                    "More than one resource is found at this URI.")
+            bundle = self.build_bundle(obj=obj, request=request)
 
-        get_product_ids = lambda: {'object_ids': list(obj.products.values_list('pk', flat=True))}
+            get_product_ids = lambda: {'object_ids': list(obj.products.values_list('pk', flat=True))}
 
-        if request.method == 'GET':
-            return self.create_response(request, get_product_ids())
+            if request.method == 'GET':
+                return self.create_response(request, get_product_ids())
 
-        # get PUT's data from request.body
-        deserialized = self.deserialize(
-            request, request.body,
-            format=request.META.get('CONTENT_TYPE', 'application/json'))
-        deserialized = self.alter_deserialized_list_data(request, deserialized)
+            # get PUT's data from request.body
+            deserialized = self.deserialize(
+                request, request.body,
+                format=request.META.get('CONTENT_TYPE', 'application/json'))
+            deserialized = self.alter_deserialized_list_data(request, deserialized)
 
-        obj.products.clear()
-        obj.add_products(deserialized['object_ids'])
+            obj.products.clear()
+            obj.add_products(deserialized['object_ids'])
 
-        if not self._meta.always_return_data:
-            return http.HttpAccepted(location=location)
-        else:
-            return self.create_response(request, get_product_ids(),
-                                        response_class=http.HttpAccepted)
+            if not self._meta.always_return_data:
+                return http.HttpAccepted(location=location)
+            else:
+                return self.create_response(request, get_product_ids(),
+                                            response_class=http.HttpAccepted)
 
 
 class ActivityResource(CRMServiceModelResource):
@@ -1542,10 +1540,10 @@ class ShareResource(CRMServiceModelResource):
 
     @undocumented: prepend_urls, Meta
     '''
-    contact = fields.ForeignKey(ContactResource, 'contact')
-    share_to = fields.ForeignKey(CRMUserResource, 'share_to',
+    contact = fields.ToOneField(ContactResource, 'contact')
+    share_to = fields.ToOneField(CRMUserResource, 'share_to',
                                  full=True, null=True)
-    share_from = fields.ForeignKey(CRMUserResource, 'share_from',
+    share_from = fields.ToOneField(CRMUserResource, 'share_from',
                                    full=True, null=True)
 
     class Meta(CommonMeta):

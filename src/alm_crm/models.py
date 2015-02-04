@@ -625,9 +625,7 @@ class SalesCycle(SubscriptionObject):
     followers = models.ManyToManyField(
         CRMUser, related_name='follow_sales_cycles',
         null=True, blank=True)
-    contact = models.ForeignKey(
-        Contact, related_name='sales_cycles',
-        on_delete=models.SET_DEFAULT, default=None, null=True, blank=True)
+    contact = models.ForeignKey(Contact, related_name='sales_cycles')
     latest_activity = models.OneToOneField('Activity',
                                            blank=True, null=True,
                                            on_delete=models.SET_NULL)
@@ -884,8 +882,7 @@ class Activity(SubscriptionObject):
     date_created = models.DateTimeField(blank=True, null=True,
                                         auto_now_add=True)
     date_edited = models.DateTimeField(blank=True, null=True, auto_now=True)
-    sales_cycle = models.ForeignKey(SalesCycle, related_name='rel_activities',
-                                    null=True, blank=True)
+    sales_cycle = models.ForeignKey(SalesCycle, related_name='rel_activities')
     owner = models.ForeignKey(CRMUser, related_name='activity_owner')
     mentions = generic.GenericRelation('Mention', null=True)
     comments = generic.GenericRelation('Comment', null=True)
@@ -1112,7 +1109,7 @@ class Feedback(SubscriptionObject):
     status = models.CharField(max_length=1, choices=STATUSES_OPTIONS, default=WAITING)
     date_created = models.DateTimeField(blank=True, auto_now_add=True)
     date_edited = models.DateTimeField(blank=True, auto_now_add=True)
-    activity = models.OneToOneField(Activity, blank=False)
+    activity = models.OneToOneField(Activity)
     value = models.OneToOneField(Value, blank=True, null=True)
     mentions = generic.GenericRelation('Mention')
     comments = generic.GenericRelation('Comment')
@@ -1222,7 +1219,7 @@ class Comment(SubscriptionObject):
 
 class Share(SubscriptionObject):
     is_read = models.BooleanField(default=False, blank=False)
-    contact = models.ForeignKey(Contact, blank=True, null=True)
+    contact = models.ForeignKey(Contact, related_name='share_set', blank=True, null=True)
     share_to = models.ForeignKey(CRMUser, related_name='in_shares')
     share_from = models.ForeignKey(CRMUser, related_name='owned_shares')
     date_created = models.DateTimeField(blank=True, auto_now_add=True)
@@ -1303,6 +1300,7 @@ def get_mentions(user_id=None, content_class=None, object_id=None):
 
 
 class ContactList(SubscriptionObject):
+    owner = models.ForeignKey(CRMUser, related_name='owned_list', blank=True, null=True)
     title = models.CharField(max_length=150)
     users = models.ManyToManyField(CRMUser, related_name='contact_list',
                                    null=True, blank=True)

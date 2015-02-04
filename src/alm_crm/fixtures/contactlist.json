@@ -4,6 +4,7 @@
     "model": "alm_crm.contactlist",
     "fields": {
         "subscription_id": null,
+        "owner": 2, 
         "users": [
             1
         ],
@@ -16,6 +17,7 @@
     "model": "alm_crm.contactlist",
     "fields": {
         "subscription_id": null,
+        "owner": 1, 
         "users": [
             2
         ],
@@ -28,6 +30,7 @@
     "model": "alm_crm.contactlist",
     "fields": {
         "subscription_id": null,
+        "owner": 1, 
         "users": [],
         "title": "NASA",
         "date_created": "2014-09-10T00:00:00Z"
