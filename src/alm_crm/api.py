@@ -2105,7 +2105,6 @@ class AppStateObject(object):
 
     def get_constants(self):
         return {
-            'global_sales_cycle_id': SalesCycle.get_global(self.subscription_id).id,
             'sales_cycle': {
                 'statuses': SalesCycle.STATUSES_OPTIONS,
                 'statuses_hash': SalesCycle.STATUSES_DICT

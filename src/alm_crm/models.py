@@ -665,12 +665,17 @@ class SalesCycle(SubscriptionObject):
 
     @classmethod
     def create_globalcycle(cls, **kwargs):
-        global_cycle = cls(
-            is_global=True,
-            title=GLOBAL_CYCLE_TITLE,
-            description=GLOBAL_CYCLE_DESCRIPTION, **kwargs)
-        global_cycle.save()
-        return global_cycle
+        try:
+            global_cycle = SalesCycle.get_global(contact_id=kwargs['contact_id'], 
+                                    subscription_id=kwargs['subscription_id'])
+        except SalesCycle.DoesNotExist: 
+            global_cycle = cls(
+                is_global=True,
+                title=GLOBAL_CYCLE_TITLE,
+                description=GLOBAL_CYCLE_DESCRIPTION, **kwargs)
+            global_cycle.save()
+        finally:
+            return global_cycle
 
     def add_mention(self, user_ids=None):
         if isinstance(user_ids, int):
@@ -919,12 +924,9 @@ class Activity(SubscriptionObject):
             self.feedback.save()
 
     def spray(self, subscription_id):
-        if self.sales_cycle.is_global:
-            unfollow_set = set([])
-        else:
-            unfollow_set = {
-                unfollower.id for unfollower
-                in self.sales_cycle.contact.unfollowers.all()}
+        unfollow_set = {
+            unfollower.id for unfollower
+            in self.sales_cycle.contact.unfollowers.all()}
 
         q = Q(subscription_id=subscription_id)
         university_set = set(CRMUser.objects.filter(q).values_list(
