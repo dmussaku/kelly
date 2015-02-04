@@ -386,7 +386,7 @@ class ContactResource(CRMServiceModelResource):
         return bundle
 
     def full_hydrate(self, bundle, **kwargs):
-        t1 = time.time()
+        # t1 = time.time()
         contact_id = kwargs.get('pk', None)
         subscription_id = self.get_crmsubscr_id(bundle.request)
         if contact_id:
@@ -409,8 +409,8 @@ class ContactResource(CRMServiceModelResource):
         bundle = self.hydrate_parent(bundle)
         if bundle.data.get('user_id', ""):
             bundle.obj.owner_id = int(bundle.data['user_id'])
-        if bundle.data.get('parent_id',""):
-            bundle.obj.parent_id = int(bundle.data['parent_id'])
+        # if bundle.data.get('parent_id',""):
+        #     bundle.obj.parent_id = int(bundle.data['parent_id'])
         field_names = bundle.obj._meta.get_all_field_names()
         field_names.remove('parent')
         field_names.remove('children')
@@ -444,13 +444,13 @@ class ContactResource(CRMServiceModelResource):
                             bundle=vcard_bundle,
                             **kwargs
                             )
-        t2=time.time()-t1
-        print "Time to finish contact hydration %s" % t2
+        # t2=time.time()-t1
+        # print "Time to finish contact hydration %s" % t2
         bundle.obj.vcard = vcard_bundle.obj
-        t3=time.time()-t2
-        print "Time to finish vcard hydration %s" % t3
+        # t3=time.time()-t2
+        # print "Time to finish vcard hydration %s" % t3
         bundle.obj.save()
-        with transaction.commit_on_success():
+        with transaction.atomic():
             if bundle.data.get('note') and not kwargs.get('pk'):
                 bundle.obj.create_share_to(self.get_crmuser(bundle.request).id,
                                            bundle.data.get('note'))
@@ -461,8 +461,8 @@ class ContactResource(CRMServiceModelResource):
                      'contact_id':bundle.obj.id
                     }
                 )
-        t4=time.time()-t3
-        print "Time to finish creating share and sales_cycle objects %s" % t4
+        # t4=time.time()-t3
+        # print "Time to finish creating share and sales_cycle objects %s" % t4
         return bundle
 
     def follow_contacts(self, request, **kwargs):
@@ -1315,11 +1315,12 @@ class ActivityResource(CRMServiceModelResource):
         act = bundle.obj = self._meta.object_class()
         act.author_id = bundle.data.get('author_id')
         act.description = bundle.data.get('description')
-        if bundle.data.get('sales_cycle_id', None):
-            act.sales_cycle_id = bundle.data.get('sales_cycle_id')
-        else:
-            _subscr_id = self.get_crmsubscr_id(bundle.request)
-            act.sales_cycle_id = SalesCycle.get_global(_subscr_id).pk
+        act.sales_cycle_id = bundle.data.get('sales_cycle_id')
+        # if bundle.data.get('sales_cycle_id', None):
+        #     act.sales_cycle_id = bundle.data.get('sales_cycle_id')
+        # else:
+        #     _subscr_id = self.get_crmsubscr_id(bundle.request)
+        #     act.sales_cycle_id = SalesCycle.get_global(_subscr_id).pk
         act.save()
         if bundle.data.get('feedback_status'):
             act.feedback = Feedback(
@@ -2106,7 +2107,6 @@ class AppStateObject(object):
 
     def get_constants(self):
         return {
-            'global_sales_cycle_id': SalesCycle.get_global(self.subscription_id).id,
             'sales_cycle': {
                 'statuses': SalesCycle.STATUSES_OPTIONS,
                 'statuses_hash': SalesCycle.STATUSES_DICT
