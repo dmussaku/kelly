@@ -460,20 +460,24 @@ class Contact(SubscriptionObject):
         return rv
 
     @classmethod
-    def import_from_csv(cls, csv_file, creator):
-        raw_data = csv_file.read()
+    def import_from_csv(cls, csv_file_data, creator):
+        raw_data = csv_file_data.split('\n')
+        raw_data = [obj.replace('"','') for obj in raw_data]
+        raw_data = [obj.encode('utf-8') for obj in raw_data]
         fields = raw_data[0].split(';')
         data = []
         for obj in raw_data[1:]:
             data.append(obj.split(';'))
+        # print data
         contact_list = []
         for i in range(0, len(data)):
             if len(fields)==len(data[i]):
-                c = Contact()
+                c = cls()
                 c.owner = creator.get_crmuser()
                 c.subscription_id = creator.get_crmuser().subscription_id
                 v = VCard()
                 v.given_name = data[i][0].decode('utf-8')
+                # print data[i]
                 v.additional_name = data[i][1].decode('utf-8')
                 v.family_name = data[i][2].decode('utf-8')
                 v.fn = v.given_name+" "+v.family_name
@@ -481,8 +485,11 @@ class Contact(SubscriptionObject):
                     continue
                 v.save()
                 c.vcard = v
-                c.sales_cycles.add(SalesCycle().create_globalcycle())
                 c.save()
+                # c.sales_cycles.add(SalesCycle().create_globalcycle(
+                #     owner=creator.get_crmuser(),
+                #     contact=c
+                #     ))
                 if data[i][5]:
                     org = Org(vcard=v)
                     org.organization_name = data[i][5].decode('utf-8')
@@ -528,6 +535,8 @@ class Contact(SubscriptionObject):
                     email.value = data[i][15].decode('utf-8')
                     email.save()
                 contact_list.append(c)
+                print "%s created contact %s" % (c, c.id)
+                # print contact_list
         return contact_list
 
 

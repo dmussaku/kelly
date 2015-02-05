@@ -1075,6 +1075,7 @@ class ContactResource(CRMServiceModelResource):
         ...        ],
         ... },
         '''
+
         objects = []
         contact_resource = ContactResource()
         self.method_check(request, allowed=['post'])
@@ -1083,17 +1084,24 @@ class ContactResource(CRMServiceModelResource):
         data = self.deserialize(
             request, request.body,
             format=request.META.get('CONTENT_TYPE', 'application/json'))
-
         current_crmuser = request.user.get_crmuser()
-        for contact in Contact.import_from_vcard(
-                data['uploaded_file'], current_crmuser):
+        if data['filename'].split('.')[1]=='csv':
+            for contact in Contact.import_from_csv(
+                data['uploaded_file'], request.user):
+                _bundle = contact_resource.build_bundle(
+                    obj=contact, request=request)
+                objects.append(contact_resource.full_dehydrate(
+                    _bundle, for_list=True))
+        else:    
+            for contact in Contact.import_from_vcard(
+                    data['uploaded_file'], current_crmuser):
 
-            contact.create_share_to(current_crmuser.pk)
+                contact.create_share_to(current_crmuser.pk)
 
-            _bundle = contact_resource.build_bundle(
-                obj=contact, request=request)
-            objects.append(contact_resource.full_dehydrate(
-                _bundle, for_list=True))
+                _bundle = contact_resource.build_bundle(
+                    obj=contact, request=request)
+                objects.append(contact_resource.full_dehydrate(
+                    _bundle, for_list=True))
         self.log_throttled_access(request)
         return self.create_response(request, {'success': objects})
 
