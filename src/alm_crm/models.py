@@ -823,7 +823,7 @@ class SalesCycle(SubscriptionObject):
     @classmethod
     def get_salescycles_by_last_activity_date(
         cls, subscription_id, user_id=None, owned=True, mentioned=False,
-        followed=False, all=False, include_activities=False):
+            followed=False, all=False, include_activities=False):
         """Returns sales_cycles where user is owner, mentioned or followed
             ordered by last activity date.
 
@@ -900,7 +900,7 @@ class Activity(SubscriptionObject):
 
     @property
     def author_id(self):
-        return self.owner.id
+        return self.owner_id
 
     @author_id.setter
     def author_id(self, author_id):
@@ -909,6 +909,12 @@ class Activity(SubscriptionObject):
     @property
     def contact(self):
         return self.sales_cycle.contact
+
+    @property
+    def feedback_status(self):
+        if hasattr(self, 'feedback'):
+            return self.feedback.status
+        return None
 
     def set_feedback(self, feedback_obj, save=False):
         """Set feedback to activity instance. Saves if `save` is set(True)."""
@@ -944,6 +950,10 @@ class Activity(SubscriptionObject):
             for follower in followers:
                 act_recip = ActivityRecipient(user=follower, activity=self)
                 act_recip.save()
+
+    def has_read(self, user_id):
+        recip = self.recipients.filter(user__pk=user_id).first()
+        return not recip or recip.has_read
 
     @classmethod
     def mark_as_read(cls, user_id, act_id):

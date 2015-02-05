@@ -41,7 +41,7 @@ class VCardResource(ModelResource):
                               related_name='vcard', null=True, full=True)
     orgs = fields.ToManyField('alm_vcard.api.VCardOrgResource', 'org_set',
                               related_name='vcard', null=True, full=True)
-    geos = fields.ToManyField('alm_vcard.api.VCardGeo', 'geo_set',
+    geos = fields.ToManyField('alm_vcard.api.VCardGeoResource', 'geo_set',
                               related_name='vcard', null=True, full=True)
     adrs = fields.ToManyField('alm_vcard.api.VCardAdrResource', 'adr_set',
                               related_name='vcard', null=True, full=True)
@@ -88,7 +88,7 @@ class VCardResource(ModelResource):
     @transaction.commit_on_success()
     def full_hydrate(self, bundle):
         return super(self.__class__, self).full_hydrate(bundle)
-        
+
     def obj_delete(self, bundle, **kwargs):
         return super(self.__class__, self).obj_delete(bundle, **kwargs)
 
