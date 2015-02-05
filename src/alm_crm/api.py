@@ -1004,7 +1004,6 @@ class ContactResource(CRMServiceModelResource):
         current_crmuser = request.user.get_crmuser()
         for contact in Contact.import_from_vcard(
                 data['uploaded_file'], current_crmuser):
-
             contact.create_share_to(current_crmuser.pk)
 
             _bundle = contact_resource.build_bundle(

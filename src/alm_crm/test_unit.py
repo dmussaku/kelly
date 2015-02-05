@@ -90,9 +90,14 @@ class ContactTestCase(TestCase):
     def test_upload_contacts(self):
         file_path = os.path.join(os.path.dirname(os.path.dirname(__file__)),
                                  'alm_crm/fixtures/aliya.vcf')
+        # amount_before_import = SalesCycle.objects.all().count()
         file_obj = open(file_path, "r").read()
         contact = Contact.upload_contacts(upload_type='vcard',
-                                          file_obj=file_obj)
+                                          file_obj=file_obj,
+                                          save = True)
+        # amount_after_import = SalesCycle.objects.all().count()
+        # self.assertEqual(amount_after_import, amount_before_import+1)
+        # self.assertTrue(c.sales_cycles.first().title == GLOBAL_CYCLE_TITLE for c in contacts)
         self.assertEqual(contact.__class__, Contact)
         self.assertEqual(contact.vcard.__class__, VCard)
         addr = list(contact.vcard.adr_set.all())
@@ -188,8 +193,10 @@ class ContactTestCase(TestCase):
         count = Contact.objects.all().count()
         file_path = os.path.join(os.path.dirname(os.path.dirname(__file__)),
                                  'alm_crm/fixtures/nurlan.vcf')
+        amount_before_import = SalesCycle.objects.all().count()
         contacts = Contact.import_from_vcard(raw_vcard=open(file_path, "r"),
                                                 creator=CRMUser.objects.first())
+        amount_after_import = SalesCycle.objects.all().count()
 
         contact1 = Contact.filter_contacts_by_vcard(self.crm_subscr_id,
                                                     search_text='Aslan',
@@ -207,6 +214,8 @@ class ContactTestCase(TestCase):
                                                     search_text='Mukatayev',
                                                     search_params=[('fn', 'icontains')],
                                                     order_by=[])
+        self.assertEqual(amount_after_import, amount_before_import+3)
+        self.assertTrue(c.sales_cycles.first().title == GLOBAL_CYCLE_TITLE for c in contacts)
         self.assertEqual(len(Contact.objects.all()), count+3)
         self.assertEqual(len(contact4), 3)
         self.assertTrue(contact1.first() in Contact.objects.all())
