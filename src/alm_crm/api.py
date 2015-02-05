@@ -1007,6 +1007,12 @@ class ContactResource(CRMServiceModelResource):
 
             _bundle = contact_resource.build_bundle(
                 obj=contact, request=request)
+            
+            _bundle.data['global_sales_cycle'] = SalesCycleResource().full_dehydrate(
+                SalesCycleResource().build_bundle(
+                    obj=SalesCycle.objects.get(contact_id=contact.id)
+                )
+            )
             objects.append(contact_resource.full_dehydrate(
                 _bundle, for_list=True))
         self.log_throttled_access(request)

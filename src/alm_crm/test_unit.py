@@ -1462,8 +1462,14 @@ class ContactResourceTest(ResourceTestMixin, ResourceTestCase):
                                                     order_by=[])
         self.assertEqual(amount_after_import, amount_before_import+3)
         self.assertTrue(c.sales_cycles.first().title == GLOBAL_CYCLE_TITLE for c in contact4)
-        self.assertTrue('sales_cycles' in self.deserialize(resp)['success'][i].keys()
+        self.assertTrue('global_sales_cycle' in self.deserialize(resp)['success'][i].keys()
                         for i in range(0,3))
+        self.assertEqual(self.deserialize(resp)['success'][0]['global_sales_cycle']['id'],
+                        contact1.first().sales_cycles.get(is_global=True).id)
+        self.assertEqual(self.deserialize(resp)['success'][1]['global_sales_cycle']['id'],
+                        contact2.first().sales_cycles.get(is_global=True).id)
+        self.assertEqual(self.deserialize(resp)['success'][2]['global_sales_cycle']['id'],
+                        contact3.first().sales_cycles.get(is_global=True).id)
         self.assertEqual(len(Contact.objects.all()), amout_of_contacts_before_import+3)
         self.assertEqual(len(contact4), 3)
         self.assertTrue(contact1.first() in Contact.objects.all())
