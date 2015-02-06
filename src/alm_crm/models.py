@@ -12,7 +12,7 @@ from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
 from django.utils import timezone
 import datetime
-
+import xlrd
 
 ALLOWED_TIME_PERIODS = ['week', 'month', 'year']
 
@@ -538,6 +538,12 @@ class Contact(SubscriptionObject):
                 print "%s created contact %s" % (c, c.id)
                 # print contact_list
         return contact_list
+
+
+    @classmethod
+    def import_from_xls(cls, xls_file_data, creator):
+        book = xlrd.open_workbook(file_contents=xls_file_data)
+        pass
 
 
 
