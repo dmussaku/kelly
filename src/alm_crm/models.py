@@ -738,8 +738,8 @@ class SalesCycle(SubscriptionObject):
         return '%s [%s %s]' % (self.title, self.contact, self.status)
 
     @classmethod
-    def get_global(cls, subscription_id):
-        return SalesCycle.objects.get(subscription_id=subscription_id,
+    def get_global(cls, subscription_id, contact_id):
+        return SalesCycle.objects.get(subscription_id=subscription_id, contact_id=contact_id,
                                       is_global=True)
 
     def find_latest_activity(self):
@@ -750,24 +750,18 @@ class SalesCycle(SubscriptionObject):
     # is declared in Mention class
 
     @classmethod
-    def on_subscribtion_reconn(cls, sender, **kwargs):
-        service = kwargs.get('service')
-        service_user = kwargs.get('service_user')
-        if not service.slug == settings.DEFAULT_SERVICE:
-            return
-        try:
-            service_user.owned_sales_cycles.get(is_global=True)
-        except SalesCycle.DoesNotExist:
-            cls.create_globalcycle(owner=service_user)
-
-    @classmethod
     def create_globalcycle(cls, **kwargs):
-        global_cycle = cls(
-            is_global=True,
-            title=GLOBAL_CYCLE_TITLE,
-            description=GLOBAL_CYCLE_DESCRIPTION, **kwargs)
-        global_cycle.save()
-        return global_cycle
+        try:
+            global_cycle = SalesCycle.get_global(contact_id=kwargs['contact_id'], 
+                                    subscription_id=kwargs['subscription_id'])
+        except SalesCycle.DoesNotExist: 
+            global_cycle = cls(
+                is_global=True,
+                title=GLOBAL_CYCLE_TITLE,
+                description=GLOBAL_CYCLE_DESCRIPTION, **kwargs)
+            global_cycle.save()
+        finally:
+            return global_cycle
 
     def add_mention(self, user_ids=None):
         if isinstance(user_ids, int):
@@ -911,7 +905,7 @@ class SalesCycle(SubscriptionObject):
     @classmethod
     def get_salescycles_by_last_activity_date(
         cls, subscription_id, user_id=None, owned=True, mentioned=False,
-        followed=False, all=False, include_activities=False):
+            followed=False, all=False, include_activities=False):
         """Returns sales_cycles where user is owner, mentioned or followed
             ordered by last activity date.
 
@@ -988,7 +982,7 @@ class Activity(SubscriptionObject):
 
     @property
     def author_id(self):
-        return self.owner.id
+        return self.owner_id
 
     @author_id.setter
     def author_id(self, author_id):
@@ -997,6 +991,12 @@ class Activity(SubscriptionObject):
     @property
     def contact(self):
         return self.sales_cycle.contact
+
+    @property
+    def feedback_status(self):
+        if hasattr(self, 'feedback'):
+            return self.feedback.status
+        return None
 
     def set_feedback(self, feedback_obj, save=False):
         """Set feedback to activity instance. Saves if `save` is set(True)."""
@@ -1015,12 +1015,9 @@ class Activity(SubscriptionObject):
             self.feedback.save()
 
     def spray(self, subscription_id):
-        if self.sales_cycle.is_global:
-            unfollow_set = set([])
-        else:
-            unfollow_set = {
-                unfollower.id for unfollower
-                in self.sales_cycle.contact.unfollowers.all()}
+        unfollow_set = {
+            unfollower.id for unfollower
+            in self.sales_cycle.contact.unfollowers.all()}
 
         q = Q(subscription_id=subscription_id)
         university_set = set(CRMUser.objects.filter(q).values_list(
@@ -1032,6 +1029,10 @@ class Activity(SubscriptionObject):
             for follower in followers:
                 act_recip = ActivityRecipient(user=follower, activity=self)
                 act_recip.save()
+
+    def has_read(self, user_id):
+        recip = self.recipients.filter(user__pk=user_id).first()
+        return not recip or recip.has_read
 
     @classmethod
     def mark_as_read(cls, user_id, act_id):
@@ -1448,9 +1449,6 @@ class ContactList(SubscriptionObject):
 
     def count(self):
         return self.users.count()
-
-
-almanet_signals.subscription_reconn.connect(SalesCycle.on_subscribtion_reconn)
 
 
 class SalesCycleProductStat(SubscriptionObject):
