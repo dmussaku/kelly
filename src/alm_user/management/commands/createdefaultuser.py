@@ -47,7 +47,6 @@ class Command(BaseCommand):
                 c=Company.objects.get(subdomain=subdomain)
                 u.owned_company.add(c)
             except (Company.DoesNotExist, KeyError):
-                u = UserManager().create_user(first_name, last_name, email, password, is_admin)
                 c = Company(name=name, subdomain=subdomain)
                 c.save()
                 c.users.add(u)
