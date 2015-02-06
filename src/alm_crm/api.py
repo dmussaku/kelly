@@ -2208,6 +2208,8 @@ class AppStateObject(object):
                 'subscription_id'])
 
             def _value(value_name):
+                if s.is_global:
+                    return None
                 if hasattr(s, value_name):
                     v = getattr(s, value_name)
                     dv = model_to_dict(v, exclude=['owner', 'amount'])
