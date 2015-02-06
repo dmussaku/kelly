@@ -451,7 +451,6 @@ class ContactResource(CRMServiceModelResource):
                         request=bundle.request
                         )
                     if kwargs.get('pk', None):
-                        print vcard_bundle
                         vcard_bundle = VCardResource().obj_create(
                             bundle=vcard_bundle,
                             skip_errors=False,
@@ -1022,11 +1021,16 @@ class ContactResource(CRMServiceModelResource):
         current_crmuser = request.user.get_crmuser()
         for contact in Contact.import_from_vcard(
                 data['uploaded_file'], current_crmuser):
-
             contact.create_share_to(current_crmuser.pk)
 
             _bundle = contact_resource.build_bundle(
                 obj=contact, request=request)
+            
+            _bundle.data['global_sales_cycle'] = SalesCycleResource().full_dehydrate(
+                SalesCycleResource().build_bundle(
+                    obj=SalesCycle.objects.get(contact_id=contact.id)
+                )
+            )
             objects.append(contact_resource.full_dehydrate(
                 _bundle, for_list=True))
         self.log_throttled_access(request)

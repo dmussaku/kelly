@@ -90,9 +90,14 @@ class ContactTestCase(TestCase):
     def test_upload_contacts(self):
         file_path = os.path.join(os.path.dirname(os.path.dirname(__file__)),
                                  'alm_crm/fixtures/aliya.vcf')
+        # amount_before_import = SalesCycle.objects.all().count()
         file_obj = open(file_path, "r").read()
         contact = Contact.upload_contacts(upload_type='vcard',
-                                          file_obj=file_obj)
+                                          file_obj=file_obj,
+                                          save = True)
+        # amount_after_import = SalesCycle.objects.all().count()
+        # self.assertEqual(amount_after_import, amount_before_import+1)
+        # self.assertTrue(c.sales_cycles.first().title == GLOBAL_CYCLE_TITLE for c in contacts)
         self.assertEqual(contact.__class__, Contact)
         self.assertEqual(contact.vcard.__class__, VCard)
         addr = list(contact.vcard.adr_set.all())
@@ -188,8 +193,10 @@ class ContactTestCase(TestCase):
         count = Contact.objects.all().count()
         file_path = os.path.join(os.path.dirname(os.path.dirname(__file__)),
                                  'alm_crm/fixtures/nurlan.vcf')
+        amount_before_import = SalesCycle.objects.all().count()
         contacts = Contact.import_from_vcard(raw_vcard=open(file_path, "r"),
                                                 creator=CRMUser.objects.first())
+        amount_after_import = SalesCycle.objects.all().count()
 
         contact1 = Contact.filter_contacts_by_vcard(self.crm_subscr_id,
                                                     search_text='Aslan',
@@ -207,6 +214,8 @@ class ContactTestCase(TestCase):
                                                     search_text='Mukatayev',
                                                     search_params=[('fn', 'icontains')],
                                                     order_by=[])
+        self.assertEqual(amount_after_import, amount_before_import+3)
+        self.assertTrue(c.sales_cycles.first().title == GLOBAL_CYCLE_TITLE for c in contacts)
         self.assertEqual(len(Contact.objects.all()), count+3)
         self.assertEqual(len(contact4), 3)
         self.assertTrue(contact1.first() in Contact.objects.all())
@@ -1204,6 +1213,7 @@ class ContactResourceTest(ResourceTestMixin, ResourceTestCase):
         self.api_path_contact = '/api/v1/contact/'
         self.api_path_contact_products_f = '/api/v1/contact/%s/products/'
         self.api_path_contact_activities_f = '/api/v1/contact/%s/activities/'
+        self.api_path_import = '/api/v1/contact/import/'
 
 
         # get_list
@@ -1233,6 +1243,13 @@ class ContactResourceTest(ResourceTestMixin, ResourceTestCase):
                                                                             HTTP_HOST='localhost')
 
         self.get_list_recent_des = self.deserialize(self.get_list_recent_resp)
+
+         #get list for recent contacts
+        self.get_list_import_resp = self.api_client.get(self.api_path_contact+'import/',
+                                                                            format='json',
+                                                                            HTTP_HOST='localhost')
+
+        self.get_list_import_des = self.deserialize(self.get_list_import_resp)
 
         # get_detail(pk)
         self.get_detail_resp = \
@@ -1408,6 +1425,57 @@ class ContactResourceTest(ResourceTestMixin, ResourceTestCase):
             )
         self.assertEqual(len(self.deserialize(resp)['objects']),
                          len(Contact.get_contact_activities(self.contact.pk)))
+
+    def test_import_from_vcard(self):
+        uploaded_file = os.path.join(os.path.dirname(os.path.dirname(__file__)),
+                                 'alm_crm/fixtures/nurlan.vcf')
+        post_data = {
+            "uploaded_file": open(uploaded_file, "r").read()
+        }
+
+        amount_before_import = SalesCycle.objects.all().count()
+        amout_of_contacts_before_import = Contact.objects.all().count()
+
+        resp = self.api_client.post(
+            self.api_path_import, format='json', data=post_data)
+
+        self.assertHttpOK(resp)
+
+
+        amount_after_import = SalesCycle.objects.all().count()
+
+        contact1 = Contact.filter_contacts_by_vcard(self.crm_subscr_id,
+                                                    search_text='Aslan',
+                                                    search_params=[('fn', 'icontains')],
+                                                    order_by=[])
+        contact2 = Contact.filter_contacts_by_vcard(self.crm_subscr_id,
+                                                    search_text='Serik',
+                                                    search_params=[('fn', 'icontains')],
+                                                    order_by=[])
+        contact3 = Contact.filter_contacts_by_vcard(self.crm_subscr_id,
+                                                    search_text='Almat',
+                                                    search_params=[('fn', 'icontains')],
+                                                    order_by=[])
+        contact4 = Contact.filter_contacts_by_vcard(self.crm_subscr_id,
+                                                    search_text='Mukatayev',
+                                                    search_params=[('fn', 'icontains')],
+                                                    order_by=[])
+        self.assertEqual(amount_after_import, amount_before_import+3)
+        self.assertTrue(c.sales_cycles.first().title == GLOBAL_CYCLE_TITLE for c in contact4)
+        self.assertTrue('global_sales_cycle' in self.deserialize(resp)['success'][i].keys()
+                        for i in range(0,3))
+        self.assertEqual(self.deserialize(resp)['success'][0]['global_sales_cycle']['id'],
+                        contact1.first().sales_cycles.get(is_global=True).id)
+        self.assertEqual(self.deserialize(resp)['success'][1]['global_sales_cycle']['id'],
+                        contact2.first().sales_cycles.get(is_global=True).id)
+        self.assertEqual(self.deserialize(resp)['success'][2]['global_sales_cycle']['id'],
+                        contact3.first().sales_cycles.get(is_global=True).id)
+        self.assertEqual(len(Contact.objects.all()), amout_of_contacts_before_import+3)
+        self.assertEqual(len(contact4), 3)
+        self.assertTrue(contact1.first() in Contact.objects.all())
+        self.assertTrue(contact2.first() in Contact.objects.all())
+        self.assertTrue(contact3.first() in Contact.objects.all())
+
 
 
 class ContactListResourceTest(ResourceTestMixin, ResourceTestCase):
