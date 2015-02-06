@@ -1025,7 +1025,7 @@ class ContactResource(CRMServiceModelResource):
 
             _bundle = contact_resource.build_bundle(
                 obj=contact, request=request)
-            
+
             _bundle.data['global_sales_cycle'] = SalesCycleResource().full_dehydrate(
                 SalesCycleResource().build_bundle(
                     obj=SalesCycle.objects.get(contact_id=contact.id)
@@ -2212,6 +2212,8 @@ class AppStateObject(object):
                     return None
                 if hasattr(s, value_name):
                     v = getattr(s, value_name)
+                    if v is None:
+                        return None
                     dv = model_to_dict(v, exclude=['owner', 'amount'])
                     dv.update({'value': v.amount})
                 else:
