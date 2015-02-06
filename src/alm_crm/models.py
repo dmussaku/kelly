@@ -486,10 +486,12 @@ class Contact(SubscriptionObject):
                 v.save()
                 c.vcard = v
                 c.save()
-                # c.sales_cycles.add(SalesCycle().create_globalcycle(
-                #     owner=creator.get_crmuser(),
-                #     contact=c
-                #     ))
+                SalesCycle.create_globalcycle(
+                        **{'subscription_id':c.subscription_id,
+                         'owner_id':creator.get_crmuser().id,
+                         'contact_id':c.id
+                        }
+                    )
                 if data[i][5]:
                     org = Org(vcard=v)
                     org.organization_name = data[i][5].decode('utf-8')
