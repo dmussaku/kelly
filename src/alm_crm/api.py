@@ -1,19 +1,3 @@
-from tastypie import fields, http
-from tastypie.contrib.contenttypes.fields import GenericForeignKeyField
-from django.contrib.contenttypes.models import ContentType
-from tastypie.constants import ALL_WITH_RELATIONS
-from tastypie.resources import Resource, ModelResource
-from tastypie.authorization import Authorization
-from tastypie.utils import trailing_slash
-from tastypie.authentication import (
-    MultiAuthentication,
-    SessionAuthentication,
-    BasicAuthentication,
-    )
-from django.conf.urls import url
-from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
-from django.forms.models import model_to_dict
-from django.utils import translation
 from .models import (
     SalesCycle,
     Product,
@@ -29,17 +13,53 @@ from .models import (
     SalesCycleProductStat,
     Filter
     )
+from alm_vcard.api import (
+    VCardResource,
+    VCardEmailResource,
+    VCardTelResource,
+    VCardOrgResource,
+    VCardGeoResource,
+    VCardAdrResource,
+    VCardAgentResource,
+    VCardCategoryResource,
+    VCardKeyResource,
+    VCardLabelResource,
+    VCardMailerResource,
+    VCardNicknameResource,
+    VCardNoteResource,
+    VCardRoleResource,
+    VCardTitleResource,
+    VCardTzResource,
+    VCardUrlResource
+    )
 from alm_vcard.models import *
-from alm_vcard.api import VCardResource
 from almanet.settings import DEFAULT_SERVICE
 from almanet.utils.api import RequestContext
 from almanet.utils.env import get_subscr_id
-import ast
-from tastypie.serializers import Serializer
+from django.conf.urls import url
+from django.contrib.contenttypes.models import ContentType
+from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.db import models
-from tastypie.exceptions import ImmediateHttpResponse, NotFound, Unauthorized
+from django.db import transaction
+from django.forms.models import model_to_dict
 from django.http import HttpResponse
+from django.utils import translation
+from tastypie import fields, http
+from tastypie.authentication import (
+    MultiAuthentication,
+    SessionAuthentication,
+    BasicAuthentication,
+    )
+from tastypie.authorization import Authorization
+from tastypie.constants import ALL_WITH_RELATIONS
+from tastypie.contrib.contenttypes.fields import GenericForeignKeyField
+from tastypie.exceptions import ImmediateHttpResponse, NotFound, Unauthorized
+from tastypie.resources import Resource, ModelResource
+from tastypie.serializers import Serializer
+from tastypie.utils import trailing_slash
+import ast
 import datetime
+import time
 
 
 class CommonMeta:
@@ -279,14 +299,19 @@ class ContactResource(CRMServiceModelResource):
             setattr(bundle.obj, key, value)
 
         bundle = self.full_hydrate(bundle)
-        raise ImmediateHttpResponse(
-            HttpResponse(
-                content=Serializer().to_json(
-                    self.full_dehydrate(
+        new_bundle = self.full_dehydrate(
                         self.build_bundle(
                             obj=Contact.objects.get(id=bundle.obj.id))
                         )
-                    ),
+        new_bundle.data['global_sales_cycle'] = SalesCycleResource().full_dehydrate(
+                SalesCycleResource().build_bundle(
+                    obj=SalesCycle.objects.get(contact_id=bundle.obj.id)
+                )
+            )
+        #return self.save(bundle, skip_errors=skip_errors)
+        raise ImmediateHttpResponse(
+            HttpResponse(
+                content=Serializer().to_json(new_bundle),
                 content_type='application/json; charset=utf-8', status=200
                 )
             )
@@ -359,7 +384,11 @@ class ContactResource(CRMServiceModelResource):
 
     def hydrate_sales_cycles(self, bundle):
         for sales_cycle in bundle.data.get('sales_cycles', []):
-            bundle.obj.sales_cycles.add(SalesCycle.objects.get(id=int(sales_cycle)))
+            bundle.obj.sales_cycles.add(
+                SalesCycle.objects.get(
+                    id=int(sales_cycle)
+                    )
+                )
         return bundle
 
     def hydrate_parent(self, bundle):
@@ -384,7 +413,7 @@ class ContactResource(CRMServiceModelResource):
         else:
             bundle.obj = self._meta.object_class()
             bundle.obj.subscription_id = subscription_id
-            # bundle.obj.owner_id = bundle.request.user.get_crmuser().id
+            bundle.obj.owner_id = bundle.request.user.get_crmuser().id
             bundle.obj.save()
 
         '''
@@ -404,6 +433,7 @@ class ContactResource(CRMServiceModelResource):
         field_names.remove('parent')
         field_names.remove('children')
         field_names.remove('sales_cycles')
+        field_names.remove('share_set')
         for field_name in field_names:
             if bundle.data.get(str(field_name), None):
                 try:
@@ -415,138 +445,43 @@ class ContactResource(CRMServiceModelResource):
                 elif isinstance(field_object, list):
                     for obj in field_object:
                         bundle.obj.__getattribute__(field_name).add(int(obj))
-                elif isinstance(field_object, dict):
-                    # t2 = time.time() - t1
-                    self.vcard_full_hydrate(bundle)
-                    # t3 = time.time() - t2
-
-        bundle.obj.save()
-        if bundle.data.get('note') and not kwargs.get('pk'):
-            bundle.obj.create_share_to(self.get_crmuser(bundle.request).id,
-                                       bundle.data.get('note'))
-
-        return bundle
-
-    def vcard_full_hydrate(self, bundle):
-        field_object = bundle.data.get('vcard', {})
-        subscription_id = self.get_crmsubscr_id(bundle.request)
-        if bundle.obj.vcard:
-            vcard = bundle.obj.vcard
-        else:
-            vcard = VCard()
-        vcard_fields = list(VCard._meta.get_fields_with_model())
-        for vcard_field in vcard_fields:
-            if vcard_field[0].__class__==models.fields.AutoField:
-                pass
-            elif vcard_field[0].__class__==models.fields.IntegerField:
-                pass
-            elif vcard_field[0].__class__==models.fields.DateField:
-                attname = vcard_field[0].attname
-                bday = field_object.get(attname, "")
-                '''
-                format = yyyy-mm-dd
-                '''
-                if bday:
-                    bday = datetime.datetime.strptime(bday, '%Y-%m-%d').date()
-                    vcard.__setattr__(attname, bday)
-            elif vcard_field[0].__class__==models.fields.DateTimeField:
-                attname = vcard_field[0].attname
-                rev = field_object.get(attname, "")
-                if rev:
-                    rev = datetime.datetime.strptime(date, "%Y-%m-%dT%H:%M:%S.%f")
-                    vcard.__setattr__(attname, bday)
-            elif vcard_field[0].__class__==models.fields.CharField:
-                attname = vcard_field[0].attname
-                vcard.__setattr__(attname,
-                    field_object.get(attname, ""))
-
-        vcard.save()
-        vcard.subscription_id = subscription_id
-        vcard.contact = bundle.obj
-        '''
-        Now i need to go over the list of vcard keys
-        check their model names, go through each and every
-        model and check for three things
-        1) if id is set, then change the values in json
-        2) if id is not set, then create
-        3) if models are missing then delete the missing values
-        '''
-        vcard_rel_fields = vcard._meta.get_all_related_objects()
-        vcard_rel_fields.reverse()
-        del vcard_rel_fields[0]
-        del vcard_rel_fields[0]
-        for vcard_field in vcard_rel_fields:
-            field_value = vcard_field.var_name+'s'
-            obj_list = ast.literal_eval(str(field_object.get(vcard_field.var_name+'s','None')))
-            vcard_field_name = vcard_field.var_name+'_set'
-            model = vcard.__getattribute__(vcard_field_name).model
-            if obj_list:
-                queryset = vcard.__getattribute__(vcard_field_name).all()
-                json_objects = obj_list
-                id_list = []
-                for obj in json_objects:
-                    if obj.get('id',None):
-                        vcard_obj = model.objects.get(id=int(obj.get('id',None)))
-                        vcard_obj.vcard = vcard
-                        del obj['id']
+                elif isinstance(field_object, dict) :
+                    vcard_bundle = VCardResource().build_bundle(
+                        data=field_object,
+                        request=bundle.request
+                        )
+                    if kwargs.get('pk', None):
+                        print vcard_bundle
+                        vcard_bundle = VCardResource().obj_create(
+                            bundle=vcard_bundle,
+                            skip_errors=False,
+                            **kwargs
+                            )
                     else:
-                        vcard_obj = model()
-                        vcard_obj.vcard = vcard
-                    for key, value in obj.viewitems():
-                        if key == 'vcard':
-                            vcard_obj.vcard = VCard.objects.get(id=value)
-                        else:
-                            vcard_obj.__setattr__(key, value)
-                    vcard_obj.subscription_id = subscription_id
-                    vcard_obj.save()
-                    id_list.append(vcard_obj.id)
-                for obj in queryset:
-                    if not obj.id in id_list:
-                        obj.delete()
-            else:
-                for obj in model.objects.filter(vcard=vcard):
-                    obj.delete()
-        vcard.subscription_id = subscription_id
-        vcard.save()
-
-    # def save(self, bundle, skip_errors=False):
-    #     self.is_valid(bundle)
-
-    #     if bundle.errors and not skip_errors:
-    #         raise ImmediateHttpResponse(response=self.error_response(bundle.request, bundle.errors))
-
-    #     # Check if they're authorized.
-    #     if bundle.obj.pk:
-    #         self.authorized_update_detail(self.get_object_list(bundle.request), bundle)
-    #     else:
-    #         self.authorized_create_detail(self.get_object_list(bundle.request), bundle)
-
-    #     # Save FKs just in case.
-    #     self.save_related(bundle)
-
-    #     #If Contact is saved with a small note/comment
-    #     # Save the main object.
-
-    #     if bundle.data['owner_id']:
-    #         bundle.obj.owner_id=int(bundle.data['owner_id'])
-    #     bundle.obj.save()
-    #     try:
-    #         if bundle.data['note']:
-    #             note = bundle.data['note']
-    #             share = Share(
-    #                 note=note,
-    #                 share_to_id=bundle.obj.owner.id,
-    #                 share_from_id=bundle.obj.owner.id,
-    #                 contact_id=bundle.obj.id
-    #                 )
-    #             share.save()
-    #     except KeyError:
-    #         bundle.obj.save()
-    #     bundle.objects_saved.add(self.create_identifier(bundle.obj))
-    #     # Now pick up the M2M bits.
-    #     m2m_bundle = self.hydrate_m2m(bundle)
-    #     self.save_m2m(m2m_bundle)
-    #     return bundle
+                        vcard_bundle = VCardResource().obj_create(
+                            bundle=vcard_bundle,
+                            **kwargs
+                            )
+        # t2=time.time()-t1
+        # print "Time to finish contact hydration %s" % t2
+        bundle.obj.vcard = vcard_bundle.obj
+        # t3=time.time()-t2
+        # print "Time to finish vcard hydration %s" % t3
+        bundle.obj.save()
+        with transaction.atomic():
+            if bundle.data.get('note') and not kwargs.get('pk'):
+                bundle.obj.create_share_to(self.get_crmuser(bundle.request).id,
+                                           bundle.data.get('note'))
+            if not kwargs.get('pk'):
+                SalesCycle.create_globalcycle(
+                    **{'subscription_id':subscription_id,
+                     'owner_id':self.get_crmuser(bundle.request).id,
+                     'contact_id':bundle.obj.id
+                    }
+                )
+        # t4=time.time()-t3
+        # print "Time to finish creating share and sales_cycle objects %s" % t4
+        return bundle
 
     def follow_contacts(self, request, **kwargs):
         if kwargs.get('contact_ids'):
@@ -1092,6 +1027,8 @@ class ContactResource(CRMServiceModelResource):
                     obj=contact, request=request)
                 objects.append(contact_resource.full_dehydrate(
                     _bundle, for_list=True))
+        elif data['filename'].split('.')[1]=='xls':
+            print data['uploaded_file']
         else:    
             for contact in Contact.import_from_vcard(
                     data['uploaded_file'], current_crmuser):
@@ -1326,12 +1263,8 @@ class ActivityResource(CRMServiceModelResource):
         ]
 
     def dehydrate(self, bundle):
-        recip = bundle.obj.recipients.filter(
-            user__pk=bundle.obj.owner_id).first()
-        if not recip or recip.has_read:
-            bundle.data['has_read'] = True
-        else:
-            bundle.data['has_read'] = False
+        crmuser = self.get_crmuser(bundle.request)
+        bundle.data['has_read'] = bundle.obj.has_read(crmuser.id)
 
         # send updated contact (status was changed to LEAD)
         if bundle.data.get('obj_created'):
@@ -1345,9 +1278,7 @@ class ActivityResource(CRMServiceModelResource):
         return bundle.obj.sales_cycle_id
 
     def dehydrate_feedback_status(self, bundle):
-        if hasattr(bundle.obj, 'feedback'):
-            return bundle.obj.feedback.status
-        return None
+        return bundle.obj.feedback_status
 
     def build_filters(self, filters=None):
         filters = super(self.__class__, self).build_filters(filters=filters)
@@ -1406,11 +1337,12 @@ class ActivityResource(CRMServiceModelResource):
         act = bundle.obj = self._meta.object_class()
         act.author_id = bundle.data.get('author_id')
         act.description = bundle.data.get('description')
-        if bundle.data.get('sales_cycle_id', None):
-            act.sales_cycle_id = bundle.data.get('sales_cycle_id')
-        else:
-            _subscr_id = self.get_crmsubscr_id(bundle.request)
-            act.sales_cycle_id = SalesCycle.get_global(_subscr_id).pk
+        act.sales_cycle_id = bundle.data.get('sales_cycle_id')
+        # if bundle.data.get('sales_cycle_id', None):
+        #     act.sales_cycle_id = bundle.data.get('sales_cycle_id')
+        # else:
+        #     _subscr_id = self.get_crmsubscr_id(bundle.request)
+        #     act.sales_cycle_id = SalesCycle.get_global(_subscr_id).pk
         act.save()
         if bundle.data.get('feedback_status'):
             act.feedback = Feedback(
@@ -1455,7 +1387,7 @@ class ProductResource(CRMServiceModelResource):
     @undocumented: Meta
     '''
     author_id = fields.IntegerField(attribute='author_id', null=True)
-    sales_cycles = fields.ToManyField(SalesCycleResource, 'sales_cycles', readonly=True)
+#    sales_cycles = fields.ToManyField(SalesCycleResource, 'sales_cycles', readonly=True)
 
     class Meta(CommonMeta):
         queryset = Product.objects.all()
@@ -1549,7 +1481,7 @@ class CRMUserResource(CRMServiceModelResource):
 
     @undocumented: Meta
     '''
-    user = fields.ToOneField('alm_user.api.UserResource', 'user', null=True, full=True)
+#    user = fields.ToOneField('alm_user.api.UserResource', 'user', null=True, full=True, readonly=True)
     unfollow_list = fields.ToManyField(ContactResource, 'unfollow_list', null=True, full=False)
     vcard = fields.ToOneField('alm_vcard.api.VCardResource', 'vcard', null=True, full=True)
 
@@ -1568,7 +1500,7 @@ class CRMUserResource(CRMServiceModelResource):
         ]
 
     def dehydrate_unfollow_list(self, bundle):
-        return [contact.id for contact in bundle.obj.unfollow_list.all()]
+        return list(bundle.obj.unfollow_list.values_list('id', flat=True))
 
     def dehydrate_vcard(self, bundle):
         try:
@@ -1583,7 +1515,8 @@ class CRMUserResource(CRMServiceModelResource):
     def full_dehydrate(self, bundle, for_list=False):
         bundle = super(self.__class__, self).full_dehydrate(bundle, for_list=True)
         user = bundle.obj.get_billing_user()
-        bundle.data['user'] = user.id
+        # WHY 'user' now 'user_id' ?
+        # bundle.data['user'] = user.id
         if user.userpic:
             bundle.data['userpic'] = user.userpic.url
         return bundle
@@ -1592,13 +1525,15 @@ class CRMUserResource(CRMServiceModelResource):
         data = self.deserialize(request, request.body, format=request.META.get('CONTENT_TYPE', 'application/json'))
         contact_ids = data.get('contact_ids', None)
         if contact_ids:
-            if type(contact_ids)!=list:
+            if type(contact_ids) != list:
                 return self.create_response(
-                    request, {'success':False, 'message':'Pass a list as a parameter'}
+                    request,
+                    {'success': False, 'message': 'Pass a list as a parameter'}
                     )
         else:
             return self.create_response(
-                    request, {'success':False, 'message':'Must pass a contact_ids parameter'}
+                    request,
+                    {'success': False, 'message': 'Must pass a contact_ids parameter'}
                     )
         crmuser = request.user.get_crmuser()
         unfollow_list = [contact.id for contact in crmuser.unfollow_list.all()]
@@ -2145,10 +2080,102 @@ class AppStateObject(object):
         self.constants = self.get_constants()
         self.session = self.get_session()
 
+    def _vcard(self, vcard):
+
+        def _email(email):
+            return model_to_dict(email, exclude=VCardEmailResource.Meta.excludes)
+
+        def _tel(tel):
+            return model_to_dict(tel, exclude=VCardTelResource.Meta.excludes)
+
+        def _org(org):
+            return model_to_dict(org, exclude=VCardOrgResource.Meta.excludes)
+
+        def _geo(geo):
+            return model_to_dict(geo, exclude=VCardGeoResource.Meta.excludes)
+
+        def _adr(adr):
+            return model_to_dict(adr, exclude=VCardAdrResource.Meta.excludes)
+
+        def _agent(agent):
+            return model_to_dict(agent, exclude=VCardAgentResource.Meta.excludes)
+
+        def _category(category):
+            return model_to_dict(category, exclude=VCardCategoryResource.Meta.excludes)
+
+        def _key(key):
+            return model_to_dict(key, exclude=VCardKeyResource.Meta.excludes)
+
+        def _label(label):
+            return model_to_dict(label, exclude=VCardLabelResource.Meta.excludes)
+
+        def _mailer(mailer):
+            return model_to_dict(mailer, exclude=VCardMailerResource.Meta.excludes)
+
+        def _nickname(nickname):
+            return model_to_dict(nickname, exclude=VCardNicknameResource.Meta.excludes)
+
+        def _note(note):
+            return model_to_dict(note, exclude=VCardNoteResource.Meta.excludes)
+
+        def _role(role):
+            return model_to_dict(role, exclude=VCardRoleResource.Meta.excludes)
+
+        def _title(title):
+            return model_to_dict(title, exclude=VCardTitleResource.Meta.excludes)
+
+        def _tz(tz):
+            return model_to_dict(tz, exclude=VCardTzResource.Meta.excludes)
+
+        def _url(url):
+            return model_to_dict(url, exclude=VCardUrlResource.Meta.excludes)
+
+        if vcard is None:
+            return None
+
+        d = model_to_dict(vcard, exclude=['id'])
+        d.update({
+            'emails': map(_email, vcard.email_set.all()),
+            'tels': map(_tel, vcard.tel_set.all()),
+            'orgs': map(_org, vcard.org_set.all()),
+            'geos': map(_geo, vcard.geo_set.all()),
+            'adrs': map(_adr, vcard.adr_set.all()),
+            'agents': map(_agent, vcard.agent_set.all()),
+            'categories': map(_category, vcard.category_set.all()),
+            'keys': map(_key, vcard.key_set.all()),
+            'labels': map(_label, vcard.label_set.all()),
+            'mailers': map(_mailer, vcard.mailer_set.all()),
+            'nicknames': map(_nickname, vcard.nickname_set.all()),
+            'notes': map(_note, vcard.note_set.all()),
+            'roles': map(_role, vcard.role_set.all()),
+            'titles': map(_title, vcard.title_set.all()),
+            'tzs': map(_tz, vcard.tz_set.all()),
+            'urls': map(_url, vcard.url_set.all()),
+            })
+        return d
+
+    def _share(self, share):
+        if share is None:
+            return None
+
+        d = model_to_dict(share, exclude=['subscription_id'])
+        d.update({'date_created': share.date_created})
+        return d
+
     def get_users(self):
         crmusers, users = CRMUser.get_crmusers(
             self.subscription_id, with_users=True)
-        return CRMUserResource().get_bundle_list(crmusers, self.request)
+
+        def _map(cu):
+            user = users.get(id=cu.user_id)
+            vcard = VCard.objects.get(id=user.vcard.id)
+
+            d = model_to_dict(cu)
+            d.update({'vcard': self._vcard(vcard)})
+            return d
+
+        return map(_map, crmusers)
+        # return CRMUserResource().get_bundle_list(crmusers, self.request)
 
     def get_company(self):
         data = model_to_dict(self.company, fields=['name', 'subdomain', 'id'])
@@ -2161,27 +2188,103 @@ class AppStateObject(object):
         contacts = Contact.get_contacts_by_last_activity_date(
             self.subscription_id, all=True)
 
-        return ContactResource().get_bundle_list(contacts, self.request)
+        def _map(c):
+            d = model_to_dict(c, exclude=['latest_activity'])
+            d.update({
+                    'author_id': c.owner_id,
+                    'date_created': c.date_created,
+                    'children': list(c.children.values_list('id', flat=True)),
+                    'parent_id': c.parent_id,
+                    'sales_cycles': list(c.sales_cycles.values_list('id', flat=True)),
+                    'share': self._share(c.share_set.first()),
+                    'vcard': self._vcard(c.vcard)
+                     })
+            return d
+
+        return map(_map, contacts)
+        # return ContactResource().get_bundle_list(contacts, self.request)
 
     def get_sales_cycles(self):
         sales_cycles = SalesCycle.get_salescycles_by_last_activity_date(
             self.subscription_id, all=True, include_activities=False)
 
-        return SalesCycleResource().get_bundle_list(sales_cycles, self.request)
+        def _map(s):
+            d = model_to_dict(s, fields=[
+                'id', 'title', 'description', 'is_global', 'status',
+                'subscription_id'])
+
+            def _value(value_name):
+                if hasattr(s, value_name):
+                    v = getattr(s, value_name)
+                    dv = model_to_dict(v, exclude=['owner', 'amount'])
+                    dv.update({'value': v.amount})
+                else:
+                    dv = None
+                return dv
+
+            def _stat(stat):
+                st = model_to_dict(stat, exclude=['product'])
+                st.update({'product_id': stat.product_id})
+                return st
+
+            d.update({
+                'author_id': s.owner_id,
+                'date_created': s.date_created,
+                'contact_id': s.contact_id,
+                'projected_value': _value('projected_value'),
+                'real_value': _value('real_value'),
+                'stat': map(_stat, s.salescycleproductstat_set.all())
+                })
+            return d
+
+        return map(_map, sales_cycles)
+        # return SalesCycleResource().get_bundle_list(sales_cycles, self.request)
 
     def get_activities(self):
         activities = Activity.get_activities_by_date_created(
             self.subscription_id, all=True, include_sales_cycles=False)
 
-        return ActivityResource().get_bundle_list(activities, self.request)
+        def _map(a):
+            d = model_to_dict(a, fields=['id', 'description'])
+            d.update({
+                'author_id': a.owner_id,
+                'date_created': a.date_created,
+                'feedback_status': a.feedback_status,
+                'sales_cycle_id': a.sales_cycle_id,
+                'has_read': a.has_read(self.current_crmuser.id)
+                })
+            return d
+
+        return map(_map, activities)
+        # return ActivityResource().get_bundle_list(activities, self.request)
 
     def get_filters(self):
         filters = Filter.get_filters_by_crmuser(self.subscription_id)
-        return FilterResource().get_bundle_list(filters, self.request)
+
+        def _map(f):
+            d = model_to_dict(f, exclude=['owner'])
+            d.update({
+                    'author_id': f.owner_id,
+                    'date_created': f.date_created
+                    })
+            return d
+
+        return map(_map, filters)
+        # return FilterResource().get_bundle_list(filters, self.request)
 
     def get_products(self):
         products = Product.get_products(self.subscription_id)
-        return ProductResource().get_bundle_list(products, self.request)
+
+        def _map(p):
+            d = model_to_dict(p, exclude=['owner'])
+            d.update({
+                'author_id': p.owner_id,
+                'date_created': p.date_created
+                })
+            return d
+
+        return map(_map, products)
+        # return ProductResource().get_bundle_list(products, self.request)
 
     def get_sales_cycle2products_map(self):
         sales_cycles = SalesCycle.get_salescycles_by_last_activity_date(
@@ -2193,11 +2296,11 @@ class AppStateObject(object):
 
     def get_shares(self):
         shares = Share.get_shares_in_for(self.subscription_id)
-        return ShareResource().get_bundle_list(shares, self.request)
+        return map(self._share, shares)
+        # return ShareResource().get_bundle_list(shares, self.request)
 
     def get_constants(self):
         return {
-            'global_sales_cycle_id': SalesCycle.get_global(self.subscription_id).id,
             'sales_cycle': {
                 'statuses': SalesCycle.STATUSES_OPTIONS,
                 'statuses_hash': SalesCycle.STATUSES_DICT
