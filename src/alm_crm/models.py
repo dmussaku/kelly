@@ -542,8 +542,84 @@ class Contact(SubscriptionObject):
 
     @classmethod
     def import_from_xls(cls, xls_file_data, creator):
+        print xls_file_data
         book = xlrd.open_workbook(file_contents=xls_file_data)
-        pass
+        sheets_left = True
+        contact_list = []
+        for sheet in book.sheets():
+            i = 1
+            header_row = sheet.row(0) 
+            while(sheets_left):
+                try:
+                    data = sheet.row(i)
+                    c = cls()
+                    c.owner = creator.get_crmuser()
+                    c.subscription_id = creator.get_crmuser().subscription_id
+                    v = VCard()
+                    v.given_name = data[0].value.decode('utf-8')
+                    # print data
+                    v.additional_name = data[1].value.decode('utf-8')
+                    v.family_name = data[2].value.decode('utf-8')
+                    v.fn = v.given_name+" "+v.family_name
+                    if not v.fn:
+                        continue
+                    v.save()
+                    c.vcard = v
+                    c.save()
+                    # c.sales_cycles.add(SalesCycle().create_globalcycle(
+                    #     owner=creator.get_crmuser(),
+                    #     contact=c
+                    #     ))
+                    if data[5].value:
+                        org = Org(vcard=v)
+                        org.organization_name = data[5].value.decode('utf-8')
+                        org.save()
+                    if data[6].value:
+                        title = Title(vcard=v)
+                        title.data = data[6].value.decode('utf-8')
+                        title.save()
+                    if data[7].value:
+                        tel = Tel(vcard=v, type='cell_phone')
+                        tel.value = data[7].value.decode('utf-8')
+                        tel.save()
+                    if data[8].value:
+                        tel = Tel(vcard=v, type='fax')
+                        tel.value = data[8].value.decode('utf-8')
+                        tel.save()
+                    if data[9].value:
+                        tel = Tel(vcard=v, type='home')
+                        tel.value = data[9].value.decode('utf-8')
+                        tel.save()
+                    if data[10].value:
+                        tel = Tel(vcard=v, type='pager')
+                        tel.value = data[10].value.decode('utf-8')
+                        tel.save()
+                    if data[11].value:
+                        tel = Tel(vcard=v, type='INTL')
+                        tel.value = data[11].value.decode('utf-8')
+                        tel.save()
+                    if data[12].value:
+                        email = Email(vcard=v, type='internet')
+                        email.value = data[12].value.decode('utf-8')
+                        email.save()
+                    if data[13].value:
+                        email = Email(vcard=v, type='x400')
+                        email.value = data[13].value.decode('utf-8')
+                        email.save()
+                    if data[14].value:
+                        tel = Tel(vcard=v, type='work')
+                        tel.value = data[14].value.decode('utf-8')
+                        tel.save()
+                    if data[15].value:
+                        email = Email(vcard=v, type='pref')
+                        email.value = data[15].value.decode('utf-8')
+                        email.save()
+                    contact_list.append(c)
+                    print "%s created contact %s" % (c, c.id)
+                    i = i+1
+                except:
+                    sheets_left = False
+        return contact_list
 
 
 

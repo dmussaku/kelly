@@ -1028,7 +1028,12 @@ class ContactResource(CRMServiceModelResource):
                 objects.append(contact_resource.full_dehydrate(
                     _bundle, for_list=True))
         elif data['filename'].split('.')[1]=='xls':
-            print data['uploaded_file']
+            for contact in Contact.import_from_xls(
+                data['uploaded_file'], request.user):
+                _bundle = contact_resource.build_bundle(
+                    obj=contact, request=request)
+                objects.append(contact_resource.full_dehydrate(
+                    _bundle, for_list=True))
         else:    
             for contact in Contact.import_from_vcard(
                     data['uploaded_file'], current_crmuser):
