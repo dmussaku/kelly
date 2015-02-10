@@ -427,6 +427,12 @@ class Contact(SubscriptionObject):
         contacts = upload_handler(file_obj)
         if save:
             contacts.save()
+            # SalesCycle.create_globalcycle(
+            #         **{'subscription_id': contacts.subscription_id,
+            #          'owner_id': contacts.owner.id,
+            #          'contact_id': contacts.id
+            #         }
+            #     )
         return contacts
 
     @classmethod
@@ -456,6 +462,13 @@ class Contact(SubscriptionObject):
                     continue
                 c = cls(vcard=vcard, owner=creator)
                 c.save()
+                SalesCycle.create_globalcycle(
+                    **{'subscription_id': c.subscription_id,
+                     'owner_id': c.owner.id,
+                     'contact_id': c.id
+                    }
+                )
+
                 rv.append(c)
         return rv
 

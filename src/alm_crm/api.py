@@ -451,7 +451,6 @@ class ContactResource(CRMServiceModelResource):
                         request=bundle.request
                         )
                     if kwargs.get('pk', None):
-                        print vcard_bundle
                         vcard_bundle = VCardResource().obj_create(
                             bundle=vcard_bundle,
                             skip_errors=False,
@@ -1025,6 +1024,11 @@ class ContactResource(CRMServiceModelResource):
                 data['uploaded_file'], request.user):
                 _bundle = contact_resource.build_bundle(
                     obj=contact, request=request)
+                _bundle.data['global_sales_cycle'] = SalesCycleResource().full_dehydrate(
+                    SalesCycleResource().build_bundle(
+                        obj=SalesCycle.objects.get(contact_id=contact.id)
+                    )
+                )
                 objects.append(contact_resource.full_dehydrate(
                     _bundle, for_list=True))
         elif data['filename'].split('.')[1]=='xls':
@@ -1033,6 +1037,11 @@ class ContactResource(CRMServiceModelResource):
                 base64.b64decode(data['uploaded_file']), request.user):
                 _bundle = contact_resource.build_bundle(
                     obj=contact, request=request)
+                _bundle.data['global_sales_cycle'] = SalesCycleResource().full_dehydrate(
+                    SalesCycleResource().build_bundle(
+                        obj=SalesCycle.objects.get(contact_id=contact.id)
+                    )
+                )
                 objects.append(contact_resource.full_dehydrate(
                     _bundle, for_list=True))
         else:    
@@ -1043,8 +1052,14 @@ class ContactResource(CRMServiceModelResource):
 
                 _bundle = contact_resource.build_bundle(
                     obj=contact, request=request)
+                _bundle.data['global_sales_cycle'] = SalesCycleResource().full_dehydrate(
+                    SalesCycleResource().build_bundle(
+                        obj=SalesCycle.objects.get(contact_id=contact.id)
+                    )
+                )
                 objects.append(contact_resource.full_dehydrate(
                     _bundle, for_list=True))
+
         self.log_throttled_access(request)
         return self.create_response(request, {'success': objects})
 
