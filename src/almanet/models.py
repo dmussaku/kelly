@@ -36,8 +36,9 @@ class Subscription(models.Model):
 
     def __init__(self, *args, **kwargs):
         super(Subscription, self).__init__(*args, **kwargs)
-        if hasattr(self, 'user') and not self.user is None:
-            self.organization = self.user.get_company()
+        if hasattr(self, 'user') and self.user is not None:
+            if not hasattr(self, 'organization') or not self.organization:
+                self.organization = self.user.get_company()
 
     class Meta:
         verbose_name = _('subscription')
