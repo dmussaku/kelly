@@ -1028,8 +1028,9 @@ class ContactResource(CRMServiceModelResource):
                 objects.append(contact_resource.full_dehydrate(
                     _bundle, for_list=True))
         elif data['filename'].split('.')[1]=='xls':
+            import base64
             for contact in Contact.import_from_xls(
-                data['uploaded_file'], request.user):
+                base64.b64decode(data['uploaded_file']), request.user):
                 _bundle = contact_resource.build_bundle(
                     obj=contact, request=request)
                 objects.append(contact_resource.full_dehydrate(
@@ -2219,6 +2220,8 @@ class AppStateObject(object):
                 'subscription_id'])
 
             def _value(value_name):
+                if s.is_global:
+                    return None
                 if hasattr(s, value_name):
                     v = getattr(s, value_name)
                     dv = model_to_dict(v, exclude=['owner', 'amount'])
