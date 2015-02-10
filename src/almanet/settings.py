@@ -45,6 +45,16 @@ class SubdomainConfiguration:
             setattr(self, '__SUBDOMAIN_MAP', rv)
         return getattr(self, '__SUBDOMAIN_MAP')
 
+    @property
+    def CORS_ORIGIN_WHITELIST(self):
+
+        def __inner():
+            from alm_company.models import Company
+            subd = ["%s.%s" % (c.subdomain, self.SITE_NAME)
+                    for c in Company.objects.all()]
+            return (self.SITE_NAME, ) + tuple(subd)
+        return lazy(__inner, tuple)
+
 
 def FileSettings(path):
     path = os.path.expanduser(path)
@@ -318,13 +328,12 @@ class BaseConfiguration(SubdomainConfiguration, Configuration):
 
 class DevConfiguration(
         FileSettings('~/.almanet/almanet.conf.py'), BaseConfiguration):
+
     DEBUG = True
     TEMPLATE_DEBUG = DEBUG
 
-    CORS_ORIGIN_WHITELIST = (
-        'alma.net:8000',
-        'almacloud.alma.net:8000'
-    )
+    SITE_NAME = 'alma.net:8000'
+
     CSRF_COOKIE_DOMAIN = '.alma.net'
     CORS_ALLOW_CREDENTIALS = True
 
@@ -372,7 +381,6 @@ class TestConfiguration(
 
     DEBUG = True
 
-
 class DemoConfiguration(FileSettings('~/.almanet/almanet.conf.py'), BaseConfiguration):
     DEBUG = False
     PARENT_HOST = 'almasales.kz'
@@ -384,8 +392,8 @@ class DemoConfiguration(FileSettings('~/.almanet/almanet.conf.py'), BaseConfigur
     SESSION_COOKIE_DOMAIN = '.almasales.kz'
     CORS_ORIGIN_WHITELIST = (
         'almasales.kz',
-        'almacloud.almasales.kz',
-        'arta.almasales.kz'
+        # 'almacloud.almasales.kz',
+        # 'arta.almasales.kz'
     )
     CORS_ALLOW_CREDENTIALS = True
 
