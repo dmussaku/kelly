@@ -12,6 +12,7 @@ from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
 from django.utils import timezone
 import datetime
+from alm_crm import fields as modified_fields
 
 
 ALLOWED_TIME_PERIODS = ['week', 'month', 'year']
@@ -1420,3 +1421,43 @@ class Filter(SubscriptionObject):
     @classmethod
     def get_filters_by_crmuser(cls, crmuser_id):
         return Filter.objects.filter(owner=crmuser_id)
+
+
+class HashTag(models.Model):
+    text = models.CharField(max_length=500, unique=True)
+
+    class Meta:
+        verbose_name = _('hashtag')
+        db_table = settings.DB_PREFIX.format('hashtag')
+
+    def __unicode__(self):
+        return u'%s' % (self.text)
+
+
+    def save(self, **kwargs):
+        import re
+        if not re.match("\B#\w*[a-zA-Z]+\w*", self.text):
+            return
+
+        self.text = self.text.lower()
+        super(self.__class__, self).save(**kwargs)
+
+
+class HashTagReference(SubscriptionObject):
+    hashtag = models.ForeignKey(HashTag, related_name="references")
+    content_type = models.ForeignKey(ContentType)
+    object_id = models.IntegerField()
+    content_object = generic.GenericForeignKey('content_type', 'object_id')
+
+    @property
+    def owner(self):
+        return content_object.owner
+
+    class Meta:
+        verbose_name = _('hashtag_reference')
+        db_table = settings.DB_PREFIX.format('hashtag_reference')
+
+    def __unicode__(self):
+        return u'%s' % (self.hashtag)
+
+
