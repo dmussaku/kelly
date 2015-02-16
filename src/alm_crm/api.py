@@ -2537,3 +2537,7 @@ class FilterResource(CRMServiceModelResource):
         queryset = Filter.objects.all()
         resource_name = 'filter'
         always_return_data = True
+
+
+# class HashTagReferenceResource(CRMServiceModelResource):
+

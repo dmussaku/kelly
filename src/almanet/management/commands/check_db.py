@@ -16,7 +16,7 @@ def check_for_global_cycle_existence():
             sales_cycles = contact.sales_cycles.filter(is_global=True).count()
             if sales_cycles > 1:
                 print "WARNING: Contact with ID: %s has %s global sales cycles"%(contact.id, sales_cycles)
-            elif sales_cycles < 1:
+            elif not sales_cycles:
                 print "WARNING: Contact with ID: %s doesn't have global cycle"%(contact.id)
         except SalesCycle.DoesNotExist:
             print "WARNING: Contact with ID: %s doesn't have global cycle"%(contact.id)
@@ -27,6 +27,8 @@ def check_is_cycle_has_contact():
     for sales_cycle in SalesCycle.objects.all():
         try:
             contact = sales_cycle.contact
+            if not contact:
+                print "WARNING: SalesCycle with ID: %s doesn't have contact"%(sales_cycle.id)
         except Contact.DoesNotExist:
             print "WARNING: SalesCycle with ID: %s doesn't have contact"%(sales_cycle.id)
     print "******** Checking finished ******** \n"
@@ -36,6 +38,8 @@ def check_is_activity_on_cycle():
     for activity in Activity.objects.all():
         try:
             activity = activity.sales_cycle
+            if not activity:
+                print "WARNING: Activity with ID: %s doesn't have sales_cycle"%(activity.id)
         except SalesCycle.DoesNotExist:
             print "WARNING: Activity with ID: %s doesn't have sales_cycle"%(activity.id)
     print "******** Checking finished ******** \n"
@@ -45,8 +49,10 @@ def check_is_contact_has_owner():
     for contact in Contact.objects.all():
         try:
             owner = contact.owner
+            if not owner:
+                print "WARNING: Contact with ID: %s doesn't have owner"%(contact.id)
         except CRMUser.DoesNotExist:
-            print "WARNING: Contact with ID: %s doesn't have owner"%(sales_cycle.id)
+            print "WARNING: Contact with ID: %s doesn't have owner"%(contact.id)
     print "******** Checking finished ******** \n"
 
 def check_is_product_has_sales_cycles():
@@ -54,6 +60,8 @@ def check_is_product_has_sales_cycles():
     for product in Product.objects.all():
         try:
             sales_cycles = product.sales_cycles
+            if not sales_cycles:
+                print "WARNING: Product with ID: %s doesn't have sales_cycles"%(product.id)
         except SalesCycle.DoesNotExist:
             print "WARNING: Product with ID: %s doesn't have sales_cycles"%(product.id)
     print "******** Checking finished ******** \n"
@@ -63,8 +71,10 @@ def check_is_contact_has_vcard():
     for contact in Contact.objects.all():
         try:
             vcard = contact.vcard
+            if not vcard:
+                print "WARNING: Contact with ID: %s doesn't have vcard"%(contact.id)
         except VCard.DoesNotExist:
-            print "WARNING: Contact with ID: %s doesn't have vcard"%(vcard.id)
+            print "WARNING: Contact with ID: %s doesn't have vcard"%(contact.id)
     print "******** Checking finished ******** \n"
 
 class Command(BaseCommand):
