@@ -476,7 +476,8 @@ class Contact(SubscriptionObject):
     def import_from_csv(cls, csv_file_data, creator):
         raw_data = csv_file_data.split('\n')
         raw_data = [obj.replace('"','') for obj in raw_data]
-        raw_data = [obj.encode('utf-8') for obj in raw_data]
+        print raw_data
+        # raw_data = [obj.encode('utf-8') for obj in raw_data]
         fields = raw_data[0].split(';')
         data = []
         for obj in raw_data[1:]:
