@@ -22,6 +22,7 @@ class Migration(SchemaMigration):
             ('hashtag', self.gf('django.db.models.fields.related.ForeignKey')(related_name='references', to=orm['alm_crm.HashTag'])),
             ('content_type', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['contenttypes.ContentType'])),
             ('object_id', self.gf('django.db.models.fields.IntegerField')()),
+            ('date_created', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
         ))
         db.send_create_signal(u'alm_crm', ['HashTagReference'])
 
@@ -133,6 +134,7 @@ class Migration(SchemaMigration):
         u'alm_crm.hashtagreference': {
             'Meta': {'object_name': 'HashTagReference', 'db_table': "'alma_hashtag_reference'"},
             'content_type': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['contenttypes.ContentType']"}),
+            'date_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'hashtag': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'references'", 'to': u"orm['alm_crm.HashTag']"}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'object_id': ('django.db.models.fields.IntegerField', [], {}),

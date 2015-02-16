@@ -1177,6 +1177,12 @@ class Mention(SubscriptionObject):
         """
         return Mention.objects.filter(user_id=user_id)
 
+    def save(self, **kwargs):
+        if not self.subscription_id and self.content_object:
+            self.subscription_id = self.content_object.owner.subscription_id
+        super(SubscriptionObject, self).save(**kwargs)
+
+
 
 class Comment(SubscriptionObject):
     comment = models.CharField(max_length=140)
@@ -1448,6 +1454,7 @@ class HashTagReference(SubscriptionObject):
     content_type = models.ForeignKey(ContentType)
     object_id = models.IntegerField()
     content_object = generic.GenericForeignKey('content_type', 'object_id')
+    date_created = models.DateTimeField(blank=True, auto_now_add=True)
 
     @property
     def owner(self):
@@ -1460,4 +1467,17 @@ class HashTagReference(SubscriptionObject):
     def __unicode__(self):
         return u'%s' % (self.hashtag)
 
+    @classmethod
+    def build_new(cls, hashtag_id, content_class=None,
+                  object_id=None, save=False):
+        hashtag_reference = cls(hashtag_id=hashtag_id)
+        hashtag_reference.content_type = ContentType.objects.get_for_model(content_class)
+        hashtag_reference.object_id = object_id
+        if save:
+            hashtag_reference.save()
+        return hashtag_reference
 
+    def save(self, **kwargs):
+        if not self.subscription_id and self.content_object:
+            self.subscription_id = self.content_object.owner.subscription_id
+        super(SubscriptionObject, self).save(**kwargs)
