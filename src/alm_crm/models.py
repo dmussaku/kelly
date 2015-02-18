@@ -4,7 +4,17 @@ from django.utils.translation import ugettext_lazy as _
 from almanet import settings
 from almanet import signals as almanet_signals
 from almanet.models import SubscriptionObject
-from alm_vcard.models import VCard, BadVCardError, Org, Title, Tel, Email
+from alm_vcard.models import (
+    VCard, 
+    BadVCardError,
+    Org,
+    Title,
+    Tel,
+    Email,
+    Category,
+    Adr,
+    Url
+    )
 from alm_user.models import User
 from django.template.loader import render_to_string
 from django.db.models import signals, Q
@@ -476,7 +486,6 @@ class Contact(SubscriptionObject):
     def import_from_csv(cls, csv_file_data, creator):
         raw_data = csv_file_data.split('\n')
         raw_data = [obj.replace('"','') for obj in raw_data]
-        print raw_data
         # raw_data = [obj.encode('utf-8') for obj in raw_data]
         fields = raw_data[0].split(';')
         data = []
@@ -568,74 +577,149 @@ class Contact(SubscriptionObject):
             while(sheets_left):
                 try:
                     data = sheet.row(i)
+                except:
+                    sheets_left = False
+                c = None
+                v = VCard()
+                v.family_name = data[0].value if type(data[0].value) == unicode else str(data[0].value)  
+                v.given_name = data[1].value if type(data[1].value) == unicode else str(data[1].value)  
+                v.additional_name = data[2].value if type(data[2].value) == unicode else str(data[2].value)
+                v.fn = v.given_name+" "+v.family_name
+                if ((not v.given_name) and (not v.family_name) and data[4].value):
+                    print 'was at company creation'
+                    v, created = VCard.objects.get_or_create(fn=data[4].value)
+                    if created:
+                        c = cls(vcard=company_vcard, tp='co')
+                        c.owner = creator.get_crmuser()
+                        c.subscription_id = creator.get_crmuser().subscription_id
+                        if data[5].value:
+                            category = Category(data=data[5].value)
+                            v.save()
+                            category.vcard=v
+                            category.save()
+                elif data[4].value:
+                    company_vcard, created = VCard.objects.get_or_create(fn=data[4].value)
+                    if created:
+                        if data[5].value:
+                            category = Category(
+                                vcard=company_vcard,
+                                data=data[5].value
+                                )
+                            category.save()
+                        company_contact = Contact(
+                            vcard=company_vcard,
+                            tp='co'
+                            )
+                        company_contact.save()
+                    else:
+                        company_contact = company_vcard.contact
+                    print company_contact
+                v.save()
+                if c:
+                    c
+                else:
                     c = cls()
                     c.owner = creator.get_crmuser()
                     c.subscription_id = creator.get_crmuser().subscription_id
-                    v = VCard()
-                    v.given_name = data[0].value if type(data[0].value) == unicode else str(data[0].value)  
-                    v.additional_name = data[1].value if type(data[1].value) == unicode else str(data[1].value)  
-                    v.family_name = data[2].value if type(data[2].value) == unicode else str(data[2].value)  
-                    v.fn = v.given_name+" "+v.family_name
-                    if not v.fn:
-                        continue
-                    v.save()
-                    c.vcard = v
-                    c.save()
-                    SalesCycle.create_globalcycle(**{
-                        'subscription_id':c.subscription_id,
-                        'owner_id': c.owner_id,
-                        'contact_id': c.id
-                    })
-                    if data[5].value:
-                        org = Org(vcard=v)
-                        org.organization_name = data[5].value 
-                        org.save()
-                    if data[6].value:
-                        title = Title(vcard=v)
-                        title.data = data[6].value 
+                c.vcard = v
+                print c.vcard.fn
+                try:
+                    c.parent = company_contact
+                except NameError:
+                    pass
+                c.save()
+                SalesCycle.create_globalcycle(**{
+                    'subscription_id':c.subscription_id,
+                    'owner_id': c.owner_id,
+                    'contact_id': c.id
+                })
+                if data[3].value:
+                    positions = data[3].value.split(';')
+                    for position in data[3].value.split(';'):
+                        title = Title(
+                            vcard=v,
+                            data=position
+                            )
                         title.save()
-                    if data[7].value:
-                        tel = Tel(vcard=v, type='cell_phone')
-                        tel.value = data[7].value 
-                        tel.save()
-                    if data[8].value:
-                        tel = Tel(vcard=v, type='fax')
-                        tel.value = data[8].value 
-                        tel.save()
-                    if data[9].value:
-                        tel = Tel(vcard=v, type='home')
-                        tel.value = data[9].value 
-                        tel.save()
-                    if data[10].value:
-                        tel = Tel(vcard=v, type='pager')
-                        tel.value = data[10].value 
-                        tel.save()
-                    if data[11].value:
-                        tel = Tel(vcard=v, type='INTL')
-                        tel.value = data[11].value 
-                        tel.save()
-                    if data[12].value:
-                        email = Email(vcard=v, type='internet')
-                        email.value = data[12].value 
-                        email.save()
-                    if data[13].value:
-                        email = Email(vcard=v, type='x400')
-                        email.value = data[13].value 
-                        email.save()
-                    if data[14].value:
-                        tel = Tel(vcard=v, type='work')
-                        tel.value = data[14].value 
-                        tel.save()
-                    if data[15].value:
-                        email = Email(vcard=v, type='pref')
-                        email.value = data[15].value 
-                        email.save()
-                    contact_list.append(c)
-                    print "%s created contact %s" % (c, c.id)
-                    i = i+1
-                except:
-                    sheets_left = False
+                if data[4].value:
+                    org = Org(vcard=v)
+                    org.organization_name = data[4].value
+                    if data[5].value:
+                         org.organization_unit = data[5].value
+                    org.save()
+                for phone in data[6].value.split(';'):
+                    tel = Tel(vcard=v, type='WORK')
+                    tel.data = phone 
+                    tel.save()
+                for phone in data[7].value.split(';'):
+                    tel = Tel(vcard=v, type='cell')
+                    tel.data = phone 
+                    tel.save()
+                for phone in data[8].value.split(';'):
+                    tel = Tel(vcard=v, type='xadditional')
+                    tel.data = phone 
+                    tel.save()
+                for phone in data[9].value.split(';'):
+                    tel = Tel(vcard=v, type='fax')
+                    tel.data = phone 
+                    tel.save()
+                for email_str in data[10].value.split(';'):
+                    email = Email(vcard=v, type='work')
+                    email.value = email_str
+                    email.save()
+                for email_str in data[11].value.split(';'):
+                    email = Email(vcard=v, type='internet')
+                    email.value = email_str
+                    email.save()
+                for address_str in data[12].value.split(';;'):
+                    addr_objs = address_str.split(';')
+                    address = Adr(
+                        vcard=v,
+                            type='POSTAL',
+                            street_address=addr_objs[0],
+                            locality=addr_objs[1],
+                            region=addr_objs[2],
+                            country_name=addr_objs[3],
+                            post_office_box=addr_objs[4]
+                            )
+                    address.save()
+                for address_str in data[13].value.split(';;'):
+                    addr_objs = address_str.split(';')
+                    address = Adr(
+                        vcard=v,
+                            type='xlegal',
+                            street_address=addr_objs[0],
+                            locality=addr_objs[1],
+                            region=addr_objs[2],
+                            country_name=addr_objs[3],
+                            post_office_box=addr_objs[4]
+                            )
+                    address.save()
+                for address_str in data[14].value.split(';;'):
+                    addr_objs = address_str.split(';')
+                    address = Adr(
+                        vcard=v,
+                            type='WORK',
+                            street_address=addr_objs[0],
+                            locality=addr_objs[1],
+                            region=addr_objs[2],
+                            country_name=addr_objs[3],
+                            post_office_box=addr_objs[4]
+                            )
+                    address.save()
+                for site in data[15].value.split(';'):
+                    url = Url(
+                        vcard=v,
+                        type='website',
+                            value=site
+                            )
+                    url.save()
+                contact_list.append(c)
+                print "%s created contact %s" % (c, c.id)
+                i = i+1
+                
         return contact_list
+
 
 
 

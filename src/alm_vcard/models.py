@@ -731,6 +731,7 @@ class Tel(models.Model):
         ('car',  _(u"car phone")),
         ('isdn',  _(u"isdn")),
         ('pcs',  _(u"pcs")),
+        ('xadditional',  _(u"xadditional")),
     )
 
     vcard = models.ForeignKey(VCard)
@@ -817,6 +818,7 @@ class Adr(models.Model):
         ('dom',  _(u"dom")),
         ('home',  _(u"home")),
         ('pref',  _(u"pref")),
+        ('xlegal',  _(u"xlegal")),
     )
 
     vcard = models.ForeignKey(VCard)
