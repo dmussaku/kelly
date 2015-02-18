@@ -822,7 +822,7 @@ class Adr(models.Model):
     )
 
     vcard = models.ForeignKey(VCard)
-    post_office_box = models.CharField(max_length=1024, verbose_name=_("post office box"), blank=True)
+    post_office_box= models.CharField(max_length=1024, verbose_name=_("post office box"), blank=True)
     extended_address = models.CharField(max_length=1024, verbose_name=_("extended address"), blank=True)
     street_address = models.CharField(max_length=1024, verbose_name=_("street address"))
     locality = models.CharField(max_length=1024, verbose_name=_("locality"))

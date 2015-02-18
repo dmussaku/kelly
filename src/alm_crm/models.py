@@ -570,158 +570,130 @@ class Contact(SubscriptionObject):
         book = xlrd.open_workbook(file_contents=xls_file_data)
         sheets_left = True
         contact_list = []
-        value=1
         for sheet in book.sheets():
             i = 1
             header_row = sheet.row(0) 
             while(sheets_left):
                 try:
                     data = sheet.row(i)
-                except:
+                except IndexError:
                     sheets_left = False
-                c = None
+                    continue
+                c = cls()
                 v = VCard()
                 v.family_name = data[0].value if type(data[0].value) == unicode else str(data[0].value)  
                 v.given_name = data[1].value if type(data[1].value) == unicode else str(data[1].value)  
                 v.additional_name = data[2].value if type(data[2].value) == unicode else str(data[2].value)
                 v.fn = v.given_name+" "+v.family_name
                 if ((not v.given_name) and (not v.family_name) and data[4].value):
-                    print 'was at company creation'
                     v, created = VCard.objects.get_or_create(fn=data[4].value)
                     if created:
-                        c = cls(vcard=company_vcard, tp='co')
+                        c = cls(vcard=v, tp='co')
                         c.owner = creator.get_crmuser()
                         c.subscription_id = creator.get_crmuser().subscription_id
-                        if data[5].value:
-                            category = Category(data=data[5].value)
-                            v.save()
-                            category.vcard=v
-                            category.save()
-                elif data[4].value:
-                    company_vcard, created = VCard.objects.get_or_create(fn=data[4].value)
-                    if created:
-                        if data[5].value:
-                            category = Category(
-                                vcard=company_vcard,
-                                data=data[5].value
-                                )
-                            category.save()
-                        company_contact = Contact(
-                            vcard=company_vcard,
-                            tp='co'
-                            )
-                        company_contact.save()
+                        c.save()
                     else:
-                        company_contact = company_vcard.contact
-                    print company_contact
-                v.save()
-                if c:
-                    c
-                else:
-                    c = cls()
+                        c = v.contact
+                if not v.id:
+                    v.save()
+                    c.vcard = v
                     c.owner = creator.get_crmuser()
                     c.subscription_id = creator.get_crmuser().subscription_id
-                c.vcard = v
-                print c.vcard.fn
-                try:
-                    c.parent = company_contact
-                except NameError:
-                    pass
-                c.save()
-                SalesCycle.create_globalcycle(**{
-                    'subscription_id':c.subscription_id,
-                    'owner_id': c.owner_id,
-                    'contact_id': c.id
-                })
-                if data[3].value:
-                    positions = data[3].value.split(';')
-                    for position in data[3].value.split(';'):
-                        title = Title(
+                    c.save()
+                with transaction.commit_on_success():
+                    SalesCycle.create_globalcycle(**{
+                        'subscription_id':c.subscription_id,
+                        'owner_id': c.owner_id,
+                        'contact_id': c.id
+                    })
+                    if data[3].value:
+                        positions = data[3].value.split(';')
+                        for position in data[3].value.split(';'):
+                            title = Title(
+                                vcard=v,
+                                data=position
+                                )
+                            title.save()
+                    if data[4].value:
+                        org = Org(vcard=v)
+                        org.organization_name = data[4].value
+                        if data[5].value:
+                             org.organization_unit = data[5].value
+                        org.save()
+                    for phone in data[6].value.split(';'):
+                        tel = Tel(vcard=v, type='WORK')
+                        tel.value = phone 
+                        tel.save()
+                    for phone in data[7].value.split(';'):
+                        tel = Tel(vcard=v, type='cell')
+                        tel.value = phone 
+                        tel.save()
+                    for phone in data[8].value.split(';'):
+                        tel = Tel(vcard=v, type='xadditional')
+                        tel.value = phone 
+                        tel.save()
+                    for phone in data[9].value.split(';'):
+                        tel = Tel(vcard=v, type='fax')
+                        tel.value = phone 
+                        tel.save()
+                    for email_str in data[10].value.split(';'):
+                        email = Email(vcard=v, type='work')
+                        email.value = email_str
+                        email.save()
+                    for email_str in data[11].value.split(';'):
+                        email = Email(vcard=v, type='internet')
+                        email.value = email_str
+                        email.save()
+                    if data[12].value:
+                        for address_str in data[12].value.split(';;'):
+                            addr_objs = address_str.split(';')
+                            address = Adr(
+                                vcard=v,
+                                    type='POSTAL',
+                                    street_address=addr_objs[0],
+                                    locality=addr_objs[1],
+                                    region=addr_objs[2],
+                                    country_name=addr_objs[3],
+                                    post_office_box=addr_objs[4]
+                                    )
+                            address.save()
+                    if data[13].value:
+                        for address_str in data[13].value.split(';;'):
+                            addr_objs = address_str.split(';')
+                            address = Adr(
+                                vcard=v,
+                                    type='xlegal',
+                                    street_address=addr_objs[0],
+                                    locality=addr_objs[1],
+                                    region=addr_objs[2],
+                                    country_name=addr_objs[3],
+                                    post_office_box=addr_objs[4]
+                                    )
+                            address.save()
+                    if data[14].value:
+                        for address_str in data[14].value.split(';;'):
+                            addr_objs = address_str.split(';')
+                            address = Adr(
+                                vcard=v,
+                                    type='WORK',
+                                    street_address=addr_objs[0],
+                                    locality=addr_objs[1],
+                                    region=addr_objs[2],
+                                    country_name=addr_objs[3],
+                                    post_office_box=addr_objs[4]
+                                    )
+                            address.save()
+                    for site in data[15].value.split(';'):
+                        url = Url(
                             vcard=v,
-                            data=position
-                            )
-                        title.save()
-                if data[4].value:
-                    org = Org(vcard=v)
-                    org.organization_name = data[4].value
-                    if data[5].value:
-                         org.organization_unit = data[5].value
-                    org.save()
-                for phone in data[6].value.split(';'):
-                    tel = Tel(vcard=v, type='WORK')
-                    tel.data = phone 
-                    tel.save()
-                for phone in data[7].value.split(';'):
-                    tel = Tel(vcard=v, type='cell')
-                    tel.data = phone 
-                    tel.save()
-                for phone in data[8].value.split(';'):
-                    tel = Tel(vcard=v, type='xadditional')
-                    tel.data = phone 
-                    tel.save()
-                for phone in data[9].value.split(';'):
-                    tel = Tel(vcard=v, type='fax')
-                    tel.data = phone 
-                    tel.save()
-                for email_str in data[10].value.split(';'):
-                    email = Email(vcard=v, type='work')
-                    email.value = email_str
-                    email.save()
-                for email_str in data[11].value.split(';'):
-                    email = Email(vcard=v, type='internet')
-                    email.value = email_str
-                    email.save()
-                for address_str in data[12].value.split(';;'):
-                    addr_objs = address_str.split(';')
-                    address = Adr(
-                        vcard=v,
-                            type='POSTAL',
-                            street_address=addr_objs[0],
-                            locality=addr_objs[1],
-                            region=addr_objs[2],
-                            country_name=addr_objs[3],
-                            post_office_box=addr_objs[4]
-                            )
-                    address.save()
-                for address_str in data[13].value.split(';;'):
-                    addr_objs = address_str.split(';')
-                    address = Adr(
-                        vcard=v,
-                            type='xlegal',
-                            street_address=addr_objs[0],
-                            locality=addr_objs[1],
-                            region=addr_objs[2],
-                            country_name=addr_objs[3],
-                            post_office_box=addr_objs[4]
-                            )
-                    address.save()
-                for address_str in data[14].value.split(';;'):
-                    addr_objs = address_str.split(';')
-                    address = Adr(
-                        vcard=v,
-                            type='WORK',
-                            street_address=addr_objs[0],
-                            locality=addr_objs[1],
-                            region=addr_objs[2],
-                            country_name=addr_objs[3],
-                            post_office_box=addr_objs[4]
-                            )
-                    address.save()
-                for site in data[15].value.split(';'):
-                    url = Url(
-                        vcard=v,
-                        type='website',
-                            value=site
-                            )
-                    url.save()
+                            type='website',
+                                value=site
+                                )
+                        url.save()
                 contact_list.append(c)
                 print "%s created contact %s" % (c, c.id)
                 i = i+1
-                
         return contact_list
-
-
-
 
     @classmethod
     def get_contacts_by_last_activity_date(
