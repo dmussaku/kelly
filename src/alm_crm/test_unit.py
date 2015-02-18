@@ -1426,10 +1426,26 @@ class ContactResourceTest(ResourceTestMixin, ResourceTestCase):
         self.assertEqual(len(self.deserialize(resp)['objects']),
                          len(Contact.get_contact_activities(self.contact.pk)))
 
+    def test_import_from_xls(self):          
+        count = Contact.objects.all().count()
+        file_path = os.path.join(os.path.dirname(os.path.dirname(__file__)),
+                                 'alm_crm/fixtures/contacts.xls')
+        import base64
+        post_data={
+            'filename': 'aliya.xls',
+            'uploaded_file': base64.b64encode(open(file_path, "rb").read())
+            }
+
+        resp = self.api_client.post(
+            self.api_path_contact+"import/", format='json', data=post_data)
+        self.assertHttpOK(resp)
+        self.assertEqual(Contact.objects.all().count(), count+23)
+
     def test_import_from_vcard(self):
         uploaded_file = os.path.join(os.path.dirname(os.path.dirname(__file__)),
                                  'alm_crm/fixtures/nurlan.vcf')
         post_data = {
+            'filename': 'nurlan.vcf',
             "uploaded_file": open(uploaded_file, "r").read()
         }
 
@@ -1475,7 +1491,6 @@ class ContactResourceTest(ResourceTestMixin, ResourceTestCase):
         self.assertTrue(contact1.first() in Contact.objects.all())
         self.assertTrue(contact2.first() in Contact.objects.all())
         self.assertTrue(contact3.first() in Contact.objects.all())
-
 
 
 class ContactListResourceTest(ResourceTestMixin, ResourceTestCase):
