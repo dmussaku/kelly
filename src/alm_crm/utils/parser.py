@@ -18,10 +18,11 @@ def text_parser(base_text, content_class=None, object_id=None):
 
 	for hashtag_item in hashtags:
 		hashtag = HashTag.objects.get_or_create(text=hashtag_item)
-		hashtag_reference = HashTagReference.build_new(hashtag_id=hashtag.id, 
-														content_class=content_class,
-														object_id=object_id,
-														save=True)
+		if(hashtag):
+			hashtag_reference = HashTagReference.build_new(hashtag_id=hashtag[0].id, 
+															content_class=content_class,
+															object_id=object_id,
+															save=True)
 
 	user_id_parser = re.compile('\d[0-9]*')
 	for mention_item in mentions:

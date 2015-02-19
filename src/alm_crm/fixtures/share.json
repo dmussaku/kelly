@@ -9,7 +9,7 @@
         "contact": 1,
         "date_created": "2014-11-18T05:32:28.379Z",
         "subscription_id": null,
-        "note": "Share note #1"
+        "note": "Share note"
     }
 },
 {
@@ -22,7 +22,7 @@
         "contact": 1,
         "date_created": "2014-11-18T09:02:47.080Z",
         "subscription_id": null,
-        "note": "Share note #1"
+        "note": "Share note"
 
     }
 },
@@ -36,7 +36,7 @@
         "contact": 4,
         "date_created": "2014-11-18T09:02:47.080Z",
         "subscription_id": null,
-        "note": "Share note #1"
+        "note": "Share note"
     }
 }
 ]

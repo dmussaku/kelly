@@ -12,12 +12,7 @@ from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
 from django.utils import timezone
 import datetime
-<<<<<<< HEAD
-from alm_crm import fields as modified_fields
-
-=======
 import xlrd
->>>>>>> develop
 
 ALLOWED_TIME_PERIODS = ['week', 'month', 'year']
 

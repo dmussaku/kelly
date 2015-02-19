@@ -62,6 +62,7 @@ from tastypie.utils import trailing_slash
 import ast
 import datetime
 import time
+from .utils.parser import text_parser
 
 
 class CommonMeta:
@@ -1367,6 +1368,8 @@ class ActivityResource(CRMServiceModelResource):
         #     _subscr_id = self.get_crmsubscr_id(bundle.request)
         #     act.sales_cycle_id = SalesCycle.get_global(_subscr_id).pk
         act.save()
+        text_parser(base_text=act.description, content_class=act.__class__, 
+                    object_id=act.id)
         if bundle.data.get('feedback_status'):
             act.feedback = Feedback(
                 status=bundle.data.get('feedback_status', None),
@@ -1395,6 +1398,8 @@ class ActivityResource(CRMServiceModelResource):
                 sales_cycle = SalesCycle.objects.get(pk=new_sc_id)
                 bundle.obj.sales_cycle = sales_cycle
                 bundle.obj.save()
+        text_parser(base_text=bundle.obj.description, content_class=bundle.obj.__class__, 
+                    object_id=bundle.obj.id)
         return bundle
 
 
@@ -1709,6 +1714,12 @@ class ShareResource(CRMServiceModelResource):
         bundle.data['share_to'] = share_to
         return bundle
 
+    def save(self, bundle, skip_errors=False):
+        bundle = super(ShareResource, self).save(bundle)
+        text_parser(base_text=bundle.obj.note, content_class=bundle.obj.__class__,
+                    object_id=bundle.obj.id)
+        return bundle
+
 
 class FeedbackResource(CRMServiceModelResource):
     '''
@@ -1774,6 +1785,12 @@ class CommentResource(CRMServiceModelResource):
         bundle.data.pop(model_name)
         return bundle
 
+
+    def save(self, bundle, skip_errors=False):
+        bundle = super(CommentResource, self).save(bundle)
+        text_parser(base_text=bundle.obj.comment, content_class=bundle.obj.__class__,
+                    object_id=bundle.obj.id)
+        return bundle
 
 class MentionResource(CRMServiceModelResource):
     '''

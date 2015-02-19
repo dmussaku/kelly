@@ -17,6 +17,8 @@ from alm_crm.models import (
     ContactList,
     SalesCycleProductStat,
     Filter,
+    HashTag,
+    HashTagReference
     )
 from alm_vcard.models import VCard, Tel, Email, Org
 from alm_user.models import User
@@ -1041,6 +1043,41 @@ class ActivityResourceTest(ResourceTestMixin, ResourceTestCase):
         self.assertEqual(Activity.objects.last().feedback,
                          Feedback.objects.last())
 
+
+    def test_create_activity_with_mentions_and_hashtags(self):
+        owner = CRMUser.objects.last()
+        sales_cycle = SalesCycle.objects.first()
+        post_data = {
+            'author_id': owner.id,
+            'description': '#almacloud @[1:Bruce Wayne] has sold #almacrm to @[2:Nurlan Abiken]',
+            'sales_cycle_id': sales_cycle.id,
+            'feedback_status': "$"
+        }
+        count = Activity.objects.all().count()
+        count2 = sales_cycle.rel_activities.count()
+        hashtag_count = HashTag.objects.all().count()
+        hashtag_reference_count = HashTagReference.objects.all().count()
+        mention_count = Mention.objects.all().count()
+        resp = self.api_client.post(self.api_path_activity, format='json', data=post_data)
+        self.assertHttpCreated(resp)
+        self.assertEqual(Activity.objects.all().count(), count + 1)
+        # verify that new one has been added.
+        self.assertEqual(sales_cycle.rel_activities.count(), count2 + 1)
+        activity = sales_cycle.rel_activities.last()
+        # verify that subscription_id was set
+        self.assertIsInstance(activity.subscription_id, int)
+        # verify that owner was set
+        self.assertIsInstance(activity.owner, CRMUser)
+        self.assertIsInstance(activity.feedback, Feedback)
+        self.assertEqual(Activity.objects.last().feedback,
+                         Feedback.objects.last())
+        self.assertEqual(hashtag_count+2, HashTag.objects.all().count())
+        self.assertEqual(hashtag_reference_count+2, HashTagReference.objects.all().count())
+        self.assertEqual(mention_count+2, Mention.objects.all().count())
+        self.assertEqual(HashTagReference.objects.last().hashtag, 
+                        HashTag.objects.get(text=HashTagReference.objects.last().hashtag.text))
+
+
     def test_create_activity_without_feedback(self):
         owner = CRMUser.objects.last()
         sales_cycle = SalesCycle.objects.first()
@@ -1095,6 +1132,42 @@ class ActivityResourceTest(ResourceTestMixin, ResourceTestCase):
         activity_last = Activity.objects.last()
         self.assertEqual(self.get_detail_des(activity.pk)['sales_cycle_id'], sales_cycle_id)
         self.assertEqual(sales_cycle_id, activity_last.sales_cycle.id)
+
+
+    def test_update_activity_via_put_with_hashtag_and_mention(self):
+        # get exist product data
+        activity = Activity.objects.last()
+        activity_data = self.get_detail_des(activity.pk)
+        sales_cycle_id = SalesCycle.objects.last().id
+        new_feedback = "5"
+        # update it
+        t = '_UPDATED! #updated by @[1:Bruce Wayne]'
+        activity_data['description'] += t
+        activity_data['feedback_status'] = new_feedback
+        activity_data['sales_cycle_id'] = sales_cycle_id
+        hashtag_count = HashTag.objects.all().count()
+        hashtag_reference_count = HashTagReference.objects.all().count()
+        mention_count = Mention.objects.all().count()
+
+        # PUT it
+        self.api_client.put(self.api_path_activity + '%s/' % (activity.pk),
+                            format='json', data=activity_data)
+        # check
+        activity_last = Activity.objects.last()
+        self.assertEqual(activity_last.description, activity.description + t)
+        self.assertEqual(self.get_detail_des(activity.pk)['description'], activity.description + t)
+
+        self.assertEqual(activity_last.feedback.status, new_feedback)
+        self.assertEqual(self.get_detail_des(activity.pk)['feedback_status'], new_feedback)
+
+        activity_last = Activity.objects.last()
+        self.assertEqual(self.get_detail_des(activity.pk)['sales_cycle_id'], sales_cycle_id)
+        self.assertEqual(sales_cycle_id, activity_last.sales_cycle.id)
+        self.assertEqual(hashtag_count+1, HashTag.objects.all().count())
+        self.assertEqual(hashtag_reference_count+1, HashTagReference.objects.all().count())
+        self.assertEqual(mention_count+1, Mention.objects.all().count())
+        self.assertEqual(HashTagReference.objects.last().hashtag, 
+                        HashTag.objects.get(text=HashTagReference.objects.last().hashtag.text))        
 
 
 class ProductResourceTest(ResourceTestMixin, ResourceTestCase):
@@ -1775,6 +1848,70 @@ class ShareResourceTest(ResourceTestMixin, ResourceTestCase):
         self.assertEqual(share_last.share_to.id, 2)
         self.assertEqual(share_last.contact.id, 2)
 
+    def test_create_share_with_hashtag_and_mention(self):
+        share_to = CRMUser.objects.last()
+        share_from = CRMUser.objects.first()
+        contact = Contact.objects.last()
+        note = 'We have meeting at 3 PM #sold by @[1:Bruce Wayne]'
+
+        post_data = {
+            'share_to':share_to.id,
+            'share_from':share_from.id,
+            'contact':contact.id,
+            'note':note
+        }
+
+        count = Share.objects.all().count()
+        count_in_shares = share_to.in_shares.count()
+        count_owned_shares = share_from.owned_shares.count()
+        count_contact_shares = contact.share_set.count()
+        hashtag_count = HashTag.objects.all().count()
+        hashtag_reference_count = HashTagReference.objects.all().count()
+        mention_count = Mention.objects.all().count()
+
+        self.assertHttpCreated(self.api_client.post(
+             self.api_path_share, format='json', data=post_data))
+
+        self.assertEqual(Share.objects.all().count(), count+1)
+        self.assertEqual(share_to.in_shares.count(), count_in_shares+1)
+        self.assertEqual(share_from.owned_shares.count(), count_owned_shares+1)
+        self.assertEqual(contact.share_set.count(), count_contact_shares+1)
+        # verify that subscription_id was set
+        self.assertIsInstance(Share.objects.last().subscription_id, int)
+        # verify that owner was set
+        self.assertIsInstance(Share.objects.last().share_to, CRMUser)
+        self.assertIsInstance(Share.objects.last().share_from, CRMUser)
+        self.assertIsInstance(Share.objects.last().contact, Contact)
+        self.assertEqual(hashtag_count+1, HashTag.objects.all().count())
+        self.assertEqual(hashtag_reference_count+1, HashTagReference.objects.all().count())
+        self.assertEqual(mention_count+1, Mention.objects.all().count())
+        self.assertEqual(HashTagReference.objects.last().hashtag, 
+                        HashTag.objects.get(text=HashTagReference.objects.last().hashtag.text)) 
+
+    def test_update_share_via_put_with_hashtag_and_mention(self):
+        share = Share.objects.last()
+        share_data = self.get_detail_des(share.pk)
+        note_update = "_UPDATED #sold by @[1:Bruce Wayne]"
+        share_data['note'] += note_update
+        share_data['share_to'] = 2
+        share_data['contact'] = 2
+        hashtag_count = HashTag.objects.all().count()
+        hashtag_reference_count = HashTagReference.objects.all().count()
+        mention_count = Mention.objects.all().count()
+        self.api_client.put(self.api_path_share + '%s/' % (self.share.pk),
+                             format='json', data=share_data)
+
+        share_last = Share.objects.last()
+        self.assertEqual(share_last.note, share.note + note_update)
+        self.assertEqual(share_last.share_to.id, 2)
+        self.assertEqual(share_last.contact.id, 2)  
+        self.assertEqual(hashtag_count+1, HashTag.objects.all().count())
+        self.assertEqual(hashtag_reference_count+1, HashTagReference.objects.all().count())
+        self.assertEqual(mention_count+1, Mention.objects.all().count())
+        self.assertEqual(HashTagReference.objects.last().hashtag, 
+                        HashTag.objects.get(text=HashTagReference.objects.last().hashtag.text)) 
+
+
 
 class CommentResourceTest(ResourceTestMixin, ResourceTestCase):
    
@@ -1917,6 +2054,152 @@ class CommentResourceTest(ResourceTestMixin, ResourceTestCase):
                               format='json', data={'comment': comment_comment})
         # check
         self.assertEqual(self.get_detail_des(self.comment.pk)['comment'], comment_comment)
+
+
+    def test_update_comment_via_put_with_hashtag_and_mention(self):
+        # get exist product data
+        comment_data = self.get_detail_des(self.comment.pk)
+        # update it
+        t = '_UPDATED! #sold by @[1:Bruce Wayne]'
+        comment_data['comment'] += t
+        hashtag_count = HashTag.objects.all().count()
+        hashtag_reference_count = HashTagReference.objects.all().count()
+        mention_count = Mention.objects.all().count()
+        # PUT it
+        self.api_client.put(self.api_path_comment + '%s/' % (self.comment.pk),
+                            format='json', data=comment_data)
+        # check
+        self.assertEqual(self.get_detail_des(self.comment.pk)['comment'], self.comment.comment + t)
+        self.assertEqual(hashtag_count+1, HashTag.objects.all().count())
+        self.assertEqual(hashtag_reference_count+1, HashTagReference.objects.all().count())
+        self.assertEqual(mention_count+1, Mention.objects.all().count())
+        self.assertEqual(HashTagReference.objects.last().hashtag, 
+                        HashTag.objects.get(text=HashTagReference.objects.last().hashtag.text))   
+
+    def test_update_comment_via_patch(self):
+        # get exist product data
+        comment_comment = self.get_detail_des(self.comment.pk)['comment']
+        # update it
+        t = 'comment_UPDATED! #sold by @[1:Bruce Wayne]'
+        comment_comment += t
+        hashtag_count = HashTag.objects.all().count()
+        hashtag_reference_count = HashTagReference.objects.all().count()
+        mention_count = Mention.objects.all().count()
+        # PATCH it
+        self.api_client.patch(self.api_path_comment + '%s/' % (self.comment.pk),
+                              format='json', data={'comment': comment_comment})
+        # check
+        self.assertEqual(self.get_detail_des(self.comment.pk)['comment'], comment_comment)   
+        self.assertEqual(hashtag_count+1, HashTag.objects.all().count())
+        self.assertEqual(hashtag_reference_count+1, HashTagReference.objects.all().count())
+        self.assertEqual(mention_count+1, Mention.objects.all().count())
+        self.assertEqual(HashTagReference.objects.last().hashtag, 
+                        HashTag.objects.get(text=HashTagReference.objects.last().hashtag.text))   
+
+    def test_create_comment_for_activity_with_hashtag_and_mention(self):
+        activity = Activity.objects.last()
+        crmuser = CRMUser.objects.last()
+        post_data={
+            'comment': 'new test comment  #sold by @[1:Bruce Wayne]',
+            'author_id': crmuser.pk,
+            'activity_id': activity.pk
+        }
+        hashtag_count = HashTag.objects.all().count()
+        hashtag_reference_count = HashTagReference.objects.all().count()
+        mention_count = Mention.objects.all().count()
+        self.assertHttpCreated(self.api_client.post(
+            self.api_path_comment, format='json', data=post_data))
+        comment = Comment.objects.last()
+        self.assertEqual(comment.comment, 'new test comment  #sold by @[1:Bruce Wayne]')
+        self.assertEqual(comment.owner, crmuser)
+        self.assertEqual(comment.object_id, activity.id)
+        self.assertEqual(comment.content_object.__class__, Activity)
+        self.assertEqual(comment.content_object, activity)
+        self.assertIsInstance(comment.subscription_id, int)
+        self.assertEqual(hashtag_count+1, HashTag.objects.all().count())
+        self.assertEqual(hashtag_reference_count+1, HashTagReference.objects.all().count())
+        self.assertEqual(mention_count+1, Mention.objects.all().count())
+        self.assertEqual(HashTagReference.objects.last().hashtag, 
+                        HashTag.objects.get(text=HashTagReference.objects.last().hashtag.text))   
+
+    def test_create_comment_for_feedback_with_hashtag_and_mention(self):
+        feedback = Feedback.objects.last()
+        crmuser = CRMUser.objects.last()
+        post_data={
+            'comment': 'new test comment  #sold by @[1:Bruce Wayne]',
+            'author_id': crmuser.pk,
+            'feedback_id': feedback.pk
+        }
+        hashtag_count = HashTag.objects.all().count()
+        hashtag_reference_count = HashTagReference.objects.all().count()
+        mention_count = Mention.objects.all().count()
+        self.assertHttpCreated(self.api_client.post(
+            self.api_path_comment, format='json', data=post_data))
+        comment = Comment.objects.last()
+        self.assertEqual(comment.comment, 'new test comment  #sold by @[1:Bruce Wayne]')
+        self.assertEqual(comment.owner, crmuser)
+        self.assertEqual(comment.object_id, feedback.id)
+        self.assertEqual(comment.content_object.__class__, Feedback)
+        self.assertEqual(comment.content_object, feedback)
+        self.assertIsInstance(comment.subscription_id, int)
+        self.assertEqual(hashtag_count+1, HashTag.objects.all().count())
+        self.assertEqual(hashtag_reference_count+1, HashTagReference.objects.all().count())
+        self.assertEqual(mention_count+1, Mention.objects.all().count())
+        self.assertEqual(HashTagReference.objects.last().hashtag, 
+                        HashTag.objects.get(text=HashTagReference.objects.last().hashtag.text))   
+
+    def test_create_comment_for_contact_with_hashtag_and_mention(self):
+        contact = Contact.objects.last()
+        crmuser = CRMUser.objects.last()
+        post_data={
+            'comment': 'new test comment  #sold by @[1:Bruce Wayne]',
+            'author_id': crmuser.pk,
+            'contact_id': contact.pk
+        }
+        hashtag_count = HashTag.objects.all().count()
+        hashtag_reference_count = HashTagReference.objects.all().count()
+        mention_count = Mention.objects.all().count()
+        self.assertHttpCreated(self.api_client.post(
+            self.api_path_comment, format='json', data=post_data))
+        comment = Comment.objects.last()
+        self.assertEqual(comment.comment, 'new test comment  #sold by @[1:Bruce Wayne]')
+        self.assertEqual(comment.owner, crmuser)
+        self.assertEqual(comment.object_id, contact.id)
+        self.assertEqual(comment.content_object.__class__, Contact)
+        self.assertEqual(comment.content_object, contact)
+        self.assertIsInstance(comment.subscription_id, int)
+        self.assertEqual(hashtag_count+1, HashTag.objects.all().count())
+        self.assertEqual(hashtag_reference_count+1, HashTagReference.objects.all().count())
+        self.assertEqual(mention_count+1, Mention.objects.all().count())
+        self.assertEqual(HashTagReference.objects.last().hashtag, 
+                        HashTag.objects.get(text=HashTagReference.objects.last().hashtag.text))   
+
+    def test_create_comment_for_share_with_hashtag_and_mention(self):
+        share = Share.objects.last()
+        crmuser = CRMUser.objects.last()
+        post_data={
+            'comment': 'new test comment  #sold by @[1:Bruce Wayne]',
+            'author_id': crmuser.pk,
+            'share_id': share.pk
+        }
+        hashtag_count = HashTag.objects.all().count()
+        hashtag_reference_count = HashTagReference.objects.all().count()
+        mention_count = Mention.objects.all().count()
+        self.assertHttpCreated(self.api_client.post(
+            self.api_path_comment, format='json', data=post_data))
+        comment = Comment.objects.last()
+        self.assertEqual(comment.comment, 'new test comment  #sold by @[1:Bruce Wayne]')
+        self.assertEqual(comment.owner, crmuser)
+        self.assertEqual(comment.object_id, share.id)
+        self.assertEqual(comment.content_object.__class__, Share)
+        self.assertEqual(comment.content_object, share)
+        self.assertIsInstance(comment.subscription_id, int)
+        self.assertEqual(hashtag_count+1, HashTag.objects.all().count())
+        self.assertEqual(hashtag_reference_count+1, HashTagReference.objects.all().count())
+        self.assertEqual(mention_count+1, Mention.objects.all().count())
+        self.assertEqual(HashTagReference.objects.last().hashtag, 
+                        HashTag.objects.get(text=HashTagReference.objects.last().hashtag.text))   
+  
 
 
 class FilterResourceTest(ResourceTestMixin, ResourceTestCase):
