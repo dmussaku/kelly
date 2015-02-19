@@ -11,7 +11,9 @@ from .models import (
     Comment,
     Mention,
     SalesCycleProductStat,
-    Filter
+    Filter,
+    HashTag,
+    HashTagReference
     )
 from alm_vcard.api import (
     VCardResource,
@@ -2539,5 +2541,16 @@ class FilterResource(CRMServiceModelResource):
         always_return_data = True
 
 
-# class HashTagReferenceResource(CRMServiceModelResource):
+class HashTagReferenceResource(CRMServiceModelResource):
+
+    content_object = GenericForeignKeyField({
+        Activity: ActivityResource,
+        Feedback: FeedbackResource,
+        Comment: CommentResource,
+    }, 'content_object')
+
+    class Meta(CommonMeta):
+        queryset = HashTagReference.objects.all()
+        resource_name = 'hashtag_reference'
+
 
