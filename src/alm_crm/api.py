@@ -29,6 +29,25 @@ from .models import (
     SalesCycleProductStat,
     Filter
     )
+from alm_vcard.api import (
+    VCardResource,
+    VCardEmailResource,
+    VCardTelResource,
+    VCardOrgResource,
+    VCardGeoResource,
+    VCardAdrResource,
+    VCardAgentResource,
+    VCardCategoryResource,
+    VCardKeyResource,
+    VCardLabelResource,
+    VCardMailerResource,
+    VCardNicknameResource,
+    VCardNoteResource,
+    VCardRoleResource,
+    VCardTitleResource,
+    VCardTzResource,
+    VCardUrlResource
+    )
 from alm_vcard.models import *
 from alm_vcard.api import VCardResource
 from almanet.models import Service
@@ -2134,10 +2153,102 @@ class AppStateObject(object):
         self.constants = self.get_constants()
         self.session = self.get_session()
 
+    def _vcard(self, vcard):
+
+        def _email(email):
+            return model_to_dict(email, exclude=VCardEmailResource.Meta.excludes)
+
+        def _tel(tel):
+            return model_to_dict(tel, exclude=VCardTelResource.Meta.excludes)
+
+        def _org(org):
+            return model_to_dict(org, exclude=VCardOrgResource.Meta.excludes)
+
+        def _geo(geo):
+            return model_to_dict(geo, exclude=VCardGeoResource.Meta.excludes)
+
+        def _adr(adr):
+            return model_to_dict(adr, exclude=VCardAdrResource.Meta.excludes)
+
+        def _agent(agent):
+            return model_to_dict(agent, exclude=VCardAgentResource.Meta.excludes)
+
+        def _category(category):
+            return model_to_dict(category, exclude=VCardCategoryResource.Meta.excludes)
+
+        def _key(key):
+            return model_to_dict(key, exclude=VCardKeyResource.Meta.excludes)
+
+        def _label(label):
+            return model_to_dict(label, exclude=VCardLabelResource.Meta.excludes)
+
+        def _mailer(mailer):
+            return model_to_dict(mailer, exclude=VCardMailerResource.Meta.excludes)
+
+        def _nickname(nickname):
+            return model_to_dict(nickname, exclude=VCardNicknameResource.Meta.excludes)
+
+        def _note(note):
+            return model_to_dict(note, exclude=VCardNoteResource.Meta.excludes)
+
+        def _role(role):
+            return model_to_dict(role, exclude=VCardRoleResource.Meta.excludes)
+
+        def _title(title):
+            return model_to_dict(title, exclude=VCardTitleResource.Meta.excludes)
+
+        def _tz(tz):
+            return model_to_dict(tz, exclude=VCardTzResource.Meta.excludes)
+
+        def _url(url):
+            return model_to_dict(url, exclude=VCardUrlResource.Meta.excludes)
+
+        if vcard is None:
+            return None
+
+        d = model_to_dict(vcard, exclude=['id'])
+        d.update({
+            'emails': map(_email, vcard.email_set.all()),
+            'tels': map(_tel, vcard.tel_set.all()),
+            'orgs': map(_org, vcard.org_set.all()),
+            # 'geos': map(_geo, vcard.geo_set.all()),
+            'adrs': map(_adr, vcard.adr_set.all()),
+            # 'agents': map(_agent, vcard.agent_set.all()),
+            'categories': map(_category, vcard.category_set.all()),
+            # 'keys': map(_key, vcard.key_set.all()),
+            # 'labels': map(_label, vcard.label_set.all()),
+            # 'mailers': map(_mailer, vcard.mailer_set.all()),
+            # 'nicknames': map(_nickname, vcard.nickname_set.all()),
+            # 'notes': map(_note, vcard.note_set.all()),
+            # 'roles': map(_role, vcard.role_set.all()),
+            'titles': map(_title, vcard.title_set.all()),
+            # 'tzs': map(_tz, vcard.tz_set.all()),
+            'urls': map(_url, vcard.url_set.all()),
+            })
+        return d
+
+    def _share(self, share):
+        if share is None:
+            return None
+
+        d = model_to_dict(share, exclude=['subscription_id'])
+        d.update({'date_created': share.date_created})
+        return d
+
     def get_users(self):
         crmusers, users = CRMUser.get_crmusers(
             self.subscription_id, with_users=True)
-        return CRMUserResource().get_bundle_list(crmusers, self.request)
+
+        def _map(cu):
+            user = users.get(id=cu.user_id)
+            vcard = VCard.objects.get(id=user.vcard.id)
+
+            d = model_to_dict(cu)
+            d.update({'vcard': self._vcard(vcard)})
+            return d
+
+        return map(_map, crmusers)
+        # return CRMUserResource().get_bundle_list(crmusers, self.request)
 
     def get_company(self):
         data = model_to_dict(self.company, fields=['name', 'subdomain', 'id'])
@@ -2150,27 +2261,107 @@ class AppStateObject(object):
         contacts = Contact.get_contacts_by_last_activity_date(
             self.subscription_id, all=True)
 
-        return ContactResource().get_bundle_list(contacts, self.request)
+        def _map(c):
+            d = model_to_dict(c, exclude=['latest_activity'])
+            d.update({
+                    'author_id': c.owner_id,
+                    'date_created': c.date_created,
+                    'children': list(c.children.values_list('id', flat=True)),
+                    'parent_id': c.parent_id,
+                    'sales_cycles': list(c.sales_cycles.values_list('id', flat=True)),
+                    'share': self._share(c.share_set.first()),
+                    'vcard': self._vcard(c.vcard)
+                     })
+            return d
+
+        return map(_map, contacts)
+        # return ContactResource().get_bundle_list(contacts, self.request)
 
     def get_sales_cycles(self):
         sales_cycles = SalesCycle.get_salescycles_by_last_activity_date(
             self.subscription_id, all=True, include_activities=False)
 
-        return SalesCycleResource().get_bundle_list(sales_cycles, self.request)
+        def _map(s):
+            d = model_to_dict(s, fields=[
+                'id', 'title', 'description', 'is_global', 'status',
+                'subscription_id'])
+
+            def _value(value_name):
+                if s.is_global:
+                    return None
+                if hasattr(s, value_name):
+                    v = getattr(s, value_name)
+                    if v is None:
+                        return None
+                    dv = model_to_dict(v, exclude=['owner', 'amount'])
+                    dv.update({'value': v.amount})
+                else:
+                    dv = None
+                return dv
+
+            def _stat(stat):
+                st = model_to_dict(stat, exclude=['product'])
+                st.update({'product_id': stat.product_id})
+                return st
+
+            d.update({
+                'author_id': s.owner_id,
+                'date_created': s.date_created,
+                'contact_id': s.contact_id,
+                'projected_value': _value('projected_value'),
+                'real_value': _value('real_value'),
+                'stat': map(_stat, s.salescycleproductstat_set.all())
+                })
+            return d
+
+        return map(_map, sales_cycles)
+        # return SalesCycleResource().get_bundle_list(sales_cycles, self.request)
 
     def get_activities(self):
         activities = Activity.get_activities_by_date_created(
             self.subscription_id, all=True, include_sales_cycles=False)
 
-        return ActivityResource().get_bundle_list(activities, self.request)
+        def _map(a):
+            d = model_to_dict(a, fields=['id', 'description'])
+            d.update({
+                'author_id': a.owner_id,
+                'date_created': a.date_created,
+                'feedback_status': a.feedback_status,
+                'sales_cycle_id': a.sales_cycle_id,
+                'has_read': a.has_read(self.current_crmuser.id)
+                })
+            return d
+
+        return map(_map, activities)
+        # return ActivityResource().get_bundle_list(activities, self.request)
 
     def get_filters(self):
         filters = Filter.get_filters_by_crmuser(self.subscription_id)
-        return FilterResource().get_bundle_list(filters, self.request)
+
+        def _map(f):
+            d = model_to_dict(f, exclude=['owner'])
+            d.update({
+                    'author_id': f.owner_id,
+                    'date_created': f.date_created
+                    })
+            return d
+
+        return map(_map, filters)
+        # return FilterResource().get_bundle_list(filters, self.request)
 
     def get_products(self):
-        products = Product.get_products(self.current_crmuser.pk)
-        return ProductResource().get_bundle_list(products, self.request)
+        products = Product.get_products(self.subscription_id)
+
+        def _map(p):
+            d = model_to_dict(p, exclude=['owner'])
+            d.update({
+                'author_id': p.owner_id,
+                # 'date_created': p.date_created
+                })
+            return d
+
+        return map(_map, products)
+        # return ProductResource().get_bundle_list(products, self.request)
 
     def get_sales_cycle2products_map(self):
         sales_cycles = SalesCycle.get_salescycles_by_last_activity_date(
@@ -2181,8 +2372,9 @@ class AppStateObject(object):
         return data
 
     def get_shares(self):
-        shares = Share.get_shares_in_for(self.current_crmuser.pk)
-        return ShareResource().get_bundle_list(shares, self.request)
+        shares = Share.get_shares_in_for(self.subscription_id)
+        return map(self._share, shares)
+        # return ShareResource().get_bundle_list(shares, self.request)
 
     def get_constants(self):
         return {
