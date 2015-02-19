@@ -4,7 +4,7 @@ from django.utils.translation import ugettext_lazy as _
 from almanet import settings
 from almanet import signals as almanet_signals
 from almanet.models import SubscriptionObject
-from alm_vcard.models import VCard, BadVCardError
+from alm_vcard.models import VCard, BadVCardError, Org, Title, Tel, Email
 from alm_user.models import User
 from django.template.loader import render_to_string
 from django.db.models import signals, Q
@@ -12,8 +12,12 @@ from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
 from django.utils import timezone
 import datetime
+<<<<<<< HEAD
 from alm_crm import fields as modified_fields
 
+=======
+import xlrd
+>>>>>>> develop
 
 ALLOWED_TIME_PERIODS = ['week', 'month', 'year']
 
@@ -472,6 +476,173 @@ class Contact(SubscriptionObject):
 
                 rv.append(c)
         return rv
+
+    @classmethod
+    def import_from_csv(cls, csv_file_data, creator):
+        raw_data = csv_file_data.split('\n')
+        raw_data = [obj.replace('"','') for obj in raw_data]
+        raw_data = [obj.encode('utf-8') for obj in raw_data]
+        fields = raw_data[0].split(';')
+        data = []
+        for obj in raw_data[1:]:
+            data.append(obj.split(';'))
+        # print data
+        contact_list = []
+        for i in range(0, len(data)):
+            if len(fields)==len(data[i]):
+                c = cls()
+                c.owner = creator.get_crmuser()
+                c.subscription_id = creator.get_crmuser().subscription_id
+                v = VCard()
+                v.given_name = data[i][0].decode('utf-8')
+                # print data[i]
+                v.additional_name = data[i][1].decode('utf-8')
+                v.family_name = data[i][2].decode('utf-8')
+                v.fn = v.given_name+" "+v.family_name
+                if not v.fn:
+                    continue
+                v.save()
+                c.vcard = v
+                c.save()
+                SalesCycle.create_globalcycle(
+                        **{'subscription_id':c.subscription_id,
+                         'owner_id':creator.get_crmuser().id,
+                         'contact_id':c.id
+                        }
+                    )
+                if data[i][5]:
+                    org = Org(vcard=v)
+                    org.organization_name = data[i][5].decode('utf-8')
+                    org.save()
+                if data[i][6]:
+                    title = Title(vcard=v)
+                    title.data = data[i][6].decode('utf-8')
+                    title.save()
+                if data[i][7]:
+                    tel = Tel(vcard=v, type='cell_phone')
+                    tel.value = data[i][7].decode('utf-8')
+                    tel.save()
+                if data[i][8]:
+                    tel = Tel(vcard=v, type='fax')
+                    tel.value = data[i][8].decode('utf-8')
+                    tel.save()
+                if data[i][9]:
+                    tel = Tel(vcard=v, type='home')
+                    tel.value = data[i][9].decode('utf-8')
+                    tel.save()
+                if data[i][10]:
+                    tel = Tel(vcard=v, type='pager')
+                    tel.value = data[i][10].decode('utf-8')
+                    tel.save()
+                if data[i][11]:
+                    tel = Tel(vcard=v, type='INTL')
+                    tel.value = data[i][11].decode('utf-8')
+                    tel.save()
+                if data[i][12]:
+                    email = Email(vcard=v, type='internet')
+                    email.value = data[i][12].decode('utf-8')
+                    email.save()
+                if data[i][13]:
+                    email = Email(vcard=v, type='x400')
+                    email.value = data[i][13].decode('utf-8')
+                    email.save()
+                if data[i][14]:
+                    tel = Tel(vcard=v, type='work')
+                    tel.value = data[i][14].decode('utf-8')
+                    tel.save()
+                if data[i][15]:
+                    email = Email(vcard=v, type='pref')
+                    email.value = data[i][15].decode('utf-8')
+                    email.save()
+                contact_list.append(c)
+                print "%s created contact %s" % (c, c.id)
+                # print contact_list
+        return contact_list
+
+
+    @classmethod
+    @transaction.commit_on_success()
+    def import_from_xls(cls, xls_file_data, creator):
+        book = xlrd.open_workbook(file_contents=xls_file_data)
+        sheets_left = True
+        contact_list = []
+        value=1
+        for sheet in book.sheets():
+            i = 1
+            header_row = sheet.row(0) 
+            while(sheets_left):
+                try:
+                    data = sheet.row(i)
+                    c = cls()
+                    c.owner = creator.get_crmuser()
+                    c.subscription_id = creator.get_crmuser().subscription_id
+                    v = VCard()
+                    v.given_name = data[0].value if type(data[0].value) == unicode else str(data[0].value)  
+                    v.additional_name = data[1].value if type(data[1].value) == unicode else str(data[1].value)  
+                    v.family_name = data[2].value if type(data[2].value) == unicode else str(data[2].value)  
+                    v.fn = v.given_name+" "+v.family_name
+                    if not v.fn:
+                        continue
+                    v.save()
+                    c.vcard = v
+                    c.save()
+                    SalesCycle.create_globalcycle(**{
+                        'subscription_id':c.subscription_id,
+                        'owner_id': c.owner_id,
+                        'contact_id': c.id
+                    })
+                    if data[5].value:
+                        org = Org(vcard=v)
+                        org.organization_name = data[5].value 
+                        org.save()
+                    if data[6].value:
+                        title = Title(vcard=v)
+                        title.data = data[6].value 
+                        title.save()
+                    if data[7].value:
+                        tel = Tel(vcard=v, type='cell_phone')
+                        tel.value = data[7].value 
+                        tel.save()
+                    if data[8].value:
+                        tel = Tel(vcard=v, type='fax')
+                        tel.value = data[8].value 
+                        tel.save()
+                    if data[9].value:
+                        tel = Tel(vcard=v, type='home')
+                        tel.value = data[9].value 
+                        tel.save()
+                    if data[10].value:
+                        tel = Tel(vcard=v, type='pager')
+                        tel.value = data[10].value 
+                        tel.save()
+                    if data[11].value:
+                        tel = Tel(vcard=v, type='INTL')
+                        tel.value = data[11].value 
+                        tel.save()
+                    if data[12].value:
+                        email = Email(vcard=v, type='internet')
+                        email.value = data[12].value 
+                        email.save()
+                    if data[13].value:
+                        email = Email(vcard=v, type='x400')
+                        email.value = data[13].value 
+                        email.save()
+                    if data[14].value:
+                        tel = Tel(vcard=v, type='work')
+                        tel.value = data[14].value 
+                        tel.save()
+                    if data[15].value:
+                        email = Email(vcard=v, type='pref')
+                        email.value = data[15].value 
+                        email.save()
+                    contact_list.append(c)
+                    print "%s created contact %s" % (c, c.id)
+                    i = i+1
+                except:
+                    sheets_left = False
+        return contact_list
+
+
 
     @classmethod
     def get_contacts_by_last_activity_date(

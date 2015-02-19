@@ -5,17 +5,15 @@
     "fields": {
         "is_global":true,
         "title":"SalesCycle #1",
-        "owner":2,
+        "owner":5,
         "followers":[],
         "contact":1,
         "latest_activity":null,
-        "projected_value":1,
-        "real_value":2,
-        "status":"C",
-        "date_created":"2014-01-10 00:00:00+00:00",
-        "from_date":"2014-01-10 00:00:00+00:00",
-        "to_date":"2014-03-10 00:00:00+00:00",
-        "subscription_id":1
+        "status":"N",
+        "date_created":"2014-10-01 00:00:00+00:00",
+        "from_date":"2014-10-01 00:00:00+00:00",
+        "to_date":"2014-10-01 00:00:00+00:00",
+        "subscription_id": 1
     }
 },
 {
@@ -24,17 +22,15 @@
     "fields": {
         "is_global":false,
         "title":"SalesCycle #2",
-        "owner":3,
+        "owner":4,
         "followers":[],
         "contact":1,
         "latest_activity":null,
-        "projected_value":3,
-        "real_value":4,
-        "status":"N",
-        "date_created":"2014-02-10 00:00:00+00:00",
-        "from_date":"2014-02-10 00:00:00+00:00",
-        "to_date":"2014-04-10 00:00:00+00:00",
-        "subscription_id":1
+        "status":"P",
+        "date_created":"2014-10-02 00:00:00+00:00",
+        "from_date":"2014-10-02 00:00:00+00:00",
+        "to_date":"2014-10-02 00:00:00+00:00",
+        "subscription_id": 1
     }
 },
 {
@@ -43,17 +39,15 @@
     "fields": {
         "is_global":false,
         "title":"SalesCycle #3",
-        "owner":3,
+        "owner":2,
         "followers":[],
         "contact":1,
         "latest_activity":null,
-        "projected_value":5,
-        "real_value":6,
-        "status":"N",
-        "date_created":"2014-03-10 00:00:00+00:00",
-        "from_date":"2014-03-10 00:00:00+00:00",
-        "to_date":"2014-05-10 00:00:00+00:00",
-        "subscription_id":1
+        "status":"C",
+        "date_created":"2014-10-03 00:00:00+00:00",
+        "from_date":"2014-10-03 00:00:00+00:00",
+        "to_date":"2014-10-03 00:00:00+00:00",
+        "subscription_id": 1
     }
 },
 {
@@ -64,34 +58,30 @@
         "title":"SalesCycle #4",
         "owner":3,
         "followers":[],
-        "contact":2,
+        "contact":1,
         "latest_activity":null,
-        "projected_value":7,
-        "real_value":8,
         "status":"C",
-        "date_created":"2014-01-10 00:00:00+00:00",
-        "from_date":"2014-01-10 00:00:00+00:00",
-        "to_date":"2014-03-10 00:00:00+00:00",
-        "subscription_id":1
+        "date_created":"2014-10-04 00:00:00+00:00",
+        "from_date":"2014-10-04 00:00:00+00:00",
+        "to_date":"2014-10-04 00:00:00+00:00",
+        "subscription_id": 1
     }
 },
 {
     "pk": 5,
     "model": "alm_crm.SalesCycle",
     "fields": {
-        "is_global":false,
+        "is_global":true,
         "title":"SalesCycle #5",
-        "owner":2,
+        "owner":5,
         "followers":[],
         "contact":2,
         "latest_activity":null,
-        "projected_value":9,
-        "real_value":10,
-        "status":"P",
-        "date_created":"2014-02-10 00:00:00+00:00",
-        "from_date":"2014-02-10 00:00:00+00:00",
-        "to_date":"2014-04-10 00:00:00+00:00",
-        "subscription_id":1
+        "status":"C",
+        "date_created":"2014-10-01 00:00:00+00:00",
+        "from_date":"2014-10-01 00:00:00+00:00",
+        "to_date":"2014-10-01 00:00:00+00:00",
+        "subscription_id": 1
     }
 },
 {
@@ -100,17 +90,15 @@
     "fields": {
         "is_global":false,
         "title":"SalesCycle #6",
-        "owner":3,
+        "owner":1,
         "followers":[],
         "contact":2,
         "latest_activity":null,
-        "projected_value":11,
-        "real_value":12,
-        "status":"C",
-        "date_created":"2014-03-10 00:00:00+00:00",
-        "from_date":"2014-03-10 00:00:00+00:00",
-        "to_date":"2014-05-10 00:00:00+00:00",
-        "subscription_id":1
+        "status":"P",
+        "date_created":"2014-10-02 00:00:00+00:00",
+        "from_date":"2014-10-02 00:00:00+00:00",
+        "to_date":"2014-10-02 00:00:00+00:00",
+        "subscription_id": 1
     }
 },
 {
@@ -119,17 +107,15 @@
     "fields": {
         "is_global":false,
         "title":"SalesCycle #7",
-        "owner":1,
+        "owner":4,
         "followers":[],
-        "contact":3,
+        "contact":2,
         "latest_activity":null,
-        "projected_value":13,
-        "real_value":14,
-        "status":"C",
-        "date_created":"2014-01-10 00:00:00+00:00",
-        "from_date":"2014-01-10 00:00:00+00:00",
-        "to_date":"2014-03-10 00:00:00+00:00",
-        "subscription_id":1
+        "status":"P",
+        "date_created":"2014-10-03 00:00:00+00:00",
+        "from_date":"2014-10-03 00:00:00+00:00",
+        "to_date":"2014-10-03 00:00:00+00:00",
+        "subscription_id": 1
     }
 },
 {
@@ -138,36 +124,32 @@
     "fields": {
         "is_global":false,
         "title":"SalesCycle #8",
-        "owner":1,
+        "owner":3,
         "followers":[],
-        "contact":3,
+        "contact":2,
         "latest_activity":null,
-        "projected_value":15,
-        "real_value":16,
-        "status":"N",
-        "date_created":"2014-02-10 00:00:00+00:00",
-        "from_date":"2014-02-10 00:00:00+00:00",
-        "to_date":"2014-04-10 00:00:00+00:00",
-        "subscription_id":1
+        "status":"P",
+        "date_created":"2014-10-04 00:00:00+00:00",
+        "from_date":"2014-10-04 00:00:00+00:00",
+        "to_date":"2014-10-04 00:00:00+00:00",
+        "subscription_id": 1
     }
 },
 {
     "pk": 9,
     "model": "alm_crm.SalesCycle",
     "fields": {
-        "is_global":false,
+        "is_global":true,
         "title":"SalesCycle #9",
-        "owner":1,
+        "owner":2,
         "followers":[],
         "contact":3,
         "latest_activity":null,
-        "projected_value":17,
-        "real_value":18,
-        "status":"C",
-        "date_created":"2014-03-10 00:00:00+00:00",
-        "from_date":"2014-03-10 00:00:00+00:00",
-        "to_date":"2014-05-10 00:00:00+00:00",
-        "subscription_id":1
+        "status":"P",
+        "date_created":"2014-10-01 00:00:00+00:00",
+        "from_date":"2014-10-01 00:00:00+00:00",
+        "to_date":"2014-10-01 00:00:00+00:00",
+        "subscription_id": 1
     }
 },
 {
@@ -176,17 +158,15 @@
     "fields": {
         "is_global":false,
         "title":"SalesCycle #10",
-        "owner":2,
+        "owner":4,
         "followers":[],
-        "contact":4,
+        "contact":3,
         "latest_activity":null,
-        "projected_value":19,
-        "real_value":20,
-        "status":"N",
-        "date_created":"2014-01-10 00:00:00+00:00",
-        "from_date":"2014-01-10 00:00:00+00:00",
-        "to_date":"2014-03-10 00:00:00+00:00",
-        "subscription_id":1
+        "status":"P",
+        "date_created":"2014-10-02 00:00:00+00:00",
+        "from_date":"2014-10-02 00:00:00+00:00",
+        "to_date":"2014-10-02 00:00:00+00:00",
+        "subscription_id": 1
     }
 },
 {
@@ -197,15 +177,13 @@
         "title":"SalesCycle #11",
         "owner":2,
         "followers":[],
-        "contact":4,
+        "contact":3,
         "latest_activity":null,
-        "projected_value":21,
-        "real_value":22,
-        "status":"C",
-        "date_created":"2014-02-10 00:00:00+00:00",
-        "from_date":"2014-02-10 00:00:00+00:00",
-        "to_date":"2014-04-10 00:00:00+00:00",
-        "subscription_id":1
+        "status":"P",
+        "date_created":"2014-10-03 00:00:00+00:00",
+        "from_date":"2014-10-03 00:00:00+00:00",
+        "to_date":"2014-10-03 00:00:00+00:00",
+        "subscription_id": 1
     }
 },
 {
@@ -214,36 +192,32 @@
     "fields": {
         "is_global":false,
         "title":"SalesCycle #12",
-        "owner":3,
+        "owner":2,
         "followers":[],
-        "contact":4,
+        "contact":3,
         "latest_activity":null,
-        "projected_value":23,
-        "real_value":24,
-        "status":"P",
-        "date_created":"2014-03-10 00:00:00+00:00",
-        "from_date":"2014-03-10 00:00:00+00:00",
-        "to_date":"2014-05-10 00:00:00+00:00",
-        "subscription_id":1
+        "status":"C",
+        "date_created":"2014-10-04 00:00:00+00:00",
+        "from_date":"2014-10-04 00:00:00+00:00",
+        "to_date":"2014-10-04 00:00:00+00:00",
+        "subscription_id": 1
     }
 },
 {
     "pk": 13,
     "model": "alm_crm.SalesCycle",
     "fields": {
-        "is_global":false,
+        "is_global":true,
         "title":"SalesCycle #13",
-        "owner":1,
+        "owner":2,
         "followers":[],
-        "contact":5,
+        "contact":4,
         "latest_activity":null,
-        "projected_value":25,
-        "real_value":26,
-        "status":"C",
-        "date_created":"2014-01-10 00:00:00+00:00",
-        "from_date":"2014-01-10 00:00:00+00:00",
-        "to_date":"2014-03-10 00:00:00+00:00",
-        "subscription_id":1
+        "status":"P",
+        "date_created":"2014-10-01 00:00:00+00:00",
+        "from_date":"2014-10-01 00:00:00+00:00",
+        "to_date":"2014-10-01 00:00:00+00:00",
+        "subscription_id": 1
     }
 },
 {
@@ -252,17 +226,15 @@
     "fields": {
         "is_global":false,
         "title":"SalesCycle #14",
-        "owner":3,
+        "owner":5,
         "followers":[],
-        "contact":5,
+        "contact":4,
         "latest_activity":null,
-        "projected_value":27,
-        "real_value":28,
-        "status":"N",
-        "date_created":"2014-02-10 00:00:00+00:00",
-        "from_date":"2014-02-10 00:00:00+00:00",
-        "to_date":"2014-04-10 00:00:00+00:00",
-        "subscription_id":1
+        "status":"P",
+        "date_created":"2014-10-02 00:00:00+00:00",
+        "from_date":"2014-10-02 00:00:00+00:00",
+        "to_date":"2014-10-02 00:00:00+00:00",
+        "subscription_id": 1
     }
 },
 {
@@ -271,17 +243,15 @@
     "fields": {
         "is_global":false,
         "title":"SalesCycle #15",
-        "owner":3,
+        "owner":2,
         "followers":[],
-        "contact":5,
+        "contact":4,
         "latest_activity":null,
-        "projected_value":29,
-        "real_value":30,
-        "status":"P",
-        "date_created":"2014-03-10 00:00:00+00:00",
-        "from_date":"2014-03-10 00:00:00+00:00",
-        "to_date":"2014-05-10 00:00:00+00:00",
-        "subscription_id":1
+        "status":"N",
+        "date_created":"2014-10-03 00:00:00+00:00",
+        "from_date":"2014-10-03 00:00:00+00:00",
+        "to_date":"2014-10-03 00:00:00+00:00",
+        "subscription_id": 1
     }
 },
 {
@@ -290,36 +260,32 @@
     "fields": {
         "is_global":false,
         "title":"SalesCycle #16",
-        "owner":3,
+        "owner":5,
         "followers":[],
-        "contact":6,
+        "contact":4,
         "latest_activity":null,
-        "projected_value":31,
-        "real_value":32,
-        "status":"N",
-        "date_created":"2014-01-10 00:00:00+00:00",
-        "from_date":"2014-01-10 00:00:00+00:00",
-        "to_date":"2014-03-10 00:00:00+00:00",
-        "subscription_id":1
+        "status":"P",
+        "date_created":"2014-10-04 00:00:00+00:00",
+        "from_date":"2014-10-04 00:00:00+00:00",
+        "to_date":"2014-10-04 00:00:00+00:00",
+        "subscription_id": 1
     }
 },
 {
     "pk": 17,
     "model": "alm_crm.SalesCycle",
     "fields": {
-        "is_global":false,
+        "is_global":true,
         "title":"SalesCycle #17",
-        "owner":1,
+        "owner":5,
         "followers":[],
-        "contact":6,
+        "contact":5,
         "latest_activity":null,
-        "projected_value":33,
-        "real_value":34,
-        "status":"C",
-        "date_created":"2014-02-10 00:00:00+00:00",
-        "from_date":"2014-02-10 00:00:00+00:00",
-        "to_date":"2014-04-10 00:00:00+00:00",
-        "subscription_id":1
+        "status":"P",
+        "date_created":"2014-10-01 00:00:00+00:00",
+        "from_date":"2014-10-01 00:00:00+00:00",
+        "to_date":"2014-10-01 00:00:00+00:00",
+        "subscription_id": 1
     }
 },
 {
@@ -328,17 +294,15 @@
     "fields": {
         "is_global":false,
         "title":"SalesCycle #18",
-        "owner":3,
+        "owner":1,
         "followers":[],
-        "contact":6,
+        "contact":5,
         "latest_activity":null,
-        "projected_value":35,
-        "real_value":36,
-        "status":"N",
-        "date_created":"2014-03-10 00:00:00+00:00",
-        "from_date":"2014-03-10 00:00:00+00:00",
-        "to_date":"2014-05-10 00:00:00+00:00",
-        "subscription_id":1
+        "status":"C",
+        "date_created":"2014-10-02 00:00:00+00:00",
+        "from_date":"2014-10-02 00:00:00+00:00",
+        "to_date":"2014-10-02 00:00:00+00:00",
+        "subscription_id": 1
     }
 },
 {
@@ -347,17 +311,15 @@
     "fields": {
         "is_global":false,
         "title":"SalesCycle #19",
-        "owner":1,
+        "owner":4,
         "followers":[],
-        "contact":7,
+        "contact":5,
         "latest_activity":null,
-        "projected_value":37,
-        "real_value":38,
-        "status":"C",
-        "date_created":"2014-01-10 00:00:00+00:00",
-        "from_date":"2014-01-10 00:00:00+00:00",
-        "to_date":"2014-03-10 00:00:00+00:00",
-        "subscription_id":1
+        "status":"N",
+        "date_created":"2014-10-03 00:00:00+00:00",
+        "from_date":"2014-10-03 00:00:00+00:00",
+        "to_date":"2014-10-03 00:00:00+00:00",
+        "subscription_id": 1
     }
 },
 {
@@ -368,34 +330,30 @@
         "title":"SalesCycle #20",
         "owner":3,
         "followers":[],
-        "contact":7,
+        "contact":5,
         "latest_activity":null,
-        "projected_value":39,
-        "real_value":40,
-        "status":"N",
-        "date_created":"2014-02-10 00:00:00+00:00",
-        "from_date":"2014-02-10 00:00:00+00:00",
-        "to_date":"2014-04-10 00:00:00+00:00",
-        "subscription_id":1
+        "status":"P",
+        "date_created":"2014-10-04 00:00:00+00:00",
+        "from_date":"2014-10-04 00:00:00+00:00",
+        "to_date":"2014-10-04 00:00:00+00:00",
+        "subscription_id": 1
     }
 },
 {
     "pk": 21,
     "model": "alm_crm.SalesCycle",
     "fields": {
-        "is_global":false,
+        "is_global":true,
         "title":"SalesCycle #21",
         "owner":1,
         "followers":[],
-        "contact":7,
+        "contact":6,
         "latest_activity":null,
-        "projected_value":41,
-        "real_value":42,
-        "status":"P",
-        "date_created":"2014-03-10 00:00:00+00:00",
-        "from_date":"2014-03-10 00:00:00+00:00",
-        "to_date":"2014-05-10 00:00:00+00:00",
-        "subscription_id":1
+        "status":"N",
+        "date_created":"2014-10-01 00:00:00+00:00",
+        "from_date":"2014-10-01 00:00:00+00:00",
+        "to_date":"2014-10-01 00:00:00+00:00",
+        "subscription_id": 1
     }
 },
 {
@@ -404,17 +362,15 @@
     "fields": {
         "is_global":false,
         "title":"SalesCycle #22",
-        "owner":1,
+        "owner":4,
         "followers":[],
-        "contact":8,
+        "contact":6,
         "latest_activity":null,
-        "projected_value":43,
-        "real_value":44,
         "status":"P",
-        "date_created":"2014-01-10 00:00:00+00:00",
-        "from_date":"2014-01-10 00:00:00+00:00",
-        "to_date":"2014-03-10 00:00:00+00:00",
-        "subscription_id":1
+        "date_created":"2014-10-02 00:00:00+00:00",
+        "from_date":"2014-10-02 00:00:00+00:00",
+        "to_date":"2014-10-02 00:00:00+00:00",
+        "subscription_id": 1
     }
 },
 {
@@ -423,17 +379,15 @@
     "fields": {
         "is_global":false,
         "title":"SalesCycle #23",
-        "owner":3,
+        "owner":1,
         "followers":[],
-        "contact":8,
+        "contact":6,
         "latest_activity":null,
-        "projected_value":45,
-        "real_value":46,
-        "status":"C",
-        "date_created":"2014-02-10 00:00:00+00:00",
-        "from_date":"2014-02-10 00:00:00+00:00",
-        "to_date":"2014-04-10 00:00:00+00:00",
-        "subscription_id":1
+        "status":"N",
+        "date_created":"2014-10-03 00:00:00+00:00",
+        "from_date":"2014-10-03 00:00:00+00:00",
+        "to_date":"2014-10-03 00:00:00+00:00",
+        "subscription_id": 1
     }
 },
 {
@@ -444,34 +398,30 @@
         "title":"SalesCycle #24",
         "owner":3,
         "followers":[],
-        "contact":8,
+        "contact":6,
         "latest_activity":null,
-        "projected_value":47,
-        "real_value":48,
-        "status":"C",
-        "date_created":"2014-03-10 00:00:00+00:00",
-        "from_date":"2014-03-10 00:00:00+00:00",
-        "to_date":"2014-05-10 00:00:00+00:00",
-        "subscription_id":1
+        "status":"N",
+        "date_created":"2014-10-04 00:00:00+00:00",
+        "from_date":"2014-10-04 00:00:00+00:00",
+        "to_date":"2014-10-04 00:00:00+00:00",
+        "subscription_id": 1
     }
 },
 {
     "pk": 25,
     "model": "alm_crm.SalesCycle",
     "fields": {
-        "is_global":false,
+        "is_global":true,
         "title":"SalesCycle #25",
-        "owner":1,
+        "owner":2,
         "followers":[],
-        "contact":9,
+        "contact":7,
         "latest_activity":null,
-        "projected_value":49,
-        "real_value":50,
         "status":"P",
-        "date_created":"2014-01-10 00:00:00+00:00",
-        "from_date":"2014-01-10 00:00:00+00:00",
-        "to_date":"2014-03-10 00:00:00+00:00",
-        "subscription_id":1
+        "date_created":"2014-10-01 00:00:00+00:00",
+        "from_date":"2014-10-01 00:00:00+00:00",
+        "to_date":"2014-10-01 00:00:00+00:00",
+        "subscription_id": 1
     }
 },
 {
@@ -480,17 +430,15 @@
     "fields": {
         "is_global":false,
         "title":"SalesCycle #26",
-        "owner":2,
+        "owner":4,
         "followers":[],
-        "contact":9,
+        "contact":7,
         "latest_activity":null,
-        "projected_value":51,
-        "real_value":52,
         "status":"P",
-        "date_created":"2014-02-10 00:00:00+00:00",
-        "from_date":"2014-02-10 00:00:00+00:00",
-        "to_date":"2014-04-10 00:00:00+00:00",
-        "subscription_id":1
+        "date_created":"2014-10-02 00:00:00+00:00",
+        "from_date":"2014-10-02 00:00:00+00:00",
+        "to_date":"2014-10-02 00:00:00+00:00",
+        "subscription_id": 1
     }
 },
 {
@@ -499,17 +447,15 @@
     "fields": {
         "is_global":false,
         "title":"SalesCycle #27",
-        "owner":2,
+        "owner":4,
         "followers":[],
-        "contact":9,
+        "contact":7,
         "latest_activity":null,
-        "projected_value":53,
-        "real_value":54,
         "status":"N",
-        "date_created":"2014-03-10 00:00:00+00:00",
-        "from_date":"2014-03-10 00:00:00+00:00",
-        "to_date":"2014-05-10 00:00:00+00:00",
-        "subscription_id":1
+        "date_created":"2014-10-03 00:00:00+00:00",
+        "from_date":"2014-10-03 00:00:00+00:00",
+        "to_date":"2014-10-03 00:00:00+00:00",
+        "subscription_id": 1
     }
 },
 {
@@ -518,36 +464,32 @@
     "fields": {
         "is_global":false,
         "title":"SalesCycle #28",
-        "owner":1,
+        "owner":5,
         "followers":[],
-        "contact":10,
+        "contact":7,
         "latest_activity":null,
-        "projected_value":55,
-        "real_value":56,
         "status":"N",
-        "date_created":"2014-01-10 00:00:00+00:00",
-        "from_date":"2014-01-10 00:00:00+00:00",
-        "to_date":"2014-03-10 00:00:00+00:00",
-        "subscription_id":1
+        "date_created":"2014-10-04 00:00:00+00:00",
+        "from_date":"2014-10-04 00:00:00+00:00",
+        "to_date":"2014-10-04 00:00:00+00:00",
+        "subscription_id": 1
     }
 },
 {
     "pk": 29,
     "model": "alm_crm.SalesCycle",
     "fields": {
-        "is_global":false,
+        "is_global":true,
         "title":"SalesCycle #29",
-        "owner":1,
+        "owner":5,
         "followers":[],
-        "contact":10,
+        "contact":8,
         "latest_activity":null,
-        "projected_value":57,
-        "real_value":58,
         "status":"N",
-        "date_created":"2014-02-10 00:00:00+00:00",
-        "from_date":"2014-02-10 00:00:00+00:00",
-        "to_date":"2014-04-10 00:00:00+00:00",
-        "subscription_id":1
+        "date_created":"2014-10-01 00:00:00+00:00",
+        "from_date":"2014-10-01 00:00:00+00:00",
+        "to_date":"2014-10-01 00:00:00+00:00",
+        "subscription_id": 1
     }
 },
 {
@@ -558,15 +500,13 @@
         "title":"SalesCycle #30",
         "owner":3,
         "followers":[],
-        "contact":10,
+        "contact":8,
         "latest_activity":null,
-        "projected_value":59,
-        "real_value":60,
         "status":"P",
-        "date_created":"2014-03-10 00:00:00+00:00",
-        "from_date":"2014-03-10 00:00:00+00:00",
-        "to_date":"2014-05-10 00:00:00+00:00",
-        "subscription_id":1
+        "date_created":"2014-10-02 00:00:00+00:00",
+        "from_date":"2014-10-02 00:00:00+00:00",
+        "to_date":"2014-10-02 00:00:00+00:00",
+        "subscription_id": 1
     }
 },
 {
@@ -575,17 +515,15 @@
     "fields": {
         "is_global":false,
         "title":"SalesCycle #31",
-        "owner":5,
+        "owner":4,
         "followers":[],
-        "contact":11,
+        "contact":8,
         "latest_activity":null,
-        "projected_value":61,
-        "real_value":62,
         "status":"P",
-        "date_created":"2014-01-10 00:00:00+00:00",
-        "from_date":"2014-01-10 00:00:00+00:00",
-        "to_date":"2014-03-10 00:00:00+00:00",
-        "subscription_id":2
+        "date_created":"2014-10-03 00:00:00+00:00",
+        "from_date":"2014-10-03 00:00:00+00:00",
+        "to_date":"2014-10-03 00:00:00+00:00",
+        "subscription_id": 1
     }
 },
 {
@@ -594,17 +532,15 @@
     "fields": {
         "is_global":false,
         "title":"SalesCycle #32",
-        "owner":5,
+        "owner":4,
         "followers":[],
-        "contact":11,
+        "contact":8,
         "latest_activity":null,
-        "projected_value":63,
-        "real_value":64,
         "status":"P",
-        "date_created":"2014-02-10 00:00:00+00:00",
-        "from_date":"2014-02-10 00:00:00+00:00",
-        "to_date":"2014-04-10 00:00:00+00:00",
-        "subscription_id":2
+        "date_created":"2014-10-04 00:00:00+00:00",
+        "from_date":"2014-10-04 00:00:00+00:00",
+        "to_date":"2014-10-04 00:00:00+00:00",
+        "subscription_id": 1
     }
 },
 {
@@ -613,36 +549,32 @@
     "fields": {
         "is_global":true,
         "title":"SalesCycle #33",
-        "owner":5,
+        "owner":1,
         "followers":[],
-        "contact":12,
+        "contact":9,
         "latest_activity":null,
-        "projected_value":65,
-        "real_value":66,
-        "status":"N",
-        "date_created":"2014-01-10 00:00:00+00:00",
-        "from_date":"2014-01-10 00:00:00+00:00",
-        "to_date":"2014-03-10 00:00:00+00:00",
-        "subscription_id":2
+        "status":"P",
+        "date_created":"2014-10-01 00:00:00+00:00",
+        "from_date":"2014-10-01 00:00:00+00:00",
+        "to_date":"2014-10-01 00:00:00+00:00",
+        "subscription_id": 1
     }
 },
 {
     "pk": 34,
     "model": "alm_crm.SalesCycle",
     "fields": {
-        "is_global":true,
+        "is_global":false,
         "title":"SalesCycle #34",
-        "owner":5,
+        "owner":2,
         "followers":[],
-        "contact":12,
+        "contact":9,
         "latest_activity":null,
-        "projected_value":67,
-        "real_value":68,
         "status":"N",
-        "date_created":"2014-02-10 00:00:00+00:00",
-        "from_date":"2014-02-10 00:00:00+00:00",
-        "to_date":"2014-04-10 00:00:00+00:00",
-        "subscription_id":2
+        "date_created":"2014-10-02 00:00:00+00:00",
+        "from_date":"2014-10-02 00:00:00+00:00",
+        "to_date":"2014-10-02 00:00:00+00:00",
+        "subscription_id": 1
     }
 },
 {
@@ -651,17 +583,15 @@
     "fields": {
         "is_global":false,
         "title":"SalesCycle #35",
-        "owner":5,
+        "owner":2,
         "followers":[],
-        "contact":13,
+        "contact":9,
         "latest_activity":null,
-        "projected_value":69,
-        "real_value":70,
-        "status":"N",
-        "date_created":"2014-01-10 00:00:00+00:00",
-        "from_date":"2014-01-10 00:00:00+00:00",
-        "to_date":"2014-03-10 00:00:00+00:00",
-        "subscription_id":2
+        "status":"C",
+        "date_created":"2014-10-03 00:00:00+00:00",
+        "from_date":"2014-10-03 00:00:00+00:00",
+        "to_date":"2014-10-03 00:00:00+00:00",
+        "subscription_id": 1
     }
 },
 {
@@ -672,34 +602,30 @@
         "title":"SalesCycle #36",
         "owner":5,
         "followers":[],
-        "contact":13,
+        "contact":9,
         "latest_activity":null,
-        "projected_value":71,
-        "real_value":72,
         "status":"P",
-        "date_created":"2014-02-10 00:00:00+00:00",
-        "from_date":"2014-02-10 00:00:00+00:00",
-        "to_date":"2014-04-10 00:00:00+00:00",
-        "subscription_id":2
+        "date_created":"2014-10-04 00:00:00+00:00",
+        "from_date":"2014-10-04 00:00:00+00:00",
+        "to_date":"2014-10-04 00:00:00+00:00",
+        "subscription_id": 1
     }
 },
 {
     "pk": 37,
     "model": "alm_crm.SalesCycle",
     "fields": {
-        "is_global":false,
+        "is_global":true,
         "title":"SalesCycle #37",
-        "owner":5,
+        "owner":3,
         "followers":[],
-        "contact":14,
+        "contact":10,
         "latest_activity":null,
-        "projected_value":73,
-        "real_value":74,
-        "status":"P",
-        "date_created":"2014-01-10 00:00:00+00:00",
-        "from_date":"2014-01-10 00:00:00+00:00",
-        "to_date":"2014-03-10 00:00:00+00:00",
-        "subscription_id":2
+        "status":"C",
+        "date_created":"2014-10-01 00:00:00+00:00",
+        "from_date":"2014-10-01 00:00:00+00:00",
+        "to_date":"2014-10-01 00:00:00+00:00",
+        "subscription_id": 1
     }
 },
 {
@@ -708,17 +634,219 @@
     "fields": {
         "is_global":false,
         "title":"SalesCycle #38",
+        "owner":1,
+        "followers":[],
+        "contact":10,
+        "latest_activity":null,
+        "status":"P",
+        "date_created":"2014-10-02 00:00:00+00:00",
+        "from_date":"2014-10-02 00:00:00+00:00",
+        "to_date":"2014-10-02 00:00:00+00:00",
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 39,
+    "model": "alm_crm.SalesCycle",
+    "fields": {
+        "is_global":false,
+        "title":"SalesCycle #39",
         "owner":5,
+        "followers":[],
+        "contact":10,
+        "latest_activity":null,
+        "status":"P",
+        "date_created":"2014-10-03 00:00:00+00:00",
+        "from_date":"2014-10-03 00:00:00+00:00",
+        "to_date":"2014-10-03 00:00:00+00:00",
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 40,
+    "model": "alm_crm.SalesCycle",
+    "fields": {
+        "is_global":false,
+        "title":"SalesCycle #40",
+        "owner":1,
+        "followers":[],
+        "contact":10,
+        "latest_activity":null,
+        "status":"C",
+        "date_created":"2014-10-04 00:00:00+00:00",
+        "from_date":"2014-10-04 00:00:00+00:00",
+        "to_date":"2014-10-04 00:00:00+00:00",
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 41,
+    "model": "alm_crm.SalesCycle",
+    "fields": {
+        "is_global":true,
+        "title":"SalesCycle #41",
+        "owner":2,
+        "followers":[],
+        "contact":11,
+        "latest_activity":null,
+        "status":"N",
+        "date_created":"2014-10-01 00:00:00+00:00",
+        "from_date":"2014-10-01 00:00:00+00:00",
+        "to_date":"2014-10-01 00:00:00+00:00",
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 42,
+    "model": "alm_crm.SalesCycle",
+    "fields": {
+        "is_global":false,
+        "title":"SalesCycle #42",
+        "owner":1,
+        "followers":[],
+        "contact":11,
+        "latest_activity":null,
+        "status":"C",
+        "date_created":"2014-10-02 00:00:00+00:00",
+        "from_date":"2014-10-02 00:00:00+00:00",
+        "to_date":"2014-10-02 00:00:00+00:00",
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 43,
+    "model": "alm_crm.SalesCycle",
+    "fields": {
+        "is_global":false,
+        "title":"SalesCycle #43",
+        "owner":2,
+        "followers":[],
+        "contact":11,
+        "latest_activity":null,
+        "status":"P",
+        "date_created":"2014-10-03 00:00:00+00:00",
+        "from_date":"2014-10-03 00:00:00+00:00",
+        "to_date":"2014-10-03 00:00:00+00:00",
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 44,
+    "model": "alm_crm.SalesCycle",
+    "fields": {
+        "is_global":false,
+        "title":"SalesCycle #44",
+        "owner":4,
+        "followers":[],
+        "contact":11,
+        "latest_activity":null,
+        "status":"N",
+        "date_created":"2014-10-04 00:00:00+00:00",
+        "from_date":"2014-10-04 00:00:00+00:00",
+        "to_date":"2014-10-04 00:00:00+00:00",
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 45,
+    "model": "alm_crm.SalesCycle",
+    "fields": {
+        "is_global":true,
+        "title":"SalesCycle #45",
+        "owner":6,
+        "followers":[],
+        "contact":12,
+        "latest_activity":null,
+        "status":"P",
+        "date_created":"2014-10-01 00:00:00+00:00",
+        "from_date":"2014-10-01 00:00:00+00:00",
+        "to_date":"2014-10-01 00:00:00+00:00",
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 46,
+    "model": "alm_crm.SalesCycle",
+    "fields": {
+        "is_global":false,
+        "title":"SalesCycle #46",
+        "owner":7,
+        "followers":[],
+        "contact":12,
+        "latest_activity":null,
+        "status":"C",
+        "date_created":"2014-10-02 00:00:00+00:00",
+        "from_date":"2014-10-02 00:00:00+00:00",
+        "to_date":"2014-10-02 00:00:00+00:00",
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 47,
+    "model": "alm_crm.SalesCycle",
+    "fields": {
+        "is_global":true,
+        "title":"SalesCycle #47",
+        "owner":6,
+        "followers":[],
+        "contact":13,
+        "latest_activity":null,
+        "status":"N",
+        "date_created":"2014-10-01 00:00:00+00:00",
+        "from_date":"2014-10-01 00:00:00+00:00",
+        "to_date":"2014-10-01 00:00:00+00:00",
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 48,
+    "model": "alm_crm.SalesCycle",
+    "fields": {
+        "is_global":false,
+        "title":"SalesCycle #48",
+        "owner":6,
+        "followers":[],
+        "contact":13,
+        "latest_activity":null,
+        "status":"P",
+        "date_created":"2014-10-02 00:00:00+00:00",
+        "from_date":"2014-10-02 00:00:00+00:00",
+        "to_date":"2014-10-02 00:00:00+00:00",
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 49,
+    "model": "alm_crm.SalesCycle",
+    "fields": {
+        "is_global":true,
+        "title":"SalesCycle #49",
+        "owner":6,
         "followers":[],
         "contact":14,
         "latest_activity":null,
-        "projected_value":75,
-        "real_value":76,
+        "status":"N",
+        "date_created":"2014-10-01 00:00:00+00:00",
+        "from_date":"2014-10-01 00:00:00+00:00",
+        "to_date":"2014-10-01 00:00:00+00:00",
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 50,
+    "model": "alm_crm.SalesCycle",
+    "fields": {
+        "is_global":false,
+        "title":"SalesCycle #50",
+        "owner":7,
+        "followers":[],
+        "contact":14,
+        "latest_activity":null,
         "status":"C",
-        "date_created":"2014-02-10 00:00:00+00:00",
-        "from_date":"2014-02-10 00:00:00+00:00",
-        "to_date":"2014-04-10 00:00:00+00:00",
-        "subscription_id":2
+        "date_created":"2014-10-02 00:00:00+00:00",
+        "from_date":"2014-10-02 00:00:00+00:00",
+        "to_date":"2014-10-02 00:00:00+00:00",
+        "subscription_id": 2
     }
 }
 ]

@@ -1011,6 +1011,7 @@ class ContactResource(CRMServiceModelResource):
         ...        ],
         ... },
         '''
+
         objects = []
         contact_resource = ContactResource()
         self.method_check(request, allowed=['post'])
@@ -1019,22 +1020,48 @@ class ContactResource(CRMServiceModelResource):
         data = self.deserialize(
             request, request.body,
             format=request.META.get('CONTENT_TYPE', 'application/json'))
-
         current_crmuser = request.user.get_crmuser()
-        for contact in Contact.import_from_vcard(
-                data['uploaded_file'], current_crmuser):
-            contact.create_share_to(current_crmuser.pk)
-
-            _bundle = contact_resource.build_bundle(
-                obj=contact, request=request)
-            
-            _bundle.data['global_sales_cycle'] = SalesCycleResource().full_dehydrate(
-                SalesCycleResource().build_bundle(
-                    obj=SalesCycle.objects.get(contact_id=contact.id)
+        if data['filename'].split('.')[1]=='csv':
+            for contact in Contact.import_from_csv(
+                data['uploaded_file'], request.user):
+                _bundle = contact_resource.build_bundle(
+                    obj=contact, request=request)
+                _bundle.data['global_sales_cycle'] = SalesCycleResource().full_dehydrate(
+                    SalesCycleResource().build_bundle(
+                        obj=SalesCycle.objects.get(contact_id=contact.id)
+                    )
                 )
-            )
-            objects.append(contact_resource.full_dehydrate(
-                _bundle, for_list=True))
+                objects.append(contact_resource.full_dehydrate(
+                    _bundle, for_list=True))
+        elif data['filename'].split('.')[1]=='xls':
+            import base64
+            for contact in Contact.import_from_xls(
+                base64.b64decode(data['uploaded_file']), request.user):
+                _bundle = contact_resource.build_bundle(
+                    obj=contact, request=request)
+                _bundle.data['global_sales_cycle'] = SalesCycleResource().full_dehydrate(
+                    SalesCycleResource().build_bundle(
+                        obj=SalesCycle.objects.get(contact_id=contact.id)
+                    )
+                )
+                objects.append(contact_resource.full_dehydrate(
+                    _bundle, for_list=True))
+        else:    
+            for contact in Contact.import_from_vcard(
+                    data['uploaded_file'], current_crmuser):
+
+                contact.create_share_to(current_crmuser.pk)
+
+                _bundle = contact_resource.build_bundle(
+                    obj=contact, request=request)
+                _bundle.data['global_sales_cycle'] = SalesCycleResource().full_dehydrate(
+                    SalesCycleResource().build_bundle(
+                        obj=SalesCycle.objects.get(contact_id=contact.id)
+                    )
+                )
+                objects.append(contact_resource.full_dehydrate(
+                    _bundle, for_list=True))
+
         self.log_throttled_access(request)
         return self.create_response(request, {'success': objects})
 
@@ -2134,18 +2161,18 @@ class AppStateObject(object):
             'emails': map(_email, vcard.email_set.all()),
             'tels': map(_tel, vcard.tel_set.all()),
             'orgs': map(_org, vcard.org_set.all()),
-            'geos': map(_geo, vcard.geo_set.all()),
+            # 'geos': map(_geo, vcard.geo_set.all()),
             'adrs': map(_adr, vcard.adr_set.all()),
-            'agents': map(_agent, vcard.agent_set.all()),
+            # 'agents': map(_agent, vcard.agent_set.all()),
             'categories': map(_category, vcard.category_set.all()),
-            'keys': map(_key, vcard.key_set.all()),
-            'labels': map(_label, vcard.label_set.all()),
-            'mailers': map(_mailer, vcard.mailer_set.all()),
-            'nicknames': map(_nickname, vcard.nickname_set.all()),
-            'notes': map(_note, vcard.note_set.all()),
-            'roles': map(_role, vcard.role_set.all()),
+            # 'keys': map(_key, vcard.key_set.all()),
+            # 'labels': map(_label, vcard.label_set.all()),
+            # 'mailers': map(_mailer, vcard.mailer_set.all()),
+            # 'nicknames': map(_nickname, vcard.nickname_set.all()),
+            # 'notes': map(_note, vcard.note_set.all()),
+            # 'roles': map(_role, vcard.role_set.all()),
             'titles': map(_title, vcard.title_set.all()),
-            'tzs': map(_tz, vcard.tz_set.all()),
+            # 'tzs': map(_tz, vcard.tz_set.all()),
             'urls': map(_url, vcard.url_set.all()),
             })
         return d
@@ -2214,6 +2241,8 @@ class AppStateObject(object):
                     return None
                 if hasattr(s, value_name):
                     v = getattr(s, value_name)
+                    if v is None:
+                        return None
                     dv = model_to_dict(v, exclude=['owner', 'amount'])
                     dv.update({'value': v.amount})
                 else:
