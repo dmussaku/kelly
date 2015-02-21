@@ -2211,7 +2211,10 @@ class AppStateObject(object):
             vcard = VCard.objects.get(id=user.vcard.id)
 
             d = model_to_dict(cu)
-            d.update({'vcard': self._vcard(vcard)})
+            d.update({
+                'vcard': self._vcard(vcard),
+                'userpic': user.userpic.url
+            })
             return d
 
         return map(_map, crmusers)
