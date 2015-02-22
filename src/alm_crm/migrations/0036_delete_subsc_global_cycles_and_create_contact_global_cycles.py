@@ -36,6 +36,14 @@ class Migration(DataMigration):
                      'contact_id':contact.id
                     }
                     )
+            finally:
+                sales_cycles = contact.sales_cycles.filter(is_global=True)
+                if len(sales_cycles) > 1:
+                    for sc in sales_cycles[1:]:
+                        for a in sc.get_activities():
+                            sales_cycles[0].rel_activities.add(a)
+                        sc.delete()
+
 
 
     def backwards(self, orm):
