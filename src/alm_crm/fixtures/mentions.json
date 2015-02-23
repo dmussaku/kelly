@@ -5,7 +5,8 @@
         "fields": {
             "user":1,
             "content_type":["alm_crm", "activity"],
-            "object_id":1
+            "object_id":1,
+            "date_created": "2014-09-10T00:00:00Z"
         }
     },
     {
@@ -14,7 +15,8 @@
         "fields": {
         	"user":1,
             "content_type":["alm_crm", "activity"],
-        	"object_id":2
+        	"object_id":2,
+            "date_created": "2014-09-10T00:00:00Z"
         }
     },
     {
@@ -23,7 +25,8 @@
         "fields": {
         	"user":1,
             "content_type":["alm_crm", "activity"],
-        	"object_id":3
+        	"object_id":3,
+            "date_created": "2014-09-10T00:00:00Z"
         }
     },
     {
@@ -32,7 +35,8 @@
         "fields": {
         	"user":1,
             "content_type":["alm_crm", "activity"],
-        	"object_id":4
+        	"object_id":4,
+            "date_created": "2014-09-10T00:00:00Z"
         }
     },
     {
@@ -41,7 +45,8 @@
         "fields": {
             "user":1,
             "content_type":["alm_crm", "salescycle"],
-            "object_id":4
+            "object_id":4,
+            "date_created": "2014-09-10T00:00:00Z"
         }
     }
 ]

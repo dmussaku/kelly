@@ -7,7 +7,9 @@
             "description":"Microsoft Office 360 is your new Office in everyplace where you are.",
             "price":8900,
             "currency":"KZT",
-            "owner": 1
+            "date_created": "2014-09-10T00:00:00Z",
+            "owner": 1,
+            "subscription_id": 1
         }
     },
     {
@@ -18,7 +20,9 @@
             "description":"1C Online - monthly subscription",
             "price":3000,
             "currency":"KZT",
-            "owner": 1
+            "date_created": "2014-09-10T00:00:00Z",
+            "owner": 1,
+            "subscription_id": 1
         }
     },
     {
@@ -29,7 +33,9 @@
             "description":"1C Online - year subscription",
             "price":25000,
             "currency":"KZT",
-            "owner": 1
+            "date_created": "2014-09-10T00:00:00Z",
+            "owner": 1,
+            "subscription_id": 1
         }
     },
     {
@@ -40,7 +46,23 @@
             "description":"Paragraph Online is product for lawyers",
             "price":59000,
             "currency":"KZT",
-            "owner": 1
+            "date_created": "2014-09-10T00:00:00Z",
+            "owner": 1,
+            "subscription_id": 1
+        }
+    },
+
+    {
+        "pk":5,
+        "model":"alm_crm.Product",
+        "fields": {
+            "name":"Facebook's OculusRift",
+            "description":"Technology of Virtual 3D",
+            "price":159000,
+            "currency":"KZT",
+            "date_created": "2015-01-01T00:00:00Z",
+            "owner": 5,
+            "subscription_id": 2
         }
     }
 ]

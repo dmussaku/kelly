@@ -1,0 +1,198 @@
+[
+{
+    "pk": 1,
+    "model": "alm_crm.contact",
+    "fields": {
+        "status": 1,
+        "latest_activity": null,
+        "tp": "user",
+        "parent": null,
+        "owner": 5,
+        "date_created": "2014-09-10T00:00:00Z",
+        "subscription_id": 1,
+        "vcard": 6
+    }
+},
+{
+    "pk": 2,
+    "model": "alm_crm.contact",
+    "fields": {
+        "status": 1,
+        "latest_activity": null,
+        "tp": "user",
+        "parent": null,
+        "owner": 5,
+        "date_created": "2014-09-10T00:00:00Z",
+        "subscription_id": 1,
+        "vcard": 7
+    }
+},
+{
+    "pk": 3,
+    "model": "alm_crm.contact",
+    "fields": {
+        "status": 1,
+        "latest_activity": null,
+        "tp": "user",
+        "parent": null,
+        "owner": 5,
+        "date_created": "2014-09-10T00:00:00Z",
+        "subscription_id": 1,
+        "vcard": 8
+    }
+},
+{
+    "pk": 4,
+    "model": "alm_crm.contact",
+    "fields": {
+        "status": 1,
+        "latest_activity": null,
+        "tp": "user",
+        "parent": null,
+        "owner": 5,
+        "date_created": "2014-09-10T00:00:00Z",
+        "subscription_id": 1,
+        "vcard": 9
+    }
+},
+{
+    "pk": 5,
+    "model": "alm_crm.contact",
+    "fields": {
+        "status": 1,
+        "latest_activity": null,
+        "tp": "user",
+        "parent": null,
+        "owner": 1,
+        "date_created": "2014-09-10T00:00:00Z",
+        "subscription_id": 1,
+        "vcard": 10
+    }
+},
+{
+    "pk": 6,
+    "model": "alm_crm.contact",
+    "fields": {
+        "status": 1,
+        "latest_activity": null,
+        "tp": "user",
+        "parent": null,
+        "owner": 2,
+        "date_created": "2014-09-10T00:00:00Z",
+        "subscription_id": 1,
+        "vcard": 11
+    }
+},
+{
+    "pk": 7,
+    "model": "alm_crm.contact",
+    "fields": {
+        "status": 1,
+        "latest_activity": null,
+        "tp": "user",
+        "parent": null,
+        "owner": 5,
+        "date_created": "2014-09-10T00:00:00Z",
+        "subscription_id": 1,
+        "vcard": 12
+    }
+},
+{
+    "pk": 8,
+    "model": "alm_crm.contact",
+    "fields": {
+        "status": 1,
+        "latest_activity": null,
+        "tp": "user",
+        "parent": null,
+        "owner": 3,
+        "date_created": "2014-09-10T00:00:00Z",
+        "subscription_id": 1,
+        "vcard": 13
+    }
+},
+{
+    "pk": 9,
+    "model": "alm_crm.contact",
+    "fields": {
+        "status": 1,
+        "latest_activity": null,
+        "tp": "user",
+        "parent": null,
+        "owner": 3,
+        "date_created": "2014-09-10T00:00:00Z",
+        "subscription_id": 1,
+        "vcard": 14
+    }
+},
+{
+    "pk": 10,
+    "model": "alm_crm.contact",
+    "fields": {
+        "status": 1,
+        "latest_activity": null,
+        "tp": "user",
+        "parent": null,
+        "owner": 1,
+        "date_created": "2014-09-10T00:00:00Z",
+        "subscription_id": 1,
+        "vcard": 15
+    }
+},
+{
+    "pk": 11,
+    "model": "alm_crm.contact",
+    "fields": {
+        "status": 1,
+        "latest_activity": null,
+        "tp": "user",
+        "parent": null,
+        "owner": 5,
+        "date_created": "2014-09-10T00:00:00Z",
+        "subscription_id": 1,
+        "vcard": 16
+    }
+},
+{
+    "pk": 12,
+    "model": "alm_crm.contact",
+    "fields": {
+        "status": 1,
+        "latest_activity": null,
+        "tp": "user",
+        "parent": null,
+        "owner": 7,
+        "date_created": "2014-09-10T00:00:00Z",
+        "subscription_id": 2,
+        "vcard": 19
+    }
+},
+{
+    "pk": 13,
+    "model": "alm_crm.contact",
+    "fields": {
+        "status": 1,
+        "latest_activity": null,
+        "tp": "user",
+        "parent": null,
+        "owner": 6,
+        "date_created": "2014-09-10T00:00:00Z",
+        "subscription_id": 2,
+        "vcard": 20
+    }
+},
+{
+    "pk": 14,
+    "model": "alm_crm.contact",
+    "fields": {
+        "status": 1,
+        "latest_activity": null,
+        "tp": "user",
+        "parent": null,
+        "owner": 6,
+        "date_created": "2014-09-10T00:00:00Z",
+        "subscription_id": 2,
+        "vcard": 21
+    }
+}
+]

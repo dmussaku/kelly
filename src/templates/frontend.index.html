@@ -105,7 +105,11 @@
     <script src="{% static 'js/webfont.min.js' %}"></script>
     <script>
      WebFont.load({
-      google: { families: [ 'Roboto:400,700:latin,cyrillic', 'Roboto+Condensed::latin,cyrillic' ] },
+      custom: {
+        families: ['Roboto', 'Roboto Condensed'],
+        urls: ["{% static 'css/fonts.css' %}"]
+      },
+      // google: { families: [ 'Roboto:400,700:latin,cyrillic', 'Roboto+Condensed::latin,cyrillic' ] },
       active: function(familyName, fvd) {
       }
     });

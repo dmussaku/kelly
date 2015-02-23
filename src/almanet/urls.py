@@ -28,7 +28,7 @@ from alm_crm.api import (
     AppStateResource,
     SalesCycleProductStatResource,
     FilterResource,
-    CommentResource
+    CommentResource,
     )
 from alm_user.api import UserResource
 from tastypie.resources import ModelResource

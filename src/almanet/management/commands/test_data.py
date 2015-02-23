@@ -15,9 +15,8 @@ def path_rel(*x):
 
 def load_fixtures():
     fixtures = (
-        'users', 'companies', 'services', 'subscriptions', 'crmusers',
-        'vcards', 'contacts', 'sales_cycles', 'products', 'values',
-        'activities', 'comments',
+        'services', 'vcard', 'user', 'company', 'subscription', 'products',
+        'crmuser', 'contact', 'sales_cycles', 'activities', 'comments',
         'mentions')
 
     # syncdb, migrate on main_database db and delete all data

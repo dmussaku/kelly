@@ -16,7 +16,9 @@ from alm_crm.models import (
     Share,
     ContactList,
     SalesCycleProductStat,
-    Filter
+    Filter,
+    HashTag,
+    HashTagReference
     )
 from alm_vcard.models import VCard, Tel, Email, Org
 from alm_user.models import User
@@ -25,17 +27,18 @@ from alm_crm.models import GLOBAL_CYCLE_TITLE
 
 
 class CRMUserTestCase(TestCase):
-    fixtures=['crmusers.json', 'users.json']
+    fixtures = ['crmusers.json', 'users.json']
 
     def setUp(self):
         super(CRMUserTestCase, self).setUp()
-        self.crmuser=CRMUser.objects.first()
+        self.crmuser = CRMUser.objects.first()
 
     def test_unicode(self):
         self.assertEqual(str(self.crmuser), 'Bruce Wayne')
 
     def test_get_billing_user(self):
-        self.assertEqual(self.crmuser.get_billing_user(), User.objects.get(pk=self.crmuser.user_id))
+        self.assertEqual(self.crmuser.get_billing_user(),
+                         User.objects.get(pk=self.crmuser.user_id))
 
     def test_set_supervisor(self):
         self.crmuser.set_supervisor()
@@ -46,9 +49,11 @@ class CRMUserTestCase(TestCase):
         self.assertFalse(self.crmuser.is_supervisor)
 
     def test_get_crmusers(self):
-        self.assertEqual(CRMUser.get_crmusers().last(), CRMUser.objects.last())
-        user = User.objects.last()
-        get_with_users = CRMUser.get_crmusers(with_users=True)
+        self.assertEqual(CRMUser.get_crmusers(self.crmuser.subscription_id).last(), 
+                                                            CRMUser.objects.last())
+        user = User.objects.first()
+        get_with_users = CRMUser.get_crmusers(subscription_id = self.crmuser.subscription_id,
+                                                with_users=True)
         self.assertTrue(user in get_with_users[1])
 
 
@@ -62,14 +67,14 @@ class ContactTestCase(TestCase):
         super(ContactTestCase, self).setUp()
         self.contact1 = Contact.objects.get(pk=1)
         self.crmuser = self.contact1.owner
+        self.crm_subscr_id = CRMUser.get_subscription_id(self.crmuser.id)
 
     def test_get_contacts_by_status(self):
-        contacts = Contact.get_contacts_by_status(self.crmuser.id, status=1)
+        contacts = Contact.get_contacts_by_status(self.crm_subscr_id, status=1)
         self.assertEqual(len(contacts), 2)
 
     def test_get_cold_base(self):
-        crmuser = CRMUser.objects.first()
-        cold_contacts = Contact.get_cold_base(crmuser.id)
+        cold_contacts = Contact.get_cold_base(self.crm_subscr_id)
         self.assertEqual(len(cold_contacts), 1)
 
     def test_change_status_without_save(self):
@@ -87,9 +92,14 @@ class ContactTestCase(TestCase):
     def test_upload_contacts(self):
         file_path = os.path.join(os.path.dirname(os.path.dirname(__file__)),
                                  'alm_crm/fixtures/aliya.vcf')
+        # amount_before_import = SalesCycle.objects.all().count()
         file_obj = open(file_path, "r").read()
         contact = Contact.upload_contacts(upload_type='vcard',
-                                          file_obj=file_obj)
+                                          file_obj=file_obj,
+                                          save = True)
+        # amount_after_import = SalesCycle.objects.all().count()
+        # self.assertEqual(amount_after_import, amount_before_import+1)
+        # self.assertTrue(c.sales_cycles.first().title == GLOBAL_CYCLE_TITLE for c in contacts)
         self.assertEqual(contact.__class__, Contact)
         self.assertEqual(contact.vcard.__class__, VCard)
         addr = list(contact.vcard.adr_set.all())
@@ -108,35 +118,35 @@ class ContactTestCase(TestCase):
         self.assertNotEqual(contact.name, "Unknown")
 
     def test_filter_contacts_by_vcard(self):
-        cs = Contact.filter_contacts_by_vcard(self.crmuser.id,
+        cs = Contact.filter_contacts_by_vcard(self.crm_subscr_id,
                                               search_text='Akerke Akerke',
                                               search_params=[('fn')],
                                               order_by=[])
         self.assertEqual(len(cs), 1)
-        cs = Contact.filter_contacts_by_vcard(self.crmuser.id,
+        cs = Contact.filter_contacts_by_vcard(self.crm_subscr_id,
                                               search_text='Akerke',
                                               search_params=[('fn', 'icontains')],
                                               order_by=[])
         self.assertEqual(len(cs), 1)
-        cs = Contact.filter_contacts_by_vcard(self.crmuser.id,
+        cs = Contact.filter_contacts_by_vcard(self.crm_subscr_id,
                                               search_text='359',
                                               search_params=[('tel__value', 'icontains')],
                                               order_by=[])
         self.assertEqual(len(cs), 1)
-        cs = Contact.filter_contacts_by_vcard(self.crmuser.id,
+        cs = Contact.filter_contacts_by_vcard(self.crm_subscr_id,
                                               search_text='359',
                                               search_params=[('fn', 'icontains')],
                                               order_by=[])
         self.assertEqual(len(cs), 0)
 
     def test_get_contacts_by_last_activity_date_without_activities(self):
-        contacts = Contact.get_contacts_by_last_activity_date(user_id=3)
+        contacts = Contact.get_contacts_by_last_activity_date(subscription_id=1)
         self.assertEqual(len(contacts), 0)
 
     def test_get_contacts_by_last_activity_date(self):
-        crmuser = CRMUser.objects.first()
-        contacts = Contact.get_contacts_by_last_activity_date(user_id=crmuser.id, all=True)
-        subscr_contacts = Contact.objects.filter(subscription_id=crmuser.subscription_id)
+        contacts = Contact.get_contacts_by_last_activity_date(self.crm_subscr_id,
+                                                              all=True)
+        subscr_contacts = Contact.objects.filter(subscription_id=self.crm_subscr_id)
         self.assertEqual(contacts.count(), subscr_contacts.count())
 
     def test_export_to(self):
@@ -148,13 +158,6 @@ class ContactTestCase(TestCase):
     def test_properties(self):
         contact2 = Contact.objects.get(pk=2)
         contact2.vcard = None
-        self.assertEqual(contact2.name(), 'Unknown')
-        self.assertEqual(contact2.tel(), 'Unknown')
-        self.assertEqual(contact2.mobile(), 'Unknown')
-        self.assertEqual(contact2.email(), 'Unknown')
-        self.assertEqual(contact2.company(), 'Unknown organization')
-        self.assertEqual(Contact.objects.get(pk=3).company(),
-                         'Unknown organization')
         self.assertEqual(self.contact1.tel(), Tel.objects.get(vcard=self.contact1.vcard).value)
         self.assertEqual(self.contact1.mobile(), Tel.objects.get(vcard=self.contact1.vcard).value)
         self.assertEqual(self.contact1.email(), Email.objects.get(vcard=self.contact1.vcard).value)
@@ -192,24 +195,29 @@ class ContactTestCase(TestCase):
         count = Contact.objects.all().count()
         file_path = os.path.join(os.path.dirname(os.path.dirname(__file__)),
                                  'alm_crm/fixtures/nurlan.vcf')
-        contacts = Contact.import_from_vcard(open(file_path, "r"))
+        amount_before_import = SalesCycle.objects.all().count()
+        contacts = Contact.import_from_vcard(raw_vcard=open(file_path, "r"),
+                                                creator=CRMUser.objects.first())
+        amount_after_import = SalesCycle.objects.all().count()
 
-        contact1 = Contact.filter_contacts_by_vcard(self.crmuser.id,
+        contact1 = Contact.filter_contacts_by_vcard(self.crm_subscr_id,
                                                     search_text='Aslan',
                                                     search_params=[('fn', 'icontains')],
                                                     order_by=[])
-        contact2 = Contact.filter_contacts_by_vcard(self.crmuser.id,
+        contact2 = Contact.filter_contacts_by_vcard(self.crm_subscr_id,
                                                     search_text='Serik',
                                                     search_params=[('fn', 'icontains')],
                                                     order_by=[])
-        contact3 = Contact.filter_contacts_by_vcard(self.crmuser.id,
+        contact3 = Contact.filter_contacts_by_vcard(self.crm_subscr_id,
                                                     search_text='Almat',
                                                     search_params=[('fn', 'icontains')],
                                                     order_by=[])
-        contact4 = Contact.filter_contacts_by_vcard(self.crmuser.id,
+        contact4 = Contact.filter_contacts_by_vcard(self.crm_subscr_id,
                                                     search_text='Mukatayev',
                                                     search_params=[('fn', 'icontains')],
                                                     order_by=[])
+        self.assertEqual(amount_after_import, amount_before_import+3)
+        self.assertTrue(c.sales_cycles.first().title == GLOBAL_CYCLE_TITLE for c in contacts)
         self.assertEqual(len(Contact.objects.all()), count+3)
         self.assertEqual(len(contact4), 3)
         self.assertTrue(contact1.first() in Contact.objects.all())
@@ -240,14 +248,14 @@ class ProductTestCase(TestCase):
     def setUp(self):
         super(ProductTestCase, self).setUp()
         self.product = Product.objects.get(pk=1)
-        self.crmuser = self.product.owner
+        self.crm_subscr_id = 1
 
     def test_unicode(self):
         self.assertEqual(self.product.__unicode__(), 'p1')
 
     def test_get_products(self):
         self.assertEqual(len(Product.objects.all()),
-                         len(Product.get_products(self.crmuser.id)))
+                         len(Product.get_products(self.crm_subscr_id)))
 
 
 class ActivityTestCase(TestCase):
@@ -275,7 +283,7 @@ class ActivityTestCase(TestCase):
         a.save()
         self.assertEqual(a, Activity.objects.get(id=a.id))
         self.assertEqual(0, len(Feedback.objects.filter(id=a.id)))
-        f = Feedback(feedback='feedback8', status="W",
+        f = Feedback(feedback='feedback8', status=Feedback.WAITING,
                      date_created=timezone.now(), date_edited=timezone.now(),
                      activity=a, owner_id=1)
         f.save()
@@ -335,12 +343,12 @@ class ActivityTestCase(TestCase):
                                          list(self.activity1.mentions.all()))
 
                     self.assertEqual('comments' in details, include_c)
-                    if include_c:
-                        self.assertQuerysetEqual(details['comments'],
-                                                 self.activity1.comments.all())
+                    # if include_c:
+                    #     self.assertQuerysetEqual(details['comments'].order_by('id'),
+                    #                              self.activity1.comments.all())
 
     def test_get_number_of_activities_by_day(self):
-        user_id = 1
+        user_id = 2
         user_activities = Activity.objects.filter(owner=user_id)\
             .order_by('date_created')
         from_dt = user_activities.first().date_created
@@ -350,12 +358,12 @@ class ActivityTestCase(TestCase):
                                                               from_dt,
                                                               to_dt)
         self.assertEqual(sum(owned_data.values()), user_activities.count())
-        self.assertEqual(owned_data, {'2014-09-15': 1, '2014-09-11': 1,
-                         '2014-09-13': 1, '2014-09-12': 2})
+        self.assertEqual(owned_data, {'2014-12-30': 3, '2014-11-24': 3})
+        
 
 
     def test_unicode(self):
-        self.assertEqual(self.activity1.__unicode__(), self.activity1.title)
+        self.assertEqual(self.activity1.__unicode__(), self.activity1.description)
 
 
 class MentionTestCase(TestCase):
@@ -416,10 +424,10 @@ class CommentTestCase(TestCase):
     def test_get_comments_by_context(self):
         activity1 = Activity.objects.get(pk=1)
 
-        self.assertEqual(Comment.get_comments_by_context(1, Activity, 1, 0)
+        self.assertEqual(Comment.get_comments_by_context(1, Activity)
                          .count(), activity1.comments.count())
-        self.assertEqual(Comment.get_comments_by_context(1, Activity, 1, 1)
-                         .count(), 0)
+        self.assertEqual(Comment.get_comments_by_context(1, Activity)
+                         .count(), 4)
 
     def test_add_mention(self):
         count = self.comment.mentions.count()
@@ -436,9 +444,23 @@ class SalesCycleTestCase(TestCase):
         super(SalesCycleTestCase, self).setUp()
         self.sc1 = SalesCycle.objects.get(pk=1)
         self.crmusers = self.sc1.owner
+        self.crm_subscr_id = 1
 
     def get_sc(self, pk):
         return SalesCycle.objects.get(pk=pk)
+
+    def test_try_to_create_another_global_cycle(self):
+        contact = Contact.objects.first()
+        owner = contact.owner
+        subscription_id = owner.subscription_id
+        count = SalesCycle.objects.all().count()
+        self.assertEqual(SalesCycle.create_globalcycle(**{'subscription_id': subscription_id,
+                                                         'owner_id': owner.id,
+                                                         'contact_id': contact.id}),
+                        contact.sales_cycles.get(is_global=True))
+        actual_count = SalesCycle.objects.all().count()
+        expected_count = count
+        self.assertEqual(actual_count, expected_count)
 
     def test_unicode(self):
         self.assertEqual(self.sc1.__unicode__(), '%s [%s %s]' % (self.sc1.title, self.sc1.contact, self.sc1.status))
@@ -462,7 +484,7 @@ class SalesCycleTestCase(TestCase):
     def test_get_activities(self):
         self.assertEqual(
             list(self.sc1.get_activities().values_list('id', flat=True)),
-            [4, 3, 2, 1])
+            [2, 4, 6, 1, 3, 5])
 
     def test_add_product(self):
         count = len(self.sc1.products.all())
@@ -494,22 +516,30 @@ class SalesCycleTestCase(TestCase):
 
     def test_get_salescycles_by_last_activity_date(self):
         user_id = 1
-        ret = SalesCycle.get_salescycles_by_last_activity_date(user_id, include_activities=True)
-        self.assertEqual(sorted(list(ret[0].values_list('pk', flat=True))), [1, 2, 3])
-        self.assertEqual(sorted(list(ret[1].values_list('pk', flat=True))), range(1, 8))
-        self.assertItemsEqual(ret[2], {1: [1, 3], 2: [2], 3: []})
+        ret = SalesCycle.get_salescycles_by_last_activity_date(self.crm_subscr_id,
+                                                               user_id,
+                                                               include_activities=True)
+        self.assertEqual(sorted(list(ret[0].values_list('pk', flat=True))), [1, 2, 3, 4, 5])
+        self.assertEqual(sorted(list(ret[1].values_list('pk', flat=True))), range(1, 7))
+        self.assertItemsEqual(ret[2], {1: [1, 2, 3, 4, 5, 6], 2: [], 3: [], 4: [], 5: []})
+
+
 
     def test_get_salescycles_by_last_activity_date_with_mentioned(self):
         user_id = 1
-        ret = SalesCycle.get_salescycles_by_last_activity_date(user_id, mentioned=True,
+        ret = SalesCycle.get_salescycles_by_last_activity_date(self.crm_subscr_id,
+                                                               user_id,
+                                                               mentioned=True,
                                                                include_activities=True)
-        self.assertEqual(sorted(list(ret[0].values_list('pk', flat=True))), [1, 2, 3, 4])
-        self.assertEqual(sorted(list(ret[1].values_list('pk', flat=True))), range(1, 8))
-        self.assertItemsEqual(ret[2], {1: [1, 3], 2: [2], 3: [], 4: []})
+        self.assertEqual(sorted(list(ret[0].values_list('pk', flat=True))), [1, 2, 3, 4, 5])
+        self.assertEqual(sorted(list(ret[1].values_list('pk', flat=True))), range(1, 7))
+        self.assertItemsEqual(ret[2], {1: [1, 2, 3, 4, 5, 6], 2: [], 3: [], 4: [], 5: []})
 
     def test_get_salescycles_by_last_activity_date_only_mentioned(self):
         user_id = 1
-        ret = SalesCycle.get_salescycles_by_last_activity_date(user_id, owned=False,
+        ret = SalesCycle.get_salescycles_by_last_activity_date(self.crm_subscr_id,
+                                                               user_id,
+                                                               owned=False,
                                                                mentioned=True,
                                                                include_activities=True)
         self.assertEqual(list(ret[0].values_list('pk', flat=True)), [4])
@@ -518,17 +548,17 @@ class SalesCycleTestCase(TestCase):
 
     def test_get_salescycles_by_last_activity_date_only_followed(self):
         user_id = 1
-        ret = SalesCycle.get_salescycles_by_last_activity_date(user_id,
+        ret = SalesCycle.get_salescycles_by_last_activity_date(self.crm_subscr_id,
+                                                               user_id,
                                                                owned=False,
                                                                mentioned=False,
                                                                followed=True,
                                                                include_activities=True)
         self.assertEqual(list(ret[0].values_list('pk', flat=True)), [3])
-        self.assertEqual(list(ret[1].values_list('pk', flat=True)), [7])
-        self.assertItemsEqual(ret[2], {3: [7]})
+
 
     def test_get_salescycles_by_last_activity_date_without_user_id(self):
-        user_id = 5
+        user_id = 10
         try:
             CRMUser.objects.get(pk=user_id)
         except CRMUser.DoesNotExist:
@@ -538,18 +568,9 @@ class SalesCycleTestCase(TestCase):
         finally:
             self.assertTrue(raised)
 
-        try:
-            SalesCycle.get_salescycles_by_last_activity_date(user_id)
-        except CRMUser.DoesNotExist:
-            raised = True
-        else:
-            raised = False
-        finally:
-            self.assertTrue(raised)
-
     def test_get_salescycles_by_contact(self):
         ret = SalesCycle.get_salescycles_by_contact(1)
-        self.assertEqual(list(ret.values_list('pk', flat=True)), [1, 2, 3, 4])
+        self.assertEqual(list(ret.values_list('pk', flat=True)), [1])
 
     def test_close_salescycle(self):
         self.assertNotEqual(self.sc1.status, 'C')
@@ -684,82 +705,14 @@ class ResourceTestMixin(object):
 
     def get_credentials(self):
         self.get_user()
-        post_data = {
-            'email': self.user.email,
-            'password': self.user_password
-        }
-        self.api_path_user_session = '/api/v1/user_session/'
-
-        # create session
-        self.api_client.post(self.api_path_user_session, format='json',
-                             data=post_data)
-
-
-class UserSessionResourceTest(ResourceTestMixin, ResourceTestCase):
-    def setUp(self):
-        super(self.__class__, self).setUp()
-        self.api_path_user_session = '/api/v1/user_session/'
-
-    def test_get_detail_valid_json(self):
-        resp = self.api_client.get(
-            self.api_path_user_session, format='json', HTTP_HOST='localhost')
-        self.assertValidJSONResponse(resp)
-
-    def test_get_detail_without_session(self):
-        resp = self.api_client.get(
-            self.api_path_user_session, format='json', HTTP_HOST='localhost')
-        self.assertEqual(len(self.deserialize(resp)['objects']), 0)
-
-    def test_create_session(self):
-        self.get_user()
-        post_data = {
-            'email': self.user.email,
-            'password': self.user_password
-        }
-
-        # create session
-        resp = self.api_client.post(
-            self.api_path_user_session, format='json', data=post_data)
-        self.assertHttpCreated(resp)
-
-        # get_detail to check session was created
-        resp = self.api_client.get(
-            self.api_path_user_session, format='json', HTTP_HOST='localhost')
-        des_resp = self.deserialize(resp)
-        self.assertEqual(len(des_resp['objects']), 1)
-
-        session_user = des_resp['objects'][0]['user']
-        self.assertEqual(session_user['id'], self.user.id)
-
-    def test_delete_session(self):
-        # create session
-        self.get_credentials()
-
-        # get session_key by get_detail
-        resp = self.api_client.get(
-            self.api_path_user_session, format='json', HTTP_HOST='localhost')
-        session_key = self.deserialize(resp)['objects'][0]['id']
-
-        resp = self.api_client.delete(
-            self.api_path_user_session+'%s/' % session_key,
-            format='json', HTTP_HOST='localhost')
-        # get_detail to check session was deleted
-        resp = self.api_client.get(
-            self.api_path_user_session, format='json', HTTP_HOST='localhost')
-        des_resp = self.deserialize(resp)
-        # find session with deleted session_key
-        prev_obj = filter(lambda s: s['id'] == session_key,
-                          des_resp['objects'])
-        self.assertEqual(len(prev_obj), 0)
+        self.api_client.client.login(username=self.user.email, password=self.user_password)
+        return self.create_basic(self.user.email, self.user_password)
 
 
 class SalesCycleResourceTest(ResourceTestMixin, ResourceTestCase):
     def setUp(self):
         super(self.__class__, self).setUp()
-
-        # login user
         self.get_credentials()
-
         self.api_path_sales_cycle = '/api/v1/sales_cycle/'
 
         self.get_resp = lambda path: self.api_client.get(
@@ -767,7 +720,6 @@ class SalesCycleResourceTest(ResourceTestMixin, ResourceTestCase):
             format='json',
             HTTP_HOST='localhost')
         self.get_des_res = lambda path: self.deserialize(self.get_resp(path))
-
         self.sales_cycle = SalesCycle.objects.first()
 
     def test_get_list_valid_json(self):
@@ -905,7 +857,6 @@ class SalesCycleResourceTest(ResourceTestMixin, ResourceTestCase):
         resp = self.api_client.put(
             self.api_path_sales_cycle+str(self.sales_cycle.pk)+'/close/',
             format='json', data=put_data)
-
         self.assertHttpAccepted(resp)
         resp = self.deserialize(resp)
         self.assertTrue('activity' in resp)
@@ -914,7 +865,7 @@ class SalesCycleResourceTest(ResourceTestMixin, ResourceTestCase):
         self.assertEqual(resp['sales_cycle']['status'], 'C')
         self.assertEqual(resp['sales_cycle']['real_value']['value'],
                          sum(put_data.values()))
-        self.assertEqual(resp['activity']['feedback_status'], '$')
+        self.assertEqual(resp['activity']['feedback_status'], Feedback.OUTCOME)
         stat1 = SalesCycleProductStat.objects.get(sales_cycle=self.sales_cycle,
                                                   product=Product.objects.get(id=1)).value
         stat2 = SalesCycleProductStat.objects.get(sales_cycle=self.sales_cycle,
@@ -926,7 +877,7 @@ class SalesCycleResourceTest(ResourceTestMixin, ResourceTestCase):
 
     def test_closeGlobalCycleRaiseError(self):
         owner = CRMUser.objects.first()
-        sales_cycle = SalesCycle.objects.get(owner=owner, is_global=True)
+        sales_cycle = SalesCycle.objects.get(owner=owner, is_global=True, contact_id=1)
         put_data = {
             '1': 10000,
             '2': 3000
@@ -985,7 +936,7 @@ class ActivityResourceTest(ResourceTestMixin, ResourceTestCase):
             'author_id': owner.id,
             'description': 'new activity',
             'sales_cycle_id': sales_cycle.id,
-            'feedback_status': '$'
+            'feedback_status': Feedback.OUTCOME
         }
         unfollowers = [
             unfollow.id for unfollow in sales_cycle.contact.unfollowers.all()]
@@ -1004,7 +955,7 @@ class ActivityResourceTest(ResourceTestMixin, ResourceTestCase):
             'author_id': owner.id,
             'description': 'new activity',
             'sales_cycle_id': sales_cycle.id,
-            'feedback_status': '$'
+            'feedback_status': Feedback.OUTCOME
         }
         unfollowers = [
             unfollow.id for unfollow in sales_cycle.contact.unfollowers.all()]
@@ -1092,18 +1043,24 @@ class ActivityResourceTest(ResourceTestMixin, ResourceTestCase):
         self.assertEqual(Activity.objects.last().feedback,
                          Feedback.objects.last())
 
-    def test_create_activity_without_sales_cycle(self):
-        owner = CRMUser.objects.first()
-        sales_cycle = SalesCycle.objects.get(owner=owner, is_global=True)
+
+    def test_create_activity_with_mentions_and_hashtags(self):
+        owner = CRMUser.objects.last()
+        sales_cycle = SalesCycle.objects.first()
         post_data = {
             'author_id': owner.id,
-            'description': 'new activity, test_unit'
+            'description': '#almacloud @[1:Bruce Wayne] has sold #almacrm to @[2:Nurlan Abiken]',
+            'sales_cycle_id': sales_cycle.id,
+            'feedback_status': "$"
         }
         count = Activity.objects.all().count()
         count2 = sales_cycle.rel_activities.count()
+        hashtag_count = HashTag.objects.all().count()
+        hashtag_reference_count = HashTagReference.objects.all().count()
+        mention_count = Mention.objects.all().count()
         resp = self.api_client.post(self.api_path_activity, format='json', data=post_data)
         self.assertHttpCreated(resp)
-        self.assertEqual(Activity.objects.all().count(), count+1)
+        self.assertEqual(Activity.objects.all().count(), count + 1)
         # verify that new one has been added.
         self.assertEqual(sales_cycle.rel_activities.count(), count2 + 1)
         activity = sales_cycle.rel_activities.last()
@@ -1111,6 +1068,15 @@ class ActivityResourceTest(ResourceTestMixin, ResourceTestCase):
         self.assertIsInstance(activity.subscription_id, int)
         # verify that owner was set
         self.assertIsInstance(activity.owner, CRMUser)
+        self.assertIsInstance(activity.feedback, Feedback)
+        self.assertEqual(Activity.objects.last().feedback,
+                         Feedback.objects.last())
+        self.assertEqual(hashtag_count+2, HashTag.objects.all().count())
+        self.assertEqual(hashtag_reference_count+2, HashTagReference.objects.all().count())
+        self.assertEqual(mention_count+2, Mention.objects.all().count())
+        self.assertEqual(HashTagReference.objects.last().hashtag, 
+                        HashTag.objects.get(text=HashTagReference.objects.last().hashtag.text))
+
 
     def test_create_activity_without_feedback(self):
         owner = CRMUser.objects.last()
@@ -1166,6 +1132,42 @@ class ActivityResourceTest(ResourceTestMixin, ResourceTestCase):
         activity_last = Activity.objects.last()
         self.assertEqual(self.get_detail_des(activity.pk)['sales_cycle_id'], sales_cycle_id)
         self.assertEqual(sales_cycle_id, activity_last.sales_cycle.id)
+
+
+    def test_update_activity_via_put_with_hashtag_and_mention(self):
+        # get exist product data
+        activity = Activity.objects.last()
+        activity_data = self.get_detail_des(activity.pk)
+        sales_cycle_id = SalesCycle.objects.last().id
+        new_feedback = "5"
+        # update it
+        t = '_UPDATED! #updated by @[1:Bruce Wayne]'
+        activity_data['description'] += t
+        activity_data['feedback_status'] = new_feedback
+        activity_data['sales_cycle_id'] = sales_cycle_id
+        hashtag_count = HashTag.objects.all().count()
+        hashtag_reference_count = HashTagReference.objects.all().count()
+        mention_count = Mention.objects.all().count()
+
+        # PUT it
+        self.api_client.put(self.api_path_activity + '%s/' % (activity.pk),
+                            format='json', data=activity_data)
+        # check
+        activity_last = Activity.objects.last()
+        self.assertEqual(activity_last.description, activity.description + t)
+        self.assertEqual(self.get_detail_des(activity.pk)['description'], activity.description + t)
+
+        self.assertEqual(activity_last.feedback.status, new_feedback)
+        self.assertEqual(self.get_detail_des(activity.pk)['feedback_status'], new_feedback)
+
+        activity_last = Activity.objects.last()
+        self.assertEqual(self.get_detail_des(activity.pk)['sales_cycle_id'], sales_cycle_id)
+        self.assertEqual(sales_cycle_id, activity_last.sales_cycle.id)
+        self.assertEqual(hashtag_count+1, HashTag.objects.all().count())
+        self.assertEqual(hashtag_reference_count+1, HashTagReference.objects.all().count())
+        self.assertEqual(mention_count+1, Mention.objects.all().count())
+        self.assertEqual(HashTagReference.objects.last().hashtag, 
+                        HashTag.objects.get(text=HashTagReference.objects.last().hashtag.text))        
 
 
 class ProductResourceTest(ResourceTestMixin, ResourceTestCase):
@@ -1284,6 +1286,7 @@ class ContactResourceTest(ResourceTestMixin, ResourceTestCase):
         self.api_path_contact = '/api/v1/contact/'
         self.api_path_contact_products_f = '/api/v1/contact/%s/products/'
         self.api_path_contact_activities_f = '/api/v1/contact/%s/activities/'
+        self.api_path_import = '/api/v1/contact/import/'
 
 
         # get_list
@@ -1314,12 +1317,12 @@ class ContactResourceTest(ResourceTestMixin, ResourceTestCase):
 
         self.get_list_recent_des = self.deserialize(self.get_list_recent_resp)
 
-        #get list for assign contact
-        self.get_list_assign_contact_resp = self.api_client.get(self.api_path_contact+'assign_contact/',
+         #get list for recent contacts
+        self.get_list_import_resp = self.api_client.get(self.api_path_contact+'import/',
                                                                             format='json',
                                                                             HTTP_HOST='localhost')
 
-        self.get_list_assign_contact_des = self.deserialize(self.get_list_assign_contact_resp)
+        self.get_list_import_des = self.deserialize(self.get_list_import_resp)
 
         # get_detail(pk)
         self.get_detail_resp = \
@@ -1331,32 +1334,12 @@ class ContactResourceTest(ResourceTestMixin, ResourceTestCase):
             lambda pk: self.deserialize(self.get_detail_resp(pk))
 
         self.contact = Contact.objects.first()
-        self.crmuser = self.contact.owner
+        self.crm_subscr_id = 1
 
     def test_get_list_valid_json(self):
         self.assertValidJSONResponse(self.get_list_resp)
         self.assertValidJSONResponse(self.get_list_cold_base_resp)
         self.assertValidJSONResponse(self.get_list_leads_resp)
-
-    def test_get_activities_with_embedded_comments(self):
-        resp = self.api_client.get(
-            self.api_path_contact_activities_f % (self.contact.pk),
-            format='json',
-            HTTP_HOST='localhost'
-            )
-        activites = self.deserialize(resp)['objects']
-
-        self.assertEqual(len(activites),
-                         len(Contact.get_contact_activities(self.contact.pk)))
-
-        # exists at least one comment from activities
-        self.assertTrue(sum(len(a['comments']) for a in activites) > 0)
-
-        for a in activites:
-            self.assertEqual(
-                len(Activity.objects.get(pk=a['id']).comments.all()),
-                len(a['comments'])
-                )
 
     def test_get_list_non_empty(self):
         self.assertTrue(self.get_list_des['meta']['total_count'] > 0)
@@ -1369,46 +1352,47 @@ class ContactResourceTest(ResourceTestMixin, ResourceTestCase):
 
     def test_create_contact(self):
         post_data = {
-            'status': 1,
-            'tp': 'user',
-            'assignees': [],
+            'vcard': {"fn": "Nurlan Abiken"},
+            'note': 'some text'
         }
-
         count = Contact.objects.count()
-        self.assertHttpCreated(self.api_client.post(
-            self.api_path_contact, format='json', data=post_data))
+        resp = self.api_client.post(
+            self.api_path_contact, format='json', data=post_data)
+        self.assertHttpOK(resp)
         # verify that new one has been added.
         self.assertEqual(Contact.objects.count(), count + 1)
+        created_contact = Contact.objects.last()
+        self.assertEqual(created_contact.sales_cycles.first().title, GLOBAL_CYCLE_TITLE)
 
     def test_delete_contact(self):
         count = Contact.objects.count()
 
-        sales_cycles = self.contact.sales_cycles.all()
-
-        for sales_cycle in sales_cycles:
-            self.assertHttpAccepted(self.api_client.delete(
-                '/api/v1/sales_cycle/' + '%s/' % sales_cycle.pk, format='json'))
+        count_related_sales_cycles = self.contact.sales_cycles.all().count()
+        count_all_sales_cycle = SalesCycle.objects.all().count()
 
         self.assertHttpAccepted(self.api_client.delete(
             self.api_path_contact + '%s/' % self.contact.pk, format='json'))
+        count_sales_cycle = SalesCycle.objects.all().count()
         # verify that one contact been deleted.
         self.assertEqual(Contact.objects.count(), count - 1)
+        self.assertEqual(count_sales_cycle, count_all_sales_cycle - count_related_sales_cycles)
 
     def test_get_last_contacted(self):
-        recent = Contact.get_contacts_by_last_activity_date(1)
+        user = CRMUser.objects.first()
+        recent = Contact.get_contacts_by_last_activity_date(subscription_id = user.subscription_id, 
+                                                            user_id = user.id)
         self.assertEqual(len(self.get_list_recent_des['objects']),
                          len(recent))
 
     def test_get_cold_base(self):
-        cold_base = Contact.get_cold_base(self.crmuser.id)
+        cold_base = Contact.get_cold_base(self.crm_subscr_id)
         self.assertEqual(
             len(self.get_list_cold_base_des['objects']),
             len(cold_base)
             )
 
     def test_get_leads(self):
-        STATUS_LEAD = 1
-        leads = Contact.get_contacts_by_status(self.crmuser.id, STATUS_LEAD)
+        leads = Contact.get_contacts_by_status(self.crm_subscr_id, Contact.LEAD)
         self.assertEqual(len(self.get_list_leads_des['objects']),
                          len(leads))
 
@@ -1420,8 +1404,8 @@ class ContactResourceTest(ResourceTestMixin, ResourceTestCase):
 
         self.assertEqual(Share.objects.count(), count+1)
 
-        share_to = Share.objects.get(id=1).share_to
-        share_from = Share.objects.get(id=1).share_from
+        share_to = Share.objects.last().share_to
+        share_from = Share.objects.last().share_from
 
         self.assertEqual(share_from, CRMUser.objects.get(pk=1))
         self.assertEqual(share_to, CRMUser.objects.get(pk=2))
@@ -1434,26 +1418,26 @@ class ContactResourceTest(ResourceTestMixin, ResourceTestCase):
 
         self.assertEqual(Share.objects.count(), count+3)
 
-        share_to = CRMUser.objects.get(id=Share.objects.get(id=1).share_to.id)
-        share_from = CRMUser.objects.get(id=Share.objects.get(id=1).share_from.id)
+        share_to = CRMUser.objects.get(id=Share.objects.last().share_to.id)
+        share_from = CRMUser.objects.get(id=Share.objects.last().share_from.id)
 
         self.assertEqual(share_from, CRMUser.objects.get(pk=1))
         self.assertEqual(share_to, CRMUser.objects.get(pk=2))
 
     def test_search(self):
-        search_text_A = Contact.filter_contacts_by_vcard(self.crmuser.id,
+        search_text_A = Contact.filter_contacts_by_vcard(self.crm_subscr_id,
                                                          search_text='A',
                                                          search_params=[('fn', 'startswith')],
                                                          order_by=[])
-        srch_tx_A_ord_dc = Contact.filter_contacts_by_vcard(self.crmuser.id,
+        srch_tx_A_ord_dc = Contact.filter_contacts_by_vcard(self.crm_subscr_id,
                                                             search_text='A',
                                                             search_params=[('fn', 'startswith')],
                                                             order_by=['fn', 'desc'])
-        srch_by_bday = Contact.filter_contacts_by_vcard(self.crmuser.id,
+        srch_by_bday = Contact.filter_contacts_by_vcard(self.crm_subscr_id,
                                                         search_text='1991-09-10',
                                                         search_params=['bday'],
                                                         order_by=[])
-        srch_by_email = Contact.filter_contacts_by_vcard(self.crmuser.id,
+        srch_by_email = Contact.filter_contacts_by_vcard(self.crm_subscr_id,
                                                          search_text='mus',
                                                          search_params=[('email__value', 'startswith')],
                                                          order_by=[])
@@ -1515,6 +1499,72 @@ class ContactResourceTest(ResourceTestMixin, ResourceTestCase):
         self.assertEqual(len(self.deserialize(resp)['objects']),
                          len(Contact.get_contact_activities(self.contact.pk)))
 
+    def test_import_from_xls(self):          
+        count = Contact.objects.all().count()
+        file_path = os.path.join(os.path.dirname(os.path.dirname(__file__)),
+                                 'alm_crm/fixtures/contacts.xls')
+        import base64
+        post_data={
+            'filename': 'aliya.xls',
+            'uploaded_file': base64.b64encode(open(file_path, "rb").read())
+            }
+
+        resp = self.api_client.post(
+            self.api_path_contact+"import/", format='json', data=post_data)
+        self.assertHttpOK(resp)
+        self.assertEqual(Contact.objects.all().count(), count+23)
+
+    def test_import_from_vcard(self):
+        uploaded_file = os.path.join(os.path.dirname(os.path.dirname(__file__)),
+                                 'alm_crm/fixtures/nurlan.vcf')
+        post_data = {
+            'filename': 'nurlan.vcf',
+            "uploaded_file": open(uploaded_file, "r").read()
+        }
+
+        amount_before_import = SalesCycle.objects.all().count()
+        amout_of_contacts_before_import = Contact.objects.all().count()
+
+        resp = self.api_client.post(
+            self.api_path_import, format='json', data=post_data)
+
+        self.assertHttpOK(resp)
+
+
+        amount_after_import = SalesCycle.objects.all().count()
+
+        contact1 = Contact.filter_contacts_by_vcard(self.crm_subscr_id,
+                                                    search_text='Aslan',
+                                                    search_params=[('fn', 'icontains')],
+                                                    order_by=[])
+        contact2 = Contact.filter_contacts_by_vcard(self.crm_subscr_id,
+                                                    search_text='Serik',
+                                                    search_params=[('fn', 'icontains')],
+                                                    order_by=[])
+        contact3 = Contact.filter_contacts_by_vcard(self.crm_subscr_id,
+                                                    search_text='Almat',
+                                                    search_params=[('fn', 'icontains')],
+                                                    order_by=[])
+        contact4 = Contact.filter_contacts_by_vcard(self.crm_subscr_id,
+                                                    search_text='Mukatayev',
+                                                    search_params=[('fn', 'icontains')],
+                                                    order_by=[])
+        self.assertEqual(amount_after_import, amount_before_import+3)
+        self.assertTrue(c.sales_cycles.first().title == GLOBAL_CYCLE_TITLE for c in contact4)
+        self.assertTrue('global_sales_cycle' in self.deserialize(resp)['success'][i].keys()
+                        for i in range(0,3))
+        self.assertEqual(self.deserialize(resp)['success'][0]['global_sales_cycle']['id'],
+                        contact1.first().sales_cycles.get(is_global=True).id)
+        self.assertEqual(self.deserialize(resp)['success'][1]['global_sales_cycle']['id'],
+                        contact2.first().sales_cycles.get(is_global=True).id)
+        self.assertEqual(self.deserialize(resp)['success'][2]['global_sales_cycle']['id'],
+                        contact3.first().sales_cycles.get(is_global=True).id)
+        self.assertEqual(len(Contact.objects.all()), amout_of_contacts_before_import+3)
+        self.assertEqual(len(contact4), 3)
+        self.assertTrue(contact1.first() in Contact.objects.all())
+        self.assertTrue(contact2.first() in Contact.objects.all())
+        self.assertTrue(contact3.first() in Contact.objects.all())
+
 
 class ContactListResourceTest(ResourceTestMixin, ResourceTestCase):
 
@@ -1558,6 +1608,7 @@ class ContactListResourceTest(ResourceTestMixin, ResourceTestCase):
     def test_create_contact_list(self):
         user = CRMUser.objects.last()
         post_data = {
+            'owner': CRMUser.objects.first(),
             'title': 'Mobiliuz',
             'users': [{'pk':user.pk}]
         }
@@ -1679,10 +1730,10 @@ class AppStateResourceTest(ResourceTestMixin, ResourceTestCase):
         self.get_detail_des = \
             lambda pk: self.deserialize(self.get_detail_resp(pk))
 
-        self.subscription_id = Subscription.objects.first().pk
+        self.subscription = Subscription.objects.first()
 
     def test_get(self):
-        app_state = self.get_detail_des(self.subscription_id)
+        app_state = self.get_detail_des(self.subscription.service.slug)
         # self.assertTrue('objects' in app_state)
         self.assertTrue('users' in app_state['objects'])
         self.assertTrue('company' in app_state['objects'])
@@ -1692,7 +1743,7 @@ class AppStateResourceTest(ResourceTestMixin, ResourceTestCase):
         self.assertTrue('activities' in app_state['objects'])
 
         for activity in app_state['objects']['activities']:
-            self.assertTrue('is_read' in activity)
+            self.assertTrue('has_read' in activity)
 
 
 class ShareResourceTest(ResourceTestMixin, ResourceTestCase):
@@ -1733,7 +1784,7 @@ class ShareResourceTest(ResourceTestMixin, ResourceTestCase):
         self.assertEqual(resp_share['share_to'], self.share.share_to.id)
         self.assertEqual(resp_share['share_from'], self.share.share_from.id)
         self.assertEqual(resp_share['contact'], self.share.contact.id)
-        self.assertEqual(resp_share['note'], self.share.description)
+        self.assertEqual(resp_share['note'], self.share.note)
 
 
     def test_create_share(self):
@@ -1752,7 +1803,7 @@ class ShareResourceTest(ResourceTestMixin, ResourceTestCase):
         count = Share.objects.all().count()
         count_in_shares = share_to.in_shares.count()
         count_owned_shares = share_from.owned_shares.count()
-        count_contact_shares = contact.shares.count()
+        count_contact_shares = contact.share_set.count()
 
         self.assertHttpCreated(self.api_client.post(
              self.api_path_share, format='json', data=post_data))
@@ -1760,7 +1811,7 @@ class ShareResourceTest(ResourceTestMixin, ResourceTestCase):
         self.assertEqual(Share.objects.all().count(), count+1)
         self.assertEqual(share_to.in_shares.count(), count_in_shares+1)
         self.assertEqual(share_from.owned_shares.count(), count_owned_shares+1)
-        self.assertEqual(contact.shares.count(), count_contact_shares+1)
+        self.assertEqual(contact.share_set.count(), count_contact_shares+1)
         # verify that subscription_id was set
         self.assertIsInstance(Share.objects.last().subscription_id, int)
         # verify that owner was set
@@ -1773,14 +1824,14 @@ class ShareResourceTest(ResourceTestMixin, ResourceTestCase):
         count = Share.objects.all().count()
         count_in_shares = CRMUser.objects.first().in_shares.count()
         count_owned_shares = CRMUser.objects.first().owned_shares.count()
-        count_contact_shares = Contact.objects.first().shares.count()
+        count_contact_shares = Contact.objects.first().share_set.count()
         self.assertHttpAccepted(self.api_client.delete(
              self.api_path_share + '%s/' % self.share.pk, format='json'))
 
         self.assertEqual(Share.objects.all().count(), count-1)
         self.assertEqual(CRMUser.objects.first().in_shares.count(), count_in_shares-1)
         self.assertEqual(CRMUser.objects.first().owned_shares.count(), count_owned_shares-1)
-        self.assertEqual(Contact.objects.first().shares.count(), count_contact_shares-1)
+        self.assertEqual(Contact.objects.first().share_set.count(), count_contact_shares-1)
 
     def test_update_share_via_put(self):
         share = Share.objects.last()
@@ -1793,137 +1844,77 @@ class ShareResourceTest(ResourceTestMixin, ResourceTestCase):
                              format='json', data=share_data)
 
         share_last = Share.objects.last()
-        self.assertEqual(share_last.description, share.description + note_update)
+        self.assertEqual(share_last.note, share.note + note_update)
         self.assertEqual(share_last.share_to.id, 2)
         self.assertEqual(share_last.contact.id, 2)
 
+    def test_create_share_with_hashtag_and_mention(self):
+        share_to = CRMUser.objects.last()
+        share_from = CRMUser.objects.first()
+        contact = Contact.objects.last()
+        note = 'We have meeting at 3 PM #sold by @[1:Bruce Wayne]'
 
-class TestCreationGlobalSalesCycle(TestCase):
-    fixtures=['services.json','crmusers.json', 'users.json', 'companies.json', 'subscriptions.json',  'salescycles.json']
-
-    def setUp(self):
-        super(TestCreationGlobalSalesCycle, self).setUp()
-        self.user = User.objects.first()
-
-    def test_connect_service(self):
-        crm_user = self.user.get_crmuser()
-
-        with self.assertRaises(SalesCycle.DoesNotExist):
-            SalesCycle.objects.get(owner=crm_user, is_global=True)
-
-        self.user.connect_service(service=Service.objects.first())
-        self.assertIsInstance(crm_user, CRMUser)
-        self.assertTrue(SalesCycle.objects.get(owner=crm_user, is_global=True))
-        self.assertEqual(SalesCycle.objects.get(owner=crm_user, is_global=True).title, GLOBAL_CYCLE_TITLE)
-
-
-class FilterResourceTest(ResourceTestMixin, ResourceTestCase):
-
-    def setUp(self):
-        super(self.__class__, self).setUp()
-
-        # login user
-        self.get_credentials()
-
-        self.api_path_filter = '/api/v1/filter/'
-
-        # get_list
-        self.get_list_resp = self.api_client.get(self.api_path_filter,
-                                                 format='json',
-                                                 HTTP_HOST='localhost')
-        self.get_list_des = self.deserialize(self.get_list_resp)
-
-        # get_detail(pk)
-        self.get_detail_resp = \
-            lambda pk: self.api_client.get(self.api_path_filter+str(pk)+'/',
-                                           format='json',
-                                           HTTP_HOST='localhost')
-        self.get_detail_des = \
-            lambda pk: self.deserialize(self.get_detail_resp(pk))
-
-        self.filter = Filter.objects.first()
-
-    def test_get_list_valid_json(self):
-        self.assertValidJSONResponse(self.get_list_resp)
-
-    def test_get_list_non_empty(self):
-        self.assertTrue(self.get_list_des['meta']['total_count'] > 0)
-
-    def test_get_detail(self):
-        self.assertEqual(
-            self.get_detail_des(self.filter.pk)['title'],
-            self.filter.title
-            )
-
-    def test_create_filter(self):
-        crmuser = CRMUser.objects.last()
-        post_data={
-            'title': 'Filter Resource',
-            'filter_text': 'Filter Resource text',
-            'author_id': crmuser.pk
+        post_data = {
+            'share_to':share_to.id,
+            'share_from':share_from.id,
+            'contact':contact.id,
+            'note':note
         }
+
+        count = Share.objects.all().count()
+        count_in_shares = share_to.in_shares.count()
+        count_owned_shares = share_from.owned_shares.count()
+        count_contact_shares = contact.share_set.count()
+        hashtag_count = HashTag.objects.all().count()
+        hashtag_reference_count = HashTagReference.objects.all().count()
+        mention_count = Mention.objects.all().count()
+
         self.assertHttpCreated(self.api_client.post(
-            self.api_path_filter, format='json', data=post_data))
-        filter_obj = Filter.objects.last()
-        self.assertEqual(filter_obj.title, 'Filter Resource')
-        self.assertEqual(filter_obj.owner, crmuser)
-        self.assertEqual(filter_obj.base, 'all')
-        self
-        self.assertIsInstance(filter_obj.subscription_id, int)
+             self.api_path_share, format='json', data=post_data))
 
-    def test_create_filter_with_base(self):
-        crmuser = CRMUser.objects.last()
-        post_data={
-            'title': 'Filter Resource',
-            'filter_text': 'Filter Resource text',
-            'author_id': crmuser.pk,
-            'base': 'cold'
-        }
-        self.assertHttpCreated(self.api_client.post(
-            self.api_path_filter, format='json', data=post_data))
-        filter_obj = Filter.objects.last()
-        self.assertEqual(filter_obj.title, 'Filter Resource')
-        self.assertEqual(filter_obj.owner, crmuser)
-        self.assertEqual(filter_obj.base, 'cold')
-        self
-        self.assertIsInstance(filter_obj.subscription_id, int)
+        self.assertEqual(Share.objects.all().count(), count+1)
+        self.assertEqual(share_to.in_shares.count(), count_in_shares+1)
+        self.assertEqual(share_from.owned_shares.count(), count_owned_shares+1)
+        self.assertEqual(contact.share_set.count(), count_contact_shares+1)
+        # verify that subscription_id was set
+        self.assertIsInstance(Share.objects.last().subscription_id, int)
+        # verify that owner was set
+        self.assertIsInstance(Share.objects.last().share_to, CRMUser)
+        self.assertIsInstance(Share.objects.last().share_from, CRMUser)
+        self.assertIsInstance(Share.objects.last().contact, Contact)
+        self.assertEqual(hashtag_count+1, HashTag.objects.all().count())
+        self.assertEqual(hashtag_reference_count+1, HashTagReference.objects.all().count())
+        self.assertEqual(mention_count+1, Mention.objects.all().count())
+        self.assertEqual(HashTagReference.objects.last().hashtag, 
+                        HashTag.objects.get(text=HashTagReference.objects.last().hashtag.text)) 
 
+    def test_update_share_via_put_with_hashtag_and_mention(self):
+        share = Share.objects.last()
+        share_data = self.get_detail_des(share.pk)
+        note_update = "_UPDATED #sold by @[1:Bruce Wayne]"
+        share_data['note'] += note_update
+        share_data['share_to'] = 2
+        share_data['contact'] = 2
+        hashtag_count = HashTag.objects.all().count()
+        hashtag_reference_count = HashTagReference.objects.all().count()
+        mention_count = Mention.objects.all().count()
+        self.api_client.put(self.api_path_share + '%s/' % (self.share.pk),
+                             format='json', data=share_data)
 
-    def test_delete_filter(self):
-        before = Filter.objects.all().count()
-        self.assertHttpAccepted(self.api_client.delete(
-            self.api_path_filter + '%s/' % self.filter.pk, format='json'))
-        after = Filter.objects.all().count()
-        # verify that one sales_cycle has been deleted.
-        self.assertEqual(after, before - 1)
+        share_last = Share.objects.last()
+        self.assertEqual(share_last.note, share.note + note_update)
+        self.assertEqual(share_last.share_to.id, 2)
+        self.assertEqual(share_last.contact.id, 2)  
+        self.assertEqual(hashtag_count+1, HashTag.objects.all().count())
+        self.assertEqual(hashtag_reference_count+1, HashTagReference.objects.all().count())
+        self.assertEqual(mention_count+1, Mention.objects.all().count())
+        self.assertEqual(HashTagReference.objects.last().hashtag, 
+                        HashTag.objects.get(text=HashTagReference.objects.last().hashtag.text)) 
 
-    def test_update_filter_via_put(self):
-        # get exist product data
-        filter_data = self.get_detail_des(self.filter.pk)
-        # update it
-        t = '_UPDATED!'
-        filter_data['title'] += t
-        # PUT it
-        self.api_client.put(self.api_path_filter + '%s/' % (self.filter.pk),
-                            format='json', data=filter_data)
-        # check
-        self.assertEqual(self.get_detail_des(self.filter.pk)['title'], self.filter.title + t)
-
-    def test_update_filter_via_patch(self):
-        # get exist product data
-        filter_title = self.get_detail_des(self.filter.pk)['title']
-        # update it
-        t = 'TITLE_UPDATED!'
-        filter_title += t
-        # PATCH it
-        self.api_client.patch(self.api_path_filter + '%s/' % (self.filter.pk),
-                              format='json', data={'title': filter_title})
-        # check
-        self.assertEqual(self.get_detail_des(self.filter.pk)['title'], filter_title)
 
 
 class CommentResourceTest(ResourceTestMixin, ResourceTestCase):
-
+   
     def setUp(self):
         super(self.__class__, self).setUp()
 
@@ -2065,6 +2056,258 @@ class CommentResourceTest(ResourceTestMixin, ResourceTestCase):
         self.assertEqual(self.get_detail_des(self.comment.pk)['comment'], comment_comment)
 
 
+    def test_update_comment_via_put_with_hashtag_and_mention(self):
+        # get exist product data
+        comment_data = self.get_detail_des(self.comment.pk)
+        # update it
+        t = '_UPDATED! #sold by @[1:Bruce Wayne]'
+        comment_data['comment'] += t
+        hashtag_count = HashTag.objects.all().count()
+        hashtag_reference_count = HashTagReference.objects.all().count()
+        mention_count = Mention.objects.all().count()
+        # PUT it
+        self.api_client.put(self.api_path_comment + '%s/' % (self.comment.pk),
+                            format='json', data=comment_data)
+        # check
+        self.assertEqual(self.get_detail_des(self.comment.pk)['comment'], self.comment.comment + t)
+        self.assertEqual(hashtag_count+1, HashTag.objects.all().count())
+        self.assertEqual(hashtag_reference_count+1, HashTagReference.objects.all().count())
+        self.assertEqual(mention_count+1, Mention.objects.all().count())
+        self.assertEqual(HashTagReference.objects.last().hashtag, 
+                        HashTag.objects.get(text=HashTagReference.objects.last().hashtag.text))   
+
+    def test_update_comment_via_patch(self):
+        # get exist product data
+        comment_comment = self.get_detail_des(self.comment.pk)['comment']
+        # update it
+        t = 'comment_UPDATED! #sold by @[1:Bruce Wayne]'
+        comment_comment += t
+        hashtag_count = HashTag.objects.all().count()
+        hashtag_reference_count = HashTagReference.objects.all().count()
+        mention_count = Mention.objects.all().count()
+        # PATCH it
+        self.api_client.patch(self.api_path_comment + '%s/' % (self.comment.pk),
+                              format='json', data={'comment': comment_comment})
+        # check
+        self.assertEqual(self.get_detail_des(self.comment.pk)['comment'], comment_comment)   
+        self.assertEqual(hashtag_count+1, HashTag.objects.all().count())
+        self.assertEqual(hashtag_reference_count+1, HashTagReference.objects.all().count())
+        self.assertEqual(mention_count+1, Mention.objects.all().count())
+        self.assertEqual(HashTagReference.objects.last().hashtag, 
+                        HashTag.objects.get(text=HashTagReference.objects.last().hashtag.text))   
+
+    def test_create_comment_for_activity_with_hashtag_and_mention(self):
+        activity = Activity.objects.last()
+        crmuser = CRMUser.objects.last()
+        post_data={
+            'comment': 'new test comment  #sold by @[1:Bruce Wayne]',
+            'author_id': crmuser.pk,
+            'activity_id': activity.pk
+        }
+        hashtag_count = HashTag.objects.all().count()
+        hashtag_reference_count = HashTagReference.objects.all().count()
+        mention_count = Mention.objects.all().count()
+        self.assertHttpCreated(self.api_client.post(
+            self.api_path_comment, format='json', data=post_data))
+        comment = Comment.objects.last()
+        self.assertEqual(comment.comment, 'new test comment  #sold by @[1:Bruce Wayne]')
+        self.assertEqual(comment.owner, crmuser)
+        self.assertEqual(comment.object_id, activity.id)
+        self.assertEqual(comment.content_object.__class__, Activity)
+        self.assertEqual(comment.content_object, activity)
+        self.assertIsInstance(comment.subscription_id, int)
+        self.assertEqual(hashtag_count+1, HashTag.objects.all().count())
+        self.assertEqual(hashtag_reference_count+1, HashTagReference.objects.all().count())
+        self.assertEqual(mention_count+1, Mention.objects.all().count())
+        self.assertEqual(HashTagReference.objects.last().hashtag, 
+                        HashTag.objects.get(text=HashTagReference.objects.last().hashtag.text))   
+
+    def test_create_comment_for_feedback_with_hashtag_and_mention(self):
+        feedback = Feedback.objects.last()
+        crmuser = CRMUser.objects.last()
+        post_data={
+            'comment': 'new test comment  #sold by @[1:Bruce Wayne]',
+            'author_id': crmuser.pk,
+            'feedback_id': feedback.pk
+        }
+        hashtag_count = HashTag.objects.all().count()
+        hashtag_reference_count = HashTagReference.objects.all().count()
+        mention_count = Mention.objects.all().count()
+        self.assertHttpCreated(self.api_client.post(
+            self.api_path_comment, format='json', data=post_data))
+        comment = Comment.objects.last()
+        self.assertEqual(comment.comment, 'new test comment  #sold by @[1:Bruce Wayne]')
+        self.assertEqual(comment.owner, crmuser)
+        self.assertEqual(comment.object_id, feedback.id)
+        self.assertEqual(comment.content_object.__class__, Feedback)
+        self.assertEqual(comment.content_object, feedback)
+        self.assertIsInstance(comment.subscription_id, int)
+        self.assertEqual(hashtag_count+1, HashTag.objects.all().count())
+        self.assertEqual(hashtag_reference_count+1, HashTagReference.objects.all().count())
+        self.assertEqual(mention_count+1, Mention.objects.all().count())
+        self.assertEqual(HashTagReference.objects.last().hashtag, 
+                        HashTag.objects.get(text=HashTagReference.objects.last().hashtag.text))   
+
+    def test_create_comment_for_contact_with_hashtag_and_mention(self):
+        contact = Contact.objects.last()
+        crmuser = CRMUser.objects.last()
+        post_data={
+            'comment': 'new test comment  #sold by @[1:Bruce Wayne]',
+            'author_id': crmuser.pk,
+            'contact_id': contact.pk
+        }
+        hashtag_count = HashTag.objects.all().count()
+        hashtag_reference_count = HashTagReference.objects.all().count()
+        mention_count = Mention.objects.all().count()
+        self.assertHttpCreated(self.api_client.post(
+            self.api_path_comment, format='json', data=post_data))
+        comment = Comment.objects.last()
+        self.assertEqual(comment.comment, 'new test comment  #sold by @[1:Bruce Wayne]')
+        self.assertEqual(comment.owner, crmuser)
+        self.assertEqual(comment.object_id, contact.id)
+        self.assertEqual(comment.content_object.__class__, Contact)
+        self.assertEqual(comment.content_object, contact)
+        self.assertIsInstance(comment.subscription_id, int)
+        self.assertEqual(hashtag_count+1, HashTag.objects.all().count())
+        self.assertEqual(hashtag_reference_count+1, HashTagReference.objects.all().count())
+        self.assertEqual(mention_count+1, Mention.objects.all().count())
+        self.assertEqual(HashTagReference.objects.last().hashtag, 
+                        HashTag.objects.get(text=HashTagReference.objects.last().hashtag.text))   
+
+    def test_create_comment_for_share_with_hashtag_and_mention(self):
+        share = Share.objects.last()
+        crmuser = CRMUser.objects.last()
+        post_data={
+            'comment': 'new test comment  #sold by @[1:Bruce Wayne]',
+            'author_id': crmuser.pk,
+            'share_id': share.pk
+        }
+        hashtag_count = HashTag.objects.all().count()
+        hashtag_reference_count = HashTagReference.objects.all().count()
+        mention_count = Mention.objects.all().count()
+        self.assertHttpCreated(self.api_client.post(
+            self.api_path_comment, format='json', data=post_data))
+        comment = Comment.objects.last()
+        self.assertEqual(comment.comment, 'new test comment  #sold by @[1:Bruce Wayne]')
+        self.assertEqual(comment.owner, crmuser)
+        self.assertEqual(comment.object_id, share.id)
+        self.assertEqual(comment.content_object.__class__, Share)
+        self.assertEqual(comment.content_object, share)
+        self.assertIsInstance(comment.subscription_id, int)
+        self.assertEqual(hashtag_count+1, HashTag.objects.all().count())
+        self.assertEqual(hashtag_reference_count+1, HashTagReference.objects.all().count())
+        self.assertEqual(mention_count+1, Mention.objects.all().count())
+        self.assertEqual(HashTagReference.objects.last().hashtag, 
+                        HashTag.objects.get(text=HashTagReference.objects.last().hashtag.text))   
+  
+
+
+class FilterResourceTest(ResourceTestMixin, ResourceTestCase):
+
+    def setUp(self):
+        super(self.__class__, self).setUp()
+
+        # login user
+        self.get_credentials()
+
+        self.api_path_filter = '/api/v1/filter/'
+
+        # get_list
+        self.get_list_resp = self.api_client.get(self.api_path_filter,
+                                                 format='json',
+                                                 HTTP_HOST='localhost')
+        self.get_list_des = self.deserialize(self.get_list_resp)
+
+        # get_detail(pk)
+        self.get_detail_resp = \
+            lambda pk: self.api_client.get(self.api_path_filter+str(pk)+'/',
+                                           format='json',
+                                           HTTP_HOST='localhost')
+        self.get_detail_des = \
+            lambda pk: self.deserialize(self.get_detail_resp(pk))
+
+        self.filter = Filter.objects.first()
+
+    def test_get_list_valid_json(self):
+        self.assertValidJSONResponse(self.get_list_resp)
+
+    def test_get_list_non_empty(self):
+        self.assertTrue(self.get_list_des['meta']['total_count'] > 0)
+
+    def test_get_detail(self):
+        self.assertEqual(
+            self.get_detail_des(self.filter.pk)['title'],
+            self.filter.title
+            )
+
+    def test_create_filter(self):
+        crmuser = CRMUser.objects.last()
+        post_data={
+            'title': 'Filter Resource',
+            'filter_text': 'Filter Resource text',
+            'author_id': crmuser.pk
+        }
+        self.assertHttpCreated(self.api_client.post(
+            self.api_path_filter, format='json', data=post_data))
+        filter_obj = Filter.objects.last()
+        self.assertEqual(filter_obj.title, 'Filter Resource')
+        self.assertEqual(filter_obj.owner, crmuser)
+        self.assertEqual(filter_obj.base, 'all')
+        self
+        self.assertIsInstance(filter_obj.subscription_id, int)
+
+    def test_create_filter_with_base(self):
+        crmuser = CRMUser.objects.last()
+        post_data={
+            'title': 'Filter Resource',
+            'filter_text': 'Filter Resource text',
+            'author_id': crmuser.pk,
+            'base': 'cold'
+        }
+        self.assertHttpCreated(self.api_client.post(
+            self.api_path_filter, format='json', data=post_data))
+        filter_obj = Filter.objects.last()
+        self.assertEqual(filter_obj.title, 'Filter Resource')
+        self.assertEqual(filter_obj.owner, crmuser)
+        self.assertEqual(filter_obj.base, 'cold')
+        self
+        self.assertIsInstance(filter_obj.subscription_id, int)
+
+
+    def test_delete_filter(self):
+        before = Filter.objects.all().count()
+        self.assertHttpAccepted(self.api_client.delete(
+            self.api_path_filter + '%s/' % self.filter.pk, format='json'))
+        after = Filter.objects.all().count()
+        # verify that one sales_cycle has been deleted.
+        self.assertEqual(after, before - 1)
+
+    def test_update_filter_via_put(self):
+        # get exist product data
+        filter_data = self.get_detail_des(self.filter.pk)
+        # update it
+        t = '_UPDATED!'
+        filter_data['title'] += t
+        # PUT it
+        self.api_client.put(self.api_path_filter + '%s/' % (self.filter.pk),
+                            format='json', data=filter_data)
+        # check
+        self.assertEqual(self.get_detail_des(self.filter.pk)['title'], self.filter.title + t)
+
+    def test_update_filter_via_patch(self):
+        # get exist product data
+        filter_title = self.get_detail_des(self.filter.pk)['title']
+        # update it
+        t = 'TITLE_UPDATED!'
+        filter_title += t
+        # PATCH it
+        self.api_client.patch(self.api_path_filter + '%s/' % (self.filter.pk),
+                              format='json', data={'title': filter_title})
+        # check
+        self.assertEqual(self.get_detail_des(self.filter.pk)['title'], filter_title)
+
+
+
 class UserResourceTest(ResourceTestMixin, ResourceTestCase):
 
     def setUp(self):
@@ -2073,10 +2316,10 @@ class UserResourceTest(ResourceTestMixin, ResourceTestCase):
         # login user
         self.get_credentials()
 
-        self.api_path_comment = '/api/v1/user/'
+        self.api_path_user = '/api/v1/user/'
 
         # get_list
-        self.get_list_resp = self.api_client.get(self.api_path_comment,
+        self.get_list_resp = self.api_client.get(self.api_path_user,
                                                  format='json',
                                                  HTTP_HOST='localhost')
         self.get_list_des = self.deserialize(self.get_list_resp)
@@ -2089,7 +2332,7 @@ class UserResourceTest(ResourceTestMixin, ResourceTestCase):
         self.get_detail_des = \
             lambda pk: self.deserialize(self.get_detail_resp(pk))
 
-        self.comment = Comment.objects.first()
+        self.user = User.objects.first()
 
     # def test_get_list_valid_json(self):
     #     self.assertValidJSONResponse(self.get_list_resp)

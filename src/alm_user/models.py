@@ -13,8 +13,8 @@ class UserManager(contrib_user_manager):
     """
     had to override just because of missing username field in model
     """
-    def create_user(self, first_name, last_name, email, password):
-        user = User(first_name=first_name, last_name=last_name, email=email)
+    def create_user(self, first_name, last_name, email, password, is_admin=False):
+        user = User(first_name=first_name, last_name=last_name, email=email, is_admin=is_admin)
         user.set_password(password)
         user.save()
         return user
@@ -138,7 +138,6 @@ class User(AbstractBaseUser):
                 create_user = getattr(self,
                                       'create_{}user'.format(service.slug))
                 service_user = create_user(s.pk, self.get_company().pk)
-            signals.subscription_reconn.send(self.__class__, service=service, service_user=service_user)
 
     def disconnect_service(self, service):
         s = self.subscriptions.filter(is_active=True, service=service).first()
