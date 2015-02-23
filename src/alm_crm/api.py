@@ -1058,7 +1058,7 @@ class ContactResource(CRMServiceModelResource):
                 )
                 objects.append(contact_resource.full_dehydrate(
                     _bundle, for_list=True))
-        elif data['filename'].split('.')[1]=='xls':
+        elif data['filename'].split('.')[1]=='xls' or 'xlsx':
             for contact in Contact.import_from_xls(
                 decoded_string, request.user):
                 _bundle = contact_resource.build_bundle(
