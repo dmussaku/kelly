@@ -81,7 +81,11 @@ from tastypie.utils import trailing_slash
 import ast
 import datetime
 import time
+
 from .utils.parser import text_parser
+
+import base64
+
 
 
 class CommonMeta:
@@ -1041,9 +1045,10 @@ class ContactResource(CRMServiceModelResource):
             request, request.body,
             format=request.META.get('CONTENT_TYPE', 'application/json'))
         current_crmuser = request.user.get_crmuser()
+        decoded_string = base64.b64decode(data['uploaded_file'])
         if data['filename'].split('.')[1]=='csv':
             for contact in Contact.import_from_csv(
-                data['uploaded_file'], request.user):
+                decoded_string, request.user):
                 _bundle = contact_resource.build_bundle(
                     obj=contact, request=request)
                 _bundle.data['global_sales_cycle'] = SalesCycleResource().full_dehydrate(
@@ -1054,9 +1059,8 @@ class ContactResource(CRMServiceModelResource):
                 objects.append(contact_resource.full_dehydrate(
                     _bundle, for_list=True))
         elif data['filename'].split('.')[1]=='xls':
-            import base64
             for contact in Contact.import_from_xls(
-                base64.b64decode(data['uploaded_file']), request.user):
+                decoded_string, request.user):
                 _bundle = contact_resource.build_bundle(
                     obj=contact, request=request)
                 _bundle.data['global_sales_cycle'] = SalesCycleResource().full_dehydrate(
@@ -1068,7 +1072,7 @@ class ContactResource(CRMServiceModelResource):
                     _bundle, for_list=True))
         else:
             for contact in Contact.import_from_vcard(
-                    data['uploaded_file'], current_crmuser):
+                    decoded_string, current_crmuser):
 
                 contact.create_share_to(current_crmuser.pk)
 

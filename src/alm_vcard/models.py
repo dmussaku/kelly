@@ -731,6 +731,7 @@ class Tel(models.Model):
         ('car',  _(u"car phone")),
         ('isdn',  _(u"isdn")),
         ('pcs',  _(u"pcs")),
+        ('xadditional',  _(u"xadditional")),
     )
 
     vcard = models.ForeignKey(VCard)
@@ -817,10 +818,11 @@ class Adr(models.Model):
         ('dom',  _(u"dom")),
         ('home',  _(u"home")),
         ('pref',  _(u"pref")),
+        ('xlegal',  _(u"xlegal")),
     )
 
     vcard = models.ForeignKey(VCard)
-    post_office_box = models.CharField(max_length=1024, verbose_name=_("post office box"), blank=True)
+    post_office_box= models.CharField(max_length=1024, verbose_name=_("post office box"), blank=True)
     extended_address = models.CharField(max_length=1024, verbose_name=_("extended address"), blank=True)
     street_address = models.CharField(max_length=1024, verbose_name=_("street address"))
     locality = models.CharField(max_length=1024, verbose_name=_("locality"))
