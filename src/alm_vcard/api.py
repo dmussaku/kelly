@@ -30,7 +30,6 @@ class VCardResource(ModelResource):
     """
     GET Method
     I{URL}:  U{alma.net:8000/api/v1/vcard/}
-
     Description
     Api for VCard model
     """

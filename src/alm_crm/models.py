@@ -1090,6 +1090,12 @@ class Activity(SubscriptionObject):
             return self.feedback.status
         return None
 
+    @property
+    def feedback_status(self):
+        if hasattr(self, 'feedback'):
+            return self.feedback.status
+        return None
+
     def set_feedback(self, feedback_obj, save=False):
         """Set feedback to activity instance. Saves if `save` is set(True)."""
         feedback_obj.activity = self

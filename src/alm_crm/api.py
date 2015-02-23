@@ -34,6 +34,25 @@ from alm_vcard.api import (
     VCardTzResource,
     VCardUrlResource
     )
+from alm_vcard.api import (
+    VCardResource,
+    VCardEmailResource,
+    VCardTelResource,
+    VCardOrgResource,
+    VCardGeoResource,
+    VCardAdrResource,
+    VCardAgentResource,
+    VCardCategoryResource,
+    VCardKeyResource,
+    VCardLabelResource,
+    VCardMailerResource,
+    VCardNicknameResource,
+    VCardNoteResource,
+    VCardRoleResource,
+    VCardTitleResource,
+    VCardTzResource,
+    VCardUrlResource
+    )
 from alm_vcard.models import *
 from almanet.settings import DEFAULT_SERVICE
 from almanet.utils.api import RequestContext
@@ -1047,7 +1066,7 @@ class ContactResource(CRMServiceModelResource):
                 )
                 objects.append(contact_resource.full_dehydrate(
                     _bundle, for_list=True))
-        else:    
+        else:
             for contact in Contact.import_from_vcard(
                     data['uploaded_file'], current_crmuser):
 
@@ -1368,7 +1387,7 @@ class ActivityResource(CRMServiceModelResource):
         #     _subscr_id = self.get_crmsubscr_id(bundle.request)
         #     act.sales_cycle_id = SalesCycle.get_global(_subscr_id).pk
         act.save()
-        text_parser(base_text=act.description, content_class=act.__class__, 
+        text_parser(base_text=act.description, content_class=act.__class__,
                     object_id=act.id)
         if bundle.data.get('feedback_status'):
             act.feedback = Feedback(
@@ -1398,7 +1417,7 @@ class ActivityResource(CRMServiceModelResource):
                 sales_cycle = SalesCycle.objects.get(pk=new_sc_id)
                 bundle.obj.sales_cycle = sales_cycle
                 bundle.obj.save()
-        text_parser(base_text=bundle.obj.description, content_class=bundle.obj.__class__, 
+        text_parser(base_text=bundle.obj.description, content_class=bundle.obj.__class__,
                     object_id=bundle.obj.id)
         return bundle
 
