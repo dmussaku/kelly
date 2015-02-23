@@ -2236,7 +2236,7 @@ class AppStateObject(object):
             d = model_to_dict(cu)
             d.update({
                 'vcard': self._vcard(vcard),
-                'userpic': user.userpic.url
+                'userpic': user.userpic and user.userpic.url
             })
             return d
 
