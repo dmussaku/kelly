@@ -335,6 +335,7 @@ class DevConfiguration(
     #     'alma.net:8000',
     #     'almacloud.alma.net:8000'
     # )
+    SITE_NAME = 'alma.net:8000'
     CSRF_COOKIE_DOMAIN = '.alma.net'
     CORS_ALLOW_CREDENTIALS = True
 

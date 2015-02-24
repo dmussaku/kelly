@@ -2236,7 +2236,7 @@ class AppStateObject(object):
             d = model_to_dict(cu)
             d.update({
                 'vcard': self._vcard(vcard),
-                'userpic': user.userpic.url
+                'userpic': user.userpic and user.userpic.url
             })
             return d
 
@@ -2329,14 +2329,14 @@ class AppStateObject(object):
         # return ActivityResource().get_bundle_list(activities, self.request)
 
     def get_filters(self):
-        filters = Filter.get_filters_by_crmuser(self.subscription_id)
+        filters = Filter.get_filters_by_crmuser(self.current_crmuser.id)
 
         def _map(f):
             d = model_to_dict(f, exclude=['owner'])
             d.update({
-                    'author_id': f.owner_id,
-                    'date_created': f.date_created
-                    })
+                'author_id': f.owner_id,
+                'date_created': f.date_created
+                })
             return d
 
         return map(_map, filters)
@@ -2365,7 +2365,7 @@ class AppStateObject(object):
         return data
 
     def get_shares(self):
-        shares = Share.get_shares_in_for(self.subscription_id)
+        shares = Share.get_shares_in_for(self.current_crmuser.id)
         return map(self._share, shares)
         # return ShareResource().get_bundle_list(shares, self.request)
 
