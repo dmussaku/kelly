@@ -14,11 +14,11 @@ class Migration(DataMigration):
         # and orm['appname.ModelName'] for models in other applications.
         for sales_cycle in orm['alm_crm.SalesCycle'].objects.all():
             try:
-                if  (sales_cycle.is_global and sales_cycle.contact == None) or \
-                    (sales_cycle.title == ''):
+                sales_cycle.contact
+                if sales_cycle.title == '':
                     sales_cycle.delete()
             except:
-                continue
+                sales_cycle.delete()
 
         for contact in orm['alm_crm.Contact'].objects.all():
             if contact.vcard == None:
