@@ -10,10 +10,10 @@ class Migration(SchemaMigration):
     def forwards(self, orm):
 
         # Changing field 'SalesCycle.contact'
-        db.alter_column('alma_sales_cycle', 'contact_id', self.gf('django.db.models.fields.related.ForeignKey')(default=1, to=orm['alm_crm.Contact']))
+        db.alter_column('alma_sales_cycle', 'contact_id', self.gf('django.db.models.fields.related.ForeignKey')(default=orm['alm_crm.Contact'].objects.first().id, to=orm['alm_crm.Contact']))
 
         # Changing field 'Activity.sales_cycle'
-        db.alter_column('alma_activity', 'sales_cycle_id', self.gf('django.db.models.fields.related.ForeignKey')(default=1, to=orm['alm_crm.SalesCycle']))
+        db.alter_column('alma_activity', 'sales_cycle_id', self.gf('django.db.models.fields.related.ForeignKey')(default=orm['alm_crm.SalesCycle'].objects.first().id, to=orm['alm_crm.SalesCycle']))
 
     def backwards(self, orm):
 

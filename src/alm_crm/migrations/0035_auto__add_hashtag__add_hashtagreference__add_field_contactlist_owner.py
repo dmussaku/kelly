@@ -26,11 +26,6 @@ class Migration(SchemaMigration):
         ))
         db.send_create_signal(u'alm_crm', ['HashTagReference'])
 
-        # Adding field 'ContactList.owner'
-        db.add_column('alma_contact_list', 'owner',
-                      self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='owned_list', null=True, to=orm['alm_crm.CRMUser']),
-                      keep_default=False)
-
 
     def backwards(self, orm):
         # Deleting model 'HashTag'

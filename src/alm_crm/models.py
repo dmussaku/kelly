@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import functools
 from django.db import models, transaction
 from django.utils.translation import ugettext_lazy as _
@@ -32,8 +34,8 @@ CURRENCY_OPTIONS = (
     ('KZT', 'Tenge'),
 )
 
-GLOBAL_CYCLE_TITLE = 'MAIN CYCLE'
-GLOBAL_CYCLE_DESCRIPTION = 'AUTOMATICALLY CREATED MAIN SALES CYCLE'
+GLOBAL_CYCLE_TITLE = 'Основной поток'
+GLOBAL_CYCLE_DESCRIPTION = 'Автоматически созданный цикл'
 
 
 class CRMUser(SubscriptionObject):
@@ -909,8 +911,7 @@ class SalesCycle(SubscriptionObject):
                 title=GLOBAL_CYCLE_TITLE,
                 description=GLOBAL_CYCLE_DESCRIPTION, **kwargs)
             global_cycle.save()
-        finally:
-            return global_cycle
+        return global_cycle
 
     def add_mention(self, user_ids=None):
         if isinstance(user_ids, int):

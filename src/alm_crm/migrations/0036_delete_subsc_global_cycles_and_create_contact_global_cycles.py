@@ -14,35 +14,31 @@ class Migration(DataMigration):
         # and orm['appname.ModelName'] for models in other applications.
         for sales_cycle in orm['alm_crm.SalesCycle'].objects.all():
             try:
-                if sales_cycle.is_global == True and sales_cycle.contact == None:
+                if  (sales_cycle.is_global and sales_cycle.contact == None) or \
+                    (sales_cycle.title == ''):
                     sales_cycle.delete()
             except:
                 continue
 
         for contact in orm['alm_crm.Contact'].objects.all():
-            try:
-                sales_cycle_count = contact.sales_cycles.filter(is_global=True).count()
-                if sales_cycle_count < 1:
-                    SalesCycle.create_globalcycle(
-                        **{'subscription_id':contact.subscription_id,
-                         'owner_id':contact.owner_id,
-                         'contact_id':contact.id
-                        }
-                        )
-            except:
+            if contact.vcard == None:
+                contact.delete()
+                continue
+            sales_cycles = contact.sales_cycles.filter(is_global=True)
+            if len(sales_cycles) < 1:
                 SalesCycle.create_globalcycle(
                     **{'subscription_id':contact.subscription_id,
                      'owner_id':contact.owner_id,
                      'contact_id':contact.id
                     }
-                    )
-            finally:
-                sales_cycles = contact.sales_cycles.filter(is_global=True)
-                if len(sales_cycles) > 1:
-                    for sc in sales_cycles[1:]:
-                        for a in sc.get_activities():
-                            sales_cycles[0].rel_activities.add(a)
-                        sc.delete()
+                )
+            elif len(sales_cycles) > 1:
+                proper_cycle = SalesCycle.objects.get(id=sales_cycles[0].id)
+                for sc in sales_cycles[1:]:
+                    for a in sc.rel_activities.all():
+                        a.sales_cycle = sales_cycles[0]
+                        a.save()
+                    sc.delete()
 
 
 
