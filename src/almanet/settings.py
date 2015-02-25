@@ -256,7 +256,6 @@ class BaseConfiguration(SubdomainConfiguration, Configuration):
     EMAIL_BACKEND = 'djrill.mail.backends.djrill.DjrillBackend'
     MANDRILL_API_KEY = 'RcETDKfvxER6iYnJ70DuyA'
     ADMINS = (('Rustem', 'r.kamun@gmail.com'),
-              ('Yernar', 'mailubai@gmail.com'),
               ('Askhat', 'askhat.omarov91@gmail.com'),
               ('Sattar', 'sattar.stamkul@gmail.com'),
               ('Danik', 'dmussaku@gmail.com'),)
@@ -391,8 +390,8 @@ class StagingConfiguration(FileSettings('~/.almanet/almanet.conf.py'), BaseConfi
 
     SITE_NAME = 'almasales.kz:3082'
     SITE_DOMAIN = 'http://almasales.kz:3082'
-    CSRF_COOKIE_DOMAIN = '.almasales.kz:3082'
-    SESSION_COOKIE_DOMAIN = '.almasales.kz:3082'
+    CSRF_COOKIE_DOMAIN = '.almasales.kz'
+    SESSION_COOKIE_DOMAIN = '.almasales.kz'
     # CORS_ORIGIN_WHITELIST = (
     #     'almasales.kz',
     #     'almacloud.almasales.kz',
