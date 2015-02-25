@@ -159,7 +159,8 @@ class Migration(SchemaMigration):
         db.create_table(u'alm_vcard_url', (
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('vcard', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['alm_vcard.VCard'])),
-            ('data', self.gf('django.db.models.fields.URLField')(max_length=200)),
+            ('type', self.gf('django.db.models.fields.CharField')(max_length=40)),
+            ('value', self.gf('django.db.models.fields.URLField')(max_length=200)),
         ))
         db.send_create_signal(u'alm_vcard', ['Url'])
 
@@ -320,8 +321,9 @@ class Migration(SchemaMigration):
         },
         u'alm_vcard.url': {
             'Meta': {'object_name': 'Url'},
-            'data': ('django.db.models.fields.URLField', [], {'max_length': '200'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'type': ('django.db.models.fields.CharField', [], {'max_length': '40'}),
+            'value': ('django.db.models.fields.URLField', [], {'max_length': '200'}),
             'vcard': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['alm_vcard.VCard']"})
         },
         u'alm_vcard.vcard': {
