@@ -375,7 +375,6 @@ class ContactResource(CRMServiceModelResource):
                 )
             )
         return bundle
-
     def full_dehydrate(self, bundle, for_list=False):
         '''Custom representation of followers, assignees etc.'''
         bundle = super(self.__class__, self).full_dehydrate(
@@ -431,19 +430,19 @@ class ContactResource(CRMServiceModelResource):
 
     def full_hydrate(self, bundle, **kwargs):
         # t1 = time.time()
+        vcard_instance = ast.literal_eval(
+                str(
+                    bundle.data.get('vcard', '{}')
+                    )
+                )
+        if not vcard_instance.get('fn'):
+            raise Exception
         contact_id = kwargs.get('pk', None)
         subscription_id = self.get_crmsubscr_id(bundle.request)
         if contact_id:
             bundle.obj = Contact.objects.get(id=int(contact_id))
             bundle.obj.subscription_id = subscription_id
         else:
-            vcard_instance = ast.literal_eval(
-                str(
-                    bundle.data.get('vcard', '{}')
-                    )
-                )
-            if not vcard_instance.get('fn'):
-                raise Exception
             bundle.obj = self._meta.object_class()
             bundle.obj.subscription_id = subscription_id
             bundle.obj.owner_id = bundle.request.user.get_crmuser().id
