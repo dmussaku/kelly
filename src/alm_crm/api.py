@@ -78,6 +78,7 @@ from tastypie.exceptions import ImmediateHttpResponse, NotFound, Unauthorized
 from tastypie.resources import Resource, ModelResource
 from tastypie.serializers import Serializer
 from tastypie.utils import trailing_slash
+from alm_crm.models import GLOBAL_CYCLE_TITLE, GLOBAL_CYCLE_DESCRIPTION
 import ast
 import datetime
 import time
@@ -505,7 +506,10 @@ class ContactResource(CRMServiceModelResource):
                                            bundle.data.get('note'))
             if not kwargs.get('pk'):
                 SalesCycle.create_globalcycle(
-                    **{'subscription_id':subscription_id,
+                    **{
+                    'title':GLOBAL_CYCLE_TITLE,
+                    'description':GLOBAL_CYCLE_DESCRIPTION,
+                     'subscription_id':subscription_id,
                      'owner_id':self.get_crmuser(bundle.request).id,
                      'contact_id':bundle.obj.id
                     }
