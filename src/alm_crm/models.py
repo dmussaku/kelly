@@ -855,6 +855,7 @@ class SalesCycle(SubscriptionObject):
     STATUSES_DICT = dict(zip(('NEW', 'PENDING', 'COMPLETED'), STATUSES))
 
     is_global = models.BooleanField(default=False)
+
     title = models.CharField(max_length=100)
     description = models.CharField(max_length=500)
     products = models.ManyToManyField(Product, related_name='sales_cycles',
@@ -1533,8 +1534,13 @@ def on_activity_delete(sender, instance=None, **kwargs):
     contact.latest_activity = contact.find_latest_activity()
     contact.save()
 
+def check_is_title_empty(sender, instance=None, **kwargs):
+    if len(instance.title) == 0:
+        raise Exception("Requires non empty value")
+
 
 signals.post_delete.connect(on_activity_delete, sender=Activity)
+signals.pre_save.connect(check_is_title_empty, sender=SalesCycle)
 
 
 '''
