@@ -437,6 +437,13 @@ class ContactResource(CRMServiceModelResource):
             bundle.obj = Contact.objects.get(id=int(contact_id))
             bundle.obj.subscription_id = subscription_id
         else:
+            vcard_instance = ast.literal_eval(
+                str(
+                    bundle.data.get('vcard', '{}')
+                    )
+                )
+            if not vcard_instance.get('fn'):
+                raise Exception
             bundle.obj = self._meta.object_class()
             bundle.obj.subscription_id = subscription_id
             bundle.obj.owner_id = bundle.request.user.get_crmuser().id
