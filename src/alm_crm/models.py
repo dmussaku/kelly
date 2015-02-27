@@ -915,6 +915,7 @@ class SalesCycle(SubscriptionObject):
                                     subscription_id=kwargs['subscription_id'])
         except SalesCycle.DoesNotExist: 
             global_cycle = cls(
+                is_global=True,
                 title=GLOBAL_CYCLE_TITLE,
                 description=GLOBAL_CYCLE_DESCRIPTION,
                 **kwargs)
