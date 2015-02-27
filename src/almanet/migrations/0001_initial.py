@@ -8,19 +8,19 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Adding model 'Product'
-        db.create_table('alma_product', (
+        # Adding model 'Service'
+        db.create_table('alma_service', (
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('title', self.gf('django.db.models.fields.CharField')(max_length=100)),
-            ('description', self.gf('django.db.models.fields.TextField')()),
+            ('description', self.gf('django.db.models.fields.TextField')(null=True)),
             ('slug', self.gf('django.db.models.fields.CharField')(unique=True, max_length=30)),
         ))
-        db.send_create_signal(u'almanet', ['Product'])
+        db.send_create_signal(u'almanet', ['Service'])
 
         # Adding model 'Subscription'
         db.create_table('alma_subscription', (
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('product', self.gf('django.db.models.fields.related.ForeignKey')(related_name='subscriptions', to=orm['almanet.Product'])),
+            ('service', self.gf('django.db.models.fields.related.ForeignKey')(related_name='subscriptions', to=orm['almanet.Service'])),
             ('user', self.gf('django.db.models.fields.related.ForeignKey')(related_name='subscriptions', to=orm['alm_user.User'])),
             ('organization', self.gf('django.db.models.fields.related.ForeignKey')(related_name='subscriptions', to=orm['alm_company.Company'])),
             ('is_active', self.gf('django.db.models.fields.BooleanField')(default=True)),
@@ -29,8 +29,8 @@ class Migration(SchemaMigration):
 
 
     def backwards(self, orm):
-        # Deleting model 'Product'
-        db.delete_table('alma_product')
+        # Deleting model 'Service'
+        db.delete_table('alma_service')
 
         # Deleting model 'Subscription'
         db.delete_table('alma_subscription')
@@ -55,11 +55,28 @@ class Migration(SchemaMigration):
             'last_login': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
             'last_name': ('django.db.models.fields.CharField', [], {'max_length': '30'}),
             'password': ('django.db.models.fields.CharField', [], {'max_length': '128'}),
-            'timezone': ('timezone_field.fields.TimeZoneField', [], {'default': "'Asia/Almaty'"})
+            'timezone': ('timezone_field.fields.TimeZoneField', [], {'default': "'Asia/Almaty'"}),
+            'userpic': ('django.db.models.fields.files.ImageField', [], {'max_length': '100'}),
+            'vcard': ('django.db.models.fields.related.OneToOneField', [], {'to': u"orm['alm_vcard.VCard']", 'unique': 'True', 'null': 'True', 'blank': 'True'})
         },
-        u'almanet.product': {
-            'Meta': {'object_name': 'Product', 'db_table': "'alma_product'"},
-            'description': ('django.db.models.fields.TextField', [], {}),
+        u'alm_vcard.vcard': {
+            'Meta': {'object_name': 'VCard', 'db_table': "'alma_vcard'"},
+            'additional_name': ('django.db.models.fields.CharField', [], {'max_length': '1024', 'blank': 'True'}),
+            'bday': ('django.db.models.fields.DateField', [], {'null': 'True', 'blank': 'True'}),
+            'classP': ('django.db.models.fields.CharField', [], {'max_length': '256', 'null': 'True', 'blank': 'True'}),
+            'family_name': ('django.db.models.fields.CharField', [], {'max_length': '1024'}),
+            'fn': ('django.db.models.fields.CharField', [], {'max_length': '1024'}),
+            'given_name': ('django.db.models.fields.CharField', [], {'max_length': '1024'}),
+            'honorific_prefix': ('django.db.models.fields.CharField', [], {'max_length': '1024', 'blank': 'True'}),
+            'honorific_suffix': ('django.db.models.fields.CharField', [], {'max_length': '1024', 'blank': 'True'}),
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'rev': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
+            'sort_string': ('django.db.models.fields.CharField', [], {'max_length': '256', 'null': 'True', 'blank': 'True'}),
+            'uid': ('django.db.models.fields.CharField', [], {'max_length': '256', 'null': 'True', 'blank': 'True'})
+        },
+        u'almanet.service': {
+            'Meta': {'object_name': 'Service', 'db_table': "'alma_service'"},
+            'description': ('django.db.models.fields.TextField', [], {'null': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'slug': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '30'}),
             'title': ('django.db.models.fields.CharField', [], {'max_length': '100'})
@@ -69,7 +86,7 @@ class Migration(SchemaMigration):
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'is_active': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
             'organization': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'subscriptions'", 'to': u"orm['alm_company.Company']"}),
-            'product': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'subscriptions'", 'to': u"orm['almanet.Product']"}),
+            'service': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'subscriptions'", 'to': u"orm['almanet.Service']"}),
             'user': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'subscriptions'", 'to': u"orm['alm_user.User']"})
         }
     }

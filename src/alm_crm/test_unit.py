@@ -462,6 +462,20 @@ class SalesCycleTestCase(TestCase):
         expected_count = count
         self.assertEqual(actual_count, expected_count)
 
+    def test_create_cycle_with_empty_title(self):
+        title = ""
+        description = "SalesCycle description"
+        contact = Contact.objects.first()
+        owner = contact.owner
+        sales_cycle = SalesCycle(title = title, description=description, contact=contact, owner=owner)
+        raised = False
+        try:
+            sales_cycle.save()
+        except Exception:
+            raised = True
+        self.assertTrue(raised)
+
+
     def test_unicode(self):
         self.assertEqual(self.sc1.__unicode__(), '%s [%s %s]' % (self.sc1.title, self.sc1.contact, self.sc1.status))
 
@@ -758,6 +772,23 @@ class SalesCycleResourceTest(ResourceTestMixin, ResourceTestCase):
             sales_cycle.owner,
             self.user.get_subscr_user(sales_cycle.subscription_id)
             )
+
+    def test_create_sales_cycle_with_empty_title(self):
+        post_data = {
+            'title': '',
+            'contact_id': Contact.objects.last().pk
+        }
+
+        count = SalesCycle.objects.count()
+        raised = False
+        try:
+            resp = self.api_client.post(
+                self.api_path_sales_cycle, format='json', data=post_data)
+        except Exception:
+            raised= True
+
+        self.assertTrue(raised)
+
 
     @skipIf(True, "Resource needs in overwrite save_m2m() to create with M2M-relations")
     def test_patch_sales_cycle_with_products(self):

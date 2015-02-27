@@ -568,7 +568,7 @@ class Contact(SubscriptionObject):
 
 
     @classmethod
-    @transaction.commit_on_success()
+    @transaction.atomic()
     def import_from_xls(cls, xls_file_data, creator):
         book = xlrd.open_workbook(file_contents=xls_file_data)
         sheets_left = True
@@ -603,8 +603,10 @@ class Contact(SubscriptionObject):
                     c.owner = creator.get_crmuser()
                     c.subscription_id = creator.get_crmuser().subscription_id
                     c.save()
-                with transaction.commit_on_success():
+                with transaction.atomic():
                     SalesCycle.create_globalcycle(**{
+                        'title':GLOBAL_CYCLE_TITLE,
+                        'description':GLOBAL_CYCLE_DESCRIPTION,
                         'subscription_id':c.subscription_id,
                         'owner_id': c.owner_id,
                         'contact_id': c.id
@@ -623,30 +625,36 @@ class Contact(SubscriptionObject):
                         if data[5].value:
                              org.organization_unit = data[5].value
                         org.save()
-                    for phone in data[6].value.split(';'):
-                        tel = Tel(vcard=v, type='WORK')
-                        tel.value = phone 
-                        tel.save()
-                    for phone in data[7].value.split(';'):
-                        tel = Tel(vcard=v, type='cell')
-                        tel.value = phone 
-                        tel.save()
-                    for phone in data[8].value.split(';'):
-                        tel = Tel(vcard=v, type='xadditional')
-                        tel.value = phone 
-                        tel.save()
-                    for phone in data[9].value.split(';'):
-                        tel = Tel(vcard=v, type='fax')
-                        tel.value = phone 
-                        tel.save()
-                    for email_str in data[10].value.split(';'):
-                        email = Email(vcard=v, type='work')
-                        email.value = email_str
-                        email.save()
-                    for email_str in data[11].value.split(';'):
-                        email = Email(vcard=v, type='internet')
-                        email.value = email_str
-                        email.save()
+                    if data[6].value:
+                        for phone in data[6].value.split(';'):
+                            tel = Tel(vcard=v, type='WORK')
+                            tel.value = phone 
+                            tel.save()
+                    if data[7].value:
+                        for phone in data[7].value.split(';'):
+                            tel = Tel(vcard=v, type='cell')
+                            tel.value = phone 
+                            tel.save()
+                    if data[8].value:
+                        for phone in data[8].value.split(';'):
+                            tel = Tel(vcard=v, type='xadditional')
+                            tel.value = phone 
+                            tel.save()
+                    if data[9].value:
+                        for phone in data[9].value.split(';'):
+                            tel = Tel(vcard=v, type='fax')
+                            tel.value = phone 
+                            tel.save()
+                    if data[10].value:
+                        for email_str in data[10].value.split(';'):
+                            email = Email(vcard=v, type='work')
+                            email.value = email_str
+                            email.save()
+                    if data[11].value:
+                        for email_str in data[11].value.split(';'):
+                            email = Email(vcard=v, type='internet')
+                            email.value = email_str
+                            email.save()
                     if data[12].value:
                         for address_str in data[12].value.split(';;'):
                             addr_objs = address_str.split(';')
@@ -686,13 +694,14 @@ class Contact(SubscriptionObject):
                                     post_office_box=addr_objs[4]
                                     )
                             address.save()
-                    for site in data[15].value.split(';'):
-                        url = Url(
-                            vcard=v,
-                            type='website',
-                                value=site
-                                )
-                        url.save()
+                    if data[15].value:
+                        for site in data[15].value.split(';'):
+                            url = Url(
+                                vcard=v,
+                                type='website',
+                                    value=site
+                                    )
+                            url.save()
                 contact_list.append(c)
                 print "%s created contact %s" % (c, c.id)
                 i = i+1
@@ -855,6 +864,7 @@ class SalesCycle(SubscriptionObject):
     STATUSES_DICT = dict(zip(('NEW', 'PENDING', 'COMPLETED'), STATUSES))
 
     is_global = models.BooleanField(default=False)
+
     title = models.CharField(max_length=100)
     description = models.CharField(max_length=500)
     products = models.ManyToManyField(Product, related_name='sales_cycles',
@@ -906,10 +916,10 @@ class SalesCycle(SubscriptionObject):
             global_cycle = SalesCycle.get_global(contact_id=kwargs['contact_id'], 
                                     subscription_id=kwargs['subscription_id'])
         except SalesCycle.DoesNotExist: 
+            print 'sales doesnt exist'
             global_cycle = cls(
                 is_global=True,
-                title=GLOBAL_CYCLE_TITLE,
-                description=GLOBAL_CYCLE_DESCRIPTION, **kwargs)
+                **kwargs)
             global_cycle.save()
         return global_cycle
 
@@ -1533,8 +1543,13 @@ def on_activity_delete(sender, instance=None, **kwargs):
     contact.latest_activity = contact.find_latest_activity()
     contact.save()
 
+def check_is_title_empty(sender, instance=None, **kwargs):
+    if len(instance.title) == 0:
+        raise Exception("Requires non empty value")
+
 
 signals.post_delete.connect(on_activity_delete, sender=Activity)
+signals.pre_save.connect(check_is_title_empty, sender=SalesCycle)
 
 
 '''

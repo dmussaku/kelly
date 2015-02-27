@@ -77,14 +77,19 @@ class VCardResource(ModelResource):
     #     del bundle.data['resource_uri']
     #     return bundle
 
-    @transaction.commit_on_success()
+    @transaction.atomic()
     def obj_create(self, bundle, **kwargs):
         if kwargs.get('pk'):
             bundle.obj = VCard.objects.get(contact=int(kwargs['pk']))
+            print bundle.obj
+            print bundle.obj.id
             bundle.obj.delete()
-        return super(self.__class__, self).obj_create(bundle, **kwargs)
+        bundle.obj = self._meta.object_class()
+        bundle = self.full_hydrate(bundle)
+        return self.save(bundle)
+        # return super(self.__class__, self).obj_create(bundle, **kwargs)
 
-    @transaction.commit_on_success()
+    @transaction.atomic()
     def full_hydrate(self, bundle):
         return super(self.__class__, self).full_hydrate(bundle)
 
