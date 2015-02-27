@@ -605,8 +605,6 @@ class Contact(SubscriptionObject):
                     c.save()
                 with transaction.atomic():
                     SalesCycle.create_globalcycle(**{
-                        'title':GLOBAL_CYCLE_TITLE,
-                        'description':GLOBAL_CYCLE_DESCRIPTION,
                         'subscription_id':c.subscription_id,
                         'owner_id': c.owner_id,
                         'contact_id': c.id
@@ -916,10 +914,10 @@ class SalesCycle(SubscriptionObject):
             global_cycle = SalesCycle.get_global(contact_id=kwargs['contact_id'], 
                                     subscription_id=kwargs['subscription_id'])
         except SalesCycle.DoesNotExist: 
-            print 'sales doesnt exist'
             global_cycle = cls(
                 is_global=True,
-                **kwargs)
+                title=GLOBAL_CYCLE_TITLE,
+                description=GLOBAL_CYCLE_DESCRIPTION, **kwargs)
             global_cycle.save()
         return global_cycle
 

@@ -507,8 +507,6 @@ class ContactResource(CRMServiceModelResource):
             if not kwargs.get('pk'):
                 SalesCycle.create_globalcycle(
                     **{
-                    'title':GLOBAL_CYCLE_TITLE,
-                    'description':GLOBAL_CYCLE_DESCRIPTION,
                      'subscription_id':subscription_id,
                      'owner_id':self.get_crmuser(bundle.request).id,
                      'contact_id':bundle.obj.id
