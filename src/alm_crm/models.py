@@ -589,14 +589,12 @@ class Contact(SubscriptionObject):
                 v.additional_name = data[2].value if type(data[2].value) == unicode else str(data[2].value)
                 v.fn = v.given_name+" "+v.family_name
                 if ((not v.given_name) and (not v.family_name) and data[4].value):
-                    v, created = VCard.objects.get_or_create(fn=data[4].value)
-                    if created:
-                        c = cls(vcard=v, tp='co')
-                        c.owner = creator.get_crmuser()
-                        c.subscription_id = creator.get_crmuser().subscription_id
-                        c.save()
-                    else:
-                        c = v.contact
+                    v = VCard(fn=data[4].value)
+                    v.save()
+                    c = cls(vcard=v, tp='co')
+                    c.owner = creator.get_crmuser()
+                    c.subscription_id = creator.get_crmuser().subscription_id
+                    c.save()
                 if not v.id:
                     v.save()
                     c.vcard = v
@@ -605,8 +603,6 @@ class Contact(SubscriptionObject):
                     c.save()
                 with transaction.atomic():
                     SalesCycle.create_globalcycle(**{
-                        'title':GLOBAL_CYCLE_TITLE,
-                        'description':GLOBAL_CYCLE_DESCRIPTION,
                         'subscription_id':c.subscription_id,
                         'owner_id': c.owner_id,
                         'contact_id': c.id
@@ -703,7 +699,7 @@ class Contact(SubscriptionObject):
                                     )
                             url.save()
                 contact_list.append(c)
-                print "%s created contact %s" % (c, c.id)
+                # print "%s created contact %s" % (c, c.id)
                 i = i+1
         return contact_list
 
@@ -909,16 +905,17 @@ class SalesCycle(SubscriptionObject):
     # Adds mentions to a current class, takes a lsit of user_ids as an input
     # and then runs through the list and calls the function build_new which
     # is declared in Mention class
-
+    
     @classmethod
     def create_globalcycle(cls, **kwargs):
         try:
             global_cycle = SalesCycle.get_global(contact_id=kwargs['contact_id'], 
                                     subscription_id=kwargs['subscription_id'])
         except SalesCycle.DoesNotExist: 
-            print 'sales doesnt exist'
             global_cycle = cls(
                 is_global=True,
+                title=GLOBAL_CYCLE_TITLE,
+                description=GLOBAL_CYCLE_DESCRIPTION,
                 **kwargs)
             global_cycle.save()
         return global_cycle
