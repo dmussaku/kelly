@@ -589,14 +589,12 @@ class Contact(SubscriptionObject):
                 v.additional_name = data[2].value if type(data[2].value) == unicode else str(data[2].value)
                 v.fn = v.given_name+" "+v.family_name
                 if ((not v.given_name) and (not v.family_name) and data[4].value):
-                    v, created = VCard.objects.get_or_create(fn=data[4].value)
-                    if created:
-                        c = cls(vcard=v, tp='co')
-                        c.owner = creator.get_crmuser()
-                        c.subscription_id = creator.get_crmuser().subscription_id
-                        c.save()
-                    else:
-                        c = v.contact
+                    v = VCard(fn=data[4].value)
+                    v.save()
+                    c = cls(vcard=v, tp='co')
+                    c.owner = creator.get_crmuser()
+                    c.subscription_id = creator.get_crmuser().subscription_id
+                    c.save()
                 if not v.id:
                     v.save()
                     c.vcard = v
@@ -701,7 +699,7 @@ class Contact(SubscriptionObject):
                                     )
                             url.save()
                 contact_list.append(c)
-                print "%s created contact %s" % (c, c.id)
+                # print "%s created contact %s" % (c, c.id)
                 i = i+1
         return contact_list
 
