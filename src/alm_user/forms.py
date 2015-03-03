@@ -71,7 +71,6 @@ class RegistrationForm(forms.ModelForm):
 class PasswordResetForm(forms.Form):
 
     email = forms.EmailField(label=_("Email"), max_length=254)
-
     error_messages = (_("User with such email is not registered."))
 
     def clean_email(self):
