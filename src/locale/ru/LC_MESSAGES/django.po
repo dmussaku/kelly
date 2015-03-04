@@ -423,11 +423,6 @@ msgid ""
 "used.  Please request a new password reset."
 msgstr ""
 
-#: alm_user/templates/user/password_reset_done.html:4
-#: alm_user/templates/user/password_reset_done.html:8
-msgid "Password reset successful"
-msgstr ""
-
 #: alm_user/templates/user/password_reset_done.html:10
 msgid ""
 "We've emailed you instructions for setting your password. You should be "
@@ -439,6 +434,18 @@ msgid ""
 "If you don't receive an email, please make sure you've entered the address "
 "you registered with, and check your spam folder."
 msgstr ""
+
+#: alm_user/templates/user/password_reset_success.html:9
+msgid "Password reset successful"
+msgstr "Пароль успешно восстановлен"
+
+#: alm_user/templates/user/password_reset_success.html:11
+msgid "Your password has been changed, for sign in go to"
+msgstr "Пожалуйста, для входа в систему продите на: "
+
+#: alm_user/templates/user/password_reset_success.html:11
+msgid "login page"
+msgstr "страницу входа"
 
 #: alm_user/templates/user/profile.html:3
 msgid "User Profile"
