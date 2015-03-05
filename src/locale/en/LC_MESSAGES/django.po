@@ -421,11 +421,6 @@ msgid ""
 "used.  Please request a new password reset."
 msgstr ""
 
-#: alm_user/templates/user/password_reset_done.html:4
-#: alm_user/templates/user/password_reset_done.html:8
-msgid "Password reset successful"
-msgstr ""
-
 #: alm_user/templates/user/password_reset_done.html:10
 msgid ""
 "We've emailed you instructions for setting your password. You should be "
@@ -436,6 +431,18 @@ msgstr ""
 msgid ""
 "If you don't receive an email, please make sure you've entered the address "
 "you registered with, and check your spam folder."
+msgstr ""
+
+#: alm_user/templates/user/password_reset_success.html:9
+msgid "Password reset successful"
+msgstr ""
+
+#: alm_user/templates/user/password_reset_success.html:11
+msgid "Your password has been changed, for sign in go to"
+msgstr ""
+
+#: alm_user/templates/user/password_reset_success.html:11
+msgid "login page"
 msgstr ""
 
 #: alm_user/templates/user/profile.html:3
@@ -458,7 +465,15 @@ msgid "User Profile Password Settings Page"
 msgstr ""
 
 #: alm_user/templates/user/user_login.html:47
+msgid "Forgot your password?"
+msgstr ""
+
+#: alm_user/templates/user/user_login.html:50
 msgid "Login"
+msgstr ""
+
+#: alm_user/templates/user/referral-complete.html:9
+msgid "Thank you! Our managers will contact you."
 msgstr ""
 
 #: alm_vcard/admin.py:170

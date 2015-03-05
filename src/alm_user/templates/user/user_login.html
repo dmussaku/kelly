@@ -43,7 +43,10 @@
                     {% if form.password.errors %}
                     <div class="login-error">Error message here!</div>
                     {% endif %}
-        <div class="login-fieldset">
+                    <div>
+                        <a href="{% url 'password_reset' %}">{{ _("Forgot your password?") }}</a>
+                    </div>
+        <div class="login-fieldset" style="margin-top: 0;">
           <button class="login-submit" type="submit">{{ _("Login") }}</button>
         </div>
       </div>
