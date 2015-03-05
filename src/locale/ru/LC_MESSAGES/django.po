@@ -467,8 +467,16 @@ msgid "User Profile Password Settings Page"
 msgstr ""
 
 #: alm_user/templates/user/user_login.html:47
+msgid "Forgot your password?"
+msgstr "Забыли пароль?"
+
+#: alm_user/templates/user/user_login.html:50
 msgid "Login"
 msgstr "Войти"
+
+#: alm_user/templates/user/referral-complete.html:9
+msgid "Thank you! Our managers will contact you."
+msgstr "Спасибо! Мы свяжемся с вами в ближайшее время."
 
 #: alm_vcard/admin.py:170
 msgid "Select VCF"
