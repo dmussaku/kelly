@@ -262,7 +262,7 @@ msgstr ""
 
 #: alm_user/forms.py:75
 msgid "User with such email is not registered."
-msgstr ""
+msgstr "Пользователь с таким email не найден"
 
 #: alm_user/forms.py:117
 msgid "Old password"
