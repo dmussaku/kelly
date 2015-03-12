@@ -1401,6 +1401,7 @@ class ActivityResource(CRMServiceModelResource):
         act = bundle.obj = self._meta.object_class()
         act.author_id = bundle.data.get('author_id')
         act.description = bundle.data.get('description')
+        act.status = bundle.data.get('status')
         act.sales_cycle_id = bundle.data.get('sales_cycle_id')
         if 'milestone' in bundle.data:
             milestone = Milestone.objects.get(pk=bundle.data.get('milestone'))

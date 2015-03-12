@@ -1134,12 +1134,14 @@ class Activity(SubscriptionObject):
     description = models.CharField(max_length=500)
     date_created = models.DateTimeField(blank=True, null=True,
                                         auto_now_add=True)
+    deadline = models.DateTimeField(blank=True, null=True)
     date_edited = models.DateTimeField(blank=True, null=True, auto_now=True)
     sales_cycle = models.ForeignKey(SalesCycle, related_name='rel_activities')
     owner = models.ForeignKey(CRMUser, related_name='activity_owner')
     mentions = generic.GenericRelation('Mention', null=True)
     comments = generic.GenericRelation('Comment', null=True)
     milestone = models.ForeignKey(Milestone, related_name='activities', null=True)
+    status = models.BooleanField(default=False, blank=True)
 
     class Meta:
         verbose_name = 'activity'
