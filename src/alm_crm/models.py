@@ -1582,7 +1582,7 @@ def get_mentions(user_id=None, content_class=None, object_id=None):
 class ContactList(SubscriptionObject):
     owner = models.ForeignKey(CRMUser, related_name='owned_list', blank=True, null=True)
     title = models.CharField(max_length=150)
-    users = models.ManyToManyField(CRMUser, related_name='contact_list',
+    contacts = models.ManyToManyField(Contact, related_name='contact_list',
                                    null=True, blank=True)
     date_created = models.DateTimeField(blank=True, auto_now_add=True)
 
@@ -1593,45 +1593,49 @@ class ContactList(SubscriptionObject):
     def __unicode__(self):
         return self.title
 
-    def check_user(self, user_id):
+    @classmethod
+    def get_for_subscr(cls, subscr_id):
+        return cls.objects.filter(subscription_id=subscr_id)
+
+    def check_contact(self, contact_id):
         try:
-            crm_user = self.users.get(user_id=user_id)
-            if crm_user is not None:
+            contact = self.contacts.get(contact_id=contact_id)
+            if contact is not None:
                 return True
             else:
                 return False
-        except CRMUser.DoesNotExist:
+        except Contact.DoesNotExist:
             return False
 
-    def get_contact_list_users(self):
-        return self.users
+    def get_contacts(self):
+        return self.contacts
 
-    def add_users(self, user_ids):
+    def add_contacts(self, user_ids):
         assert isinstance(user_ids, (tuple, list)), 'must be a list'
         status = []
-        for user_id in user_ids:
+        for contact_id in contact_ids:
             try:
-                crm_user = CRMUser.objects.get(id=user_id)
-                if not self.check_user(user_id=user_id):
-                    self.users.add(crm_user)
+                contact = Contact.objects.get(id=contact_id)
+                if not self.check_contact(contact_id=contact_id):
+                    self.contacts.add(contact)
                     status.append(True)
                 else:
                     status.append(False)
-            except CRMUser.DoesNotExist:
+            except Contact.DoesNotExist:
                 status.append(False)
         return status
 
-    def add_user(self, user_id):
-        return self.add_users([user_id])
+    def add_contact(self, contact_id):
+        return self.add_contacts([contact_id])
 
-    def delete_user(self, user_id):
+    def delete_contact(self, contact_id):
         status = False
-        if self.check_user(user_id):
-            crm_user = CRMUser.objects.get(id=user_id)
+        if self.check_contact(contact_id):
+            contact = Contact.objects.get(id=contact_id)
             try:
-                self.users.remove(crm_user)
+                self.contacts.remove(contact)
                 status = True
-            except CRMUser.DoesNotExist:
+            except Contact.DoesNotExist:
                 status = False
         else:
             return False
@@ -1639,7 +1643,7 @@ class ContactList(SubscriptionObject):
         return status
 
     def count(self):
-        return self.users.count()
+        return self.contacts.count()
 
 
 class SalesCycleProductStat(SubscriptionObject):

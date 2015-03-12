@@ -1869,41 +1869,55 @@ class ContactListResource(CRMServiceModelResource):
 
     @undocumented: Meta
     '''
-    users = fields.ToManyField('alm_crm.api.CRMUserResource', 'users',
-                               related_name='contact_list', null=True,
-                               full=False)
+    contacts = fields.ListField(null=True)
 
     class Meta(CommonMeta):
         queryset = ContactList.objects.all()
         resource_name = 'contact_list'
+        always_return_data = True
 
     def prepend_urls(self):
         return [
             url(
-                r"^(?P<resource_name>%s)/(?P<id>\d+)/users%s$" %
+                r"^(?P<resource_name>%s)/(?P<id>\d+)/contacts%s$" %
                 (self._meta.resource_name, trailing_slash()),
-                self.wrap_view('get_users'),
-                name='api_get_users'
+                self.wrap_view('get_contacts'),
+                name='api_get_contacts'
             ),
             url(
-                r"^(?P<resource_name>%s)/(?P<id>\d+)/check_user%s$" %
+                r"^(?P<resource_name>%s)/(?P<id>\d+)/check_contact%s$" %
                 (self._meta.resource_name, trailing_slash()),
-                self.wrap_view('check_user'),
-                name='api_check_user'
+                self.wrap_view('check_contact'),
+                name='api_check_contact'
             ),
             url(
-                r"^(?P<resource_name>%s)/(?P<id>\d+)/add_users%s$" %
+                r"^(?P<resource_name>%s)/(?P<id>\d+)/add_contacts%s$" %
                 (self._meta.resource_name, trailing_slash()),
-                self.wrap_view('add_users'),
-                name='api_add_users'
+                self.wrap_view('add_contacts'),
+                name='api_add_contacts'
             ),
             url(
-                r"^(?P<resource_name>%s)/(?P<id>\d+)/delete_user%s$" %
+                r"^(?P<resource_name>%s)/(?P<id>\d+)/delete_contact%s$" %
                 (self._meta.resource_name, trailing_slash()),
-                self.wrap_view('delete_user'),
-                name='api_delete_user'
+                self.wrap_view('delete_contact'),
+                name='api_delete_contact'
             ),
         ]
+
+    def dehydrate_contacts(self, bundle):
+        return [contact.pk for contact in bundle.obj.contacts.all()]
+
+    def hydrate_contacts(self, bundle):
+        contacts = Contact.objects.filter(pk__in=bundle.data['contacts'])
+        bundle.data['contacts'] = contacts
+        return bundle
+
+    def obj_create(self, bundle, **kwargs):
+        bundle.obj = self._meta.object_class()
+        bundle = self.full_hydrate(bundle)
+        bundle = self.save(bundle)
+        bundle.obj.contacts.add(*bundle.data['contacts'])
+        return bundle
 
     def post_list(self, request, **kwargs):
         '''
@@ -1918,7 +1932,7 @@ class ContactListResource(CRMServiceModelResource):
         >>> example POST payload
         ... {
         ...     title: "ALMA Cloud",
-        ...     users: [
+        ...     contacts: [
         ...         "/api/v1/crmuser/1/",
         ...         "/api/v1/crmuser/2/",
         ...     ]
@@ -1962,13 +1976,13 @@ class ContactListResource(CRMServiceModelResource):
         '''
         return super(self.__class__, self).put_detail(request, **kwargs)
 
-    def get_users(self, request, **kwargs):
+    def get_contacts(self, request, **kwargs):
         '''
         GET METHOD
-        I{URL}:  U{alma.net/api/v1/contact/:id/users}
+        I{URL}:  U{alma.net/api/v1/contact/:id/contacts}
 
         Description:
-        Api function to return the contact list users
+        Api function to return the contact list contacts
 
         @type  limit: number
         @param limit: The limit of results, 20 by default.
@@ -1982,7 +1996,7 @@ class ContactListResource(CRMServiceModelResource):
         ...         "resource_uri": "/api/v1/contact_list/1/",
         ...         "subscription_id": null,
         ...         "title": "ALMA Cloud",
-        ...         "users": [
+        ...         "contacts": [
         ...         {
         ...             "id": 1,
         ...             "is_supervisor": false,
@@ -2006,11 +2020,11 @@ class ContactListResource(CRMServiceModelResource):
             contact_list = ContactList.objects.get(id=kwargs.get('id'))
             limit = int(request.GET.get('limit', 20))
             offset = int(request.GET.get('offset', 0))
-            users = contact_list.users.all()[offset:offset + limit]
-            crm_user_resource = CRMUserResource()
+            contacts = contact_list.contacts.all()[offset:offset + limit]
+            crm_user_resource = ContactResource()
             obj_dict = {}
             obj_dict['objects'] = \
-                crm_user_resource.get_bundle_list(users, request)
+                crm_user_resource.get_bundle_list(contacts, request)
             return self.create_response(request, obj_dict)
         except ContactList.DoesNotExist:
             return self.create_response(
@@ -2039,15 +2053,15 @@ class ContactListResource(CRMServiceModelResource):
         '''
         try:
             contact_list = ContactList.objects.get(id=kwargs.get('id'))
-            user_id = int(request.GET.get('user_id', 0))
-            if not user_id:
+            contact_id = int(request.GET.get('contact_id', 0))
+            if not contact_id:
                 return self.create_response(
                     request,
                     {'success': False, 'error_string': 'User id is not set'}
                     )
             return self.create_response(
                 request,
-                {'success': ContactList.objects.get(id=kwargs.get('id')).check_user(user_id=user_id)}
+                {'success': ContactList.objects.get(id=kwargs.get('id')).check_contact(contact_id=contact_id)}
                 )
         except ContactList.DoesNotExist:
             return self.create_response(
@@ -2056,13 +2070,13 @@ class ContactListResource(CRMServiceModelResource):
                  'error_string': 'Contact list does not exits'}
                 )
 
-    def add_users(self, request, **kwargs):
+    def add_contacts(self, request, **kwargs):
         '''
         GET METHOD
-        I{URL}:  U{alma.net/api/v1/contact/:id/add_users}
+        I{URL}:  U{alma.net/api/v1/contact/:id/add_contacts}
 
         Description:
-        Api function to add users to the contact list
+        Api function to add contacts to the contact list
 
         @type  user_ids: list
         @param user_ids: Adding user ids for adding.
@@ -2075,14 +2089,14 @@ class ContactListResource(CRMServiceModelResource):
 
         '''
         try:
-            user_ids = ast.literal_eval(request.GET.get('user_ids'))
-            if not user_ids:
+            contact_ids = ast.literal_eval(request.GET.get('contact_ids'))
+            if not contact_ids:
                 return self.create_response(
                     request,
-                    {'success': False, 'error_string': 'User ids is not set'}
+                    {'success': False, 'error_string': 'Contact ids is not set'}
                     )
             obj_dict = {}
-            obj_dict['success'] = ContactList.objects.get(id=kwargs.get('id')).add_users(user_ids=user_ids)
+            obj_dict['success'] = ContactList.objects.get(id=kwargs.get('id')).add_contacts(contact_ids=contact_ids)
             return self.create_response(
                 request, obj_dict)
         except ContactList.DoesNotExist:
@@ -2092,7 +2106,7 @@ class ContactListResource(CRMServiceModelResource):
                  'error_string': 'Contact list does not exits'}
                 )
 
-    def delete_user(self, request, **kwargs):
+    def delete_contact(self, request, **kwargs):
         '''
         GET METHOD
         I{URL}:  U{alma.net/api/v1/contact/:id/delete_user}
@@ -2112,17 +2126,17 @@ class ContactListResource(CRMServiceModelResource):
         '''
         try:
             contact_list = ContactList.objects.get(id=kwargs.get('id'))
-            user_id = int(request.GET.get('user_id', 0))
-            if not user_id:
+            contact_id = int(request.GET.get('contact_id', 0))
+            if not contact_id:
                 return self.create_response(
                     request,
-                    {'success': False, 'error_string': 'User id is not set'}
+                    {'success': False, 'error_string': 'Contact id is not set'}
                     )
             return self.create_response(
                 request,
                 {'success':
-                    ContactList.objects.get(id=kwargs.get('id')).delete_user(
-                        user_id=user_id)}
+                    ContactList.objects.get(id=kwargs.get('id')).delete_contact(
+                        contact_id=contact_id)}
                 )
         except ContactList.DoesNotExist:
             return self.create_response(
@@ -2153,6 +2167,7 @@ class AppStateObject(object):
             'users': self.get_users(),
             'company': self.get_company(),
             'contacts': self.get_contacts(),
+            'contact_lists': self.get_contact_lists(),
             'shares': self.get_shares(),
             'sales_cycles': self.get_sales_cycles(),
             'activities': self.get_activities(),
@@ -2290,6 +2305,15 @@ class AppStateObject(object):
 
         return map(_map, contacts)
         # return ContactResource().get_bundle_list(contacts, self.request)
+
+    def get_contact_lists(self):
+        contact_lists = ContactList.get_for_subscr(self.subscription_id)
+
+        def _map(contact_list):
+            d = model_to_dict(contact_list)
+            return d
+
+        return map(_map, contact_lists)
 
     def get_sales_cycles(self):
         sales_cycles = SalesCycle.get_salescycles_by_last_activity_date(
