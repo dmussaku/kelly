@@ -1406,6 +1406,8 @@ class ActivityResource(CRMServiceModelResource):
         if 'milestone' in bundle.data:
             milestone = Milestone.objects.get(pk=bundle.data.get('milestone'))
             act.milestone = milestone
+        if 'deadline' in bundle.data:
+            act.deadline = bundle.data.get('deadline')
         act.save()
         text_parser(base_text=act.description, content_class=act.__class__,
                     object_id=act.id)
@@ -2366,6 +2368,8 @@ class AppStateObject(object):
                 'date_created': a.date_created,
                 'feedback_status': a.feedback_status,
                 'sales_cycle_id': a.sales_cycle_id,
+                'deadline': a.deadline,
+                'status': a.status,
                 'has_read': a.has_read(self.current_crmuser.id),
                 })
             if a.milestone:
