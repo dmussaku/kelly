@@ -1156,6 +1156,7 @@ class Activity(SubscriptionObject):
         if not self.pk:
             created = True
         super(Activity, self).save(*args, **kwargs)
+        self = Activity.objects.get(pk=self.pk)
         if created and not self.status and timezone.now() < self.deadline:
             GCalConnection().establish().build_event_from_activity(self)
 
@@ -1603,7 +1604,7 @@ class ContactList(SubscriptionObject):
         return self.title
 
     @classmethod
-    def get_lists(cls, subscr_id):
+    def get_for_subscr(cls, subscr_id):
         return cls.objects.filter(subscription_id=subscr_id)
 
     def check_contact(self, contact_id):
