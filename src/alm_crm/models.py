@@ -7,7 +7,7 @@ from almanet import settings
 from almanet import signals as almanet_signals
 from almanet.models import SubscriptionObject
 from alm_vcard.models import (
-    VCard, 
+    VCard,
     BadVCardError,
     Org,
     Title,
@@ -88,6 +88,20 @@ class CRMUser(SubscriptionObject):
     @classmethod
     def get_subscription_id(cls, user_id):
         return cls.objects.get(id=user_id).subscription_id
+
+
+class Milestone(SubscriptionObject):
+
+    title = models.CharField(_("title"), max_length=1024, null=True, blank=True)
+    color_code = models.CharField(_('color code'), max_length=1024, null=True, blank=True)
+
+    class Meta:
+        verbose_name = _('milestone')
+        db_table = settings.DB_PREFIX.format('milestone')
+
+    @classmethod
+    def get_for_subscr(cls, subscr_id):
+        return cls.objects.filter(subscription_id=subscr_id)
 
 
 class Contact(SubscriptionObject):
@@ -575,7 +589,7 @@ class Contact(SubscriptionObject):
         contact_list = []
         for sheet in book.sheets():
             i = 1
-            header_row = sheet.row(0) 
+            header_row = sheet.row(0)
             while(sheets_left):
                 try:
                     data = sheet.row(i)
@@ -584,8 +598,8 @@ class Contact(SubscriptionObject):
                     continue
                 c = cls()
                 v = VCard()
-                v.family_name = data[0].value if type(data[0].value) == unicode else str(data[0].value)  
-                v.given_name = data[1].value if type(data[1].value) == unicode else str(data[1].value)  
+                v.family_name = data[0].value if type(data[0].value) == unicode else str(data[0].value)
+                v.given_name = data[1].value if type(data[1].value) == unicode else str(data[1].value)
                 v.additional_name = data[2].value if type(data[2].value) == unicode else str(data[2].value)
                 v.fn = v.given_name+" "+v.family_name
                 if ((not v.given_name) and (not v.family_name) and data[4].value):
@@ -624,22 +638,22 @@ class Contact(SubscriptionObject):
                     if data[6].value:
                         for phone in data[6].value.split(';'):
                             tel = Tel(vcard=v, type='WORK')
-                            tel.value = phone 
+                            tel.value = phone
                             tel.save()
                     if data[7].value:
                         for phone in data[7].value.split(';'):
                             tel = Tel(vcard=v, type='cell')
-                            tel.value = phone 
+                            tel.value = phone
                             tel.save()
                     if data[8].value:
                         for phone in data[8].value.split(';'):
                             tel = Tel(vcard=v, type='xadditional')
-                            tel.value = phone 
+                            tel.value = phone
                             tel.save()
                     if data[9].value:
                         for phone in data[9].value.split(';'):
                             tel = Tel(vcard=v, type='fax')
-                            tel.value = phone 
+                            tel.value = phone
                             tel.save()
                     if data[10].value:
                         for email_str in data[10].value.split(';'):
@@ -905,13 +919,13 @@ class SalesCycle(SubscriptionObject):
     # Adds mentions to a current class, takes a lsit of user_ids as an input
     # and then runs through the list and calls the function build_new which
     # is declared in Mention class
-    
+
     @classmethod
     def create_globalcycle(cls, **kwargs):
         try:
-            global_cycle = SalesCycle.get_global(contact_id=kwargs['contact_id'], 
+            global_cycle = SalesCycle.get_global(contact_id=kwargs['contact_id'],
                                     subscription_id=kwargs['subscription_id'])
-        except SalesCycle.DoesNotExist: 
+        except SalesCycle.DoesNotExist:
             global_cycle = cls(
                 is_global=True,
                 title=GLOBAL_CYCLE_TITLE,
@@ -1125,6 +1139,7 @@ class Activity(SubscriptionObject):
     owner = models.ForeignKey(CRMUser, related_name='activity_owner')
     mentions = generic.GenericRelation('Mention', null=True)
     comments = generic.GenericRelation('Comment', null=True)
+    milestone = models.ForeignKey(Milestone, related_name='activities', null=True)
 
     class Meta:
         verbose_name = 'activity'

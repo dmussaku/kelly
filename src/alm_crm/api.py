@@ -1,5 +1,6 @@
 from .models import (
     SalesCycle,
+    Milestone,
     Product,
     Activity,
     Contact,
@@ -1244,6 +1245,10 @@ class SalesCycleResource(CRMServiceModelResource):
                                             response_class=http.HttpAccepted)
 
 
+class MilestoneResource(CRMServiceModelResource):
+    pass
+
+
 class ActivityResource(CRMServiceModelResource):
     """
     GET Method
@@ -1272,6 +1277,7 @@ class ActivityResource(CRMServiceModelResource):
     description = fields.CharField(attribute='description')
     sales_cycle_id = fields.IntegerField(null=True)
     feedback_status = fields.CharField(null=True)
+    milestone_id = fields.IntegerField(null=True, attribute='milestone_id')
 
     class Meta(CommonMeta):
         queryset = Activity.objects.all().prefetch_related('recipients')
@@ -1326,8 +1332,11 @@ class ActivityResource(CRMServiceModelResource):
             if len(Contact.get_contact_activities(bundle.obj.contact.id)) == 1:
                 bundle.data['contact'] = ContactResource().get_bundle_detail(bundle.obj.contact, bundle.request)
             bundle.data.pop('obj_created')
-
+        # bundle.data['milestone_id'] = bundle.obj.milestone_id
         return bundle
+
+    # def hydrate_milestone(self, obj):
+    #     return Milestone.objects.get(pk=bundle.data['milestone'])
 
     def dehydrate_sales_cycle_id(self, bundle):
         return bundle.obj.sales_cycle_id
@@ -1393,11 +1402,9 @@ class ActivityResource(CRMServiceModelResource):
         act.author_id = bundle.data.get('author_id')
         act.description = bundle.data.get('description')
         act.sales_cycle_id = bundle.data.get('sales_cycle_id')
-        # if bundle.data.get('sales_cycle_id', None):
-        #     act.sales_cycle_id = bundle.data.get('sales_cycle_id')
-        # else:
-        #     _subscr_id = self.get_crmsubscr_id(bundle.request)
-        #     act.sales_cycle_id = SalesCycle.get_global(_subscr_id).pk
+        if 'milestone' in bundle.data:
+            milestone = Milestone.objects.get(pk=bundle.data.get('milestone'))
+            act.milestone = milestone
         act.save()
         text_parser(base_text=act.description, content_class=act.__class__,
                     object_id=act.id)
@@ -1415,6 +1422,9 @@ class ActivityResource(CRMServiceModelResource):
     def save(self, bundle, **kwargs):
         bundle = super(ActivityResource, self).save(bundle, **kwargs)
         if bundle.data.get('feedback_status', None):
+            if 'milestone' in bundle.data:
+                mile = Milestone.objects.get(pk=bundle.data.get('milestone'))
+                bundle.obj.milestone = mile
             if not hasattr(bundle.obj, 'feedback'):
                 bundle.obj.feedback = Feedback(
                     status=bundle.data['feedback_status'],
@@ -1429,6 +1439,7 @@ class ActivityResource(CRMServiceModelResource):
                 sales_cycle = SalesCycle.objects.get(pk=new_sc_id)
                 bundle.obj.sales_cycle = sales_cycle
                 bundle.obj.save()
+        bundle.obj.save()
         text_parser(base_text=bundle.obj.description, content_class=bundle.obj.__class__,
                     object_id=bundle.obj.id)
         return bundle
@@ -2146,6 +2157,7 @@ class AppStateObject(object):
             'activities': self.get_activities(),
             'products': self.get_products(),
             'filters': self.get_filters(),
+            'milestones': self.get_milestones(),
             'sales_cycles_to_products_map': self.get_sales_cycle2products_map()
         }
         self.constants = self.get_constants()
@@ -2329,8 +2341,10 @@ class AppStateObject(object):
                 'date_created': a.date_created,
                 'feedback_status': a.feedback_status,
                 'sales_cycle_id': a.sales_cycle_id,
-                'has_read': a.has_read(self.current_crmuser.id)
+                'has_read': a.has_read(self.current_crmuser.id),
                 })
+            if a.milestone:
+                d['milestone_id'] = a.milestone.pk
             return d
 
         return map(_map, activities)
@@ -2407,6 +2421,15 @@ class AppStateObject(object):
             'logged_in': self.current_user.is_authenticated(),
             'language': translation.get_language()
         }
+
+    def get_milestones(self):
+        milestones = Milestone.get_for_subscr(self.subscription_id)
+
+        def _map(mile):
+            d = model_to_dict(mile)
+            return d
+
+        return map(_map, milestones)
 
     def to_dict(self):
         return self._data
