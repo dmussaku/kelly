@@ -5,6 +5,7 @@ from django.db import models, transaction
 from django.utils.translation import ugettext_lazy as _
 from almanet import settings
 from almanet import signals as almanet_signals
+from almanet.utils.gcal import GCalConnection
 from almanet.models import SubscriptionObject
 from alm_vcard.models import (
     VCard,
@@ -1150,6 +1151,14 @@ class Activity(SubscriptionObject):
     def __unicode__(self):
         return self.description
 
+    def save(self, *args, **kwargs):
+        created = False
+        if not self.pk:
+            created = True
+        super(Activity, self).save(*args, **kwargs)
+        if created and not self.status and timezone.now() < self.deadline:
+            GCalConnection().establish().build_event_from_activity(self)
+
     @property
     def author(self):
         return self.owner
@@ -1594,7 +1603,7 @@ class ContactList(SubscriptionObject):
         return self.title
 
     @classmethod
-    def get_for_subscr(cls, subscr_id):
+    def get_lists(cls, subscr_id):
         return cls.objects.filter(subscription_id=subscr_id)
 
     def check_contact(self, contact_id):
