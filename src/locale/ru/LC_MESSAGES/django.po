@@ -262,7 +262,7 @@ msgstr ""
 
 #: alm_user/forms.py:75
 msgid "User with such email is not registered."
-msgstr ""
+msgstr "Пользователь с таким email не найден"
 
 #: alm_user/forms.py:117
 msgid "Old password"
@@ -423,11 +423,6 @@ msgid ""
 "used.  Please request a new password reset."
 msgstr ""
 
-#: alm_user/templates/user/password_reset_done.html:4
-#: alm_user/templates/user/password_reset_done.html:8
-msgid "Password reset successful"
-msgstr ""
-
 #: alm_user/templates/user/password_reset_done.html:10
 msgid ""
 "We've emailed you instructions for setting your password. You should be "
@@ -439,6 +434,18 @@ msgid ""
 "If you don't receive an email, please make sure you've entered the address "
 "you registered with, and check your spam folder."
 msgstr ""
+
+#: alm_user/templates/user/password_reset_success.html:9
+msgid "Password reset successful"
+msgstr "Пароль успешно восстановлен"
+
+#: alm_user/templates/user/password_reset_success.html:11
+msgid "Your password has been changed, for sign in go to"
+msgstr "Пожалуйста, для входа в систему продите на: "
+
+#: alm_user/templates/user/password_reset_success.html:11
+msgid "login page"
+msgstr "страницу входа"
 
 #: alm_user/templates/user/profile.html:3
 msgid "User Profile"
@@ -460,8 +467,16 @@ msgid "User Profile Password Settings Page"
 msgstr ""
 
 #: alm_user/templates/user/user_login.html:47
+msgid "Forgot your password?"
+msgstr "Забыли пароль?"
+
+#: alm_user/templates/user/user_login.html:50
 msgid "Login"
 msgstr "Войти"
+
+#: alm_user/templates/user/referral-complete.html:9
+msgid "Thank you! Our managers will contact you."
+msgstr "Спасибо! Мы свяжемся с вами в ближайшее время."
 
 #: alm_vcard/admin.py:170
 msgid "Select VCF"

@@ -4,6 +4,5 @@
 
 ----
 Sincerely,
-{{ site_name }} team
-Email: info@v3na.com
+Almasales team
 {% endblock %}

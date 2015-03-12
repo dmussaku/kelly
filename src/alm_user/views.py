@@ -11,7 +11,13 @@ from django.conf import settings
 from almanet.settings import MY_SD
 
 from alm_user.models import User, Referral
-from alm_user.forms import RegistrationForm, UserBaseSettingsForm, UserPasswordSettingsForm, ReferralForm
+from alm_user.forms import(
+    RegistrationForm, 
+    UserBaseSettingsForm, 
+    UserPasswordSettingsForm, 
+    ReferralForm, 
+    PasswordResetForm,
+) 
 from almanet.models import Service
 from almanet.url_resolvers import reverse_lazy
 
@@ -79,7 +85,6 @@ class UserRegistrationView(CreateView):
     success_url = reverse_lazy('user_profile_url', subdomain=settings.MY_SD)
     template_name = 'user/user_registration.html'
 
-
 @sensitive_post_parameters()
 @never_cache
 def password_reset_confirm(request, user_pk=None, token=None,
@@ -95,7 +100,7 @@ def password_reset_confirm(request, user_pk=None, token=None,
     if post_reset_redirect is None:
         post_reset_redirect = reverse_lazy('password_reset_complete')
     else:
-        post_reset_redirect = reverse_lazy('user_login')
+        post_reset_redirect = reverse_lazy('password_reset_success')
 
     try:
         user = User._default_manager.get(pk=user_pk)
@@ -121,6 +126,16 @@ def password_reset_confirm(request, user_pk=None, token=None,
     if extra_context is not None:
         context.update(extra_context)
     return TemplateResponse(request, template_name, context)
+
+
+def password_reset_success(request,
+                        template_name='registration/password_reset_success.html',
+                        current_app=None, extra_context=None):
+    context = {}
+    if extra_context is not None:
+        context.update(extra_context)
+    return TemplateResponse(request, template_name, context,
+                            current_app=current_app)
 
 
 class UserProfileView(TemplateView):
