@@ -864,6 +864,24 @@ class Product(SubscriptionObject):
         q = Q(subscription_id=subscription_id)
         return cls.objects.filter(q).order_by('-date_created')
 
+class ProductGroup(SubscriptionObject):
+    owner = models.ForeignKey(CRMUser, related_name='owned_product_groups', blank=True, null=True)
+    title = models.CharField(max_length=150)
+    products = models.ManyToManyField(Product, related_name='product_groups',
+                                   null=True, blank=True)
+    date_created = models.DateTimeField(blank=True, auto_now_add=True)
+
+    class Meta:
+        verbose_name = _('product_group')
+        db_table = settings.DB_PREFIX.format('product_group')
+
+    def __unicode__(self):
+        return self.title
+
+    @classmethod
+    def get_for_subscr(cls, subscr_id):
+        return cls.objects.filter(subscription_id=subscr_id)
+
 
 class SalesCycle(SubscriptionObject):
     STATUSES_CAPS = (

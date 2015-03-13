@@ -15,7 +15,7 @@ django-extensions==1.4.9
 django-hosts==0.6
 django-mailviews==0.6.3
 django-model-utils==2.2
-django-nose2==0.1.1
+# django-nose2==0.1.1
 django-tastypie==0.12.1
 django-tastypie-swagger==0.1.2
 django-timezone-field==1.1
@@ -28,9 +28,9 @@ httplib2==0.9
 ipython==2.3.0
 jdcal==1.0
 mock==1.0.1
-nose2==0.4.7
-nose2-cov==1.0a4
--e git+git@github.com:Rustem/nose2django.git@faabed3a92b1a38f3fb96970a7eb82b4b8ab3d59#egg=nose2django-origin/hotfix/djver-incompat
+# nose2==0.4.7
+# nose2-cov==1.0a4
+# -e git+git@github.com:Rustem/nose2django.git@faabed3a92b1a38f3fb96970a7eb82b4b8ab3d59#egg=nose2django-origin/hotfix/djver-incompat
 oauth2client==1.4.6
 openpyxl==2.1.4
 paramiko==1.14.0
