@@ -2,6 +2,7 @@ from .models import (
     SalesCycle,
     Milestone,
     Product,
+    ProductGroup,
     Activity,
     Contact,
     ContactList,
@@ -1513,6 +1514,38 @@ class ProductResource(CRMServiceModelResource):
         obj_dict['success'] = obj
         return self.create_response(request, obj_dict, response_class=http.HttpAccepted)
 
+class ProductGroupResource(CRMServiceModelResource):
+    '''
+    ALL Method
+    I{URL}:  U{alma.net/api/v1/product_group/}
+
+    B{Description}:
+    API resource to manage ProductGroup
+
+    @undocumented: Meta
+    '''
+    products = fields.ListField(null=True)
+
+    class Meta(CommonMeta):
+        queryset = ProductGroup.objects.all()
+        resource_name = 'product_group'
+        always_return_data = True
+
+    def dehydrate_products(self, bundle):
+        return [product.pk for product in bundle.obj.products.all()]
+
+    def hydrate_products(self, bundle):
+        products = Product.objects.filter(pk__in=bundle.data['products'])
+        bundle.data['products'] = products
+        return bundle
+
+    def obj_create(self, bundle, **kwargs):
+        bundle.obj = self._meta.object_class()
+        bundle = self.full_hydrate(bundle)
+        bundle = self.save(bundle)
+        bundle.obj.products.add(*bundle.data['products'])
+        return bundle
+
 
 class ValueResource(CRMServiceModelResource):
     '''
@@ -2174,6 +2207,7 @@ class AppStateObject(object):
             'sales_cycles': self.get_sales_cycles(),
             'activities': self.get_activities(),
             'products': self.get_products(),
+            'product_groups': self.get_product_groups(),
             'filters': self.get_filters(),
             'milestones': self.get_milestones(),
             'sales_cycles_to_products_map': self.get_sales_cycle2products_map()
@@ -2406,6 +2440,15 @@ class AppStateObject(object):
 
         return map(_map, products)
         # return ProductResource().get_bundle_list(products, self.request)
+
+    def get_product_groups(self):
+        product_groups = ProductGroup.get_for_subscr(self.subscription_id)
+
+        def _map(product_group):
+            d = model_to_dict(product_group)
+            return d
+
+        return map(_map, product_groups)
 
     def get_sales_cycle2products_map(self):
         sales_cycles = SalesCycle.get_salescycles_by_last_activity_date(
