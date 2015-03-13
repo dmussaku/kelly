@@ -10,10 +10,10 @@ from oauth2client.client import OAuth2WebServerFlow
 import gflags
 from django.utils.translation import ugettext_lazy as _
 FLAGS = gflags.FLAGS
-CALENDAR_ID = '7so4s32gs2mpbrs7ecrqqist3o@group.calendar.google.com'
+CALENDAR_ID = 'grhc502knl9puo3qcsvnbj2i8o@group.calendar.google.com'
 FLOW = OAuth2WebServerFlow(
-    client_id='405002223375-06d8suldprun88p84dgmoed8ir3higa1.apps.googleusercontent.com',
-    client_secret='WcbTngSPwGQl_z41EsrS1Agk',
+    client_id='95263978532-16369qcnql6vlfpg557bovit8k36s1dk.apps.googleusercontent.com',
+    client_secret='SFWiFZOWqnVfQS5ytqGOvkt9',
     scope='https://www.googleapis.com/auth/calendar',
     user_agent='chrome/38',
     redirect_uri='http://localhost:8080/')
@@ -32,7 +32,7 @@ class GCalConnection(object):
             http = credentials.authorize(http)
             self.service = build(
                 serviceName='calendar', version='v3',
-                http=http, developerKey='AIzaSyCqPeJk-5kcWO3T9uiXV9OIGhIo3gDhe7A')
+                http=http, developerKey='AIzaSyAxL4aIOSlW11sgc0qWe8KOlRwkGQ08vNM')
             return self
         # return self.service
 
