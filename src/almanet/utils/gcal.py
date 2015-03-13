@@ -92,3 +92,8 @@ class GCalConnection(object):
             eventId=event_id,
             body=event).execute()
 
+    def remove_event(self, event_id):
+        assert self.service is not None, 'service should not be known'
+        self.service.events().delete(
+            calendarId=CALENDAR_ID,
+            eventId=event_id).execute()

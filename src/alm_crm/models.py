@@ -1162,6 +1162,7 @@ class Activity(SubscriptionObject):
 
     def save(self, *args, **kwargs):
         created = False
+        previous_status = self.status
         if not self.pk:
             created = True
         super(Activity, self).save(*args, **kwargs)
@@ -1176,6 +1177,11 @@ class Activity(SubscriptionObject):
                 event_id = self.gcal_events.first().event_id
                 GCalConnection().establish(
                     ).update_event_with_activity(self, event_id)
+        if self.status and self.gcal_events.count():
+            event_id = self.gcal_events.first().event_id
+            GCalConnection().establish(
+                ).remove_event(event_id)
+            self.gcal_events.all().delete()   # drop stale events
 
     @property
     def author(self):
