@@ -66,6 +66,34 @@ class GCalConnection(object):
                 'displayName': author.get_full_name()
             }],
         }
-        self.service.events().insert(
+        new_event = self.service.events().insert(
             calendarId=CALENDAR_ID,
             body=event).execute()
+        return new_event['id']
+
+    def get_event_by_id(self, event_id):
+        assert self.service is not None, 'service should not be known'
+        return self.service.events().get(
+            calendarId=CALENDAR_ID, eventId=event_id).execute()
+
+    def update_event_with_activity(self, activity, event_id):
+        assert self.service is not None, "service should not be known"
+        event = self.get_event_by_id(event_id)
+        from_dt = activity.deadline.isoformat()
+        to_dt = (activity.deadline + datetime.timedelta(minutes=60)).isoformat()
+        author = activity.author.get_billing_user()
+        event.update({
+            'summary': activity.description,
+            'start': {'dateTime': from_dt},
+            'end': {'dateTime': to_dt},})
+        event['sequence'] += 1    # incr sequence since google checks it
+        self.service.events().update(
+            calendarId=CALENDAR_ID,
+            eventId=event_id,
+            body=event).execute()
+
+    def remove_event(self, event_id):
+        assert self.service is not None, 'service should not be known'
+        self.service.events().delete(
+            calendarId=CALENDAR_ID,
+            eventId=event_id).execute()
