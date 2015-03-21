@@ -8,18 +8,19 @@ from almanet.settings import DEFAULT_SERVICE
 from almanet.models import Service, Subscription
 from alm_crm.models import Contact, SalesCycle, Activity, CRMUser, Product, ContactList
 from alm_vcard.models import VCard
+import logging
 
 def check_for_global_cycle_existence():
-    print "******** Check is Contact has global cycle ********"
+    print ("******** Check is Contact has global cycle ********")
     for contact in Contact.objects.all():
         try:
             sales_cycles = contact.sales_cycles.filter(is_global=True).count()
             if sales_cycles > 1:
-                print "WARNING: Contact with ID: %s has %s global sales cycles"%(contact.id, sales_cycles)
+                logging.warning("Contact with ID: %s has %s global sales cycles"%(contact.id, sales_cycles))
             elif not sales_cycles:
-                print "WARNING: Contact with ID: %s doesn't have global cycle"%(contact.id)
+                logging.warning("Contact with ID: %s doesn't have global cycle"%(contact.id))
         except SalesCycle.DoesNotExist:
-            print "WARNING: Contact with ID: %s doesn't have global cycle"%(contact.id)
+            logging.warning("Contact with ID: %s doesn't have global cycle"%(contact.id))
     print "******** Checking finished ******** \n"
 
 def check_is_cycle_has_contact():
@@ -28,11 +29,11 @@ def check_is_cycle_has_contact():
         try:
             contact = sales_cycle.contact
             if not contact:
-                print "WARNING: SalesCycle with ID: %s doesn't have contact"%(sales_cycle.id)
+                logging.warning("SalesCycle with ID: %s doesn't have contact"%(sales_cycle.id))
             if contact.subscription_id != sales_cycle.subscription_id:
-                print "WARNING: SalesCycle with ID: %s and contact with ID: %s have different subscription_ids"%(sales_cycle.id, contact.id)
+                logging.warning("SalesCycle with ID: %s and contact with ID: %s have different subscription_ids"%(sales_cycle.id, contact.id))
         except Contact.DoesNotExist:
-            print "WARNING: SalesCycle with ID: %s doesn't have contact"%(sales_cycle.id)
+            logging.warning("SalesCycle with ID: %s doesn't have contact"%(sales_cycle.id))
     print "******** Checking finished ******** \n"
 
 def check_is_activity_on_cycle():
@@ -41,11 +42,11 @@ def check_is_activity_on_cycle():
         try:
             sales_cycle = activity.sales_cycle
             if not sales_cycle:
-                print "WARNING: Activity with ID: %s doesn't have sales_cycle"%(activity.id)
+                logging.warning("Activity with ID: %s doesn't have sales_cycle"%(activity.id))
             if activity.subscription_id != sales_cycle.subscription_id:
-                print "WARNING: Activity with ID: %s and SalesCycle with ID: %s have different subscription_ids"%(activity.id, sales_cycle.id)
+                logging.warning("Activity with ID: %s and SalesCycle with ID: %s have different subscription_ids"%(activity.id, sales_cycle.id))
         except SalesCycle.DoesNotExist:
-            print "WARNING: Activity with ID: %s doesn't have sales_cycle"%(activity.id)
+            logging.warning("Activity with ID: %s doesn't have sales_cycle"%(activity.id))
     print "******** Checking finished ******** \n"
     
 def check_is_contact_has_owner():
@@ -54,11 +55,11 @@ def check_is_contact_has_owner():
         try:
             owner = contact.owner
             if not owner:
-                print "WARNING: Contact with ID: %s doesn't have owner"%(contact.id)
+                logging.warning("Contact with ID: %s doesn't have owner"%(contact.id))
             if contact.subscription_id != owner.subscription_id:
-                print "WARNING: Contact with ID: %s and his owner with ID: %s have different subscription_ids"%(contact.id, owner.id)
+                logging.warning("Contact with ID: %s and his owner with ID: %s have different subscription_ids"%(contact.id, owner.id))
         except CRMUser.DoesNotExist:
-            print "WARNING: Contact with ID: %s doesn't have owner"%(contact.id)
+            logging.warning("Contact with ID: %s doesn't have owner"%(contact.id))
     print "******** Checking finished ******** \n"
 
 def check_is_product_has_sales_cycles():
@@ -67,14 +68,14 @@ def check_is_product_has_sales_cycles():
         try:
             sales_cycles = product.sales_cycles
             if not sales_cycles:
-                print "WARNING: Product with ID: %s doesn't have sales_cycles"%(product.id)
+                logging.warning("Product with ID: %s doesn't have sales_cycles"%(product.id))
             else:
                 for sales_cycle in sales_cycles.all():
                     if product.subscription_id != sales_cycle.subscription_id:
-                        print "WARNING: Product with ID: %s and sales_cycle with ID: %s have different subscription_ids"%(product.id, sales_cycle.id)
+                        logging.warning("Product with ID: %s and sales_cycle with ID: %s have different subscription_ids"%(product.id, sales_cycle.id))
 
         except SalesCycle.DoesNotExist:
-            print "WARNING: Product with ID: %s doesn't have sales_cycles"%(product.id)
+            logging.warning("Product with ID: %s doesn't have sales_cycles"%(product.id))
     print "******** Checking finished ******** \n"
 
 def check_is_contact_has_vcard():
@@ -83,9 +84,9 @@ def check_is_contact_has_vcard():
         try:
             vcard = contact.vcard
             if not vcard:
-                print "WARNING: Contact with ID: %s doesn't have vcard"%(contact.id)
+                logging.warning("Contact with ID: %s doesn't have vcard"%(contact.id))
         except VCard.DoesNotExist:
-            print "WARNING: Contact with ID: %s doesn't have vcard"%(contact.id)
+            logging.warning("Contact with ID: %s doesn't have vcard"%(contact.id))
     print "******** Checking finished ******** \n"
 
 def check_are_contact_in_contactlist_exist():
@@ -95,9 +96,9 @@ def check_are_contact_in_contactlist_exist():
             contacts = contact_list.users
             for contact in contacts.all():
                 if not contact.pk:
-                    print "WARNING: ContactList with ID: %s has nonexistent contact %s"%(contact_list.id, contact)
+                    logging.warning("ContactList with ID: %s has nonexistent contact %s"%(contact_list.id, contact))
         except VCard.DoesNotExist:
-            print "WARNING: Contact with ID: %s doesn't have vcard"%(contact.id)
+            logging.warning("Contact with ID: %s doesn't have vcard"%(contact.id))
     print "******** Checking finished ******** \n"
 
 class Command(BaseCommand):
