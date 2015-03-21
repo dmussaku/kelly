@@ -1576,6 +1576,14 @@ class ProductGroupResource(CRMServiceModelResource):
         bundle.obj.products.add(*bundle.data['products'])
         return bundle
 
+    def obj_update(self, bundle, **kwargs):
+        bundle.obj = self._meta.object_class()
+        bundle = self.full_hydrate(bundle)
+        bundle = self.save(bundle)
+        bundle.obj.products.clear()
+        bundle.obj.products.add(*bundle.data['products'])
+        return bundle
+
 
 class ValueResource(CRMServiceModelResource):
     '''
