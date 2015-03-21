@@ -1115,11 +1115,14 @@ class ContactResource(CRMServiceModelResource):
             if not contacts:
                 self.log_throttled_access(request)
                 return self.create_response(request, {'success': False})
-            contact_list = ContactList(
-                owner = request.user.get_crmuser(), 
-                title = 'imported on %s ' % datetime.datetime.now(request.user.timezone))
-            contact_list.save()
-            contact_list.contacts = contacts
+            if len(contacts)>1:
+                contact_list = ContactList(
+                    owner = request.user.get_crmuser(), 
+                    title = 'imported on %s ' % datetime.datetime.now(request.user.timezone))
+                contact_list.save()
+                contact_list.contacts = contacts
+            else:
+                contact_list = False
             for contact in contacts:
                 contact.create_share_to(current_crmuser.pk)
                 _bundle = contact_resource.build_bundle(
@@ -1131,11 +1134,12 @@ class ContactResource(CRMServiceModelResource):
                 )
                 objects.append(contact_resource.full_dehydrate(
                     _bundle, for_list=True))
-            contact_list = ContactListResource().full_dehydrate(
-                ContactListResource().build_bundle(
-                    obj=contact_list
+            if contact_list:
+                contact_list = ContactListResource().full_dehydrate(
+                    ContactListResource().build_bundle(
+                        obj=contact_list
+                        )
                     )
-                )
 
         self.log_throttled_access(request)
         return self.create_response(
