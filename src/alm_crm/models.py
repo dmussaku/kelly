@@ -587,7 +587,7 @@ class Contact(SubscriptionObject):
     def import_from_xls(cls, xls_file_data, creator):
         book = xlrd.open_workbook(file_contents=xls_file_data)
         sheets_left = True
-        contact_list = []
+        contacts = []
         for sheet in book.sheets():
             i = 1
             header_row = sheet.row(0)
@@ -713,10 +713,10 @@ class Contact(SubscriptionObject):
                                     value=site
                                     )
                             url.save()
-                contact_list.append(c)
+                contacts.append(c)
                 # print "%s created contact %s" % (c, c.id)
                 i = i+1
-        return contact_list
+        return contacts
 
     @classmethod
     def get_contacts_by_last_activity_date(

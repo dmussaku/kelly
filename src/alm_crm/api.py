@@ -88,6 +88,7 @@ import time
 from .utils.parser import text_parser
 
 import base64
+from tastypie.bundle import Bundle
 
 
 
@@ -1068,9 +1069,15 @@ class ContactResource(CRMServiceModelResource):
                 )
                 objects.append(contact_resource.full_dehydrate(
                     _bundle, for_list=True))
-        elif data['filename'].split('.')[1]=='xls' or 'xlsx':
-            for contact in Contact.import_from_xls(
-                decoded_string, request.user):
+        elif data['filename'].split('.')[1]=='xls' or data['filename'].split('.')[1]=='xlsx':
+            contacts = Contact.import_from_xls(
+                decoded_string, request.user)
+            contact_list = ContactList(
+                owner = request.user.get_crmuser(), 
+                title = 'imported on %s ' % datetime.datetime.now(request.user.timezone))
+            contact_list.save()
+            contact_list.contacts = contacts
+            for contact in contacts:
                 _bundle = contact_resource.build_bundle(
                     obj=contact, request=request)
                 _bundle.data['global_sales_cycle'] = SalesCycleResource().full_dehydrate(
@@ -1080,6 +1087,13 @@ class ContactResource(CRMServiceModelResource):
                 )
                 objects.append(contact_resource.full_dehydrate(
                     _bundle, for_list=True))
+            _bundle = Bundle()
+            _bundle.data['contact_list'] = ContactListResource().full_dehydrate(
+                ContactListResource().build_bundle(
+                    obj=contact_list
+                    )
+                )
+            objects.append({'contact_list':_bundle.data['contact_list']})
         else:
             for contact in Contact.import_from_vcard(
                     decoded_string, current_crmuser):
