@@ -872,6 +872,9 @@ class Category(models.Model):
         verbose_name = _("category")
         verbose_name_plural = _("categories")
 
+    def __unicode__(self):
+        return self.data
+
 
 class Key(models.Model):
     """

@@ -10,6 +10,7 @@ from alm_vcard.models import *
 from django.db import transaction
 from django.core.exceptions import ObjectDoesNotExist
 from tastypie.exceptions import NotFound
+from collections import OrderedDict
 
 def vcard_rel_dehydrate(bundle):
     if bundle.data.get('vcard'):
@@ -79,6 +80,9 @@ class VCardResource(ModelResource):
 
     @transaction.atomic()
     def obj_create(self, bundle, **kwargs):
+        if bundle.data.get('categories'):
+            categories = [x['data'] for x in bundle.data['categories']]
+            bundle.data['categories'] = [{"data":x} for x in list(OrderedDict.fromkeys(categories))]
         if kwargs.get('pk'):
             bundle.obj = VCard.objects.get(contact=int(kwargs['pk']))
             print bundle.obj

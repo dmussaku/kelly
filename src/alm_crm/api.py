@@ -86,6 +86,7 @@ import time
 from .utils.parser import text_parser
 
 import base64
+from collections import OrderedDict
 
 
 
@@ -2139,6 +2140,7 @@ class AppStateObject(object):
 
         self.objects = {
             'users': self.get_users(),
+            'categories': self.get_categories(),
             'company': self.get_company(),
             'contacts': self.get_contacts(),
             'shares': self.get_shares(),
@@ -2349,6 +2351,12 @@ class AppStateObject(object):
 
         return map(_map, filters)
         # return FilterResource().get_bundle_list(filters, self.request)
+
+    def get_categories(self):
+        seq = [x.data for x in Category.objects.filter(
+            vcard__contact__subscription_id=self.subscription_id)]
+        categories = [x for x in list(OrderedDict.fromkeys(seq))]
+        return categories
 
     def get_products(self):
         products = Product.get_products(self.subscription_id)
