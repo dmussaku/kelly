@@ -1058,20 +1058,11 @@ class ContactResource(CRMServiceModelResource):
         current_crmuser = request.user.get_crmuser()
         decoded_string = base64.b64decode(data['uploaded_file'])
         if data['filename'].split('.')[1]=='csv':
-            for contact in Contact.import_from_csv(
-                decoded_string, request.user):
-                _bundle = contact_resource.build_bundle(
-                    obj=contact, request=request)
-                _bundle.data['global_sales_cycle'] = SalesCycleResource().full_dehydrate(
-                    SalesCycleResource().build_bundle(
-                        obj=SalesCycle.objects.get(contact_id=contact.id)
-                    )
-                )
-                objects.append(contact_resource.full_dehydrate(
-                    _bundle, for_list=True))
-        elif data['filename'].split('.')[1]=='xls' or data['filename'].split('.')[1]=='xlsx':
-            contacts = Contact.import_from_xls(
+            contacts = Contact.import_from_csv(
                 decoded_string, request.user)
+            if not contacts:
+                self.log_throttled_access(request)
+                return self.create_response(request, {'success': False})
             contact_list = ContactList(
                 owner = request.user.get_crmuser(), 
                 title = 'imported on %s ' % datetime.datetime.now(request.user.timezone))
@@ -1087,13 +1078,37 @@ class ContactResource(CRMServiceModelResource):
                 )
                 objects.append(contact_resource.full_dehydrate(
                     _bundle, for_list=True))
-            _bundle = Bundle()
-            _bundle.data['contact_list'] = ContactListResource().full_dehydrate(
+            contact_list = ContactListResource().full_dehydrate(
                 ContactListResource().build_bundle(
                     obj=contact_list
                     )
                 )
-            objects.append({'contact_list':_bundle.data['contact_list']})
+        elif data['filename'].split('.')[1]=='xls' or data['filename'].split('.')[1]=='xlsx':
+            contacts = Contact.import_from_xls(
+                decoded_string, request.user)
+            if not contacts:
+                self.log_throttled_access(request)
+                return self.create_response(request, {'success': False})
+            contact_list = ContactList(
+                owner = request.user.get_crmuser(), 
+                title = 'imported on %s ' % datetime.datetime.now(request.user.timezone))
+            contact_list.save()
+            contact_list.contacts = contacts
+            for contact in contacts:
+                _bundle = contact_resource.build_bundle(
+                    obj=contact, request=request)
+                _bundle.data['global_sales_cycle'] = SalesCycleResource().full_dehydrate(
+                    SalesCycleResource().build_bundle(
+                        obj=SalesCycle.objects.get(contact_id=contact.id)
+                    )
+                )
+                objects.append(contact_resource.full_dehydrate(
+                    _bundle, for_list=True))
+            contact_list = ContactListResource().full_dehydrate(
+                ContactListResource().build_bundle(
+                    obj=contact_list
+                    )
+                )
         else:
             for contact in Contact.import_from_vcard(
                     decoded_string, current_crmuser):
@@ -1111,7 +1126,8 @@ class ContactResource(CRMServiceModelResource):
                     _bundle, for_list=True))
 
         self.log_throttled_access(request)
-        return self.create_response(request, {'success': objects})
+        return self.create_response(
+            request, {'objects': objects, 'contact_list': contact_list})
 
 
 class SalesCycleResource(CRMServiceModelResource):
