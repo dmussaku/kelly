@@ -1110,11 +1110,18 @@ class ContactResource(CRMServiceModelResource):
                     )
                 )
         else:
-            for contact in Contact.import_from_vcard(
-                    decoded_string, current_crmuser):
-
+            contacts = Contact.import_from_vcard(
+                    decoded_string, current_crmuser)
+            if not contacts:
+                self.log_throttled_access(request)
+                return self.create_response(request, {'success': False})
+            contact_list = ContactList(
+                owner = request.user.get_crmuser(), 
+                title = 'imported on %s ' % datetime.datetime.now(request.user.timezone))
+            contact_list.save()
+            contact_list.contacts = contacts
+            for contact in contacts:
                 contact.create_share_to(current_crmuser.pk)
-
                 _bundle = contact_resource.build_bundle(
                     obj=contact, request=request)
                 _bundle.data['global_sales_cycle'] = SalesCycleResource().full_dehydrate(
@@ -1124,6 +1131,11 @@ class ContactResource(CRMServiceModelResource):
                 )
                 objects.append(contact_resource.full_dehydrate(
                     _bundle, for_list=True))
+            contact_list = ContactListResource().full_dehydrate(
+                ContactListResource().build_bundle(
+                    obj=contact_list
+                    )
+                )
 
         self.log_throttled_access(request)
         return self.create_response(
