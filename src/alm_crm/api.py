@@ -13,7 +13,9 @@ from .models import (
     SalesCycleProductStat,
     Filter,
     HashTag,
-    HashTagReference
+    HashTagReference,
+    CustomSection,
+    CustomField,
     )
 from alm_vcard.api import (
     VCardResource,
@@ -84,6 +86,13 @@ import datetime
 import time
 
 from .utils.parser import text_parser
+from .utils.data_processing import (
+    processing_custom_section_data, 
+    processing_custom_field_data,
+    from_section_object_to_data,
+    from_field_object_to_data,
+    )
+
 
 import base64
 from collections import OrderedDict
@@ -1454,6 +1463,11 @@ class ProductResource(CRMServiceModelResource):
         resource_name = 'product'
         always_return_data = True
 
+    def dehydrate(self, bundle):
+        bundle.data['custom_sections'] = from_section_object_to_data(bundle.obj)
+        bundle.data['custom_fields'] = from_field_object_to_data(bundle.obj)
+        return bundle
+
     def prepend_urls(self):
         return [
             url(
@@ -1462,7 +1476,35 @@ class ProductResource(CRMServiceModelResource):
                 self.wrap_view('replace_cycles'),
                 name='api_replace_cycles'
             ),
+            url(
+                r"^(?P<resource_name>%s)/import%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('import_products'),
+                name='api_import_products'
+            ),
         ]
+
+    def import_products(self, request, **kwargs):
+    	objects = []
+        product_resource = ProductResource()
+        self.method_check(request, allowed=['post'])
+        self.is_authenticated(request)
+        self.throttle_check(request)
+        data = self.deserialize(
+            request, request.body,
+            format=request.META.get('CONTENT_TYPE', 'application/json'))
+        current_crmuser = request.user.get_crmuser()
+        decoded_string = base64.b64decode(data['uploaded_file'])
+        file_extension = data['filename'].split('.')[1]
+        if file_extension=='xls' or file_extension=='xlsx':
+            for product in Product.import_from_xls(
+                decoded_string, request.user):
+                _bundle = product_resource.build_bundle(
+                    obj=product, request=request)
+                objects.append(product_resource.full_dehydrate(
+                    _bundle, for_list=True))
+        self.log_throttled_access(request)
+        return self.create_response(request, {'objects': objects})
 
     def replace_cycles(self, request, **kwargs):
         '''
@@ -1499,6 +1541,14 @@ class ProductResource(CRMServiceModelResource):
         obj_dict = {}
         obj_dict['success'] = obj
         return self.create_response(request, obj_dict, response_class=http.HttpAccepted)
+
+    def save(self, bundle, **kwargs):
+        bundle = super(self.__class__, self).save(bundle, **kwargs)
+        if bundle.data.get('custom_sections', None):
+            processing_custom_section_data(bundle.data['custom_sections'], bundle.obj)
+        if bundle.data.get('custom_fields', None):
+            processing_custom_field_data(bundle.data['custom_fields'], bundle.obj)
+        return bundle
 
 
 class ValueResource(CRMServiceModelResource):
@@ -2642,3 +2692,67 @@ class HashTagReferenceResource(CRMServiceModelResource):
         resource_name = 'hashtag_reference'
 
 
+class CustomSectionResource(CRMServiceModelResource):
+    '''
+    ALL Method
+    I{URL}:  U{alma.net/api/v1/custom_section/}
+    B{Description}:
+    API resource to manage CustomSection
+    (GenericRelation with VCard, Product)
+    @undocumented: Meta
+    '''
+    # field_values = fields.ToManyField('alm_crm.api.CustomFieldValueResource', 'field_values',
+    #                            related_name='product', null=True,
+    #                            full=True, readonly=True)
+
+    content_object = GenericForeignKeyField({
+        Product: ProductResource,
+        VCard: VCardResource,
+    }, 'content_object')
+
+    class Meta(CommonMeta):
+        queryset = CustomSection.objects.all()
+        resource_name = 'custom_section'
+
+    def hydrate(self, bundle):
+        """
+        CustomField have property owner which is  
+        content_object owner, we shouldn't set owner
+        """
+        crmuser = self.get_crmuser(bundle.request)
+        if not crmuser:
+            return 
+        return bundle
+
+class CustomFieldResource(CRMServiceModelResource):
+    '''
+    ALL Method
+    I{URL}:  U{alma.net/api/v1/custom_field/}
+    B{Description}:
+    API resource to manage CustomFields
+    (GenericRelation with VCard, Product)
+    @undocumented: Meta
+    '''
+    # field_values = fields.ToManyField('alm_crm.api.CustomFieldValueResource', 'field_values',
+    #                            related_name='product', null=True,
+    #                            full=True, readonly=True)
+    section = fields.ToOneField('alm_crm.api.CustomSectionResource', 'section',
+                              null=True, blank=True, full=False)
+    content_object = GenericForeignKeyField({
+        Product: ProductResource,
+        VCard: VCardResource,
+    }, 'content_object')
+
+    class Meta(CommonMeta):
+        queryset = CustomField.objects.all()
+        resource_name = 'custom_field'
+
+    def hydrate(self, bundle):
+        """
+        CustomField have property owner which is  
+        content_object owner, we shouldn't set owner
+        """
+        crmuser = self.get_crmuser(bundle.request)
+        if not crmuser:
+            return 
+        return bundle
