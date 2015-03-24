@@ -852,6 +852,27 @@ class Product(SubscriptionObject):
         q = Q(subscription_id=subscription_id)
         return cls.objects.filter(q).order_by('-date_created')
 
+    @classmethod
+    def import_from_xls(cls, xls_file_data, creator):
+        book = xlrd.open_workbook(file_contents=xls_file_data)
+        sheets_left = True
+        product_list = []
+        for sheet in book.sheets():
+            field_names = sheet.col(0)
+            for i in range(1, sheet.ncols):
+                field_vals = sheet.col(i)
+                if not field_vals[0].value:
+                    raise Exception
+                p = Product(
+                    name = field_vals[0].value,
+                    description = field_vals[1].value
+                    )
+                for i in range(2, len(field_vals)):
+                    c = CustomField.build_new(
+                        
+                        )
+
+
 
 class SalesCycle(SubscriptionObject):
     STATUSES_CAPS = (
