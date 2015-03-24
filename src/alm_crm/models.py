@@ -1762,8 +1762,8 @@ class CustomSection(SubscriptionObject):
 class CustomField(SubscriptionObject):
     title = models.CharField(max_length=255, null=True, blank=True)
     value = models.TextField(null=True, blank=True)
-    content_type = models.ForeignKey(ContentType)
-    object_id = models.IntegerField()
+    content_type = models.ForeignKey(ContentType, null=True, blank=True)
+    object_id = models.IntegerField(null=True, blank=True)
     content_object = generic.GenericForeignKey('content_type', 'object_id')
     date_created = models.DateTimeField(blank=True, auto_now_add=True)
     section = models.ForeignKey('CustomSection', related_name='custom_fields', null=True, blank=True)
@@ -1789,6 +1789,8 @@ class CustomField(SubscriptionObject):
         custom_field = cls(title=title, value=value)
         if section:
             custom_field.section=section
+            custom_field.content_type = section.content_type
+            custom_field.object_id = section.object_id
         if content_class and object_id:
             custom_field.content_type = ContentType.objects.get_for_model(content_class)
             custom_field.object_id = object_id

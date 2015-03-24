@@ -10,6 +10,7 @@ from alm_vcard.models import *
 from django.db import transaction
 from django.core.exceptions import ObjectDoesNotExist
 from tastypie.exceptions import NotFound
+from alm_crm.utils.data_processing import processing_custom_section_data, processing_custom_field_data
 
 def vcard_rel_dehydrate(bundle):
     if bundle.data.get('vcard'):
@@ -95,6 +96,14 @@ class VCardResource(ModelResource):
 
     def obj_delete(self, bundle, **kwargs):
         return super(self.__class__, self).obj_delete(bundle, **kwargs)
+
+    def save(self, bundle, **kwargs):
+        bundle = super(self.__class__, self).save(bundle, **kwargs)
+        if bundle.data.get('custom_sections', None):
+            processing_custom_section_data(bundle.data['custom_sections'], bundle.obj)
+        if bundle.data.get('custom_fields', None):
+            processing_custom_field_data(bundle.data['custom_fields'], bundle.obj)
+        return bundle
 
 
 class VCardRelatedResource(ModelResource):

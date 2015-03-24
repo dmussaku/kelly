@@ -86,6 +86,7 @@ import datetime
 import time
 
 from .utils.parser import text_parser
+from .utils.data_processing import processing_custom_section_data, processing_custom_field_data
 
 import base64
 
@@ -1500,6 +1501,14 @@ class ProductResource(CRMServiceModelResource):
         obj_dict = {}
         obj_dict['success'] = obj
         return self.create_response(request, obj_dict, response_class=http.HttpAccepted)
+
+    def save(self, bundle, **kwargs):
+        bundle = super(self.__class__, self).save(bundle, **kwargs)
+        if bundle.data.get('custom_sections', None):
+            processing_custom_section_data(bundle.data['custom_sections'], bundle.obj)
+        if bundle.data.get('custom_fields', None):
+            processing_custom_field_data(bundle.data['custom_fields'], bundle.obj)
+        return bundle
 
 
 class ValueResource(CRMServiceModelResource):
