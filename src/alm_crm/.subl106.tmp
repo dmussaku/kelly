@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import functools
 from django.db import models, transaction
 from django.utils.translation import ugettext_lazy as _
@@ -15,7 +13,7 @@ from alm_vcard.models import (
     Email,
     Category,
     Adr,
-    Url,
+    Url
     )
 from alm_user.models import User
 from django.template.loader import render_to_string
@@ -34,8 +32,8 @@ CURRENCY_OPTIONS = (
     ('KZT', 'Tenge'),
 )
 
-GLOBAL_CYCLE_TITLE = 'Основной поток'
-GLOBAL_CYCLE_DESCRIPTION = 'Автоматически созданный цикл'
+GLOBAL_CYCLE_TITLE = 'GLOBAL CYCLE'
+GLOBAL_CYCLE_DESCRIPTION = 'AUTOMATICALLY CREATED GLOBAL SALES CYCLE'
 
 
 class CRMUser(SubscriptionObject):
@@ -117,7 +115,7 @@ class Contact(SubscriptionObject):
         choices=TYPES_OPTIONS, default=USER_TP)
     date_created = models.DateTimeField(blank=True, auto_now_add=True)
     vcard = models.OneToOneField('alm_vcard.VCard', blank=True, null=True,
-                                 on_delete=models.SET_NULL, related_name='contact')
+                                 on_delete=models.SET_NULL,)
     parent = models.ForeignKey(
         'Contact', blank=True, null=True, related_name='children')
     owner = models.ForeignKey(
@@ -568,140 +566,159 @@ class Contact(SubscriptionObject):
 
 
     @classmethod
-    @transaction.atomic()
     def import_from_xls(cls, xls_file_data, creator):
         book = xlrd.open_workbook(file_contents=xls_file_data)
         sheets_left = True
         contact_list = []
+        value=1
         for sheet in book.sheets():
             i = 1
             header_row = sheet.row(0) 
             while(sheets_left):
                 try:
                     data = sheet.row(i)
-                except IndexError:
+                except:
                     sheets_left = False
-                    continue
-                c = cls()
                 v = VCard()
                 v.family_name = data[0].value if type(data[0].value) == unicode else str(data[0].value)  
                 v.given_name = data[1].value if type(data[1].value) == unicode else str(data[1].value)  
                 v.additional_name = data[2].value if type(data[2].value) == unicode else str(data[2].value)
                 v.fn = v.given_name+" "+v.family_name
-                if ((not v.given_name) and (not v.family_name) and data[4].value):
-                    v = VCard(fn=data[4].value)
-                    v.save()
-                    c = cls(vcard=v, tp='co')
-                    c.owner = creator.get_crmuser()
-                    c.subscription_id = creator.get_crmuser().subscription_id
-                    c.save()
-                if not v.id:
-                    v.save()
-                    c.vcard = v
-                    c.owner = creator.get_crmuser()
-                    c.subscription_id = creator.get_crmuser().subscription_id
-                    c.save()
-                with transaction.atomic():
-                    SalesCycle.create_globalcycle(**{
-                        'subscription_id':c.subscription_id,
-                        'owner_id': c.owner_id,
-                        'contact_id': c.id
-                    })
-                    if data[3].value:
-                        positions = data[3].value.split(';')
-                        for position in data[3].value.split(';'):
-                            title = Title(
-                                vcard=v,
-                                data=position
-                                )
-                            title.save()
-                    if data[4].value:
-                        org = Org(vcard=v)
-                        org.organization_name = data[4].value
+                if (not v.given_name and not v.family_name and data[4].value):
+                    print 'was at company creation'
+                    v, created = VCard.objects.get_or_create(fn=data[4].value)
+                    if created:
+                        c = cls(vcard=company_vcard, tp='co')
+                        c.owner = creator.get_crmuser()
+                        c.subscription_id = creator.get_crmuser().subscription_id
                         if data[5].value:
-                             org.organization_unit = data[5].value
-                        org.save()
-                    if data[6].value:
-                        for phone in data[6].value.split(';'):
-                            tel = Tel(vcard=v, type='WORK')
-                            tel.value = phone 
-                            tel.save()
-                    if data[7].value:
-                        for phone in data[7].value.split(';'):
-                            tel = Tel(vcard=v, type='cell')
-                            tel.value = phone 
-                            tel.save()
-                    if data[8].value:
-                        for phone in data[8].value.split(';'):
-                            tel = Tel(vcard=v, type='xadditional')
-                            tel.value = phone 
-                            tel.save()
-                    if data[9].value:
-                        for phone in data[9].value.split(';'):
-                            tel = Tel(vcard=v, type='fax')
-                            tel.value = phone 
-                            tel.save()
-                    if data[10].value:
-                        for email_str in data[10].value.split(';'):
-                            email = Email(vcard=v, type='work')
-                            email.value = email_str
-                            email.save()
-                    if data[11].value:
-                        for email_str in data[11].value.split(';'):
-                            email = Email(vcard=v, type='internet')
-                            email.value = email_str
-                            email.save()
-                    if data[12].value:
-                        for address_str in data[12].value.split(';;'):
-                            addr_objs = address_str.split(';')
-                            address = Adr(
-                                vcard=v,
-                                    type='POSTAL',
-                                    street_address=addr_objs[0],
-                                    locality=addr_objs[1],
-                                    region=addr_objs[2],
-                                    country_name=addr_objs[3],
-                                    post_office_box=addr_objs[4]
-                                    )
-                            address.save()
-                    if data[13].value:
-                        for address_str in data[13].value.split(';;'):
-                            addr_objs = address_str.split(';')
-                            address = Adr(
-                                vcard=v,
-                                    type='xlegal',
-                                    street_address=addr_objs[0],
-                                    locality=addr_objs[1],
-                                    region=addr_objs[2],
-                                    country_name=addr_objs[3],
-                                    post_office_box=addr_objs[4]
-                                    )
-                            address.save()
-                    if data[14].value:
-                        for address_str in data[14].value.split(';;'):
-                            addr_objs = address_str.split(';')
-                            address = Adr(
-                                vcard=v,
-                                    type='WORK',
-                                    street_address=addr_objs[0],
-                                    locality=addr_objs[1],
-                                    region=addr_objs[2],
-                                    country_name=addr_objs[3],
-                                    post_office_box=addr_objs[4]
-                                    )
-                            address.save()
-                    if data[15].value:
-                        for site in data[15].value.split(';'):
-                            url = Url(
-                                vcard=v,
-                                type='website',
-                                    value=site
-                                    )
-                            url.save()
+                            category = Category(data=data[5].value)
+                            v.save()
+                            category.vcard=v
+                            category.save()
+                elif data[4].value:
+                    company_vcard, created = VCard.objects.get_or_create(fn=data[4].value)
+                    if created:
+                        if data[5].value:
+                            category = Category(
+                                vcard=company_vcard,
+                                data=data[5].value
+                                )
+                            category.save()
+                        company_contact = Contact(
+                            vcard=company_vcard,
+                            tp='co'
+                            )
+                        company_contact.save()
+                    else:
+                        company_contact = company_vcard.contact
+                v.save()
+                try:
+                    c
+                except NameError:
+                    c = cls()
+                    c.owner = creator.get_crmuser()
+                    c.subscription_id = creator.get_crmuser().subscription_id
+                c.vcard = v
+                try:
+                    c.parent = company_contact
+                except NameError:
+                    pass
+                c.save()
+                SalesCycle.create_globalcycle(**{
+                    'subscription_id':c.subscription_id,
+                    'owner_id': c.owner_id,
+                    'contact_id': c.id
+                })
+                if data[3].value:
+                    positions = data[3].value.split(';')
+                    for position in data[3].value.split(';'):
+                        title = Title(
+                            vcard=v,
+                            data=position
+                            )
+                        title.save()
+                if data[4].value:
+                    org = Org(vcard=v)
+                    org.organization_name = data[4].value
+                    if data[5].value:
+                         org.organization_unit = data[5].value
+                    org.save()
+                for phone in data[6].value.split(';'):
+                    tel = Tel(vcard=v, type='WORK')
+                    tel.data = phone 
+                    tel.save()
+                for phone in data[7].value.split(';'):
+                    tel = Tel(vcard=v, type='cell')
+                    tel.data = phone 
+                    tel.save()
+                for phone in data[8].value.split(';'):
+                    tel = Tel(vcard=v, type='xadditional')
+                    tel.data = phone 
+                    tel.save()
+                for phone in data[9].value.split(';'):
+                    tel = Tel(vcard=v, type='fax')
+                    tel.data = phone 
+                    tel.save()
+                for email_str in data[10].value.split(';'):
+                    email = Email(vcard=v, type='work')
+                    email.value = email_str
+                    email.save()
+                for email_str in data[11].value.split(';'):
+                    email = Email(vcard=v, type='internet')
+                    email.value = email_str
+                    email.save()
+                for address_str in data[12].value.split(';;'):
+                    addr_objs = address_str.split(';')
+                    address = Adr(
+                        vcard=v,
+                            type='POSTAL',
+                            street_address=addr_objs[0],
+                            locality=addr_objs[1],
+                            region=addr_objs[2],
+                            country_name=addr_objs[3],
+                            post_office_box=addr_objs[4]
+                            )
+                        address.save()
+                for address_str in data[13].value.split(';;'):
+                    addr_objs = address_str.split(';')
+                    address = Adr(
+                        vcard=v,
+                            type='xlegal',
+                            street_address=addr_objs[0],
+                            locality=addr_objs[1],
+                            region=addr_objs[2],
+                            country_name=addr_objs[3],
+                            post_office_box=addr_objs[4]
+                            )
+                        address.save()
+                for address_str in data[14].value.split(';;'):
+                    addr_objs = address_str.split(';')
+                    address = Adr(
+                        vcard=v,
+                            type='WORK',
+                            street_address=addr_objs[0],
+                            locality=addr_objs[1],
+                            region=addr_objs[2],
+                            country_name=addr_objs[3],
+                            post_office_box=addr_objs[4]
+                            )
+                        address.save()
+                for site in data[15].value.split(';'):
+                    url = Url(
+                        vcard=v,
+                        type='website',
+                            value=site
+                            )
+                        url.save()
                 contact_list.append(c)
-                # print "%s created contact %s" % (c, c.id)
+                print "%s created contact %s" % (c, c.id)
                 i = i+1
+                
         return contact_list
+
+
+
 
     @classmethod
     def get_contacts_by_last_activity_date(
@@ -806,9 +823,6 @@ class Product(SubscriptionObject):
     owner = models.ForeignKey('CRMUser', related_name='crm_products',
                               null=True, blank=True)
     date_created = models.DateTimeField(blank=True, auto_now_add=True)
-    custom_sections = generic.GenericRelation('CustomSection')
-    custom_fields = generic.GenericRelation('CustomField')
-
 
     class Meta:
         verbose_name = _('product')
@@ -852,67 +866,6 @@ class Product(SubscriptionObject):
         q = Q(subscription_id=subscription_id)
         return cls.objects.filter(q).order_by('-date_created')
 
-    @classmethod
-    @transaction.atomic()
-    def import_from_xls(cls, xls_file_data, creator):
-        book = xlrd.open_workbook(file_contents=xls_file_data)
-        #book = xlrd.open_workbook(filename='medonica_products.xlsx')
-        product_list = []
-        for sheet in book.sheets():
-            NUM_CELLS = sheet.nrows
-            a_col = sheet.col(0)
-            b_col = sheet.col(1)
-            c_col = sheet.col(2)
-            p = Product(
-                    name=b_col[0].value,
-                    description=b_col[1].value,
-                    price=b_col[2].value,
-                    subscription_id=creator.get_crmuser().subscription_id,
-                    owner=creator.get_crmuser()
-                    )
-            p.save()
-            i = 3
-            while (i<=NUM_CELLS):
-                if (a_col[i].value and b_col[i].value and not c_col[i].value):
-                    field = CustomField.build_new(
-                        title=a_col[i].value,
-                        value=b_col[i].value,
-                        content_class=Product,
-                        object_id=p.id,
-                        save=True
-                        )
-                    i+=1
-                elif(a_col[i].value and b_col[i].value and c_col[i].value):
-                    is_section = True
-                    section = CustomSection.build_new(
-                        title = a_col[i].value,
-                        content_class=Product,
-                        object_id=p.id,
-                        save=True
-                        )
-                    print section
-                    i += 1
-                    while(is_section):
-                        if (not a_col[i].value and not b_col[i].value and not b_col[i].value):
-                            is_section = False
-                            break
-                        else:
-                            field = CustomField.build_new(
-                                title=b_col[i].value,
-                                value=c_col[i].value,
-                                section = section,
-                                content_class=Product,
-                                object_id=p.id,
-                                save=True
-                                )
-                        i+=1
-                        if i==NUM_CELLS:
-                            break
-                i+=1
-            product_list.append(p)
-        return product_list
-
-
 
 class SalesCycle(SubscriptionObject):
     STATUSES_CAPS = (
@@ -924,7 +877,6 @@ class SalesCycle(SubscriptionObject):
     STATUSES_DICT = dict(zip(('NEW', 'PENDING', 'COMPLETED'), STATUSES))
 
     is_global = models.BooleanField(default=False)
-
     title = models.CharField(max_length=100)
     description = models.CharField(max_length=500)
     products = models.ManyToManyField(Product, related_name='sales_cycles',
@@ -969,7 +921,7 @@ class SalesCycle(SubscriptionObject):
     # Adds mentions to a current class, takes a lsit of user_ids as an input
     # and then runs through the list and calls the function build_new which
     # is declared in Mention class
-    
+
     @classmethod
     def create_globalcycle(cls, **kwargs):
         try:
@@ -979,10 +931,10 @@ class SalesCycle(SubscriptionObject):
             global_cycle = cls(
                 is_global=True,
                 title=GLOBAL_CYCLE_TITLE,
-                description=GLOBAL_CYCLE_DESCRIPTION,
-                **kwargs)
+                description=GLOBAL_CYCLE_DESCRIPTION, **kwargs)
             global_cycle.save()
-        return global_cycle
+        finally:
+            return global_cycle
 
     def add_mention(self, user_ids=None):
         if isinstance(user_ids, int):
@@ -1212,12 +1164,6 @@ class Activity(SubscriptionObject):
     @property
     def contact(self):
         return self.sales_cycle.contact
-
-    @property
-    def feedback_status(self):
-        if hasattr(self, 'feedback'):
-            return self.feedback.status
-        return None
 
     @property
     def feedback_status(self):
@@ -1478,12 +1424,6 @@ class Mention(SubscriptionObject):
         """
         return Mention.objects.filter(user_id=user_id)
 
-    def save(self, **kwargs):
-        if not self.subscription_id and self.content_object:
-            self.subscription_id = self.content_object.owner.subscription_id
-        super(SubscriptionObject, self).save(**kwargs)
-
-
 
 class Comment(SubscriptionObject):
     comment = models.CharField(max_length=140)
@@ -1604,13 +1544,8 @@ def on_activity_delete(sender, instance=None, **kwargs):
     contact.latest_activity = contact.find_latest_activity()
     contact.save()
 
-def check_is_title_empty(sender, instance=None, **kwargs):
-    if len(instance.title) == 0:
-        raise Exception("Requires non empty value")
-
 
 signals.post_delete.connect(on_activity_delete, sender=Activity)
-signals.pre_save.connect(check_is_title_empty, sender=SalesCycle)
 
 
 '''
@@ -1733,128 +1668,3 @@ class Filter(SubscriptionObject):
     @classmethod
     def get_filters_by_crmuser(cls, crmuser_id):
         return Filter.objects.filter(owner=crmuser_id)
-
-
-class HashTag(models.Model):
-    text = models.CharField(max_length=500, unique=True)
-
-    class Meta:
-        verbose_name = _('hashtag')
-        db_table = settings.DB_PREFIX.format('hashtag')
-
-    def __unicode__(self):
-        return u'%s' % (self.text)
-
-
-    def save(self, **kwargs):
-        import re
-        if not re.match("\B#\w*[a-zA-Z]+\w*", self.text):
-            return
-
-        self.text = self.text.lower()
-        super(self.__class__, self).save(**kwargs)
-
-
-class HashTagReference(SubscriptionObject):
-    hashtag = models.ForeignKey(HashTag, related_name="references")
-    content_type = models.ForeignKey(ContentType)
-    object_id = models.IntegerField()
-    content_object = generic.GenericForeignKey('content_type', 'object_id')
-    date_created = models.DateTimeField(blank=True, auto_now_add=True)
-
-    @property
-    def owner(self):
-        return content_object.owner
-
-    class Meta:
-        verbose_name = _('hashtag_reference')
-        db_table = settings.DB_PREFIX.format('hashtag_reference')
-
-    def __unicode__(self):
-        return u'%s' % (self.hashtag)
-
-    @classmethod
-    def build_new(cls, hashtag_id, content_class=None,
-                  object_id=None, save=False):
-        hashtag_reference = cls(hashtag_id=hashtag_id)
-        hashtag_reference.content_type = ContentType.objects.get_for_model(content_class)
-        hashtag_reference.object_id = object_id
-        if save:
-            hashtag_reference.save()
-        return hashtag_reference
-
-    def save(self, **kwargs):
-        if not self.subscription_id and self.content_object:
-            self.subscription_id = self.content_object.owner.subscription_id
-        super(SubscriptionObject, self).save(**kwargs)
-
-
-class CustomSection(SubscriptionObject):
-    title = models.CharField(max_length=255, null=True, blank=True)
-    content_type = models.ForeignKey(ContentType)
-    object_id = models.IntegerField()
-    content_object = generic.GenericForeignKey('content_type', 'object_id')
-    date_created = models.DateTimeField(blank=True, auto_now_add=True)
-
-    @property
-    def owner(self):
-        if self.content_object.__class__ == VCard:
-            return self.content_object.contact.owner
-        return self.content_object.owner
-
-    class Meta:
-        verbose_name = _('custom_section')
-        db_table = settings.DB_PREFIX.format('custom_sections')
-
-    def __unicode__(self):
-        return u'%s' % self.title
-
-    @classmethod
-    def build_new(cls, title=None, content_class=None,
-                  object_id=None, save=False):
-        custom_field = cls(title=title)
-        custom_field.content_type = ContentType.objects.get_for_model(content_class)
-        custom_field.object_id = object_id
-        if save:
-            custom_field.save()
-        return custom_field
-
-
-class CustomField(SubscriptionObject):
-    title = models.CharField(max_length=255, null=True, blank=True)
-    value = models.TextField(null=True, blank=True)
-    content_type = models.ForeignKey(ContentType, null=True, blank=True)
-    object_id = models.IntegerField(null=True, blank=True)
-    content_object = generic.GenericForeignKey('content_type', 'object_id')
-    date_created = models.DateTimeField(blank=True, auto_now_add=True)
-    section = models.ForeignKey('CustomSection', related_name='custom_fields', null=True, blank=True)
-
-    @property
-    def owner(self):
-        if self.section:
-            return self.section.owner
-        if self.content_object.__class__ == VCard:
-            return self.content_object.contact.owner
-        return self.content_object.owner
-
-    class Meta:
-        verbose_name = _('custom_field')
-        db_table = settings.DB_PREFIX.format('custom_fields')
-
-    def __unicode__(self):
-        return u'%s: %s' % (self.title, self.value)
-
-    @classmethod
-    def build_new(cls, section=None, title=None, value=None, content_class=None,
-                  object_id=None, save=False):
-        custom_field = cls(title=title, value=value)
-        if section:
-            custom_field.section=section
-            custom_field.content_type = section.content_type
-            custom_field.object_id = section.object_id
-        if content_class and object_id:
-            custom_field.content_type = ContentType.objects.get_for_model(content_class)
-            custom_field.object_id = object_id
-        if save:
-            custom_field.save()
-        return custom_field

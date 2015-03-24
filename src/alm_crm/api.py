@@ -1475,7 +1475,35 @@ class ProductResource(CRMServiceModelResource):
                 self.wrap_view('replace_cycles'),
                 name='api_replace_cycles'
             ),
+            url(
+                r"^(?P<resource_name>%s)/import%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('import_products'),
+                name='api_import_products'
+            ),
         ]
+
+    def import_products(self, request, **kwargs):
+    	objects = []
+        product_resource = ProductResource()
+        self.method_check(request, allowed=['post'])
+        self.is_authenticated(request)
+        self.throttle_check(request)
+        data = self.deserialize(
+            request, request.body,
+            format=request.META.get('CONTENT_TYPE', 'application/json'))
+        current_crmuser = request.user.get_crmuser()
+        decoded_string = base64.b64decode(data['uploaded_file'])
+        file_extension = data['filename'].split('.')[1]
+        if file_extension=='xls' or file_extension=='xlsx':
+            for product in Product.import_from_xls(
+                decoded_string, request.user):
+                _bundle = product_resource.build_bundle(
+                    obj=product, request=request)
+                objects.append(product_resource.full_dehydrate(
+                    _bundle, for_list=True))
+        self.log_throttled_access(request)
+        return self.create_response(request, {'objects': objects})
 
     def replace_cycles(self, request, **kwargs):
         '''
