@@ -86,7 +86,13 @@ import datetime
 import time
 
 from .utils.parser import text_parser
-from .utils.data_processing import processing_custom_section_data, processing_custom_field_data
+from .utils.data_processing import (
+    processing_custom_section_data, 
+    processing_custom_field_data,
+    from_section_object_to_data,
+    from_field_object_to_data,
+    )
+
 
 import base64
 
@@ -1455,6 +1461,11 @@ class ProductResource(CRMServiceModelResource):
         queryset = Product.objects.all()
         resource_name = 'product'
         always_return_data = True
+
+    def dehydrate(self, bundle):
+        bundle.data['custom_sections'] = from_section_object_to_data(bundle.obj)
+        bundle.data['custom_fields'] = from_field_object_to_data(bundle.obj)
+        return bundle
 
     def prepend_urls(self):
         return [

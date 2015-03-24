@@ -13,22 +13,44 @@ def processing_custom_section_data(custom_sections_data, content_object):
 
     	if section_data.get('custom_fields', None):
 	    	for field_data in section_data['custom_fields']:
-	    		field = CustomField(title=field_data.get('title', None), 
+	    		field = CustomField.build_new(title=field_data.get('title', None), 
 	    							value=field_data.get('value', None), 
-	    							section=custom_section)
-	    		field.save()
+	    							section=custom_section,
+	    							save=True)
 
 def processing_custom_field_data(custom_fields_data, content_object):
     for field_data in custom_fields_data:
     	custom_field = CustomField.build_new( title=field_data.get('title', None),
-    											value=field_data.get('value', None),
-    											section=section, 
+    											value=field_data.get('value', None), 
 	    										content_class=content_object.__class__, 
 	    										object_id=content_object.id, save=True)
 
 
-# def from_object_to_data(content_object):
-# 	return processing_object_data(content_object.custom_fields.filter(parent_field=None))
+def from_section_object_to_data(content_object):
+	return processing_section_object_data(content_object.custom_sections.all())
+
+def from_field_object_to_data(content_object):
+	return processing_field_object_data(content_object.custom_fields.filter(section=None))
+
+def processing_field_object_data(object_data):
+	fields_list = []
+	for field in object_data.all():
+		field_dict = {}
+		field_dict['title'] = field.title
+		field_dict['value'] = field.value
+		fields_list.append(field_dict)
+	return fields_list
+
+def processing_section_object_data(object_data):
+	section_list = []
+	for section in object_data.all():
+		section_dict = {}
+		section_dict['title'] = section.title
+		section_dict['fields'] = processing_field_object_data(section.custom_fields.all())
+		section_list.append(section_dict)
+	return section_list
+
+
 
 # def processing_object_data(object_data):
 # 	fields_list = []

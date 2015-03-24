@@ -15,7 +15,7 @@ from alm_vcard.models import (
     Email,
     Category,
     Adr,
-    Url
+    Url,
     )
 from alm_user.models import User
 from django.template.loader import render_to_string
@@ -117,7 +117,7 @@ class Contact(SubscriptionObject):
         choices=TYPES_OPTIONS, default=USER_TP)
     date_created = models.DateTimeField(blank=True, auto_now_add=True)
     vcard = models.OneToOneField('alm_vcard.VCard', blank=True, null=True,
-                                 on_delete=models.SET_NULL,)
+                                 on_delete=models.SET_NULL, related_name='contact')
     parent = models.ForeignKey(
         'Contact', blank=True, null=True, related_name='children')
     owner = models.ForeignKey(
@@ -806,7 +806,7 @@ class Product(SubscriptionObject):
     owner = models.ForeignKey('CRMUser', related_name='crm_products',
                               null=True, blank=True)
     date_created = models.DateTimeField(blank=True, auto_now_add=True)
-    sections = generic.GenericRelation('CustomSection')
+    custom_sections = generic.GenericRelation('CustomSection')
     custom_fields = generic.GenericRelation('CustomField')
 
 
