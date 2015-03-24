@@ -5,7 +5,6 @@ from django.db import models, transaction
 from django.utils.translation import ugettext_lazy as _
 from almanet import settings
 from almanet import signals as almanet_signals
-from almanet.utils.gcal import GCalConnection
 from almanet.models import SubscriptionObject
 from alm_vcard.models import (
     VCard,
@@ -1147,16 +1146,6 @@ class SalesCycle(SubscriptionObject):
             .order_by('-latest_activity__date_created')
         return sales_cycles
 
-
-class GCalEvent(models.Model):
-    event_id = models.CharField(blank=True, max_length=256)
-    activity = models.ForeignKey('alm_crm.Activity', null=True, blank=True, related_name='gcal_events')
-
-    class Meta:
-        verbose_name = 'google_cal'
-        db_table = 'third_party_google_cal'
-
-
 class Activity(SubscriptionObject):
     title = models.CharField(max_length=100, null=True, blank=True)
     description = models.CharField(max_length=500)
@@ -1164,12 +1153,13 @@ class Activity(SubscriptionObject):
     date_created = models.DateTimeField(blank=True, null=True,
                                         auto_now_add=True)
     date_edited = models.DateTimeField(blank=True, null=True, auto_now=True)
+    date_finished = models.DateTimeField(blank=True, null=True)
+    need_preparation = models.BooleanField(default=False, blank=True)
     sales_cycle = models.ForeignKey(SalesCycle, related_name='rel_activities')
     owner = models.ForeignKey(CRMUser, related_name='activity_owner')
     mentions = generic.GenericRelation('Mention', null=True)
     comments = generic.GenericRelation('Comment', null=True)
     milestone = models.ForeignKey(Milestone, related_name='activities', null=True)
-    status = models.BooleanField(default=False, blank=True)
 
     class Meta:
         verbose_name = 'activity'
@@ -1177,29 +1167,6 @@ class Activity(SubscriptionObject):
 
     def __unicode__(self):
         return self.description
-
-    def save(self, *args, **kwargs):
-        created = False
-        previous_status = self.status
-        if not self.pk:
-            created = True
-        super(Activity, self).save(*args, **kwargs)
-        self = Activity.objects.get(pk=self.pk)
-
-        if not self.status and timezone.now() < self.deadline:
-            if created or not self.gcal_events.count():
-                event_id = GCalConnection().establish(
-                    ).build_event_from_activity(self)
-                GCalEvent(event_id=event_id, activity=self).save()
-            else:
-                event_id = self.gcal_events.first().event_id
-                GCalConnection().establish(
-                    ).update_event_with_activity(self, event_id)
-        if self.status and self.gcal_events.count():
-            event_id = self.gcal_events.first().event_id
-            GCalConnection().establish(
-                ).remove_event(event_id)
-            self.gcal_events.all().delete()   # drop stale events
 
     @property
     def author(self):

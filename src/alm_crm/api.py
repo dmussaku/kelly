@@ -1322,6 +1322,7 @@ class ActivityResource(CRMServiceModelResource):
 
     author_id = fields.IntegerField(attribute='author_id', null=True)
     description = fields.CharField(attribute='description')
+    need_preparation = fields.BooleanField(attribute='need_preparation')
     sales_cycle_id = fields.IntegerField(null=True)
     feedback_status = fields.CharField(null=True)
     milestone_id = fields.IntegerField(null=True, attribute='milestone_id')
@@ -1367,6 +1368,12 @@ class ActivityResource(CRMServiceModelResource):
                 (self._meta.resource_name, trailing_slash()),
                 self.wrap_view('get_contact_activities'),
                 name='api_contact_activities'
+            ),
+            url(
+                r"^(?P<resource_name>%s)/finish/(?P<id>\d+)%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('finish_activity'),
+                name='api_finish_activity'
             ),
         ]
 
@@ -1444,17 +1451,34 @@ class ActivityResource(CRMServiceModelResource):
         return self.create_response(
             request, {'success': rv})
 
+    def finish_activity(self, request, **kwargs):
+        with RequestContext(self, request, allowed_methods=['post']):
+            data = self.deserialize(
+                request, request.body,
+                format=request.META.get('CONTENT_TYPE', 'application/json'))
+            activity = Activity.objects.get(id=data.get('id'))
+            activity.description = data.get('description')
+            activity.date_finished = datetime.datetime.now(request.user.timezone)
+            activity.save()
+        return self.create_response(
+            request, {'activity': ActivityResource().full_dehydrate(
+                    ActivityResource().build_bundle(
+                        obj=activity, request=request
+                        )
+                    )})
+
     def obj_create(self, bundle, **kwargs):
         act = bundle.obj = self._meta.object_class()
         act.author_id = bundle.data.get('author_id')
         act.description = bundle.data.get('description')
-        act.status = bundle.data.get('status')
         act.sales_cycle_id = bundle.data.get('sales_cycle_id')
         if 'milestone' in bundle.data:
             milestone = Milestone.objects.get(pk=bundle.data.get('milestone'))
             act.milestone = milestone
         if 'deadline' in bundle.data:
             act.deadline = bundle.data.get('deadline')
+        if 'need_preparation' in bundle.data:
+            act.need_preparation = bundle.data.get('need_preparation')
         act.save()
         text_parser(base_text=act.description, content_class=act.__class__,
                     object_id=act.id)
@@ -2454,10 +2478,11 @@ class AppStateObject(object):
             d.update({
                 'author_id': a.owner_id,
                 'date_created': a.date_created,
+                'date_finished': a.date_finished,
                 'feedback_status': a.feedback_status,
                 'sales_cycle_id': a.sales_cycle_id,
                 'deadline': a.deadline,
-                'status': a.status,
+                'need_preparation': a.need_preparation,
                 'has_read': a.has_read(self.current_crmuser.id),
                 })
             if a.milestone:
