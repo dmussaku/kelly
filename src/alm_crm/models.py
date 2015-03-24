@@ -7,7 +7,7 @@ from almanet import settings
 from almanet import signals as almanet_signals
 from almanet.models import SubscriptionObject
 from alm_vcard.models import (
-    VCard, 
+    VCard,
     BadVCardError,
     Org,
     Title,
@@ -88,6 +88,20 @@ class CRMUser(SubscriptionObject):
     @classmethod
     def get_subscription_id(cls, user_id):
         return cls.objects.get(id=user_id).subscription_id
+
+
+class Milestone(SubscriptionObject):
+
+    title = models.CharField(_("title"), max_length=1024, null=True, blank=True)
+    color_code = models.CharField(_('color code'), max_length=1024, null=True, blank=True)
+
+    class Meta:
+        verbose_name = _('milestone')
+        db_table = settings.DB_PREFIX.format('milestone')
+
+    @classmethod
+    def get_for_subscr(cls, subscr_id):
+        return cls.objects.filter(subscription_id=subscr_id)
 
 
 class Contact(SubscriptionObject):
@@ -572,10 +586,10 @@ class Contact(SubscriptionObject):
     def import_from_xls(cls, xls_file_data, creator):
         book = xlrd.open_workbook(file_contents=xls_file_data)
         sheets_left = True
-        contact_list = []
+        contacts = []
         for sheet in book.sheets():
             i = 1
-            header_row = sheet.row(0) 
+            header_row = sheet.row(0)
             while(sheets_left):
                 try:
                     data = sheet.row(i)
@@ -584,8 +598,8 @@ class Contact(SubscriptionObject):
                     continue
                 c = cls()
                 v = VCard()
-                v.family_name = data[0].value if type(data[0].value) == unicode else str(data[0].value)  
-                v.given_name = data[1].value if type(data[1].value) == unicode else str(data[1].value)  
+                v.family_name = data[0].value if type(data[0].value) == unicode else str(data[0].value)
+                v.given_name = data[1].value if type(data[1].value) == unicode else str(data[1].value)
                 v.additional_name = data[2].value if type(data[2].value) == unicode else str(data[2].value)
                 v.fn = v.given_name+" "+v.family_name
                 if ((not v.given_name) and (not v.family_name) and data[4].value):
@@ -624,22 +638,22 @@ class Contact(SubscriptionObject):
                     if data[6].value:
                         for phone in data[6].value.split(';'):
                             tel = Tel(vcard=v, type='WORK')
-                            tel.value = phone 
+                            tel.value = phone
                             tel.save()
                     if data[7].value:
                         for phone in data[7].value.split(';'):
                             tel = Tel(vcard=v, type='cell')
-                            tel.value = phone 
+                            tel.value = phone
                             tel.save()
                     if data[8].value:
                         for phone in data[8].value.split(';'):
                             tel = Tel(vcard=v, type='xadditional')
-                            tel.value = phone 
+                            tel.value = phone
                             tel.save()
                     if data[9].value:
                         for phone in data[9].value.split(';'):
                             tel = Tel(vcard=v, type='fax')
-                            tel.value = phone 
+                            tel.value = phone
                             tel.save()
                     if data[10].value:
                         for email_str in data[10].value.split(';'):
@@ -698,10 +712,10 @@ class Contact(SubscriptionObject):
                                     value=site
                                     )
                             url.save()
-                contact_list.append(c)
+                contacts.append(c)
                 # print "%s created contact %s" % (c, c.id)
                 i = i+1
-        return contact_list
+        return contacts
 
     @classmethod
     def get_contacts_by_last_activity_date(
@@ -912,6 +926,23 @@ class Product(SubscriptionObject):
             product_list.append(p)
         return product_list
 
+class ProductGroup(SubscriptionObject):
+    owner = models.ForeignKey(CRMUser, related_name='owned_product_groups', blank=True, null=True)
+    title = models.CharField(max_length=150)
+    products = models.ManyToManyField(Product, related_name='product_groups',
+                                   null=True, blank=True)
+    date_created = models.DateTimeField(blank=True, auto_now_add=True)
+
+    class Meta:
+        verbose_name = _('product_group')
+        db_table = settings.DB_PREFIX.format('product_group')
+
+    def __unicode__(self):
+        return self.title
+
+    @classmethod
+    def get_for_subscr(cls, subscr_id):
+        return cls.objects.filter(subscription_id=subscr_id)
 
 
 class SalesCycle(SubscriptionObject):
@@ -969,13 +1000,13 @@ class SalesCycle(SubscriptionObject):
     # Adds mentions to a current class, takes a lsit of user_ids as an input
     # and then runs through the list and calls the function build_new which
     # is declared in Mention class
-    
+
     @classmethod
     def create_globalcycle(cls, **kwargs):
         try:
-            global_cycle = SalesCycle.get_global(contact_id=kwargs['contact_id'], 
+            global_cycle = SalesCycle.get_global(contact_id=kwargs['contact_id'],
                                     subscription_id=kwargs['subscription_id'])
-        except SalesCycle.DoesNotExist: 
+        except SalesCycle.DoesNotExist:
             global_cycle = cls(
                 is_global=True,
                 title=GLOBAL_CYCLE_TITLE,
@@ -1178,17 +1209,20 @@ class SalesCycle(SubscriptionObject):
             .order_by('-latest_activity__date_created')
         return sales_cycles
 
-
 class Activity(SubscriptionObject):
     title = models.CharField(max_length=100, null=True, blank=True)
     description = models.CharField(max_length=500)
+    deadline = models.DateTimeField(blank=True, null=True)
     date_created = models.DateTimeField(blank=True, null=True,
                                         auto_now_add=True)
     date_edited = models.DateTimeField(blank=True, null=True, auto_now=True)
+    date_finished = models.DateTimeField(blank=True, null=True)
+    need_preparation = models.BooleanField(default=False, blank=True)
     sales_cycle = models.ForeignKey(SalesCycle, related_name='rel_activities')
     owner = models.ForeignKey(CRMUser, related_name='activity_owner')
     mentions = generic.GenericRelation('Mention', null=True)
     comments = generic.GenericRelation('Comment', null=True)
+    milestone = models.ForeignKey(Milestone, related_name='activities', null=True)
 
     class Meta:
         verbose_name = 'activity'
@@ -1629,7 +1663,7 @@ def get_mentions(user_id=None, content_class=None, object_id=None):
 class ContactList(SubscriptionObject):
     owner = models.ForeignKey(CRMUser, related_name='owned_list', blank=True, null=True)
     title = models.CharField(max_length=150)
-    users = models.ManyToManyField(CRMUser, related_name='contact_list',
+    contacts = models.ManyToManyField(Contact, related_name='contact_list',
                                    null=True, blank=True)
     date_created = models.DateTimeField(blank=True, auto_now_add=True)
 
@@ -1640,45 +1674,49 @@ class ContactList(SubscriptionObject):
     def __unicode__(self):
         return self.title
 
-    def check_user(self, user_id):
+    @classmethod
+    def get_for_subscr(cls, subscr_id):
+        return cls.objects.filter(subscription_id=subscr_id)
+
+    def check_contact(self, contact_id):
         try:
-            crm_user = self.users.get(user_id=user_id)
-            if crm_user is not None:
+            contact = self.contacts.get(contact_id=contact_id)
+            if contact is not None:
                 return True
             else:
                 return False
-        except CRMUser.DoesNotExist:
+        except Contact.DoesNotExist:
             return False
 
-    def get_contact_list_users(self):
-        return self.users
+    def get_contacts(self):
+        return self.contacts
 
-    def add_users(self, user_ids):
+    def add_contacts(self, user_ids):
         assert isinstance(user_ids, (tuple, list)), 'must be a list'
         status = []
-        for user_id in user_ids:
+        for contact_id in contact_ids:
             try:
-                crm_user = CRMUser.objects.get(id=user_id)
-                if not self.check_user(user_id=user_id):
-                    self.users.add(crm_user)
+                contact = Contact.objects.get(id=contact_id)
+                if not self.check_contact(contact_id=contact_id):
+                    self.contacts.add(contact)
                     status.append(True)
                 else:
                     status.append(False)
-            except CRMUser.DoesNotExist:
+            except Contact.DoesNotExist:
                 status.append(False)
         return status
 
-    def add_user(self, user_id):
-        return self.add_users([user_id])
+    def add_contact(self, contact_id):
+        return self.add_contacts([contact_id])
 
-    def delete_user(self, user_id):
+    def delete_contact(self, contact_id):
         status = False
-        if self.check_user(user_id):
-            crm_user = CRMUser.objects.get(id=user_id)
+        if self.check_contact(contact_id):
+            contact = Contact.objects.get(id=contact_id)
             try:
-                self.users.remove(crm_user)
+                self.contacts.remove(contact)
                 status = True
-            except CRMUser.DoesNotExist:
+            except Contact.DoesNotExist:
                 status = False
         else:
             return False
@@ -1686,7 +1724,7 @@ class ContactList(SubscriptionObject):
         return status
 
     def count(self):
-        return self.users.count()
+        return self.contacts.count()
 
 
 class SalesCycleProductStat(SubscriptionObject):

@@ -325,6 +325,9 @@ class BaseConfiguration(SubdomainConfiguration, Configuration):
 
     USE_PROFILER = False   # degbug toolbar on/off
 
+    GCALSYNC_APIKEY = 'AIzaSyAlLnRj_quAiDlXs3G07Xn1yGL2L_dJwuI'
+    GCALSYNC_CREDENTIALS = rel('google_api_cred.json')
+
 
 class DevConfiguration(
         FileSettings('~/.almanet/almanet.conf.py'), BaseConfiguration):

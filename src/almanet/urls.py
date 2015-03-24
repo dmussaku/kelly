@@ -20,6 +20,7 @@ from alm_crm.api import (
     SalesCycleResource,
     ActivityResource,
     ProductResource,
+    ProductGroupResource,
     ShareResource,
     FeedbackResource,
     CRMUserResource,
@@ -48,6 +49,7 @@ v1_api.register(ContactResource())
 v1_api.register(SalesCycleResource())
 v1_api.register(ActivityResource())
 v1_api.register(ProductResource())
+v1_api.register(ProductGroupResource())
 v1_api.register(ShareResource())
 v1_api.register(ValueResource())
 v1_api.register(FeedbackResource())
