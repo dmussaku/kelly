@@ -6,6 +6,7 @@ from alm_crm.models import (
 from alm_vcard.models import VCard
 
 def processing_custom_section_data(custom_sections_data, content_object):
+	content_object.custom_fields.clear()
     for section_data in custom_sections_data:
     	custom_section = CustomSection.build_new( title=section_data.get('title', None), 
 	    										content_class=content_object.__class__, 
@@ -19,6 +20,7 @@ def processing_custom_section_data(custom_sections_data, content_object):
 	    							save=True)
 
 def processing_custom_field_data(custom_fields_data, content_object):
+	content_object.custom_fields.clear()
     for field_data in custom_fields_data:
     	custom_field = CustomField.build_new( title=field_data.get('title', None),
     											value=field_data.get('value', None), 
