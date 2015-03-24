@@ -15,7 +15,7 @@ from alm_vcard.models import (
     Email,
     Category,
     Adr,
-    Url
+    Url,
     )
 from alm_user.models import User
 from django.template.loader import render_to_string
