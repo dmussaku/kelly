@@ -13,7 +13,9 @@ from .models import (
     SalesCycleProductStat,
     Filter,
     HashTag,
-    HashTagReference
+    HashTagReference,
+    CustomSection,
+    CustomField,
     )
 from alm_vcard.api import (
     VCardResource,
@@ -2634,3 +2636,67 @@ class HashTagReferenceResource(CRMServiceModelResource):
         resource_name = 'hashtag_reference'
 
 
+class CustomSectionResource(CRMServiceModelResource):
+    '''
+    ALL Method
+    I{URL}:  U{alma.net/api/v1/custom_section/}
+    B{Description}:
+    API resource to manage CustomSection
+    (GenericRelation with VCard, Product)
+    @undocumented: Meta
+    '''
+    # field_values = fields.ToManyField('alm_crm.api.CustomFieldValueResource', 'field_values',
+    #                            related_name='product', null=True,
+    #                            full=True, readonly=True)
+
+    content_object = GenericForeignKeyField({
+        Product: ProductResource,
+        VCard: VCardResource,
+    }, 'content_object')
+
+    class Meta(CommonMeta):
+        queryset = CustomSection.objects.all()
+        resource_name = 'custom_section'
+
+    def hydrate(self, bundle):
+        """
+        CustomField have property owner which is  
+        content_object owner, we shouldn't set owner
+        """
+        crmuser = self.get_crmuser(bundle.request)
+        if not crmuser:
+            return 
+        return bundle
+
+class CustomFieldResource(CRMServiceModelResource):
+    '''
+    ALL Method
+    I{URL}:  U{alma.net/api/v1/custom_field/}
+    B{Description}:
+    API resource to manage CustomFields
+    (GenericRelation with VCard, Product)
+    @undocumented: Meta
+    '''
+    # field_values = fields.ToManyField('alm_crm.api.CustomFieldValueResource', 'field_values',
+    #                            related_name='product', null=True,
+    #                            full=True, readonly=True)
+    section = fields.ToOneField('alm_crm.api.CustomSectionResource', 'section',
+                              null=True, blank=True, full=False)
+    content_object = GenericForeignKeyField({
+        Product: ProductResource,
+        VCard: VCardResource,
+    }, 'content_object')
+
+    class Meta(CommonMeta):
+        queryset = CustomField.objects.all()
+        resource_name = 'custom_field'
+
+    def hydrate(self, bundle):
+        """
+        CustomField have property owner which is  
+        content_object owner, we shouldn't set owner
+        """
+        crmuser = self.get_crmuser(bundle.request)
+        if not crmuser:
+            return 
+        return bundle

@@ -8,6 +8,7 @@ import vobject
 from vobject.vcard import *
 from django.utils.translation import ugettext as _
 from django.conf import settings
+from django.contrib.contenttypes import generic
 
 
 class VObjectImportException(Exception):
@@ -83,6 +84,8 @@ class VCard(models.Model):
     # a common CharField was used
     uid = models.CharField(max_length=256, blank=True,
                            null=True, verbose_name=_("unique identifier"))
+    sections = generic.GenericRelation('CustomSection')
+    custom_fields = generic.GenericRelation('CustomField')
 
     class Meta:
         verbose_name = _("vcard")

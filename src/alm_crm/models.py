@@ -806,6 +806,9 @@ class Product(SubscriptionObject):
     owner = models.ForeignKey('CRMUser', related_name='crm_products',
                               null=True, blank=True)
     date_created = models.DateTimeField(blank=True, auto_now_add=True)
+    sections = generic.GenericRelation('CustomSection')
+    custom_fields = generic.GenericRelation('CustomField')
+
 
     class Meta:
         verbose_name = _('product')
@@ -1723,3 +1726,72 @@ class HashTagReference(SubscriptionObject):
         if not self.subscription_id and self.content_object:
             self.subscription_id = self.content_object.owner.subscription_id
         super(SubscriptionObject, self).save(**kwargs)
+
+
+class CustomSection(SubscriptionObject):
+    title = models.CharField(max_length=255, null=True, blank=True)
+    content_type = models.ForeignKey(ContentType)
+    object_id = models.IntegerField()
+    content_object = generic.GenericForeignKey('content_type', 'object_id')
+    date_created = models.DateTimeField(blank=True, auto_now_add=True)
+
+    @property
+    def owner(self):
+        if self.content_object.__class__ == VCard:
+            return self.content_object.contact.owner
+        return self.content_object.owner
+
+    class Meta:
+        verbose_name = _('custom_section')
+        db_table = settings.DB_PREFIX.format('custom_sections')
+
+    def __unicode__(self):
+        return u'%s' % self.title
+
+    @classmethod
+    def build_new(cls, title=None, content_class=None,
+                  object_id=None, save=False):
+        custom_field = cls(title=title)
+        custom_field.content_type = ContentType.objects.get_for_model(content_class)
+        custom_field.object_id = object_id
+        if save:
+            custom_field.save()
+        return custom_field
+
+
+class CustomField(SubscriptionObject):
+    title = models.CharField(max_length=255, null=True, blank=True)
+    value = models.TextField(null=True, blank=True)
+    content_type = models.ForeignKey(ContentType)
+    object_id = models.IntegerField()
+    content_object = generic.GenericForeignKey('content_type', 'object_id')
+    date_created = models.DateTimeField(blank=True, auto_now_add=True)
+    section = models.ForeignKey('CustomSection', related_name='custom_fields', null=True, blank=True)
+
+    @property
+    def owner(self):
+        if self.section:
+            return self.section.owner
+        if self.content_object.__class__ == VCard:
+            return self.content_object.contact.owner
+        return self.content_object.owner
+
+    class Meta:
+        verbose_name = _('custom_field')
+        db_table = settings.DB_PREFIX.format('custom_fields')
+
+    def __unicode__(self):
+        return u'%s: %s' % (self.title, self.value)
+
+    @classmethod
+    def build_new(cls, section=None, title=None, value=None, content_class=None,
+                  object_id=None, save=False):
+        custom_field = cls(title=title, value=value)
+        if section:
+            custom_field.section=section
+        if content_class and object_id:
+            custom_field.content_type = ContentType.objects.get_for_model(content_class)
+            custom_field.object_id = object_id
+        if save:
+            custom_field.save()
+        return custom_field
