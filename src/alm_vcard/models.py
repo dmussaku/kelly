@@ -84,7 +84,7 @@ class VCard(models.Model):
     # a common CharField was used
     uid = models.CharField(max_length=256, blank=True,
                            null=True, verbose_name=_("unique identifier"))
-    sections = generic.GenericRelation('CustomSection')
+    custom_sections = generic.GenericRelation('CustomSection')
     custom_fields = generic.GenericRelation('CustomField')
 
     class Meta:

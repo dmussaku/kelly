@@ -806,7 +806,7 @@ class Product(SubscriptionObject):
     owner = models.ForeignKey('CRMUser', related_name='crm_products',
                               null=True, blank=True)
     date_created = models.DateTimeField(blank=True, auto_now_add=True)
-    sections = generic.GenericRelation('CustomSection')
+    custom_sections = generic.GenericRelation('CustomSection')
     custom_fields = generic.GenericRelation('CustomField')
 
 
