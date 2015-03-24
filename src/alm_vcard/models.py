@@ -9,6 +9,7 @@ from vobject.vcard import *
 from django.utils.translation import ugettext as _
 from django.conf import settings
 from django.contrib.contenttypes import generic
+from alm_crm.models import CustomSection, CustomField
 
 
 class VObjectImportException(Exception):

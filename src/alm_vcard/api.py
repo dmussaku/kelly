@@ -10,7 +10,12 @@ from alm_vcard.models import *
 from django.db import transaction
 from django.core.exceptions import ObjectDoesNotExist
 from tastypie.exceptions import NotFound
-from alm_crm.utils.data_processing import processing_custom_section_data, processing_custom_field_data
+from alm_crm.utils.data_processing import (
+    processing_custom_section_data, 
+    processing_custom_field_data,
+    from_section_object_to_data,
+    from_field_object_to_data,
+    )
 
 def vcard_rel_dehydrate(bundle):
     if bundle.data.get('vcard'):
@@ -77,6 +82,11 @@ class VCardResource(ModelResource):
     #     bundle = super(self.__class__, self).full_dehydrate(bundle)
     #     del bundle.data['resource_uri']
     #     return bundle
+
+    def dehydrate(self, bundle):
+        bundle.data['custom_sections'] = from_section_object_to_data(bundle.obj)
+        bundle.data['custom_fields'] = from_field_object_to_data(bundle.obj)
+        return bundle
 
     @transaction.atomic()
     def obj_create(self, bundle, **kwargs):
