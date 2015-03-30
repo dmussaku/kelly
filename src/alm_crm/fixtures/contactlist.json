@@ -6,7 +6,7 @@
         "subscription_id": null,
         "owner": 2, 
         "contacts": [
-            1
+            1,2,3
         ],
         "title": "ALMA Cloud",
         "date_created": "2014-09-10T00:00:00Z"

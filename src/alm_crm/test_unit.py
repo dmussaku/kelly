@@ -1747,12 +1747,12 @@ class ContactListResourceTest(ResourceTestMixin, ResourceTestCase):
         p = ContactList.objects.first()
         contactlist = self.get_detail_des(p.pk)
         # update it
-        contactlist['contacts'] = [1,2,3]
+        contactlist['contacts'] = [1]
         # PUT it
         self.api_client.put(self.api_path_contact_list + '%s/' % (p.pk),
                             format='json', data=contactlist)
         # check
-        self.assertEqual(self.get_detail_des(p.pk)['contacts'], [1,2,3])
+        self.assertEqual(self.get_detail_des(p.pk)['contacts'], [1])
 
 
 
