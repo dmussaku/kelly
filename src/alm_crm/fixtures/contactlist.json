@@ -5,7 +5,7 @@
     "fields": {
         "subscription_id": null,
         "owner": 2, 
-        "users": [
+        "contacts": [
             1
         ],
         "title": "ALMA Cloud",
@@ -18,7 +18,7 @@
     "fields": {
         "subscription_id": null,
         "owner": 1, 
-        "users": [
+        "contacts": [
             2
         ],
         "title": "Arta",
@@ -31,7 +31,7 @@
     "fields": {
         "subscription_id": null,
         "owner": 1, 
-        "users": [],
+        "contacts": [],
         "title": "NASA",
         "date_created": "2014-09-10T00:00:00Z"
     }

@@ -1742,6 +1742,22 @@ class ContactListResourceTest(ResourceTestMixin, ResourceTestCase):
         self.assertEqual(get_list_get_user_des['objects'][0]['id'], users.first().id)
 
 
+    def test_update_product_via_put(self):
+        # get exist product data
+        p = ContactList.objects.first()
+        contactlist = self.get_detail_des(p.pk)
+        # update it
+        contactlist['contacts'] = [1,2,3]
+        # PUT it
+        self.api_client.put(self.api_path_contact_list + '%s/' % (p.pk),
+                            format='json', data=contactlist)
+        # check
+        self.assertEqual(self.get_detail_des(p.pk)['contacts'], [1,2,3])
+
+
+
+
+
 class AppStateResourceTest(ResourceTestMixin, ResourceTestCase):
 
     def setUp(self):
