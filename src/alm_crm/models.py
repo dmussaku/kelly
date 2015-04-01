@@ -1254,10 +1254,8 @@ class Activity(SubscriptionObject):
         return None
 
     @property
-    def feedback_status(self):
-        if hasattr(self, 'feedback'):
-            return self.feedback.status
-        return None
+    def comments_count(self):
+        return self.comments.count()
 
     def set_feedback(self, feedback_obj, save=False):
         """Set feedback to activity instance. Saves if `save` is set(True)."""

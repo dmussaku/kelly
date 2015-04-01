@@ -89,7 +89,7 @@ import time
 
 from .utils.parser import text_parser
 from .utils.data_processing import (
-    processing_custom_section_data, 
+    processing_custom_section_data,
     processing_custom_field_data,
     from_section_object_to_data,
     from_field_object_to_data,
@@ -1073,7 +1073,7 @@ class ContactResource(CRMServiceModelResource):
                 self.log_throttled_access(request)
                 return self.create_response(request, {'success': False})
             contact_list = ContactList(
-                owner = request.user.get_crmuser(), 
+                owner = request.user.get_crmuser(),
                 title = 'imported on %s ' % datetime.datetime.now(request.user.timezone))
             contact_list.save()
             contact_list.contacts = contacts
@@ -1099,7 +1099,7 @@ class ContactResource(CRMServiceModelResource):
                 self.log_throttled_access(request)
                 return self.create_response(request, {'success': False})
             contact_list = ContactList(
-                owner = request.user.get_crmuser(), 
+                owner = request.user.get_crmuser(),
                 title = 'imported on %s ' % datetime.datetime.now(request.user.timezone))
             contact_list.save()
             contact_list.contacts = contacts
@@ -1126,7 +1126,7 @@ class ContactResource(CRMServiceModelResource):
                 return self.create_response(request, {'success': False})
             if len(contacts)>1:
                 contact_list = ContactList(
-                    owner = request.user.get_crmuser(), 
+                    owner = request.user.get_crmuser(),
                     title = 'imported on %s ' % datetime.datetime.now(request.user.timezone))
                 contact_list.save()
                 contact_list.contacts = contacts
@@ -1335,6 +1335,7 @@ class ActivityResource(CRMServiceModelResource):
     sales_cycle_id = fields.IntegerField(null=True)
     feedback_status = fields.CharField(null=True)
     milestone_id = fields.IntegerField(null=True, attribute='milestone_id')
+    comments_count = fields.IntegerField(attribute='comments_count', readonly=True)
 
     class Meta(CommonMeta):
         queryset = Activity.objects.all().prefetch_related('recipients')
@@ -2543,6 +2544,7 @@ class AppStateObject(object):
                 'deadline': a.deadline,
                 'need_preparation': a.need_preparation,
                 'has_read': a.has_read(self.current_crmuser.id),
+                'comments_count': a.comments_count
                 })
             if a.milestone:
                 d['milestone_id'] = a.milestone.pk
@@ -2899,12 +2901,12 @@ class CustomSectionResource(CRMServiceModelResource):
 
     def hydrate(self, bundle):
         """
-        CustomField have property owner which is  
+        CustomField have property owner which is
         content_object owner, we shouldn't set owner
         """
         crmuser = self.get_crmuser(bundle.request)
         if not crmuser:
-            return 
+            return
         return bundle
 
 class CustomFieldResource(CRMServiceModelResource):
@@ -2932,10 +2934,10 @@ class CustomFieldResource(CRMServiceModelResource):
 
     def hydrate(self, bundle):
         """
-        CustomField have property owner which is  
+        CustomField have property owner which is
         content_object owner, we shouldn't set owner
         """
         crmuser = self.get_crmuser(bundle.request)
         if not crmuser:
-            return 
+            return
         return bundle
