@@ -826,14 +826,14 @@ class Adr(models.Model):
     )
 
     vcard = models.ForeignKey(VCard)
-    post_office_box= models.CharField(max_length=1024, verbose_name=_("post office box"), blank=True)
-    extended_address = models.CharField(max_length=1024, verbose_name=_("extended address"), blank=True)
+    type = models.CharField(max_length=1024, verbose_name=_("type"), choices=TYPE_CHOICES)
     street_address = models.CharField(max_length=1024, verbose_name=_("street address"))
     locality = models.CharField(max_length=1024, verbose_name=_("locality"))
     region  = models.CharField(max_length=1024, verbose_name=_("region"))
-    postal_code = models.CharField(max_length=1024, verbose_name=_("postal code"))
     country_name = models.CharField(max_length=1024, verbose_name=_("country name"))
-    type = models.CharField(max_length=1024, verbose_name=_("type"), choices=TYPE_CHOICES)
+    post_office_box= models.CharField(max_length=1024, verbose_name=_("post office box"), blank=True)
+    extended_address = models.CharField(max_length=1024, verbose_name=_("extended address"), blank=True)
+    postal_code = models.CharField(max_length=1024, verbose_name=_("postal code"))
     # value = models.CharField(max_lengt =1024, verbose_name=_("Value"))
 
     class Meta:
@@ -850,6 +850,19 @@ class Adr(models.Model):
             l.postal_code == r.postal_code and
             l.country_name == r.country_name and
             l.type == r.type)
+
+    @classmethod
+    def create_from_list(cls, params):
+        adr = cls(vcard=params[0], type=params[1])
+        try:
+            adr.street_address = params[2]
+            adr.locality = params[3]
+            adr.region = params[4]
+            adr.country_name = params[5]
+            adr.post_office_box = params[6]
+        except:
+            pass
+        return adr
 
 
 class Agent(models.Model):

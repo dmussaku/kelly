@@ -668,41 +668,20 @@ class Contact(SubscriptionObject):
                     if data[12].value:
                         for address_str in data[12].value.split(';;'):
                             addr_objs = address_str.split(';')
-                            address = Adr(
-                                vcard=v,
-                                    type='POSTAL',
-                                    street_address=addr_objs[0],
-                                    locality=addr_objs[1],
-                                    region=addr_objs[2],
-                                    country_name=addr_objs[3],
-                                    post_office_box=addr_objs[4]
-                                    )
+                            addr_objs = [v,'POSTAL'] + addr_objs
+                            address = Adr.create_from_list(addr_objs)
                             address.save()
                     if data[13].value:
                         for address_str in data[13].value.split(';;'):
                             addr_objs = address_str.split(';')
-                            address = Adr(
-                                vcard=v,
-                                    type='xlegal',
-                                    street_address=addr_objs[0],
-                                    locality=addr_objs[1],
-                                    region=addr_objs[2],
-                                    country_name=addr_objs[3],
-                                    post_office_box=addr_objs[4]
-                                    )
+                            addr_objs = [v,'POSTAL'] + addr_objs
+                            address = Adr.create_from_list(addr_objs)
                             address.save()
                     if data[14].value:
                         for address_str in data[14].value.split(';;'):
                             addr_objs = address_str.split(';')
-                            address = Adr(
-                                vcard=v,
-                                    type='WORK',
-                                    street_address=addr_objs[0],
-                                    locality=addr_objs[1],
-                                    region=addr_objs[2],
-                                    country_name=addr_objs[3],
-                                    post_office_box=addr_objs[4]
-                                    )
+                            addr_objs = [v,'POSTAL'] + addr_objs
+                            address = Adr.create_from_list(addr_objs)
                             address.save()
                     if data[15].value:
                         for site in data[15].value.split(';'):
