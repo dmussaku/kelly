@@ -4,7 +4,6 @@ from django.contrib.auth.models import (
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from timezone_field import TimeZoneField
-from almanet import signals
 from almanet.models import Subscription
 from alm_vcard.models import VCard, Email
 
