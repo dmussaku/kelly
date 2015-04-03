@@ -854,7 +854,6 @@ class Adr(models.Model):
     @classmethod
     def create_from_list(cls, params):
         adr = cls(vcard=params[0], type=params[1])
-        print params
         try:
             adr.street_address = params[2]
             adr.locality = params[3]
