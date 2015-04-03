@@ -672,19 +672,16 @@ class Contact(SubscriptionObject):
                             addr_objs = address_str.split(';')
                             addr_objs = [v,'POSTAL'] + addr_objs
                             address = Adr.create_from_list(addr_objs)
-                            address.save()
                     if data[13].value:
                         for address_str in data[13].value.split(';;'):
                             addr_objs = address_str.split(';')
                             addr_objs = [v,'POSTAL'] + addr_objs
                             address = Adr.create_from_list(addr_objs)
-                            address.save()
                     if data[14].value:
                         for address_str in data[14].value.split(';;'):
                             addr_objs = address_str.split(';')
                             addr_objs = [v,'POSTAL'] + addr_objs
                             address = Adr.create_from_list(addr_objs)
-                            address.save()
                     if data[15].value:
                         for site in data[15].value.split(';'):
                             url = Url(
