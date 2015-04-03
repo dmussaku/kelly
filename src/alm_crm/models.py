@@ -636,32 +636,35 @@ class Contact(SubscriptionObject):
                              org.organization_unit = data[5].value
                         org.save()
                     if data[6].value:
-                        for phone in data[6].value.split(';'):
+                        for phone in str(data[6].value).split(';'):
                             tel = Tel(vcard=v, type='WORK')
                             tel.value = phone
                             tel.save()
                     if data[7].value:
-                        for phone in data[7].value.split(';'):
+                        for phone in str(data[7].value).split(';'):
                             tel = Tel(vcard=v, type='cell')
                             tel.value = phone
                             tel.save()
                     if data[8].value:
-                        for phone in data[8].value.split(';'):
+                        for phone in str(data[8].value).split(';'):
                             tel = Tel(vcard=v, type='xadditional')
                             tel.value = phone
                             tel.save()
                     if data[9].value:
-                        for phone in data[9].value.split(';'):
+                        for phone in str(data[9].value).split(';'):
                             tel = Tel(vcard=v, type='fax')
                             tel.value = phone
                             tel.save()
                     if data[10].value:
-                        for email_str in data[10].value.split(';'):
-                            email = Email(vcard=v, type='work')
-                            email.value = email_str
-                            email.save()
+                        try:
+                            for email_str in str(data[10].value).split(';'):
+                                email = Email(vcard=v, type='work')
+                                email.value = email_str
+                                email.save()
+                        except:
+                            pass
                     if data[11].value:
-                        for email_str in data[11].value.split(';'):
+                        for email_str in str(data[11].value).split(';'):
                             email = Email(vcard=v, type='internet')
                             email.value = email_str
                             email.save()

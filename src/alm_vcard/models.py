@@ -855,11 +855,11 @@ class Adr(models.Model):
     def create_from_list(cls, params):
         adr = cls(vcard=params[0], type=params[1])
         try:
-            adr.street_address = params[2]
-            adr.locality = params[3]
-            adr.region = params[4]
-            adr.country_name = params[5]
-            adr.post_office_box = params[6]
+            adr.street_address = str(params[2])
+            adr.locality = str(params[3])
+            adr.region = str(params[4])
+            adr.country_name = str(params[5])
+            adr.post_office_box = str(params[6])
         except:
             pass
         return adr
