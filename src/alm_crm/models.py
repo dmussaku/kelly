@@ -4,7 +4,6 @@ import functools
 from django.db import models, transaction
 from django.utils.translation import ugettext_lazy as _
 from almanet import settings
-from almanet import signals as almanet_signals
 from almanet.models import SubscriptionObject
 from alm_vcard.models import (
     VCard,
