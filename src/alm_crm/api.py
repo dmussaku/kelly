@@ -88,6 +88,7 @@ import datetime
 import time
 
 from .utils.parser import text_parser
+from .utils import report_builders
 from .utils.data_processing import (
     processing_custom_section_data,
     processing_custom_field_data,
@@ -2941,3 +2942,54 @@ class CustomFieldResource(CRMServiceModelResource):
         if not crmuser:
             return
         return bundle
+
+class ReportResource(Resource):
+    '''
+    ALL Method
+    I{URL}:  U{alma.net/api/v1/reports/}
+
+    B{Description}:
+    API resource to get data for reports
+
+    @undocumented: Meta
+    '''
+
+    class Meta:
+        resource_name = 'reports'
+        object_class = AppStateObject
+        authorization = Authorization()
+
+    def prepend_urls(self):
+        return [
+            url(
+                r"^(?P<resource_name>%s)/funnel%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('funnel'),
+                name='api_funnel'
+            ),
+            url(
+                r"^(?P<resource_name>%s)/realtime_funnel%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('realtime_funnel'),
+                name='api_realtime_funnel'
+            )]
+
+    def funnel(self, request, **kwargs):
+        '''
+        retrieves data for building sales funnel
+        '''
+        
+
+        return self.create_response(
+            request,
+            report_builders.build_funnel(request.user.get_crmuser().subscription_id))
+
+    def realtime_funnel(self, request, **kwargs):
+        '''
+        retrieves data for building sales funnel
+        '''
+        
+
+        return self.create_response(
+            request,
+            report_builders.build_realtime_funnel(request.user.get_crmuser().subscription_id))
