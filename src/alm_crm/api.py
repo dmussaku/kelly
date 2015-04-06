@@ -1074,7 +1074,7 @@ class ContactResource(CRMServiceModelResource):
                 return self.create_response(request, {'success': False})
             contact_list = ContactList(
                 owner = request.user.get_crmuser(),
-                title = 'imported on %s ' % datetime.datetime.now(request.user.timezone))
+                title = data['filename'])
             contact_list.save()
             contact_list.contacts = contacts
             for contact in contacts:
@@ -1100,7 +1100,7 @@ class ContactResource(CRMServiceModelResource):
                 return self.create_response(request, {'success': False})
             contact_list = ContactList(
                 owner = request.user.get_crmuser(),
-                title = 'imported on %s ' % datetime.datetime.now(request.user.timezone))
+                title = data['filename'])
             contact_list.save()
             contact_list.contacts = contacts
             for contact in contacts:
@@ -1127,7 +1127,7 @@ class ContactResource(CRMServiceModelResource):
             if len(contacts)>1:
                 contact_list = ContactList(
                     owner = request.user.get_crmuser(),
-                    title = 'imported on %s ' % datetime.datetime.now(request.user.timezone))
+                    title = data['filename'])
                 contact_list.save()
                 contact_list.contacts = contacts
             else:

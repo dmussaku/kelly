@@ -862,6 +862,7 @@ class Adr(models.Model):
             adr.post_office_box = params[6]
         except:
             pass
+        adr.save()
         return adr
 
 
