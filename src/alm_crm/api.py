@@ -2095,13 +2095,11 @@ class ContactListResource(CRMServiceModelResource):
         return bundle
 
     def save(self, bundle, **kwargs):
-        if not bundle.obj.id:
-            bundle = super(self.__class__, self).save(bundle, **kwargs)
-            return bundle
-        bundle.obj.contacts.clear()
-        bundle.obj.contacts.add(*bundle.data['contacts'])
+        bundle = super(self.__class__, self).save(bundle, **kwargs)
+        if bundle.obj.id:
+            bundle.obj.contacts.clear()
+            bundle.obj.contacts.add(*bundle.data['contacts'])
         return bundle
-
 
     def post_list(self, request, **kwargs):
         '''
