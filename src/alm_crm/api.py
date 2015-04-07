@@ -1189,6 +1189,7 @@ class SalesCycleResource(CRMServiceModelResource):
     stat = fields.ToManyField('alm_crm.api.SalesCycleProductStatResource',
         attribute=lambda bundle: SalesCycleProductStat.objects.filter(sales_cycle=bundle.obj),
         null=True, blank=True, readonly=True, full=True)
+    milestone_id = fields.IntegerField(null=True, attribute='milestone_id')
 
     class Meta(CommonMeta):
         queryset = SalesCycle.objects.all().prefetch_related('products')
@@ -1300,9 +1301,32 @@ class SalesCycleResource(CRMServiceModelResource):
                 return self.create_response(request, get_product_ids(),
                                             response_class=http.HttpAccepted)
 
+    def obj_create(self, bundle, **kwargs):
+        bundle = super(self.__class__. self).obj_create(bundle, **kwargs)
+        if 'milestone' in bundle.data:
+            milestone = Milestone.objects.get(pk=bundle.data.get('milestone'))
+            bundle.obj.milestone = milestone
+        bundle.obj.save()
+        bundle = self.full_hydrate(bundle)
+        bundle.data['obj_created'] = True
+        return bundle
+
+    def save(self, bundle, **kwargs):
+        bundle = super(ActivityResource, self).save(bundle, **kwargs)
+        if 'milestone' in bundle.data:
+            milestone = Milestone.objects.get(pk=bundle.data.get('milestone'))
+            bundle.obj.milestone = milestone
+        bundle.obj.save()
+        return bundle
+
 
 class MilestoneResource(CRMServiceModelResource):
-    pass
+
+    class Meta(CommonMeta):
+        queryset = Milestone.objects.all()
+        resource_name = 'milestone'
+        detail_allowed_methods = ['get', 'post', 'put', 'patch', 'delete']
+        always_return_data = True
 
 
 class ActivityResource(CRMServiceModelResource):
@@ -1334,7 +1358,6 @@ class ActivityResource(CRMServiceModelResource):
     need_preparation = fields.BooleanField(attribute='need_preparation')
     sales_cycle_id = fields.IntegerField(null=True)
     feedback_status = fields.CharField(null=True)
-    milestone_id = fields.IntegerField(null=True, attribute='milestone_id')
     comments_count = fields.IntegerField(attribute='comments_count', readonly=True)
 
     class Meta(CommonMeta):
@@ -1482,9 +1505,6 @@ class ActivityResource(CRMServiceModelResource):
         act.author_id = bundle.data.get('author_id')
         act.description = bundle.data.get('description')
         act.sales_cycle_id = bundle.data.get('sales_cycle_id')
-        if 'milestone' in bundle.data:
-            milestone = Milestone.objects.get(pk=bundle.data.get('milestone'))
-            act.milestone = milestone
         if 'deadline' in bundle.data:
             act.deadline = bundle.data.get('deadline')
         if 'need_preparation' in bundle.data:
@@ -1506,9 +1526,6 @@ class ActivityResource(CRMServiceModelResource):
     def save(self, bundle, **kwargs):
         bundle = super(ActivityResource, self).save(bundle, **kwargs)
         if bundle.data.get('feedback_status', None):
-            if 'milestone' in bundle.data:
-                mile = Milestone.objects.get(pk=bundle.data.get('milestone'))
-                bundle.obj.milestone = mile
             if not hasattr(bundle.obj, 'feedback'):
                 bundle.obj.feedback = Feedback(
                     status=bundle.data['feedback_status'],
@@ -2494,7 +2511,7 @@ class AppStateObject(object):
         def _map(s):
             d = model_to_dict(s, fields=[
                 'id', 'title', 'description', 'is_global', 'status',
-                'subscription_id'])
+                'subscription_id', 'milestone_id'])
 
             def _value(value_name):
                 if s.is_global:
@@ -2520,8 +2537,10 @@ class AppStateObject(object):
                 'contact_id': s.contact_id,
                 'projected_value': _value('projected_value'),
                 'real_value': _value('real_value'),
-                'stat': map(_stat, s.salescycleproductstat_set.all())
+                'stat': map(_stat, s.salescycleproductstat_set.all()),
                 })
+            if s.milestone:
+                d['milestone_id'] = s.milestone.pk
             return d
 
         return map(_map, sales_cycles)
@@ -2544,8 +2563,6 @@ class AppStateObject(object):
                 'has_read': a.has_read(self.current_crmuser.id),
                 'comments_count': a.comments_count
                 })
-            if a.milestone:
-                d['milestone_id'] = a.milestone.pk
             return d
 
         return map(_map, activities)

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import os
 from django.test import TestCase
 from django.utils.unittest import skipIf
@@ -8,6 +9,7 @@ from alm_crm.models import (
     CRMUser,
     Activity,
     SalesCycle,
+    Milestone,
     Product,
     Mention,
     Feedback,
@@ -710,7 +712,7 @@ class ResourceTestMixin(object):
                 'crmusers.json', 'vcards.json', 'contacts.json',
                 'salescycles.json', 'activities.json', 'products.json',
                 'mentions.json', 'values.json', 'emails.json', 'contactlist.json', 'share.json',
-                'feedbacks.json', 'salescycle_product_stat.json', 'filters.json']
+                'feedbacks.json', 'salescycle_product_stat.json', 'filters.json', 'milestones.json']
 
     def get_user(self):
         from alm_user.models import User
@@ -2498,3 +2500,88 @@ class UserResourceTest(ResourceTestMixin, ResourceTestCase):
     #     self.assertEqual(self.get_detail_des(self.comment.pk)['comment'], comment_comment)
 
 
+class MilestoneResourceTest(ResourceTestMixin, ResourceTestCase):
+
+    def setUp(self):
+        super(self.__class__, self).setUp()
+
+        # login user
+        self.get_credentials()
+
+        self.api_path_milestone = '/api/v1/milestone/'
+
+        # get_list
+        self.get_list_resp = self.api_client.get(self.api_path_milestone,
+                                                 format='json',
+                                                 charset='utf-8',
+                                                 HTTP_HOST='localhost')
+        self.get_list_des = self.deserialize(self.get_list_resp)
+
+        # get_detail(pk)
+        self.get_detail_resp = \
+            lambda pk: self.api_client.get(self.api_path_milestone+str(pk)+'/',
+                                           format='json',
+                                           charset='utf-8',
+                                           HTTP_HOST='localhost')
+        self.get_detail_des = \
+            lambda pk: self.deserialize(self.get_detail_resp(pk))
+
+        self.milestone = Milestone.objects.first()
+
+    def test_get_list_valid_json(self):
+        self.assertValidJSONResponse(self.get_list_resp)
+
+    def test_get_list_non_empty(self):
+        self.assertTrue(self.get_list_des['meta']['total_count'] > 0)
+
+    def test_get_detail(self):
+        self.assertEqual(
+            self.get_detail_des(self.milestone.pk)['title'],
+            self.milestone.title
+            )
+
+    def test_create_milestone(self):
+        crmuser = CRMUser.objects.last()
+        post_data={
+            'title': 'Milestone Resource',
+            'color_code': '#000000',
+        }
+        resp = self.api_client.post(
+            self.api_path_milestone, format='json', data=post_data)
+        self.assertHttpCreated(resp)
+        milestone_obj = Milestone.objects.last()
+        self.assertEqual(milestone_obj.title, 'Milestone Resource')
+        self.assertIsInstance(milestone_obj.subscription_id, int)
+
+    def test_delete_milestone(self):
+        before = Milestone.objects.all().count()
+        self.assertHttpAccepted(self.api_client.delete(
+            self.api_path_milestone + '%s/' % self.milestone.pk, format='json'))
+        after = Milestone.objects.all().count()
+        # verify that one sales_cycle has been deleted.
+        self.assertEqual(after, before - 1)
+
+    def test_update_milestone_via_put(self):
+        # get exist product data
+        milestone_data = self.get_detail_des(self.milestone.pk)
+        # update it
+        t = '_UPDATED!'
+        milestone_data['title'] += t
+        # PUT it
+        self.api_client.put(self.api_path_milestone + '%s/' % (self.milestone.pk),
+                            format='json', data=milestone_data)
+        # check
+        self.assertEqual(self.get_detail_des(self.milestone.pk)['title'], self.milestone.title + t)
+
+    def test_update_milestone_via_patch(self):
+        # get exist product data
+        milestone_title = self.get_detail_des(self.milestone.pk)['title']
+        # update it
+        t = 'TITLE_UPDATED!'
+        milestone_title += t
+        # PATCH it
+        resp = self.api_client.patch(self.api_path_milestone + '%s/' % (self.milestone.pk),
+                              format='json', charset='utf-8', data={'title': milestone_title})
+        # check
+        self.assertHttpAccepted(resp)
+        self.assertEqual(self.get_detail_des(self.milestone.pk)['title'], milestone_title)

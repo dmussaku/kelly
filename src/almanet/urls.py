@@ -18,6 +18,7 @@ from alm_vcard import api as vcard_api
 from alm_crm.api import (
     ContactResource,
     SalesCycleResource,
+    MilestoneResource,
     ActivityResource,
     ProductResource,
     ProductGroupResource,
@@ -62,6 +63,7 @@ v1_api.register(FilterResource())
 v1_api.register(CommentResource())
 v1_api.register(CustomSectionResource())
 v1_api.register(CustomFieldResource())
+v1_api.register(MilestoneResource())
 
 
 urlpatterns = patterns(

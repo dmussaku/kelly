@@ -959,6 +959,7 @@ class SalesCycle(SubscriptionObject):
     to_date = models.DateTimeField(blank=False, auto_now_add=True)
     mentions = generic.GenericRelation('Mention')
     comments = generic.GenericRelation('Comment')
+    milestone = models.ForeignKey(Milestone, related_name='sales_cycles', null=True)
 
     class Meta:
         verbose_name = 'sales_cycle'
@@ -1200,7 +1201,6 @@ class Activity(SubscriptionObject):
     owner = models.ForeignKey(CRMUser, related_name='activity_owner')
     mentions = generic.GenericRelation('Mention', null=True)
     comments = generic.GenericRelation('Comment', null=True)
-    milestone = models.ForeignKey(Milestone, related_name='activities', null=True)
 
     class Meta:
         verbose_name = 'activity'
