@@ -303,6 +303,12 @@ class ContactResource(CRMServiceModelResource):
                 self.wrap_view('import_contacts'),
                 name='api_import_contacts_from_vcard'
             ),
+            url(
+                r"^(?P<resource_name>%s)/delete_contacts%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('delete_contacts'),
+                name='api_delete_contacts_from_vcard'
+            ),
         ]
 
     def get_meta_dict(self, limit, offset, count, url):
@@ -1166,6 +1172,30 @@ class ContactResource(CRMServiceModelResource):
         return self.create_response(
             request, {'objects': objects, 'contact_list': contact_list})
 
+    def delete_contacts(self, request, **kwargs):
+        """
+        POST METHOD
+        example
+        send {'ids':[1,2,3]}
+        """
+        data = self.deserialize(
+            request, request.body,
+            format=request.META.get('CONTENT_TYPE', 'application/json'))
+        obj_ids = data.get('ids', "")
+        print obj_ids
+        print type(obj_ids)
+        with transaction.atomic():
+            for id in obj_ids:
+                try:
+                    obj = Contact.objects.get(id=id)
+                    obj.delete()
+                except ObjectDoesNotExist:
+                    return self.create_response(
+                        request, {'success':False}
+                        )
+        return self.create_response(
+            request, {'success':True}
+            )
 
 class SalesCycleResource(CRMServiceModelResource):
     '''
@@ -2326,7 +2356,6 @@ class ContactListResource(CRMServiceModelResource):
                 {'success': False,
                  'error_string': 'Contact list does not exits'}
                 )
-
 
 class AppStateObject(object):
     '''
