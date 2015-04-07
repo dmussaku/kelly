@@ -1,3 +1,5 @@
+#!/usr/bin/env python 
+# -*- coding: utf-8 -*- 
 from .models import (
     SalesCycle,
     Milestone,
@@ -1066,9 +1068,15 @@ class ContactResource(CRMServiceModelResource):
             format=request.META.get('CONTENT_TYPE', 'application/json'))
         current_crmuser = request.user.get_crmuser()
         decoded_string = base64.b64decode(data['uploaded_file'])
-        if data['filename'].split('.')[1]=='csv':
+        filename_chunks = data['filename'].split('.')
+        filename = filename_chunks[len(filename_chunks)-1]
+        if filename=='csv':
             contacts = Contact.import_from_csv(
                 decoded_string, request.user)
+            if type(contacts) == tuple:
+                self.log_throttled_access(request)
+                return self.create_response(
+                    request, {'success': False, 'error':"Ошибка в ячейке %s в %s-ом ряду." % contacts})
             if not contacts:
                 self.log_throttled_access(request)
                 return self.create_response(request, {'success': False})
@@ -1092,10 +1100,14 @@ class ContactResource(CRMServiceModelResource):
                     obj=contact_list
                     )
                 )
-        elif data['filename'].split('.')[1]=='xls' or data['filename'].split('.')[1]=='xlsx':
+        elif filename=='xls' or filename=='xlsx':
             contacts = Contact.import_from_xls(
                 decoded_string, request.user)
-            if not contacts:
+            if type(contacts) == tuple:
+                self.log_throttled_access(request)
+                return self.create_response(
+                    request, {'success': False, 'error':"Ошибка в ячейке %s в %s-ом ряду." % contacts})
+            elif not contacts:
                 self.log_throttled_access(request)
                 return self.create_response(request, {'success': False})
             contact_list = ContactList(

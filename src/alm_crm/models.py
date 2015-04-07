@@ -36,6 +36,8 @@ CURRENCY_OPTIONS = (
 GLOBAL_CYCLE_TITLE = 'Основной поток'
 GLOBAL_CYCLE_DESCRIPTION = 'Автоматически созданный цикл'
 
+def type_cast(input):
+    return input if type(input) != float else str(input)
 
 class CRMUser(SubscriptionObject):
 
@@ -580,6 +582,7 @@ class Contact(SubscriptionObject):
         return contact_list
 
 
+
     @classmethod
     @transaction.atomic()
     def import_from_xls(cls, xls_file_data, creator):
@@ -597,14 +600,26 @@ class Contact(SubscriptionObject):
                     continue
                 c = cls()
                 v = VCard()
-                v.family_name = data[0].value if type(data[0].value) == unicode else str(data[0].value)
-                v.given_name = data[1].value if type(data[1].value) == unicode else str(data[1].value)
-                v.additional_name = data[2].value if type(data[2].value) == unicode else str(data[2].value)
+                try:
+                    v.family_name = data[0].value if type(data[0].value) == unicode else str(data[0].value)
+                except:
+                    return (i,1)
+                try:
+                    v.given_name = data[1].value if type(data[1].value) == unicode else str(data[1].value)
+                except:
+                    return (i,2)
+                try:
+                    v.additional_name = data[2].value if type(data[2].value) == unicode else str(data[2].value)
+                except:
+                    return (i,3)
                 v.fn = v.given_name+" "+v.family_name
                 if ((not v.given_name) and (not v.family_name) and data[4].value):
-                    v = VCard(fn=data[4].value)
-                    v.save()
-                    c = cls(vcard=v, tp='co')
+                    try:
+                        v = VCard(fn=data[4].value)
+                        v.save()
+                        c = cls(vcard=v, tp='co')
+                    except:
+                        return (i,5)
                     c.owner = creator.get_crmuser()
                     c.subscription_id = creator.get_crmuser().subscription_id
                     c.save()
@@ -620,76 +635,122 @@ class Contact(SubscriptionObject):
                         'owner_id': c.owner_id,
                         'contact_id': c.id
                     })
-                    if data[3].value:
-                        positions = data[3].value.split(';')
-                        for position in data[3].value.split(';'):
-                            title = Title(
-                                vcard=v,
-                                data=position
-                                )
-                            title.save()
-                    if data[4].value:
-                        org = Org(vcard=v)
-                        org.organization_name = data[4].value
-                        if data[5].value:
-                             org.organization_unit = data[5].value
-                        org.save()
-                    if data[6].value:
-                        for phone in str(data[6].value).split(';'):
-                            tel = Tel(vcard=v, type='WORK')
-                            tel.value = phone
-                            tel.save()
-                    if data[7].value:
-                        for phone in str(data[7].value).split(';'):
-                            tel = Tel(vcard=v, type='cell')
-                            tel.value = phone
-                            tel.save()
-                    if data[8].value:
-                        for phone in str(data[8].value).split(';'):
-                            tel = Tel(vcard=v, type='xadditional')
-                            tel.value = phone
-                            tel.save()
-                    if data[9].value:
-                        for phone in str(data[9].value).split(';'):
-                            tel = Tel(vcard=v, type='fax')
-                            tel.value = phone
-                            tel.save()
-                    if data[10].value:
-                        try:
-                            for email_str in str(data[10].value).split(';'):
+                    try:
+                        if data[3].value:
+                            positions = type_cast(data[3].value).split(';')
+                            for position in positions:
+                                title = Title(
+                                    vcard=v,
+                                    data=position
+                                    )
+                                title.save()
+                    except:
+                        return (i, 4)
+                    try:
+                        if data[4].value:
+                            org = Org(vcard=v)
+                            org.organization_name = type_cast(data[4].value)
+                            try:
+                                if data[5].value:
+                                    org.organization_unit = type_cast(data[5].value)
+                                org.save()
+                            except:
+                                return (i, 6)
+                    except:
+                        return (i, 5)
+                    try:
+                        if data[6].value:
+                            phones = type_cast(data[6].value).split(';')
+                            for phone in phones:
+                                tel = Tel(vcard=v, type='WORK')
+                                tel.value = phone
+                                tel.save()
+                    except:
+                        return (i,7)
+                    try:
+                        if data[7].value:
+                            phones = type_cast(data[7].value).split(';')
+                            for phone in phones:
+                                tel = Tel(vcard=v, type='cell')
+                                tel.value = phone
+                                tel.save()
+                    except:
+                        return (i, 8)
+                    try:
+                        if data[8].value:
+                            phones = type_cast(data[8].value).split(';')
+                            for phone in phones:
+                                tel = Tel(vcard=v, type='xadditional')
+                                tel.value = phone
+                                tel.save()
+                    except:
+                        return (i, 9)
+                    try:
+                        if data[9].value:
+                            phones = type_cast(data[9].value).split(';')
+                            for phone in phones:
+                                tel = Tel(vcard=v, type='fax')
+                                tel.value = phone
+                                tel.save()
+                    except:
+                        return (i, 10)
+                    try:
+                        if data[10].value:
+                            emails = type_cast(data[10].value).split(';')
+                            for email_str in emails:
                                 email = Email(vcard=v, type='work')
                                 email.value = email_str
                                 email.save()
-                        except:
-                            pass
-                    if data[11].value:
-                        for email_str in str(data[11].value).split(';'):
-                            email = Email(vcard=v, type='internet')
-                            email.value = email_str
-                            email.save()
-                    if data[12].value:
-                        for address_str in data[12].value.split(';;'):
-                            addr_objs = address_str.split(';')
-                            addr_objs = [v,'POSTAL'] + addr_objs
-                            address = Adr.create_from_list(addr_objs)
-                    if data[13].value:
-                        for address_str in data[13].value.split(';;'):
-                            addr_objs = address_str.split(';')
-                            addr_objs = [v,'POSTAL'] + addr_objs
-                            address = Adr.create_from_list(addr_objs)
-                    if data[14].value:
-                        for address_str in data[14].value.split(';;'):
-                            addr_objs = address_str.split(';')
-                            addr_objs = [v,'POSTAL'] + addr_objs
-                            address = Adr.create_from_list(addr_objs)
-                    if data[15].value:
-                        for site in data[15].value.split(';'):
-                            url = Url(
-                                vcard=v,
-                                type='website',
-                                    value=site
-                                    )
-                            url.save()
+                    except:
+                        return (i, 11)
+                    try:
+                        if data[11].value:
+                            emails = type_cast(data[11].value).split(';')
+                            for email_str in emails:
+                                email = Email(vcard=v, type='internet')
+                                email.value = email_str
+                                email.save()
+                    except:
+                        return (i, 12)
+                    try:
+                        if data[12].value:
+                            adresses = type_cast(data[12].value).split(';;')
+                            for address_str in adresses:
+                                addr_objs = address_str.split(';')
+                                addr_objs = [v,'POSTAL'] + addr_objs
+                                address = Adr.create_from_list(addr_objs)
+                    except:
+                        return (i, 13)
+                    try:
+                        if data[13].value:
+                            adresses = type_cast(data[13].value).split(';;')
+                            for address_str in adresses:
+                                addr_objs = address_str.split(';')
+                                addr_objs = [v,'xlegal'] + addr_objs
+                                address = Adr.create_from_list(addr_objs)
+                    except:
+                        return (i, 14)
+                    try:
+                        if data[14].value:
+                            adresses = type_cast(data[14].value).split(';;')
+                            for address_str in adresses:
+                                addr_objs = address_str.split(';')
+                                addr_objs = [v,'WORK'] + addr_objs
+                                address = Adr.create_from_list(addr_objs)
+                    except:
+                        return (i, 15)
+                    try:
+                        if data[15].value:
+                            sites = type_cast(data[15].value).split('')
+                            for site in sites:
+                                url = Url(
+                                    vcard=v,
+                                    type='website',
+                                        value=site
+                                        )
+                                url.save()
+                    except:
+                        return (i, 16)
                 contacts.append(c)
                 # print "%s created contact %s" % (c, c.id)
                 i = i+1
