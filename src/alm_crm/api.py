@@ -1057,7 +1057,6 @@ class ContactResource(CRMServiceModelResource):
         ...        ],
         ... },
         '''
-
         objects = []
         contact_resource = ContactResource()
         self.method_check(request, allowed=['post'])
@@ -1075,11 +1074,14 @@ class ContactResource(CRMServiceModelResource):
                 decoded_string, request.user)
             if type(contacts) == tuple:
                 self.log_throttled_access(request)
-                return self.create_response(
-                    request, {'success': False, 'error':"Ошибка в ячейке %s в %s-ом ряду." % contacts})
+                data = {'success': False, 'error':"Ошибка в ячейке %s в %s-ом ряду." % contacts}
+                return self.error_response(request, data, response_class=http.HttpBadRequest)
+                # return self.create_response(
+                #     request, {'success': False, 'error':"Ошибка в ячейке %s в %s-ом ряду." % contacts})
             if not contacts:
                 self.log_throttled_access(request)
-                return self.create_response(request, {'success': False})
+                return self.error_response(request, {'success': False}, response_class=http.HttpBadRequest)
+                # return self.create_response(request, {'success': False})
             contact_list = ContactList(
                 owner = request.user.get_crmuser(),
                 title = data['filename'])
@@ -1105,11 +1107,14 @@ class ContactResource(CRMServiceModelResource):
                 decoded_string, request.user)
             if type(contacts) == tuple:
                 self.log_throttled_access(request)
-                return self.create_response(
-                    request, {'success': False, 'error':"Ошибка в ячейке %s в %s-ом ряду." % contacts})
+                # data = {'success': False, 'error':"Ошибка в ячейке %s в %s-ом ряду." % contacts}
+                data = {'success': False, 'error':list(contacts)}
+                return self.error_response(request, data, response_class=http.HttpBadRequest)
+                #self.create_response(request, data)
             elif not contacts:
                 self.log_throttled_access(request)
-                return self.create_response(request, {'success': False})
+                return self.error_response(request, {'success': False}, response_class=http.HttpBadRequest)
+                # return self.create_response(request, {'success': False})
             contact_list = ContactList(
                 owner = request.user.get_crmuser(),
                 title = data['filename'])
@@ -1135,7 +1140,8 @@ class ContactResource(CRMServiceModelResource):
                     decoded_string, current_crmuser)
             if not contacts:
                 self.log_throttled_access(request)
-                return self.create_response(request, {'success': False})
+                return self.error_response(request, {'success': False}, response_class=http.HttpBadRequest)
+                # return self.create_response(request, {'success': False})
             if len(contacts)>1:
                 contact_list = ContactList(
                     owner = request.user.get_crmuser(),
