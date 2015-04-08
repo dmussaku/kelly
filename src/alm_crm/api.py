@@ -1652,6 +1652,7 @@ class ProductResource(CRMServiceModelResource):
             processing_custom_section_data(bundle.data['custom_sections'], bundle.obj)
         if bundle.data.get('custom_fields', None):
             processing_custom_field_data(bundle.data['custom_fields'], bundle.obj)
+        return bundle
 
 class ProductGroupResource(CRMServiceModelResource):
     '''
