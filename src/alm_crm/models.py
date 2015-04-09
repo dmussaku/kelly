@@ -1735,7 +1735,7 @@ class ContactList(SubscriptionObject):
 
     def check_contact(self, contact_id):
         try:
-            contact = self.contacts.get(contact_id=contact_id)
+            contact = self.contacts.get(id=contact_id)
             if contact is not None:
                 return True
             else:

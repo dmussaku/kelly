@@ -1610,82 +1610,82 @@ class ContactResourceTest(ResourceTestMixin, ResourceTestCase):
         self.assertTrue(contact3.first() in Contact.objects.all())
 
 
-# class ContactListResourceTest(ResourceTestMixin, ResourceTestCase):
+class ContactListResourceTest(ResourceTestMixin, ResourceTestCase):
 
-#     def setUp(self):
-#         super(self.__class__, self).setUp()
+    def setUp(self):
+        super(self.__class__, self).setUp()
 
-#         # login user
-#         self.get_credentials()
+        # login user
+        self.get_credentials()
 
-#         self.api_path_contact_list = '/api/v1/contact_list/'
+        self.api_path_contact_list = '/api/v1/contact_list/'
 
-#         # get_list
-#         self.get_list_resp = self.api_client.get(self.api_path_contact_list,
-#                                                  format='json',
-#                                                  HTTP_HOST='localhost')
-#         self.get_list_des = self.deserialize(self.get_list_resp)
+        # get_list
+        self.get_list_resp = self.api_client.get(self.api_path_contact_list,
+                                                 format='json',
+                                                 HTTP_HOST='localhost')
+        self.get_list_des = self.deserialize(self.get_list_resp)
 
-#         # get_detail(pk)
-#         self.get_detail_resp = \
-#             lambda pk: self.api_client.get(self.api_path_contact_list+str(pk)+'/',
-#                                            format='json',
-#                                            HTTP_HOST='localhost')
-#         self.get_detail_des = \
-#             lambda pk: self.deserialize(self.get_detail_resp(pk))
+        # get_detail(pk)
+        self.get_detail_resp = \
+            lambda pk: self.api_client.get(self.api_path_contact_list+str(pk)+'/',
+                                           format='json',
+                                           HTTP_HOST='localhost')
+        self.get_detail_des = \
+            lambda pk: self.deserialize(self.get_detail_resp(pk))
 
-#         self.contact_list = ContactList.objects.first()
-
-
-#     def test_get_list_valid_json(self):
-#         self.assertValidJSONResponse(self.get_list_resp)
-
-#     def test_get_list_non_empty(self):
-#         self.assertTrue(self.get_list_des['meta']['total_count'] > 0)
-
-#     def test_get_detail(self):
-#         self.assertEqual(
-#             self.get_detail_des(self.contact_list.pk)['title'],
-#             self.contact_list.title
-#             )
-
-#     def test_create_contact_list(self):
-#         user = CRMUser.objects.last()
-#         post_data = {
-#             'owner': CRMUser.objects.first(),
-#             'title': 'Mobiliuz',
-#             'users': [{'pk':user.pk}]
-#         }
-
-#         count = user.contact_list.count()
-#         self.assertHttpCreated(self.api_client.post(
-#             self.api_path_contact_list, format='json', data=post_data))
-#         contact_list = user.contact_list.last()
-#         # verify that new one has been added.
-#         self.assertEqual(user.contact_list.count(), count + 1)
-#         self.assertEqual(ContactList.objects.last().title, 'Mobiliuz')
-
-#     def test_delete_contact_list(self):
-#         count = ContactList.objects.count()
-#         contact_list = ContactList.objects.last()
-#         self.assertHttpAccepted(self.api_client.delete(
-#             self.api_path_contact_list + '%s/' % contact_list.pk, format='json'))
-#         # verify that one sales_cycle has been deleted.
-#         self.assertEqual(ContactList.objects.count(), count - 1)
-#         count = count - 1
-#         self.assertHttpAccepted(self.api_client.delete(
-#             self.api_path_contact_list + '%s/' % self.contact_list.pk, format='json'))
-#         self.assertEqual(ContactList.objects.count(), count - 1)
+        self.contact_list = ContactList.objects.first()
 
 
-#     def test_delete_user_from_contact_list(self):
-#         api_path_delete_user = self.api_path_contact_list+'%s/delete_user/' % self.contact_list.pk
-#         user_id = self.contact_list.users.first().id
-#         count = self.contact_list.users.all().count()
-#         self.assertHttpOK(self.api_client.get(api_path_delete_user+'?user_id=%d'%user_id))
-#         self.assertEqual(self.contact_list.users.all().count(), count-1)
-#         self.assertHttpOK(self.api_client.get(api_path_delete_user+'?user_id=%d'%user_id))
-#         self.assertEqual(self.contact_list.users.all().count(), count-1)
+    def test_get_list_valid_json(self):
+        self.assertValidJSONResponse(self.get_list_resp)
+
+    def test_get_list_non_empty(self):
+        self.assertTrue(self.get_list_des['meta']['total_count'] > 0)
+
+    def test_get_detail(self):
+        self.assertEqual(
+            self.get_detail_des(self.contact_list.pk)['title'],
+            self.contact_list.title
+            )
+
+    def test_create_contact_list(self):
+        contact = Contact.objects.last()
+        post_data = {
+            'owner': Contact.objects.first(),
+            'title': 'Mobiliuz',
+            'contacts': [contact.pk]
+        }
+
+        count = contact.contact_list.count()
+        self.assertHttpCreated(self.api_client.post(
+            self.api_path_contact_list, format='json', data=post_data))
+        contact_list = contact.contact_list.last()
+        # verify that new one has been added.
+        self.assertEqual(contact.contact_list.count(), count + 1)
+        self.assertEqual(ContactList.objects.last().title, 'Mobiliuz')
+
+    def test_delete_contact_list(self):
+        count = ContactList.objects.count()
+        contact_list = ContactList.objects.last()
+        self.assertHttpAccepted(self.api_client.delete(
+            self.api_path_contact_list + '%s/' % contact_list.pk, format='json'))
+        # verify that one sales_cycle has been deleted.
+        self.assertEqual(ContactList.objects.count(), count - 1)
+        count = count - 1
+        self.assertHttpAccepted(self.api_client.delete(
+            self.api_path_contact_list + '%s/' % self.contact_list.pk, format='json'))
+        self.assertEqual(ContactList.objects.count(), count - 1)
+
+
+    def test_delete_user_from_contact_list(self):
+        api_path_delete_contact = self.api_path_contact_list+'%s/delete_contact/' % self.contact_list.pk
+        contact_id = self.contact_list.contacts.first().id
+        count = self.contact_list.contacts.all().count()
+        self.assertHttpOK(self.api_client.get(api_path_delete_contact+'?contact_id=%d'%contact_id))
+        self.assertEqual(self.contact_list.contacts.all().count(), count-1)
+        self.assertHttpOK(self.api_client.get(api_path_delete_contact+'?contact_id=%d'%contact_id))
+        self.assertEqual(self.contact_list.contacts.all().count(), count-1)
 
 #     def test_add_users(self):
 #         user = CRMUser.objects.get(pk=3)
