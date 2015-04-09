@@ -82,3 +82,5 @@ class ValueForm(ModelForm):
 
     class Meta:
         model = Value
+
+        

@@ -1,11 +1,12 @@
 from django.contrib import admin
+from django import forms
 from alm_user.models import (
     User
 )
 from alm_company.models import Company
 from almanet.models import Service, Subscription
 from alm_crm.models import CRMUser
-from alm_crm.models import Contact
+from alm_crm.models import Contact, Milestone
 
 
 class UserAdmin(admin.ModelAdmin):
@@ -31,9 +32,14 @@ class ContactAdmin(admin.ModelAdmin):
 	def save_model(self, request, obj, form, change):
 		obj.save();
 
+class MilestoneAdmin(admin.ModelAdmin):
+
+    list_display = ['subscription_id', 'title', 'color_code']
+
 admin.site.register(User, UserAdmin)
 admin.site.register(Company)
 admin.site.register(Service)
 admin.site.register(Subscription, SubscriptionAdmin)
 admin.site.register(CRMUser)
 admin.site.register(Contact, ContactAdmin)
+admin.site.register(Milestone, MilestoneAdmin)

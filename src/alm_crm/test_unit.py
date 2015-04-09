@@ -26,6 +26,7 @@ from alm_vcard.models import VCard, Tel, Email, Org
 from alm_user.models import User
 from almanet.models import Subscription, Service
 from alm_crm.models import GLOBAL_CYCLE_TITLE
+from alm_company.models import Company
 
 
 class CRMUserTestCase(TestCase):
@@ -704,6 +705,42 @@ class FilterTestCase(TestCase):
         self.assertEqual(new_filter.title, 'New filter')
         self.assertEqual(new_filter.base, 'cold')
         self.assertEqual(new_filter.owner, crmuser)
+
+
+class MilestoneTestCase(TestCase):
+    fixtures = ['subscriptions.json', 'services.json', 'companies.json', 'users.json']
+
+    def setUp(self):
+        super(self.__class__, self).setUp()
+        self.milestone = Milestone.objects.first()
+
+    def test_create_default_subscription(self):
+        before = Milestone.objects.all().count()
+        s = Subscription(service=Service.objects.first(), organization = Company.objects.last(), user=User.objects.last())
+        s.save()
+        after = Milestone.objects.all().count()
+        actual = after
+        expected = before+7
+        expected_titles = ['Звонок/Заявка',
+                            'Отправка КП',
+                            'Согласование договора',
+                            'Выставление счета',
+                            'Контроль оплаты',
+                            'Предоставление услуги',
+                            'Upsales']
+        expected_colors = ['#F4B59C',
+                            '#F59CC8',
+                            '#A39CF4',
+                            '#9CE5F4',
+                            '#9CF4A7',
+                            '#D4F49B',
+                            '#F4DC9C'
+                            ]
+        self.assertEqual(actual, expected)
+        for milestone in Milestone.objects.filter(subscription_id = s.pk):
+            self.assertTrue(milestone.title.encode('utf-8') in expected_titles)
+            self.assertTrue(milestone.color_code in expected_colors)
+            self.assertEqual(expected_titles.index(milestone.title.encode('utf-8')), expected_colors.index(milestone.color_code))
 
 
 class ResourceTestMixin(object):

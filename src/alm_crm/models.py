@@ -4,7 +4,7 @@ import functools
 from django.db import models, transaction
 from django.utils.translation import ugettext_lazy as _
 from almanet import settings
-from almanet.models import SubscriptionObject
+from almanet.models import SubscriptionObject, Subscription
 from alm_vcard.models import (
     VCard,
     BadVCardError,
@@ -101,6 +101,30 @@ class Milestone(SubscriptionObject):
     @classmethod
     def get_for_subscr(cls, subscr_id):
         return cls.objects.filter(subscription_id=subscr_id)
+
+    @classmethod
+    def create_default_milestones(cls, subscription_id):
+        milestones = []
+        default_data = [{'title':'Звонок/Заявка', 'color_code': '#F4B59C'},
+                        {'title':'Отправка КП', 'color_code': '#F59CC8'},
+                        {'title':'Согласование договора', 'color_code': '#A39CF4'},
+                        {'title':'Выставление счета', 'color_code': '#9CE5F4'},
+                        {'title':'Контроль оплаты', 'color_code': '#9CF4A7'},
+                        {'title':'Предоставление услуги', 'color_code': '#D4F49B'},
+                        {'title':'Upsales', 'color_code': '#F4DC9C'}]
+
+        for data in default_data:   
+            milestone = Milestone()
+            milestone.title = data['title']
+            milestone.color_code = data['color_code']
+            milestone.subscription_id = subscription_id
+            milestone.save()
+            milestones.append(milestone)
+
+        return milestones
+
+    def __unicode__(self):
+        return '%s'%self.title
 
 
 class Contact(SubscriptionObject):
@@ -1618,10 +1642,17 @@ def check_is_title_empty(sender, instance=None, **kwargs):
     if len(instance.title) == 0:
         raise Exception("Requires non empty value")
 
+def create_milestones(sender, instance, **kwargs):
+    milestones = Milestone.create_default_milestones(instance.id)
+
+def delete_related_milestones(sender, instance, **kwargs):
+    for milestone in Milestone.objects.filter(subscription_id=instance.id):
+        milestone.delete()
 
 signals.post_delete.connect(on_activity_delete, sender=Activity)
 signals.pre_save.connect(check_is_title_empty, sender=SalesCycle)
-
+signals.post_save.connect(create_milestones, sender=Subscription)
+signals.pre_delete.connect(delete_related_milestones, sender=Subscription)
 
 '''
 Function to get mentions by 3 of optional parameters:
