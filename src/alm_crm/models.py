@@ -1746,8 +1746,8 @@ class ContactList(SubscriptionObject):
     def get_contacts(self):
         return self.contacts
 
-    def add_contacts(self, user_ids):
-        assert isinstance(user_ids, (tuple, list)), 'must be a list'
+    def add_contacts(self, contact_ids):
+        assert isinstance(contact_ids, (tuple, list)), 'must be a list'
         status = []
         for contact_id in contact_ids:
             try:

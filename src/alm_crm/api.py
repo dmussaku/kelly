@@ -1189,8 +1189,8 @@ class ContactResource(CRMServiceModelResource):
             request, request.body,
             format=request.META.get('CONTENT_TYPE', 'application/json'))
         obj_ids = data.get('ids', "")
-        print obj_ids
-        print type(obj_ids)
+        # print obj_ids
+        # print type(obj_ids)
         with transaction.atomic():
             for id in obj_ids:
                 try:
@@ -2253,16 +2253,16 @@ class ContactListResource(CRMServiceModelResource):
                  'error_string': 'Contact list does not exits'}
                 )
 
-    def check_user(self, request, **kwargs):
+    def check_contact(self, request, **kwargs):
         '''
         GET METHOD
-        I{URL}:  U{alma.net/api/v1/contact/:id/check_user}
+        I{URL}:  U{alma.net/api/v1/contact/:id/check_contact}
 
         Description:
-        Api function to return existence user in the contact list
+        Api function to return existence contact in the contact list
 
-        @type  user_id: number
-        @param user_id: User id which you are checking.
+        @type  contact_id: number
+        @param contact_id: contact id which you are checking.
 
         @return:  success and list of boolean fields
 
@@ -2277,7 +2277,7 @@ class ContactListResource(CRMServiceModelResource):
             if not contact_id:
                 return self.create_response(
                     request,
-                    {'success': False, 'error_string': 'User id is not set'}
+                    {'success': False, 'error_string': 'contact id is not set'}
                     )
             return self.create_response(
                 request,
@@ -2719,7 +2719,7 @@ class AppStateResource(Resource):
 
     class Meta:
         resource_name = 'app_state'
-        object_class = AppStateObject
+        # object_class = AppStateObject
         authorization = Authorization()
 
     def prepend_urls(self):

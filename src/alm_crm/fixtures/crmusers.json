@@ -28,5 +28,25 @@
         "subscription_id": 1, 
         "user_id": 3
     }
+},
+{
+    "pk": 4, 
+    "model": "alm_crm.crmuser", 
+    "fields": {
+        "organization_id": 1, 
+        "is_supervisor": false, 
+        "subscription_id": 1, 
+        "user_id": 4
+    }
+},
+{
+    "pk": 5, 
+    "model": "alm_crm.crmuser", 
+    "fields": {
+        "organization_id": 1, 
+        "is_supervisor": false, 
+        "subscription_id": 1, 
+        "user_id": 5
+    }
 }
 ]
