@@ -712,7 +712,8 @@ class ResourceTestMixin(object):
                 'crmusers.json', 'vcards.json', 'contacts.json',
                 'salescycles.json', 'activities.json', 'products.json',
                 'mentions.json', 'values.json', 'emails.json', 'contactlist.json', 'share.json',
-                'feedbacks.json', 'salescycle_product_stat.json', 'filters.json']
+                'feedbacks.json', 'salescycle_product_stat.json', 'filters.json', 'hashtag.json',
+                'hashtag_ref.json']
 
     def get_user(self):
         from alm_user.models import User
@@ -1385,18 +1386,30 @@ class ContactResourceTest(ResourceTestMixin, ResourceTestCase):
 
     def test_create_contact(self):
         post_data = {
-            'vcard': {"fn": "Nurlan Abiken"},
-            'note': 'some text'
+            'vcard': {"fn": "Nurlan Abiken",
+            'notes': [{'data':'#some text #almacloud @[1:Bruce Wayne] @[2:Nurlan Abiken]'}]
+            },
         }
         count = Contact.objects.count()
+        # print resp
+        hashtag_count = HashTag.objects.all().count()
+        hashtag_reference_count = HashTagReference.objects.all().count()
+        mention_count = Mention.objects.all().count()
         resp = self.api_client.post(
             self.api_path_contact, format='json', data=post_data)
         self.assertHttpOK(resp)
+        hashtag = HashTag.objects.first()
+        for reference in hashtag.references.all():
+            print reference.content_object.__class__
         # verify that new one has been added.
         self.assertEqual(Contact.objects.count(), count + 1)
         created_contact = Contact.objects.last()
         self.assertEqual(created_contact.sales_cycles.first().title, GLOBAL_CYCLE_TITLE.decode('utf-8'))
-        # print resp
+        self.assertEqual(hashtag_count+2, HashTag.objects.all().count())
+        self.assertEqual(hashtag_reference_count+2, HashTagReference.objects.all().count())
+        self.assertEqual(mention_count+2, Mention.objects.all().count())
+        self.assertEqual(HashTagReference.objects.last().hashtag, 
+                        HashTag.objects.get(text=HashTagReference.objects.last().hashtag.text))
 
     def test_delete_contact(self):
         count = Contact.objects.count()
@@ -2411,3 +2424,64 @@ class UserResourceTest(ResourceTestMixin, ResourceTestCase):
             self.get_detail_des(self.user.pk)['email'],
             self.user.email
             )
+
+
+class HashTagReferenceResourceTest(ResourceTestMixin, ResourceTestCase):
+
+    def setUp(self):
+        super(self.__class__, self).setUp()
+
+        # login user
+        self.get_credentials()
+
+        self.api_path_ht_ref = '/api/v1/hashtag_reference/'
+
+        # get_list
+        self.get_list_resp = self.api_client.get(self.api_path_ht_ref,
+                                                 format='json',
+                                                 HTTP_HOST='localhost')
+        self.get_list_des = self.deserialize(self.get_list_resp)
+
+        # get_detail(pk)
+        self.get_detail_resp = \
+            lambda pk: self.api_client.get(self.api_path_ht_ref+str(pk)+'/',
+                                           format='json',
+                                           HTTP_HOST='localhost')
+        self.get_detail_des = \
+            lambda pk: self.deserialize(self.get_detail_resp(pk))
+
+        self.ht_ref = HashTagReference.objects.first()
+
+    def test_get_list_valid_json(self):
+        self.assertValidJSONResponse(self.get_list_resp)
+
+    def test_get_list_non_empty(self):
+        self.assertTrue(self.get_list_des['meta']['total_count'] > 0)
+
+    def test_get_detail(self):
+        self.assertEqual(
+            self.get_detail_des(self.ht_ref.pk)['object_id'],
+            self.ht_ref.object_id
+            )
+
+    def test_search(self):
+        get_list_search_resp = self.api_client.get(self.api_path_ht_ref+
+                                            "search/?hashtag=nurlan",
+                                            format='json',
+                                            HTTP_HOST='localhost')
+        des_resp = self.deserialize(get_list_search_resp)['objects']
+        self.assertTrue(des_resp['activities'])
+        self.assertTrue(des_resp['contacts'])
+        self.assertTrue(des_resp['sales_cycles'])
+        self.assertTrue(des_resp['comments'])
+
+        get_list_search_resp = self.api_client.get(self.api_path_ht_ref+
+                                            "search/?hashtag=hp",
+                                            format='json',
+                                            HTTP_HOST='localhost')
+        des_resp = self.deserialize(get_list_search_resp)['objects']
+
+        self.assertTrue(des_resp['activities'])
+        self.assertTrue(des_resp['sales_cycles'])
+        self.assertEqual(len(des_resp['activities']), 2)
+        self.assertEqual(len(des_resp['sales_cycles']), 1)

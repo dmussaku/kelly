@@ -15,6 +15,7 @@ from alm_vcard.models import (
     Category,
     Adr,
     Url,
+    Note,
     )
 from alm_user.models import User
 from django.template.loader import render_to_string
@@ -144,6 +145,7 @@ class Contact(SubscriptionObject):
         related_name='contact_latest_activity', null=True)
     mentions = generic.GenericRelation('Mention')
     comments = generic.GenericRelation('Comment')
+    hashtags = generic.GenericRelation('HashTagReference')
 
     class Meta:
         verbose_name = _('contact')
@@ -837,7 +839,7 @@ class Contact(SubscriptionObject):
             2. status is NEW"""
         q = Q(subscription_id=subscription_id)
         q &= Q(status=cls.NEW)
-        return cls.objects.filter(q).order_by('-date_created')
+        return cls.objects.filter(q).order_by('-date_created')           
 
 
 class Value(SubscriptionObject):
@@ -1280,6 +1282,7 @@ class Activity(SubscriptionObject):
     mentions = generic.GenericRelation('Mention', null=True)
     comments = generic.GenericRelation('Comment', null=True)
     milestone = models.ForeignKey(Milestone, related_name='activities', null=True)
+    hashtags = generic.GenericRelation('HashTagReference')
 
     class Meta:
         verbose_name = 'activity'
@@ -1583,6 +1586,7 @@ class Comment(SubscriptionObject):
     content_type = models.ForeignKey(ContentType)
     content_object = generic.GenericForeignKey('content_type', 'object_id')
     mentions = generic.GenericRelation('Mention')
+    hashtags = generic.GenericRelation('HashTagReference')
 
     def __unicode__(self):
         return "%s's comment" % (self.owner)
@@ -1668,8 +1672,15 @@ class Share(SubscriptionObject):
         return u'%s : %s -> %s' % (self.contact, self.share_from, self.share_to)
 
 
+def parse_note_text(sender, instance=None, **kwargs):
+    from utils.parser import text_parser
+    for note in Note.objects.filter(vcard = instance.vcard):
+        text_parser(base_text=note.data, content_class=instance.__class__,
+                    object_id=instance.id)
+
 signals.post_save.connect(
     Contact.upd_lst_activity_on_create, sender=Activity)
+signals.post_save.connect(parse_note_text, sender=Contact)
 signals.post_save.connect(
     Contact.upd_status_when_first_activity_created, sender=Activity)
 signals.post_save.connect(
