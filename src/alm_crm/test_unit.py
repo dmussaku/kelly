@@ -1396,6 +1396,7 @@ class ContactResourceTest(ResourceTestMixin, ResourceTestCase):
         self.assertEqual(Contact.objects.count(), count + 1)
         created_contact = Contact.objects.last()
         self.assertEqual(created_contact.sales_cycles.first().title, GLOBAL_CYCLE_TITLE.decode('utf-8'))
+        # print resp
 
     def test_delete_contact(self):
         count = Contact.objects.count()
@@ -1538,7 +1539,7 @@ class ContactResourceTest(ResourceTestMixin, ResourceTestCase):
                                  'alm_crm/fixtures/contacts.xls')
         import base64
         post_data={
-            'filename': 'aliya.xls',
+            'filename': 'aliya.xlsx',
             'uploaded_file': base64.b64encode(open(file_path, "rb").read())
             }
 
@@ -1549,7 +1550,7 @@ class ContactResourceTest(ResourceTestMixin, ResourceTestCase):
         file_path = os.path.join(os.path.dirname(os.path.dirname(__file__)),
                                  'alm_crm/fixtures/correct_contacts_format.xlsx')
         post_data={
-            'filename': 'aliya.xls',
+            'filename': 'aliya.xlsx',
             'uploaded_file': base64.b64encode(open(file_path, "rb").read())
             }
         resp = self.api_client.post(
@@ -1557,6 +1558,9 @@ class ContactResourceTest(ResourceTestMixin, ResourceTestCase):
         self.assertHttpOK(resp)
 
         self.assertEqual(Contact.objects.all().count(), count+17)
+        des_resp = self.deserialize(resp)
+        self.assertTrue('contact_list' in des_resp)
+        self.assertEqual(des_resp['contact_list']['title'], 'aliya.xlsx')
 
     def test_import_from_vcard(self):
         uploaded_file = os.path.join(os.path.dirname(os.path.dirname(__file__)),
@@ -1609,6 +1613,9 @@ class ContactResourceTest(ResourceTestMixin, ResourceTestCase):
         self.assertTrue(contact1.first() in Contact.objects.all())
         self.assertTrue(contact2.first() in Contact.objects.all())
         self.assertTrue(contact3.first() in Contact.objects.all())
+        des_resp = self.deserialize(resp)
+        self.assertTrue('contact_list' in des_resp)
+        self.assertEqual(des_resp['contact_list']['title'], 'nurlan.vcf')
 
 
 class ContactListResourceTest(ResourceTestMixin, ResourceTestCase):
