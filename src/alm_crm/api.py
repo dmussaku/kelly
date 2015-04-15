@@ -1302,9 +1302,9 @@ class SalesCycleResource(CRMServiceModelResource):
                                             response_class=http.HttpAccepted)
 
     def obj_create(self, bundle, **kwargs):
-        bundle = super(self.__class__. self).obj_create(bundle, **kwargs)
-        if 'milestone' in bundle.data:
-            milestone = Milestone.objects.get(pk=bundle.data.get('milestone'))
+        bundle = super(self.__class__, self).obj_create(bundle, **kwargs)
+        if 'milestone_id' in bundle.data:
+            milestone = Milestone.objects.get(pk=bundle.data.get('milestone_id'))
             bundle.obj.milestone = milestone
         bundle.obj.save()
         bundle = self.full_hydrate(bundle)
@@ -1312,9 +1312,9 @@ class SalesCycleResource(CRMServiceModelResource):
         return bundle
 
     def save(self, bundle, **kwargs):
-        bundle = super(ActivityResource, self).save(bundle, **kwargs)
-        if 'milestone' in bundle.data:
-            milestone = Milestone.objects.get(pk=bundle.data.get('milestone'))
+        bundle = super(SalesCycleResource, self).save(bundle, **kwargs)
+        if 'milestone_id' in bundle.data:
+            milestone = Milestone.objects.get(pk=bundle.data.get('milestone_id'))
             bundle.obj.milestone = milestone
         bundle.obj.save()
         return bundle
