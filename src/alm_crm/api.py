@@ -13,6 +13,7 @@ from .models import (
     Comment,
     Mention,
     SalesCycleProductStat,
+    SalesCycleLogEntry,
     Filter,
     HashTag,
     HashTagReference,
@@ -97,6 +98,7 @@ from .utils.data_processing import (
 
 
 import base64
+import simplejson as json
 from collections import OrderedDict
 
 
@@ -1190,6 +1192,7 @@ class SalesCycleResource(CRMServiceModelResource):
         attribute=lambda bundle: SalesCycleProductStat.objects.filter(sales_cycle=bundle.obj),
         null=True, blank=True, readonly=True, full=True)
     milestone_id = fields.IntegerField(null=True, attribute='milestone_id')
+    log = fields.ToManyField('alm_crm.api.SalesCycleLogEntryResource', 'log', null=True, full=True)
 
     class Meta(CommonMeta):
         queryset = SalesCycle.objects.all().prefetch_related('products')
@@ -1211,6 +1214,12 @@ class SalesCycleResource(CRMServiceModelResource):
                 (self._meta.resource_name, trailing_slash()),
                 self.wrap_view('products'),
                 name='api_products'
+            ),
+            url(
+                r"^(?P<resource_name>%s)/(?P<id>\d+)/change_milestone%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('change_milestone'),
+                name='api_change_milestone'
             ),
         ]
 
@@ -1301,6 +1310,46 @@ class SalesCycleResource(CRMServiceModelResource):
                 return self.create_response(request, get_product_ids(),
                                             response_class=http.HttpAccepted)
 
+    def change_milestone(self, request, **kwargs):
+        '''
+        POST METHOD
+        I{URL}:  U{alma.net/api/v1/sales_cycle/:id/change_milestone/}
+
+        B{Description}:
+        change milestone of the sales cycle, creates SalesCycleLogEntry record with entry_type = MC
+
+        @return: updated SalesCycle
+
+        '''
+        with RequestContext(self, request, allowed_methods=['post']):
+            basic_bundle = self.build_bundle(request=request)
+            try:
+                obj = self.cached_obj_get(bundle=basic_bundle,
+                                          **self.remove_api_resource_names(kwargs))
+            except ObjectDoesNotExist:
+                return http.HttpNotFound()
+            except MultipleObjectsReturned:
+                return http.HttpMultipleChoices(
+                    "More than one resource is found at this URI.")
+            bundle = self.build_bundle(obj=obj, request=request)
+
+            # get PUT's data from request.body
+            deserialized = self.deserialize(
+                request, request.body,
+                format=request.META.get('CONTENT_TYPE', 'application/json'))
+
+            sales_cycle = obj.change_milestone(crmuser=request.user.get_crmuser(),
+                                               milestone_id=deserialized['milestone_id'], 
+                                               meta=json.dumps(deserialized['meta']))
+
+            if not self._meta.always_return_data:
+                return http.HttpAccepted()
+            else:
+                return self.create_response(request, {
+                    'sales_cycle': SalesCycleResource().get_bundle_detail(sales_cycle, request),
+                },
+                response_class=http.HttpAccepted)
+
     def obj_create(self, bundle, **kwargs):
         bundle = super(self.__class__, self).obj_create(bundle, **kwargs)
         if 'milestone_id' in bundle.data:
@@ -1318,6 +1367,16 @@ class SalesCycleResource(CRMServiceModelResource):
             bundle.obj.milestone = milestone
         bundle.obj.save()
         return bundle
+
+class SalesCycleLogEntryResource(CRMServiceModelResource):
+
+    owner = fields.IntegerField(attribute='owner_id')
+
+    class Meta(CommonMeta):
+        queryset = SalesCycleLogEntry.objects.all()
+        resource_name = 'sales_cycle_log_entry'
+        detail_allowed_methods = ['get', 'post', 'put', 'patch', 'delete']
+        always_return_data = True
 
 
 class MilestoneResource(CRMServiceModelResource):
@@ -2531,6 +2590,14 @@ class AppStateObject(object):
                 st.update({'product_id': stat.product_id})
                 return st
 
+            def _log(log):
+                l = model_to_dict(log)
+                l.update({
+                    'date_created': log.date_created,
+                    'owner': log.owner.pk,
+                })
+                return l
+
             d.update({
                 'author_id': s.owner_id,
                 'date_created': s.date_created,
@@ -2538,6 +2605,7 @@ class AppStateObject(object):
                 'projected_value': _value('projected_value'),
                 'real_value': _value('real_value'),
                 'stat': map(_stat, s.salescycleproductstat_set.all()),
+                'log': map(_log, s.log.all()),
                 })
             if s.milestone:
                 d['milestone_id'] = s.milestone.pk
@@ -2631,6 +2699,9 @@ class AppStateObject(object):
             'sales_cycle': {
                 'statuses': SalesCycle.STATUSES_OPTIONS,
                 'statuses_hash': SalesCycle.STATUSES_DICT
+            },
+            'sales_cycle_log_entry': {
+                'types_hash': SalesCycleLogEntry.TYPES_DICT
             },
             'activity': {
                 'feedback_options': Feedback.STATUSES_OPTIONS,

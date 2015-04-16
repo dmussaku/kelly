@@ -1126,6 +1126,18 @@ class SalesCycle(SubscriptionObject):
                 status.append(False)
         return status
 
+    def change_milestone(self, crmuser, milestone_id, meta):
+        milestone = Milestone.objects.get(id=milestone_id)
+        self.milestone = milestone
+        self.save()
+
+        sc_log_entry = SalesCycleLogEntry(meta=meta, 
+                                          entry_type=SalesCycleLogEntry.MC,
+                                          sales_cycle=self, 
+                                          owner=crmuser)
+        sc_log_entry.save()
+        return self
+
     def close(self, products_with_values):
         amount = 0
         for product, value in products_with_values.iteritems():
@@ -1211,6 +1223,24 @@ class SalesCycle(SubscriptionObject):
         sales_cycles = cls.objects.filter(contact_id=contact_id)\
             .order_by('-latest_activity__date_created')
         return sales_cycles
+
+
+class SalesCycleLogEntry(SubscriptionObject):
+    TYPES_CAPS = (
+        _('Milestone change'),
+    )
+    TYPES = (MC, ) = ('MC', )
+    TYPES_OPTIONS = zip(TYPES, TYPES_CAPS)
+    TYPES_DICT = dict(zip(('MC', ), TYPES))    
+
+    meta = models.TextField(null=True, blank=True)
+    sales_cycle = models.ForeignKey(SalesCycle, related_name='log')
+    entry_type = models.CharField(max_length=2,
+                              choices=TYPES_OPTIONS, default=MC)
+    owner = models.ForeignKey(CRMUser, related_name='owner', null=True)
+    date_created = models.DateTimeField(blank=True, null=True,
+                                        auto_now_add=True)
+    date_edited = models.DateTimeField(blank=True, null=True, auto_now=True)
 
 class Activity(SubscriptionObject):
     title = models.CharField(max_length=100, null=True, blank=True)
