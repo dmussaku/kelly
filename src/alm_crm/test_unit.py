@@ -1346,6 +1346,8 @@ class ActivityResourceTest(ResourceTestMixin, ResourceTestCase):
         activity = Activity.objects.first()
         prev_sales_cycle = activity.sales_cycle
         next_sales_cycle = SalesCycle.objects.last()
+        prev_acts_count = prev_sales_cycle.rel_activities.all().count()
+        next_acts_count = next_sales_cycle.rel_activities.all().count()
         post_data={
             'sales_cycle_id': next_sales_cycle.pk
             }
@@ -1356,6 +1358,11 @@ class ActivityResourceTest(ResourceTestMixin, ResourceTestCase):
         self.assertEqual(self.deserialize(resp)['objects']['activity']['id'], activity.id)
         self.assertEqual(self.deserialize(resp)['objects']['prev_sales_cycle']['id'], prev_sales_cycle.id)
         self.assertEqual(self.deserialize(resp)['objects']['next_sales_cycle']['id'], next_sales_cycle.id)
+        self.assertEqual(list(self.deserialize(resp)['objects']['prev_sales_cycle']['activities']), 
+                        list(prev_sales_cycle.rel_activities.all().values_list('id', flat=True)))
+        self.assertEqual(list(self.deserialize(resp)['objects']['next_sales_cycle']['activities']), 
+                        list(next_sales_cycle.rel_activities.all().values_list('id', flat=True)))
+        self.assertEqual(prev_sales_cycle.rel_activities.all().count()+1, prev_acts_count)
 
         # resp =  self.api_client.post(self.api_path_activity + '%s/move/' % activity.pk)
         # self.assertHttpBadRequest(resp)
