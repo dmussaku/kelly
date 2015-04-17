@@ -1193,6 +1193,7 @@ class SalesCycleResource(CRMServiceModelResource):
         null=True, blank=True, readonly=True, full=True)
     milestone_id = fields.IntegerField(null=True, attribute='milestone_id')
     log = fields.ToManyField('alm_crm.api.SalesCycleLogEntryResource', 'log', null=True, full=True)
+    activities = fields.ToManyField('alm_crm.api.ActivityResource', 'rel_activities', null=True, full=False)
 
     class Meta(CommonMeta):
         queryset = SalesCycle.objects.all().prefetch_related('products')
@@ -1380,6 +1381,9 @@ class SalesCycleResource(CRMServiceModelResource):
             objects['activities'] = list(sales_cycle.rel_activities.all().values_list('id', flat=True))
             sales_cycle.delete()
             return self.create_response(request, {'objects':objects}, response_class=http.HttpAccepted)
+
+    def dehydrate_activities(self, bundle):
+        return list(bundle.obj.rel_activities.values_list('id', flat=True))
 
     def obj_create(self, bundle, **kwargs):
         bundle = super(self.__class__, self).obj_create(bundle, **kwargs)
@@ -2677,6 +2681,7 @@ class AppStateObject(object):
                 'real_value': _value('real_value'),
                 'stat': map(_stat, s.product_stats.all()),
                 'log': map(_log, s.log.all()),
+                'activities': list(s.rel_activities.all().values_list('id', flat=True))
                 })
             if s.milestone:
                 d['milestone_id'] = s.milestone.pk
