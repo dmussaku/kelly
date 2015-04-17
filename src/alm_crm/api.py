@@ -2672,7 +2672,7 @@ class AppStateObject(object):
                 'contact_id': s.contact_id,
                 'projected_value': _value('projected_value'),
                 'real_value': _value('real_value'),
-                'stat': map(_stat, s.salescycleproductstat_set.all()),
+                'stat': map(_stat, s.product_stats.all()),
                 'log': map(_log, s.log.all()),
                 })
             if s.milestone:
