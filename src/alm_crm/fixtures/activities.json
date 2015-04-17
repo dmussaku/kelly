@@ -55,7 +55,7 @@
     "pk": 5, 
     "model": "alm_crm.activity", 
     "fields": {
-        "sales_cycle": 1, 
+        "sales_cycle": 2, 
         "description": "description 5", 
         "title": "Activity", 
         "owner": 2, 

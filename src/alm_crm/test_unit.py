@@ -9,6 +9,7 @@ from alm_crm.models import (
     CRMUser,
     Activity,
     SalesCycle,
+    SalesCycleLogEntry,
     Milestone,
     Product,
     Mention,
@@ -20,7 +21,7 @@ from alm_crm.models import (
     SalesCycleProductStat,
     Filter,
     HashTag,
-    HashTagReference
+    HashTagReference,
     )
 from alm_vcard.models import VCard, Tel, Email, Org
 from alm_user.models import User
@@ -441,7 +442,8 @@ class CommentTestCase(TestCase):
 class SalesCycleTestCase(TestCase):
     fixtures = ['crmusers.json', 'vcards.json', 'contacts.json',
                 'salescycles.json', 'activities.json', 'mentions.json',
-                'products.json', 'values.json', 'salescycle_product_stat']
+                'products.json', 'values.json', 'salescycle_product_stat.json', 
+                'milestones.json', 'comments.json', 'sc_log_entry.json']
 
     def setUp(self):
         super(SalesCycleTestCase, self).setUp()
@@ -501,7 +503,7 @@ class SalesCycleTestCase(TestCase):
     def test_get_activities(self):
         self.assertEqual(
             list(self.sc1.get_activities().values_list('id', flat=True)),
-            [2, 4, 6, 1, 3, 5])
+            [2, 4, 6, 1, 3])
 
     def test_add_product(self):
         count = len(self.sc1.products.all())
@@ -614,6 +616,35 @@ class SalesCycleTestCase(TestCase):
         self.sc1.set_result_by_amount(amount)
         self.assertEqual(self.get_sc(pk=1).real_value.amount, amount)
 
+    def test_delete_sales_cycle(self):
+        sales_cycle = SalesCycle.objects.first()
+        activities = sales_cycle.rel_activities.all()
+        activities_count = activities.count()
+        milestone = sales_cycle.milestone
+        comments = sales_cycle.comments.all().count()
+        product_stats = sales_cycle.product_stats.all()
+        product_stats_count = product_stats.count()
+        log_count = sales_cycle.log.all().count()
+        act_comments = 0
+        for activity in activities:
+            act_comments += activity.comments.all().count()
+
+        all_acts_count = Activity.objects.all().count()
+        milestones_count = Milestone.objects.all().count()
+        comments_count = Comment.objects.all().count()
+        all_product_stats_count = SalesCycleProductStat.objects.all().count()
+        products_count = Product.objects.all().count()
+        all_log_count = SalesCycleLogEntry.objects.all().count()
+
+        sales_cycle.delete()
+
+        self.assertEqual(Activity.objects.all().count()+activities_count, all_acts_count)
+        self.assertEqual(Comment.objects.all().count()+comments+act_comments, comments_count)
+        self.assertEqual(SalesCycleLogEntry.objects.all().count()+log_count, all_log_count)
+
+        self.assertEqual(SalesCycleProductStat.objects.all().count(), all_product_stats_count)
+        self.assertEqual(Product.objects.all().count(), products_count)
+        self.assertEqual(Milestone.objects.all().count(), milestones_count)
 
 class ContactListTestCase(TestCase):
     fixtures = ['crmusers.json', 'contactlist.json', 'users.json']
@@ -749,7 +780,8 @@ class ResourceTestMixin(object):
                 'crmusers.json', 'vcards.json', 'contacts.json',
                 'salescycles.json', 'activities.json', 'products.json',
                 'mentions.json', 'values.json', 'emails.json', 'contactlist.json', 'share.json',
-                'feedbacks.json', 'salescycle_product_stat.json', 'filters.json', 'milestones.json']
+                'feedbacks.json', 'salescycle_product_stat.json', 'filters.json', 'milestones.json',
+                'sc_log_entry.json']
 
     def get_user(self):
         from alm_user.models import User
@@ -956,6 +988,77 @@ class SalesCycleResourceTest(ResourceTestMixin, ResourceTestCase):
             self.api_path_sales_cycle + str(sales_cycle.pk) + '/close/',
             format='json', data=put_data)
         self.assertHttpUnauthorized(resp)
+
+    def test_delete_cycle_service(self):
+        sales_cycle = SalesCycle.objects.get(pk=2)
+        activities = sales_cycle.rel_activities.all()
+        activities_count = activities.count()
+        milestone = sales_cycle.milestone
+        comments = sales_cycle.comments.all().count()
+        product_stats = sales_cycle.product_stats.all()
+        product_stats_count = product_stats.count()
+        log_count = sales_cycle.log.all().count()
+        act_comments = 0
+        for activity in activities:
+            act_comments += activity.comments.all().count()
+
+        all_acts_count = Activity.objects.all().count()
+        milestones_count = Milestone.objects.all().count()
+        comments_count = Comment.objects.all().count()
+        all_product_stats_count = SalesCycleProductStat.objects.all().count()
+        products_count = Product.objects.all().count()
+        all_log_count = SalesCycleLogEntry.objects.all().count()
+
+        sales_cycle_pk = sales_cycle.pk
+        acts_pks = list(sales_cycle.rel_activities.all().values_list('id', flat=True))
+
+        resp = self.api_client.get(
+            self.api_path_sales_cycle+str(sales_cycle.pk)+'/delete/')
+        self.assertHttpAccepted(resp)
+
+        self.assertEqual(self.deserialize(resp)['objects']['activities'], acts_pks)
+        self.assertEqual(self.deserialize(resp)['objects']['sales_cycle'], sales_cycle_pk)
+
+        self.assertEqual(Activity.objects.all().count()+activities_count, all_acts_count)
+        self.assertEqual(Comment.objects.all().count()+comments+act_comments, comments_count)
+        self.assertEqual(SalesCycleLogEntry.objects.all().count()+log_count, all_log_count)
+
+        self.assertEqual(SalesCycleProductStat.objects.all().count(), all_product_stats_count)
+        self.assertEqual(Product.objects.all().count(), products_count)
+        self.assertEqual(Milestone.objects.all().count(), milestones_count)
+
+    def test_try_delete_global(self):
+        sales_cycle = SalesCycle.objects.first()
+        activities = sales_cycle.rel_activities.all()
+        activities_count = activities.count()
+        milestone = sales_cycle.milestone
+        comments = sales_cycle.comments.all().count()
+        product_stats = sales_cycle.product_stats.all()
+        product_stats_count = product_stats.count()
+        log_count = sales_cycle.log.all().count()
+        act_comments = 0
+        for activity in activities:
+            act_comments += activity.comments.all().count()
+
+        all_acts_count = Activity.objects.all().count()
+        milestones_count = Milestone.objects.all().count()
+        comments_count = Comment.objects.all().count()
+        all_product_stats_count = SalesCycleProductStat.objects.all().count()
+        products_count = Product.objects.all().count()
+        all_log_count = SalesCycleLogEntry.objects.all().count()
+
+        resp = self.api_client.get(
+            self.api_path_sales_cycle+str(sales_cycle.pk)+'/delete/')
+
+        self.assertHttpBadRequest(resp)
+
+        self.assertEqual(Activity.objects.all().count(), all_acts_count)
+        self.assertEqual(Comment.objects.all().count(), comments_count)
+        self.assertEqual(SalesCycleLogEntry.objects.all().count(), all_log_count)
+        self.assertEqual(SalesCycleProductStat.objects.all().count(), all_product_stats_count)
+        self.assertEqual(Product.objects.all().count(), products_count)
+        self.assertEqual(Milestone.objects.all().count(), milestones_count)
+        
 
 
 class ActivityResourceTest(ResourceTestMixin, ResourceTestCase):

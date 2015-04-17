@@ -16,7 +16,8 @@
         "to_date": "2014-11-10T09:36:58.880Z",
         "owner": 1,
         "date_created": "2014-11-10T09:36:58.880Z",
-        "subscription_id": 1
+        "subscription_id": 1,
+        "milestone": 1
     }
 },
 {
@@ -24,7 +25,7 @@
     "model": "alm_crm.salescycle",
     "fields": {
         "status": "N",
-        "is_global": true,
+        "is_global": false,
         "latest_activity": 5,
         "description": "New SalesCycle Description",
         "title": "New SalesCycle",
@@ -36,7 +37,8 @@
         "to_date": "2015-01-08T08:28:32.171Z",
         "owner": 1,
         "date_created": "2015-01-08T08:28:32.171Z",
-        "subscription_id": 1
+        "subscription_id": 1,
+        "milestone": 2
     }
 },
 {
@@ -55,7 +57,8 @@
         "owner": 1,
         "date_created": "2014-11-10T09:36:58.880Z",
         "subscription_id": 1,
-        "is_global": true
+        "is_global": true,
+        "milestone": 3
     }
 },
 {
@@ -75,7 +78,8 @@
         "owner": 1,
         "date_created": "2014-11-10T09:36:58.880Z",
         "subscription_id": 1,
-        "is_global": true
+        "is_global": true,
+        "milestone": 4
     }
 },
 {
@@ -95,7 +99,8 @@
         "owner": 1,
         "date_created": "2014-11-10T09:36:58.880Z",
         "subscription_id": 1,
-        "is_global": true
+        "is_global": true,
+        "milestone": 5
     }
 }
 ]

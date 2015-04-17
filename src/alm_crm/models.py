@@ -1765,7 +1765,8 @@ class ContactList(SubscriptionObject):
 
 
 class SalesCycleProductStat(SubscriptionObject):
-    sales_cycle = models.ForeignKey(SalesCycle)
+    sales_cycle = models.ForeignKey(SalesCycle, related_name='product_stats', 
+                                null=True, blank=True, on_delete=models.SET_NULL)
     product = models.ForeignKey(Product)
     value = models.IntegerField(default=0)
 

@@ -1,0 +1,133 @@
+[
+{
+    "pk": 1,
+    "model": "alm_crm.SalesCycleLogEntry",
+    "fields": {
+        "meta":"",
+        "sales_cycle":1,
+        "date_created":"2014-02-01T01:43:00.827Z",
+        "date_edited":"2014-02-01T01:43:00.827Z",
+        "owner":1,
+        "entry_type":"MC",
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 2,
+    "model": "alm_crm.SalesCycleLogEntry",
+    "fields": {
+        "meta":"",
+        "sales_cycle":1,
+        "date_created":"2014-02-01T01:43:00.827Z",
+        "date_edited":"2014-02-01T01:43:00.827Z",
+        "owner":1,
+        "entry_type":"MC",
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 3,
+    "model": "alm_crm.SalesCycleLogEntry",
+    "fields": {
+        "meta":"",
+        "sales_cycle":2,
+        "date_created":"2014-02-01T01:43:00.827Z",
+        "date_edited":"2014-02-01T01:43:00.827Z",
+        "owner":1,
+        "entry_type":"MC",
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 4,
+    "model": "alm_crm.SalesCycleLogEntry",
+    "fields": {
+        "meta":"",
+        "sales_cycle":2,
+        "date_created":"2014-02-01T01:43:00.827Z",
+        "date_edited":"2014-02-01T01:43:00.827Z",
+        "owner":1,
+        "entry_type":"MC",
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 5,
+    "model": "alm_crm.SalesCycleLogEntry",
+    "fields": {
+        "meta":"",
+        "sales_cycle":3,
+        "date_created":"2014-02-01T01:43:00.827Z",
+        "date_edited":"2014-02-01T01:43:00.827Z",
+        "owner":1,
+        "entry_type":"MC",
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 6,
+    "model": "alm_crm.SalesCycleLogEntry",
+    "fields": {
+        "meta":"",
+        "sales_cycle":3,
+        "date_created":"2014-02-01T01:43:00.827Z",
+        "date_edited":"2014-02-01T01:43:00.827Z",
+        "owner":1,
+        "entry_type":"MC",
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 7,
+    "model": "alm_crm.SalesCycleLogEntry",
+    "fields": {
+        "meta":"",
+        "sales_cycle":4,
+        "date_created":"2014-02-01T01:43:00.827Z",
+        "date_edited":"2014-02-01T01:43:00.827Z",
+        "owner":1,
+        "entry_type":"MC",
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 8,
+    "model": "alm_crm.SalesCycleLogEntry",
+    "fields": {
+        "meta":"",
+        "sales_cycle":4,
+        "date_created":"2014-02-01T01:43:00.827Z",
+        "date_edited":"2014-02-01T01:43:00.827Z",
+        "owner":1,
+        "entry_type":"MC",
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 9,
+    "model": "alm_crm.SalesCycleLogEntry",
+    "fields": {
+        "meta":"",
+        "sales_cycle":5,
+        "date_created":"2014-02-01T01:43:00.827Z",
+        "date_edited":"2014-02-01T01:43:00.827Z",
+        "owner":1,
+        "entry_type":"MC",
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 10,
+    "model": "alm_crm.SalesCycleLogEntry",
+    "fields": {
+        "meta":"",
+        "sales_cycle":5,
+        "date_created":"2014-02-01T01:43:00.827Z",
+        "date_edited":"2014-02-01T01:43:00.827Z",
+        "owner":1,
+        "entry_type":"MC",
+        "subscription_id": 1
+    }
+}
+]
+

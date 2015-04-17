@@ -1221,6 +1221,12 @@ class SalesCycleResource(CRMServiceModelResource):
                 self.wrap_view('change_milestone'),
                 name='api_change_milestone'
             ),
+            url(
+                r"^(?P<resource_name>%s)/(?P<id>\d+)/delete%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('delete_sales_cycle'),
+                name='api_delete_sales_cycle'
+            ),
         ]
 
     def close(self, request, **kwargs):
@@ -1349,6 +1355,31 @@ class SalesCycleResource(CRMServiceModelResource):
                     'sales_cycle': SalesCycleResource().get_bundle_detail(sales_cycle, request),
                 },
                 response_class=http.HttpAccepted)
+
+    def delete_sales_cycle(self, request, **kwargs):
+        '''
+        GET METHOD
+        I{URL}:  U{alma.net/api/v1/sales_cycle/:id/delete/}
+
+        B{Description}:
+        delete sales cycle and add in response deleted sales cycle id and related activities ids
+
+        @return: deleted SalesCycle id and related Activities ids
+
+        '''
+        with RequestContext(self, request, allowed_methods=['get']):
+            objects = {}
+            try:
+                sales_cycle = SalesCycle.objects.get(pk=kwargs.get('id'))
+                if sales_cycle.is_global:
+                    return http.HttpBadRequest()
+            except SalesCycle.DoesNotExist:
+                return http.HttpNotFound()
+
+            objects['sales_cycle'] = sales_cycle.id
+            objects['activities'] = list(sales_cycle.rel_activities.all().values_list('id', flat=True))
+            sales_cycle.delete()
+            return self.create_response(request, {'objects':objects}, response_class=http.HttpAccepted)
 
     def obj_create(self, bundle, **kwargs):
         bundle = super(self.__class__, self).obj_create(bundle, **kwargs)
