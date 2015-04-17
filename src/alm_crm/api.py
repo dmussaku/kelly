@@ -1598,7 +1598,10 @@ class ActivityResource(CRMServiceModelResource):
 
     def move_activity(self, request, **kwargs):
         with RequestContext(self, request, allowed_methods=['post']):
-            if not request.POST.get('sales_cycle_id', None):
+            data = self.deserialize(
+            request, request.body,
+            format=request.META.get('CONTENT_TYPE', 'application/json'))
+            if not data.get('sales_cycle_id', None):
                 return http.HttpBadRequest()
             try:
                 activity = Activity.objects.get(pk=kwargs.get('id'))
@@ -1606,7 +1609,7 @@ class ActivityResource(CRMServiceModelResource):
                 return http.HttpNotFound()
 
             try:
-                sales_cycle = SalesCycle.objects.get(pk=request.POST.get('sales_cycle_id', None))
+                sales_cycle = SalesCycle.objects.get(pk=data.get('sales_cycle_id', None))
             except SalesCycle.DoesNotExist:
                 return http.HttpNotFound()
 
