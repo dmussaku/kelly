@@ -1340,7 +1340,22 @@ class ActivityResourceTest(ResourceTestMixin, ResourceTestCase):
         self.assertEqual(hashtag_reference_count+1, HashTagReference.objects.all().count())
         self.assertEqual(mention_count+1, Mention.objects.all().count())
         self.assertEqual(HashTagReference.objects.last().hashtag, 
-                        HashTag.objects.get(text=HashTagReference.objects.last().hashtag.text))        
+                        HashTag.objects.get(text=HashTagReference.objects.last().hashtag.text))   
+
+    def test_move(self):
+        activity = Activity.objects.first()
+        prev_sales_cycle = activity.sales_cycle
+        next_sales_cycle = SalesCycle.objects.last()
+        resp =  self.api_client.get(self.api_path_activity + '%s/move/' % (activity.pk), 
+                                    format='json', data={'sales_cycle_id': next_sales_cycle.pk})
+        self.assertHttpAccepted(resp)
+        self.assertEqual(Activity.objects.first().sales_cycle, next_sales_cycle)
+        self.assertEqual(self.deserialize(resp)['objects']['activity']['id'], activity.id)
+        self.assertEqual(self.deserialize(resp)['objects']['prev_sales_cycle']['id'], prev_sales_cycle.id)
+        self.assertEqual(self.deserialize(resp)['objects']['next_sales_cycle']['id'], next_sales_cycle.id)
+
+        resp =  self.api_client.get(self.api_path_activity + '%s/move/' % activity.pk)
+        self.assertHttpBadRequest(resp)
 
 
 class ProductResourceTest(ResourceTestMixin, ResourceTestCase):

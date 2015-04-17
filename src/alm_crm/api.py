@@ -1368,7 +1368,6 @@ class SalesCycleResource(CRMServiceModelResource):
 
         '''
         with RequestContext(self, request, allowed_methods=['get']):
-            objects = {}
             try:
                 sales_cycle = SalesCycle.objects.get(pk=kwargs.get('id'))
                 if sales_cycle.is_global:
@@ -1376,6 +1375,7 @@ class SalesCycleResource(CRMServiceModelResource):
             except SalesCycle.DoesNotExist:
                 return http.HttpNotFound()
 
+            objects = {}
             objects['sales_cycle'] = sales_cycle.id
             objects['activities'] = list(sales_cycle.rel_activities.all().values_list('id', flat=True))
             sales_cycle.delete()
@@ -1498,6 +1498,12 @@ class ActivityResource(CRMServiceModelResource):
                 self.wrap_view('finish_activity'),
                 name='api_finish_activity'
             ),
+            url(
+                r"^(?P<resource_name>%s)/(?P<id>\d+)/move%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('move_activity'),
+                name='api_move_activity'
+            ),
         ]
 
     def dehydrate(self, bundle):
@@ -1589,6 +1595,37 @@ class ActivityResource(CRMServiceModelResource):
                         obj=activity, request=request
                         )
                     )})
+
+    def move_activity(self, request, **kwargs):
+        with RequestContext(self, request, allowed_methods=['get']):
+            if not request.GET.get('sales_cycle_id', None):
+                return http.HttpBadRequest()
+            try:
+                activity = Activity.objects.get(pk=kwargs.get('id'))
+            except Activity.DoesNotExist:
+                return http.HttpNotFound()
+
+            try:
+                sales_cycle = SalesCycle.objects.get(pk=request.GET.get('sales_cycle_id', None))
+            except SalesCycle.DoesNotExist:
+                return http.HttpNotFound()
+
+            objects = {}
+            objects['prev_sales_cycle'] = SalesCycleResource().full_dehydrate(
+                                            SalesCycleResource().build_bundle(
+                                                obj=activity.sales_cycle, request=request))
+
+            activity.sales_cycle = sales_cycle
+            activity.save()
+            
+            objects['activity'] = ActivityResource().full_dehydrate(
+                                            ActivityResource().build_bundle(
+                                                obj=activity, request=request))
+            objects['next_sales_cycle'] =  SalesCycleResource().full_dehydrate(
+                                            SalesCycleResource().build_bundle(
+                                                obj=sales_cycle, request=request))
+
+            return self.create_response(request, {'objects':objects}, response_class=http.HttpAccepted)
 
     def obj_create(self, bundle, **kwargs):
         act = bundle.obj = self._meta.object_class()
