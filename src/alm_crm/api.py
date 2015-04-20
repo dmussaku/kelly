@@ -1618,12 +1618,12 @@ class ActivityResource(CRMServiceModelResource):
                 return http.HttpNotFound()
 
             objects = {}
-            objects['prev_sales_cycle'] = SalesCycleResource().full_dehydrate(
-                                            SalesCycleResource().build_bundle(
-                                                obj=activity.sales_cycle, request=request))
-
+            prev_sales_cycle = activity.sales_cycle
             activity.sales_cycle = sales_cycle
             activity.save()
+            objects['prev_sales_cycle'] = SalesCycleResource().full_dehydrate(
+                                            SalesCycleResource().build_bundle(
+                                                obj=prev_sales_cycle, request=request))
             
             objects['activity'] = ActivityResource().full_dehydrate(
                                             ActivityResource().build_bundle(
