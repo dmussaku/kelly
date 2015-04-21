@@ -1,3 +1,5 @@
+#!/usr/bin/env python 
+# -*- coding: utf-8 -*- 
 from .models import (
     SalesCycle,
     Milestone,
@@ -89,6 +91,7 @@ import datetime
 import time
 
 from .utils.parser import text_parser
+from .utils import report_builders
 from .utils.data_processing import (
     processing_custom_section_data,
     processing_custom_field_data,
@@ -302,6 +305,12 @@ class ContactResource(CRMServiceModelResource):
                 (self._meta.resource_name, trailing_slash()),
                 self.wrap_view('import_contacts'),
                 name='api_import_contacts_from_vcard'
+            ),
+            url(
+                r"^(?P<resource_name>%s)/delete_contacts%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('delete_contacts'),
+                name='api_delete_contacts_from_vcard'
             ),
         ]
 
@@ -1057,7 +1066,6 @@ class ContactResource(CRMServiceModelResource):
         ...        ],
         ... },
         '''
-
         objects = []
         contact_resource = ContactResource()
         self.method_check(request, allowed=['post'])
@@ -1068,12 +1076,21 @@ class ContactResource(CRMServiceModelResource):
             format=request.META.get('CONTENT_TYPE', 'application/json'))
         current_crmuser = request.user.get_crmuser()
         decoded_string = base64.b64decode(data['uploaded_file'])
-        if data['filename'].split('.')[1]=='csv':
+        filename_chunks = data['filename'].split('.')
+        filename = filename_chunks[len(filename_chunks)-1]
+        if filename=='csv':
             contacts = Contact.import_from_csv(
                 decoded_string, request.user)
+            if type(contacts) == tuple:
+                self.log_throttled_access(request)
+                data = {'success': False, 'error':"Ошибка в ячейке %s в %s-ом ряду." % contacts}
+                return self.error_response(request, data, response_class=http.HttpBadRequest)
+                # return self.create_response(
+                #     request, {'success': False, 'error':"Ошибка в ячейке %s в %s-ом ряду." % contacts})
             if not contacts:
                 self.log_throttled_access(request)
-                return self.create_response(request, {'success': False})
+                return self.error_response(request, {'success': False}, response_class=http.HttpBadRequest)
+                # return self.create_response(request, {'success': False})
             contact_list = ContactList(
                 owner = request.user.get_crmuser(),
                 title = data['filename'])
@@ -1094,12 +1111,19 @@ class ContactResource(CRMServiceModelResource):
                     obj=contact_list
                     )
                 )
-        elif data['filename'].split('.')[1]=='xls' or data['filename'].split('.')[1]=='xlsx':
+        elif filename=='xls' or filename=='xlsx':
             contacts = Contact.import_from_xls(
                 decoded_string, request.user)
-            if not contacts:
+            if type(contacts) == tuple:
                 self.log_throttled_access(request)
-                return self.create_response(request, {'success': False})
+                # data = {'success': False, 'error':"Ошибка в ячейке %s в %s-ом ряду." % contacts}
+                data = {'success': False, 'error':list(contacts)}
+                return self.error_response(request, data, response_class=http.HttpBadRequest)
+                #self.create_response(request, data)
+            elif not contacts:
+                self.log_throttled_access(request)
+                return self.error_response(request, {'success': False}, response_class=http.HttpBadRequest)
+                # return self.create_response(request, {'success': False})
             contact_list = ContactList(
                 owner = request.user.get_crmuser(),
                 title = data['filename'])
@@ -1125,7 +1149,8 @@ class ContactResource(CRMServiceModelResource):
                     decoded_string, current_crmuser)
             if not contacts:
                 self.log_throttled_access(request)
-                return self.create_response(request, {'success': False})
+                return self.error_response(request, {'success': False}, response_class=http.HttpBadRequest)
+                # return self.create_response(request, {'success': False})
             if len(contacts)>1:
                 contact_list = ContactList(
                     owner = request.user.get_crmuser(),
@@ -1156,6 +1181,30 @@ class ContactResource(CRMServiceModelResource):
         return self.create_response(
             request, {'objects': objects, 'contact_list': contact_list})
 
+    def delete_contacts(self, request, **kwargs):
+        """
+        POST METHOD
+        example
+        send {'ids':[1,2,3]}
+        """
+        data = self.deserialize(
+            request, request.body,
+            format=request.META.get('CONTENT_TYPE', 'application/json'))
+        obj_ids = data.get('ids', "")
+        # print obj_ids
+        # print type(obj_ids)
+        with transaction.atomic():
+            for id in obj_ids:
+                try:
+                    obj = Contact.objects.get(id=id)
+                    obj.delete()
+                except ObjectDoesNotExist:
+                    return self.create_response(
+                        request, {'success':False}
+                        )
+        return self.create_response(
+            request, {'success':True}
+            )
 
 class SalesCycleResource(CRMServiceModelResource):
     '''
@@ -1784,6 +1833,7 @@ class ProductResource(CRMServiceModelResource):
             processing_custom_section_data(bundle.data['custom_sections'], bundle.obj)
         if bundle.data.get('custom_fields', None):
             processing_custom_field_data(bundle.data['custom_fields'], bundle.obj)
+        return bundle
 
 class ProductGroupResource(CRMServiceModelResource):
     '''
@@ -2354,16 +2404,16 @@ class ContactListResource(CRMServiceModelResource):
                  'error_string': 'Contact list does not exits'}
                 )
 
-    def check_user(self, request, **kwargs):
+    def check_contact(self, request, **kwargs):
         '''
         GET METHOD
-        I{URL}:  U{alma.net/api/v1/contact/:id/check_user}
+        I{URL}:  U{alma.net/api/v1/contact/:id/check_contact}
 
         Description:
-        Api function to return existence user in the contact list
+        Api function to return existence contact in the contact list
 
-        @type  user_id: number
-        @param user_id: User id which you are checking.
+        @type  contact_id: number
+        @param contact_id: contact id which you are checking.
 
         @return:  success and list of boolean fields
 
@@ -2378,7 +2428,7 @@ class ContactListResource(CRMServiceModelResource):
             if not contact_id:
                 return self.create_response(
                     request,
-                    {'success': False, 'error_string': 'User id is not set'}
+                    {'success': False, 'error_string': 'contact id is not set'}
                     )
             return self.create_response(
                 request,
@@ -2465,7 +2515,6 @@ class ContactListResource(CRMServiceModelResource):
                 {'success': False,
                  'error_string': 'Contact list does not exits'}
                 )
-
 
 class AppStateObject(object):
     '''
@@ -2834,7 +2883,7 @@ class AppStateResource(Resource):
 
     class Meta:
         resource_name = 'app_state'
-        object_class = AppStateObject
+        # object_class = AppStateObject
         authorization = Authorization()
 
     def prepend_urls(self):
@@ -3103,3 +3152,54 @@ class CustomFieldResource(CRMServiceModelResource):
         if not crmuser:
             return
         return bundle
+
+class ReportResource(Resource):
+    '''
+    ALL Method
+    I{URL}:  U{alma.net/api/v1/reports/}
+
+    B{Description}:
+    API resource to get data for reports
+
+    @undocumented: Meta
+    '''
+
+    class Meta:
+        resource_name = 'reports'
+        object_class = AppStateObject
+        authorization = Authorization()
+
+    def prepend_urls(self):
+        return [
+            url(
+                r"^(?P<resource_name>%s)/funnel%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('funnel'),
+                name='api_funnel'
+            ),
+            url(
+                r"^(?P<resource_name>%s)/realtime_funnel%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('realtime_funnel'),
+                name='api_realtime_funnel'
+            )]
+
+    def funnel(self, request, **kwargs):
+        '''
+        retrieves data for building sales funnel
+        '''
+        
+
+        return self.create_response(
+            request,
+            report_builders.build_funnel(request.user.get_crmuser().subscription_id))
+
+    def realtime_funnel(self, request, **kwargs):
+        '''
+        retrieves data for building sales funnel
+        '''
+        
+
+        return self.create_response(
+            request,
+            report_builders.build_realtime_funnel(request.user.get_crmuser().subscription_id))

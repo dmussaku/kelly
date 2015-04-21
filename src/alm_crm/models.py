@@ -36,6 +36,8 @@ CURRENCY_OPTIONS = (
 GLOBAL_CYCLE_TITLE = 'Основной поток'
 GLOBAL_CYCLE_DESCRIPTION = 'Автоматически созданный цикл'
 
+def type_cast(input):
+    return input if type(input) != float else str(input)
 
 class CRMUser(SubscriptionObject):
 
@@ -604,12 +606,14 @@ class Contact(SubscriptionObject):
         return contact_list
 
 
+
     @classmethod
-    @transaction.atomic()
+    @transaction.atomic
     def import_from_xls(cls, xls_file_data, creator):
         book = xlrd.open_workbook(file_contents=xls_file_data)
         sheets_left = True
         contacts = []
+        sid = transaction.savepoint()
         for sheet in book.sheets():
             i = 1
             header_row = sheet.row(0)
@@ -621,14 +625,30 @@ class Contact(SubscriptionObject):
                     continue
                 c = cls()
                 v = VCard()
-                v.family_name = data[0].value if type(data[0].value) == unicode else str(data[0].value)
-                v.given_name = data[1].value if type(data[1].value) == unicode else str(data[1].value)
-                v.additional_name = data[2].value if type(data[2].value) == unicode else str(data[2].value)
+                try:
+                    v.family_name = data[0].value if type(data[0].value) == unicode else str(data[0].value)
+                except:
+                    transaction.savepoint_rollback(sid)
+                    return (i,1)
+                try:
+                    v.given_name = data[1].value if type(data[1].value) == unicode else str(data[1].value)
+                except:
+                    transaction.savepoint_rollback(sid)
+                    return (i,2)
+                try:
+                    v.additional_name = data[2].value if type(data[2].value) == unicode else str(data[2].value)
+                except:
+                    transaction.savepoint_rollback(sid)
+                    return (i,3)
                 v.fn = v.given_name+" "+v.family_name
                 if ((not v.given_name) and (not v.family_name) and data[4].value):
-                    v = VCard(fn=data[4].value)
-                    v.save()
-                    c = cls(vcard=v, tp='co')
+                    try:
+                        v = VCard(fn=data[4].value)
+                        v.save()
+                        c = cls(vcard=v, tp='co')
+                    except:
+                        transaction.savepoint_rollback(sid)
+                        return (i,5)
                     c.owner = creator.get_crmuser()
                     c.subscription_id = creator.get_crmuser().subscription_id
                     c.save()
@@ -638,85 +658,144 @@ class Contact(SubscriptionObject):
                     c.owner = creator.get_crmuser()
                     c.subscription_id = creator.get_crmuser().subscription_id
                     c.save()
-                with transaction.atomic():
-                    SalesCycle.create_globalcycle(**{
-                        'subscription_id':c.subscription_id,
-                        'owner_id': c.owner_id,
-                        'contact_id': c.id
-                    })
+                SalesCycle.create_globalcycle(**{
+                    'subscription_id':c.subscription_id,
+                    'owner_id': c.owner_id,
+                    'contact_id': c.id
+                })
+                try:
                     if data[3].value:
-                        positions = data[3].value.split(';')
-                        for position in data[3].value.split(';'):
+                        positions = type_cast(data[3].value).split(';')
+                        for position in positions:
                             title = Title(
                                 vcard=v,
                                 data=position
                                 )
                             title.save()
+                except:
+                    transaction.savepoint_rollback(sid)
+                    return (i, 4)
+                try:
                     if data[4].value:
                         org = Org(vcard=v)
-                        org.organization_name = data[4].value
-                        if data[5].value:
-                             org.organization_unit = data[5].value
-                        org.save()
+                        org.organization_name = type_cast(data[4].value)
+                        try:
+                            if data[5].value:
+                                org.organization_unit = type_cast(data[5].value)
+                            org.save()
+                        except:
+                            transaction.savepoint_rollback(sid)
+                            return (i, 6)
+                except:
+                    transaction.savepoint_rollback(sid)
+                    return (i, 5)
+                try:
                     if data[6].value:
-                        for phone in str(data[6].value).split(';'):
+                        phones = type_cast(data[6].value).split(';')
+                        for phone in phones:
                             tel = Tel(vcard=v, type='WORK')
                             tel.value = phone
                             tel.save()
+                except:
+                    transaction.savepoint_rollback(sid)
+                    return (i,7)
+                try:
                     if data[7].value:
-                        for phone in str(data[7].value).split(';'):
+                        phones = type_cast(data[7].value).split(';')
+                        for phone in phones:
                             tel = Tel(vcard=v, type='cell')
                             tel.value = phone
                             tel.save()
+                except:
+                    transaction.savepoint_rollback(sid)
+                    return (i, 8)
+                try:
                     if data[8].value:
-                        for phone in str(data[8].value).split(';'):
+                        phones = type_cast(data[8].value).split(';')
+                        for phone in phones:
                             tel = Tel(vcard=v, type='xadditional')
                             tel.value = phone
                             tel.save()
+                except:
+                    transaction.savepoint_rollback(sid)
+                    return (i, 9)
+                try:
                     if data[9].value:
-                        for phone in str(data[9].value).split(';'):
+                        phones = type_cast(data[9].value).split(';')
+                        for phone in phones:
                             tel = Tel(vcard=v, type='fax')
                             tel.value = phone
                             tel.save()
+                except:
+                    transaction.savepoint_rollback(sid)
+                    return (i, 10)
+                try:
                     if data[10].value:
-                        try:
-                            for email_str in str(data[10].value).split(';'):
-                                email = Email(vcard=v, type='work')
-                                email.value = email_str
-                                email.save()
-                        except:
-                            pass
+                        emails = type_cast(data[10].value).split(';')
+                        for email_str in emails:
+                            email = Email(vcard=v, type='work')
+                            email.value = email_str
+                            email.save()
+                except:
+                    transaction.savepoint_rollback(sid)
+                    return (i, 11)
+                try:
                     if data[11].value:
-                        for email_str in str(data[11].value).split(';'):
+                        emails = type_cast(data[11].value).split(';')
+                        for email_str in emails:
                             email = Email(vcard=v, type='internet')
                             email.value = email_str
                             email.save()
+                except:
+                    transaction.savepoint_rollback(sid)
+                    return (i, 12)
+                try:
                     if data[12].value:
-                        for address_str in data[12].value.split(';;'):
+                        adresses = type_cast(data[12].value).split(';;')
+                        for address_str in adresses:
                             addr_objs = address_str.split(';')
                             addr_objs = [v,'POSTAL'] + addr_objs
                             address = Adr.create_from_list(addr_objs)
+                except:
+                    transaction.savepoint_rollback(sid)
+                    return (i, 13)
+                try:
                     if data[13].value:
-                        for address_str in data[13].value.split(';;'):
+                        adresses = type_cast(data[13].value).split(';;')
+                        for address_str in adresses:
                             addr_objs = address_str.split(';')
-                            addr_objs = [v,'POSTAL'] + addr_objs
+                            addr_objs = [v,'xlegal'] + addr_objs
                             address = Adr.create_from_list(addr_objs)
+                except:
+                    transaction.savepoint_rollback(sid)
+                    return (i, 14)
+                try:
                     if data[14].value:
-                        for address_str in data[14].value.split(';;'):
+                        adresses = type_cast(data[14].value).split(';;')
+                        for address_str in adresses:
                             addr_objs = address_str.split(';')
-                            addr_objs = [v,'POSTAL'] + addr_objs
+                            addr_objs = [v,'WORK'] + addr_objs
                             address = Adr.create_from_list(addr_objs)
+                except:
+                    transaction.savepoint_rollback(sid)
+                    return (i, 15)
+                try:
                     if data[15].value:
-                        for site in data[15].value.split(';'):
+                        sites = type_cast(data[15].value).split('')
+                        for site in sites:
                             url = Url(
                                 vcard=v,
                                 type='website',
                                     value=site
                                     )
                             url.save()
+                except:
+                    transaction.savepoint_rollback(sid)
+                    return (i, 16)
                 contacts.append(c)
                 # print "%s created contact %s" % (c, c.id)
                 i = i+1
+        transaction.savepoint_commit(sid)
         return contacts
 
     @classmethod
@@ -1717,7 +1796,7 @@ class ContactList(SubscriptionObject):
 
     def check_contact(self, contact_id):
         try:
-            contact = self.contacts.get(contact_id=contact_id)
+            contact = self.contacts.get(id=contact_id)
             if contact is not None:
                 return True
             else:
@@ -1728,8 +1807,8 @@ class ContactList(SubscriptionObject):
     def get_contacts(self):
         return self.contacts
 
-    def add_contacts(self, user_ids):
-        assert isinstance(user_ids, (tuple, list)), 'must be a list'
+    def add_contacts(self, contact_ids):
+        assert isinstance(contact_ids, (tuple, list)), 'must be a list'
         status = []
         for contact_id in contact_ids:
             try:

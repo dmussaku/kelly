@@ -32,7 +32,8 @@ from alm_crm.api import (
     FilterResource,
     CommentResource,
     CustomSectionResource,
-    CustomFieldResource
+    CustomFieldResource,
+    ReportResource
     )
 from alm_user.api import UserResource
 from tastypie.resources import ModelResource
@@ -64,6 +65,7 @@ v1_api.register(CommentResource())
 v1_api.register(CustomSectionResource())
 v1_api.register(CustomFieldResource())
 v1_api.register(MilestoneResource())
+v1_api.register(ReportResource())
 
 
 urlpatterns = patterns(

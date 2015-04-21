@@ -431,7 +431,7 @@ class CommentTestCase(TestCase):
         self.assertEqual(Comment.get_comments_by_context(1, Activity)
                          .count(), activity1.comments.count())
         self.assertEqual(Comment.get_comments_by_context(1, Activity)
-                         .count(), 4)
+                         .count(), 30)
 
     def test_add_mention(self):
         count = self.comment.mentions.count()
@@ -647,7 +647,7 @@ class SalesCycleTestCase(TestCase):
         self.assertEqual(Milestone.objects.all().count(), milestones_count)
 
 class ContactListTestCase(TestCase):
-    fixtures = ['crmusers.json', 'contactlist.json', 'users.json']
+    fixtures = ['crmusers.json', 'contactlist.json', 'users.json', 'contacts.json']
 
     def setUp(self):
         super(self.__class__, self).setUp()
@@ -657,57 +657,58 @@ class ContactListTestCase(TestCase):
         contact_list = ContactList(title = 'UNREGISTERED')
         self.assertEqual(contact_list.__unicode__(), 'UNREGISTERED')
 
-    def test_add_user(self):
-        crm_user = CRMUser.objects.get(id=2)
-        self.contact_list.add_user(user_id=crm_user.id)
-        self.assertEqual(self.contact_list.users.get(user_id=2), crm_user)
-        self.assertFalse(self.contact_list.add_user(user_id=1)[0])
+    def test_add_contact(self):
+        contact = Contact.objects.get(id=2)
+        self.contact_list.add_contact(contact_id=contact.id)
+        self.assertEqual(self.contact_list.contacts.get(id=2), contact)
+        self.assertFalse(self.contact_list.add_contact(contact_id=1)[0])
 
 
-    def test_user_contact_lists(self):
-        crm_user = CRMUser.objects.get(pk=1)
+    def test_contact_contact_lists(self):
+        contact = Contact.objects.get(pk=1)
         self.assertEqual(self.contact_list,
-                                crm_user.contact_list.get(id=1))
+                                contact.contact_list.get(id=1))
 
 
-    def test_add_users(self):
-        crm_user_1 = CRMUser.objects.get(id=1)
-        crm_user_2 = CRMUser.objects.get(id=2)
-        crm_user_3 = CRMUser.objects.get(id=3)
-        self.assertEqual(self.contact_list.add_users(user_ids=[crm_user_1.id, crm_user_2.id, crm_user_3.id]), [False, True, True])
-        self.assertEqual(self.contact_list.users.get(user_id=crm_user_2.id), crm_user_2)
-        self.assertEqual(self.contact_list.users.get(user_id=crm_user_3.id), crm_user_3)
+    def test_add_contacts(self):
+        contact_1 = Contact.objects.get(id=1)
+        contact_2 = Contact.objects.get(id=2)
+        contact_3 = Contact.objects.get(id=3)
+        contact_list = ContactList.objects.get(pk=2)
+        self.assertEqual(contact_list.add_contacts(contact_ids=[contact_1.id, contact_2.id, contact_3.id]), [True, False, True])
+        self.assertEqual(self.contact_list.contacts.get(id=contact_2.id), contact_2)
+        self.assertEqual(self.contact_list.contacts.get(id=contact_3.id), contact_3)
 
-    def test_check_user(self):
-        crm_user_1 = CRMUser.objects.get(id=1)
-        crm_user_2 = CRMUser.objects.get(id=2)
-        crm_user_3 = CRMUser.objects.get(id=3)
-        self.contact_list.add_user(user_id=crm_user_2.id)
-        self.assertTrue(self.contact_list.check_user(user_id=crm_user_1.id))
-        self.assertTrue(self.contact_list.check_user(user_id=crm_user_2.id))
-        self.assertFalse(self.contact_list.check_user(user_id=crm_user_3.id))
+    def test_check_contact(self):
+        contact_1 = Contact.objects.get(id=1)
+        contact_2 = Contact.objects.get(id=2)
+        contact_3 = Contact.objects.get(id=3)
+        self.contact_list.add_contact(contact_id=contact_2.id)
+        self.assertTrue(self.contact_list.check_contact(contact_id=contact_1.id))
+        self.assertTrue(self.contact_list.check_contact(contact_id=contact_2.id))
+        self.assertTrue(self.contact_list.check_contact(contact_id=contact_3.id))
 
-    def test_delete_user(self):
-        crm_user_1 = CRMUser.objects.get(id=1)
-        crm_user_2 = CRMUser.objects.get(id=2)
-        crm_user_3 = CRMUser.objects.get(id=3)
+    def test_delete_contact(self):
+        contact_1 = Contact.objects.get(id=1)
+        contact_2 = Contact.objects.get(id=2)
+        contact_3 = Contact.objects.get(id=3)
         contact_list2 = ContactList(title='Test Contact list')
         contact_list2.save()
-        contact_list2.add_users(user_ids=[crm_user_1.id, crm_user_2.id])
-        self.assertFalse(contact_list2.delete_user(user_id=crm_user_3.id))
-        self.assertTrue(contact_list2.delete_user(user_id=crm_user_2.id))
-        self.assertFalse(contact_list2.delete_user(user_id=crm_user_2.id))
-        self.assertTrue(contact_list2.delete_user(user_id=crm_user_1.id))
-        self.assertFalse(contact_list2.delete_user(user_id=crm_user_1.id))
+        contact_list2.add_contacts(contact_ids=[contact_1.id, contact_2.id])
+        self.assertFalse(contact_list2.delete_contact(contact_id=contact_3.id))
+        self.assertTrue(contact_list2.delete_contact(contact_id=contact_2.id))
+        self.assertFalse(contact_list2.delete_contact(contact_id=contact_2.id))
+        self.assertTrue(contact_list2.delete_contact(contact_id=contact_1.id))
+        self.assertFalse(contact_list2.delete_contact(contact_id=contact_1.id))
         self.assertEqual(contact_list2.count(), 0)
 
     def test_count(self):
-        crm_user_1 = CRMUser.objects.get(id=1)
-        crm_user_2 = CRMUser.objects.get(id=2)
-        crm_user_3 = CRMUser.objects.get(id=3)
+        contact_1 = Contact.objects.get(id=1)
+        contact_2 = Contact.objects.get(id=2)
+        contact_3 = Contact.objects.get(id=3)
         contact_list2 = ContactList(title='Test Contact list')
         contact_list2.save()
-        contact_list2.add_users(user_ids=[crm_user_1.id, crm_user_2.id, crm_user_3.id])
+        contact_list2.add_contacts(contact_ids=[contact_1.id, contact_2.id, contact_3.id])
         self.assertEqual(contact_list2.count(), 3)
 
 class FilterTestCase(TestCase):
@@ -1560,7 +1561,7 @@ class ContactResourceTest(ResourceTestMixin, ResourceTestCase):
         # verify that new one has been added.
         self.assertEqual(Contact.objects.count(), count + 1)
         created_contact = Contact.objects.last()
-        self.assertEqual(created_contact.sales_cycles.first().title, GLOBAL_CYCLE_TITLE)
+        self.assertEqual(created_contact.sales_cycles.first().title, GLOBAL_CYCLE_TITLE.decode('utf-8'))
 
     def test_delete_contact(self):
         count = Contact.objects.count()
@@ -1709,15 +1710,27 @@ class ContactResourceTest(ResourceTestMixin, ResourceTestCase):
 
         resp = self.api_client.post(
             self.api_path_contact+"import/", format='json', data=post_data)
+        self.assertContains(resp, '"error":', status_code=400)
+        self.assertEqual(Contact.objects.all().count(), count)
+        file_path = os.path.join(os.path.dirname(os.path.dirname(__file__)),
+                                 'alm_crm/fixtures/correct_contacts_format.xlsx')
+        post_data={
+            'filename': 'aliya.xls',
+            'uploaded_file': base64.b64encode(open(file_path, "rb").read())
+            }
+        resp = self.api_client.post(
+            self.api_path_contact+"import/", format='json', data=post_data)
         self.assertHttpOK(resp)
-        self.assertEqual(Contact.objects.all().count(), count+23)
+
+        self.assertEqual(Contact.objects.all().count(), count+17)
 
     def test_import_from_vcard(self):
         uploaded_file = os.path.join(os.path.dirname(os.path.dirname(__file__)),
                                  'alm_crm/fixtures/nurlan.vcf')
+        import base64
         post_data = {
             'filename': 'nurlan.vcf',
-            "uploaded_file": open(uploaded_file, "r").read()
+            "uploaded_file": base64.b64encode(open(uploaded_file, "r").read())
         }
 
         amount_before_import = SalesCycle.objects.all().count()
@@ -1749,14 +1762,14 @@ class ContactResourceTest(ResourceTestMixin, ResourceTestCase):
                                                     order_by=[])
         self.assertEqual(amount_after_import, amount_before_import+3)
         self.assertTrue(c.sales_cycles.first().title == GLOBAL_CYCLE_TITLE for c in contact4)
-        self.assertTrue('global_sales_cycle' in self.deserialize(resp)['success'][i].keys()
-                        for i in range(0,3))
-        self.assertEqual(self.deserialize(resp)['success'][0]['global_sales_cycle']['id'],
-                        contact1.first().sales_cycles.get(is_global=True).id)
-        self.assertEqual(self.deserialize(resp)['success'][1]['global_sales_cycle']['id'],
-                        contact2.first().sales_cycles.get(is_global=True).id)
-        self.assertEqual(self.deserialize(resp)['success'][2]['global_sales_cycle']['id'],
-                        contact3.first().sales_cycles.get(is_global=True).id)
+        # self.assertTrue('global_sales_cycle' in self.deserialize(resp)['success'][i].keys()
+        #                 for i in range(0,3))
+        # self.assertEqual(self.deserialize(resp)['success'][0]['global_sales_cycle']['id'],
+        #                 contact1.first().sales_cycles.get(is_global=True).id)
+        # self.assertEqual(self.deserialize(resp)['success'][1]['global_sales_cycle']['id'],
+        #                 contact2.first().sales_cycles.get(is_global=True).id)
+        # self.assertEqual(self.deserialize(resp)['success'][2]['global_sales_cycle']['id'],
+        #                 contact3.first().sales_cycles.get(is_global=True).id)
         self.assertEqual(len(Contact.objects.all()), amout_of_contacts_before_import+3)
         self.assertEqual(len(contact4), 3)
         self.assertTrue(contact1.first() in Contact.objects.all())
@@ -1804,19 +1817,19 @@ class ContactListResourceTest(ResourceTestMixin, ResourceTestCase):
             )
 
     def test_create_contact_list(self):
-        user = CRMUser.objects.last()
+        contact = Contact.objects.last()
         post_data = {
-            'owner': CRMUser.objects.first(),
+            'owner': Contact.objects.first(),
             'title': 'Mobiliuz',
-            'users': [{'pk':user.pk}]
+            'contacts': [contact.pk]
         }
 
-        count = user.contact_list.count()
+        count = contact.contact_list.count()
         self.assertHttpCreated(self.api_client.post(
             self.api_path_contact_list, format='json', data=post_data))
-        contact_list = user.contact_list.last()
+        contact_list = contact.contact_list.last()
         # verify that new one has been added.
-        self.assertEqual(user.contact_list.count(), count + 1)
+        self.assertEqual(contact.contact_list.count(), count + 1)
         self.assertEqual(ContactList.objects.last().title, 'Mobiliuz')
 
     def test_delete_contact_list(self):
@@ -1833,83 +1846,83 @@ class ContactListResourceTest(ResourceTestMixin, ResourceTestCase):
 
 
     def test_delete_user_from_contact_list(self):
-        api_path_delete_user = self.api_path_contact_list+'%s/delete_user/' % self.contact_list.pk
-        user_id = self.contact_list.users.first().id
-        count = self.contact_list.users.all().count()
-        self.assertHttpOK(self.api_client.get(api_path_delete_user+'?user_id=%d'%user_id))
-        self.assertEqual(self.contact_list.users.all().count(), count-1)
-        self.assertHttpOK(self.api_client.get(api_path_delete_user+'?user_id=%d'%user_id))
-        self.assertEqual(self.contact_list.users.all().count(), count-1)
+        api_path_delete_contact = self.api_path_contact_list+'%s/delete_contact/' % self.contact_list.pk
+        contact_id = self.contact_list.contacts.first().id
+        count = self.contact_list.contacts.all().count()
+        self.assertHttpOK(self.api_client.get(api_path_delete_contact+'?contact_id=%d'%contact_id))
+        self.assertEqual(self.contact_list.contacts.all().count(), count-1)
+        self.assertHttpOK(self.api_client.get(api_path_delete_contact+'?contact_id=%d'%contact_id))
+        self.assertEqual(self.contact_list.contacts.all().count(), count-1)
 
-    def test_add_users(self):
-        user = CRMUser.objects.get(pk=3)
-        user3 = CRMUser.objects.get(pk=2)
-        user4 = CRMUser.objects.get(pk=1)
-        users = [user.pk, user3.pk, user4.pk]
+    def test_add_contacts(self):
+        contact = Contact.objects.get(pk=3)
+        contact3 = Contact.objects.get(pk=2)
+        contact4 = Contact.objects.get(pk=1)
+        contacts = [contact.pk, contact3.pk, contact4.pk]
+        contact_list = ContactList.objects.get(pk=2)
 
-        api_path_add_user = self.api_path_contact_list+'%s/add_users/' % self.contact_list.pk
-        count = self.contact_list.users.all().count()
+        api_path_add_contact = self.api_path_contact_list+'%s/add_contacts/' % contact_list.pk
+        count = contact_list.contacts.all().count()
 
-        self.assertHttpOK(self.api_client.get(api_path_add_user+'?user_ids=%s'%[user.pk]))
-        self.assertEqual(self.contact_list.users.all().count(), count+1)
+        self.assertHttpOK(self.api_client.get(api_path_add_contact+'?contact_ids=%s'%[contact.pk]))
+        self.assertEqual(contact_list.contacts.all().count(), count+1)
 
-        self.assertHttpOK(self.api_client.get(api_path_add_user+'?user_ids=%s'%[user.pk]))
-        self.assertEqual(self.contact_list.users.all().count(), count+1)
+        self.assertHttpOK(self.api_client.get(api_path_add_contact+'?contact_ids=%s'%[contact3.pk]))
+        self.assertEqual(contact_list.contacts.all().count(), count+1)
 
         count = count+1
-        self.assertHttpOK(self.api_client.get(api_path_add_user+'?user_ids=%s'%users))
-        self.assertEqual(self.contact_list.users.all().count(), count+1)
+        self.assertHttpOK(self.api_client.get(api_path_add_contact+'?contact_ids=%s'%contacts))
+        self.assertEqual(contact_list.contacts.all().count(), count+1)
 
         contact_list2 = ContactList(title='HP Webcam')
         contact_list2.save()
-        count = contact_list2.users.all().count()
-        api_path_add_user = self.api_path_contact_list+'%s/add_users/' % contact_list2.pk
+        count = contact_list2.contacts.all().count()
+        api_path_add_contact = self.api_path_contact_list+'%s/add_contacts/' % contact_list2.pk
 
-        self.assertHttpOK(self.api_client.post(api_path_add_user+'?user_ids=%s'%users))
-        self.assertEqual(contact_list2.users.all().count(), count+3)
+        self.assertHttpOK(self.api_client.post(api_path_add_contact+'?contact_ids=%s'%contacts))
+        self.assertEqual(contact_list2.contacts.all().count(), count+3)
 
-    def test_check_user(self):
-        user = CRMUser.objects.get(pk=1)
-        user2 = CRMUser.objects.get(pk=2)
+    def test_check_contact(self):
+        contact = Contact.objects.get(pk=1)
+        contact2 = Contact.objects.get(pk=2)
 
-        api_path_check_user = self.api_path_contact_list+'%s/check_user/?user_id=%s' % \
-                                                            (self.contact_list.pk, user.pk)
+        api_path_check_contact = self.api_path_contact_list+'%s/check_contact/?contact_id=%s' % \
+                                                            (self.contact_list.pk, contact.pk)
 
-        get_list_check_user_resp = self.api_client.get(api_path_check_user,
+        get_list_check_contact_resp = self.api_client.get(api_path_check_contact,
                                                                             format='json',
                                                                             HTTP_HOST='localhost')
 
-        get_list_check_user_des = self.deserialize(get_list_check_user_resp)
-        self.assertTrue(get_list_check_user_des['success'])
+        get_list_check_contact_des = self.deserialize(get_list_check_contact_resp)
+        self.assertTrue(get_list_check_contact_des['success'])
 
-        api_path_check_user = self.api_path_contact_list+'%s/check_user/?user_id=%s' % \
-                                                            (self.contact_list.pk, user2.pk)
+        api_path_check_contact = self.api_path_contact_list+'%s/check_contact/?contact_id=%s' % \
+                                                            (self.contact_list.pk, 4)
 
-        get_list_check_user_resp = self.api_client.get(api_path_check_user,
+        get_list_check_contact_resp = self.api_client.get(api_path_check_contact,
                                                                             format='json',
                                                                             HTTP_HOST='localhost')
 
-        get_list_check_user_des = self.deserialize(get_list_check_user_resp)
-        self.assertFalse(get_list_check_user_des['success'])
+        get_list_check_contact_des = self.deserialize(get_list_check_contact_resp)
+        self.assertFalse(get_list_check_contact_des['success'])
 
-    def test_get_users(self):
-        user = CRMUser.objects.get(pk=1)
+    def test_get_contacts(self):
+        contact = Contact.objects.get(pk=1)
 
-        api_path_get_user = self.api_path_contact_list+'%s/users/' % \
+        api_path_get_contact = self.api_path_contact_list+'%s/contacts/' % \
                                                             self.contact_list.pk
 
-        get_list_get_user_resp = self.api_client.get(api_path_get_user,
+        get_list_get_contact_resp = self.api_client.get(api_path_get_contact,
                                                                             format='json',
                                                                             HTTP_HOST='localhost')
 
-        get_list_get_user_des = self.deserialize(get_list_get_user_resp)
+        get_list_get_contact_des = self.deserialize(get_list_get_contact_resp)
 
-        users = self.contact_list.users.all()
-        self.assertEqual(get_list_get_user_des['objects'][0]['user_id'], users.first().user_id)
-        self.assertEqual(get_list_get_user_des['objects'][0]['id'], users.first().id)
+        contacts = self.contact_list.contacts.all()
+        self.assertEqual(get_list_get_contact_des['objects'][0]['id'], contacts.first().id)
 
 
-    def test_update_product_via_put(self):
+    def test_update_contactlist_via_put(self):
         # get exist product data
         p = ContactList.objects.first()
         contactlist = self.get_detail_des(p.pk)
@@ -1922,9 +1935,6 @@ class ContactListResourceTest(ResourceTestMixin, ResourceTestCase):
         self.assertEqual(self.get_detail_des(p.pk)['contacts'], [1])
 
 
-
-
-
 class AppStateResourceTest(ResourceTestMixin, ResourceTestCase):
 
     def setUp(self):
@@ -1935,7 +1945,7 @@ class AppStateResourceTest(ResourceTestMixin, ResourceTestCase):
 
         self.api_path_app_state_list = '/api/v1/app_state/'
 
-        # get_detail(pk)
+
         self.get_detail_resp = \
             lambda pk: self.api_client.get(
                 self.api_path_app_state_list+str(pk)+'/',
@@ -1948,7 +1958,8 @@ class AppStateResourceTest(ResourceTestMixin, ResourceTestCase):
 
     def test_get(self):
         app_state = self.get_detail_des(self.subscription.service.slug)
-        # self.assertTrue('objects' in app_state)
+        self.assertHttpOK(self.get_detail_resp(self.subscription.service.slug))
+        self.assertTrue('objects' in app_state)
         self.assertTrue('users' in app_state['objects'])
         self.assertTrue('company' in app_state['objects'])
         self.assertTrue('contacts' in app_state['objects'])
@@ -2540,7 +2551,7 @@ class UserResourceTest(ResourceTestMixin, ResourceTestCase):
 
         # get_detail(pk)
         self.get_detail_resp = \
-            lambda pk: self.api_client.get(self.api_path_comment+str(pk)+'/',
+            lambda pk: self.api_client.get(self.api_path_user+str(pk)+'/',
                                            format='json',
                                            HTTP_HOST='localhost')
         self.get_detail_des = \
@@ -2548,121 +2559,18 @@ class UserResourceTest(ResourceTestMixin, ResourceTestCase):
 
         self.user = User.objects.first()
 
-    # def test_get_list_valid_json(self):
-    #     self.assertValidJSONResponse(self.get_list_resp)
+    def test_get_list_valid_json(self):
+        self.assertValidJSONResponse(self.get_list_resp)
 
-    # def test_get_list_non_empty(self):
-    #     self.assertTrue(self.get_list_des['meta']['total_count'] > 0)
+    def test_get_list_non_empty(self):
+        self.assertTrue(self.get_list_des['meta']['total_count'] > 0)
 
-    # def test_get_detail(self):
-    #     self.assertEqual(
-    #         self.get_detail_des(self.comment.pk)['comment'],
-    #         self.comment.comment
-    #         )
+    def test_get_detail(self):
+        self.assertEqual(
+            self.get_detail_des(self.user.pk)['email'],
+            self.user.email
+            )
 
-    # def test_create_comment_for_activity(self):
-    #     activity = Activity.objects.last()
-    #     crmuser = CRMUser.objects.last()
-    #     post_data={
-    #         'comment': 'new test comment',
-    #         'author_id': crmuser.pk,
-    #         'activity_id': activity.pk
-    #     }
-    #     self.assertHttpCreated(self.api_client.post(
-    #         self.api_path_comment, format='json', data=post_data))
-    #     comment = Comment.objects.last()
-    #     self.assertEqual(comment.comment, 'new test comment')
-    #     self.assertEqual(comment.owner, crmuser)
-    #     self.assertEqual(comment.object_id, activity.id)
-    #     self.assertEqual(comment.content_object.__class__, Activity)
-    #     self.assertEqual(comment.content_object, activity)
-    #     self.assertIsInstance(comment.subscription_id, int)
-
-    # def test_create_comment_for_feedback(self):
-    #     feedback = Feedback.objects.last()
-    #     crmuser = CRMUser.objects.last()
-    #     post_data={
-    #         'comment': 'new test comment',
-    #         'author_id': crmuser.pk,
-    #         'feedback_id': feedback.pk
-    #     }
-    #     self.assertHttpCreated(self.api_client.post(
-    #         self.api_path_comment, format='json', data=post_data))
-    #     comment = Comment.objects.last()
-    #     self.assertEqual(comment.comment, 'new test comment')
-    #     self.assertEqual(comment.owner, crmuser)
-    #     self.assertEqual(comment.object_id, feedback.id)
-    #     self.assertEqual(comment.content_object.__class__, Feedback)
-    #     self.assertEqual(comment.content_object, feedback)
-    #     self.assertIsInstance(comment.subscription_id, int)
-
-    # def test_create_comment_for_contact(self):
-    #     contact = Contact.objects.last()
-    #     crmuser = CRMUser.objects.last()
-    #     post_data={
-    #         'comment': 'new test comment',
-    #         'author_id': crmuser.pk,
-    #         'contact_id': contact.pk
-    #     }
-    #     self.assertHttpCreated(self.api_client.post(
-    #         self.api_path_comment, format='json', data=post_data))
-    #     comment = Comment.objects.last()
-    #     self.assertEqual(comment.comment, 'new test comment')
-    #     self.assertEqual(comment.owner, crmuser)
-    #     self.assertEqual(comment.object_id, contact.id)
-    #     self.assertEqual(comment.content_object.__class__, Contact)
-    #     self.assertEqual(comment.content_object, contact)
-    #     self.assertIsInstance(comment.subscription_id, int)
-
-    # def test_create_comment_for_share(self):
-    #     share = Share.objects.last()
-    #     crmuser = CRMUser.objects.last()
-    #     post_data={
-    #         'comment': 'new test comment',
-    #         'author_id': crmuser.pk,
-    #         'share_id': share.pk
-    #     }
-    #     self.assertHttpCreated(self.api_client.post(
-    #         self.api_path_comment, format='json', data=post_data))
-    #     comment = Comment.objects.last()
-    #     self.assertEqual(comment.comment, 'new test comment')
-    #     self.assertEqual(comment.owner, crmuser)
-    #     self.assertEqual(comment.object_id, share.id)
-    #     self.assertEqual(comment.content_object.__class__, Share)
-    #     self.assertEqual(comment.content_object, share)
-    #     self.assertIsInstance(comment.subscription_id, int)
-
-    # def test_delete_comment(self):
-    #     before = Comment.objects.all().count()
-    #     self.assertHttpAccepted(self.api_client.delete(
-    #         self.api_path_comment + '%s/' % self.comment.pk, format='json'))
-    #     after = Comment.objects.all().count()
-    #     # verify that one sales_cycle has been deleted.
-    #     self.assertEqual(after, before - 1)
-
-    # def test_update_comment_via_put(self):
-    #     # get exist product data
-    #     comment_data = self.get_detail_des(self.comment.pk)
-    #     # update it
-    #     t = '_UPDATED!'
-    #     comment_data['comment'] += t
-    #     # PUT it
-    #     self.api_client.put(self.api_path_comment + '%s/' % (self.comment.pk),
-    #                         format='json', data=comment_data)
-    #     # check
-    #     self.assertEqual(self.get_detail_des(self.comment.pk)['comment'], self.comment.comment + t)
-
-    # def test_update_comment_via_patch(self):
-    #     # get exist product data
-    #     comment_comment = self.get_detail_des(self.comment.pk)['comment']
-    #     # update it
-    #     t = 'comment_UPDATED!'
-    #     comment_comment += t
-    #     # PATCH it
-    #     self.api_client.patch(self.api_path_comment + '%s/' % (self.comment.pk),
-    #                           format='json', data={'comment': comment_comment})
-    #     # check
-    #     self.assertEqual(self.get_detail_des(self.comment.pk)['comment'], comment_comment)
 
 
 class MilestoneResourceTest(ResourceTestMixin, ResourceTestCase):

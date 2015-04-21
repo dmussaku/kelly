@@ -10,7 +10,7 @@
             1
         ], 
         "is_active": true, 
-        "vcard": 11, 
+        "vcard": 1, 
         "last_login": "2014-11-11T07:51:02.253Z", 
         "is_admin": false, 
         "timezone": "Asia/Almaty", 
@@ -29,7 +29,7 @@
             1
         ], 
         "is_active": true, 
-        "vcard": 12, 
+        "vcard": 2, 
         "last_login": "2014-11-11T10:08:02.503Z", 
         "is_admin": false, 
         "timezone": "Asia/Almaty", 
@@ -48,7 +48,7 @@
             1
         ], 
         "is_active": true, 
-        "vcard": 13, 
+        "vcard": 3, 
         "last_login": "2014-11-11T10:08:02.503Z", 
         "is_admin": false, 
         "timezone": "Asia/Almaty", 
@@ -67,7 +67,7 @@
             1
         ], 
         "is_active": true, 
-        "vcard": 14, 
+        "vcard": 4, 
         "last_login": "2014-11-11T10:08:02.503Z", 
         "is_admin": false, 
         "timezone": "Asia/Almaty", 
@@ -86,7 +86,7 @@
             2
         ], 
         "is_active": true, 
-        "vcard": 15, 
+        "vcard": 5, 
         "last_login": "2015-01-22T10:10:03.205Z", 
         "is_admin": false, 
         "timezone": "Asia/Almaty", 
