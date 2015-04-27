@@ -312,6 +312,12 @@ class ContactResource(CRMServiceModelResource):
                 self.wrap_view('delete_contacts'),
                 name='api_delete_contacts_from_vcard'
             ),
+            url(
+                r"^(?P<resource_name>%s)/(?P<id>\d+)/delete%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('delete_contact'),
+                name='api_delete_contact'
+            ),
         ]
 
     def get_meta_dict(self, limit, offset, count, url):
@@ -1187,24 +1193,20 @@ class ContactResource(CRMServiceModelResource):
         example
         send {'ids':[1,2,3]}
         """
-        data = self.deserialize(
-            request, request.body,
-            format=request.META.get('CONTENT_TYPE', 'application/json'))
-        obj_ids = data.get('ids', "")
-        # print obj_ids
-        # print type(obj_ids)
-        with transaction.atomic():
-            for id in obj_ids:
-                try:
-                    obj = Contact.objects.get(id=id)
-                    obj.delete()
-                except ObjectDoesNotExist:
-                    return self.create_response(
-                        request, {'success':False}
-                        )
-        return self.create_response(
-            request, {'success':True}
-            )
+        with RequestContext(self, request, allowed_methods=['post']):
+            data = self.deserialize(
+                request, request.body,
+                format=request.META.get('CONTENT_TYPE', 'application/json'))
+            obj_ids = data.get('ids', "")
+            objects = Contact.delete_contacts(obj_ids)
+            return self.create_response(request, {'objects':objects}, response_class=http.HttpAccepted)
+
+    def delete_contact(self, request, **kwargs):
+        with RequestContext(self, request, allowed_methods=['post']):
+            objects = Contact.delete_contacts(list(kwargs.get('id')))
+            objects['contact'] = int(objects['contacts'][0]) if len(objects['contacts']) > 0 else None
+            objects.pop('contacts')
+            return self.create_response(request, {'objects':objects}, response_class=http.HttpAccepted)
 
 class SalesCycleResource(CRMServiceModelResource):
     '''
