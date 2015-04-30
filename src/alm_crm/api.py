@@ -1,5 +1,5 @@
-#!/usr/bin/env python 
-# -*- coding: utf-8 -*- 
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 from .models import (
     SalesCycle,
     Milestone,
@@ -62,6 +62,7 @@ from alm_vcard.api import (
     )
 from alm_vcard.models import *
 from almanet.settings import DEFAULT_SERVICE
+from almanet.settings import TIME_ZONE
 from almanet.utils.api import RequestContext
 from almanet.utils.env import get_subscr_id
 from django.conf.urls import url
@@ -85,10 +86,8 @@ from tastypie.exceptions import ImmediateHttpResponse, NotFound, Unauthorized
 from tastypie.resources import Resource, ModelResource
 from tastypie.serializers import Serializer
 from tastypie.utils import trailing_slash
-from alm_crm.models import GLOBAL_CYCLE_TITLE, GLOBAL_CYCLE_DESCRIPTION
 import ast
 import datetime
-import time
 
 from .utils.parser import text_parser
 from .utils import report_builders
@@ -103,7 +102,6 @@ from .utils.data_processing import (
 import base64
 import simplejson as json
 from collections import OrderedDict
-
 
 
 class CommonMeta:
@@ -1395,7 +1393,7 @@ class SalesCycleResource(CRMServiceModelResource):
                 format=request.META.get('CONTENT_TYPE', 'application/json'))
 
             sales_cycle = obj.change_milestone(crmuser=request.user.get_crmuser(),
-                                               milestone_id=deserialized['milestone_id'], 
+                                               milestone_id=deserialized['milestone_id'],
                                                meta=json.dumps(deserialized['meta']))
 
             if not self._meta.always_return_data:
@@ -1673,7 +1671,7 @@ class ActivityResource(CRMServiceModelResource):
             objects['prev_sales_cycle'] = SalesCycleResource().full_dehydrate(
                                             SalesCycleResource().build_bundle(
                                                 obj=prev_sales_cycle, request=request))
-            
+
             objects['activity'] = ActivityResource().full_dehydrate(
                                             ActivityResource().build_bundle(
                                                 obj=activity, request=request))
@@ -2516,6 +2514,7 @@ class ContactListResource(CRMServiceModelResource):
                  'error_string': 'Contact list does not exits'}
                 )
 
+
 class AppStateObject(object):
     '''
     @undocumented: __init__, get_users, get_company, get_contacts,
@@ -2850,7 +2849,8 @@ class AppStateObject(object):
             'user_id': self.current_crmuser.pk,
             'session_key': self.request.session.session_key,
             'logged_in': self.current_user.is_authenticated(),
-            'language': translation.get_language()
+            'language': translation.get_language(),
+            'timezone': TIME_ZONE
         }
 
     def get_milestones(self):
@@ -3188,7 +3188,7 @@ class ReportResource(Resource):
         '''
         retrieves data for building sales funnel
         '''
-        
+
 
         return self.create_response(
             request,
@@ -3198,7 +3198,7 @@ class ReportResource(Resource):
         '''
         retrieves data for building sales funnel
         '''
-        
+
 
         return self.create_response(
             request,

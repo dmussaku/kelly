@@ -193,7 +193,7 @@ class BaseConfiguration(SubdomainConfiguration, Configuration):
         ('en', lambda: 'English'),
     )
 
-    TIME_ZONE = 'UTC'
+    TIME_ZONE = 'Asia/Almaty'
 
     DATETIME_FORMAT = 'H:i, d N y'
     DATETIME_FORMAT_NORMAL = '%H:%M, %d %b %y'
