@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import functools
-from django.db import models, transaction
+from django.db import models, transaction, IntegrityError
 from django.utils.translation import ugettext_lazy as _
 from almanet import settings
 from almanet.models import SubscriptionObject, Subscription
@@ -626,27 +626,31 @@ class Contact(SubscriptionObject):
                 c = cls()
                 v = VCard()
                 try:
-                    v.family_name = data[0].value if type(data[0].value) == unicode else str(data[0].value)
-                except:
+                    with transaction.atomic():
+                        v.family_name = data[0].value if type(data[0].value) == unicode else str(data[0].value)
+                except IntegrityError:
                     transaction.savepoint_rollback(sid)
                     return (i,1)
                 try:
-                    v.given_name = data[1].value if type(data[1].value) == unicode else str(data[1].value)
-                except:
+                    with transaction.atomic():
+                        v.given_name = data[1].value if type(data[1].value) == unicode else str(data[1].value)
+                except IntegrityError:
                     transaction.savepoint_rollback(sid)
                     return (i,2)
                 try:
-                    v.additional_name = data[2].value if type(data[2].value) == unicode else str(data[2].value)
-                except:
+                    with transaction.atomic():
+                        v.additional_name = data[2].value if type(data[2].value) == unicode else str(data[2].value)
+                except IntegrityError:
                     transaction.savepoint_rollback(sid)
                     return (i,3)
                 v.fn = v.given_name+" "+v.family_name
                 if ((not v.given_name) and (not v.family_name) and data[4].value):
                     try:
-                        v = VCard(fn=data[4].value)
-                        v.save()
-                        c = cls(vcard=v, tp='co')
-                    except:
+                        with transaction.atomic():
+                            v = VCard(fn=data[4].value)
+                            v.save()
+                            c = cls(vcard=v, tp='co')
+                    except IntegrityError:
                         transaction.savepoint_rollback(sid)
                         return (i,5)
                     c.owner = creator.get_crmuser()
@@ -664,132 +668,145 @@ class Contact(SubscriptionObject):
                     'contact_id': c.id
                 })
                 try:
-                    if data[3].value:
-                        positions = type_cast(data[3].value).split(';')
-                        for position in positions:
-                            title = Title(
-                                vcard=v,
-                                data=position
-                                )
-                            title.save()
-                except:
+                    with transaction.atomic():
+                        if data[3].value:
+                            positions = type_cast(data[3].value).split(';')
+                            for position in positions:
+                                title = Title(
+                                    vcard=v,
+                                    data=position
+                                    )
+                                title.save()
+                except IntegrityError:
                     transaction.savepoint_rollback(sid)
                     return (i, 4)
                 try:
-                    if data[4].value:
-                        org = Org(vcard=v)
-                        org.organization_name = type_cast(data[4].value)
-                        try:
-                            if data[5].value:
-                                org.organization_unit = type_cast(data[5].value)
-                            org.save()
-                        except:
-                            transaction.savepoint_rollback(sid)
-                            return (i, 6)
-                except:
+                    with transaction.atomic():
+                        if data[4].value:
+                            org = Org(vcard=v)
+                            org.organization_name = type_cast(data[4].value)
+                            try:
+                                with transaction.atomic():
+                                    if data[5].value:
+                                        org.organization_unit = type_cast(data[5].value)
+                                    org.save()
+                            except IntegrityError:
+                                transaction.savepoint_rollback(sid)
+                                return (i, 6)
+                except IntegrityError:
                     transaction.savepoint_rollback(sid)
                     return (i, 5)
                 try:
-                    if data[6].value:
-                        phones = type_cast(data[6].value).split(';')
-                        for phone in phones:
-                            tel = Tel(vcard=v, type='WORK')
-                            tel.value = phone
-                            tel.save()
-                except:
+                    with transaction.atomic():
+                        if data[6].value:
+                            phones = type_cast(data[6].value).split(';')
+                            for phone in phones:
+                                tel = Tel(vcard=v, type='WORK')
+                                tel.value = phone
+                                tel.save()
+                except IntegrityError:
                     transaction.savepoint_rollback(sid)
                     return (i,7)
                 try:
-                    if data[7].value:
-                        phones = type_cast(data[7].value).split(';')
-                        for phone in phones:
-                            tel = Tel(vcard=v, type='cell')
-                            tel.value = phone
-                            tel.save()
-                except:
+                    with transaction.atomic():
+                        if data[7].value:
+                            phones = type_cast(data[7].value).split(';')
+                            for phone in phones:
+                                tel = Tel(vcard=v, type='cell')
+                                tel.value = phone
+                                tel.save()
+                except IntegrityError:
                     transaction.savepoint_rollback(sid)
                     return (i, 8)
                 try:
-                    if data[8].value:
-                        phones = type_cast(data[8].value).split(';')
-                        for phone in phones:
-                            tel = Tel(vcard=v, type='xadditional')
-                            tel.value = phone
-                            tel.save()
-                except:
+                    with transaction.atomic():
+                        if data[8].value:
+                            phones = type_cast(data[8].value).split(';')
+                            for phone in phones:
+                                tel = Tel(vcard=v, type='xadditional')
+                                tel.value = phone
+                                tel.save()
+                except IntegrityError:
                     transaction.savepoint_rollback(sid)
                     return (i, 9)
                 try:
-                    if data[9].value:
-                        phones = type_cast(data[9].value).split(';')
-                        for phone in phones:
-                            tel = Tel(vcard=v, type='fax')
-                            tel.value = phone
-                            tel.save()
-                except:
+                    with transaction.atomic():
+                        if data[9].value:
+                            phones = type_cast(data[9].value).split(';')
+                            for phone in phones:
+                                tel = Tel(vcard=v, type='fax')
+                                tel.value = phone
+                                tel.save()
+                except IntegrityError:
                     transaction.savepoint_rollback(sid)
                     return (i, 10)
                 try:
-                    if data[10].value:
-                        emails = type_cast(data[10].value).split(';')
-                        for email_str in emails:
-                            email = Email(vcard=v, type='work')
-                            email.value = email_str
-                            email.save()
-                except:
+                    with transaction.atomic():
+                        if data[10].value:
+                            emails = type_cast(data[10].value).split(';')
+                            for email_str in emails:
+                                email = Email(vcard=v, type='work')
+                                email.value = email_str
+                                email.save()
+                except IntegrityError:
                     transaction.savepoint_rollback(sid)
                     return (i, 11)
                 try:
-                    if data[11].value:
-                        emails = type_cast(data[11].value).split(';')
-                        for email_str in emails:
-                            email = Email(vcard=v, type='internet')
-                            email.value = email_str
-                            email.save()
-                except:
+                    with transaction.atomic():
+                        if data[11].value:
+                            emails = type_cast(data[11].value).split(';')
+                            for email_str in emails:
+                                email = Email(vcard=v, type='internet')
+                                email.value = email_str
+                                email.save()
+                except IntegrityError:
                     transaction.savepoint_rollback(sid)
                     return (i, 12)
                 try:
-                    if data[12].value:
-                        adresses = type_cast(data[12].value).split(';;')
-                        for address_str in adresses:
-                            addr_objs = address_str.split(';')
-                            addr_objs = [v,'POSTAL'] + addr_objs
-                            address = Adr.create_from_list(addr_objs)
-                except:
+                    with transaction.atomic():
+                        if data[12].value:
+                            adresses = type_cast(data[12].value).split(';;')
+                            for address_str in adresses:
+                                addr_objs = address_str.split(';')
+                                addr_objs = [v,'POSTAL'] + addr_objs
+                                address = Adr.create_from_list(addr_objs)
+                except IntegrityError:
                     transaction.savepoint_rollback(sid)
                     return (i, 13)
                 try:
-                    if data[13].value:
-                        adresses = type_cast(data[13].value).split(';;')
-                        for address_str in adresses:
-                            addr_objs = address_str.split(';')
-                            addr_objs = [v,'xlegal'] + addr_objs
-                            address = Adr.create_from_list(addr_objs)
-                except:
+                    with transaction.atomic():
+                        if data[13].value:
+                            adresses = type_cast(data[13].value).split(';;')
+                            for address_str in adresses:
+                                addr_objs = address_str.split(';')
+                                addr_objs = [v,'xlegal'] + addr_objs
+                                address = Adr.create_from_list(addr_objs)
+                except IntegrityError:
                     transaction.savepoint_rollback(sid)
                     return (i, 14)
                 try:
-                    if data[14].value:
-                        adresses = type_cast(data[14].value).split(';;')
-                        for address_str in adresses:
-                            addr_objs = address_str.split(';')
-                            addr_objs = [v,'WORK'] + addr_objs
-                            address = Adr.create_from_list(addr_objs)
-                except:
+                    with transaction.atomic():
+                        if data[14].value:
+                            adresses = type_cast(data[14].value).split(';;')
+                            for address_str in adresses:
+                                addr_objs = address_str.split(';')
+                                addr_objs = [v,'WORK'] + addr_objs
+                                address = Adr.create_from_list(addr_objs)
+                except IntegrityError:
                     transaction.savepoint_rollback(sid)
                     return (i, 15)
                 try:
-                    if data[15].value:
-                        sites = type_cast(data[15].value).split('')
-                        for site in sites:
-                            url = Url(
-                                vcard=v,
-                                type='website',
-                                    value=site
-                                    )
-                            url.save()
-                except:
+                    with transaction.atomic():
+                        if data[15].value:
+                            sites = type_cast(data[15].value).split(';')
+                            for site in sites:
+                                url = Url(
+                                    vcard=v,
+                                    type='website',
+                                        value=site
+                                        )
+                                url.save()
+                except IntegrityError:
                     transaction.savepoint_rollback(sid)
                     return (i, 16)
                 contacts.append(c)
