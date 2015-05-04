@@ -680,6 +680,8 @@ class Contact(SubscriptionObject):
                 except IntegrityError:
                     transaction.savepoint_rollback(sid)
                     return (i, 4)
+                except IndexError:
+                    pass
                 try:
                     with transaction.atomic():
                         if data[4].value:
@@ -696,6 +698,8 @@ class Contact(SubscriptionObject):
                 except IntegrityError:
                     transaction.savepoint_rollback(sid)
                     return (i, 5)
+                except IndexError:
+                    pass
                 try:
                     with transaction.atomic():
                         if data[6].value:
@@ -707,6 +711,8 @@ class Contact(SubscriptionObject):
                 except IntegrityError:
                     transaction.savepoint_rollback(sid)
                     return (i,7)
+                except IndexError:
+                    pass
                 try:
                     with transaction.atomic():
                         if data[7].value:
@@ -718,6 +724,8 @@ class Contact(SubscriptionObject):
                 except IntegrityError:
                     transaction.savepoint_rollback(sid)
                     return (i, 8)
+                except IndexError:
+                    pass
                 try:
                     with transaction.atomic():
                         if data[8].value:
@@ -729,6 +737,8 @@ class Contact(SubscriptionObject):
                 except IntegrityError:
                     transaction.savepoint_rollback(sid)
                     return (i, 9)
+                except IndexError:
+                    pass
                 try:
                     with transaction.atomic():
                         if data[9].value:
@@ -740,6 +750,8 @@ class Contact(SubscriptionObject):
                 except IntegrityError:
                     transaction.savepoint_rollback(sid)
                     return (i, 10)
+                except IndexError:
+                    pass
                 try:
                     with transaction.atomic():
                         if data[10].value:
@@ -751,6 +763,8 @@ class Contact(SubscriptionObject):
                 except IntegrityError:
                     transaction.savepoint_rollback(sid)
                     return (i, 11)
+                except IndexError:
+                    pass
                 try:
                     with transaction.atomic():
                         if data[11].value:
@@ -762,6 +776,8 @@ class Contact(SubscriptionObject):
                 except IntegrityError:
                     transaction.savepoint_rollback(sid)
                     return (i, 12)
+                except IndexError:
+                    pass
                 try:
                     with transaction.atomic():
                         if data[12].value:
@@ -773,6 +789,8 @@ class Contact(SubscriptionObject):
                 except IntegrityError:
                     transaction.savepoint_rollback(sid)
                     return (i, 13)
+                except IndexError:
+                    pass
                 try:
                     with transaction.atomic():
                         if data[13].value:
@@ -784,6 +802,8 @@ class Contact(SubscriptionObject):
                 except IntegrityError:
                     transaction.savepoint_rollback(sid)
                     return (i, 14)
+                except IndexError:
+                    pass
                 try:
                     with transaction.atomic():
                         if data[14].value:
@@ -795,6 +815,8 @@ class Contact(SubscriptionObject):
                 except IntegrityError:
                     transaction.savepoint_rollback(sid)
                     return (i, 15)
+                except IndexError:
+                    pass
                 try:
                     with transaction.atomic():
                         if data[15].value:
@@ -809,6 +831,8 @@ class Contact(SubscriptionObject):
                 except IntegrityError:
                     transaction.savepoint_rollback(sid)
                     return (i, 16)
+                except IndexError:
+                    pass
                 contacts.append(c)
                 # print "%s created contact %s" % (c, c.id)
                 i = i+1
