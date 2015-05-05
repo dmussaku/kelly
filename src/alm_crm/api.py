@@ -102,6 +102,7 @@ from .utils.data_processing import (
 import base64
 import simplejson as json
 from collections import OrderedDict
+from .tasks import add_contacts_from_xls
 
 
 class CommonMeta:
@@ -310,6 +311,19 @@ class ContactResource(CRMServiceModelResource):
                 self.wrap_view('delete_contacts'),
                 name='api_delete_contacts_from_vcard'
             ),
+            url(
+                r"^(?P<resource_name>%s)/import_from_structure%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('import_from_structure'),
+                name='api_import_from_structure'
+            ),
+            url(
+                r"^(?P<resource_name>%s)/get_response_from_import%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('get_response_from_import'),
+                name='api_get_response_from_import'
+            ),
+
         ]
 
     def get_meta_dict(self, limit, offset, count, url):
@@ -1083,12 +1097,9 @@ class ContactResource(CRMServiceModelResource):
                 self.log_throttled_access(request)
                 data = {'success': False, 'error':"Ошибка в ячейке %s в %s-ом ряду." % contacts}
                 return self.error_response(request, data, response_class=http.HttpBadRequest)
-                # return self.create_response(
-                #     request, {'success': False, 'error':"Ошибка в ячейке %s в %s-ом ряду." % contacts})
             if not contacts:
                 self.log_throttled_access(request)
                 return self.error_response(request, {'success': False}, response_class=http.HttpBadRequest)
-                # return self.create_response(request, {'success': False})
             contact_list = ContactList(
                 owner = request.user.get_crmuser(),
                 title = data['filename'])
@@ -1110,38 +1121,9 @@ class ContactResource(CRMServiceModelResource):
                     )
                 )
         elif filename=='xls' or filename=='xlsx':
-            contacts = Contact.import_from_xls(
-                decoded_string, request.user)
-            if type(contacts) == tuple:
-                self.log_throttled_access(request)
-                # data = {'success': False, 'error':"Ошибка в ячейке %s в %s-ом ряду." % contacts}
-                data = {'success': False, 'error':list(contacts)}
-                return self.error_response(request, data, response_class=http.HttpBadRequest)
-                #self.create_response(request, data)
-            elif not contacts:
-                self.log_throttled_access(request)
-                return self.error_response(request, {'success': False}, response_class=http.HttpBadRequest)
-                # return self.create_response(request, {'success': False})
-            contact_list = ContactList(
-                owner = request.user.get_crmuser(),
-                title = data['filename'])
-            contact_list.save()
-            contact_list.contacts = contacts
-            for contact in contacts:
-                _bundle = contact_resource.build_bundle(
-                    obj=contact, request=request)
-                _bundle.data['global_sales_cycle'] = SalesCycleResource().full_dehydrate(
-                    SalesCycleResource().build_bundle(
-                        obj=SalesCycle.objects.get(contact_id=contact.id)
-                    )
-                )
-                objects.append(contact_resource.full_dehydrate(
-                    _bundle, for_list=True))
-            contact_list = ContactListResource().full_dehydrate(
-                ContactListResource().build_bundle(
-                    obj=contact_list
-                    )
-                )
+            xls = Contact.get_xls_structure(data['filename'], decoded_string)
+            return self.create_response(
+                request, file_structure)
         else:
             contacts = Contact.import_from_vcard(
                     decoded_string, current_crmuser)
@@ -1174,7 +1156,6 @@ class ContactResource(CRMServiceModelResource):
                         obj=contact_list
                         )
                     )
-
         self.log_throttled_access(request)
         return self.create_response(
             request, {'objects': objects, 'contact_list': contact_list})
@@ -1203,6 +1184,39 @@ class ContactResource(CRMServiceModelResource):
         return self.create_response(
             request, {'success':True}
             )
+
+    def import_from_structure(self, request, **kwargs):
+        data = self.deserialize(
+            request, request.body,
+            format=request.META.get('CONTENT_TYPE', 'application/json'))
+        col_structure = data.get('col_structure')
+        filename = data.get('filename')
+        if not col_structure or not filename:
+            return self.create_response(
+                request, {'success':False, 'message':'Invalid parameters'}
+                )
+        """
+        col structure {0:'Adr_postal', 1:'VCard_fn'}
+        """
+        col_hash = []
+        for key, value in obj.viewitems():
+            obj_dict = {'num':key}
+            obj_dict['model'] = value.split('_')[0]
+            obj_dict['attr'] = value.split('_')[1]
+            col_hash.append(obj_dict)
+        queued_task = add_contacts_from_xls.delay(col_structure, filename)
+        return self.create_response(
+            request, {'success':True,'task_id':queued_task.id}
+            )
+
+    def get_response_from_import(self, request, **kwargs):
+        task_id = request.GET.get('task_id', "")
+        if not task_id:
+            return self.create_response(
+                request, {'success':False, 'message':'No task with this id'}
+                )
+        received_task = add_contact_from_xls.AsyncResult(task_id)
+
 
 class SalesCycleResource(CRMServiceModelResource):
     '''

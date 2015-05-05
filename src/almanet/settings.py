@@ -15,6 +15,7 @@ from django.utils.functional import lazy
 from configurations import Configuration, pristinemethod
 from configurations.utils import uppercase_attributes
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+TEMP_DIR = '/temp_dir/'
 
 
 def rel(*x):
@@ -85,6 +86,16 @@ def FileSettings(path):
 
 
 class BaseConfiguration(SubdomainConfiguration, Configuration):
+
+    # Celery settings
+
+    BROKER_URL = 'amqp://guest:guest@localhost//'
+
+    #: Only add pickle to this list if your broker is secured
+    #: from unwanted access (see userguide/security.html)
+    CELERY_ACCEPT_CONTENT = ['json']
+    CELERY_TASK_SERIALIZER = 'json'
+    CELERY_RESULT_SERIALIZER = 'json'
 
     @pristinemethod
     def reverse_lazy(viewname, **kw):

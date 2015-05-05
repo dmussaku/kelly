@@ -24,6 +24,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.utils import timezone
 import datetime
 import xlrd
+from almanet.settings import TEMP_DIR
 
 ALLOWED_TIME_PERIODS = ['week', 'month', 'year']
 
@@ -616,9 +617,9 @@ class Contact(SubscriptionObject):
         sid = transaction.savepoint()
         for sheet in book.sheets():
             i = 1
-            header_row = sheet.row(0)
             while(sheets_left):
                 try:
+                    header_row = sheet.row(0)
                     data = sheet.row(i)
                 except IndexError:
                     sheets_left = False
@@ -838,6 +839,30 @@ class Contact(SubscriptionObject):
                 i = i+1
         transaction.savepoint_commit(sid)
         return contacts
+
+    @classmethod
+    def get_xls_structure(cls, filename, xls_file_data):
+        book = xlrd.open_workbook(file_contents=xls_file_data)
+        sheet = book.sheets()[0]
+        xls_structure = []
+        try:
+            data=sheet.row(0)
+        except:
+            return False
+        for obj in data:
+            xls_structure.append(obj.value)
+        ext = filename.split('.')[len(filename.split('.')) - 1]
+        new_filename = filename.strip('.' + ext) + datetime.datetime.now().__str__() + '.' + ext
+        myfile = open(
+            TEMP_DIR + new_filename,
+            'wb'
+            )
+        myfile.write(xls_file_data)
+        myfile.close()
+        return {
+            'xls_structure_array':xls_structure,
+            'filename':new_filename
+        }
 
     @classmethod
     def get_contacts_by_last_activity_date(
@@ -2054,3 +2079,13 @@ class CustomField(SubscriptionObject):
         if save:
             custom_field.save()
         return custom_field
+
+class ImportTask(models.Model):
+    uuid = models.CharField(blank=False, null=False, max_length=100)
+    finished = models.BooleanField(default=False)
+    filename = models.CharField(max_length=250)
+
+class ErrorCell(models.Model):
+    import_task = models.ForeignKey(ImportTask)
+    row = models.IntegerField()
+    col = models.IntegerField()
