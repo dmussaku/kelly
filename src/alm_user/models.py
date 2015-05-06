@@ -7,7 +7,6 @@ from timezone_field import TimeZoneField
 from almanet.models import Subscription
 from alm_vcard.models import VCard, Email
 
-
 class UserManager(contrib_user_manager):
     """
     had to override just because of missing username field in model
