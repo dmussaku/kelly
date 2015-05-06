@@ -3119,77 +3119,77 @@ class AppStateResource(Resource):
     def get_users(self, request, **kwargs):
         with RequestContext(self, request, allowed_methods=['get']):
             obj = AppStateObject(service_slug=kwargs['slug'], request=request)
-            return self.create_response(request, {'users': obj.get_users()}, response_class=http.HttpAccepted)
+            return self.create_response(request, {'objects': obj.get_users()}, response_class=http.HttpAccepted)
 
     def get_categories(self, request, **kwargs):
         with RequestContext(self, request, allowed_methods=['get']):
             obj = AppStateObject(service_slug=kwargs['slug'], request=request)
-            return self.create_response(request, {'categories': obj.get_categories()}, response_class=http.HttpAccepted)
+            return self.create_response(request, {'objects': obj.get_categories()}, response_class=http.HttpAccepted)
 
     def get_company(self, request, **kwargs):
         with RequestContext(self, request, allowed_methods=['get']):
             obj = AppStateObject(service_slug=kwargs['slug'], request=request)
-            return self.create_response(request, {'company': obj.get_company()}, response_class=http.HttpAccepted)
+            return self.create_response(request, {'objects': obj.get_company()}, response_class=http.HttpAccepted)
 
     def get_contacts(self, request, **kwargs):
         with RequestContext(self, request, allowed_methods=['get']):
             obj = AppStateObject(service_slug=kwargs['slug'], request=request)
-            return self.create_response(request, {'contacts': obj.get_contacts()}, response_class=http.HttpAccepted)
+            return self.create_response(request, {'objects': obj.get_contacts()}, response_class=http.HttpAccepted)
 
     def get_contact_lists(self, request, **kwargs):
         with RequestContext(self, request, allowed_methods=['get']):
             obj = AppStateObject(service_slug=kwargs['slug'], request=request)
-            return self.create_response(request, {'contact_lists': obj.get_contact_lists()}, response_class=http.HttpAccepted)
+            return self.create_response(request, {'objects': obj.get_contact_lists()}, response_class=http.HttpAccepted)
 
     def get_shares(self, request, **kwargs):
         with RequestContext(self, request, allowed_methods=['get']):
             obj = AppStateObject(service_slug=kwargs['slug'], request=request)
-            return self.create_response(request, {'shares': obj.get_shares()}, response_class=http.HttpAccepted)
+            return self.create_response(request, {'objects': obj.get_shares()}, response_class=http.HttpAccepted)
 
     def get_sales_cycles(self, request, **kwargs):
         with RequestContext(self, request, allowed_methods=['get']):
             obj = AppStateObject(service_slug=kwargs['slug'], request=request)
-            return self.create_response(request, {'sales_cycles': obj.get_sales_cycles()}, response_class=http.HttpAccepted)
+            return self.create_response(request, {'objects': obj.get_sales_cycles()}, response_class=http.HttpAccepted)
 
     def get_activities(self, request, **kwargs):
         with RequestContext(self, request, allowed_methods=['get']):
             obj = AppStateObject(service_slug=kwargs['slug'], request=request)
-            return self.create_response(request, {'activities': obj.get_activities()}, response_class=http.HttpAccepted)
+            return self.create_response(request, {'objects': obj.get_activities()}, response_class=http.HttpAccepted)
 
     def get_products(self, request, **kwargs):
         with RequestContext(self, request, allowed_methods=['get']):
             obj = AppStateObject(service_slug=kwargs['slug'], request=request)
-            return self.create_response(request, {'products': obj.get_products()}, response_class=http.HttpAccepted)
+            return self.create_response(request, {'objects': obj.get_products()}, response_class=http.HttpAccepted)
 
     def get_product_groups(self, request, **kwargs):
         with RequestContext(self, request, allowed_methods=['get']):
             obj = AppStateObject(service_slug=kwargs['slug'], request=request)
-            return self.create_response(request, {'product_groups': obj.get_product_groups()}, response_class=http.HttpAccepted)
+            return self.create_response(request, {'objects': obj.get_product_groups()}, response_class=http.HttpAccepted)
 
     def get_filters(self, request, **kwargs):
         with RequestContext(self, request, allowed_methods=['get']):
             obj = AppStateObject(service_slug=kwargs['slug'], request=request)
-            return self.create_response(request, {'filters': obj.get_filters()}, response_class=http.HttpAccepted)
+            return self.create_response(request, {'objects': obj.get_filters()}, response_class=http.HttpAccepted)
 
     def get_milestones(self, request, **kwargs):
         with RequestContext(self, request, allowed_methods=['get']):
             obj = AppStateObject(service_slug=kwargs['slug'], request=request)
-            return self.create_response(request, {'milestones': obj.get_milestones()}, response_class=http.HttpAccepted)
+            return self.create_response(request, {'objects': obj.get_milestones()}, response_class=http.HttpAccepted)
 
     def get_sales_cycles_to_products_map(self, request, **kwargs):
         with RequestContext(self, request, allowed_methods=['get']):
             obj = AppStateObject(service_slug=kwargs['slug'], request=request)
-            return self.create_response(request, {'sales_cycles_to_products_map': obj.get_sales_cycle2products_map()}, response_class=http.HttpAccepted)
+            return self.create_response(request, {'objects': obj.get_sales_cycle2products_map()}, response_class=http.HttpAccepted)
 
     def get_constants(self, request, **kwargs):
         with RequestContext(self, request, allowed_methods=['get']):
             obj = AppStateObject(service_slug=kwargs['slug'], request=request)
-            return self.create_response(request, {'constants': obj.get_constants()}, response_class=http.HttpAccepted)
+            return self.create_response(request, {'objects': obj.get_constants()}, response_class=http.HttpAccepted)
 
     def get_session(self, request, **kwargs):
         with RequestContext(self, request, allowed_methods=['get']):
             obj = AppStateObject(service_slug=kwargs['slug'], request=request)
-            return self.create_response(request, {'session': obj.get_session()}, response_class=http.HttpAccepted)
+            return self.create_response(request, {'objects': obj.get_session()}, response_class=http.HttpAccepted)
 
 
 class SalesCycleProductStatResource(CRMServiceModelResource):
