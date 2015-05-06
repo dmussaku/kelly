@@ -21,6 +21,8 @@ from .models import (
     HashTagReference,
     CustomSection,
     CustomField,
+    ImportTask,
+    ErrorCell
     )
 from alm_vcard.api import (
     VCardResource,
@@ -102,7 +104,7 @@ from .utils.data_processing import (
 import base64
 import simplejson as json
 from collections import OrderedDict
-from .tasks import add_contacts_from_xls
+from .tasks import grouped_contact_import_task
 
 
 class CommonMeta:
@@ -322,6 +324,12 @@ class ContactResource(CRMServiceModelResource):
                 (self._meta.resource_name, trailing_slash()),
                 self.wrap_view('get_response_from_import'),
                 name='api_get_response_from_import'
+            ),
+            url(
+                r"^(?P<resource_name>%s)/check_import_status%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('check_import_status'),
+                name='api_check_import_status'
             ),
 
         ]
@@ -1121,9 +1129,9 @@ class ContactResource(CRMServiceModelResource):
                     )
                 )
         elif filename=='xls' or filename=='xlsx':
-            xls = Contact.get_xls_structure(data['filename'], decoded_string)
+            xls_meta = Contact.get_xls_structure(data['filename'], decoded_string)
             return self.create_response(
-                request, file_structure)
+                request, xls_meta)
         else:
             contacts = Contact.import_from_vcard(
                     decoded_string, current_crmuser)
@@ -1196,13 +1204,15 @@ class ContactResource(CRMServiceModelResource):
                 request, {'success':False, 'message':'Invalid parameters'}
                 )
         """
-        col structure {0:'Adr_postal', 1:'VCard_fn'}
+        col structure: 
+        {0:'Adr__postal', 1:'VCard__fn', 2:'Adr__home', 3:'Org', 4:'Nickname'}
         """
         col_hash = []
         for key, value in obj.viewitems():
             obj_dict = {'num':key}
-            obj_dict['model'] = value.split('_')[0]
-            obj_dict['attr'] = value.split('_')[1]
+            obj_dict['model'] = value.split('__')[0]
+            if len(value.split('__'))>1:
+                obj_dict['attr'] = value.split('__')[1]
             col_hash.append(obj_dict)
         queued_task = add_contacts_from_xls.delay(col_structure, filename)
         return self.create_response(
@@ -1217,6 +1227,18 @@ class ContactResource(CRMServiceModelResource):
                 )
         received_task = add_contact_from_xls.AsyncResult(task_id)
 
+    def check_import_status(self, request, **kwargs):
+        task_id = request.GET.get('task_id', "")
+        if not task_id:
+            return self.create_response(
+                request, {'success':False, 'message':'No task was entered'}
+                )
+        try:
+            import_task = ImportTask.objects.get(uuid=task_id)
+        except ObjectDoesNotExist:
+            return self.create_response(
+                request, {'success':False, 'message':'The task with particular id does not exist'}
+                )
 
 class SalesCycleResource(CRMServiceModelResource):
     '''

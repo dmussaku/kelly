@@ -24,7 +24,9 @@ from django.contrib.contenttypes.models import ContentType
 from django.utils import timezone
 import datetime
 import xlrd
-from almanet.settings import TEMP_DIR
+from almanet.settings import TEMP_DIR, BASE_DIR
+from alm_vcard import models as vcard_models
+from celery import group, Task
 
 ALLOWED_TIME_PERIODS = ['week', 'month', 'year']
 
@@ -169,6 +171,8 @@ class Contact(SubscriptionObject):
         related_name='contact_latest_activity', null=True)
     mentions = generic.GenericRelation('Mention')
     comments = generic.GenericRelation('Comment')
+    import_task = models.ForeignKey(
+        'ImportTask', blank=True, null=True, related_name='contacts')
 
     class Meta:
         verbose_name = _('contact')
@@ -606,7 +610,121 @@ class Contact(SubscriptionObject):
                 # print contact_list
         return contact_list
 
+    '''
+    Creates contact from data which is row from xls file and file_structure
+    which has a specific format, here's the example of both 
+    file_structure:
+    [
+        {'num':0, 'model':'VCard', 'type':'fn'},
+        {'num':1, 'model':'Adr', 'type':'postal'},
+        {'num':2, 'model':'Org'},
+        {'num':3, 'model':'Email', 'type':'internet'}
+    ]
+    data:
+    ['John Smith', 'Black water Valley;Chicago;60616;USA;;Home County;Almaty;000100;Kazakhstan',
+    'Microsoft', 'sam@gmail.com;at@gmail.com'
+    ]
 
+    The result is the response {'error':True/False, 'contact_id':n, 'error_col':m}
+    where error is boolean, n and m are integers
+    '''
+
+    @classmethod
+    @transaction.atomic()
+    def create_from_structure(cls, data, file_structure, creator, import_task):
+        sid = transaction.savepoint()
+        contact = cls()
+        vcard = VCard()
+        response = {}
+        for structure_dict in file_structure:
+            col_num = structure_dict.get('num')
+            model = getattr(vcard_models, structure_dict.get('model'))
+            if model == vcard_models.VCard:
+                attr = structure_dict.get('type',"")
+                try:
+                    with transaction.atomic():
+                        if type(data[col_num].value) == unicode:
+                            setattr(vcard, attr, data[col_num].value)
+                        else:
+                            setattr(vcard, attr, str(data[col_num].value))
+                        vcard.save()
+                except IntegrityError:
+                    transaction.savepoint_rollback(sid)
+                    response['error'] = True
+                    response['error_col'] = col_num
+                    return response
+            elif (model == vcard_models.Tel or model == vcard_models.Email 
+                        or model == vcard_models.Url):
+                try:
+                    with transaction.atomic():
+                        if data[col_num].value:
+                            objects = data[col_num].value.split(';')
+                            for object in objects:
+                                v_type = structure_dict.get('type','')
+                                obj = model(type=v_type, value = object)
+                                obj.vcard = vcard
+                                obj.save()
+                except IntegrityError:
+                    transaction.savepoint_rollback(sid)
+                    response['error'] = True
+                    response['error_col'] = col_num
+                    return response
+            elif model == vcard_models.Org:
+                try:
+                    with transaction.atomic():
+                        if data[col_num].value:
+                            objects = data[col_num].value.split(';')
+                            for object in objects:
+                                v_type = structure_dict.get('type','')
+                                obj = model(organization_name = object)
+                                obj.vcard = vcard
+                                obj.save()
+                except IntegrityError:
+                    transaction.savepoint_rollback(sid)
+                    response['error'] = True
+                    response['error_col'] = col_num
+                    return response
+            elif model == vcard_models.Adr:
+                adr_type = structure_dict.get('type','')
+                try:
+                    with transaction.atomic():
+                        if data[col_num].value:
+                            adresses = type_cast(data[col_num].value).split(';;')
+                            for address_str in adresses:
+                                addr_objs = address_str.split(';')
+                                addr_objs = [vcard, adr_type] + addr_objs
+                                address = Adr.create_from_list(addr_objs)
+                except IntegrityError:
+                    transaction.savepoint_rollback(sid)
+                    response['error'] = True
+                    response['error_col'] = col_num
+                    return response
+            elif (model == vcard_models.Geo or model == vcard_models.Agent 
+                    or model == vcard_models.Category or model == vcard_models.Key 
+                    or model == vcard_models.Label or model == vcard_models.Mailer 
+                    or model == vcard_models.Nickname or model == vcard_models.Note 
+                    or model == vcard_models.Role or model == vcard_models.Title 
+                    or model == vcard_models.Tz):
+                try:
+                    with transaction.atomic():
+                        if data[col_num].value:
+                            objects = data[col_num].value.split(';')
+                            for object in objects:
+                                v_type = structure_dict.get('type','')
+                                obj = model(value = object)
+                                obj.vcard = vcard
+                                obj.save()
+                except IntegrityError:
+                    transaction.savepoint_rollback(sid)
+                    response['error'] = True
+                    response['error_col'] = col_num
+                    return response
+        contact.vcard = vcard
+        contact.import_task = import_task
+        contact.owner = creator.get_crmuser()
+        contact.subscription_id = creator.get_crmuser().subscription_id
+        contact.save()
+        return {'error':False, 'contact_id':contact.id}
 
     @classmethod
     @transaction.atomic
@@ -844,23 +962,21 @@ class Contact(SubscriptionObject):
     def get_xls_structure(cls, filename, xls_file_data):
         book = xlrd.open_workbook(file_contents=xls_file_data)
         sheet = book.sheets()[0]
-        xls_structure = []
         try:
             data=sheet.row(0)
         except:
-            return False
-        for obj in data:
-            xls_structure.append(obj.value)
+            return {'success':False}
         ext = filename.split('.')[len(filename.split('.')) - 1]
         new_filename = filename.strip('.' + ext) + datetime.datetime.now().__str__() + '.' + ext
         myfile = open(
-            TEMP_DIR + new_filename,
+            BASE_DIR + new_filename,
             'wb'
             )
         myfile.write(xls_file_data)
         myfile.close()
         return {
-            'xls_structure_array':xls_structure,
+            'success':True,
+            'col_num':sheet.ncols,
             'filename':new_filename
         }
 
@@ -2081,9 +2197,15 @@ class CustomField(SubscriptionObject):
         return custom_field
 
 class ImportTask(models.Model):
-    uuid = models.CharField(blank=False, null=False, max_length=100)
+    uuid = models.CharField(blank=True, null=True, max_length=100)
     finished = models.BooleanField(default=False)
     filename = models.CharField(max_length=250)
+
+    @classmethod
+    def check_status(self):
+        if not self.uuid:
+            return False
+        current_task = Task
 
 class ErrorCell(models.Model):
     import_task = models.ForeignKey(ImportTask)
