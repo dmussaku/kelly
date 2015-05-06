@@ -2532,23 +2532,28 @@ class AppStateObject(object):
         self.current_crmuser = \
             request.user.get_subscr_user(self.subscription_id)
 
-        self.objects = {
-            'users': self.get_users(),
-            'categories': self.get_categories(),
-            'company': self.get_company(),
-            'contacts': self.get_contacts(),
-            'contact_lists': self.get_contact_lists(),
-            'shares': self.get_shares(),
-            'sales_cycles': self.get_sales_cycles(),
-            'activities': self.get_activities(),
-            'products': self.get_products(),
-            'product_groups': self.get_product_groups(),
-            'filters': self.get_filters(),
-            'milestones': self.get_milestones(),
-            'sales_cycles_to_products_map': self.get_sales_cycle2products_map()
+    @classmethod
+    def create_object(cls, service_slug=None, request=None):
+        obj = AppStateObject(service_slug=service_slug, request=request)
+        obj.objects = {
+            'users': obj.get_users(),
+            'categories': obj.get_categories(),
+            'company': obj.get_company(),
+            'contacts': obj.get_contacts(),
+            'contact_lists': obj.get_contact_lists(),
+            'shares': obj.get_shares(),
+            'sales_cycles': obj.get_sales_cycles(),
+            'activities': obj.get_activities(),
+            'products': obj.get_products(),
+            'product_groups': obj.get_product_groups(),
+            'filters': obj.get_filters(),
+            'milestones': obj.get_milestones(),
+            'sales_cycles_to_products_map': obj.get_sales_cycle2products_map()
         }
-        self.constants = self.get_constants()
-        self.session = self.get_session()
+        obj.constants = obj.get_constants()
+        obj.session = obj.get_session()
+        return obj
+
 
     def _vcard(self, vcard):
 
@@ -2893,7 +2898,98 @@ class AppStateResource(Resource):
                 (self._meta.resource_name, trailing_slash()),
                 self.wrap_view('my_feed'),
                 name='api_my_feed'
-            )]
+            ),
+            url(
+                r"^(?P<resource_name>%s)/(?P<slug>\w+)/users%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('get_users'),
+                name='api_get_users'
+            ),
+            url(
+                r"^(?P<resource_name>%s)/(?P<slug>\w+)/categories%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('get_categories'),
+                name='api_get_categories'
+            ),
+            url(
+                r"^(?P<resource_name>%s)/(?P<slug>\w+)/company%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('get_company'),
+                name='api_get_company'
+            ),
+            url(
+                r"^(?P<resource_name>%s)/(?P<slug>\w+)/contacts%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('get_contacts'),
+                name='api_get_contacts'
+            ),
+            url(
+                r"^(?P<resource_name>%s)/(?P<slug>\w+)/contact_lists%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('get_contact_lists'),
+                name='api_get_contact_lists'
+            ),
+            url(
+                r"^(?P<resource_name>%s)/(?P<slug>\w+)/shares%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('get_shares'),
+                name='api_get_shares'
+            ),
+            url(
+                r"^(?P<resource_name>%s)/(?P<slug>\w+)/sales_cycles%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('get_sales_cycles'),
+                name='api_get_sales_cycles'
+            ),
+            url(
+                r"^(?P<resource_name>%s)/(?P<slug>\w+)/activities%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('get_activities'),
+                name='api_get_activities'
+            ),
+            url(
+                r"^(?P<resource_name>%s)/(?P<slug>\w+)/products%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('get_products'),
+                name='api_get_products'
+            ),
+            url(
+                r"^(?P<resource_name>%s)/(?P<slug>\w+)/product_groups%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('get_product_groups'),
+                name='api_get_product_groups'
+            ),
+            url(
+                r"^(?P<resource_name>%s)/(?P<slug>\w+)/filters%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('get_filters'),
+                name='api_get_filters'
+            ),
+            url(
+                r"^(?P<resource_name>%s)/(?P<slug>\w+)/milestones%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('get_milestones'),
+                name='api_get_milestones'
+            ),
+            url(
+                r"^(?P<resource_name>%s)/(?P<slug>\w+)/sales_cycles_to_products_map%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('get_sales_cycles_to_products_map'),
+                name='api_get_sales_cycles_to_products_map'
+            ),
+            url(
+                r"^(?P<resource_name>%s)/(?P<slug>\w+)/constants%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('get_constants'),
+                name='api_get_constants'
+            ),
+            url(
+                r"^(?P<resource_name>%s)/(?P<slug>\w+)/session%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('get_session'),
+                name='api_get_session'
+            ),
+        ]
 
     def obj_get(self, bundle, **kwargs):
         '''
@@ -3001,7 +3097,7 @@ class AppStateResource(Resource):
         ... }
 
         '''
-        return AppStateObject(service_slug=kwargs['pk'],
+        return AppStateObject.create_object(service_slug=kwargs['pk'],
                               request=bundle.request)
 
     def my_feed(self, request, **kwargs):
@@ -3019,6 +3115,81 @@ class AppStateResource(Resource):
                 'sales_cycles': SalesCycleResource().get_bundle_list(sales_cycles, request),
                 'activities': ActivityResource().get_bundle_list(activities, request)
             })
+
+    def get_users(self, request, **kwargs):
+        with RequestContext(self, request, allowed_methods=['get']):
+            obj = AppStateObject(service_slug=kwargs['slug'], request=request)
+            return self.create_response(request, {'users': obj.get_users()}, response_class=http.HttpAccepted)
+
+    def get_categories(self, request, **kwargs):
+        with RequestContext(self, request, allowed_methods=['get']):
+            obj = AppStateObject(service_slug=kwargs['slug'], request=request)
+            return self.create_response(request, {'categories': obj.get_categories()}, response_class=http.HttpAccepted)
+
+    def get_company(self, request, **kwargs):
+        with RequestContext(self, request, allowed_methods=['get']):
+            obj = AppStateObject(service_slug=kwargs['slug'], request=request)
+            return self.create_response(request, {'company': obj.get_company()}, response_class=http.HttpAccepted)
+
+    def get_contacts(self, request, **kwargs):
+        with RequestContext(self, request, allowed_methods=['get']):
+            obj = AppStateObject(service_slug=kwargs['slug'], request=request)
+            return self.create_response(request, {'contacts': obj.get_contacts()}, response_class=http.HttpAccepted)
+
+    def get_contact_lists(self, request, **kwargs):
+        with RequestContext(self, request, allowed_methods=['get']):
+            obj = AppStateObject(service_slug=kwargs['slug'], request=request)
+            return self.create_response(request, {'contact_lists': obj.get_contact_lists()}, response_class=http.HttpAccepted)
+
+    def get_shares(self, request, **kwargs):
+        with RequestContext(self, request, allowed_methods=['get']):
+            obj = AppStateObject(service_slug=kwargs['slug'], request=request)
+            return self.create_response(request, {'shares': obj.get_shares()}, response_class=http.HttpAccepted)
+
+    def get_sales_cycles(self, request, **kwargs):
+        with RequestContext(self, request, allowed_methods=['get']):
+            obj = AppStateObject(service_slug=kwargs['slug'], request=request)
+            return self.create_response(request, {'sales_cycles': obj.get_sales_cycles()}, response_class=http.HttpAccepted)
+
+    def get_activities(self, request, **kwargs):
+        with RequestContext(self, request, allowed_methods=['get']):
+            obj = AppStateObject(service_slug=kwargs['slug'], request=request)
+            return self.create_response(request, {'activities': obj.get_activities()}, response_class=http.HttpAccepted)
+
+    def get_products(self, request, **kwargs):
+        with RequestContext(self, request, allowed_methods=['get']):
+            obj = AppStateObject(service_slug=kwargs['slug'], request=request)
+            return self.create_response(request, {'products': obj.get_products()}, response_class=http.HttpAccepted)
+
+    def get_product_groups(self, request, **kwargs):
+        with RequestContext(self, request, allowed_methods=['get']):
+            obj = AppStateObject(service_slug=kwargs['slug'], request=request)
+            return self.create_response(request, {'product_groups': obj.get_product_groups()}, response_class=http.HttpAccepted)
+
+    def get_filters(self, request, **kwargs):
+        with RequestContext(self, request, allowed_methods=['get']):
+            obj = AppStateObject(service_slug=kwargs['slug'], request=request)
+            return self.create_response(request, {'filters': obj.get_filters()}, response_class=http.HttpAccepted)
+
+    def get_milestones(self, request, **kwargs):
+        with RequestContext(self, request, allowed_methods=['get']):
+            obj = AppStateObject(service_slug=kwargs['slug'], request=request)
+            return self.create_response(request, {'milestones': obj.get_milestones()}, response_class=http.HttpAccepted)
+
+    def get_sales_cycles_to_products_map(self, request, **kwargs):
+        with RequestContext(self, request, allowed_methods=['get']):
+            obj = AppStateObject(service_slug=kwargs['slug'], request=request)
+            return self.create_response(request, {'sales_cycles_to_products_map': obj.get_sales_cycle2products_map()}, response_class=http.HttpAccepted)
+
+    def get_constants(self, request, **kwargs):
+        with RequestContext(self, request, allowed_methods=['get']):
+            obj = AppStateObject(service_slug=kwargs['slug'], request=request)
+            return self.create_response(request, {'constants': obj.get_constants()}, response_class=http.HttpAccepted)
+
+    def get_session(self, request, **kwargs):
+        with RequestContext(self, request, allowed_methods=['get']):
+            obj = AppStateObject(service_slug=kwargs['slug'], request=request)
+            return self.create_response(request, {'session': obj.get_session()}, response_class=http.HttpAccepted)
 
 
 class SalesCycleProductStatResource(CRMServiceModelResource):
