@@ -26,7 +26,7 @@ import datetime
 import xlrd
 from almanet.settings import TEMP_DIR, BASE_DIR
 from alm_vcard import models as vcard_models
-from celery import group, Task
+from celery import group, Task, result
 
 ALLOWED_TIME_PERIODS = ['week', 'month', 'year']
 
@@ -2201,13 +2201,19 @@ class ImportTask(models.Model):
     finished = models.BooleanField(default=False)
     filename = models.CharField(max_length=250)
 
-    @classmethod
     def check_status(self):
         if not self.uuid:
             return False
-        current_task = Task
+        # get the task id
+        import_task = result.GroupResult(id=self.uuid)
+        if not import_task.ready():
+            return False
+        else:
+            return self
+
 
 class ErrorCell(models.Model):
     import_task = models.ForeignKey(ImportTask)
     row = models.IntegerField()
     col = models.IntegerField()
+    data = models.CharField(max_length=10000)

@@ -1228,6 +1228,11 @@ class ContactResource(CRMServiceModelResource):
         received_task = add_contact_from_xls.AsyncResult(task_id)
 
     def check_import_status(self, request, **kwargs):
+        objects = []
+        contact_resource = ContactResource()
+        self.method_check(request, allowed=['get'])
+        self.is_authenticated(request)
+        self.throttle_check(request)
         task_id = request.GET.get('task_id', "")
         if not task_id:
             return self.create_response(
@@ -1235,6 +1240,35 @@ class ContactResource(CRMServiceModelResource):
                 )
         try:
             import_task = ImportTask.objects.get(uuid=task_id)
+            response = import_task.check_status()
+            if not response:
+                return self.create_response(
+                    request, {'success':True, 'status':'PENDING'}
+                    )
+            contacts = response.contacts.all()
+            contact_list = ContactList(
+                owner = request.user.get_crmuser(),
+                title = response.filename)
+            contact_list.save()
+            contact_list.contacts = contacts
+            for contact in contacts:
+                _bundle = contact_resource.build_bundle(
+                    obj=contact, request=request)
+                _bundle.data['global_sales_cycle'] = SalesCycleResource().full_dehydrate(
+                    SalesCycleResource().build_bundle(
+                        obj=SalesCycle.objects.get(contact_id=contact.id)
+                    )
+                )
+                objects.append(contact_resource.full_dehydrate(
+                    _bundle, for_list=True))
+            contact_list = ContactListResource().full_dehydrate(
+                ContactListResource().build_bundle(
+                    obj=contact_list
+                    )
+                )
+            return self.create_response(
+                request, {'objects': objects, 'contact_list': contact_list})
+
         except ObjectDoesNotExist:
             return self.create_response(
                 request, {'success':False, 'message':'The task with particular id does not exist'}

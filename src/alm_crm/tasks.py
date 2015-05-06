@@ -3,10 +3,11 @@ from celery import shared_task
 from almanet.celery import app
 import xlrd
 import time
-from almanet.settings import TEMP_DIR
+from almanet.settings import BASE_DIR
 from .models import Contact, ImportTask, ErrorCell
 from alm_vcard import models as vcard_models
 from celery import group
+import xlsxwriter
 
 @app.task
 def add(x, y):
@@ -72,4 +73,24 @@ def add_contacts_by_chunks(import_task, file_structure, filename, creator, start
             error_cell.save()
 
         
-
+@app.task
+def create_failed_contacts_xls(filename, import_task):
+    if not import_task.errorcell_set.all():    
+        return False
+    cell_list = eval(
+        import_task.errorcell_set.all()
+        )
+    workbook = xlsxwriter.Workbook(BASE_DIR+filename+'_edited.xlsx')
+    worksheet = workbook.add_worksheet()
+    error_format = workbook.add_format()
+    error_format.set_bg_color('red')
+    for i in range(0,import_task.errorcell_set.count()):
+        for j in range(len(cell_list)):
+            if j==cell_list[i].col:
+                worksheet.write(i, j, cell_list[j], error_format)
+            else:
+                worksheet.write(i, j, cell_list[j])
+    workbook.close()
+    import_task.filename = filename +  '_edited.xlsx'
+    import_task.save()
+    return import_task
