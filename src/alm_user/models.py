@@ -36,7 +36,7 @@ class User(AbstractBaseUser):
 
     vcard = models.OneToOneField(VCard, blank=True, null=True)
 
-    userpic = models.ImageField(upload_to='userpics')
+    userpic = models.ForeignKey('almastorage.SwiftFile', related_name='users', null=True, blank=True)
 
     class Meta:
         verbose_name = _('user')
