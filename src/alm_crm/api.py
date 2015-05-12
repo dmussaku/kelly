@@ -1197,8 +1197,10 @@ class ContactResource(CRMServiceModelResource):
         data = self.deserialize(
             request, request.body,
             format=request.META.get('CONTENT_TYPE', 'application/json'))
-        col_structure = data.get('col_structure')
-        filename = data.get('filename')
+        # col_structure = data.get('col_structure')
+        # filename = data.get('filename')
+        col_structure = request.body.get('col_structure')
+        filename = request.body.get('filename')
         if not col_structure or not filename:
             return self.create_response(
                 request, {'success':False, 'message':'Invalid parameters'}
@@ -1214,7 +1216,8 @@ class ContactResource(CRMServiceModelResource):
             if len(value.split('__'))>1:
                 obj_dict['attr'] = value.split('__')[1]
             col_hash.append(obj_dict)
-        queued_task = add_contacts_from_xls.delay(col_structure, filename)
+        queued_task = grouped_contact_import_task.delay(
+            col_structure, filename, request.user)
         return self.create_response(
             request, {'success':True,'task_id':queued_task.id}
             )
