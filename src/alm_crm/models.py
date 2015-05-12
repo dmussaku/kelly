@@ -991,61 +991,40 @@ class Product(SubscriptionObject):
     @classmethod
     @transaction.atomic()
     def import_from_xls(cls, xls_file_data, creator):
+        '''
+        first column is name, second is description and third is price
+        '''
         book = xlrd.open_workbook(file_contents=xls_file_data)
         #book = xlrd.open_workbook(filename='medonica_products.xlsx')
         product_list = []
-        for sheet in book.sheets():
-            NUM_CELLS = sheet.nrows
-            a_col = sheet.col(0)
-            b_col = sheet.col(1)
-            c_col = sheet.col(2)
-            p = Product(
-                    name=b_col[0].value,
-                    description=b_col[1].value,
-                    price=b_col[2].value,
-                    subscription_id=creator.get_crmuser().subscription_id,
-                    owner=creator.get_crmuser()
-                    )
-            p.save()
-            i = 3
-            while (i<=NUM_CELLS):
-                if (a_col[i].value and b_col[i].value and not c_col[i].value):
+        sheet = book.sheets()[0]
+        col_names = [col_name.value for col_name in sheet.row(0)][3:]
+        for i in range(1, sheet.nrows):
+            row_vals = [val.value for val in sheet.row(i)]
+            if not row_vals[0]:
+                continue
+            product = Product(
+                name=row_vals[0],
+                subscription_id=creator.get_crmuser().subscription_id,
+                owner=creator.get_crmuser()
+                )
+            if row_vals[1]:
+                product.description = row_vals[1]
+            if row_vals[2]:
+                product.price = row_vals[2]
+            else:
+                product.price = 0
+            product.save()
+            for i in range(0, len(row_vals[3:])):
+                if row_vals[i]:
                     field = CustomField.build_new(
-                        title=a_col[i].value,
-                        value=b_col[i].value,
+                        title=col_names[i],
+                        value=row_vals[i],
                         content_class=Product,
-                        object_id=p.id,
+                        object_id=product.id,
                         save=True
                         )
-                    i+=1
-                elif(a_col[i].value and b_col[i].value and c_col[i].value):
-                    is_section = True
-                    section = CustomSection.build_new(
-                        title = a_col[i].value,
-                        content_class=Product,
-                        object_id=p.id,
-                        save=True
-                        )
-                    print section
-                    i += 1
-                    while(is_section):
-                        if (not a_col[i].value and not b_col[i].value and not b_col[i].value):
-                            is_section = False
-                            break
-                        else:
-                            field = CustomField.build_new(
-                                title=b_col[i].value,
-                                value=c_col[i].value,
-                                section = section,
-                                content_class=Product,
-                                object_id=p.id,
-                                save=True
-                                )
-                        i+=1
-                        if i==NUM_CELLS:
-                            break
-                i+=1
-            product_list.append(p)
+            product_list.append(product)
         return product_list
 
 class ProductGroup(SubscriptionObject):
