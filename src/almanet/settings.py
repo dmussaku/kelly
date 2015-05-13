@@ -143,6 +143,7 @@ class BaseConfiguration(SubdomainConfiguration, Configuration):
         'tastypie',
         'tastypie_swagger',
         'django_extensions',
+        'djcelery',
     )
 
     MIDDLEWARE_CLASSES = (

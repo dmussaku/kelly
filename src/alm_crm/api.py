@@ -104,7 +104,7 @@ from .utils.data_processing import (
 import base64
 import simplejson as json
 from collections import OrderedDict
-from .tasks import grouped_contact_import_task
+from .tasks import grouped_contact_import_task, create_failed_contacts_xls
 
 
 class CommonMeta:
@@ -1194,13 +1194,15 @@ class ContactResource(CRMServiceModelResource):
             )
 
     def import_from_structure(self, request, **kwargs):
-        data = self.deserialize(
-            request, request.body,
-            format=request.META.get('CONTENT_TYPE', 'application/json'))
+        # data = self.deserialize(
+        #     request, request.body,
+        #     format=request.META.get('CONTENT_TYPE', 'application/json'))
         # col_structure = data.get('col_structure')
         # filename = data.get('filename')
-        col_structure = request.body.get('col_structure')
-        filename = request.body.get('filename')
+        # col_structure = request.body.get('col_structure')
+        # filename = request.body.get('filename')
+        col_structure = eval(request.body)['col_structure']
+        filename = eval(request.body)['filename']
         if not col_structure or not filename:
             return self.create_response(
                 request, {'success':False, 'message':'Invalid parameters'}
@@ -1210,16 +1212,16 @@ class ContactResource(CRMServiceModelResource):
         {0:'Adr__postal', 1:'VCard__fn', 2:'Adr__home', 3:'Org', 4:'Nickname'}
         """
         col_hash = []
-        for key, value in obj.viewitems():
+        for key, value in col_structure.viewitems():
             obj_dict = {'num':key}
             obj_dict['model'] = value.split('__')[0]
             if len(value.split('__'))>1:
                 obj_dict['attr'] = value.split('__')[1]
             col_hash.append(obj_dict)
-        queued_task = grouped_contact_import_task.delay(
-            col_structure, filename, request.user)
+        queued_task_id = grouped_contact_import_task(
+            col_hash, filename, request.user)
         return self.create_response(
-            request, {'success':True,'task_id':queued_task.id}
+            request, {'success':True,'task_id':queued_task_id}
             )
 
     def get_response_from_import(self, request, **kwargs):
@@ -1248,6 +1250,7 @@ class ContactResource(CRMServiceModelResource):
                 return self.create_response(
                     request, {'success':True, 'status':'PENDING'}
                     )
+            create_failed_contacts_xls.delay(response.filename, response)
             contacts = response.contacts.all()
             contact_list = ContactList(
                 owner = request.user.get_crmuser(),

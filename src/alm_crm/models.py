@@ -27,6 +27,7 @@ import xlrd
 from almanet.settings import TEMP_DIR, BASE_DIR
 from alm_vcard import models as vcard_models
 from celery import group, Task, result
+# from .tasks import create_failed_contacts_xls
 
 ALLOWED_TIME_PERIODS = ['week', 'month', 'year']
 
@@ -615,10 +616,10 @@ class Contact(SubscriptionObject):
     which has a specific format, here's the example of both 
     file_structure:
     [
-        {'num':0, 'model':'VCard', 'type':'fn'},
-        {'num':1, 'model':'Adr', 'type':'postal'},
+        {'num':0, 'model':'VCard', 'attr':'fn'},
+        {'num':1, 'model':'Adr', 'attr':'postal'},
         {'num':2, 'model':'Org'},
-        {'num':3, 'model':'Email', 'type':'internet'}
+        {'num':3, 'model':'Email', 'attr':'internet'}
     ]
     data:
     ['John Smith', 'Black water Valley;Chicago;60616;USA;;Home County;Almaty;000100;Kazakhstan',
@@ -640,7 +641,7 @@ class Contact(SubscriptionObject):
             col_num = structure_dict.get('num')
             model = getattr(vcard_models, structure_dict.get('model'))
             if model == vcard_models.VCard:
-                attr = structure_dict.get('type',"")
+                attr = structure_dict.get('attr',"")
                 try:
                     with transaction.atomic():
                         if type(data[col_num].value) == unicode:
@@ -660,7 +661,7 @@ class Contact(SubscriptionObject):
                         if data[col_num].value:
                             objects = data[col_num].value.split(';')
                             for object in objects:
-                                v_type = structure_dict.get('type','')
+                                v_type = structure_dict.get('attr','')
                                 obj = model(type=v_type, value = object)
                                 obj.vcard = vcard
                                 obj.save()
@@ -675,7 +676,7 @@ class Contact(SubscriptionObject):
                         if data[col_num].value:
                             objects = data[col_num].value.split(';')
                             for object in objects:
-                                v_type = structure_dict.get('type','')
+                                v_type = structure_dict.get('attr','')
                                 obj = model(organization_name = object)
                                 obj.vcard = vcard
                                 obj.save()
@@ -685,7 +686,7 @@ class Contact(SubscriptionObject):
                     response['error_col'] = col_num
                     return response
             elif model == vcard_models.Adr:
-                adr_type = structure_dict.get('type','')
+                adr_type = structure_dict.get('attr','')
                 try:
                     with transaction.atomic():
                         if data[col_num].value:
@@ -710,7 +711,7 @@ class Contact(SubscriptionObject):
                         if data[col_num].value:
                             objects = data[col_num].value.split(';')
                             for object in objects:
-                                v_type = structure_dict.get('type','')
+                                v_type = structure_dict.get('attr','')
                                 obj = model(value = object)
                                 obj.vcard = vcard
                                 obj.save()
@@ -2197,18 +2198,20 @@ class CustomField(SubscriptionObject):
         return custom_field
 
 class ImportTask(models.Model):
-    uuid = models.CharField(blank=True, null=True, max_length=100)
+    uuid = models.CharField(blank=False, null=False, max_length=100)
     finished = models.BooleanField(default=False)
     filename = models.CharField(max_length=250)
 
     def check_status(self):
         if not self.uuid:
-            return False
+            raise Exception
         # get the task id
-        import_task = result.GroupResult(id=self.uuid)
+        import_task = result.GroupResult.restore(self.uuid)
         if not import_task.ready():
             return False
         else:
+            self.finished = True
+            self.save()
             return self
 
 
