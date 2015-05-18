@@ -115,7 +115,7 @@ class Milestone(SubscriptionObject):
                         {'title':'Предоставление услуги', 'color_code': '#D4F49B'},
                         {'title':'Upsales', 'color_code': '#F4DC9C'}]
 
-        for data in default_data:   
+        for data in default_data:
             milestone = Milestone()
             milestone.title = data['title']
             milestone.color_code = data['color_code']
@@ -1251,9 +1251,9 @@ class SalesCycle(SubscriptionObject):
         self.milestone = milestone
         self.save()
 
-        sc_log_entry = SalesCycleLogEntry(meta=meta, 
+        sc_log_entry = SalesCycleLogEntry(meta=meta,
                                           entry_type=SalesCycleLogEntry.MC,
-                                          sales_cycle=self, 
+                                          sales_cycle=self,
                                           owner=crmuser)
         sc_log_entry.save()
         return self
@@ -1351,7 +1351,7 @@ class SalesCycleLogEntry(SubscriptionObject):
     )
     TYPES = (MC, ) = ('MC', )
     TYPES_OPTIONS = zip(TYPES, TYPES_CAPS)
-    TYPES_DICT = dict(zip(('MC', ), TYPES))    
+    TYPES_DICT = dict(zip(('MC', ), TYPES))
 
     meta = models.TextField(null=True, blank=True)
     sales_cycle = models.ForeignKey(SalesCycle, related_name='log')
@@ -1361,6 +1361,7 @@ class SalesCycleLogEntry(SubscriptionObject):
     date_created = models.DateTimeField(blank=True, null=True,
                                         auto_now_add=True)
     date_edited = models.DateTimeField(blank=True, null=True, auto_now=True)
+
 
 class Activity(SubscriptionObject):
     title = models.CharField(max_length=100, null=True, blank=True)
@@ -1442,7 +1443,7 @@ class Activity(SubscriptionObject):
                 act_recip.save()
 
     def has_read(self, user_id):
-        recip = self.recipients.filter(user__pk=user_id).first()
+        recip = self.recipients.filter(user_id=user_id).first()
         return not recip or recip.has_read
 
     @classmethod
@@ -1885,7 +1886,7 @@ class ContactList(SubscriptionObject):
 
 
 class SalesCycleProductStat(SubscriptionObject):
-    sales_cycle = models.ForeignKey(SalesCycle, related_name='product_stats', 
+    sales_cycle = models.ForeignKey(SalesCycle, related_name='product_stats',
                                 null=True, blank=True, on_delete=models.SET_NULL)
     product = models.ForeignKey(Product)
     value = models.IntegerField(default=0)

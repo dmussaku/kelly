@@ -115,7 +115,6 @@ class CommonMeta:
 class CRMServiceModelResource(ModelResource):
 
     def apply_authorization_limits(self, request, object_list):
-        print 'Hi!'
         return object_list.filter(subscription_id=self.get_crmsubscr_id(request))
 
     def hydrate(self, bundle):
@@ -154,13 +153,15 @@ class CRMServiceModelResource(ModelResource):
     def get_crmsubscr_id(cls, request):
         return get_subscr_id(request.user_env, DEFAULT_SERVICE)
 
-    @classmethod
-    def get_crmuser(cls, request):
-        subscription_pk = cls.get_crmsubscr_id(request)
-        crmuser = None
+    def get_crmuser(self, request):
+        if hasattr(self, 'crmuser'):
+            return self.crmuser
+
+        subscription_pk = self.get_crmsubscr_id(request)
+        self.crmuser = None
         if subscription_pk:
-            crmuser = request.user.get_subscr_user(subscription_pk)
-        return crmuser
+            self.crmuser = request.user.get_subscr_user(subscription_pk)
+        return self.crmuser
 
     class Meta:
         list_allowed_methods = ['get', 'post', 'patch']
@@ -230,7 +231,7 @@ class ContactResource(CRMServiceModelResource):
     #     )
 
     class Meta(CommonMeta):
-        queryset = Contact.objects.all()
+        queryset = Contact.objects.all().select_related('owner', 'vcard', 'parent').prefetch_related('sales_cycles', 'children', 'share_set')
         resource_name = 'contact'
         filtering = {
             'status': ['exact'],
@@ -1504,7 +1505,7 @@ class ActivityResource(CRMServiceModelResource):
     comments_count = fields.IntegerField(attribute='comments_count', readonly=True)
 
     class Meta(CommonMeta):
-        queryset = Activity.objects.all().prefetch_related('owner', 'feedback', 'comments', 'recipients')
+        queryset = Activity.objects.all().select_related('owner', 'feedback').prefetch_related('comments') #'recipients'
         resource_name = 'activity'
         excludes = ['date_edited', 'subscription_id', 'title']
         always_return_data = True
@@ -1559,13 +1560,9 @@ class ActivityResource(CRMServiceModelResource):
             ),
         ]
 
-    def get_list(self, request, **kwargs):
-        self.crmuser = self.get_crmuser(request)
-        return super(self.__class__, self).get_list(request, **kwargs)
-
     def dehydrate(self, bundle):
-        # crmuser = self.get_crmuser(bundle.request)
-        bundle.data['has_read'] = bundle.obj.has_read(self.crmuser.id)
+        crmuser = self.get_crmuser(bundle.request)
+        bundle.data['has_read'] = bundle.obj.has_read(crmuser.id)
 
         # send updated contact (status was changed to LEAD)
         if bundle.data.get('obj_created'):
