@@ -1496,7 +1496,7 @@ class ActivityResource(CRMServiceModelResource):
     @undocumented: Meta
     """
 
-    author_id = fields.IntegerField(attribute='author_id', null=True)
+    author_id = fields.IntegerField(attribute='owner_id', null=True)
     description = fields.CharField(attribute='description')
     need_preparation = fields.BooleanField(attribute='need_preparation')
     sales_cycle_id = fields.IntegerField(null=True)
@@ -1504,7 +1504,7 @@ class ActivityResource(CRMServiceModelResource):
     comments_count = fields.IntegerField(attribute='comments_count', readonly=True)
 
     class Meta(CommonMeta):
-        queryset = Activity.objects.all().prefetch_related('recipients')
+        queryset = Activity.objects.all().prefetch_related('owner', 'feedback', 'comments', 'recipients')
         resource_name = 'activity'
         excludes = ['date_edited', 'subscription_id', 'title']
         always_return_data = True
@@ -1559,9 +1559,13 @@ class ActivityResource(CRMServiceModelResource):
             ),
         ]
 
+    def get_list(self, request, **kwargs):
+        self.crmuser = self.get_crmuser(request)
+        return super(self.__class__, self).get_list(request, **kwargs)
+
     def dehydrate(self, bundle):
-        crmuser = self.get_crmuser(bundle.request)
-        bundle.data['has_read'] = bundle.obj.has_read(crmuser.id)
+        # crmuser = self.get_crmuser(bundle.request)
+        bundle.data['has_read'] = bundle.obj.has_read(self.crmuser.id)
 
         # send updated contact (status was changed to LEAD)
         if bundle.data.get('obj_created'):
