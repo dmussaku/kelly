@@ -15,7 +15,7 @@ from django.utils.functional import lazy
 from configurations import Configuration, pristinemethod
 from configurations.utils import uppercase_attributes
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
-TEMP_DIR = '/temp_dir/'
+TEMP_DIR = BASE_DIR + '/temp_dir/'
 
 
 def rel(*x):

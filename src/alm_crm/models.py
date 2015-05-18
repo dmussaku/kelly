@@ -173,7 +173,7 @@ class Contact(SubscriptionObject):
     mentions = generic.GenericRelation('Mention')
     comments = generic.GenericRelation('Comment')
     import_task = models.ForeignKey(
-        'ImportTask', blank=True, null=True, related_name='contacts')
+        'ImportTask', blank=True, null=True, related_name='contacts', on_delete=models.SET_NULL)
 
     class Meta:
         verbose_name = _('contact')
@@ -640,6 +640,8 @@ class Contact(SubscriptionObject):
         for structure_dict in file_structure:
             col_num = structure_dict.get('num')
             model = getattr(vcard_models, structure_dict.get('model'))
+            if type(data[col_num].value) == float:
+                data[col_num].value = str(data[col_num].value)
             if model == vcard_models.VCard:
                 attr = structure_dict.get('attr',"")
                 try:
@@ -648,7 +650,10 @@ class Contact(SubscriptionObject):
                             setattr(vcard, attr, data[col_num].value)
                         else:
                             setattr(vcard, attr, str(data[col_num].value))
-                        vcard.save()
+                        try:
+                            vcard.save()
+                        except:
+                            pass
                 except IntegrityError:
                     transaction.savepoint_rollback(sid)
                     response['error'] = True
@@ -712,7 +717,7 @@ class Contact(SubscriptionObject):
                             objects = data[col_num].value.split(';')
                             for object in objects:
                                 v_type = structure_dict.get('attr','')
-                                obj = model(value = object)
+                                obj = model(data = object)
                                 obj.vcard = vcard
                                 obj.save()
                 except IntegrityError:
@@ -725,6 +730,12 @@ class Contact(SubscriptionObject):
         contact.owner = creator.get_crmuser()
         contact.subscription_id = creator.get_crmuser().subscription_id
         contact.save()
+        SalesCycle.create_globalcycle(
+                        **{'subscription_id':contact.subscription_id,
+                         'owner_id':creator.get_crmuser().id,
+                         'contact_id':contact.id
+                        }
+                    )
         return {'error':False, 'contact_id':contact.id}
 
     @classmethod
@@ -970,7 +981,7 @@ class Contact(SubscriptionObject):
         ext = filename.split('.')[len(filename.split('.')) - 1]
         new_filename = filename.strip('.' + ext) + datetime.datetime.now().__str__() + '.' + ext
         myfile = open(
-            BASE_DIR + new_filename,
+            TEMP_DIR + new_filename,
             'wb'
             )
         myfile.write(xls_file_data)
@@ -2213,6 +2224,9 @@ class ImportTask(models.Model):
             self.finished = True
             self.save()
             return self
+
+    def __unicode__(self):
+        return self.uuid + ' ' + str(self.finished)
 
 
 class ErrorCell(models.Model):

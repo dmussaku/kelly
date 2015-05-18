@@ -3,9 +3,10 @@ from celery import shared_task
 from almanet.celery import app
 import xlrd
 import time
-from almanet.settings import BASE_DIR
+from almanet.settings import TEMP_DIR
 from alm_crm.models import Contact, ImportTask, ErrorCell
 from alm_vcard import models as vcard_models
+from alm_user.models import User
 from celery import group, result
 import xlsxwriter
 
@@ -39,7 +40,7 @@ group the add_contacts_by_chunks task to execute concurently
 
 
 def grouped_contact_import_task(file_structure, filename, creator):
-    book = xlrd.open_workbook(filename=BASE_DIR+'/'+filename)
+    book = xlrd.open_workbook(filename=TEMP_DIR + filename)
     sheet = book.sheets()[0]
     nrows = sheet.nrows
     print file_structure
@@ -57,7 +58,8 @@ def grouped_contact_import_task(file_structure, filename, creator):
         )
     job = grouped_task.apply_async()
     job.save()
-    import_task.uuid=job.id
+    import_task.uuid = job.id
+    import_task.filename = filename 
     import_task.save()
     return job.id
 '''
@@ -67,10 +69,10 @@ this task will open the file and only parse selected rows
 @app.task
 def add_contacts_by_chunks(import_task_id, file_structure, filename, creator_id, start_row=0, finish_row=100):
     creator = User.objects.get(id=creator_id)
-    book = xlrd.open_workbook(filename=filename)
+    book = xlrd.open_workbook(filename=TEMP_DIR+filename)
     import_task = ImportTask.objects.get(id=import_task_id)
     sheet = book.sheets()[0]
-    for i in range(start_row, finish_row):
+    for i in range(start_row, finish_row-1):
         data = sheet.row(i)
         response = Contact.create_from_structure(
             data, file_structure, creator, import_task)
@@ -84,11 +86,17 @@ def add_contacts_by_chunks(import_task_id, file_structure, filename, creator_id,
 
         
 @app.task
-def create_failed_contacts_xls(filename, import_task):
+def create_failed_contacts_xls(filename, import_task_id):
+    try:
+        import_task = ImportTask.objects.get(id=import_task_id)
+    except ObjectDoesNotExist:
+        return False
     if not import_task.errorcell_set.all():    
+        import_task.delete()
         return False
     cell_list = import_task.errorcell_set.all()
-    workbook = xlsxwriter.Workbook(BASE_DIR+filename+'_edited.xlsx')
+    filename = TEMP_DIR + filename+'_edited.xlsx'
+    workbook = xlsxwriter.Workbook(filename)
     worksheet = workbook.add_worksheet()
     error_format = workbook.add_format()
     error_format.set_bg_color('red')
@@ -99,6 +107,5 @@ def create_failed_contacts_xls(filename, import_task):
             else:
                 worksheet.write(i, j, cell_list[j])
     workbook.close()
-    import_task.filename = filename +  '_edited.xlsx'
-    import_task.save()
-    return import_task
+    import_task.delete()
+    return filename

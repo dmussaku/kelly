@@ -173,13 +173,128 @@ class CRMServiceModelResource(ModelResource):
 
 
 class ContactResource(CRMServiceModelResource):
-    """
-    GET Method
-    I{URL}:  U{alma.net/api/v1/contact}
+    '''
+    GET Method \n
+    I{URL}:  U{alma.net/api/v1/contact}\n
+    
+    Description:
+    Api for Contact model\n
 
-    Description
-    Api for Contact model
+    POST Create Contact example\n
+    ACCEPTS
+    {
+        author_id: 1
+        children: []
+        date_created: "2015-05-14T12:56:40.250227"
+        global_sales_cycle: {activities:[], author_id:1, contact_id:2, date_created:2015-05-14T12:56:40.939332,…}
+        id: 2
+        owner: 1
+        parent: null
+        parent_id: null
+        resource_uri: "/api/v1/contact/2/"
+        sales_cycles: [3]
+        0: 3
+        share: {contact:2, date_created:2015-05-14T12:56:40.930951, id:1, is_read:false, note:Example Note,…}
+        status: 0
+        subscription_id: 1
+        tp: "user"
+        vcard: {additional_name:, adrs:[], agents:[], bday:null, categories:[], classP:null, custom_fields:[],…}
+        additional_name: ""
+        adrs: []
+        agents: []
+        bday: null
+        categories: []
+        classP: null
+        custom_fields: []
+        custom_sections: []
+        emails: [{type:internet, value:example@example.com}, {type:home, value:example2@example.com}]
+        0: {type:internet, value:example@example.com}
+        1: {type:home, value:example2@example.com}
+        family_name: ""
+        fn: "Example Example"
+        geos: []
+        given_name: ""
+        honorific_prefix: ""
+        honorific_suffix: ""
+        keys: []
+        labels: []
+        mailers: []
+        nicknames: []
+        notes: []
+        orgs: [{organization_name:Company, organization_unit:}]
+        rev: null
+        roles: []
+        sort_string: null
+        tels: [{type:work, value:7777777777}]
+        titles: [{data:SEO}]
+        tzs: []
+        uid: null
+        urls: []
+    }
+    RESPONSE
+    {
+     "author_id": 1,
+     "children": [],
+     "date_created": "2015-05-14T12:56:40.250227",
+     "global_sales_cycle":{},
+     "id": 2,
+     "owner": 1,
+     "parent": null,
+     "parent_id": null,
+     "resource_uri": "/api/v1/contact/2/",
+     "sales_cycles": [3],
+     "share": {"contact": 2,
+     "date_created": "2015-05-14T12:56:40.930951",
+     "id": 1,
+     "is_read": false,
+     "note": "Example Note",
+     "resource_uri": "/api/v1/share/1/",
+     "share_from": 1,
+     "share_to": 1},
+     "status": 0,
+     "subscription_id": 1,
+     "tp": "user",
+     "vcard": {
+         "additional_name": "",
+         "adrs": [],
+         "agents": [],
+         "bday": null,
+         "categories": [],
+         "classP": null,
+         "custom_fields": [],
+         "custom_sections": [],
+         "emails": [{"type": "internet","value": "example@example.com"},{"type": "home", "value": "example2@example.com"}],
+         "family_name": "",
+         "fn": "Example Example",
+         "geos": [],
+         "given_name": "",
+         "honorific_prefix": "",
+         "honorific_suffix": "",
+         "keys": [],
+         "labels": [],
+         "mailers": [],
+         "nicknames": [],
+         "notes": [],
+         "orgs": [{"organization_name": "Company",
+         "organization_unit": ""}],
+         "rev": null,
+         "roles": [],
+         "sort_string": null,
+         "tels": [{"type": "work", "value": "7777777777"}], 
+         "titles": [{"data": "SEO"}], 
+         "tzs": [], 
+         "uid": null, 
+         "urls": []
+        }
+     }
 
+    PUT Edit Contact Example
+    So basically if you want to edit the contact you must send all the attributes
+    (except for the empty ones) If you want to say change fn (full name) and leave
+    emails and telephone number untouched you have to send them via PUT as well. And
+    if you want to add an email to a contact you have to attach the previous ones (they 
+    may be edited as well, just keep ids of those objects) plus the new email object.
+    The Accept and response json are similar to the ones used in Create example 
 
     @type  limit: number
     @param limit: The limit of results, 20 by default.
@@ -210,7 +325,7 @@ class ContactResource(CRMServiceModelResource):
 
 
     @undocumented: prepend_urls, Meta
-    """
+    '''
     vcard = fields.ToOneField('alm_vcard.api.VCardResource', 'vcard',
                               null=True, full=True)
     owner = fields.ToOneField('alm_crm.api.CRMUserResource', 'owner',
@@ -1228,10 +1343,47 @@ class ContactResource(CRMServiceModelResource):
         task_id = request.GET.get('task_id', "")
         if not task_id:
             return self.create_response(
-                request, {'success':False, 'message':'No task with this id'}
+                request, {'success':False, 'status':'FAILED', 'message':'No task id entered'}
                 )
-        received_task = add_contact_from_xls.AsyncResult(task_id)
+        try:
+            import_task = ImportTask.objects.get(uuid=task_id)
+        except:
+            return self.create_response(
+                request, {'success':False, 'status':'FAILED', 'message':'No task with this particular id'}
+                )
+        received_task = import_task.check_status()
+        if not received_task:
+            return self.create_response(
+                request, {'success':False, 'status':'PENDING', 'message':'Task not yet finished'}
+                )
+        objects = []
+        contact_resource = ContactResource()
+        contact_list = ContactList(
+                owner = request.user.get_crmuser(),
+                title = received_task.filename)
+        contact_list.save()
+        contact_list.contacts = received_task.contacts.all()
+        for contact in received_task.contacts.all():
+            _bundle = contact_resource.build_bundle(
+                obj=contact, request=request)
+            _bundle.data['global_sales_cycle'] = SalesCycleResource().full_dehydrate(
+                SalesCycleResource().build_bundle(
+                    obj=SalesCycle.objects.get(contact_id=contact.id)
+                )
+            )
+            objects.append(contact_resource.full_dehydrate(
+                _bundle, for_list=True))
+        contact_list = ContactListResource().full_dehydrate(
+            ContactListResource().build_bundle(
+                obj=contact_list
+                )
+            )
+        # received_task.delete()
+        self.log_throttled_access(request)
+        return self.create_response(
+            request, {'success':True, 'status':'FINISHED', 'objects': objects, 'contact_list': contact_list})
 
+    @transaction.atomic()
     def check_import_status(self, request, **kwargs):
         objects = []
         contact_resource = ContactResource()
@@ -1245,48 +1397,64 @@ class ContactResource(CRMServiceModelResource):
                 )
         try:
             import_task = ImportTask.objects.get(uuid=task_id)
-            response = import_task.check_status()
-            if not response:
-                return self.create_response(
-                    request, {'success':True, 'status':'PENDING'}
-                    )
-            create_failed_contacts_xls.delay(response.filename, response)
-            contacts = response.contacts.all()
-            contact_list = ContactList(
-                owner = request.user.get_crmuser(),
-                title = response.filename)
-            contact_list.save()
-            contact_list.contacts = contacts
-            for contact in contacts:
-                _bundle = contact_resource.build_bundle(
-                    obj=contact, request=request)
-                _bundle.data['global_sales_cycle'] = SalesCycleResource().full_dehydrate(
-                    SalesCycleResource().build_bundle(
-                        obj=SalesCycle.objects.get(contact_id=contact.id)
-                    )
-                )
-                objects.append(contact_resource.full_dehydrate(
-                    _bundle, for_list=True))
-            contact_list = ContactListResource().full_dehydrate(
-                ContactListResource().build_bundle(
-                    obj=contact_list
-                    )
-                )
-            return self.create_response(
-                request, {'objects': objects, 'contact_list': contact_list})
-
         except ObjectDoesNotExist:
             return self.create_response(
                 request, {'success':False, 'message':'The task with particular id does not exist'}
                 )
+        response = import_task.check_status()
+        if not response:
+            return self.create_response(
+                request, {'success':False, 'status':'PENDING'}
+                )
+        contacts = response.contacts.all()
+        title = response.filename
+        create_failed_contacts_xls.delay(response.filename, response.id)
+        contact_list = ContactList(
+            owner = request.user.get_crmuser(),
+            title = title)
+        contact_list.save()
+        contact_list.contacts = contacts
+        for contact in contacts:
+            _bundle = contact_resource.build_bundle(
+                obj=contact, request=request)
+            _bundle.data['global_sales_cycle'] = SalesCycleResource().full_dehydrate(
+                SalesCycleResource().build_bundle(
+                    obj=SalesCycle.objects.get(contact_id=contact.id)
+                )
+            )
+            objects.append(contact_resource.full_dehydrate(
+                _bundle, for_list=True))
+        contact_list = ContactListResource().full_dehydrate(
+            ContactListResource().build_bundle(
+                obj=contact_list
+                )
+            )
+        return self.create_response(
+            request, {'success':True, 'status':'FINISHED', 'objects': objects, 'contact_list': contact_list})
+
 
 class SalesCycleResource(CRMServiceModelResource):
     '''
     GET Method
-    I{URL}:  U{alma.net/api/v1/sales_cycle}
-
+    I{URL}:  U{alma.net/api/v1/sales_cycle}\n
+    B{Response}\n
+    C{{"activities": [], "author_id": 1, "contact_id": 1, "date_created": "2015-05-14T11:47:26.545833", "description": "", "id": 2, "is_global": false, "log": [], "milestone_id": null, "projected_value": null, "real_value": null, "resource_uri": "/api/v1/sales_cycle/2/", "stat": [], "status": "P", "subscription_id": 1, "title": "New Cycle"}}\n
+    
     B{Description}:
     API resource manage Contact's SalesCycles
+    
+
+    I{POST}\n
+    B{Accepts Example}
+    C{{author_id: 1, contact_id: 1, status: "N", title: "New Cycle"}}\n 
+    B{Returns Example}
+    C{{"activities": [], "author_id": 1, "contact_id": 1, "date_created": "2015-05-14T11:47:26.545833", "description": "", "id": 2, "is_global": false, "log": [], "milestone_id": null, "obj_created": true, "projected_value": null, "real_value": null, "resource_uri": "/api/v1/sales_cycle/2/", "stat": [], "status": "N", "subscription_id": 1, "title": "New Cycle"}} 
+    
+    I{PUT}\n
+    B{Accepts Example}
+    C{"status":"P"}\n
+    B{Returns Example}
+    C{"activities": [], "author_id": 1, "contact_id": 1, "date_created": "2015-05-14T11:47:26.545833", "description": "", "id": 2, "is_global": false, "log": [], "milestone_id": null, "obj_created": true, "projected_value": null, "real_value": null, "resource_uri": "/api/v1/sales_cycle/2/", "stat": [], "status": "N", "subscription_id": 1, "title": "New Cycle"}\n
 
     @undocumented: prepend_urls, Meta
     '''
@@ -1547,28 +1715,147 @@ class MilestoneResource(CRMServiceModelResource):
 
 
 class ActivityResource(CRMServiceModelResource):
-    """
+    '''
     GET Method
-    I{URL}:  U{alma.net/api/v1/activity}
+    URL:  U{alma.net/api/v1/activity}\n
+    Response:
+    {
+        "meta": {
+        "limit": 20,
+        "next": null,
+        "offset": 0,
+        "previous": null,
+        "total_count": 1
+        },
+        "objects": [
+            {
+            "author_id": 1,
+            "comments_count": 0,
+            "date_created": "2015-05-14T12:16:39.363625",
+            "date_finished": null,
+            "deadline": null,
+            "description": "Just trying to show an example of how to create activity",
+            "feedback_status": null,
+            "has_read": false,
+            "id": 1,
+            "need_preparation": false,
+            "resource_uri": "/api/v1/activity/1/",
+            "sales_cycle_id": 1
+            }
+        ]
+    }
+
 
     B{Description}:
     API resource to manage SalesCycle's Activities
+    
+    I{Create activity POST}\n
+        B{accepts example} 
+        C{
+            author_id: 1
+            comments_count: 0
+            contact:{}
+            author_id: 1
+            children: []
+            date_created: "2015-05-14T11:35:14.000637"
+            id: 1
+            owner: 1
+            parent: null
+            parent_id: null
+            resource_uri: "/api/v1/contact/1/"
+            sales_cycles: [1, 2]
+            share: null
+            status: 0
+            subscription_id: 1
+            tp: "user"
+            vcard: {}
+            date_created: "2015-05-14T12:16:39.363625"
+            date_finished: null
+            deadline: null
+            description: "Just trying to show an example of how to create activity"
+            feedback_status: null
+            has_read: false
+            id: 1
+            need_preparation: false
+            resource_uri: "/api/v1/activity/1/"
+            sales_cycle_id: "1"
+            status: true
+        }
 
-    @return:  activities
-    >>> 'objects': [
-    ... {
-    ...     'id': 1,
-    ...     'resource_uri': '/api/v1/activity/1/',
-    ...     'salescycle_id': 1,
-    ...     'description': 'd1'
-    ...     'feedback': '$',
-    ...     'author_id': 2,
-    ...     'date_created': '2014-09-11T00:00:00',
-    ... }
-    ... ]
+    Response 
+    {  
+       "author_id":1,
+       "comments_count":0,
+       "contact":{},
+       "date_created":"2015-05-14T12:16:39.363625",
+       "date_finished":null,
+       "deadline":null,
+       "description":"Just trying to show an example of how to create activity",
+       "feedback_status":null,
+       "has_read":false,
+       "id":1,
+       "need_preparation":false,
+       "resource_uri":"/api/v1/activity/1/",
+       "sales_cycle_id":"1",
+       "status":true
+    }
+
+    I{Plan activity POST}\n
+        B{accepts example} 
+        C{
+            author_id: 1
+            comments_count: 0
+            contact:{}
+            author_id: 1
+            children: []
+            
+            id: 1
+            owner: 1
+            parent: null
+            parent_id: null
+            resource_uri: "/api/v1/contact/1/"
+            sales_cycles: [1, 2]
+            share: null
+            status: 0
+            subscription_id: 1
+            tp: "user"
+            vcard: {}
+            date_created: "2015-05-14T12:16:39.363625"
+            date_finished: null
+            deadline: "2015-06-01T00:00:00"
+            description: "Just trying to show an example of how to plan activity"
+            feedback_status: null
+            has_read: false
+            id: 1
+            need_preparation: false
+            resource_uri: "/api/v1/activity/1/"
+            sales_cycle_id: "1"
+            status: true
+        }
+
+    Response 
+    {  
+       "author_id":1,
+       "comments_count":0,
+       "contact":{},
+       "date_created":"2015-05-14T12:16:39.363625",
+       "date_finished":null,
+       "deadline":null,
+       "description":"Just trying to show an example of how to create activity",
+       "feedback_status":null,
+       "has_read":false,
+       "id":1,
+       "need_preparation":false,
+       "resource_uri":"/api/v1/activity/1/",
+       "sales_cycle_id":"1",
+       "status":true
+    }
+
 
     @undocumented: Meta
-    """
+
+    
+    '''
 
     author_id = fields.IntegerField(attribute='author_id', null=True)
     description = fields.CharField(attribute='description')
