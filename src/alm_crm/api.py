@@ -3182,6 +3182,12 @@ class ReportResource(Resource):
                 (self._meta.resource_name, trailing_slash()),
                 self.wrap_view('realtime_funnel'),
                 name='api_realtime_funnel'
+            ),
+            url(
+                r"^(?P<resource_name>%s)/user_report%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('user_report'),
+                name='api_user_report'
             )]
 
     def funnel(self, request, **kwargs):
@@ -3203,3 +3209,10 @@ class ReportResource(Resource):
         return self.create_response(
             request,
             report_builders.build_realtime_funnel(request.user.get_crmuser().subscription_id))
+
+
+    def user_report(self, request, **kwargs):
+        with RequestContext(self, request, allowed_methods=['get']):
+            return self.create_response(request, report_builders.build_user_report(
+                user_ids=ast.literal_eval(request.GET.get('user_ids', "[-1]"))), 
+                response_class=http.HttpAccepted)
