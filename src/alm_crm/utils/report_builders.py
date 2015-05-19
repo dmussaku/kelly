@@ -12,6 +12,7 @@ from alm_crm.models import (
 	)
 from datetime import datetime
 from django.utils import timezone
+import pytz
 
 def build_funnel(subscription_id):
 	rv = {
@@ -50,10 +51,10 @@ def build_realtime_funnel(subscription_id):
 		
 def build_user_report(subscription_id, user_ids=[-1], from_date=None, to_date=None):
 	if from_date == None:
-		from_date = datetime(2014, 1, 1)
-		
+		from_date = datetime(2014, 1, 1).replace(tzinfo=pytz.UTC)
+
 	if to_date == None:
-		to_date = datetime.now()
+		to_date = datetime.now().replace(tzinfo=pytz.UTC)
 
 	open_sales_cycles = SalesCycle.objects.filter(owner_id__in=user_ids if user_ids[0] != -1 
 													else CRMUser.objects.filter(subscription_id=subscription_id).values_list('id', flat=True), 
@@ -98,11 +99,12 @@ def build_user_report(subscription_id, user_ids=[-1], from_date=None, to_date=No
 
 def build_product_report(subscription_id, product_ids=[-1], from_date=None, to_date=None):
 	if from_date == None:
-		from_date = datetime(2014, 1, 1)
+		from_date = datetime(2014, 1, 1).replace(tzinfo=pytz.UTC)
 
 	if to_date == None:
-		to_date = datetime.now()
+		to_date = datetime.now().replace(tzinfo=pytz.UTC)
 
+	print from_date, to_date
 	products_amount = len(product_ids) if len(product_ids) > 1 else Product.objects.filter(subscription_id=subscription_id).count()
 	open_sales_cycles = SalesCycle.objects.filter(
 							products__in = product_ids if product_ids[0] != -1 
