@@ -1383,7 +1383,7 @@ class ContactResource(CRMServiceModelResource):
         return self.create_response(
             request, {'success':True, 'status':'FINISHED', 'objects': objects, 'contact_list': contact_list})
 
-    @transaction.atomic()
+    
     def check_import_status(self, request, **kwargs):
         objects = []
         contact_resource = ContactResource()

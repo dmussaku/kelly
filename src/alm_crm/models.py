@@ -659,6 +659,11 @@ class Contact(SubscriptionObject):
                     response['error'] = True
                     response['error_col'] = col_num
                     return response
+                except:
+                    transaction.savepoint_rollback(sid)
+                    response['error'] = True
+                    response['error_col'] = col_num
+                    return response
             elif (model == vcard_models.Tel or model == vcard_models.Email 
                         or model == vcard_models.Url):
                 try:
@@ -671,6 +676,11 @@ class Contact(SubscriptionObject):
                                 obj.vcard = vcard
                                 obj.save()
                 except IntegrityError:
+                    transaction.savepoint_rollback(sid)
+                    response['error'] = True
+                    response['error_col'] = col_num
+                    return response
+                except:
                     transaction.savepoint_rollback(sid)
                     response['error'] = True
                     response['error_col'] = col_num
@@ -690,6 +700,11 @@ class Contact(SubscriptionObject):
                     response['error'] = True
                     response['error_col'] = col_num
                     return response
+                except:
+                    transaction.savepoint_rollback(sid)
+                    response['error'] = True
+                    response['error_col'] = col_num
+                    return response
             elif model == vcard_models.Adr:
                 adr_type = structure_dict.get('attr','')
                 try:
@@ -701,6 +716,11 @@ class Contact(SubscriptionObject):
                                 addr_objs = [vcard, adr_type] + addr_objs
                                 address = Adr.create_from_list(addr_objs)
                 except IntegrityError:
+                    transaction.savepoint_rollback(sid)
+                    response['error'] = True
+                    response['error_col'] = col_num
+                    return response
+                except:
                     transaction.savepoint_rollback(sid)
                     response['error'] = True
                     response['error_col'] = col_num
@@ -721,6 +741,11 @@ class Contact(SubscriptionObject):
                                 obj.vcard = vcard
                                 obj.save()
                 except IntegrityError:
+                    transaction.savepoint_rollback(sid)
+                    response['error'] = True
+                    response['error_col'] = col_num
+                    return response
+                except:
                     transaction.savepoint_rollback(sid)
                     response['error'] = True
                     response['error_col'] = col_num

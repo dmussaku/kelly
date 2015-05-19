@@ -80,6 +80,7 @@ def add_contacts_by_chunks(import_task_id, file_structure, filename, creator_id,
             error_cell = ErrorCell(
                 import_task=import_task,
                 row = i,
+                data = str([obj.value for obj in data]),
                 col = response['error_col']
                 )
             error_cell.save()
@@ -101,11 +102,12 @@ def create_failed_contacts_xls(filename, import_task_id):
     error_format = workbook.add_format()
     error_format.set_bg_color('red')
     for i in range(0,import_task.errorcell_set.count()):
-        for j in range(len(cell_list)):
+        row = eval(cell_list[i].data)
+        for j in range(len(row)):
             if j==cell_list[i].col:
-                worksheet.write(i, j, cell_list[j], error_format)
+                worksheet.write(i, j, row[j], error_format)
             else:
-                worksheet.write(i, j, cell_list[j])
+                worksheet.write(i, j, row[j])
     workbook.close()
     import_task.delete()
     return filename
