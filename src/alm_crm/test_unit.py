@@ -2665,3 +2665,39 @@ class MilestoneResourceTest(ResourceTestMixin, ResourceTestCase):
         # check
         self.assertHttpAccepted(resp)
         self.assertEqual(self.get_detail_des(self.milestone.pk)['title'], milestone_title)
+
+
+class ReportResourceTest(ResourceTestMixin, ResourceTestCase):
+
+    def setUp(self):
+        super(self.__class__, self).setUp()
+
+        # login user
+        self.get_credentials()
+
+        self.api_path_reports = '/api/v1/reports/'
+
+    def test_user_report(self):
+        path = self.api_path_reports+'user_report/'
+        resp = self.api_client.get(path)
+        des = self.deserialize(resp)
+
+        from alm_crm.utils import report_builders
+        ur = report_builders.build_user_report()
+
+        self.assertEqual(des['open_sales_cycles'], ur['open_sales_cycles'])
+        self.assertEqual(des['closed_sales_cycles'], ur['closed_sales_cycles'])
+        self.assertEqual(des['earned_money'], ur['earned_money'])
+        self.assertEqual(des['user_ids'], ur['user_ids'])
+
+        user_ids = [1,2,3]
+
+        resp = self.api_client.get(path+'?user_ids=[1,2,3]')
+        des = self.deserialize(resp)
+
+        ur = report_builders.build_user_report(user_ids)
+
+        self.assertEqual(des['open_sales_cycles'], ur['open_sales_cycles'])
+        self.assertEqual(des['closed_sales_cycles'], ur['closed_sales_cycles'])
+        self.assertEqual(des['earned_money'], ur['earned_money'])
+        self.assertEqual(des['user_ids'], ur['user_ids'])
