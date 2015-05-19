@@ -50,8 +50,7 @@ def build_realtime_funnel(subscription_id):
 		
 def build_user_report(subscription_id, user_ids=[-1], from_date=None, to_date=None):
 	if from_date == None:
-		from_date = min(SalesCycle.objects.filter(subscription_id=subscription_id).values_list('date_created', flat=True))
-
+		from_date = datetime(2015, 1, 1)
 	if to_date == None:
 		to_date = datetime.now()
 
@@ -98,7 +97,7 @@ def build_user_report(subscription_id, user_ids=[-1], from_date=None, to_date=No
 
 def build_product_report(subscription_id, product_ids=[-1], from_date=None, to_date=None):
 	if from_date == None:
-		from_date = min(Product.objects.filter(subscription_id=subscription_id).values_list('date_created', flat=True))
+		from_date = datetime(2015, 1, 1)
 
 	if to_date == None:
 		to_date = datetime.now()
@@ -117,10 +116,6 @@ def build_product_report(subscription_id, product_ids=[-1], from_date=None, to_d
 								is_global=False, date_created__range=(from_date, to_date)
 							)
 	earned_money = sum(SalesCycleProductStat.objects.filter(sales_cycle__in=closed_sales_cycles).values_list('value', flat=True))
-
-	sell_speed = []
-
-
 
 	user_report = {
 		'report_name': 'product_report',
