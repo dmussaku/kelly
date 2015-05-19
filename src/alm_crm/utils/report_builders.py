@@ -50,7 +50,8 @@ def build_realtime_funnel(subscription_id):
 		
 def build_user_report(subscription_id, user_ids=[-1], from_date=None, to_date=None):
 	if from_date == None:
-		from_date = datetime(2015, 1, 1)
+		from_date = datetime(2014, 1, 1)
+		
 	if to_date == None:
 		to_date = datetime.now()
 
@@ -97,7 +98,7 @@ def build_user_report(subscription_id, user_ids=[-1], from_date=None, to_date=No
 
 def build_product_report(subscription_id, product_ids=[-1], from_date=None, to_date=None):
 	if from_date == None:
-		from_date = datetime(2015, 1, 1)
+		from_date = datetime(2014, 1, 1)
 
 	if to_date == None:
 		to_date = datetime.now()
