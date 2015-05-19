@@ -230,6 +230,13 @@ class ContactResource(CRMServiceModelResource):
     #     null=True, full=True
     #     )
 
+    share = fields.ToOneField('alm_crm.api.ShareResource',
+        attribute=lambda bundle: bundle.obj.share_set.first(),
+        null=True, blank=True, readonly=True, full=True)
+
+    author_id = fields.IntegerField(attribute='owner_id', null=True)
+    parent_id = fields.IntegerField(attribute='parent_id', null=True)
+
     class Meta(CommonMeta):
         queryset = Contact.objects.all().select_related('owner', 'vcard', 'parent').prefetch_related('sales_cycles', 'children', 'share_set')
         resource_name = 'contact'
@@ -403,10 +410,7 @@ class ContactResource(CRMServiceModelResource):
         '''Custom representation of followers, assignees etc.'''
         bundle = super(self.__class__, self).full_dehydrate(
             bundle, for_list=True)
-        bundle.data['share'] = self.serialize_share(ShareResource, bundle.obj.share_set.first())
         bundle.data['children'] = [contact.id for contact in bundle.obj.children.all()]
-        bundle.data['author_id'] = bundle.obj.owner_id
-        bundle.data['parent_id'] = bundle.obj.parent_id
         return bundle
 
     # def dehydrate_assignees(self, bundle):
@@ -1237,15 +1241,14 @@ class SalesCycleResource(CRMServiceModelResource):
     real_value = fields.ToOneField('alm_crm.api.ValueResource',
                                    'real_value', null=True, full=True)
 
-    stat = fields.ToManyField('alm_crm.api.SalesCycleProductStatResource',
-        attribute=lambda bundle: SalesCycleProductStat.objects.filter(sales_cycle=bundle.obj),
+    stat = fields.ToManyField('alm_crm.api.SalesCycleProductStatResource', 'product_stats',
         null=True, blank=True, readonly=True, full=True)
     milestone_id = fields.IntegerField(null=True, attribute='milestone_id')
     log = fields.ToManyField('alm_crm.api.SalesCycleLogEntryResource', 'log', null=True, full=True)
     activities = fields.ToManyField('alm_crm.api.ActivityResource', 'rel_activities', null=True, full=False)
 
     class Meta(CommonMeta):
-        queryset = SalesCycle.objects.all().prefetch_related('products')
+        queryset = SalesCycle.objects.all().prefetch_related('products', 'rel_activities', 'log', 'product_stats')
         resource_name = 'sales_cycle'
         excludes = ['from_date', 'to_date']
         detail_allowed_methods = ['get', 'post', 'put', 'patch', 'delete']
@@ -1431,8 +1434,9 @@ class SalesCycleResource(CRMServiceModelResource):
             sales_cycle.delete()
             return self.create_response(request, {'objects':objects}, response_class=http.HttpAccepted)
 
-    def dehydrate_activities(self, bundle):
-        return list(bundle.obj.rel_activities.values_list('id', flat=True))
+    def dehydrate_activities(self, bundle):        
+        return [a.id for a in bundle.obj.rel_activities.all()]
+        # return list(bundle.obj.rel_activities.values_list('id', flat=True))
 
     def obj_create(self, bundle, **kwargs):
         bundle = super(self.__class__, self).obj_create(bundle, **kwargs)
@@ -1505,7 +1509,7 @@ class ActivityResource(CRMServiceModelResource):
     comments_count = fields.IntegerField(attribute='comments_count', readonly=True)
 
     class Meta(CommonMeta):
-        queryset = Activity.objects.all().select_related('owner', 'feedback').prefetch_related('comments') #'recipients'
+        queryset = Activity.objects.all().select_related('owner', 'feedback').prefetch_related('comments', 'recipients')
         resource_name = 'activity'
         excludes = ['date_edited', 'subscription_id', 'title']
         always_return_data = True
@@ -1562,7 +1566,7 @@ class ActivityResource(CRMServiceModelResource):
 
     def dehydrate(self, bundle):
         crmuser = self.get_crmuser(bundle.request)
-        bundle.data['has_read'] = bundle.obj.has_read(crmuser.id)
+        bundle.data['has_read'] = self._has_read(bundle, crmuser.id)
 
         # send updated contact (status was changed to LEAD)
         if bundle.data.get('obj_created'):
@@ -1571,6 +1575,14 @@ class ActivityResource(CRMServiceModelResource):
             bundle.data.pop('obj_created')
         # bundle.data['milestone_id'] = bundle.obj.milestone_id
         return bundle
+
+    def _has_read(self, bundle, user_id):
+        recip = None
+        for r in bundle.obj.recipients.all():
+            if r.user_id == user_id:
+                recip = r
+                break                
+        return not recip or recip.has_read
 
     # def hydrate_milestone(self, obj):
     #     return Milestone.objects.get(pk=bundle.data['milestone'])

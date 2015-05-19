@@ -1444,6 +1444,12 @@ class Activity(SubscriptionObject):
 
     def has_read(self, user_id):
         recip = self.recipients.filter(user_id=user_id).first()
+        # # OPTIMIZE VERSION =D
+        # recip = None
+        # for r in self.recipients.all():
+        #     if r.user_id == user_id:
+        #         recip = r
+        #         break                
         return not recip or recip.has_read
 
     @classmethod

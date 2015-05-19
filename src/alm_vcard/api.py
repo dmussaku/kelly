@@ -47,35 +47,35 @@ class VCardResource(ModelResource):
                               related_name='vcard', null=True, full=True)
     orgs = fields.ToManyField('alm_vcard.api.VCardOrgResource', 'org_set',
                               related_name='vcard', null=True, full=True)
-    geos = fields.ToManyField('alm_vcard.api.VCardGeoResource', 'geo_set',
-                              related_name='vcard', null=True, full=True)
+    # geos = fields.ToManyField('alm_vcard.api.VCardGeoResource', 'geo_set',
+    #                           related_name='vcard', null=True, full=True)
     adrs = fields.ToManyField('alm_vcard.api.VCardAdrResource', 'adr_set',
                               related_name='vcard', null=True, full=True)
-    agents = fields.ToManyField('alm_vcard.api.VCardAgentResource', 'agent_set',
-                              related_name='vcard', null=True, full=True)
+    # agents = fields.ToManyField('alm_vcard.api.VCardAgentResource', 'agent_set',
+    #                           related_name='vcard', null=True, full=True)
     categories = fields.ToManyField('alm_vcard.api.VCardCategoryResource', 'category_set',
                               related_name='vcard', null=True, full=True)
-    keys = fields.ToManyField('alm_vcard.api.VCardKeyResource', 'key_set',
-                              related_name='vcard', null=True, full=True)
-    labels = fields.ToManyField('alm_vcard.api.VCardLabelResource', 'label_set',
-                              related_name='vcard', null=True, full=True)
-    mailers = fields.ToManyField('alm_vcard.api.VCardMailerResource', 'mailer_set',
-                              related_name='vcard', null=True, full=True)
-    nicknames = fields.ToManyField('alm_vcard.api.VCardNicknameResource', 'nickname_set',
-                              related_name='vcard', null=True, full=True)
-    notes = fields.ToManyField('alm_vcard.api.VCardNoteResource', 'note_set',
-                              related_name='vcard', null=True, full=True)
-    roles = fields.ToManyField('alm_vcard.api.VCardRoleResource', 'role_set',
-                              related_name='vcard', null=True, full=True)
+    # keys = fields.ToManyField('alm_vcard.api.VCardKeyResource', 'key_set',
+    #                           related_name='vcard', null=True, full=True)
+    # labels = fields.ToManyField('alm_vcard.api.VCardLabelResource', 'label_set',
+    #                           related_name='vcard', null=True, full=True)
+    # mailers = fields.ToManyField('alm_vcard.api.VCardMailerResource', 'mailer_set',
+    #                           related_name='vcard', null=True, full=True)
+    # nicknames = fields.ToManyField('alm_vcard.api.VCardNicknameResource', 'nickname_set',
+    #                           related_name='vcard', null=True, full=True)
+    # notes = fields.ToManyField('alm_vcard.api.VCardNoteResource', 'note_set',
+    #                           related_name='vcard', null=True, full=True)
+    # roles = fields.ToManyField('alm_vcard.api.VCardRoleResource', 'role_set',
+    #                           related_name='vcard', null=True, full=True)
     titles = fields.ToManyField('alm_vcard.api.VCardTitleResource', 'title_set',
                               related_name='vcard', null=True, full=True)
-    tzs = fields.ToManyField('alm_vcard.api.VCardTzResource', 'tz_set',
-                              related_name='vcard', null=True, full=True)
+    # tzs = fields.ToManyField('alm_vcard.api.VCardTzResource', 'tz_set',
+    #                           related_name='vcard', null=True, full=True)
     urls = fields.ToManyField('alm_vcard.api.VCardUrlResource', 'url_set',
                               related_name='vcard', null=True, full=True)
 
     class Meta(CommonMeta):
-        queryset = VCard.objects.all().prefetch_related('email_set', 'tel_set', 'org_set', 'geo_set', 'adr_set', 'agent_set', 'category_set', 'key_set', 'label_set', 'mailer_set', 'nickname_set', 'note_set', 'role_set', 'title_set', 'tz_set', 'url_set')
+        queryset = VCard.objects.all().prefetch_related('custom_fields', 'email_set', 'tel_set', 'org_set', 'adr_set', 'category_set', 'title_set', 'url_set')
         excludes = ['id','resource_uri']
         resource_name = 'vcard'
 
