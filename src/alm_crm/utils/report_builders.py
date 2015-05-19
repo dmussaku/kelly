@@ -86,6 +86,7 @@ def build_user_report(subscription_id, user_ids=[-1], from_date=None, to_date=No
 			
 
 	user_report = {
+		'report_name': 'user_report',
 		'user_ids': user_ids if not user_ids[0] == -1 else None,
 		'open_sales_cycles': open_sales_cycles.count(),
 		'closed_sales_cycles': closed_sales_cycles.count(),
@@ -119,7 +120,10 @@ def build_product_report(subscription_id, product_ids=[-1], from_date=None, to_d
 
 	sell_speed = []
 
+
+
 	user_report = {
+		'report_name': 'product_report',
 		'product_ids': product_ids if not product_ids[0] == -1 else None,
 		'products_amount': products_amount,
 		'open_sales_cycles':open_sales_cycles,
