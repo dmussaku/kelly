@@ -2695,6 +2695,7 @@ class ReportResourceTest(ResourceTestMixin, ResourceTestCase):
         from_date =  datetime.datetime(2014, 1, 1).replace(tzinfo=pytz.UTC)
         to_date = datetime.datetime(2015, 1, 1).replace(tzinfo=pytz.UTC)
         post_data = {
+            'user_ids': [1, 2],
             'from_date': from_date,
             'to_date': to_date
         }
@@ -2702,7 +2703,7 @@ class ReportResourceTest(ResourceTestMixin, ResourceTestCase):
         resp = self.api_client.post(path, format='json', data=post_data)
         des = self.deserialize(resp)
 
-        ur = report_builders.build_user_report(subscription_id=1, from_date=from_date, to_date=to_date)
+        ur = report_builders.build_user_report(subscription_id=1, user_ids = [1,2], from_date=from_date, to_date=to_date)
 
         self.assertEqual(des['open_sales_cycles'], ur['open_sales_cycles'])
         self.assertEqual(des['closed_sales_cycles'], ur['closed_sales_cycles'])
@@ -2726,6 +2727,7 @@ class ReportResourceTest(ResourceTestMixin, ResourceTestCase):
         from_date =  datetime.datetime(2014, 1, 1).replace(tzinfo=pytz.UTC)
         to_date = datetime.datetime(2015, 1, 1).replace(tzinfo=pytz.UTC)
         post_data = {
+            'product_ids': [1,2],
             'from_date': from_date,
             'to_date': to_date
         }
@@ -2733,7 +2735,7 @@ class ReportResourceTest(ResourceTestMixin, ResourceTestCase):
         resp = self.api_client.post(path, format='json', data=post_data)
         des = self.deserialize(resp)
 
-        ur = report_builders.build_product_report(subscription_id=1, from_date=from_date, to_date=to_date)
+        ur = report_builders.build_product_report(subscription_id=1, product_ids = [1,2], from_date=from_date, to_date=to_date)
 
         self.assertEqual(des['open_sales_cycles'], ur['open_sales_cycles'])
         self.assertEqual(des['closed_sales_cycles'], ur['closed_sales_cycles'])
