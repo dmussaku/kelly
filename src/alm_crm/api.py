@@ -170,6 +170,11 @@ class CRMServiceModelResource(ModelResource):
                                              BasicAuthentication())
         authorization = Authorization()
 
+def _firstOfQuerySet(queryset):
+    try :
+        return queryset.all()[0]
+    except IndexError:
+        return None
 
 class ContactResource(CRMServiceModelResource):
     """
@@ -210,10 +215,11 @@ class ContactResource(CRMServiceModelResource):
 
     @undocumented: prepend_urls, Meta
     """
+
     vcard = fields.ToOneField('alm_vcard.api.VCardResource', 'vcard',
-                              null=True, full=True)
+        null=True, full=True)
     owner = fields.ToOneField('alm_crm.api.CRMUserResource', 'owner',
-                              null=True, full=False)
+        null=True, full=False)
     # followers = fields.ToManyField('alm_crm.api.CRMUserResource', 'followers',
     #                                null=True, full=False)
     # assignees = fields.ToManyField('alm_crm.api.CRMUserResource', 'assignees',
@@ -231,14 +237,19 @@ class ContactResource(CRMServiceModelResource):
     #     )
 
     share = fields.ToOneField('alm_crm.api.ShareResource',
-        attribute=lambda bundle: bundle.obj.share_set.first(),
+        attribute=lambda bundle: _firstOfQuerySet(bundle.obj.share_set),
         null=True, blank=True, readonly=True, full=True)
 
     author_id = fields.IntegerField(attribute='owner_id', null=True)
     parent_id = fields.IntegerField(attribute='parent_id', null=True)
 
     class Meta(CommonMeta):
-        queryset = Contact.objects.all().select_related('owner', 'vcard', 'parent').prefetch_related('sales_cycles', 'children', 'share_set')
+        queryset = Contact.objects.all().select_related(
+            'owner', 'parent').prefetch_related(
+                'sales_cycles', 'children', 'share_set',
+                'vcard', 'vcard__tel_set', 'vcard__category_set', 
+                'vcard__adr_set', 'vcard__title_set', 'vcard__url_set', 
+                'vcard__org_set', 'vcard__email_set')
         resource_name = 'contact'
         filtering = {
             'status': ['exact'],
@@ -418,16 +429,6 @@ class ContactResource(CRMServiceModelResource):
 
     # def dehydrate_followers(self, bundle):
     #     return [follower.pk for follower in bundle.obj.followers.all()]
-    def serialize_share(self, resource, obj):
-        if not obj:
-            return None
-        return resource().full_dehydrate(
-                    resource().build_bundle(
-                        obj=obj)
-                    )
-
-    # def dehydrate_shares(self, bundle):
-    #     return [self.serialize_share(ShareResource, share) for share in bundle.obj.share_set.all()]
 
     def dehydrate_sales_cycles(self, bundle):
         return [sc.pk for sc in bundle.obj.sales_cycles.all()]
