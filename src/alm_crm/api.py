@@ -1931,10 +1931,11 @@ class CRMUserResource(CRMServiceModelResource):
     '''
 #    user = fields.ToOneField('alm_user.api.UserResource', 'user', null=True, full=True, readonly=True)
     unfollow_list = fields.ToManyField(ContactResource, 'unfollow_list', null=True, full=False)
-    vcard = fields.ToOneField('alm_vcard.api.VCardResource', 'vcard', null=True, full=True)
+    vcard = fields.ToOneField('alm_vcard.api.VCardResource',
+        attribute=lambda bundle: bundle.obj.get_billing_user(cache=True).vcard, null=True, full=True)
 
     class Meta(CommonMeta):
-        queryset = CRMUser.objects.all()
+        queryset = CRMUser.objects.all().prefetch_related('unfollow_list')
         resource_name = 'crmuser'
 
     def prepend_urls(self):
@@ -1948,21 +1949,12 @@ class CRMUserResource(CRMServiceModelResource):
         ]
 
     def dehydrate_unfollow_list(self, bundle):
-        return list(bundle.obj.unfollow_list.values_list('id', flat=True))
-
-    def dehydrate_vcard(self, bundle):
-        try:
-            user = bundle.obj.get_billing_user()
-            return VCardResource().full_dehydrate(
-                            VCardResource().build_bundle(
-                                obj=VCard.objects.get(id=user.vcard.id))
-                            )
-        except:
-            return None
+        return [c.id for c in bundle.obj.unfollow_list.all()]
 
     def full_dehydrate(self, bundle, for_list=False):
         bundle = super(self.__class__, self).full_dehydrate(bundle, for_list=True)
-        user = bundle.obj.get_billing_user()
+        user = bundle.obj.get_billing_user(cache=True)
+
         # WHY 'user' now 'user_id' ?
         # bundle.data['user'] = user.id
         bundle.data['userpic'] = user.userpic.url if user.userpic else ""

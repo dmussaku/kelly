@@ -53,11 +53,14 @@ class CRMUser(SubscriptionObject):
         u = self.get_billing_user()
         return u and u.get_username() or None
 
-    def get_billing_user(self):
+    def get_billing_user(self, cache=False):
         """Returns a original user.
         Raises:
            User.DoesNotExist exception if no such relation exist"""
-        return User.objects.get(pk=self.user_id)
+        user = self.user if cache and hasattr(self, 'user') else User.objects.get(pk=self.user_id)
+        if cache:
+            self.user = user
+        return user
 
     def set_supervisor(self, save=False):
         self.is_supervisor = True
