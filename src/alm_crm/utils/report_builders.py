@@ -104,7 +104,6 @@ def build_product_report(subscription_id, product_ids=[-1], from_date=None, to_d
 	if to_date == None:
 		to_date = datetime.now().replace(tzinfo=pytz.UTC)
 
-	print from_date, to_date
 	products_amount = len(product_ids) if len(product_ids) > 1 else Product.objects.filter(subscription_id=subscription_id).count()
 	open_sales_cycles = SalesCycle.objects.filter(
 							products__in = product_ids if product_ids[0] != -1 
