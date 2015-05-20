@@ -125,8 +125,8 @@ class UserResource(ModelResource):
             # request.user.userpic.save(data['name'], file_contents, True)
             swiftfile = SwiftFile.upload_file(file_contents=base64.b64decode(data['pic']), filename=data['name'], 
                                                 content_type='image', author=request.user)
-            self.userpic = swiftfile
-
+            request.user.userpic = swiftfile
+            request.user.save()
             raise ImmediateHttpResponse(
                 HttpResponse(
                     content=Serializer().to_json(
@@ -143,7 +143,8 @@ class UserResource(ModelResource):
 
     def dehydrate(self, bundle):
         bundle.data['crm_user_id'] = bundle.obj.get_crmuser().pk
-        bundle.data['userpic'] = bundle.obj.userpic.url
+        if bundle.obj.userpic != None:
+            bundle.data['userpic'] = bundle.obj.userpic.url
         return bundle
 
     def get_current_user(self, request, **kwargs):

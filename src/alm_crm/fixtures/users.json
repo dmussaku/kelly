@@ -5,7 +5,7 @@
     "fields": {
         "first_name": "Bruce", 
         "last_name": "Wayne", 
-        "userpic": "", 
+        "userpic": null, 
         "company": [
             1
         ], 
@@ -24,7 +24,7 @@
     "fields": {
         "first_name": "Nurlan", 
         "last_name": "Abiken", 
-        "userpic": "", 
+        "userpic": null, 
         "company": [
             1
         ], 
@@ -43,7 +43,7 @@
     "fields": {
         "first_name": "Daniyar", 
         "last_name": "Mussakulov", 
-        "userpic": "", 
+        "userpic": null, 
         "company": [
             1
         ], 
@@ -62,7 +62,7 @@
     "fields": {
         "first_name": "Sattar", 
         "last_name": "Stamkulov", 
-        "userpic": "", 
+        "userpic": null, 
         "company": [
             1
         ], 
@@ -81,7 +81,7 @@
     "fields": {
         "first_name": "Askar", 
         "last_name": "Akshabay", 
-        "userpic": "", 
+        "userpic": null, 
         "company": [
             2
         ], 

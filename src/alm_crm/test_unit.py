@@ -2578,6 +2578,17 @@ class UserResourceTest(ResourceTestMixin, ResourceTestCase):
             self.user.email
             )
 
+    def test_upload_userpic(self):
+        uploaded_file = os.path.join(os.path.dirname(os.path.dirname(__file__)),
+                                 'static/img/example/userpic1.png')
+        import base64
+        post_data = {
+            'name': 'userpic1.png',
+            "pic": base64.b64encode(open(uploaded_file, "r").read())
+        }
+        resp = self.api_client.post(
+            self.api_path_user+"upload_userpic/", format='json', data=post_data)
+        self.assertTrue(self.deserialize(resp)['userpic'])
 
 
 class MilestoneResourceTest(ResourceTestMixin, ResourceTestCase):
