@@ -17,7 +17,7 @@ def load_fixtures():
     fixtures = (
         'services', 'vcard', 'user', 'company', 'subscription', 'products',
         'crmuser', 'contact', 'sales_cycles', 'activities', 'comments',
-        'mentions')
+        'mentions', 'sc_prod_stat')
 
     # syncdb, migrate on main_database db and delete all data
     #management.call_command('syncdb', database=main_database)

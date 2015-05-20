@@ -22,141 +22,11 @@
     "fields": {
         "type": "INTERNET",
         "vcard": 1,
-        "value": "bruce.wayne373@alma.net"
+        "value": "bruce.wayne775@alma.net"
     }
 },
 {
     "pk": 2,
-    "model": "alm_vcard.vcard",
-    "fields": {
-        "family_name": "Dosov",
-        "uid": null,
-        "honorific_suffix": "",
-        "additional_name": "",
-        "rev": null,
-        "honorific_prefix": "",
-        "bday": null,
-        "given_name": "Kot",
-        "sort_string": null,
-        "classP": null,
-        "fn": "Kot Dosov"
-    }
-},
-{
-    "pk": 2,
-    "model": "alm_vcard.email",
-    "fields": {
-        "type": "INTERNET",
-        "vcard": 2,
-        "value": "kot.dosov451@alma.net"
-    }
-},
-{
-    "pk": 3,
-    "model": "alm_vcard.vcard",
-    "fields": {
-        "family_name": "Sattarov",
-        "uid": null,
-        "honorific_suffix": "",
-        "additional_name": "",
-        "rev": null,
-        "honorific_prefix": "",
-        "bday": null,
-        "given_name": "Zhan",
-        "sort_string": null,
-        "classP": null,
-        "fn": "Zhan Sattarov"
-    }
-},
-{
-    "pk": 3,
-    "model": "alm_vcard.email",
-    "fields": {
-        "type": "INTERNET",
-        "vcard": 3,
-        "value": "zhan.sattarov819@alma.net"
-    }
-},
-{
-    "pk": 4,
-    "model": "alm_vcard.vcard",
-    "fields": {
-        "family_name": "Sanzharov",
-        "uid": null,
-        "honorific_suffix": "",
-        "additional_name": "",
-        "rev": null,
-        "honorific_prefix": "",
-        "bday": null,
-        "given_name": "Usman",
-        "sort_string": null,
-        "classP": null,
-        "fn": "Usman Sanzharov"
-    }
-},
-{
-    "pk": 4,
-    "model": "alm_vcard.email",
-    "fields": {
-        "type": "INTERNET",
-        "vcard": 4,
-        "value": "usman.sanzharov74@alma.net"
-    }
-},
-{
-    "pk": 5,
-    "model": "alm_vcard.vcard",
-    "fields": {
-        "family_name": "Kotov",
-        "uid": null,
-        "honorific_suffix": "",
-        "additional_name": "",
-        "rev": null,
-        "honorific_prefix": "",
-        "bday": null,
-        "given_name": "Yerlan",
-        "sort_string": null,
-        "classP": null,
-        "fn": "Yerlan Kotov"
-    }
-},
-{
-    "pk": 5,
-    "model": "alm_vcard.email",
-    "fields": {
-        "type": "INTERNET",
-        "vcard": 5,
-        "value": "yerlan.kotov357@alma.net"
-    }
-},
-{
-    "pk": 6,
-    "model": "alm_vcard.vcard",
-    "fields": {
-        "family_name": "Yerlanov",
-        "uid": null,
-        "honorific_suffix": "",
-        "additional_name": "",
-        "rev": null,
-        "honorific_prefix": "",
-        "bday": null,
-        "given_name": "Kot",
-        "sort_string": null,
-        "classP": null,
-        "fn": "Kot Yerlanov"
-    }
-},
-{
-    "pk": 6,
-    "model": "alm_vcard.email",
-    "fields": {
-        "type": "INTERNET",
-        "vcard": 6,
-        "value": "kot.yerlanov366@alma.net"
-    }
-},
-{
-    "pk": 7,
     "model": "alm_vcard.vcard",
     "fields": {
         "family_name": "Rustemov",
@@ -166,153 +36,49 @@
         "rev": null,
         "honorific_prefix": "",
         "bday": null,
-        "given_name": "Yerlan",
+        "given_name": "Yernar",
         "sort_string": null,
         "classP": null,
-        "fn": "Yerlan Rustemov"
+        "fn": "Yernar Rustemov"
     }
 },
 {
-    "pk": 7,
+    "pk": 2,
     "model": "alm_vcard.email",
     "fields": {
         "type": "INTERNET",
-        "vcard": 7,
-        "value": "yerlan.rustemov411@alma.net"
+        "vcard": 2,
+        "value": "yernar.rustemov1625@alma.net"
     }
 },
 {
-    "pk": 8,
+    "pk": 3,
     "model": "alm_vcard.vcard",
     "fields": {
-        "family_name": "Yerlanov",
+        "family_name": "Kotov",
         "uid": null,
         "honorific_suffix": "",
         "additional_name": "",
         "rev": null,
         "honorific_prefix": "",
         "bday": null,
-        "given_name": "Nurlan",
+        "given_name": "Ivan",
         "sort_string": null,
         "classP": null,
-        "fn": "Nurlan Yerlanov"
+        "fn": "Ivan Kotov"
     }
 },
 {
-    "pk": 8,
+    "pk": 3,
     "model": "alm_vcard.email",
     "fields": {
         "type": "INTERNET",
-        "vcard": 8,
-        "value": "nurlan.yerlanov1773@alma.net"
+        "vcard": 3,
+        "value": "ivan.kotov117@alma.net"
     }
 },
 {
-    "pk": 9,
-    "model": "alm_vcard.vcard",
-    "fields": {
-        "family_name": "Yerlanov",
-        "uid": null,
-        "honorific_suffix": "",
-        "additional_name": "",
-        "rev": null,
-        "honorific_prefix": "",
-        "bday": null,
-        "given_name": "Dos",
-        "sort_string": null,
-        "classP": null,
-        "fn": "Dos Yerlanov"
-    }
-},
-{
-    "pk": 9,
-    "model": "alm_vcard.email",
-    "fields": {
-        "type": "INTERNET",
-        "vcard": 9,
-        "value": "dos.yerlanov984@alma.net"
-    }
-},
-{
-    "pk": 10,
-    "model": "alm_vcard.vcard",
-    "fields": {
-        "family_name": "Yerlanov",
-        "uid": null,
-        "honorific_suffix": "",
-        "additional_name": "",
-        "rev": null,
-        "honorific_prefix": "",
-        "bday": null,
-        "given_name": "Yerlan",
-        "sort_string": null,
-        "classP": null,
-        "fn": "Yerlan Yerlanov"
-    }
-},
-{
-    "pk": 10,
-    "model": "alm_vcard.email",
-    "fields": {
-        "type": "INTERNET",
-        "vcard": 10,
-        "value": "yerlan.yerlanov957@alma.net"
-    }
-},
-{
-    "pk": 11,
-    "model": "alm_vcard.vcard",
-    "fields": {
-        "family_name": "Zhanov",
-        "uid": null,
-        "honorific_suffix": "",
-        "additional_name": "",
-        "rev": null,
-        "honorific_prefix": "",
-        "bday": null,
-        "given_name": "Sanzhar",
-        "sort_string": null,
-        "classP": null,
-        "fn": "Sanzhar Zhanov"
-    }
-},
-{
-    "pk": 11,
-    "model": "alm_vcard.email",
-    "fields": {
-        "type": "INTERNET",
-        "vcard": 11,
-        "value": "sanzhar.zhanov1066@alma.net"
-    }
-},
-{
-    "pk": 12,
-    "model": "alm_vcard.vcard",
-    "fields": {
-        "family_name": "Ivanov",
-        "uid": null,
-        "honorific_suffix": "",
-        "additional_name": "",
-        "rev": null,
-        "honorific_prefix": "",
-        "bday": null,
-        "given_name": "Zhan",
-        "sort_string": null,
-        "classP": null,
-        "fn": "Zhan Ivanov"
-    }
-},
-{
-    "pk": 12,
-    "model": "alm_vcard.email",
-    "fields": {
-        "type": "INTERNET",
-        "vcard": 12,
-        "value": "zhan.ivanov1188@alma.net"
-    }
-},
-{
-    "pk": 13,
+    "pk": 4,
     "model": "alm_vcard.vcard",
     "fields": {
         "family_name": "Zhanov",
@@ -329,94 +95,42 @@
     }
 },
 {
-    "pk": 13,
+    "pk": 4,
     "model": "alm_vcard.email",
     "fields": {
         "type": "INTERNET",
-        "vcard": 13,
-        "value": "dos.zhanov384@alma.net"
+        "vcard": 4,
+        "value": "dos.zhanov1620@alma.net"
     }
 },
 {
-    "pk": 14,
+    "pk": 5,
     "model": "alm_vcard.vcard",
     "fields": {
-        "family_name": "Nurlanov",
+        "family_name": "Usmanov",
         "uid": null,
         "honorific_suffix": "",
         "additional_name": "",
         "rev": null,
         "honorific_prefix": "",
         "bday": null,
-        "given_name": "Ivan",
+        "given_name": "Zhan",
         "sort_string": null,
         "classP": null,
-        "fn": "Ivan Nurlanov"
+        "fn": "Zhan Usmanov"
     }
 },
 {
-    "pk": 14,
+    "pk": 5,
     "model": "alm_vcard.email",
     "fields": {
         "type": "INTERNET",
-        "vcard": 14,
-        "value": "ivan.nurlanov610@alma.net"
+        "vcard": 5,
+        "value": "zhan.usmanov1890@alma.net"
     }
 },
 {
-    "pk": 15,
-    "model": "alm_vcard.vcard",
-    "fields": {
-        "family_name": "Sanzharov",
-        "uid": null,
-        "honorific_suffix": "",
-        "additional_name": "",
-        "rev": null,
-        "honorific_prefix": "",
-        "bday": null,
-        "given_name": "Kot",
-        "sort_string": null,
-        "classP": null,
-        "fn": "Kot Sanzharov"
-    }
-},
-{
-    "pk": 15,
-    "model": "alm_vcard.email",
-    "fields": {
-        "type": "INTERNET",
-        "vcard": 15,
-        "value": "kot.sanzharov150@alma.net"
-    }
-},
-{
-    "pk": 16,
-    "model": "alm_vcard.vcard",
-    "fields": {
-        "family_name": "Rustemov",
-        "uid": null,
-        "honorific_suffix": "",
-        "additional_name": "",
-        "rev": null,
-        "honorific_prefix": "",
-        "bday": null,
-        "given_name": "Alisher",
-        "sort_string": null,
-        "classP": null,
-        "fn": "Alisher Rustemov"
-    }
-},
-{
-    "pk": 16,
-    "model": "alm_vcard.email",
-    "fields": {
-        "type": "INTERNET",
-        "vcard": 16,
-        "value": "alisher.rustemov1072@alma.net"
-    }
-},
-{
-    "pk": 17,
+    "pk": 6,
     "model": "alm_vcard.vcard",
     "fields": {
         "family_name": "Kotov",
@@ -426,75 +140,23 @@
         "rev": null,
         "honorific_prefix": "",
         "bday": null,
-        "given_name": "Yerlan",
+        "given_name": "Zhan",
         "sort_string": null,
         "classP": null,
-        "fn": "Yerlan Kotov"
+        "fn": "Zhan Kotov"
     }
 },
 {
-    "pk": 17,
+    "pk": 6,
     "model": "alm_vcard.email",
     "fields": {
         "type": "INTERNET",
-        "vcard": 17,
-        "value": "yerlan.kotov30@alma.net"
+        "vcard": 6,
+        "value": "zhan.kotov265@alma.net"
     }
 },
 {
-    "pk": 18,
-    "model": "alm_vcard.vcard",
-    "fields": {
-        "family_name": "Nurlanov",
-        "uid": null,
-        "honorific_suffix": "",
-        "additional_name": "",
-        "rev": null,
-        "honorific_prefix": "",
-        "bday": null,
-        "given_name": "Ivan",
-        "sort_string": null,
-        "classP": null,
-        "fn": "Ivan Nurlanov"
-    }
-},
-{
-    "pk": 18,
-    "model": "alm_vcard.email",
-    "fields": {
-        "type": "INTERNET",
-        "vcard": 18,
-        "value": "ivan.nurlanov306@alma.net"
-    }
-},
-{
-    "pk": 19,
-    "model": "alm_vcard.vcard",
-    "fields": {
-        "family_name": "Nurlanov",
-        "uid": null,
-        "honorific_suffix": "",
-        "additional_name": "",
-        "rev": null,
-        "honorific_prefix": "",
-        "bday": null,
-        "given_name": "Nurlan",
-        "sort_string": null,
-        "classP": null,
-        "fn": "Nurlan Nurlanov"
-    }
-},
-{
-    "pk": 19,
-    "model": "alm_vcard.email",
-    "fields": {
-        "type": "INTERNET",
-        "vcard": 19,
-        "value": "nurlan.nurlanov909@alma.net"
-    }
-},
-{
-    "pk": 20,
+    "pk": 7,
     "model": "alm_vcard.vcard",
     "fields": {
         "family_name": "Zhanov",
@@ -504,23 +166,75 @@
         "rev": null,
         "honorific_prefix": "",
         "bday": null,
-        "given_name": "Kot",
+        "given_name": "Rustem",
         "sort_string": null,
         "classP": null,
-        "fn": "Kot Zhanov"
+        "fn": "Rustem Zhanov"
     }
 },
 {
-    "pk": 20,
+    "pk": 7,
     "model": "alm_vcard.email",
     "fields": {
         "type": "INTERNET",
-        "vcard": 20,
-        "value": "kot.zhanov984@alma.net"
+        "vcard": 7,
+        "value": "rustem.zhanov388@alma.net"
     }
 },
 {
-    "pk": 21,
+    "pk": 8,
+    "model": "alm_vcard.vcard",
+    "fields": {
+        "family_name": "Sattarov",
+        "uid": null,
+        "honorific_suffix": "",
+        "additional_name": "",
+        "rev": null,
+        "honorific_prefix": "",
+        "bday": null,
+        "given_name": "Nurlan",
+        "sort_string": null,
+        "classP": null,
+        "fn": "Nurlan Sattarov"
+    }
+},
+{
+    "pk": 8,
+    "model": "alm_vcard.email",
+    "fields": {
+        "type": "INTERNET",
+        "vcard": 8,
+        "value": "nurlan.sattarov1267@alma.net"
+    }
+},
+{
+    "pk": 9,
+    "model": "alm_vcard.vcard",
+    "fields": {
+        "family_name": "Usmanov",
+        "uid": null,
+        "honorific_suffix": "",
+        "additional_name": "",
+        "rev": null,
+        "honorific_prefix": "",
+        "bday": null,
+        "given_name": "Sanzhar",
+        "sort_string": null,
+        "classP": null,
+        "fn": "Sanzhar Usmanov"
+    }
+},
+{
+    "pk": 9,
+    "model": "alm_vcard.email",
+    "fields": {
+        "type": "INTERNET",
+        "vcard": 9,
+        "value": "sanzhar.usmanov645@alma.net"
+    }
+},
+{
+    "pk": 10,
     "model": "alm_vcard.vcard",
     "fields": {
         "family_name": "Kotov",
@@ -530,10 +244,296 @@
         "rev": null,
         "honorific_prefix": "",
         "bday": null,
+        "given_name": "Yernar",
+        "sort_string": null,
+        "classP": null,
+        "fn": "Yernar Kotov"
+    }
+},
+{
+    "pk": 10,
+    "model": "alm_vcard.email",
+    "fields": {
+        "type": "INTERNET",
+        "vcard": 10,
+        "value": "yernar.kotov70@alma.net"
+    }
+},
+{
+    "pk": 11,
+    "model": "alm_vcard.vcard",
+    "fields": {
+        "family_name": "Zhanov",
+        "uid": null,
+        "honorific_suffix": "",
+        "additional_name": "",
+        "rev": null,
+        "honorific_prefix": "",
+        "bday": null,
+        "given_name": "Zhan",
+        "sort_string": null,
+        "classP": null,
+        "fn": "Zhan Zhanov"
+    }
+},
+{
+    "pk": 11,
+    "model": "alm_vcard.email",
+    "fields": {
+        "type": "INTERNET",
+        "vcard": 11,
+        "value": "zhan.zhanov84@alma.net"
+    }
+},
+{
+    "pk": 12,
+    "model": "alm_vcard.vcard",
+    "fields": {
+        "family_name": "Zhanov",
+        "uid": null,
+        "honorific_suffix": "",
+        "additional_name": "",
+        "rev": null,
+        "honorific_prefix": "",
+        "bday": null,
+        "given_name": "Rustem",
+        "sort_string": null,
+        "classP": null,
+        "fn": "Rustem Zhanov"
+    }
+},
+{
+    "pk": 12,
+    "model": "alm_vcard.email",
+    "fields": {
+        "type": "INTERNET",
+        "vcard": 12,
+        "value": "rustem.zhanov88@alma.net"
+    }
+},
+{
+    "pk": 13,
+    "model": "alm_vcard.vcard",
+    "fields": {
+        "family_name": "Dosov",
+        "uid": null,
+        "honorific_suffix": "",
+        "additional_name": "",
+        "rev": null,
+        "honorific_prefix": "",
+        "bday": null,
+        "given_name": "Kot",
+        "sort_string": null,
+        "classP": null,
+        "fn": "Kot Dosov"
+    }
+},
+{
+    "pk": 13,
+    "model": "alm_vcard.email",
+    "fields": {
+        "type": "INTERNET",
+        "vcard": 13,
+        "value": "kot.dosov1288@alma.net"
+    }
+},
+{
+    "pk": 14,
+    "model": "alm_vcard.vcard",
+    "fields": {
+        "family_name": "Sattarov",
+        "uid": null,
+        "honorific_suffix": "",
+        "additional_name": "",
+        "rev": null,
+        "honorific_prefix": "",
+        "bday": null,
+        "given_name": "Kot",
+        "sort_string": null,
+        "classP": null,
+        "fn": "Kot Sattarov"
+    }
+},
+{
+    "pk": 14,
+    "model": "alm_vcard.email",
+    "fields": {
+        "type": "INTERNET",
+        "vcard": 14,
+        "value": "kot.sattarov1779@alma.net"
+    }
+},
+{
+    "pk": 15,
+    "model": "alm_vcard.vcard",
+    "fields": {
+        "family_name": "Yerlanov",
+        "uid": null,
+        "honorific_suffix": "",
+        "additional_name": "",
+        "rev": null,
+        "honorific_prefix": "",
+        "bday": null,
+        "given_name": "Yernar",
+        "sort_string": null,
+        "classP": null,
+        "fn": "Yernar Yerlanov"
+    }
+},
+{
+    "pk": 15,
+    "model": "alm_vcard.email",
+    "fields": {
+        "type": "INTERNET",
+        "vcard": 15,
+        "value": "yernar.yerlanov1036@alma.net"
+    }
+},
+{
+    "pk": 16,
+    "model": "alm_vcard.vcard",
+    "fields": {
+        "family_name": "Sattarov",
+        "uid": null,
+        "honorific_suffix": "",
+        "additional_name": "",
+        "rev": null,
+        "honorific_prefix": "",
+        "bday": null,
         "given_name": "Usman",
         "sort_string": null,
         "classP": null,
-        "fn": "Usman Kotov"
+        "fn": "Usman Sattarov"
+    }
+},
+{
+    "pk": 16,
+    "model": "alm_vcard.email",
+    "fields": {
+        "type": "INTERNET",
+        "vcard": 16,
+        "value": "usman.sattarov60@alma.net"
+    }
+},
+{
+    "pk": 17,
+    "model": "alm_vcard.vcard",
+    "fields": {
+        "family_name": "Sattarov",
+        "uid": null,
+        "honorific_suffix": "",
+        "additional_name": "",
+        "rev": null,
+        "honorific_prefix": "",
+        "bday": null,
+        "given_name": "Rustem",
+        "sort_string": null,
+        "classP": null,
+        "fn": "Rustem Sattarov"
+    }
+},
+{
+    "pk": 17,
+    "model": "alm_vcard.email",
+    "fields": {
+        "type": "INTERNET",
+        "vcard": 17,
+        "value": "rustem.sattarov1305@alma.net"
+    }
+},
+{
+    "pk": 18,
+    "model": "alm_vcard.vcard",
+    "fields": {
+        "family_name": "Dosov",
+        "uid": null,
+        "honorific_suffix": "",
+        "additional_name": "",
+        "rev": null,
+        "honorific_prefix": "",
+        "bday": null,
+        "given_name": "Yernar",
+        "sort_string": null,
+        "classP": null,
+        "fn": "Yernar Dosov"
+    }
+},
+{
+    "pk": 18,
+    "model": "alm_vcard.email",
+    "fields": {
+        "type": "INTERNET",
+        "vcard": 18,
+        "value": "yernar.dosov364@alma.net"
+    }
+},
+{
+    "pk": 19,
+    "model": "alm_vcard.vcard",
+    "fields": {
+        "family_name": "Zhanov",
+        "uid": null,
+        "honorific_suffix": "",
+        "additional_name": "",
+        "rev": null,
+        "honorific_prefix": "",
+        "bday": null,
+        "given_name": "Yerlan",
+        "sort_string": null,
+        "classP": null,
+        "fn": "Yerlan Zhanov"
+    }
+},
+{
+    "pk": 19,
+    "model": "alm_vcard.email",
+    "fields": {
+        "type": "INTERNET",
+        "vcard": 19,
+        "value": "yerlan.zhanov1354@alma.net"
+    }
+},
+{
+    "pk": 20,
+    "model": "alm_vcard.vcard",
+    "fields": {
+        "family_name": "Dosov",
+        "uid": null,
+        "honorific_suffix": "",
+        "additional_name": "",
+        "rev": null,
+        "honorific_prefix": "",
+        "bday": null,
+        "given_name": "Rustem",
+        "sort_string": null,
+        "classP": null,
+        "fn": "Rustem Dosov"
+    }
+},
+{
+    "pk": 20,
+    "model": "alm_vcard.email",
+    "fields": {
+        "type": "INTERNET",
+        "vcard": 20,
+        "value": "rustem.dosov256@alma.net"
+    }
+},
+{
+    "pk": 21,
+    "model": "alm_vcard.vcard",
+    "fields": {
+        "family_name": "Sattarov",
+        "uid": null,
+        "honorific_suffix": "",
+        "additional_name": "",
+        "rev": null,
+        "honorific_prefix": "",
+        "bday": null,
+        "given_name": "Sanzhar",
+        "sort_string": null,
+        "classP": null,
+        "fn": "Sanzhar Sattarov"
     }
 },
 {
@@ -542,7 +542,7 @@
     "fields": {
         "type": "INTERNET",
         "vcard": 21,
-        "value": "usman.kotov931@alma.net"
+        "value": "sanzhar.sattarov1482@alma.net"
     }
 }
 ]

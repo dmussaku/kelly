@@ -1,68 +1,93 @@
 [
-    {
-        "pk":1,
-        "model":"alm_crm.Product",
-        "fields": {
-            "name":"p1: Microsoft Office 360",
-            "description":"Microsoft Office 360 is your new Office in everyplace where you are.",
-            "price":8900,
-            "currency":"KZT",
-            "date_created": "2014-09-10T00:00:00Z",
-            "owner": 1,
-            "subscription_id": 1
-        }
-    },
-    {
-        "pk":2,
-        "model":"alm_crm.Product",
-        "fields": {
-            "name":"p2: 1C Online (monthly)",
-            "description":"1C Online - monthly subscription",
-            "price":3000,
-            "currency":"KZT",
-            "date_created": "2014-09-10T00:00:00Z",
-            "owner": 1,
-            "subscription_id": 1
-        }
-    },
-    {
-        "pk":3,
-        "model":"alm_crm.Product",
-        "fields": {
-            "name":"p2: 1C Online (year)",
-            "description":"1C Online - year subscription",
-            "price":25000,
-            "currency":"KZT",
-            "date_created": "2014-09-10T00:00:00Z",
-            "owner": 1,
-            "subscription_id": 1
-        }
-    },
-    {
-        "pk":4,
-        "model":"alm_crm.Product",
-        "fields": {
-            "name":"p2: Paragraph Online",
-            "description":"Paragraph Online is product for lawyers",
-            "price":59000,
-            "currency":"KZT",
-            "date_created": "2014-09-10T00:00:00Z",
-            "owner": 1,
-            "subscription_id": 1
-        }
-    },
-
-    {
-        "pk":5,
-        "model":"alm_crm.Product",
-        "fields": {
-            "name":"Facebook's OculusRift",
-            "description":"Technology of Virtual 3D",
-            "price":159000,
-            "currency":"KZT",
-            "date_created": "2015-01-01T00:00:00Z",
-            "owner": 5,
-            "subscription_id": 2
-        }
+{
+    "pk": 1,
+    "model": "alm_crm.product",
+    "fields": {
+        "name": "Product 1C Enterprise",
+        "description": " Product 1C Enterprise - is an American multinational technology company headquartered in Redmond",
+        "price": 18233,
+        "currency": "KZT",
+        "date_created":"2014-10-01 00:00:00+00:00",
+        "owner": 4,
+        "subscription_id": 1 
     }
+},
+{
+    "pk": 2,
+    "model": "alm_crm.product",
+    "fields": {
+        "name": "Product 1C Enterprise",
+        "description": " Product 1C Enterprise -  is one of the largest independent Russian software developers ",
+        "price": 49412,
+        "currency": "KZT",
+        "date_created":"2014-10-02 00:00:00+00:00",
+        "owner": 3,
+        "subscription_id": 1 
+    }
+},
+{
+    "pk": 3,
+    "model": "alm_crm.product",
+    "fields": {
+        "name": "Product SalesForce",
+        "description": " Product SalesForce -  the best software service system in the WORLD ",
+        "price": 29832,
+        "currency": "KZT",
+        "date_created":"2014-10-03 00:00:00+00:00",
+        "owner": 3,
+        "subscription_id": 1 
+    }
+},
+{
+    "pk": 4,
+    "model": "alm_crm.product",
+    "fields": {
+        "name": "Product Microsoft",
+        "description": " Product Microsoft -  the best software service system in the WORLD ",
+        "price": 12268,
+        "currency": "KZT",
+        "date_created":"2014-10-04 00:00:00+00:00",
+        "owner": 2,
+        "subscription_id": 1 
+    }
+},
+{
+    "pk": 5,
+    "model": "alm_crm.product",
+    "fields": {
+        "name": "Product Almasales",
+        "description": " Product Almasales -  is one of the largest independent Russian software developers ",
+        "price": 27541,
+        "currency": "KZT",
+        "date_created":"2014-10-05 00:00:00+00:00",
+        "owner": 3,
+        "subscription_id": 1 
+    }
+},
+{
+    "pk": 6,
+    "model": "alm_crm.product",
+    "fields": {
+        "name": "Product Almasales",
+        "description": " Product Almasales - is an American multinational technology company headquartered in Redmond",
+        "price": 71062,
+        "currency": "KZT",
+        "date_created":"2014-10-01 00:00:00+00:00",
+        "owner": 7,
+        "subscription_id": 2 
+    }
+},
+{
+    "pk": 7,
+    "model": "alm_crm.product",
+    "fields": {
+        "name": "Product SalesForce",
+        "description": " Product SalesForce -  the best software service system in the WORLD ",
+        "price": 39243,
+        "currency": "KZT",
+        "date_created":"2014-10-02 00:00:00+00:00",
+        "owner": 7,
+        "subscription_id": 2 
+    }
+}
 ]
