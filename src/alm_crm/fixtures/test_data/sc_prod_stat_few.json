@@ -1,0 +1,32 @@
+[
+{
+    "pk": 1,
+    "model": "alm_crm.salescycleproductstat",
+    "fields": {
+        "sales_cycle": 16,
+        "product": 1,
+        "subscription_id": 1,
+        "value": 8397 
+    }
+},
+{
+    "pk": 2,
+    "model": "alm_crm.salescycleproductstat",
+    "fields": {
+        "sales_cycle": 18,
+        "product": 2,
+        "subscription_id": 1,
+        "value": 6599 
+    }
+},
+{
+    "pk": 3,
+    "model": "alm_crm.salescycleproductstat",
+    "fields": {
+        "sales_cycle": 23,
+        "product": 1,
+        "subscription_id": 2,
+        "value": 2973 
+    }
+}
+]
