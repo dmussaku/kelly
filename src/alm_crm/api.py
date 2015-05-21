@@ -245,11 +245,12 @@ class ContactResource(CRMServiceModelResource):
 
     class Meta(CommonMeta):
         queryset = Contact.objects.all().select_related(
-            'owner', 'parent').prefetch_related(
+            'owner', 'parent', 'vcard').prefetch_related(
                 'sales_cycles', 'children', 'share_set',
-                'vcard', 'vcard__tel_set', 'vcard__category_set', 
+                'vcard__tel_set', 'vcard__category_set', 
                 'vcard__adr_set', 'vcard__title_set', 'vcard__url_set', 
-                'vcard__org_set', 'vcard__email_set')
+                'vcard__org_set', 'vcard__email_set',
+                'vcard__custom_sections', 'vcard__custom_fields')
         resource_name = 'contact'
         filtering = {
             'status': ['exact'],
@@ -419,8 +420,7 @@ class ContactResource(CRMServiceModelResource):
         return bundle
     def full_dehydrate(self, bundle, for_list=False):
         '''Custom representation of followers, assignees etc.'''
-        bundle = super(self.__class__, self).full_dehydrate(
-            bundle, for_list=True)
+        bundle = super(self.__class__, self).full_dehydrate(bundle, for_list=for_list)
         bundle.data['children'] = [contact.id for contact in bundle.obj.children.all()]
         return bundle
 
