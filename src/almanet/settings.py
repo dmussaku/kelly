@@ -179,8 +179,7 @@ class BaseConfiguration(SubdomainConfiguration, Configuration):
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': rel('../..', 'db.sqlite3'),
-            'ATOMIC_REQUEST': True,
+            'NAME': rel('../..', 'qadb.sqlite3'),
         },
         'test': {
             'ENGINE': 'django.db.backends.sqlite3',

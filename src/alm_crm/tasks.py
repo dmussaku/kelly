@@ -4,33 +4,40 @@ from almanet.celery import app
 import xlrd
 import time
 from almanet.settings import TEMP_DIR
-from alm_crm.models import Contact, ImportTask, ErrorCell
+from alm_crm.models import Contact, ImportTask, ErrorCell, ContactList
 from alm_vcard import models as vcard_models
 from alm_user.models import User
-from celery import group, result
+from celery import group, result, chord, task
 import xlsxwriter
 
 '''
 celery -A alm_crm.tasks worker --loglevel=info
 '''
 
-@app.task
-def add(x, y):
-    return {'result':x + y}
+# @app.task
+# def add(args=None, x=0, y=0):
+#     time.sleep(6)
+#     print x+y
+
+# @app.task
+# def xsum(args=None, num=0):
+#     time.sleep(6)
+#     print args=None
+#     print num
+#     return num
 
 
 @app.task
 def mul(x, y):
     return x * y
 
+@app.task
 def nested_add(x,y):
     result_array = group(add.s(x,y) for i in range(0,2))
     result_array = result_array()
     return result_array.id
 
-@app.task
-def xsum(numbers):
-    return sum(numbers)
+
 
 '''
 this is the main task that will be executed from the api.py file
@@ -38,6 +45,9 @@ it will first cut the ranges of excel files by 100 and then it will
 group the add_contacts_by_chunks task to execute concurently
 '''
 
+def check_task_status(uuid):
+    response = task.Task.AsyncResult(uuid)
+    return response.ready()
 
 def grouped_contact_import_task(file_structure, filename, creator):
     book = xlrd.open_workbook(filename=TEMP_DIR + filename)
@@ -53,15 +63,13 @@ def grouped_contact_import_task(file_structure, filename, creator):
     print val_list
     import_task = ImportTask()
     import_task.save()
-    grouped_task = group(
+    chord_task = chord(
         [add_contacts_by_chunks.s(import_task.id, file_structure, filename, creator.id, obj[0], obj[1]) for obj in val_list]
-        )
-    job = grouped_task.apply_async()
-    job.save()
-    import_task.uuid = job.id
+        )(finish_add_contacts.s(filename, import_task.id, creator.id))
+    import_task.uuid = chord_task.id
     import_task.filename = filename 
     import_task.save()
-    return job.id
+    return chord_task.id
 '''
 Task that will have file_structure, filename and start_col and finish col inputed
 this task will open the file and only parse selected rows
@@ -72,6 +80,8 @@ def add_contacts_by_chunks(import_task_id, file_structure, filename, creator_id,
     book = xlrd.open_workbook(filename=TEMP_DIR+filename)
     import_task = ImportTask.objects.get(id=import_task_id)
     sheet = book.sheets()[0]
+    row_num = finish_row - start_row
+    error_counter = 0
     for i in range(start_row, finish_row-1):
         data = sheet.row(i)
         response = Contact.create_from_structure(
@@ -84,30 +94,57 @@ def add_contacts_by_chunks(import_task_id, file_structure, filename, creator_id,
                 col = response['error_col']
                 )
             error_cell.save()
+            error_counter += 1
+    return {'imported_num':row_num - error_counter, 'not_imported_num':error_counter}
 
-        
+
+'''
+A task that creates a list of created contacts and sends a file containing rows with errors
+also saves statistics in ImportTask model
+'''        
 @app.task
-def create_failed_contacts_xls(filename, import_task_id):
+def finish_add_contacts(list_of_responses, filename, import_task_id, creator_id):
+    creator = User.objects.get(id=creator_id)
+    print list_of_responses
     try:
         import_task = ImportTask.objects.get(id=import_task_id)
     except ObjectDoesNotExist:
         return False
+    import_task.imported_num = 0
+    import_task.not_imported_num = 0
+    for dict_obj in list_of_responses:
+        import_task.imported_num += dict_obj['imported_num']
+        import_task.not_imported_num += dict_obj['not_imported_num']
+    import_task.save()
+    contact_list = ContactList(
+                owner = creator.get_crmuser(),
+                title = filename)
+    contact_list.save()
+    contact_list.contacts = import_task.contacts.all()
+    import_task.contactlist = contact_list
     if not import_task.errorcell_set.all():    
-        import_task.delete()
-        return False
-    cell_list = import_task.errorcell_set.all()
-    filename = TEMP_DIR + filename+'_edited.xlsx'
-    workbook = xlsxwriter.Workbook(filename)
-    worksheet = workbook.add_worksheet()
-    error_format = workbook.add_format()
-    error_format.set_bg_color('red')
-    for i in range(0,import_task.errorcell_set.count()):
-        row = eval(cell_list[i].data)
-        for j in range(len(row)):
-            if j==cell_list[i].col:
-                worksheet.write(i, j, row[j], error_format)
-            else:
-                worksheet.write(i, j, row[j])
-    workbook.close()
-    import_task.delete()
-    return filename
+        import_task.finished = True
+        import_task.save()
+        return import_task.id
+    else:
+        cell_list = import_task.errorcell_set.all()
+        filename = TEMP_DIR + filename+'_edited.xlsx'
+        workbook = xlsxwriter.Workbook(filename)
+        worksheet = workbook.add_worksheet()
+        error_format = workbook.add_format()
+        error_format.set_bg_color('red')
+        for i in range(0,import_task.errorcell_set.count()):
+            row = eval(cell_list[i].data)
+            for j in range(len(row)):
+                if j==cell_list[i].col:
+                    worksheet.write(i, j, row[j], error_format)
+                else:
+                    worksheet.write(i, j, row[j])
+        workbook.close()
+        '''
+        TO BE IMPLEMENTED
+        this is where i send a temp url or a file via email
+        '''
+        import_task.finished = True
+        import_task.save()
+        return import_task.id

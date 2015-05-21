@@ -631,9 +631,7 @@ class Contact(SubscriptionObject):
     '''
 
     @classmethod
-    @transaction.atomic()
     def create_from_structure(cls, data, file_structure, creator, import_task):
-        sid = transaction.savepoint()
         contact = cls()
         vcard = VCard()
         response = {}
@@ -645,83 +643,75 @@ class Contact(SubscriptionObject):
             if model == vcard_models.VCard:
                 attr = structure_dict.get('attr',"")
                 try:
-                    with transaction.atomic():
-                        if type(data[col_num].value) == unicode:
-                            setattr(vcard, attr, data[col_num].value)
-                        else:
-                            setattr(vcard, attr, str(data[col_num].value))
-                        try:
-                            vcard.save()
-                        except:
-                            pass
-                except IntegrityError:
-                    transaction.savepoint_rollback(sid)
-                    response['error'] = True
-                    response['error_col'] = col_num
-                    return response
+                    if type(data[col_num].value) == unicode:
+                        setattr(vcard, attr, data[col_num].value)
+                    else:
+                        setattr(vcard, attr, str(data[col_num].value))
+                    try:
+                        vcard.save()
+                    except:
+                        pass
                 except:
-                    transaction.savepoint_rollback(sid)
+                    # transaction.savepoint_rollback(sid)
+                    try:
+                        vcard.delete()
+                    except:
+                        pass
                     response['error'] = True
                     response['error_col'] = col_num
                     return response
             elif (model == vcard_models.Tel or model == vcard_models.Email 
                         or model == vcard_models.Url):
                 try:
-                    with transaction.atomic():
-                        if data[col_num].value:
-                            objects = data[col_num].value.split(';')
-                            for object in objects:
-                                v_type = structure_dict.get('attr','')
-                                obj = model(type=v_type, value = object)
-                                obj.vcard = vcard
-                                obj.save()
-                except IntegrityError:
-                    transaction.savepoint_rollback(sid)
-                    response['error'] = True
-                    response['error_col'] = col_num
-                    return response
+                    if data[col_num].value:
+                        objects = data[col_num].value.split(';')
+                        for object in objects:
+                            v_type = structure_dict.get('attr','')
+                            obj = model(type=v_type, value = object)
+                            obj.vcard = vcard
+                            obj.save()
                 except:
-                    transaction.savepoint_rollback(sid)
+                    # transaction.savepoint_rollback(sid)
+                    try:
+                        vcard.delete()
+                    except:
+                        pass
                     response['error'] = True
                     response['error_col'] = col_num
                     return response
             elif model == vcard_models.Org:
                 try:
-                    with transaction.atomic():
-                        if data[col_num].value:
-                            objects = data[col_num].value.split(';')
-                            for object in objects:
-                                v_type = structure_dict.get('attr','')
-                                obj = model(organization_name = object)
-                                obj.vcard = vcard
-                                obj.save()
-                except IntegrityError:
-                    transaction.savepoint_rollback(sid)
-                    response['error'] = True
-                    response['error_col'] = col_num
-                    return response
+                    if data[col_num].value:
+                        objects = data[col_num].value.split(';')
+                        for object in objects:
+                            v_type = structure_dict.get('attr','')
+                            obj = model(organization_name = object)
+                            obj.vcard = vcard
+                            obj.save()
                 except:
-                    transaction.savepoint_rollback(sid)
+                    # transaction.savepoint_rollback(sid)
+                    try:
+                        vcard.delete()
+                    except:
+                        pass
                     response['error'] = True
                     response['error_col'] = col_num
                     return response
             elif model == vcard_models.Adr:
                 adr_type = structure_dict.get('attr','')
                 try:
-                    with transaction.atomic():
-                        if data[col_num].value:
-                            adresses = type_cast(data[col_num].value).split(';;')
-                            for address_str in adresses:
-                                addr_objs = address_str.split(';')
-                                addr_objs = [vcard, adr_type] + addr_objs
-                                address = Adr.create_from_list(addr_objs)
-                except IntegrityError:
-                    transaction.savepoint_rollback(sid)
-                    response['error'] = True
-                    response['error_col'] = col_num
-                    return response
+                    if data[col_num].value:
+                        adresses = type_cast(data[col_num].value).split(';;')
+                        for address_str in adresses:
+                            addr_objs = address_str.split(';')
+                            addr_objs = [vcard, adr_type] + addr_objs
+                            address = Adr.create_from_list(addr_objs)
                 except:
-                    transaction.savepoint_rollback(sid)
+                    # transaction.savepoint_rollback(sid)
+                    try:
+                        vcard.delete()
+                    except:
+                        pass
                     response['error'] = True
                     response['error_col'] = col_num
                     return response
@@ -732,32 +722,31 @@ class Contact(SubscriptionObject):
                     or model == vcard_models.Role or model == vcard_models.Title 
                     or model == vcard_models.Tz):
                 try:
-                    with transaction.atomic():
-                        if data[col_num].value:
-                            objects = data[col_num].value.split(';')
-                            for object in objects:
-                                v_type = structure_dict.get('attr','')
-                                obj = model(data = object)
-                                obj.vcard = vcard
-                                obj.save()
-                except IntegrityError:
-                    transaction.savepoint_rollback(sid)
-                    response['error'] = True
-                    response['error_col'] = col_num
-                    return response
+                    if data[col_num].value:
+                        objects = data[col_num].value.split(';')
+                        for object in objects:
+                            v_type = structure_dict.get('attr','')
+                            obj = model(data = object)
+                            obj.vcard = vcard
+                            obj.save()
                 except:
-                    transaction.savepoint_rollback(sid)
+                    # transaction.savepoint_rollback(sid)
+                    try:
+                        vcard.delete()
+                    except:
+                        pass
                     response['error'] = True
                     response['error_col'] = col_num
                     return response
+        crmuser = creator.get_crmuser()
         contact.vcard = vcard
         contact.import_task = import_task
-        contact.owner = creator.get_crmuser()
-        contact.subscription_id = creator.get_crmuser().subscription_id
+        contact.owner = crmuser
+        contact.subscription_id = crmuser.subscription_id
         contact.save()
         SalesCycle.create_globalcycle(
                         **{'subscription_id':contact.subscription_id,
-                         'owner_id':creator.get_crmuser().id,
+                         'owner_id':crmuser.id,
                          'contact_id':contact.id
                         }
                     )
@@ -2000,6 +1989,8 @@ class ContactList(SubscriptionObject):
     title = models.CharField(max_length=150)
     contacts = models.ManyToManyField(Contact, related_name='contact_list',
                                    null=True, blank=True)
+    import_task = models.OneToOneField('alm_crm.ImportTask', 
+        blank=True, null=True, on_delete=models.SET_NULL)
     date_created = models.DateTimeField(blank=True, auto_now_add=True)
 
     class Meta:
@@ -2234,9 +2225,11 @@ class CustomField(SubscriptionObject):
         return custom_field
 
 class ImportTask(models.Model):
-    uuid = models.CharField(blank=False, null=False, max_length=100)
+    uuid = models.CharField(blank=True, null=True, max_length=100)
     finished = models.BooleanField(default=False)
     filename = models.CharField(max_length=250)
+    imported_num = models.IntegerField(default=0, blank=True, null=True)
+    not_imported_num = models.IntegerField(default=0, blank=True, null=True)
 
     def check_status(self):
         if not self.uuid:
@@ -2251,6 +2244,8 @@ class ImportTask(models.Model):
             return self
 
     def __unicode__(self):
+        if not self.uuid:
+            return str(self.finished)
         return self.uuid + ' ' + str(self.finished)
 
 

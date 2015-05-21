@@ -2,7 +2,7 @@ from __future__ import absolute_import
 # set the default Django settings module for the 'celery' program.
 import os
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'almanet.settings')
-os.environ.setdefault('DJANGO_CONFIGURATION', 'BaseConfiguration')
+os.environ.setdefault('DJANGO_CONFIGURATION', 'DevConfiguration')
 
 
 from celery import Celery
@@ -25,7 +25,7 @@ app = Celery('almanet',
 
 # Using a string here means the worker will not have to
 # pickle the object when using Windows.
-app.config_from_object('django.conf:settings')
+app.config_from_object(settings)
 app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)
 
 @app.task(bind=True)

@@ -104,8 +104,7 @@ from .utils.data_processing import (
 import base64
 import simplejson as json
 from collections import OrderedDict
-from .tasks import grouped_contact_import_task, create_failed_contacts_xls
-
+from .tasks import grouped_contact_import_task, check_task_status
 
 class CommonMeta:
     list_allowed_methods = ['get', 'post', 'patch']
@@ -1333,67 +1332,30 @@ class ContactResource(CRMServiceModelResource):
             if len(value.split('__'))>1:
                 obj_dict['attr'] = value.split('__')[1]
             col_hash.append(obj_dict)
-        queued_task_id = grouped_contact_import_task(
+        import_task_id = grouped_contact_import_task(
             col_hash, filename, request.user)
         return self.create_response(
-            request, {'success':True,'task_id':queued_task_id}
+            request, {'success':True,'task_id':import_task_id}
             )
 
     def get_response_from_import(self, request, **kwargs):
-        task_id = request.GET.get('task_id', "")
-        if not task_id:
-            return self.create_response(
-                request, {'success':False, 'status':'FAILED', 'message':'No task id entered'}
-                )
-        try:
-            import_task = ImportTask.objects.get(uuid=task_id)
-        except:
-            return self.create_response(
-                request, {'success':False, 'status':'FAILED', 'message':'No task with this particular id'}
-                )
-        received_task = import_task.check_status()
-        if not received_task:
-            return self.create_response(
-                request, {'success':False, 'status':'PENDING', 'message':'Task not yet finished'}
-                )
-        objects = []
-        contact_resource = ContactResource()
-        contact_list = ContactList(
-                owner = request.user.get_crmuser(),
-                title = received_task.filename)
-        contact_list.save()
-        contact_list.contacts = received_task.contacts.all()
-        for contact in received_task.contacts.all():
-            _bundle = contact_resource.build_bundle(
-                obj=contact, request=request)
-            _bundle.data['global_sales_cycle'] = SalesCycleResource().full_dehydrate(
-                SalesCycleResource().build_bundle(
-                    obj=SalesCycle.objects.get(contact_id=contact.id)
-                )
-            )
-            objects.append(contact_resource.full_dehydrate(
-                _bundle, for_list=True))
-        contact_list = ContactListResource().full_dehydrate(
-            ContactListResource().build_bundle(
-                obj=contact_list
-                )
-            )
-        # received_task.delete()
-        self.log_throttled_access(request)
-        return self.create_response(
-            request, {'success':True, 'status':'FINISHED', 'objects': objects, 'contact_list': contact_list})
+        pass
 
     
     def check_import_status(self, request, **kwargs):
         objects = []
         contact_resource = ContactResource()
-        self.method_check(request, allowed=['get'])
-        self.is_authenticated(request)
-        self.throttle_check(request)
+        # self.method_check(request, allowed=['get'])
+        # self.is_authenticated(request)
+        # self.throttle_check(request)
         task_id = request.GET.get('task_id', "")
         if not task_id:
             return self.create_response(
                 request, {'success':False, 'message':'No task was entered'}
+                )
+        if not check_task_status(task_id):
+            return self.create_response(
+                request, {'success':False, 'status':'PENDING status'}
                 )
         try:
             import_task = ImportTask.objects.get(uuid=task_id)
@@ -1401,19 +1363,8 @@ class ContactResource(CRMServiceModelResource):
             return self.create_response(
                 request, {'success':False, 'message':'The task with particular id does not exist'}
                 )
-        response = import_task.check_status()
-        if not response:
-            return self.create_response(
-                request, {'success':False, 'status':'PENDING'}
-                )
-        contacts = response.contacts.all()
-        title = response.filename
-        create_failed_contacts_xls.delay(response.filename, response.id)
-        contact_list = ContactList(
-            owner = request.user.get_crmuser(),
-            title = title)
-        contact_list.save()
-        contact_list.contacts = contacts
+        contacts = import_task.contacts.all()
+        contact_list = import_task.contactlist
         for contact in contacts:
             _bundle = contact_resource.build_bundle(
                 obj=contact, request=request)
@@ -1429,8 +1380,13 @@ class ContactResource(CRMServiceModelResource):
                 obj=contact_list
                 )
             )
+        imported_num = import_task.imported_num
+        not_imported_num = import_task.not_imported_num
+        email_sent = True if not_imported_num != 0 else False
+        import_task.delete()
         return self.create_response(
-            request, {'success':True, 'status':'FINISHED', 'objects': objects, 'contact_list': contact_list})
+            request, {'success':True, 'status':'FINISHED', 'objects': objects, 'contact_list': contact_list, 
+            'imported_num':imported_num, 'not_imported_num':not_imported_num, 'email_sent':email_sent})
 
 
 class SalesCycleResource(CRMServiceModelResource):
