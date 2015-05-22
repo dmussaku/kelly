@@ -13,8 +13,8 @@
     "model": "alm_company.company",
     "fields": {
         "owner": [21],
-        "subdomain": "cloudjuicy",
-        "name": "CloudJuicy"
+        "subdomain": "cloudfairy",
+        "name": "CloudFairy"
     }
 }
 ]

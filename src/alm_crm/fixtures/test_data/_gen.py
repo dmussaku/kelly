@@ -199,6 +199,7 @@ for index_subscr in range(0, len(limits)):
 
         print "User %s created" % user_name
 
+    subscr_prod_indx = []
     for index_product in range(0, limits[index_subscr]['products']):
         def gen_user_id():
             ids = range(id_user - limits[index_subscr]['user'], id_user)
@@ -221,6 +222,7 @@ for index_subscr in range(0, len(limits)):
         product += '},\n'
         f['products'] += product
         id_product += 1
+        subscr_prod_indx.append(id_product)
 
     for index_contact in range(0, limits[index_subscr]['contact']):
 
@@ -250,7 +252,6 @@ for index_subscr in range(0, len(limits)):
         gen_vcard(cont_name)
 
         for index_s in range(0, randint(1, 4)):
-            product_id = randint(0, limits[index_subscr]['products']-1) + 1
             s_status = ('N', 'P', 'C')[randint(0, 2 if index_s != 0 else 1)]
             s = ''
             s += '{\n'
@@ -281,7 +282,7 @@ for index_subscr in range(0, len(limits)):
 
             value = 0
             if s_status == 'C':
-                value = gen_sc_prod_stat(id_sales_cycles, product_id, id_subscr - 1)
+                value = gen_sc_prod_stat(id_sales_cycles, subscr_prod_indx[randint(0, len(subscr_prod_indx))], id_subscr - 1)
 
             for index_a in range(0, randint(1, 4)):
                 # skip if SalesCycle is NEW, mean without Activities
@@ -315,7 +316,7 @@ for index_subscr in range(0, len(limits)):
                     a += '    "fields": {\n'
                     a += '        "title":"activity #%i of SalesCycle #%i",\n' % \
                         (index_a + 1, id_sales_cycles - 1)
-                    a += '        "Closed. Amount Value is #%i",\n' %\
+                    a += '        "description":"Closed. Amount Value is #%i",\n' %\
                         value
                     a += '        "date_created":"2014-%02i-%02i 00:00:00+00:00",\n' %\
                         (index_s%12 + 1, (index_a*2)%28 + 1)
