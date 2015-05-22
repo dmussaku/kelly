@@ -904,6 +904,52 @@ class Contact(SubscriptionObject):
         q &= Q(status=cls.NEW)
         return cls.objects.filter(q).order_by('-date_created')
 
+    def merge_contacts(self, alias_objects=[], keep_old=True):
+        for obj in alias_objects:
+            if not isinstance(obj, self.__class__):
+                return {'success':False, 'message':'Not Instance of Contact'}
+        # def get_global(cls, subscription_id, contact_id):
+        original_sales_cycles = [s.id for s in self.sales_cycles.filter(is_global=False)]
+        original_activities = []
+        for sales_cycle in self.sales_cycles.filter(is_global=False):
+            for activity in sales_cycle.rel_activities.all():
+                original_activities.append(activity.id)
+        original_shares = [share.id for share in self.share_set.all()]
+        global_sales_cycle = SalesCycle.get_global(self.subscription_id, self.id)
+        deleted_contacts = [contact.id for contact in alias_objects]
+        # Merging sales Cycles
+        print 'mergin sales cycles'
+        for obj in alias_objects:
+            for sales_cycle in obj.sales_cycles.all():
+                if sales_cycle.is_global:
+                    for activity in sales_cycle.rel_activities.all():
+                        activity.sales_cycle = global_sales_cycle
+                        activity.save()
+                else:
+                    sales_cycle.contact = self
+                    sales_cycle.save()
+        # Merging vcards
+        VCard.merge_model_objects(self.vcard, [c.vcard for c in alias_objects])
+        #mergin shares
+        for obj in alias_objects:
+            for share in obj.share_set.all():
+                share.contact = self
+                share.save()
+
+        alias_objects.delete()
+        sales_cycles = list(
+            set([s.id for s in self.sales_cycles.all()])^set(original_sales_cycles)
+            )
+
+        return {
+            'contact':self,
+            'deleted_contacts_ids':deleted_contacts,
+            'sales_cycles':self.sales_cycles.all(),
+            'activities':Activity.objects.filter(sales_cycle__in=self.sales_cycles.all()),
+            
+        }
+
+
 
 class Value(SubscriptionObject):
     # Type of payment

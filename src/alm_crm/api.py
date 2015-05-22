@@ -310,6 +310,12 @@ class ContactResource(CRMServiceModelResource):
                 self.wrap_view('delete_contacts'),
                 name='api_delete_contacts_from_vcard'
             ),
+            url(
+                r"^(?P<resource_name>%s)/contacts_merge%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('contacts_merge'),
+                name='api_contacts_merge'
+            ),
         ]
 
     def get_meta_dict(self, limit, offset, count, url):
@@ -1203,6 +1209,28 @@ class ContactResource(CRMServiceModelResource):
         return self.create_response(
             request, {'success':True}
             )
+
+    def contacts_merge(self, request, **kwargs):
+        """
+        POST METHOD
+        example
+        {"merged_contacts":[1,2,3], "merge_into_contact":1}
+        """
+        # data = self.deserialize(
+        #     request, request.body,
+        #     format=request.META.get('CONTENT_TYPE', 'application/json'))
+        # print request.body
+        data = eval(request.body)
+        merged_contacts_ids = data.get("merged_contacts", [])
+        merge_into_contact_id = data.get("merge_into_contact", "")
+        if not merged_contacts_ids or merge_into_contact_id:
+            self.create_response(
+                        request, {'success':False}
+                        )
+        return self.create_response(
+            request, {'success':True, 'merged_contacts':merged_contacts_ids, 'merge_into_contact':merge_into_contact_id}
+            )
+
 
 class SalesCycleResource(CRMServiceModelResource):
     '''
