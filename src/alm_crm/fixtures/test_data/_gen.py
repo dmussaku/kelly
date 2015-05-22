@@ -51,8 +51,8 @@ id_stat = 1
 
 
 limits = [  # limits by subscription ids
-    {'user': 5, 'contact': 11, 'sales_cycle': 4, 'activity': 10, 'comment': 30, 'products': 5},
-    {'user': 2, 'contact': 3, 'sales_cycle': 2, 'activity': 4, 'comment': 5, 'products': 3}
+    {'user': 20, 'contact': randint(2000, 2500), 'sales_cycle': randint(1, 3), 'activity': randint(1, 3), 'comment': randint(0, 4), 'products': 20},
+    {'user': 10, 'contact': randint(700, 1500), 'sales_cycle': randint(1, 3), 'activity': randint(1, 2), 'comment': randint(0, 3), 'products': 1000}
 ]
 
 
@@ -111,7 +111,7 @@ def gen_vcard(user_name):
 
 def gen_sc_prod_stat(cycle_id, product_id, subscription_id):
     global id_stat
-
+    value = randint(2000, 10000)
     stat = ''
     stat += '{\n'
     stat += '    "pk": %i,\n' % (id_stat)
@@ -120,11 +120,12 @@ def gen_sc_prod_stat(cycle_id, product_id, subscription_id):
     stat += '        "sales_cycle": %i,\n' % (cycle_id)
     stat += '        "product": %i,\n' % (product_id)
     stat += '        "subscription_id": %i,\n' % (subscription_id)
-    stat += '        "value": %i \n' % (randint(2000, 10000))
+    stat += '        "value": %i \n' % (value)
     stat += '    }\n'
     stat += '},\n'
     f['sc_prod_stat'] += stat
     id_stat += 1
+    return value
 
 for index_subscr in range(0, len(limits)):
 
@@ -141,6 +142,7 @@ for index_subscr in range(0, len(limits)):
     ss += '},\n'
     f['subscription'] += ss
     id_subscr += 1
+    print "Subscription %i created" % index_subscr
 
     comp_name = 'ALMACloud' if index_subscr == 0 else words[randint(0, len(words)-1)] + words[randint(0, len(words)-1)]
     comp = ''
@@ -155,6 +157,7 @@ for index_subscr in range(0, len(limits)):
     comp += '},\n'
     f['company'] += comp
     id_company += 1
+    print "Company %s created"%comp_name
 
     for index_user in range(0, limits[index_subscr]['user']):
         is_first_user = lambda: index_subscr == 0 and index_user == 0
@@ -194,7 +197,9 @@ for index_subscr in range(0, len(limits)):
         f['crmuser'] += crmuser
         id_crmuser += 1
 
-    for index_product in range(0, limits[index_subscr]['user']):
+        print "User %s created" % user_name
+
+    for index_product in range(0, limits[index_subscr]['products']):
         def gen_user_id():
             ids = range(id_user - limits[index_subscr]['user'], id_user)
             return ids[randint(0, len(ids)-1)]
@@ -244,7 +249,7 @@ for index_subscr in range(0, len(limits)):
 
         gen_vcard(cont_name)
 
-        for index_s in range(0, limits[index_subscr]['sales_cycle']):
+        for index_s in range(0, randint(1, 4)):
             product_id = randint(0, limits[index_subscr]['products']-1) + 1
             s_status = ('N', 'P', 'C')[randint(0, 2 if index_s != 0 else 1)]
             s = ''
@@ -274,10 +279,11 @@ for index_subscr in range(0, len(limits)):
             f['sales_cycles'] += s
             id_sales_cycles += 1
 
+            value = 0
             if s_status == 'C':
-                gen_sc_prod_stat(id_sales_cycles, product_id, id_subscr - 1)
+                value = gen_sc_prod_stat(id_sales_cycles, product_id, id_subscr - 1)
 
-            for index_a in range(0, limits[index_subscr]['activity']):
+            for index_a in range(0, randint(1, 4)):
                 # skip if SalesCycle is NEW, mean without Activities
                 if s_status == 'N':
                     continue
@@ -301,7 +307,27 @@ for index_subscr in range(0, len(limits)):
                 f['activities'] += a
                 id_activities += 1
 
-                for index_c in range(0, limits[index_subscr]['comment']):
+                if s_status == 'C':
+                    a = ''
+                    a += '{\n'
+                    a += '    "pk": %i,\n' % (id_activities)
+                    a += '    "model": "alm_crm.Activity",\n'
+                    a += '    "fields": {\n'
+                    a += '        "title":"activity #%i of SalesCycle #%i",\n' % \
+                        (index_a + 1, id_sales_cycles - 1)
+                    a += '        "Closed. Amount Value is #%i",\n' %\
+                        value
+                    a += '        "date_created":"2014-%02i-%02i 00:00:00+00:00",\n' %\
+                        (index_s%12 + 1, (index_a*2)%28 + 1)
+                    a += '        "sales_cycle": %i,\n' % (id_sales_cycles - 1)
+                    a += '        "owner":%i,\n' % (gen_user_id())
+                    a += '        "subscription_id": %i\n' % (id_subscr - 1)
+                    a += '    }\n'
+                    a += '},\n'
+                    f['activities'] += a
+                    id_activities += 1
+
+                for index_c in range(0, randint(0, 3)):
                     c_owner = gen_user_id()
                     c_date = '2014-%02i-%02iT%02i:%02i:00.827Z' % (
                         index_s%12 + 1, (index_a*2)%28 + 1, index_c%23 + 1, randint(0, 59))
@@ -326,11 +352,27 @@ for index_subscr in range(0, len(limits)):
                     c += '},\n'
                     f['comments'] += c
                     id_comments += 1
+    
+print 'created %i subscriptions'%(id_subscr-1)
+print 'created %i companies'%(id_company-1)
+print 'created %i users'%(id_user-1)
+print 'created %i contacts'%(id_contact-1)
+print 'created %i vcard'%(id_vcard-1)
+print 'created %i emails'%(id_vcard_email-1)
+print 'created %i crmusers'%(id_crmuser-1)
+print 'created %i sales_cycles'%(id_sales_cycles-1)
+print 'created %i activities'%(id_activities-1)
+print 'created %i comments'%(id_comments-1)
+print 'created %i products'%(id_product-1)
+print 'created %i product stats'%(id_stat-1)
 
 
+print "start writing to file"
 for fname in f:
     f[fname] = '[\n' + f[fname][:-2] + '\n]'
 
     fixture_file = open('%s.json' % (fname), 'w+')
     fixture_file.write(f[fname])
     fixture_file.close()
+print "finished writing"
+print "GENERATED"
