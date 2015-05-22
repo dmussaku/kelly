@@ -315,7 +315,7 @@ for index_subscr in range(0, len(limits)):
                     a += '    "fields": {\n'
                     a += '        "title":"activity #%i of SalesCycle #%i",\n' % \
                         (index_a + 1, id_sales_cycles - 1)
-                    a += '        "Closed. Amount Value is #%i",\n' %\
+                    a += '        "description":"Closed. Amount Value is #%i",\n' %\
                         value
                     a += '        "date_created":"2014-%02i-%02i 00:00:00+00:00",\n' %\
                         (index_s%12 + 1, (index_a*2)%28 + 1)
