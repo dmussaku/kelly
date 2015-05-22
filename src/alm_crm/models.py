@@ -1003,7 +1003,8 @@ class Contact(SubscriptionObject):
         return {
             'success':True,
             'col_num':sheet.ncols,
-            'filename':new_filename
+            'filename':new_filename,
+            'data':data
         }
 
     @classmethod
@@ -2230,18 +2231,6 @@ class ImportTask(models.Model):
     filename = models.CharField(max_length=250)
     imported_num = models.IntegerField(default=0, blank=True, null=True)
     not_imported_num = models.IntegerField(default=0, blank=True, null=True)
-
-    def check_status(self):
-        if not self.uuid:
-            raise Exception
-        # get the task id
-        import_task = result.GroupResult.restore(self.uuid)
-        if not import_task.ready():
-            return False
-        else:
-            self.finished = True
-            self.save()
-            return self
 
     def __unicode__(self):
         if not self.uuid:

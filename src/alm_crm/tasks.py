@@ -1,14 +1,17 @@
+# -*- coding: utf-8 -*-
 from __future__ import absolute_import
 from celery import shared_task
 from almanet.celery import app
 import xlrd
 import time
-from almanet.settings import TEMP_DIR
+import os
+from almanet.settings import TEMP_DIR, EMAIL_SUBJECT_PREFIX, SUPPORT_EMAIL
 from alm_crm.models import Contact, ImportTask, ErrorCell, ContactList
 from alm_vcard import models as vcard_models
 from alm_user.models import User
 from celery import group, result, chord, task
 import xlsxwriter
+from django.core.mail import send_mail, EmailMessage
 
 '''
 celery -A alm_crm.tasks worker --loglevel=info
@@ -104,6 +107,7 @@ also saves statistics in ImportTask model
 '''        
 @app.task
 def finish_add_contacts(list_of_responses, filename, import_task_id, creator_id):
+    os.remove(TEMP_DIR+filename)
     creator = User.objects.get(id=creator_id)
     print list_of_responses
     try:
@@ -121,7 +125,8 @@ def finish_add_contacts(list_of_responses, filename, import_task_id, creator_id)
                 title = filename)
     contact_list.save()
     contact_list.contacts = import_task.contacts.all()
-    import_task.contactlist = contact_list
+    contact_list.import_task = import_task
+    contact_list.save()
     if not import_task.errorcell_set.all():    
         import_task.finished = True
         import_task.save()
@@ -142,9 +147,18 @@ def finish_add_contacts(list_of_responses, filename, import_task_id, creator_id)
                     worksheet.write(i, j, row[j])
         workbook.close()
         '''
-        TO BE IMPLEMENTED
         this is where i send a temp url or a file via email
         '''
+        msg = EmailMessage(
+            subject=EMAIL_SUBJECT_PREFIX+'файл с ошибками , do not reply',
+            body='Исправьте файл и загрузите его снова',
+            from_email=SUPPORT_EMAIL,
+            to=['dmussaku@gmail.com']
+            )
+        msg.attach_file(filename)
+        msg.send()
         import_task.finished = True
+        import_task.filename = filename
         import_task.save()
+        os.remove(filename)
         return import_task.id

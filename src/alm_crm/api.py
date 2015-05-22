@@ -434,12 +434,6 @@ class ContactResource(CRMServiceModelResource):
                 name='api_import_from_structure'
             ),
             url(
-                r"^(?P<resource_name>%s)/get_response_from_import%s$" %
-                (self._meta.resource_name, trailing_slash()),
-                self.wrap_view('get_response_from_import'),
-                name='api_get_response_from_import'
-            ),
-            url(
                 r"^(?P<resource_name>%s)/check_import_status%s$" %
                 (self._meta.resource_name, trailing_slash()),
                 self.wrap_view('check_import_status'),
@@ -1244,6 +1238,7 @@ class ContactResource(CRMServiceModelResource):
                 )
         elif filename=='xls' or filename=='xlsx':
             xls_meta = Contact.get_xls_structure(data['filename'], decoded_string)
+            xls_meta['type'] = 'excel'
             return self.create_response(
                 request, xls_meta)
         else:
@@ -1338,9 +1333,6 @@ class ContactResource(CRMServiceModelResource):
             request, {'success':True,'task_id':import_task_id}
             )
 
-    def get_response_from_import(self, request, **kwargs):
-        pass
-
     
     def check_import_status(self, request, **kwargs):
         objects = []
@@ -1355,7 +1347,7 @@ class ContactResource(CRMServiceModelResource):
                 )
         if not check_task_status(task_id):
             return self.create_response(
-                request, {'success':False, 'status':'PENDING status'}
+                request, {'success':False, 'status':'PENDING'}
                 )
         try:
             import_task = ImportTask.objects.get(uuid=task_id)
