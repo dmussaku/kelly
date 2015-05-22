@@ -282,7 +282,7 @@ for index_subscr in range(0, len(limits)):
 
             value = 0
             if s_status == 'C':
-                value = gen_sc_prod_stat(id_sales_cycles, subscr_prod_indx[randint(0, len(subscr_prod_indx))], id_subscr - 1)
+                value = gen_sc_prod_stat(id_sales_cycles, subscr_prod_indx[randint(0, len(subscr_prod_indx)-1)], id_subscr - 1)
 
             for index_a in range(0, randint(1, 4)):
                 # skip if SalesCycle is NEW, mean without Activities
