@@ -19,15 +19,15 @@
     "pk": 2,
     "model": "alm_user.user",
     "fields": {
-        "first_name": "Sattar",
-        "last_name": "Rustemov",
+        "first_name": "Kot",
+        "last_name": "Zhanov",
         "company": [1],
         "is_active": true,
         "last_login": "2014-11-11T07:51:02.253Z",
         "is_admin": false,
         "timezone": "Asia/Almaty",
         "password": "pbkdf2_sha256$12000$RfGiFmGJSeoz$063rfBSPM0AsFi1prglD5BW8qD1ElMYxBpRr5tO1M08=",
-        "email": "sattar.rustemov1697@alma.net",
+        "email": "kot.zhanov1500@alma.net",
         "vcard": 2
     }
 },
@@ -35,15 +35,15 @@
     "pk": 3,
     "model": "alm_user.user",
     "fields": {
-        "first_name": "Yernar",
-        "last_name": "Sattarov",
+        "first_name": "Yerlan",
+        "last_name": "Yernarov",
         "company": [1],
         "is_active": true,
         "last_login": "2014-11-11T07:51:02.253Z",
         "is_admin": false,
         "timezone": "Asia/Almaty",
         "password": "pbkdf2_sha256$12000$RfGiFmGJSeoz$063rfBSPM0AsFi1prglD5BW8qD1ElMYxBpRr5tO1M08=",
-        "email": "yernar.sattarov737@alma.net",
+        "email": "yerlan.yernarov1655@alma.net",
         "vcard": 3
     }
 },
@@ -51,15 +51,15 @@
     "pk": 4,
     "model": "alm_user.user",
     "fields": {
-        "first_name": "Sanzhar",
-        "last_name": "Alisherov",
+        "first_name": "Rustem",
+        "last_name": "Yernarov",
         "company": [1],
         "is_active": true,
         "last_login": "2014-11-11T07:51:02.253Z",
         "is_admin": false,
         "timezone": "Asia/Almaty",
         "password": "pbkdf2_sha256$12000$RfGiFmGJSeoz$063rfBSPM0AsFi1prglD5BW8qD1ElMYxBpRr5tO1M08=",
-        "email": "sanzhar.alisherov1381@alma.net",
+        "email": "rustem.yernarov1@alma.net",
         "vcard": 4
     }
 },
@@ -68,14 +68,14 @@
     "model": "alm_user.user",
     "fields": {
         "first_name": "Sattar",
-        "last_name": "Sattarov",
+        "last_name": "Zhanov",
         "company": [1],
         "is_active": true,
         "last_login": "2014-11-11T07:51:02.253Z",
         "is_admin": false,
         "timezone": "Asia/Almaty",
         "password": "pbkdf2_sha256$12000$RfGiFmGJSeoz$063rfBSPM0AsFi1prglD5BW8qD1ElMYxBpRr5tO1M08=",
-        "email": "sattar.sattarov338@alma.net",
+        "email": "sattar.zhanov224@alma.net",
         "vcard": 5
     }
 },
@@ -84,14 +84,14 @@
     "model": "alm_user.user",
     "fields": {
         "first_name": "Usman",
-        "last_name": "Dosov",
+        "last_name": "Yerlanov",
         "company": [1],
         "is_active": true,
         "last_login": "2014-11-11T07:51:02.253Z",
         "is_admin": false,
         "timezone": "Asia/Almaty",
         "password": "pbkdf2_sha256$12000$RfGiFmGJSeoz$063rfBSPM0AsFi1prglD5BW8qD1ElMYxBpRr5tO1M08=",
-        "email": "usman.dosov670@alma.net",
+        "email": "usman.yerlanov1916@alma.net",
         "vcard": 6
     }
 },
@@ -99,15 +99,15 @@
     "pk": 7,
     "model": "alm_user.user",
     "fields": {
-        "first_name": "Yernar",
-        "last_name": "Nurlanov",
+        "first_name": "Nurlan",
+        "last_name": "Usmanov",
         "company": [1],
         "is_active": true,
         "last_login": "2014-11-11T07:51:02.253Z",
         "is_admin": false,
         "timezone": "Asia/Almaty",
         "password": "pbkdf2_sha256$12000$RfGiFmGJSeoz$063rfBSPM0AsFi1prglD5BW8qD1ElMYxBpRr5tO1M08=",
-        "email": "yernar.nurlanov933@alma.net",
+        "email": "nurlan.usmanov1008@alma.net",
         "vcard": 7
     }
 },
@@ -115,15 +115,15 @@
     "pk": 8,
     "model": "alm_user.user",
     "fields": {
-        "first_name": "Rustem",
-        "last_name": "Kotov",
+        "first_name": "Ivan",
+        "last_name": "Dosov",
         "company": [1],
         "is_active": true,
         "last_login": "2014-11-11T07:51:02.253Z",
         "is_admin": false,
         "timezone": "Asia/Almaty",
         "password": "pbkdf2_sha256$12000$RfGiFmGJSeoz$063rfBSPM0AsFi1prglD5BW8qD1ElMYxBpRr5tO1M08=",
-        "email": "rustem.kotov1412@alma.net",
+        "email": "ivan.dosov1847@alma.net",
         "vcard": 8
     }
 },
@@ -131,7 +131,39 @@
     "pk": 9,
     "model": "alm_user.user",
     "fields": {
-        "first_name": "Rustem",
+        "first_name": "Kot",
+        "last_name": "Usmanov",
+        "company": [1],
+        "is_active": true,
+        "last_login": "2014-11-11T07:51:02.253Z",
+        "is_admin": false,
+        "timezone": "Asia/Almaty",
+        "password": "pbkdf2_sha256$12000$RfGiFmGJSeoz$063rfBSPM0AsFi1prglD5BW8qD1ElMYxBpRr5tO1M08=",
+        "email": "kot.usmanov1128@alma.net",
+        "vcard": 9
+    }
+},
+{
+    "pk": 10,
+    "model": "alm_user.user",
+    "fields": {
+        "first_name": "Dos",
+        "last_name": "Yerlanov",
+        "company": [1],
+        "is_active": true,
+        "last_login": "2014-11-11T07:51:02.253Z",
+        "is_admin": false,
+        "timezone": "Asia/Almaty",
+        "password": "pbkdf2_sha256$12000$RfGiFmGJSeoz$063rfBSPM0AsFi1prglD5BW8qD1ElMYxBpRr5tO1M08=",
+        "email": "dos.yerlanov565@alma.net",
+        "vcard": 10
+    }
+},
+{
+    "pk": 11,
+    "model": "alm_user.user",
+    "fields": {
+        "first_name": "Sanzhar",
         "last_name": "Rustemov",
         "company": [1],
         "is_active": true,
@@ -139,12 +171,12 @@
         "is_admin": false,
         "timezone": "Asia/Almaty",
         "password": "pbkdf2_sha256$12000$RfGiFmGJSeoz$063rfBSPM0AsFi1prglD5BW8qD1ElMYxBpRr5tO1M08=",
-        "email": "rustem.rustemov676@alma.net",
-        "vcard": 9
+        "email": "sanzhar.rustemov1532@alma.net",
+        "vcard": 11
     }
 },
 {
-    "pk": 10,
+    "pk": 12,
     "model": "alm_user.user",
     "fields": {
         "first_name": "Zhan",
@@ -155,39 +187,7 @@
         "is_admin": false,
         "timezone": "Asia/Almaty",
         "password": "pbkdf2_sha256$12000$RfGiFmGJSeoz$063rfBSPM0AsFi1prglD5BW8qD1ElMYxBpRr5tO1M08=",
-        "email": "zhan.zhanov98@alma.net",
-        "vcard": 10
-    }
-},
-{
-    "pk": 11,
-    "model": "alm_user.user",
-    "fields": {
-        "first_name": "Rustem",
-        "last_name": "Sanzharov",
-        "company": [1],
-        "is_active": true,
-        "last_login": "2014-11-11T07:51:02.253Z",
-        "is_admin": false,
-        "timezone": "Asia/Almaty",
-        "password": "pbkdf2_sha256$12000$RfGiFmGJSeoz$063rfBSPM0AsFi1prglD5BW8qD1ElMYxBpRr5tO1M08=",
-        "email": "rustem.sanzharov213@alma.net",
-        "vcard": 11
-    }
-},
-{
-    "pk": 12,
-    "model": "alm_user.user",
-    "fields": {
-        "first_name": "Ivan",
-        "last_name": "Yernarov",
-        "company": [1],
-        "is_active": true,
-        "last_login": "2014-11-11T07:51:02.253Z",
-        "is_admin": false,
-        "timezone": "Asia/Almaty",
-        "password": "pbkdf2_sha256$12000$RfGiFmGJSeoz$063rfBSPM0AsFi1prglD5BW8qD1ElMYxBpRr5tO1M08=",
-        "email": "ivan.yernarov1203@alma.net",
+        "email": "zhan.zhanov1959@alma.net",
         "vcard": 12
     }
 },
@@ -195,15 +195,15 @@
     "pk": 13,
     "model": "alm_user.user",
     "fields": {
-        "first_name": "Ivan",
-        "last_name": "Usmanov",
+        "first_name": "Zhan",
+        "last_name": "Zhanov",
         "company": [1],
         "is_active": true,
         "last_login": "2014-11-11T07:51:02.253Z",
         "is_admin": false,
         "timezone": "Asia/Almaty",
         "password": "pbkdf2_sha256$12000$RfGiFmGJSeoz$063rfBSPM0AsFi1prglD5BW8qD1ElMYxBpRr5tO1M08=",
-        "email": "ivan.usmanov1087@alma.net",
+        "email": "zhan.zhanov1018@alma.net",
         "vcard": 13
     }
 },
@@ -212,14 +212,14 @@
     "model": "alm_user.user",
     "fields": {
         "first_name": "Ivan",
-        "last_name": "Kotov",
+        "last_name": "Zhanov",
         "company": [1],
         "is_active": true,
         "last_login": "2014-11-11T07:51:02.253Z",
         "is_admin": false,
         "timezone": "Asia/Almaty",
         "password": "pbkdf2_sha256$12000$RfGiFmGJSeoz$063rfBSPM0AsFi1prglD5BW8qD1ElMYxBpRr5tO1M08=",
-        "email": "ivan.kotov1863@alma.net",
+        "email": "ivan.zhanov1828@alma.net",
         "vcard": 14
     }
 },
@@ -227,15 +227,15 @@
     "pk": 15,
     "model": "alm_user.user",
     "fields": {
-        "first_name": "Rustem",
-        "last_name": "Alisherov",
+        "first_name": "Sattar",
+        "last_name": "Zhanov",
         "company": [1],
         "is_active": true,
         "last_login": "2014-11-11T07:51:02.253Z",
         "is_admin": false,
         "timezone": "Asia/Almaty",
         "password": "pbkdf2_sha256$12000$RfGiFmGJSeoz$063rfBSPM0AsFi1prglD5BW8qD1ElMYxBpRr5tO1M08=",
-        "email": "rustem.alisherov1483@alma.net",
+        "email": "sattar.zhanov714@alma.net",
         "vcard": 15
     }
 },
@@ -243,15 +243,15 @@
     "pk": 16,
     "model": "alm_user.user",
     "fields": {
-        "first_name": "Alisher",
-        "last_name": "Kotov",
+        "first_name": "Dos",
+        "last_name": "Usmanov",
         "company": [1],
         "is_active": true,
         "last_login": "2014-11-11T07:51:02.253Z",
         "is_admin": false,
         "timezone": "Asia/Almaty",
         "password": "pbkdf2_sha256$12000$RfGiFmGJSeoz$063rfBSPM0AsFi1prglD5BW8qD1ElMYxBpRr5tO1M08=",
-        "email": "alisher.kotov1927@alma.net",
+        "email": "dos.usmanov653@alma.net",
         "vcard": 16
     }
 },
@@ -259,15 +259,15 @@
     "pk": 17,
     "model": "alm_user.user",
     "fields": {
-        "first_name": "Alisher",
-        "last_name": "Sanzharov",
+        "first_name": "Zhan",
+        "last_name": "Alisherov",
         "company": [1],
         "is_active": true,
         "last_login": "2014-11-11T07:51:02.253Z",
         "is_admin": false,
         "timezone": "Asia/Almaty",
         "password": "pbkdf2_sha256$12000$RfGiFmGJSeoz$063rfBSPM0AsFi1prglD5BW8qD1ElMYxBpRr5tO1M08=",
-        "email": "alisher.sanzharov1006@alma.net",
+        "email": "zhan.alisherov119@alma.net",
         "vcard": 17
     }
 },
@@ -275,15 +275,15 @@
     "pk": 18,
     "model": "alm_user.user",
     "fields": {
-        "first_name": "Zhan",
-        "last_name": "Alisherov",
+        "first_name": "Alisher",
+        "last_name": "Rustemov",
         "company": [1],
         "is_active": true,
         "last_login": "2014-11-11T07:51:02.253Z",
         "is_admin": false,
         "timezone": "Asia/Almaty",
         "password": "pbkdf2_sha256$12000$RfGiFmGJSeoz$063rfBSPM0AsFi1prglD5BW8qD1ElMYxBpRr5tO1M08=",
-        "email": "zhan.alisherov1256@alma.net",
+        "email": "alisher.rustemov542@alma.net",
         "vcard": 18
     }
 },
@@ -291,15 +291,15 @@
     "pk": 19,
     "model": "alm_user.user",
     "fields": {
-        "first_name": "Yernar",
-        "last_name": "Alisherov",
+        "first_name": "Zhan",
+        "last_name": "Ivanov",
         "company": [1],
         "is_active": true,
         "last_login": "2014-11-11T07:51:02.253Z",
         "is_admin": false,
         "timezone": "Asia/Almaty",
         "password": "pbkdf2_sha256$12000$RfGiFmGJSeoz$063rfBSPM0AsFi1prglD5BW8qD1ElMYxBpRr5tO1M08=",
-        "email": "yernar.alisherov1971@alma.net",
+        "email": "zhan.ivanov903@alma.net",
         "vcard": 19
     }
 },
@@ -307,15 +307,15 @@
     "pk": 20,
     "model": "alm_user.user",
     "fields": {
-        "first_name": "Kot",
-        "last_name": "Zhanov",
+        "first_name": "Ivan",
+        "last_name": "Nurlanov",
         "company": [1],
         "is_active": true,
         "last_login": "2014-11-11T07:51:02.253Z",
         "is_admin": false,
         "timezone": "Asia/Almaty",
         "password": "pbkdf2_sha256$12000$RfGiFmGJSeoz$063rfBSPM0AsFi1prglD5BW8qD1ElMYxBpRr5tO1M08=",
-        "email": "kot.zhanov1404@alma.net",
+        "email": "ivan.nurlanov1840@alma.net",
         "vcard": 20
     }
 },
@@ -323,103 +323,87 @@
     "pk": 21,
     "model": "alm_user.user",
     "fields": {
-        "first_name": "Nurlan",
-        "last_name": "Ivanov",
+        "first_name": "Usman",
+        "last_name": "Yernarov",
         "company": [2],
         "is_active": true,
         "last_login": "2014-11-11T07:51:02.253Z",
         "is_admin": false,
         "timezone": "Asia/Almaty",
         "password": "pbkdf2_sha256$12000$RfGiFmGJSeoz$063rfBSPM0AsFi1prglD5BW8qD1ElMYxBpRr5tO1M08=",
-        "email": "nurlan.ivanov1243@alma.net",
-        "vcard": 2026
+        "email": "usman.yernarov1868@alma.net",
+        "vcard": 2064
     }
 },
 {
     "pk": 22,
     "model": "alm_user.user",
     "fields": {
-        "first_name": "Sanzhar",
-        "last_name": "Yernarov",
+        "first_name": "Sattar",
+        "last_name": "Rustemov",
         "company": [2],
         "is_active": true,
         "last_login": "2014-11-11T07:51:02.253Z",
         "is_admin": false,
         "timezone": "Asia/Almaty",
         "password": "pbkdf2_sha256$12000$RfGiFmGJSeoz$063rfBSPM0AsFi1prglD5BW8qD1ElMYxBpRr5tO1M08=",
-        "email": "sanzhar.yernarov310@alma.net",
-        "vcard": 2027
+        "email": "sattar.rustemov1141@alma.net",
+        "vcard": 2065
     }
 },
 {
     "pk": 23,
     "model": "alm_user.user",
     "fields": {
-        "first_name": "Rustem",
-        "last_name": "Zhanov",
+        "first_name": "Zhan",
+        "last_name": "Alisherov",
         "company": [2],
         "is_active": true,
         "last_login": "2014-11-11T07:51:02.253Z",
         "is_admin": false,
         "timezone": "Asia/Almaty",
         "password": "pbkdf2_sha256$12000$RfGiFmGJSeoz$063rfBSPM0AsFi1prglD5BW8qD1ElMYxBpRr5tO1M08=",
-        "email": "rustem.zhanov979@alma.net",
-        "vcard": 2028
+        "email": "zhan.alisherov1273@alma.net",
+        "vcard": 2066
     }
 },
 {
     "pk": 24,
     "model": "alm_user.user",
     "fields": {
-        "first_name": "Usman",
-        "last_name": "Dosov",
+        "first_name": "Yerlan",
+        "last_name": "Alisherov",
         "company": [2],
         "is_active": true,
         "last_login": "2014-11-11T07:51:02.253Z",
         "is_admin": false,
         "timezone": "Asia/Almaty",
         "password": "pbkdf2_sha256$12000$RfGiFmGJSeoz$063rfBSPM0AsFi1prglD5BW8qD1ElMYxBpRr5tO1M08=",
-        "email": "usman.dosov454@alma.net",
-        "vcard": 2029
+        "email": "yerlan.alisherov1239@alma.net",
+        "vcard": 2067
     }
 },
 {
     "pk": 25,
     "model": "alm_user.user",
     "fields": {
-        "first_name": "Zhan",
-        "last_name": "Sattarov",
+        "first_name": "Nurlan",
+        "last_name": "Yerlanov",
         "company": [2],
         "is_active": true,
         "last_login": "2014-11-11T07:51:02.253Z",
         "is_admin": false,
         "timezone": "Asia/Almaty",
         "password": "pbkdf2_sha256$12000$RfGiFmGJSeoz$063rfBSPM0AsFi1prglD5BW8qD1ElMYxBpRr5tO1M08=",
-        "email": "zhan.sattarov742@alma.net",
-        "vcard": 2030
+        "email": "nurlan.yerlanov369@alma.net",
+        "vcard": 2068
     }
 },
 {
     "pk": 26,
     "model": "alm_user.user",
     "fields": {
-        "first_name": "Dos",
-        "last_name": "Yernarov",
-        "company": [2],
-        "is_active": true,
-        "last_login": "2014-11-11T07:51:02.253Z",
-        "is_admin": false,
-        "timezone": "Asia/Almaty",
-        "password": "pbkdf2_sha256$12000$RfGiFmGJSeoz$063rfBSPM0AsFi1prglD5BW8qD1ElMYxBpRr5tO1M08=",
-        "email": "dos.yernarov453@alma.net",
-        "vcard": 2031
-    }
-},
-{
-    "pk": 27,
-    "model": "alm_user.user",
-    "fields": {
-        "first_name": "Rustem",
+        "first_name": "Sanzhar",
         "last_name": "Sanzharov",
         "company": [2],
         "is_active": true,
@@ -427,31 +411,15 @@
         "is_admin": false,
         "timezone": "Asia/Almaty",
         "password": "pbkdf2_sha256$12000$RfGiFmGJSeoz$063rfBSPM0AsFi1prglD5BW8qD1ElMYxBpRr5tO1M08=",
-        "email": "rustem.sanzharov594@alma.net",
-        "vcard": 2032
+        "email": "sanzhar.sanzharov479@alma.net",
+        "vcard": 2069
     }
 },
 {
-    "pk": 28,
+    "pk": 27,
     "model": "alm_user.user",
     "fields": {
-        "first_name": "Usman",
-        "last_name": "Yernarov",
-        "company": [2],
-        "is_active": true,
-        "last_login": "2014-11-11T07:51:02.253Z",
-        "is_admin": false,
-        "timezone": "Asia/Almaty",
-        "password": "pbkdf2_sha256$12000$RfGiFmGJSeoz$063rfBSPM0AsFi1prglD5BW8qD1ElMYxBpRr5tO1M08=",
-        "email": "usman.yernarov1377@alma.net",
-        "vcard": 2033
-    }
-},
-{
-    "pk": 29,
-    "model": "alm_user.user",
-    "fields": {
-        "first_name": "Dos",
+        "first_name": "Zhan",
         "last_name": "Zhanov",
         "company": [2],
         "is_active": true,
@@ -459,24 +427,56 @@
         "is_admin": false,
         "timezone": "Asia/Almaty",
         "password": "pbkdf2_sha256$12000$RfGiFmGJSeoz$063rfBSPM0AsFi1prglD5BW8qD1ElMYxBpRr5tO1M08=",
-        "email": "dos.zhanov347@alma.net",
-        "vcard": 2034
+        "email": "zhan.zhanov207@alma.net",
+        "vcard": 2070
     }
 },
 {
-    "pk": 30,
+    "pk": 28,
     "model": "alm_user.user",
     "fields": {
-        "first_name": "Kot",
-        "last_name": "Kotov",
+        "first_name": "Nurlan",
+        "last_name": "Alisherov",
         "company": [2],
         "is_active": true,
         "last_login": "2014-11-11T07:51:02.253Z",
         "is_admin": false,
         "timezone": "Asia/Almaty",
         "password": "pbkdf2_sha256$12000$RfGiFmGJSeoz$063rfBSPM0AsFi1prglD5BW8qD1ElMYxBpRr5tO1M08=",
-        "email": "kot.kotov486@alma.net",
-        "vcard": 2035
+        "email": "nurlan.alisherov533@alma.net",
+        "vcard": 2071
+    }
+},
+{
+    "pk": 29,
+    "model": "alm_user.user",
+    "fields": {
+        "first_name": "Nurlan",
+        "last_name": "Usmanov",
+        "company": [2],
+        "is_active": true,
+        "last_login": "2014-11-11T07:51:02.253Z",
+        "is_admin": false,
+        "timezone": "Asia/Almaty",
+        "password": "pbkdf2_sha256$12000$RfGiFmGJSeoz$063rfBSPM0AsFi1prglD5BW8qD1ElMYxBpRr5tO1M08=",
+        "email": "nurlan.usmanov921@alma.net",
+        "vcard": 2072
+    }
+},
+{
+    "pk": 30,
+    "model": "alm_user.user",
+    "fields": {
+        "first_name": "Ivan",
+        "last_name": "Sattarov",
+        "company": [2],
+        "is_active": true,
+        "last_login": "2014-11-11T07:51:02.253Z",
+        "is_admin": false,
+        "timezone": "Asia/Almaty",
+        "password": "pbkdf2_sha256$12000$RfGiFmGJSeoz$063rfBSPM0AsFi1prglD5BW8qD1ElMYxBpRr5tO1M08=",
+        "email": "ivan.sattarov202@alma.net",
+        "vcard": 2073
     }
 }
 ]
