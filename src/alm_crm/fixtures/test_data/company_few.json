@@ -1,0 +1,20 @@
+[
+{
+    "pk": 1,
+    "model": "alm_company.company",
+    "fields": {
+        "owner": [1],
+        "subdomain": "almacloud",
+        "name": "ALMACloud"
+    }
+},
+{
+    "pk": 2,
+    "model": "alm_company.company",
+    "fields": {
+        "owner": [4],
+        "subdomain": "solutionatlas",
+        "name": "SolutionAtlas"
+    }
+}
+]

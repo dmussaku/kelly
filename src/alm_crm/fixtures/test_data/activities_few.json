@@ -1,0 +1,194 @@
+[
+{
+    "pk": 1,
+    "model": "alm_crm.Activity",
+    "fields": {
+        "title":"activity #1 of SalesCycle #14",
+        "description":"activity #1 of SalesCycle #14",
+        "date_created":"2014-02-01 00:00:00+00:00",
+        "sales_cycle": 14,
+        "owner":2,
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 2,
+    "model": "alm_crm.Activity",
+    "fields": {
+        "title":"activity #2 of SalesCycle #14",
+        "description":"activity #2 of SalesCycle #14",
+        "date_created":"2014-02-03 00:00:00+00:00",
+        "sales_cycle": 14,
+        "owner":1,
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 3,
+    "model": "alm_crm.Activity",
+    "fields": {
+        "title":"activity #3 of SalesCycle #14",
+        "description":"activity #3 of SalesCycle #14",
+        "date_created":"2014-02-05 00:00:00+00:00",
+        "sales_cycle": 14,
+        "owner":2,
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 4,
+    "model": "alm_crm.Activity",
+    "fields": {
+        "title":"activity #1 of SalesCycle #15",
+        "description":"activity #1 of SalesCycle #15",
+        "date_created":"2014-03-01 00:00:00+00:00",
+        "sales_cycle": 15,
+        "owner":3,
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 5,
+    "model": "alm_crm.Activity",
+    "fields": {
+        "title":"activity #2 of SalesCycle #15",
+        "description":"activity #2 of SalesCycle #15",
+        "date_created":"2014-03-03 00:00:00+00:00",
+        "sales_cycle": 15,
+        "owner":3,
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 6,
+    "model": "alm_crm.Activity",
+    "fields": {
+        "title":"activity #3 of SalesCycle #15",
+        "description":"activity #3 of SalesCycle #15",
+        "date_created":"2014-03-05 00:00:00+00:00",
+        "sales_cycle": 15,
+        "owner":2,
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 7,
+    "model": "alm_crm.Activity",
+    "fields": {
+        "title":"activity #1 of SalesCycle #17",
+        "description":"activity #1 of SalesCycle #17",
+        "date_created":"2014-02-01 00:00:00+00:00",
+        "sales_cycle": 17,
+        "owner":1,
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 8,
+    "model": "alm_crm.Activity",
+    "fields": {
+        "title":"activity #2 of SalesCycle #17",
+        "description":"activity #2 of SalesCycle #17",
+        "date_created":"2014-02-03 00:00:00+00:00",
+        "sales_cycle": 17,
+        "owner":3,
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 9,
+    "model": "alm_crm.Activity",
+    "fields": {
+        "title":"activity #3 of SalesCycle #17",
+        "description":"activity #3 of SalesCycle #17",
+        "date_created":"2014-02-05 00:00:00+00:00",
+        "sales_cycle": 17,
+        "owner":3,
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 10,
+    "model": "alm_crm.Activity",
+    "fields": {
+        "title":"activity #1 of SalesCycle #18",
+        "description":"activity #1 of SalesCycle #18",
+        "date_created":"2014-03-01 00:00:00+00:00",
+        "sales_cycle": 18,
+        "owner":3,
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 11,
+    "model": "alm_crm.Activity",
+    "fields": {
+        "title":"activity #2 of SalesCycle #18",
+        "description":"activity #2 of SalesCycle #18",
+        "date_created":"2014-03-03 00:00:00+00:00",
+        "sales_cycle": 18,
+        "owner":2,
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 12,
+    "model": "alm_crm.Activity",
+    "fields": {
+        "title":"activity #3 of SalesCycle #18",
+        "description":"activity #3 of SalesCycle #18",
+        "date_created":"2014-03-05 00:00:00+00:00",
+        "sales_cycle": 18,
+        "owner":2,
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 13,
+    "model": "alm_crm.Activity",
+    "fields": {
+        "title":"activity #1 of SalesCycle #22",
+        "description":"activity #1 of SalesCycle #22",
+        "date_created":"2014-02-01 00:00:00+00:00",
+        "sales_cycle": 22,
+        "owner":4,
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 14,
+    "model": "alm_crm.Activity",
+    "fields": {
+        "title":"activity #2 of SalesCycle #22",
+        "description":"activity #2 of SalesCycle #22",
+        "date_created":"2014-02-03 00:00:00+00:00",
+        "sales_cycle": 22,
+        "owner":4,
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 15,
+    "model": "alm_crm.Activity",
+    "fields": {
+        "title":"activity #3 of SalesCycle #22",
+        "description":"activity #3 of SalesCycle #22",
+        "date_created":"2014-02-05 00:00:00+00:00",
+        "sales_cycle": 22,
+        "owner":4,
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 16,
+    "model": "alm_crm.Activity",
+    "fields": {
+        "title":"activity #4 of SalesCycle #22",
+        "description":"activity #4 of SalesCycle #22",
+        "date_created":"2014-02-07 00:00:00+00:00",
+        "sales_cycle": 22,
+        "owner":4,
+        "subscription_id": 2
+    }
+}
+]

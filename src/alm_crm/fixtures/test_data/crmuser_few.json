@@ -1,0 +1,38 @@
+[
+{
+    "pk": 1,
+    "model": "alm_crm.CRMUser",
+    "fields": {
+        "user_id": 1,
+        "organization_id": 1,
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 2,
+    "model": "alm_crm.CRMUser",
+    "fields": {
+        "user_id": 2,
+        "organization_id": 1,
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 3,
+    "model": "alm_crm.CRMUser",
+    "fields": {
+        "user_id": 3,
+        "organization_id": 1,
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 4,
+    "model": "alm_crm.CRMUser",
+    "fields": {
+        "user_id": 4,
+        "organization_id": 2,
+        "subscription_id": 2
+    }
+}
+]
