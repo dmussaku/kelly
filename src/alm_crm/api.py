@@ -96,6 +96,8 @@ from .utils.data_processing import (
     processing_custom_field_data,
     from_section_object_to_data,
     from_field_object_to_data,
+    processing_field_object_data,
+    processing_section_object_data,
     )
 
 
@@ -1249,7 +1251,7 @@ class SalesCycleResource(CRMServiceModelResource):
     activities = fields.ToManyField('alm_crm.api.ActivityResource', 'rel_activities', null=True, full=False)
 
     class Meta(CommonMeta):
-        queryset = SalesCycle.objects.all().prefetch_related('products', 'rel_activities', 'log', 'product_stats')
+        queryset = SalesCycle.objects.all().prefetch_related('product_stats', 'product_stats__product', 'rel_activities', 'log')
         resource_name = 'sales_cycle'
         excludes = ['from_date', 'to_date']
         detail_allowed_methods = ['get', 'post', 'put', 'patch', 'delete']
@@ -1758,13 +1760,13 @@ class ProductResource(CRMServiceModelResource):
 #    sales_cycles = fields.ToManyField(SalesCycleResource, 'sales_cycles', readonly=True)
 
     class Meta(CommonMeta):
-        queryset = Product.objects.all()
+        queryset = Product.objects.all().prefetch_related('custom_sections', 'custom_fields')
         resource_name = 'product'
         always_return_data = True
 
     def dehydrate(self, bundle):
-        bundle.data['custom_sections'] = from_section_object_to_data(bundle.obj)
-        bundle.data['custom_fields'] = from_field_object_to_data(bundle.obj)
+        bundle.data['custom_sections'] = processing_section_object_data(list(bundle.obj.custom_sections.all()))
+        bundle.data['custom_fields'] = processing_field_object_data(filter(lambda f: f.section == None, bundle.obj.custom_fields.all()))
         return bundle
 
     def prepend_urls(self):
@@ -2821,10 +2823,10 @@ class AppStateObject(object):
 
     def get_sales_cycle2products_map(self):
         sales_cycles = SalesCycle.get_salescycles_by_last_activity_date(
-            self.subscription_id, all=True, include_activities=False)
+            self.subscription_id, all=True, include_activities=False).prefetch_related('products')
         data = {}
         for sc in sales_cycles:
-            data[sc.id] = list(sc.products.values_list('pk', flat=True))
+            data[sc.id] = [p.id for p in sc.products.all()]
         return data
 
     # def get_shares(self):
@@ -3229,7 +3231,7 @@ class SalesCycleProductStatResource(CRMServiceModelResource):
         return bundle
 
     def dehydrate_sales_cycle(self, bundle):
-        return bundle.obj.product.id
+        return bundle.obj.product_id
 
     def hydrate_sales_cycle(self, bundle):
         sales_cycle = SalesCycle.objects.get(id=bundle.data['sales_cycle'])

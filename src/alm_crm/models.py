@@ -962,7 +962,7 @@ class Product(SubscriptionObject):
 
     @property
     def author_id(self):
-        return self.owner.id
+        return self.owner_id
 
     @author_id.setter
     def author_id(self, author_id):
