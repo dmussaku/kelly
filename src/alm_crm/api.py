@@ -106,15 +106,22 @@ import simplejson as json
 from collections import OrderedDict
 
 
-class DummyPaginator(object): 
+def _firstOfQuerySet(queryset):
+    try :
+        return queryset.all()[0]
+    except IndexError:
+        return None
+
+
+class DummyPaginator(object):
     def __init__(self, request_data, objects, resource_uri=None,
                  limit=None, offset=0, max_limit=1000,
-                 collection_name='objects'): 
+                 collection_name='objects'):
         self.objects = objects
-        self.collection_name = collection_name 
+        self.collection_name = collection_name
 
     def page(self):
-        return { self.collection_name: self.objects, }
+        return {self.collection_name: self.objects}
 
 
 class CommonMeta:
@@ -128,8 +135,9 @@ class CommonMeta:
 
 class CRMServiceModelResource(ModelResource):
 
-    def apply_authorization_limits(self, request, object_list):
-        return object_list.filter(subscription_id=self.get_crmsubscr_id(request))
+    def apply_filters(self, request, applicable_filters):
+        objects = super(ModelResource, self).apply_filters(request, applicable_filters)
+        return objects.filter(subscription_id=self.get_crmsubscr_id(request))
 
     def hydrate(self, bundle):
         """
@@ -184,11 +192,6 @@ class CRMServiceModelResource(ModelResource):
                                              BasicAuthentication())
         authorization = Authorization()
 
-def _firstOfQuerySet(queryset):
-    try :
-        return queryset.all()[0]
-    except IndexError:
-        return None
 
 class ContactResource(CRMServiceModelResource):
     """
@@ -261,8 +264,8 @@ class ContactResource(CRMServiceModelResource):
         queryset = Contact.objects.all().select_related(
             'owner', 'parent', 'vcard').prefetch_related(
                 'sales_cycles', 'children', 'share_set',
-                'vcard__tel_set', 'vcard__category_set', 
-                'vcard__adr_set', 'vcard__title_set', 'vcard__url_set', 
+                'vcard__tel_set', 'vcard__category_set',
+                'vcard__adr_set', 'vcard__title_set', 'vcard__url_set',
                 'vcard__org_set', 'vcard__email_set',
                 'vcard__custom_sections', 'vcard__custom_fields')
         resource_name = 'contact'
@@ -1449,7 +1452,7 @@ class SalesCycleResource(CRMServiceModelResource):
             sales_cycle.delete()
             return self.create_response(request, {'objects':objects}, response_class=http.HttpAccepted)
 
-    def dehydrate_activities(self, bundle):        
+    def dehydrate_activities(self, bundle):
         return [a.id for a in bundle.obj.rel_activities.all()]
         # return list(bundle.obj.rel_activities.values_list('id', flat=True))
 
@@ -1596,7 +1599,7 @@ class ActivityResource(CRMServiceModelResource):
         for r in bundle.obj.recipients.all():
             if r.user_id == user_id:
                 recip = r
-                break                
+                break
         return not recip or recip.has_read
 
     # def hydrate_milestone(self, obj):
