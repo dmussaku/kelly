@@ -102,6 +102,7 @@ from .utils.data_processing import (
 import base64
 import simplejson as json
 from collections import OrderedDict
+import time
 
 
 class CommonMeta:
@@ -455,6 +456,7 @@ class ContactResource(CRMServiceModelResource):
         for child in children:
             bundle.obj.children.add(Contact.objects.get(id=child))
         return bundle
+
 
     def full_hydrate(self, bundle, **kwargs):
         # t1 = time.time()
@@ -1223,12 +1225,63 @@ class ContactResource(CRMServiceModelResource):
         data = eval(request.body)
         merged_contacts_ids = data.get("merged_contacts", [])
         merge_into_contact_id = data.get("merge_into_contact", "")
-        if not merged_contacts_ids or merge_into_contact_id:
-            self.create_response(
-                        request, {'success':False}
+        if not merged_contacts_ids or not merge_into_contact_id:
+            return self.create_response(
+                        request, {'success':False, 'message':'Contact ids have not been appended'}
                         )
+        try:
+            primary_object = Contact.objects.get(id=merge_into_contact_id)
+        except ObjectDoesNotExist:
+            return self.create_response(
+                    request, {
+                        'success':False, 
+                        'message':'Contact with %s id doesnt exist' % merge_into_contact_id
+                        }
+                    )
+        alias_objects = Contact.objects.filter(id__in=merged_contacts_ids)
+        response = primary_object.merge_contacts(alias_objects)
+        if not response['success']:  
+            return self.create_response(
+                request, response
+                )
+        t = time.time()
+        contact = ContactResource().full_dehydrate(
+            ContactResource().build_bundle(
+                obj=response['contact'], request=request
+                ), for_list=False
+            )
+        sales_cycles = [
+            SalesCycleResource().full_dehydrate(
+                SalesCycleResource().build_bundle(
+                    obj=sales_cycle, request=request
+                    ), for_list=True
+                )  for sales_cycle in response['sales_cycles']
+        ]
+        activities = [
+            ActivityResource().full_dehydrate(
+                ActivityResource().build_bundle(
+                    obj=activity, request=request
+                    ), for_list=True
+                )  for activity in response['activities']
+        ]
+        shares = [
+            ShareResource().full_dehydrate(
+                ShareResource().build_bundle(
+                    obj=share, request=request
+                    ), for_list=True
+                )  for share in response['shares']
+        ]
+        # print "Time to dehydrate resources %s " % str(time.time()-t)
         return self.create_response(
-            request, {'success':True, 'merged_contacts':merged_contacts_ids, 'merge_into_contact':merge_into_contact_id}
+                request,
+                {
+                 'contact':contact,
+                 'deleted_contacts_ids':response['deleted_contacts_ids'],
+                 'sales_cycles':sales_cycles,
+                 'activities':activities,
+                 'shares':shares,
+                 'success':True
+                }
             )
 
 

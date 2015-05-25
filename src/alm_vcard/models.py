@@ -708,7 +708,7 @@ class VCard(models.Model):
 
         for j in self.url_set.all():
             i = v.add('x-url')
-            i.value = j.data
+            i.value = j.dataf
 
         return v
 
