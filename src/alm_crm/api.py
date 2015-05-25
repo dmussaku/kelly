@@ -527,6 +527,7 @@ class ContactResource(CRMServiceModelResource):
                 )
             )
         return bundle
+
     def full_dehydrate(self, bundle, for_list=False):
         '''Custom representation of followers, assignees etc.'''
         bundle = super(self.__class__, self).full_dehydrate(
@@ -1310,8 +1311,12 @@ class ContactResource(CRMServiceModelResource):
         # filename = data.get('filename')
         # col_structure = request.body.get('col_structure')
         # filename = request.body.get('filename')
-        col_structure = eval(request.body)['col_structure']
-        filename = eval(request.body)['filename']
+        try:
+            body = json.loads(request.body)
+        except Exception, e:
+            pass
+        col_structure = body['col_structure']
+        filename = body['filename']
         if not col_structure or not filename:
             return self.create_response(
                 request, {'success':False, 'message':'Invalid parameters'}
