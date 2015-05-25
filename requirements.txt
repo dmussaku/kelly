@@ -19,7 +19,7 @@ django-nose2==0.1.1
 django-tastypie==0.12.1
 django-tastypie-swagger==0.1.2
 django-timezone-field==1.1
--e git+git@github.com:Rustem/django-vcard.git@1402d6c89378c026f2fd45f1ac8ccbfeebc0305f#egg=django_vcard-master
+-e git+https://github.com/Rustem/django-vcard.git@1402d6c89378c026f2fd45f1ac8ccbfeebc0305f#egg=django_vcard-master
 djrill==1.1.1
 ecdsa==0.11
 epydoc==3.0.1
