@@ -1004,7 +1004,7 @@ class Contact(SubscriptionObject):
             'success':True,
             'col_num':sheet.ncols,
             'filename':new_filename,
-            'data':data
+            'data':[d.value for d in data]
         }
 
     @classmethod
