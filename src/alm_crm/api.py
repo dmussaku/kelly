@@ -1304,19 +1304,19 @@ class ContactResource(CRMServiceModelResource):
             )
 
     def import_from_structure(self, request, **kwargs):
-        # data = self.deserialize(
-        #     request, request.body,
-        #     format=request.META.get('CONTENT_TYPE', 'application/json'))
-        # col_structure = data.get('col_structure')
-        # filename = data.get('filename')
+        data = self.deserialize(
+            request, request.body,
+            format=request.META.get('CONTENT_TYPE', 'application/json'))
+        col_structure = data.get('col_structure')
+        filename = data.get('filename')
         # col_structure = request.body.get('col_structure')
         # filename = request.body.get('filename')
-        try:
-            body = json.loads(request.body)
-        except Exception, e:
-            pass
-        col_structure = body['col_structure']
-        filename = body['filename']
+        # try:
+        #     body = json.loads(request.body)
+        # except Exception, e:
+        #     pass
+        # col_structure = body['col_structure']
+        # filename = body['filename']
         if not col_structure or not filename:
             return self.create_response(
                 request, {'success':False, 'message':'Invalid parameters'}
