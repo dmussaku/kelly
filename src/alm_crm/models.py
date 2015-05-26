@@ -636,7 +636,7 @@ class Contact(SubscriptionObject):
         vcard = VCard()
         response = {}
         for structure_dict in file_structure:
-            col_num = structure_dict.get('num')
+            col_num = int(structure_dict.get('num'))
             model = getattr(vcard_models, structure_dict.get('model'))
             if type(data[col_num].value) == float:
                 data[col_num].value = str(data[col_num].value)
