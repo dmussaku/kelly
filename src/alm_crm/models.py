@@ -739,6 +739,12 @@ class Contact(SubscriptionObject):
                     response['error_col'] = col_num
                     return response
         crmuser = creator.get_crmuser()
+        try:
+            vcard.save()
+        except:
+            response['error'] = True
+            response['error_col'] = 0
+            return response
         contact.vcard = vcard
         contact.import_task = import_task
         contact.owner = crmuser
