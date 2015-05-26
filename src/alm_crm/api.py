@@ -1241,7 +1241,7 @@ class ContactResource(CRMServiceModelResource):
             xls_meta['type'] = 'excel'
             return self.create_response(
                 request, xls_meta)
-        else:
+        elif filename=='vcf':
             contacts = Contact.import_from_vcard(
                     decoded_string, current_crmuser)
             if not contacts:

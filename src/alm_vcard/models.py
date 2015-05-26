@@ -10,6 +10,7 @@ from django.utils.translation import ugettext as _
 from django.conf import settings
 from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
+from django.db import transaction
 
 
 class VObjectImportException(Exception):
@@ -166,6 +167,7 @@ class VCard(models.Model):
             return self.toVObject()
 
     @classmethod
+    @transaction.atomic
     def fromVObject(cls, vObject, autocommit=False):
         """
         Contact sets its properties as specified by the supplied
