@@ -124,6 +124,9 @@ def finish_add_contacts(list_of_responses, filename, import_task_id, creator_id)
                 owner = creator.get_crmuser(),
                 title = filename)
     contact_list.save()
+    for contact in import_task.contacts.all():
+        if not contact.vcard:
+            contact.delete()
     contact_list.contacts = import_task.contacts.all()
     contact_list.import_task = import_task
     contact_list.save()
