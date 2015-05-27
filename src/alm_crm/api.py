@@ -1216,15 +1216,16 @@ class ContactResource(CRMServiceModelResource):
         """
         POST METHOD
         example
-        {"merged_contacts":[1,2,3], "merge_into_contact":1}
+        {"merged_contacts":[1,2,3], "merge_into_contact":1, "delete":True/False}
         """
-        # data = self.deserialize(
-        #     request, request.body,
-        #     format=request.META.get('CONTENT_TYPE', 'application/json'))
+        data = self.deserialize(
+            request, request.body,
+            format=request.META.get('CONTENT_TYPE', 'application/json'))
         # print request.body
-        data = eval(request.body)
+        # data = eval(request.body)
         merged_contacts_ids = data.get("merged_contacts", [])
         merge_into_contact_id = data.get("merge_into_contact", "")
+        delete_merged = data.get("merged_contacts", [])
         if not merged_contacts_ids or not merge_into_contact_id:
             return self.create_response(
                         request, {'success':False, 'message':'Contact ids have not been appended'}
@@ -1239,7 +1240,7 @@ class ContactResource(CRMServiceModelResource):
                         }
                     )
         alias_objects = Contact.objects.filter(id__in=merged_contacts_ids)
-        response = primary_object.merge_contacts(alias_objects)
+        response = primary_object.merge_contacts(alias_objects, delete_merged)
         if not response['success']:  
             return self.create_response(
                 request, response

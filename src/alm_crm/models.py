@@ -905,7 +905,7 @@ class Contact(SubscriptionObject):
         q &= Q(status=cls.NEW)
         return cls.objects.filter(q).order_by('-date_created')
 
-    def merge_contacts(self, alias_objects=[], keep_old=True):
+    def merge_contacts(self, alias_objects=[], delete_merged=True):
         t = time.time()
         if not alias_objects:
             return {'success':False, 'message':'No alias objects appended'}
@@ -918,7 +918,7 @@ class Contact(SubscriptionObject):
             sales_cycle__in=original_sales_cycles)
         original_shares = self.share_set.all()
         global_sales_cycle = SalesCycle.get_global(self.subscription_id, self.id)
-        deleted_contacts = [contact.id for contact in alias_objects]
+        
         # Merging sales Cycles
         print 'mergin sales cycles'
         with transaction.atomic():
@@ -939,7 +939,11 @@ class Contact(SubscriptionObject):
                 for share in obj.share_set.all():
                     share.contact = self
                     share.save()
-        alias_objects.delete()
+        if delete_merged:
+            alias_objects.delete()
+            deleted_contacts = [contact.id for contact in alias_objects]
+        else:
+            deleted_contacts = []
         sales_cycles = self.sales_cycles.all().exclude(
             id__in=original_sales_cycles).prefetch_related('rel_activities')
         activities = Activity.objects.filter(
