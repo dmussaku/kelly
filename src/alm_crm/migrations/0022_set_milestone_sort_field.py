@@ -11,19 +11,26 @@ class Migration(DataMigration):
         # Note: Don't use "from appname.models import ModelName".
         # Use orm.ModelName to refer to models in this application,
         # and orm['appname.ModelName'] for models in other applications.
-        # for s in orm['almanet.Subscription'].objects.all():
-        #     counter = 1
-        #     for milestone in orm.Milestone.objects.filter(subscription_id=s.pk):
-        #         milestone.sort = counter
-        #         milestone.save()
-        #         counter += 1
+        for s in orm['almanet.Subscription'].objects.all():
+            counter = 1
+            for milestone in orm.Milestone.objects.filter(subscription_id=s.pk):
+                milestone.sort = counter
+                milestone.save()
+                counter += 1
 
     def backwards(self, orm):
         "Write your backwards methods here."
-        # for m in orm.Milestone.objects.all():
-        #     m.sort = None
+        for m in orm.Milestone.objects.all():
+            m.sort = None
 
     models = {
+        u'alm_company.company': {
+            'Meta': {'object_name': 'Company', 'db_table': "'alma_company'"},
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'name': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
+            'owner': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'owned_company'", 'symmetrical': 'False', 'to': u"orm['alm_user.User']"}),
+            'subdomain': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '300'})
+        },
         u'alm_crm.activity': {
             'Meta': {'object_name': 'Activity', 'db_table': "'alma_activity'"},
             'date_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'null': 'True', 'blank': 'True'}),
@@ -240,6 +247,21 @@ class Migration(DataMigration):
             'salary': ('django.db.models.fields.CharField', [], {'default': "'instant'", 'max_length': '7'}),
             'subscription_id': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'})
         },
+        u'alm_user.user': {
+            'Meta': {'object_name': 'User', 'db_table': "'alma_user'"},
+            'company': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'users'", 'symmetrical': 'False', 'to': u"orm['alm_company.Company']"}),
+            'email': ('django.db.models.fields.EmailField', [], {'unique': 'True', 'max_length': '75'}),
+            'first_name': ('django.db.models.fields.CharField', [], {'max_length': '31'}),
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'is_active': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
+            'is_admin': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'last_login': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
+            'last_name': ('django.db.models.fields.CharField', [], {'max_length': '30'}),
+            'password': ('django.db.models.fields.CharField', [], {'max_length': '128'}),
+            'timezone': ('timezone_field.fields.TimeZoneField', [], {'default': "'Asia/Almaty'"}),
+            'userpic': ('django.db.models.fields.files.ImageField', [], {'max_length': '100'}),
+            'vcard': ('django.db.models.fields.related.OneToOneField', [], {'to': u"orm['alm_vcard.VCard']", 'unique': 'True', 'null': 'True', 'blank': 'True'})
+        },
         u'alm_vcard.vcard': {
             'Meta': {'object_name': 'VCard', 'db_table': "'alma_vcard'"},
             'additional_name': ('django.db.models.fields.CharField', [], {'max_length': '1024', 'blank': 'True'}),
@@ -255,6 +277,21 @@ class Migration(DataMigration):
             'sort_string': ('django.db.models.fields.CharField', [], {'max_length': '256', 'null': 'True', 'blank': 'True'}),
             'uid': ('django.db.models.fields.CharField', [], {'max_length': '256', 'null': 'True', 'blank': 'True'})
         },
+        u'almanet.service': {
+            'Meta': {'object_name': 'Service', 'db_table': "'alma_service'"},
+            'description': ('django.db.models.fields.TextField', [], {'null': 'True'}),
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'slug': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '30'}),
+            'title': ('django.db.models.fields.CharField', [], {'max_length': '100'})
+        },
+        u'almanet.subscription': {
+            'Meta': {'object_name': 'Subscription', 'db_table': "'alma_subscription'"},
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'is_active': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
+            'organization': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'subscriptions'", 'to': u"orm['alm_company.Company']"}),
+            'service': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'subscriptions'", 'to': u"orm['almanet.Service']"}),
+            'user': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'subscriptions'", 'to': u"orm['alm_user.User']"})
+        },
         u'contenttypes.contenttype': {
             'Meta': {'ordering': "('name',)", 'unique_together': "(('app_label', 'model'),)", 'object_name': 'ContentType', 'db_table': "'django_content_type'"},
             'app_label': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
@@ -264,5 +301,5 @@ class Migration(DataMigration):
         }
     }
 
-    complete_apps = ['alm_crm']
+    complete_apps = ['almanet', 'alm_crm']
     symmetrical = True

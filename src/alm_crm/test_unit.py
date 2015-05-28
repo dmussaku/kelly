@@ -2677,9 +2677,32 @@ class MilestoneResourceTest(ResourceTestMixin, ResourceTestCase):
             m_dict['subscription_id'] = milestone.subscription_id
             if milestone.id == 2:
                 m_dict['sort'] = Milestone.objects.get(pk=3).sort
-            if milestone.id == 3:
+            elif milestone.id == 3:
                 m_dict['sort'] = Milestone.objects.get(pk=2).sort
+            else:
+                m_dict['sort'] = milestone.sort
             data.append(m_dict)
         
         resp = self.api_client.post(
             self.api_path_milestone+'update/', format='json', data=data)
+        self.assertHttpAccepted(resp)
+        self.assertEqual(Milestone.objects.get(pk=2).sort, 3)
+        self.assertEqual(Milestone.objects.get(pk=3).sort, 2)
+
+        milestones = Milestone.objects.filter(subscription_id = self.user.get_crmuser().subscription_id)
+        for milestone in milestones:
+            m_dict = {}
+            m_dict['id'] = milestone.id
+            m_dict['title'] = milestone.title
+            m_dict['color_code'] = milestone.color_code
+            m_dict['subscription_id'] = milestone.subscription_id
+            if milestone.id == 3:
+                m_dict['sort'] = Milestone.objects.get(pk=2).sort
+            else:
+                m_dict['sort'] = milestone.sort
+            data.append(m_dict)
+        
+        resp = self.api_client.post(
+            self.api_path_milestone+'update/', format='json', data=data)
+        self.assertEqual(Milestone.objects.get(pk=2).sort, 2)
+        self.assertEqual(Milestone.objects.get(pk=3).sort, 3)

@@ -1485,17 +1485,23 @@ class MilestoneResource(CRMServiceModelResource):
                 request_data = self.deserialize(
                     request, request.body,
                     format=request.META.get('CONTENT_TYPE', 'application/json'))
-
+                changed_milestones = []
                 for data in request_data:
                     milestone = Milestone.objects.get(id=data['id'])
                     if milestone.sort != data['sort']:
+                        try:
+                            milestone_2 = Milestone.objects.get(subscription_id=data['subscription_id'], 
+                                                            sort=data['sort'])
+                        except MultipleObjectsReturned:
+                            return http.HttpBadRequest()
                         temp = milestone.sort
                         milestone.sort = data['sort']
-                        milestone.save()
-                        milestone = Milestone.objects.get(subscription_id=data['subscription_id'], 
-                                                            sort=data['sort'])
-                        milestone.sort = temp
-                        milestone.save()
+                        milestone_2.sort = temp
+                        changed_milestones.append(milestone)
+                        changed_milestones.append(milestone_2)
+
+                for milestone in changed_milestones:
+                    milestone.save()
 
             if not self._meta.always_return_data:
                 return http.HttpAccepted()
