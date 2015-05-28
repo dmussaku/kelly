@@ -1469,6 +1469,43 @@ class MilestoneResource(CRMServiceModelResource):
         detail_allowed_methods = ['get', 'post', 'put', 'patch', 'delete']
         always_return_data = True
 
+    def prepend_urls(self):
+        return [
+            url(
+                r"^(?P<resource_name>%s)/update%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('update'),
+                name='api_update'
+            ),
+        ]
+
+    def update(self, request, **kwargs):
+        with RequestContext(self, request, allowed_methods=['post', 'get']):
+            if request.method == "POST":
+                request_data = self.deserialize(
+                    request, request.body,
+                    format=request.META.get('CONTENT_TYPE', 'application/json'))
+
+                for data in request_data:
+                    milestone = Milestone.objects.get(id=data['id'])
+                    if milestone.sort != data['sort']:
+                        temp = milestone.sort
+                        milestone.sort = data['sort']
+                        milestone.save()
+                        milestone = Milestone.objects.get(subscription_id=data['subscription_id'], 
+                                                            sort=data['sort'])
+                        milestone.sort = temp
+                        milestone.save()
+
+            if not self._meta.always_return_data:
+                return http.HttpAccepted()
+            else:
+                return self.create_response(request,
+                    [MilestoneResource().get_bundle_detail(milestone, request) \
+                    for milestone in Milestone.objects.filter(
+                                        subscription_id=request.user.get_crmuser().subscription_id
+                                        )],
+                    response_class=http.HttpAccepted)
 
 class ActivityResource(CRMServiceModelResource):
     """

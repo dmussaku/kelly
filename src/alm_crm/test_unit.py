@@ -2665,3 +2665,21 @@ class MilestoneResourceTest(ResourceTestMixin, ResourceTestCase):
         # check
         self.assertHttpAccepted(resp)
         self.assertEqual(self.get_detail_des(self.milestone.pk)['title'], milestone_title)
+
+    def test_update_milestone(self):
+        milestones = Milestone.objects.filter(subscription_id = self.user.get_crmuser().subscription_id)
+        data = []
+        for milestone in milestones:
+            m_dict = {}
+            m_dict['id'] = milestone.id
+            m_dict['title'] = milestone.title
+            m_dict['color_code'] = milestone.color_code
+            m_dict['subscription_id'] = milestone.subscription_id
+            if milestone.id == 2:
+                m_dict['sort'] = Milestone.objects.get(pk=3).sort
+            if milestone.id == 3:
+                m_dict['sort'] = Milestone.objects.get(pk=2).sort
+            data.append(m_dict)
+        
+        resp = self.api_client.post(
+            self.api_path_milestone+'update/', format='json', data=data)
