@@ -37,6 +37,7 @@ from alm_crm.api import (
     )
 from alm_user.api import UserResource
 from tastypie.resources import ModelResource
+from almastorage.api import SwiftContainerResource, SwiftFileResource
 
 admin.autodiscover()
 
@@ -66,6 +67,8 @@ v1_api.register(CustomSectionResource())
 v1_api.register(CustomFieldResource())
 v1_api.register(MilestoneResource())
 v1_api.register(ReportResource())
+v1_api.register(SwiftContainerResource())
+v1_api.register(SwiftFileResource())
 
 
 urlpatterns = patterns(

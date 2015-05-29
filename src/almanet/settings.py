@@ -329,10 +329,10 @@ class BaseConfiguration(SubdomainConfiguration, Configuration):
     GCALSYNC_APIKEY = 'AIzaSyAlLnRj_quAiDlXs3G07Xn1yGL2L_dJwuI'
     GCALSYNC_CREDENTIALS = rel('google_api_cred.json')
 
-    SW_AUTH_URL = 'http://45.55.141.109/auth/v1.0'
     SW_USERNAME = 'nurlan'
     SW_KEY = 'nurlan'
-
+    SW_AUTH_URL = 'http://45.55.141.109/auth/v1.0'
+    
 class DevConfiguration(
         FileSettings('~/.almanet/almanet.conf.py'), BaseConfiguration):
     DEBUG = True

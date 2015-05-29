@@ -25,6 +25,7 @@ from django.http import HttpResponse
 from almanet.settings import DEFAULT_SERVICE
 from almanet.utils.api import RequestContext
 from alm_crm.api import CRMUserResource
+from almastorage.models import SwiftFile
 import json
 import datetime
 import ast
@@ -119,9 +120,13 @@ class UserResource(ModelResource):
         with RequestContext(self, request, allowed_methods=['post']):
             data = self.deserialize(request, request.body, format=request.META.get('CONTENT_TYPE', 'application/json'))
 
-            from django.core.files.uploadedfile import SimpleUploadedFile
-            file_contents = SimpleUploadedFile("%s" %(data['name']), base64.b64decode(data['pic']), content_type='image')
-            request.user.userpic.save(data['name'], file_contents, True)
+            # from django.core.files.uploadedfile import SimpleUploadedFile
+            # file_contents = SimpleUploadedFile("%s" %(data['name']), base64.b64decode(data['pic']), content_type='image')
+            # request.user.userpic.save(data['name'], file_contents, True)
+            swiftfile = SwiftFile.upload_file(file_contents=base64.b64decode(data['pic']), filename=data['name'], 
+                                                content_type='image', author=request.user)
+            request.user.userpic = swiftfile
+            request.user.save()
             raise ImmediateHttpResponse(
                 HttpResponse(
                     content=Serializer().to_json(
@@ -132,9 +137,14 @@ class UserResource(ModelResource):
                         ),
                     content_type='application/json; charset=utf-8', status=200)
             )
+            
+
+            
 
     def dehydrate(self, bundle):
         bundle.data['crm_user_id'] = bundle.obj.get_crmuser().pk
+        if bundle.obj.userpic != None:
+            bundle.data['userpic'] = bundle.obj.userpic.url
         return bundle
 
     def get_current_user(self, request, **kwargs):

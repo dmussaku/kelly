@@ -1,0 +1,54 @@
+[
+{
+    "pk": 1,
+    "model": "alm_crm.product",
+    "fields": {
+        "name": "Product SalesForce",
+        "description": " Product SalesForce - is an American multinational technology company headquartered in Redmond",
+        "price": 27206,
+        "currency": "KZT",
+        "date_created":"2014-10-01 00:00:00+00:00",
+        "owner": 3,
+        "subscription_id": 1 
+    }
+},
+{
+    "pk": 2,
+    "model": "alm_crm.product",
+    "fields": {
+        "name": "Product 1C Enterprise",
+        "description": " Product 1C Enterprise - is an American multinational technology company headquartered in Redmond",
+        "price": 40005,
+        "currency": "KZT",
+        "date_created":"2014-10-02 00:00:00+00:00",
+        "owner": 2,
+        "subscription_id": 1 
+    }
+},
+{
+    "pk": 3,
+    "model": "alm_crm.product",
+    "fields": {
+        "name": "Product 1C Enterprise",
+        "description": " Product 1C Enterprise -  is a global cloud computing company headquartered in San Francisco",
+        "price": 52980,
+        "currency": "KZT",
+        "date_created":"2014-10-03 00:00:00+00:00",
+        "owner": 3,
+        "subscription_id": 1 
+    }
+},
+{
+    "pk": 4,
+    "model": "alm_crm.product",
+    "fields": {
+        "name": "Product SalesForce",
+        "description": " Product SalesForce - is an American multinational technology company headquartered in Redmond",
+        "price": 21371,
+        "currency": "KZT",
+        "date_created":"2014-10-01 00:00:00+00:00",
+        "owner": 4,
+        "subscription_id": 2 
+    }
+}
+]

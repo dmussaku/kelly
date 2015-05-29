@@ -6,7 +6,7 @@ from django.conf import settings
 from timezone_field import TimeZoneField
 from almanet.models import Subscription
 from alm_vcard.models import VCard, Email
-
+from almastorage.utils import default_file
 
 class UserManager(contrib_user_manager):
     """
@@ -37,7 +37,8 @@ class User(AbstractBaseUser):
 
     vcard = models.OneToOneField(VCard, blank=True, null=True)
 
-    userpic = models.ImageField(upload_to='userpics')
+    userpic = models.ForeignKey('almastorage.SwiftFile', related_name='users', null=True, blank=True, 
+                                default=lambda: default_file.set_file('default_userpic.png', 'image').id)
 
     class Meta:
         verbose_name = _('user')

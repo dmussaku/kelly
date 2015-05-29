@@ -12,9 +12,9 @@
     "pk": 2,
     "model": "alm_company.company",
     "fields": {
-        "owner": [6],
-        "subdomain": "solutionfairy",
-        "name": "SolutionFairy"
+        "owner": [21],
+        "subdomain": "fairyapple",
+        "name": "FairyApple"
     }
 }
 ]

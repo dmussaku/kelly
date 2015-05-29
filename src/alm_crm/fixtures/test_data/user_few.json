@@ -1,0 +1,66 @@
+[
+{
+    "pk": 1,
+    "model": "alm_user.user",
+    "fields": {
+        "first_name": "Bruce",
+        "last_name": "Wayne",
+        "company": [1],
+        "is_active": true,
+        "last_login": "2014-11-11T07:51:02.253Z",
+        "is_admin": true,
+        "timezone": "Asia/Almaty",
+        "password": "pbkdf2_sha256$12000$RfGiFmGJSeoz$063rfBSPM0AsFi1prglD5BW8qD1ElMYxBpRr5tO1M08=",
+        "email": "b.wayne@batman.bat",
+        "vcard": 1
+    }
+},
+{
+    "pk": 2,
+    "model": "alm_user.user",
+    "fields": {
+        "first_name": "Nurlan",
+        "last_name": "Ivanov",
+        "company": [1],
+        "is_active": true,
+        "last_login": "2014-11-11T07:51:02.253Z",
+        "is_admin": false,
+        "timezone": "Asia/Almaty",
+        "password": "pbkdf2_sha256$12000$RfGiFmGJSeoz$063rfBSPM0AsFi1prglD5BW8qD1ElMYxBpRr5tO1M08=",
+        "email": "nurlan.ivanov654@alma.net",
+        "vcard": 2
+    }
+},
+{
+    "pk": 3,
+    "model": "alm_user.user",
+    "fields": {
+        "first_name": "Ivan",
+        "last_name": "Alisherov",
+        "company": [1],
+        "is_active": true,
+        "last_login": "2014-11-11T07:51:02.253Z",
+        "is_admin": false,
+        "timezone": "Asia/Almaty",
+        "password": "pbkdf2_sha256$12000$RfGiFmGJSeoz$063rfBSPM0AsFi1prglD5BW8qD1ElMYxBpRr5tO1M08=",
+        "email": "ivan.alisherov1782@alma.net",
+        "vcard": 3
+    }
+},
+{
+    "pk": 4,
+    "model": "alm_user.user",
+    "fields": {
+        "first_name": "Zhan",
+        "last_name": "Rustemov",
+        "company": [2],
+        "is_active": true,
+        "last_login": "2014-11-11T07:51:02.253Z",
+        "is_admin": false,
+        "timezone": "Asia/Almaty",
+        "password": "pbkdf2_sha256$12000$RfGiFmGJSeoz$063rfBSPM0AsFi1prglD5BW8qD1ElMYxBpRr5tO1M08=",
+        "email": "zhan.rustemov1746@alma.net",
+        "vcard": 10
+    }
+}
+]
