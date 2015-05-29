@@ -33,7 +33,8 @@ from alm_crm.api import (
     CommentResource,
     CustomSectionResource,
     CustomFieldResource,
-    ReportResource
+    ReportResource,
+    AttachedFileResource
     )
 from alm_user.api import UserResource
 from tastypie.resources import ModelResource
@@ -69,7 +70,7 @@ v1_api.register(MilestoneResource())
 v1_api.register(ReportResource())
 v1_api.register(SwiftContainerResource())
 v1_api.register(SwiftFileResource())
-
+v1_api.register(AttachedFileResource())
 
 urlpatterns = patterns(
     '',

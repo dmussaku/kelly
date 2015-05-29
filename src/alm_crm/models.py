@@ -1354,6 +1354,7 @@ class Activity(SubscriptionObject):
     owner = models.ForeignKey(CRMUser, related_name='activity_owner')
     mentions = generic.GenericRelation('Mention', null=True)
     comments = generic.GenericRelation('Comment', null=True)
+    attached_files = generic.GenericRelation('AttachedFile', null=True)
 
     class Meta:
         verbose_name = 'activity'
@@ -1700,6 +1701,37 @@ class Comment(SubscriptionObject):
         return cls.objects.filter(
             object_id=context_object_id,
             content_type=cttype)
+
+
+class AttachedFile(SubscriptionObject):
+    file_object = models.ForeignKey('almastorage.SwiftFile', related_name='attachments')
+    owner = models.ForeignKey(CRMUser, related_name='owned_attachments', null=True)
+    content_type = models.ForeignKey(ContentType)
+    object_id = models.IntegerField()
+    content_object = generic.GenericForeignKey('content_type', 'object_id')
+    date_created = models.DateTimeField(blank=True, auto_now_add=True)
+
+    def __unicode__(self):
+        return "%s %s" % (self.file_object, self.content_object)
+
+    @property
+    def author(self):
+        return self.owner
+
+    @classmethod
+    def build_new(cls, file_object, content_class=None,
+                  object_id=None, save=False):
+        attached_file = cls(file_object=file_object)
+        attached_file.content_type = ContentType.objects.get_for_model(content_class)
+        attached_file.object_id = object_id
+        if save:
+            attached_file.save()
+        return attached_file
+
+    def save(self, **kwargs):
+        if not self.subscription_id and self.content_object:
+            self.subscription_id = self.content_object.owner.subscription_id
+        super(SubscriptionObject, self).save(**kwargs)
 
 
 class Share(SubscriptionObject):

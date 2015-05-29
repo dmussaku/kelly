@@ -22,6 +22,7 @@ from alm_crm.models import (
     Filter,
     HashTag,
     HashTagReference,
+    AttachedFile,
     )
 from alm_vcard.models import VCard, Tel, Email, Org
 from alm_user.models import User
@@ -2676,3 +2677,83 @@ class MilestoneResourceTest(ResourceTestMixin, ResourceTestCase):
         # check
         self.assertHttpAccepted(resp)
         self.assertEqual(self.get_detail_des(self.milestone.pk)['title'], milestone_title)
+
+
+class AttachedFileResourceTest(ResourceTestMixin, ResourceTestCase):
+
+    def setUp(self):
+        super(self.__class__, self).setUp()
+
+        # login user
+        self.get_credentials()
+
+        self.api_path_attached_file = '/api/v1/attached_file/'
+
+        # get_list
+        self.get_list_resp = self.api_client.get(self.api_path_attached_file,
+                                                 format='json',
+                                                 charset='utf-8',
+                                                 HTTP_HOST='localhost')
+        self.get_list_des = self.deserialize(self.get_list_resp)
+
+        # get_detail(pk)
+        self.get_detail_resp = \
+            lambda pk: self.api_client.get(self.api_path_attached_file+str(pk)+'/',
+                                           format='json',
+                                           charset='utf-8',
+                                           HTTP_HOST='localhost')
+        self.get_detail_des = \
+            lambda pk: self.deserialize(self.get_detail_resp(pk))
+
+        self.attached_file = AttachedFile.objects.first()
+
+    def test_get_list_valid_json(self):
+        self.assertValidJSONResponse(self.get_list_resp)
+
+    def test_attach_file(self):
+        import base64
+        from almastorage.models import SwiftFile
+
+        activity = Activity.objects.first()
+        count = activity.attached_files.all().count()
+        sw_files_count = SwiftFile.objects.all().count()
+        path = self.api_path_attached_file + 'attach_files/';
+        file_path_1 = os.path.join(os.path.dirname(os.path.dirname(__file__)),
+                                 'alm_crm/fixtures/contacts.xls')
+        file_path_2 = os.path.join(os.path.dirname(os.path.dirname(__file__)),
+                                 'alm_crm/fixtures/correct_contacts_format.xlsx')
+        post_data = {
+                        "object_id": activity.id,
+                        "content_class": "Activity",
+                        "files":[
+                            {
+                                "filename":"contacts.xls",
+                                "content_type": "application/vnd.ms-excel",
+                                "file_content": base64.b64encode(open(file_path_1, "rb").read())
+                            },
+                            {
+                                "filename":"correct_contacts_format.xlsx",
+                                "content_type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                                "file_content": base64.b64encode(open(file_path_2, "rb").read())
+                            }
+                        ]
+                    }
+
+        resp = self.api_client.post(path, format='json', data=post_data)
+        self.assertHttpCreated(resp)
+        deserialized = self.deserialize(resp)
+        self.assertEqual(len(deserialized['files']), 2)
+        self.assertEqual(deserialized['object_id'], activity.id)
+        self.assertEqual(deserialized['content_class'], "Activity")
+        self.assertEqual(activity.attached_files.all().count(), count + 2)
+        self.assertEqual(SwiftFile.objects.all().count(), sw_files_count + 2)
+        activity_resp = self.api_client.get('/api/v1/activity/1/',
+                                                 format='json',
+                                                 charset='utf-8',
+                                                 HTTP_HOST='localhost')
+        activity_des = self.deserialize(activity_resp)
+        self.assertTrue(deserialized['files'][0] in activity_des['attached_files'])
+        self.assertTrue(deserialized['files'][1] in activity_des['attached_files'])
+        for attached_file in activity.attached_files.all():
+            attached_file.file_object.delete()
+            attached_file.delete()
