@@ -913,13 +913,17 @@ class Contact(SubscriptionObject):
             if not isinstance(obj, self.__class__):
                 return {'success':False, 'message':'Not Instance of Contact'}
 
-        original_sales_cycles = self.sales_cycles.filter(is_global=False).prefetch_related('rel_activities')
-        original_activities = Activity.objects.filter(
-            sales_cycle__in=original_sales_cycles)
-        original_shares = self.share_set.all()
+        # original_sales_cycles = self.sales_cycles.filter(
+        #     is_global=False) 
+        # original_activities = [obj.id for obj in Activity.objects.filter(
+        #             sales_cycle__in=self.sales_cycles.all())] 
+        # original_shares = [ obj.id for obj in self.share_set.all() ]
         global_sales_cycle = SalesCycle.get_global(self.subscription_id, self.id)
         
         # Merging sales Cycles
+        activities = []
+        sales_cycles = []
+        shares = []
         print 'mergin sales cycles'
         with transaction.atomic():
             for obj in alias_objects:
@@ -928,9 +932,13 @@ class Contact(SubscriptionObject):
                         for activity in sales_cycle.rel_activities.all():
                             activity.sales_cycle = global_sales_cycle
                             activity.save()
+                            activities.append(activity)
                     else:
                         sales_cycle.contact = self
                         sales_cycle.save()
+                        sales_cycles.append(sales_cycle)
+                        [activities.append(obj) for obj in sales_cycle.rel_activities.all()]
+
         # Merging vcards
         VCard.merge_model_objects(self.vcard, [c.vcard for c in alias_objects])
         #mergin shares
@@ -939,16 +947,17 @@ class Contact(SubscriptionObject):
                 for share in obj.share_set.all():
                     share.contact = self
                     share.save()
+                    shares.append(share)
         if delete_merged:
-            alias_objects.delete()
             deleted_contacts = [contact.id for contact in alias_objects]
+            alias_objects.delete()
         else:
             deleted_contacts = []
-        sales_cycles = self.sales_cycles.all().exclude(
-            id__in=original_sales_cycles).prefetch_related('rel_activities')
-        activities = Activity.objects.filter(
-            sales_cycle__in=self.sales_cycles.all()).exclude(id__in=original_activities)
-        shares = self.share_set.all().exclude(id__in=original_shares)
+        # sales_cycles = self.sales_cycles.all().exclude(
+        #     id__in=original_sales_cycles).prefetch_related('rel_activities')
+        # activities = Activity.objects.filter(
+        #     sales_cycle__in=self.sales_cycles.all()).exclude(id__in=original_activities)
+        # shares = self.share_set.all().exclude(id__in=original_shares)
         response = {
             'success':True,
             'contact':self,
