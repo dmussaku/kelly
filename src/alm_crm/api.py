@@ -1278,6 +1278,7 @@ class ContactResource(CRMServiceModelResource):
                 {
                  'contact':contact,
                  'deleted_contacts_ids':response['deleted_contacts_ids'],
+                 'deleted_sales_cycle_ids':response['deleted_sales_cycle_ids'],
                  'sales_cycles':sales_cycles,
                  'activities':activities,
                  'shares':shares,

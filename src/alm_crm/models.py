@@ -919,7 +919,7 @@ class Contact(SubscriptionObject):
         #             sales_cycle__in=self.sales_cycles.all())] 
         # original_shares = [ obj.id for obj in self.share_set.all() ]
         global_sales_cycle = SalesCycle.get_global(self.subscription_id, self.id)
-        
+        deleted_sales_cycle_ids = [ obj.sales_cycles.get(is_global=True).id for obj in alias_objects ]
         # Merging sales Cycles
         activities = []
         sales_cycles = []
@@ -961,6 +961,7 @@ class Contact(SubscriptionObject):
             'success':True,
             'contact':self,
             'deleted_contacts_ids':deleted_contacts,
+            'deleted_sales_cycle_ids':deleted_sales_cycle_ids,
             'sales_cycles':sales_cycles,
             'activities':activities,
             'shares':shares,
