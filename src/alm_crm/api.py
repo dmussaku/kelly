@@ -1218,11 +1218,11 @@ class ContactResource(CRMServiceModelResource):
         example
         {"merged_contacts":[1,2,3], "merge_into_contact":1, "delete":True/False}
         """
-        # data = self.deserialize(
-        #     request, request.body,
-        #     format=request.META.get('CONTENT_TYPE', 'application/json'))
-        print request.body
-        data = eval(request.body)
+        data = self.deserialize(
+            request, request.body,
+            format=request.META.get('CONTENT_TYPE', 'application/json'))
+        # print request.body
+        # data = eval(request.body)
         merged_contacts_ids = data.get("merged_contacts", [])
         merge_into_contact_id = data.get("merge_into_contact", "")
         delete_merged = data.get("merged_contacts", [])

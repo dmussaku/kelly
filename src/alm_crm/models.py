@@ -924,7 +924,6 @@ class Contact(SubscriptionObject):
         activities = []
         sales_cycles = []
         shares = []
-        print 'mergin sales cycles'
         with transaction.atomic():
             for obj in alias_objects:
                 for sales_cycle in obj.sales_cycles.all():
