@@ -39,6 +39,7 @@ from alm_user.api import UserResource
 from tastypie.resources import ModelResource
 
 admin.autodiscover()
+import permission; permission.autodiscover()
 
 v1_api = Api(api_name='v1')
 for obj in vars(vcard_api).values():

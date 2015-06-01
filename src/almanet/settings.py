@@ -132,6 +132,7 @@ class BaseConfiguration(SubdomainConfiguration, Configuration):
         'tastypie',
         'tastypie_swagger',
         'django_extensions',
+        'permission',
     )
 
     MIDDLEWARE_CLASSES = (
@@ -288,7 +289,9 @@ class BaseConfiguration(SubdomainConfiguration, Configuration):
     DB_PREFIX = 'alma_{}'
     AUTHENTICATION_BACKENDS = (
         'django.contrib.auth.backends.ModelBackend',
-        'alm_user.authbackend.MyAuthBackend',)  # for admin
+        'alm_user.authbackend.MyAuthBackend',  # for admin
+        'permission.backends.PermissionBackend'
+        )
 
     SITE_NAME = 'alma.net'
     SITE_DOMAIN = 'http://localhost:8000'
