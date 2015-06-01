@@ -1309,6 +1309,9 @@ class ContactResource(CRMServiceModelResource):
             format=request.META.get('CONTENT_TYPE', 'application/json'))
         col_structure = data.get('col_structure')
         filename = data.get('filename')
+        ignore_first_row = data.get('ignore_first_row',"")
+        if not ignore_first_row:
+            ignore_first_row = False
         # col_structure = request.body.get('col_structure')
         # filename = request.body.get('filename')
         # try:
@@ -1333,7 +1336,7 @@ class ContactResource(CRMServiceModelResource):
                 obj_dict['attr'] = value.split('__')[1]
             col_hash.append(obj_dict)
         import_task_id = grouped_contact_import_task(
-            col_hash, filename, request.user)
+            col_hash, filename, request.user, ignore_first_row)
         return self.create_response(
             request, {'success':True,'task_id':import_task_id}
             )

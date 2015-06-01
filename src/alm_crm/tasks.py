@@ -52,7 +52,7 @@ def check_task_status(uuid):
     response = task.Task.AsyncResult(uuid)
     return response.ready()
 
-def grouped_contact_import_task(file_structure, filename, creator):
+def grouped_contact_import_task(file_structure, filename, creator, ignore_first_row=False):
     book = xlrd.open_workbook(filename=TEMP_DIR + filename)
     sheet = book.sheets()[0]
     nrows = sheet.nrows
@@ -60,6 +60,8 @@ def grouped_contact_import_task(file_structure, filename, creator):
     i = 0
     val_list = []
     l = range(0, nrows, 100)+[100*divmod(nrows,100)[0]+divmod(nrows,100)[1]+1]
+    if ignore_first_row:
+        l[0] = 1
     while i+1!=len(l):
         val_list.append((l[i],l[i+1]))
         i+=1
