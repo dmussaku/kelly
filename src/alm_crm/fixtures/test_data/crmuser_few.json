@@ -34,5 +34,14 @@
         "organization_id": 2,
         "subscription_id": 2
     }
+},
+{
+    "pk": 5,
+    "model": "alm_crm.CRMUser",
+    "fields": {
+        "user_id": 5,
+        "organization_id": 2,
+        "subscription_id": 2
+    }
 }
 ]

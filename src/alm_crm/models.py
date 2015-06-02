@@ -321,8 +321,12 @@ class Contact(SubscriptionObject):
             return False
 
     def create_share_to(self, user_id, note=None):
+        if isinstance(self.date_created, unicode):
+            date_created = datetime.datetime.strptime(self.date_created, '%Y-%m-%dT%H:%M:%S.%f')
+        else:
+            date_created = self.date_created
         default_note = self.SHARE_IMPORTED_TEXT + \
-            self.date_created.strftime(settings.DATETIME_FORMAT_NORMAL)
+            date_created.strftime(settings.DATETIME_FORMAT_NORMAL)
 
         share = Share(
             note=note or default_note,

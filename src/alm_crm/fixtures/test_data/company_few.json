@@ -13,8 +13,8 @@
     "model": "alm_company.company",
     "fields": {
         "owner": [4],
-        "subdomain": "solutionatlas",
-        "name": "SolutionAtlas"
+        "subdomain": "solutionfairy",
+        "name": "SolutionFairy"
     }
 }
 ]

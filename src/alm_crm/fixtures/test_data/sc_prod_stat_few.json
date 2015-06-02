@@ -3,30 +3,650 @@
     "pk": 1,
     "model": "alm_crm.salescycleproductstat",
     "fields": {
-        "sales_cycle": 16,
-        "product": 1,
+        "sales_cycle": 7,
+        "product": 11,
         "subscription_id": 1,
-        "value": 8397 
+        "value": 5593 
     }
 },
 {
     "pk": 2,
     "model": "alm_crm.salescycleproductstat",
     "fields": {
-        "sales_cycle": 18,
-        "product": 2,
+        "sales_cycle": 9,
+        "product": 13,
         "subscription_id": 1,
-        "value": 6599 
+        "value": 5911 
     }
 },
 {
     "pk": 3,
     "model": "alm_crm.salescycleproductstat",
     "fields": {
-        "sales_cycle": 23,
+        "sales_cycle": 11,
         "product": 1,
+        "subscription_id": 1,
+        "value": 3105 
+    }
+},
+{
+    "pk": 4,
+    "model": "alm_crm.salescycleproductstat",
+    "fields": {
+        "sales_cycle": 53,
+        "product": 6,
+        "subscription_id": 1,
+        "value": 6028 
+    }
+},
+{
+    "pk": 5,
+    "model": "alm_crm.salescycleproductstat",
+    "fields": {
+        "sales_cycle": 62,
+        "product": 9,
+        "subscription_id": 1,
+        "value": 5154 
+    }
+},
+{
+    "pk": 6,
+    "model": "alm_crm.salescycleproductstat",
+    "fields": {
+        "sales_cycle": 66,
+        "product": 14,
+        "subscription_id": 1,
+        "value": 8306 
+    }
+},
+{
+    "pk": 7,
+    "model": "alm_crm.salescycleproductstat",
+    "fields": {
+        "sales_cycle": 81,
+        "product": 17,
+        "subscription_id": 1,
+        "value": 3760 
+    }
+},
+{
+    "pk": 8,
+    "model": "alm_crm.salescycleproductstat",
+    "fields": {
+        "sales_cycle": 84,
+        "product": 20,
+        "subscription_id": 1,
+        "value": 4194 
+    }
+},
+{
+    "pk": 9,
+    "model": "alm_crm.salescycleproductstat",
+    "fields": {
+        "sales_cycle": 93,
+        "product": 10,
+        "subscription_id": 1,
+        "value": 9952 
+    }
+},
+{
+    "pk": 10,
+    "model": "alm_crm.salescycleproductstat",
+    "fields": {
+        "sales_cycle": 95,
+        "product": 18,
+        "subscription_id": 1,
+        "value": 7312 
+    }
+},
+{
+    "pk": 11,
+    "model": "alm_crm.salescycleproductstat",
+    "fields": {
+        "sales_cycle": 103,
+        "product": 1,
+        "subscription_id": 1,
+        "value": 3630 
+    }
+},
+{
+    "pk": 12,
+    "model": "alm_crm.salescycleproductstat",
+    "fields": {
+        "sales_cycle": 106,
+        "product": 17,
+        "subscription_id": 1,
+        "value": 8348 
+    }
+},
+{
+    "pk": 13,
+    "model": "alm_crm.salescycleproductstat",
+    "fields": {
+        "sales_cycle": 115,
+        "product": 4,
+        "subscription_id": 1,
+        "value": 6202 
+    }
+},
+{
+    "pk": 14,
+    "model": "alm_crm.salescycleproductstat",
+    "fields": {
+        "sales_cycle": 118,
+        "product": 9,
+        "subscription_id": 1,
+        "value": 2757 
+    }
+},
+{
+    "pk": 15,
+    "model": "alm_crm.salescycleproductstat",
+    "fields": {
+        "sales_cycle": 125,
+        "product": 17,
+        "subscription_id": 1,
+        "value": 8764 
+    }
+},
+{
+    "pk": 16,
+    "model": "alm_crm.salescycleproductstat",
+    "fields": {
+        "sales_cycle": 137,
+        "product": 6,
+        "subscription_id": 1,
+        "value": 3590 
+    }
+},
+{
+    "pk": 17,
+    "model": "alm_crm.salescycleproductstat",
+    "fields": {
+        "sales_cycle": 139,
+        "product": 7,
+        "subscription_id": 1,
+        "value": 9619 
+    }
+},
+{
+    "pk": 18,
+    "model": "alm_crm.salescycleproductstat",
+    "fields": {
+        "sales_cycle": 158,
+        "product": 1,
+        "subscription_id": 1,
+        "value": 9103 
+    }
+},
+{
+    "pk": 19,
+    "model": "alm_crm.salescycleproductstat",
+    "fields": {
+        "sales_cycle": 163,
+        "product": 12,
+        "subscription_id": 1,
+        "value": 9233 
+    }
+},
+{
+    "pk": 20,
+    "model": "alm_crm.salescycleproductstat",
+    "fields": {
+        "sales_cycle": 167,
+        "product": 9,
+        "subscription_id": 1,
+        "value": 5609 
+    }
+},
+{
+    "pk": 21,
+    "model": "alm_crm.salescycleproductstat",
+    "fields": {
+        "sales_cycle": 169,
+        "product": 1,
+        "subscription_id": 1,
+        "value": 7776 
+    }
+},
+{
+    "pk": 22,
+    "model": "alm_crm.salescycleproductstat",
+    "fields": {
+        "sales_cycle": 177,
+        "product": 4,
+        "subscription_id": 1,
+        "value": 2961 
+    }
+},
+{
+    "pk": 23,
+    "model": "alm_crm.salescycleproductstat",
+    "fields": {
+        "sales_cycle": 191,
+        "product": 2,
+        "subscription_id": 1,
+        "value": 3013 
+    }
+},
+{
+    "pk": 24,
+    "model": "alm_crm.salescycleproductstat",
+    "fields": {
+        "sales_cycle": 196,
+        "product": 15,
+        "subscription_id": 1,
+        "value": 3055 
+    }
+},
+{
+    "pk": 25,
+    "model": "alm_crm.salescycleproductstat",
+    "fields": {
+        "sales_cycle": 206,
+        "product": 13,
+        "subscription_id": 1,
+        "value": 8109 
+    }
+},
+{
+    "pk": 26,
+    "model": "alm_crm.salescycleproductstat",
+    "fields": {
+        "sales_cycle": 239,
+        "product": 247,
         "subscription_id": 2,
-        "value": 2973 
+        "value": 2209 
+    }
+},
+{
+    "pk": 27,
+    "model": "alm_crm.salescycleproductstat",
+    "fields": {
+        "sales_cycle": 254,
+        "product": 665,
+        "subscription_id": 2,
+        "value": 4230 
+    }
+},
+{
+    "pk": 28,
+    "model": "alm_crm.salescycleproductstat",
+    "fields": {
+        "sales_cycle": 260,
+        "product": 178,
+        "subscription_id": 2,
+        "value": 4920 
+    }
+},
+{
+    "pk": 29,
+    "model": "alm_crm.salescycleproductstat",
+    "fields": {
+        "sales_cycle": 267,
+        "product": 603,
+        "subscription_id": 2,
+        "value": 2600 
+    }
+},
+{
+    "pk": 30,
+    "model": "alm_crm.salescycleproductstat",
+    "fields": {
+        "sales_cycle": 274,
+        "product": 645,
+        "subscription_id": 2,
+        "value": 6579 
+    }
+},
+{
+    "pk": 31,
+    "model": "alm_crm.salescycleproductstat",
+    "fields": {
+        "sales_cycle": 276,
+        "product": 48,
+        "subscription_id": 2,
+        "value": 2345 
+    }
+},
+{
+    "pk": 32,
+    "model": "alm_crm.salescycleproductstat",
+    "fields": {
+        "sales_cycle": 279,
+        "product": 213,
+        "subscription_id": 2,
+        "value": 6412 
+    }
+},
+{
+    "pk": 33,
+    "model": "alm_crm.salescycleproductstat",
+    "fields": {
+        "sales_cycle": 294,
+        "product": 768,
+        "subscription_id": 2,
+        "value": 4718 
+    }
+},
+{
+    "pk": 34,
+    "model": "alm_crm.salescycleproductstat",
+    "fields": {
+        "sales_cycle": 296,
+        "product": 165,
+        "subscription_id": 2,
+        "value": 6636 
+    }
+},
+{
+    "pk": 35,
+    "model": "alm_crm.salescycleproductstat",
+    "fields": {
+        "sales_cycle": 302,
+        "product": 388,
+        "subscription_id": 2,
+        "value": 4933 
+    }
+},
+{
+    "pk": 36,
+    "model": "alm_crm.salescycleproductstat",
+    "fields": {
+        "sales_cycle": 315,
+        "product": 916,
+        "subscription_id": 2,
+        "value": 3535 
+    }
+},
+{
+    "pk": 37,
+    "model": "alm_crm.salescycleproductstat",
+    "fields": {
+        "sales_cycle": 317,
+        "product": 823,
+        "subscription_id": 2,
+        "value": 2403 
+    }
+},
+{
+    "pk": 38,
+    "model": "alm_crm.salescycleproductstat",
+    "fields": {
+        "sales_cycle": 320,
+        "product": 519,
+        "subscription_id": 2,
+        "value": 3591 
+    }
+},
+{
+    "pk": 39,
+    "model": "alm_crm.salescycleproductstat",
+    "fields": {
+        "sales_cycle": 331,
+        "product": 223,
+        "subscription_id": 2,
+        "value": 7903 
+    }
+},
+{
+    "pk": 40,
+    "model": "alm_crm.salescycleproductstat",
+    "fields": {
+        "sales_cycle": 336,
+        "product": 348,
+        "subscription_id": 2,
+        "value": 3525 
+    }
+},
+{
+    "pk": 41,
+    "model": "alm_crm.salescycleproductstat",
+    "fields": {
+        "sales_cycle": 347,
+        "product": 318,
+        "subscription_id": 2,
+        "value": 3656 
+    }
+},
+{
+    "pk": 42,
+    "model": "alm_crm.salescycleproductstat",
+    "fields": {
+        "sales_cycle": 360,
+        "product": 765,
+        "subscription_id": 2,
+        "value": 9117 
+    }
+},
+{
+    "pk": 43,
+    "model": "alm_crm.salescycleproductstat",
+    "fields": {
+        "sales_cycle": 362,
+        "product": 230,
+        "subscription_id": 2,
+        "value": 6715 
+    }
+},
+{
+    "pk": 44,
+    "model": "alm_crm.salescycleproductstat",
+    "fields": {
+        "sales_cycle": 364,
+        "product": 406,
+        "subscription_id": 2,
+        "value": 9237 
+    }
+},
+{
+    "pk": 45,
+    "model": "alm_crm.salescycleproductstat",
+    "fields": {
+        "sales_cycle": 369,
+        "product": 342,
+        "subscription_id": 2,
+        "value": 8577 
+    }
+},
+{
+    "pk": 46,
+    "model": "alm_crm.salescycleproductstat",
+    "fields": {
+        "sales_cycle": 371,
+        "product": 606,
+        "subscription_id": 2,
+        "value": 8965 
+    }
+},
+{
+    "pk": 47,
+    "model": "alm_crm.salescycleproductstat",
+    "fields": {
+        "sales_cycle": 376,
+        "product": 33,
+        "subscription_id": 2,
+        "value": 2147 
+    }
+},
+{
+    "pk": 48,
+    "model": "alm_crm.salescycleproductstat",
+    "fields": {
+        "sales_cycle": 378,
+        "product": 377,
+        "subscription_id": 2,
+        "value": 3557 
+    }
+},
+{
+    "pk": 49,
+    "model": "alm_crm.salescycleproductstat",
+    "fields": {
+        "sales_cycle": 380,
+        "product": 179,
+        "subscription_id": 2,
+        "value": 7147 
+    }
+},
+{
+    "pk": 50,
+    "model": "alm_crm.salescycleproductstat",
+    "fields": {
+        "sales_cycle": 384,
+        "product": 384,
+        "subscription_id": 2,
+        "value": 5111 
+    }
+},
+{
+    "pk": 51,
+    "model": "alm_crm.salescycleproductstat",
+    "fields": {
+        "sales_cycle": 397,
+        "product": 99,
+        "subscription_id": 2,
+        "value": 5612 
+    }
+},
+{
+    "pk": 52,
+    "model": "alm_crm.salescycleproductstat",
+    "fields": {
+        "sales_cycle": 403,
+        "product": 619,
+        "subscription_id": 2,
+        "value": 8202 
+    }
+},
+{
+    "pk": 53,
+    "model": "alm_crm.salescycleproductstat",
+    "fields": {
+        "sales_cycle": 408,
+        "product": 653,
+        "subscription_id": 2,
+        "value": 2669 
+    }
+},
+{
+    "pk": 54,
+    "model": "alm_crm.salescycleproductstat",
+    "fields": {
+        "sales_cycle": 410,
+        "product": 622,
+        "subscription_id": 2,
+        "value": 7190 
+    }
+},
+{
+    "pk": 55,
+    "model": "alm_crm.salescycleproductstat",
+    "fields": {
+        "sales_cycle": 415,
+        "product": 516,
+        "subscription_id": 2,
+        "value": 3950 
+    }
+},
+{
+    "pk": 56,
+    "model": "alm_crm.salescycleproductstat",
+    "fields": {
+        "sales_cycle": 419,
+        "product": 246,
+        "subscription_id": 2,
+        "value": 4513 
+    }
+},
+{
+    "pk": 57,
+    "model": "alm_crm.salescycleproductstat",
+    "fields": {
+        "sales_cycle": 424,
+        "product": 400,
+        "subscription_id": 2,
+        "value": 6033 
+    }
+},
+{
+    "pk": 58,
+    "model": "alm_crm.salescycleproductstat",
+    "fields": {
+        "sales_cycle": 427,
+        "product": 220,
+        "subscription_id": 2,
+        "value": 6656 
+    }
+},
+{
+    "pk": 59,
+    "model": "alm_crm.salescycleproductstat",
+    "fields": {
+        "sales_cycle": 433,
+        "product": 1007,
+        "subscription_id": 2,
+        "value": 4260 
+    }
+},
+{
+    "pk": 60,
+    "model": "alm_crm.salescycleproductstat",
+    "fields": {
+        "sales_cycle": 442,
+        "product": 263,
+        "subscription_id": 2,
+        "value": 6323 
+    }
+},
+{
+    "pk": 61,
+    "model": "alm_crm.salescycleproductstat",
+    "fields": {
+        "sales_cycle": 446,
+        "product": 409,
+        "subscription_id": 2,
+        "value": 7654 
+    }
+},
+{
+    "pk": 62,
+    "model": "alm_crm.salescycleproductstat",
+    "fields": {
+        "sales_cycle": 455,
+        "product": 790,
+        "subscription_id": 2,
+        "value": 3982 
+    }
+},
+{
+    "pk": 63,
+    "model": "alm_crm.salescycleproductstat",
+    "fields": {
+        "sales_cycle": 459,
+        "product": 92,
+        "subscription_id": 2,
+        "value": 5809 
+    }
+},
+{
+    "pk": 64,
+    "model": "alm_crm.salescycleproductstat",
+    "fields": {
+        "sales_cycle": 461,
+        "product": 741,
+        "subscription_id": 2,
+        "value": 9530 
+    }
+},
+{
+    "pk": 65,
+    "model": "alm_crm.salescycleproductstat",
+    "fields": {
+        "sales_cycle": 481,
+        "product": 1011,
+        "subscription_id": 2,
+        "value": 6247 
     }
 }
 ]
