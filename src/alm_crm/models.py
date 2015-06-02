@@ -936,7 +936,7 @@ class Contact(SubscriptionObject):
                         sales_cycle.contact = self
                         sales_cycle.save()
                         sales_cycles.append(sales_cycle)
-                        [activities.append(obj) for obj in sales_cycle.rel_activities.all()]
+                        # [activities.append(obj) for obj in sales_cycle.rel_activities.all()]
 
         # Merging vcards
         VCard.merge_model_objects(self.vcard, [c.vcard for c in alias_objects])
