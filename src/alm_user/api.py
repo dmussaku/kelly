@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 import base64
-from tastypie import fields
+from tastypie import fields, http
 from tastypie.bundle import Bundle
 from tastypie.resources import Resource, ModelResource
 from tastypie.exceptions import NotFound, BadRequest
@@ -334,21 +334,26 @@ class UserResource(ModelResource):
 
     def authorization(self, request, **kwargs):
         with RequestContext(self, request, allowed_methods=['post']):
-            data = self.deserialize(
-                request, request.body,
-                format=request.META.get('CONTENT_TYPE', 'application/json'))
+            data = self.deserialize(request, request.body, format=request.META.get('CONTENT_TYPE', 'application/json'))
 
             user = authenticate(username=data.get('email'), password=data.get('password'))
+            session_key = None
+            session_expire_date = None
             if user is not None:
                 if user.is_active:
-                    login(request, user)
-                    # Redirect to a success page.
-                    print request.session.session_key
+                    login(request, user)  # will add session to request
+                    session_key = request.session.session_key
+                    session_expire_date = request.session.get_expiry_date()
                 else:
-                    print 'not activie'
+                    data = {'message': "User is not activated"}
+                    return self.error_response(request, data, response_class=http.HttpForbidden)
             else:
-                print 'invalid login'
+                data = {'message': "Invalid login"}
+                return self.error_response(request, data, response_class=http.HttpUnauthorized)
 
-            # bundle = self.build_bundle(obj=request.user, request=request)
-            # bundle = self.full_dehydrate(bundle)
+            bundle = self.build_bundle(obj=None, data={
+                'user': self.full_dehydrate(self.build_bundle(obj=request.user, request=request)),
+                'session_key': session_key,
+                'session_expire_date': session_expire_date
+                }, request=request)
             return self.create_response(request, bundle)
