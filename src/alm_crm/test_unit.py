@@ -808,6 +808,8 @@ class SalesCycleResourceTest(ResourceTestMixin, ResourceTestCase):
         self.get_des_res = lambda path: self.deserialize(self.get_resp(path))
         self.sales_cycle = SalesCycle.objects.first()
 
+        self.QUERYSET_OPEN_CYCLES = SalesCycle.objects.filter(subscription_id=1, is_global=False, status__in=[SalesCycle.NEW, SalesCycle.PENDING])
+
     def test_get_list_valid_json(self):
         self.assertValidJSONResponse(self.get_resp(''))
 
@@ -1060,6 +1062,11 @@ class SalesCycleResourceTest(ResourceTestMixin, ResourceTestCase):
         self.assertEqual(Product.objects.all().count(), products_count)
         self.assertEqual(Milestone.objects.all().count(), milestones_count)
         
+    def test_limit_for_mobile(self):
+        resp = self.api_client.get(self.api_path_sales_cycle + '?limit_for=mobile')
+        des_resp = self.deserialize(resp)
+
+        self.assertEqual(len(des_resp['objects']), self.QUERYSET_OPEN_CYCLES.count())
 
 
 class ActivityResourceTest(ResourceTestMixin, ResourceTestCase):
@@ -1088,6 +1095,10 @@ class ActivityResourceTest(ResourceTestMixin, ResourceTestCase):
             lambda pk: self.deserialize(self.get_detail_resp(pk))
 
         self.activity = Activity.objects.first()
+
+        self.QUERYSET_ACTIVITIES_FOR_MOBILE = Activity.objects.filter(
+                subscription_id=1
+            ).filter(Activity.get_filter_for_mobile())
 
     def test_get_list_valid_json(self):
         self.assertValidJSONResponse(self.get_list_resp)
@@ -1367,6 +1378,14 @@ class ActivityResourceTest(ResourceTestMixin, ResourceTestCase):
 
         # resp =  self.api_client.post(self.api_path_activity + '%s/move/' % activity.pk)
         # self.assertHttpBadRequest(resp)
+
+    def test_limit_for_mobile(self):
+        resp = self.api_client.get(self.api_path_activity + '?limit_for=mobile')
+        des_resp = self.deserialize(resp)
+        print len(des_resp), self.QUERYSET_ACTIVITIES_FOR_MOBILE.count()
+
+        self.assertEqual(len(des_resp['objects']), self.QUERYSET_ACTIVITIES_FOR_MOBILE.count())
+
 
 
 class ProductResourceTest(ResourceTestMixin, ResourceTestCase):

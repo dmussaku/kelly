@@ -22,8 +22,10 @@ from django.db.models import signals, Q
 from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
 from django.utils import timezone
-import datetime
+from datetime import datetime, timedelta
 import xlrd
+import pytz
+
 
 ALLOWED_TIME_PERIODS = ['week', 'month', 'year']
 
@@ -1468,6 +1470,13 @@ class Activity(SubscriptionObject):
         return True
 
     @classmethod
+    def get_filter_for_mobile(cls):
+        return (
+            Q(deadline__isnull=False, date_finished__isnull=True) | 
+            Q(date_edited__gte = (datetime.now(pytz.timezone(settings.TIME_ZONE)) - timedelta(days=31)) )
+            )
+
+    @classmethod
     def get_activities_by_contact(cls, contact_id):
         return Activity.objects.filter(sales_cycle__contact_id=contact_id)
 
@@ -1533,7 +1542,7 @@ class Activity(SubscriptionObject):
         need to implement the conversion to datetime object
         from input arguments
         '''
-        if (type(from_dt) and type(to_dt) == datetime.datetime):
+        if (type(from_dt) and type(to_dt) == datetime):
             pass
         activity_queryset = Activity.objects.filter(
             date_created__gte=from_dt, date_created__lte=to_dt, owner=crmuser)

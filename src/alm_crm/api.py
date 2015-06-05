@@ -87,7 +87,8 @@ from tastypie.resources import Resource, ModelResource
 from tastypie.serializers import Serializer
 from tastypie.utils import trailing_slash
 import ast
-import datetime
+from datetime import datetime, timedelta
+import pytz
 
 from .utils.parser import text_parser
 from .utils import report_builders
@@ -136,7 +137,10 @@ class CommonMeta:
 class CRMServiceModelResource(ModelResource):
 
     def apply_filters(self, request, applicable_filters):
+        custom_Q = applicable_filters.pop('q', None)  # 'q' - key for Q() object
         objects = super(ModelResource, self).apply_filters(request, applicable_filters)
+        if custom_Q:
+            objects.filter(custom_Q)
         return objects.filter(subscription_id=self.get_crmsubscr_id(request))
 
     def hydrate(self, bundle):
@@ -1300,6 +1304,20 @@ class SalesCycleResource(CRMServiceModelResource):
             ),
         ]
 
+    def build_filters(self, filters=None):
+        if filters is None:
+            filters = {}
+        orm_filters = super(self.__class__, self).build_filters(filters=filters)
+
+        if 'limit_for' in filters:
+            if filters['limit_for'] == 'mobile':
+                orm_filters.update({
+                    'is_global': False, 
+                    'status__in': [SalesCycle.NEW, SalesCycle.PENDING]
+                    })
+
+        return orm_filters
+
     def close(self, request, **kwargs):
         '''
         PUT METHOD
@@ -1618,11 +1636,29 @@ class ActivityResource(CRMServiceModelResource):
             if k.startswith('author_id'):
                 _add_filters[k.replace('author_id', 'owner__id')] = v
                 _del_keys.add(k)
+            if k == 'limit_for' and  v == 'mobile':
+                _add_filters.update({'q': Activity.get_filter_for_mobile()})
 
         for k in _del_keys:
             filters.pop(k)
         filters.update(_add_filters)
         return filters
+
+
+    # def build_filters(self, filters=None):
+    #     if filters is None:
+    #         filters = {}
+    #     orm_filters = super(self.__class__, self).build_filters(filters=filters)
+
+    #     if 'limit_for' in filters:
+    #         if filters['limit_for'] == 'mobile':
+    #             orm_filters.update({
+    #                 'is_global': False, 
+    #                 'status__in': [SalesCycle.NEW, SalesCycle.PENDING]
+    #                 })
+
+    #     return orm_filters
+
 
     def get_comments(self, request, **kwargs):
         '''
@@ -1671,7 +1707,7 @@ class ActivityResource(CRMServiceModelResource):
                 format=request.META.get('CONTENT_TYPE', 'application/json'))
             activity = Activity.objects.get(id=data.get('id'))
             activity.description = data.get('description')
-            activity.date_finished = datetime.datetime.now(request.user.timezone)
+            activity.date_finished = datetime.now(request.user.timezone)
             activity.save()
         return self.create_response(
             request, {'activity': ActivityResource().full_dehydrate(
