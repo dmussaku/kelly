@@ -68,8 +68,8 @@ from almanet.utils.env import get_subscr_id
 from django.conf.urls import url
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
-from django.db import models
-from django.db import transaction
+from django.db import models,transaction
+from django.db.models import Q
 from django.forms.models import model_to_dict
 from django.http import HttpResponse
 from django.utils import translation
@@ -137,11 +137,16 @@ class CommonMeta:
 class CRMServiceModelResource(ModelResource):
 
     def apply_filters(self, request, applicable_filters):
+        # print 'applicable_filters:', applicable_filters
         custom_Q = applicable_filters.pop('q', None)  # 'q' - key for Q() object
+
         objects = super(ModelResource, self).apply_filters(request, applicable_filters)
+        q = Q(subscription_id=self.get_crmsubscr_id(request))
+
         if custom_Q:
-            objects.filter(custom_Q)
-        return objects.filter(subscription_id=self.get_crmsubscr_id(request))
+            q = q & custom_Q
+
+        return objects.filter(q)
 
     def hydrate(self, bundle):
         """
@@ -1630,34 +1635,18 @@ class ActivityResource(CRMServiceModelResource):
         return bundle.obj.feedback_status
 
     def build_filters(self, filters=None):
-        filters = super(self.__class__, self).build_filters(filters=filters)
-        _add_filters, _del_keys = {}, set([])
+        if filters is None:
+            filters = {}
+        orm_filters = super(self.__class__, self).build_filters(filters=filters)
+
         for k, v in filters.iteritems():
             if k.startswith('author_id'):
-                _add_filters[k.replace('author_id', 'owner__id')] = v
-                _del_keys.add(k)
+                orm_filters[k.replace('author_id', 'owner__id')] = v
+                orm_filters.pop(k)
             if k == 'limit_for' and  v == 'mobile':
-                _add_filters.update({'q': Activity.get_filter_for_mobile()})
+                orm_filters.update({'q': Activity.get_filter_for_mobile()})
 
-        for k in _del_keys:
-            filters.pop(k)
-        filters.update(_add_filters)
-        return filters
-
-
-    # def build_filters(self, filters=None):
-    #     if filters is None:
-    #         filters = {}
-    #     orm_filters = super(self.__class__, self).build_filters(filters=filters)
-
-    #     if 'limit_for' in filters:
-    #         if filters['limit_for'] == 'mobile':
-    #             orm_filters.update({
-    #                 'is_global': False, 
-    #                 'status__in': [SalesCycle.NEW, SalesCycle.PENDING]
-    #                 })
-
-    #     return orm_filters
+        return orm_filters
 
 
     def get_comments(self, request, **kwargs):

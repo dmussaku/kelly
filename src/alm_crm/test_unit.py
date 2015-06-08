@@ -1382,10 +1382,7 @@ class ActivityResourceTest(ResourceTestMixin, ResourceTestCase):
     def test_limit_for_mobile(self):
         resp = self.api_client.get(self.api_path_activity + '?limit_for=mobile')
         des_resp = self.deserialize(resp)
-        print len(des_resp), self.QUERYSET_ACTIVITIES_FOR_MOBILE.count()
-
         self.assertEqual(len(des_resp['objects']), self.QUERYSET_ACTIVITIES_FOR_MOBILE.count())
-
 
 
 class ProductResourceTest(ResourceTestMixin, ResourceTestCase):
