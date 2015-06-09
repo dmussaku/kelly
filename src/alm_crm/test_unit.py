@@ -1100,7 +1100,7 @@ class ActivityResourceTest(ResourceTestMixin, ResourceTestCase):
                 subscription_id=1
             ).filter(Activity.get_filter_for_mobile())
 
-    def test_get_list_valid_json(self):
+    def test_get_list_valid_json(self):        
         self.assertValidJSONResponse(self.get_list_resp)
 
     def test_get_list_non_empty(self):
@@ -1992,6 +1992,40 @@ class AppStateResourceTest(ResourceTestMixin, ResourceTestCase):
 
         for activity in app_state['objects']['activities']:
             self.assertTrue('has_read' in activity)
+
+
+class MobileStateResourceTest(ResourceTestMixin, ResourceTestCase):
+
+    def setUp(self):
+        super(self.__class__, self).setUp()
+
+        # login user
+        self.get_credentials()
+
+        self.api_path_mobile_state_list = '/api/v1/mobile_state/'
+
+        self.subscription = Subscription.objects.first()
+
+    def test_get(self):
+        mobile_state = self.api_client.get(
+            self.api_path_mobile_state_list + self.subscription.service.slug + '/',
+            format='json', HTTP_HOST='localhost')
+        mobile_state_des = self.deserialize(mobile_state)
+
+        print mobile_state
+
+        self.assertHttpOK(mobile_state)
+        self.assertTrue('objects' in mobile_state_des)
+        # self.assertTrue('users' in mobile_state_des['objects'])
+        # self.assertTrue('company' in mobile_state_des['objects'])
+        # self.assertTrue('contacts' in mobile_state_des['objects'])
+        self.assertTrue('sales_cycles' in mobile_state_des['objects'])
+        # self.assertTrue('shares' in mobile_state_des['objects'])
+        # self.assertTrue('activities' in mobile_state_des['objects'])
+
+        # for activity in mobile_state_des['objects']['activities']:
+        #     self.assertTrue('has_read' in activity)
+
 
 
 class ShareResourceTest(ResourceTestMixin, ResourceTestCase):

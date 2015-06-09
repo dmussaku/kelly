@@ -180,6 +180,19 @@ class CRMServiceModelResource(ModelResource):
         bundle = self.full_dehydrate(bundle)
         return bundle
 
+    def full_dehydrate(self, bundle, for_list=False):
+        '''
+            Delete '_config' key in bundle.data,
+            used to store flags for our custom tastypie function.
+            Should be deleted to prevent adding to responce data
+        '''
+        bundle = super(ModelResource, self).full_dehydrate(bundle, for_list=for_list)
+        bundle.data.pop('_config', None)
+        return bundle
+
+    def get_resource_id(self, bundle):
+        return self.detail_uri_kwargs(bundle)[self._meta.detail_uri_name]
+
     @classmethod
     def get_crmsubscr_id(cls, request):
         return get_subscr_id(request.user_env, DEFAULT_SERVICE)
@@ -1237,6 +1250,42 @@ class ContactResource(CRMServiceModelResource):
             request, {'success':True}
             )
 
+
+class CustomToManyField(fields.ToManyField):
+    """
+    """
+    def __init__(self, to, attribute, related_name=None, default=None,
+                 null=False, blank=False, readonly=False, full=False,
+                 unique=False, help_text=None, use_in='all', full_list=True, full_detail=True,
+
+                 full_use_ids=False
+                 ):
+
+        super(self.__class__, self).__init__(
+            to, attribute, related_name=related_name, default=default,
+            null=null, blank=blank, readonly=readonly, full=full,
+            unique=unique, help_text=help_text, use_in=use_in,
+            full_list=full_list, full_detail=full_detail
+        )
+
+        self.full_use_ids = full_use_ids
+
+
+    def dehydrate_related(self, bundle, related_resource, for_list=True):
+        """
+        Based on the ``full_resource``, returns either the endpoint or the data
+        from ``full_dehydrate`` for the related resource.
+
+        CUSTOM:
+            return 'id' as endpoint if full_use_ids
+        """ 
+
+        if self.full_use_ids:
+            return related_resource.get_resource_id(bundle)
+        else:
+            return super(self.__class__, self).dehydrate_related(bundle, related_resource, for_list=for_list)
+
+
 class SalesCycleResource(CRMServiceModelResource):
     '''
     GET Method
@@ -1249,9 +1298,9 @@ class SalesCycleResource(CRMServiceModelResource):
     '''
     #contact = fields.ToOneField(ContactResource, 'contact')
     contact_id = fields.IntegerField(attribute='contact_id', null=True)
-    # activities = fields.ToManyField(
-    #     'alm_crm.api.ActivityResource', 'rel_activities',
-    #     related_name='sales_cycle', null=True, full=True)
+    activities = CustomToManyField(
+        'alm_crm.api.ActivityResource', 'rel_activities',
+        related_name='sales_cycle', null=True, full=False, full_use_ids=True)
     # products = fields.ToManyField(
     #     'alm_crm.api.ProductResource', 'products',
     #     related_name='sales_cycles', null=True, full=False, readonly=True)
@@ -1272,7 +1321,6 @@ class SalesCycleResource(CRMServiceModelResource):
         null=True, blank=True, readonly=True, full=True)
     milestone_id = fields.IntegerField(null=True, attribute='milestone_id')
     log = fields.ToManyField('alm_crm.api.SalesCycleLogEntryResource', 'log', null=True, full=True)
-    activities = fields.ToManyField('alm_crm.api.ActivityResource', 'rel_activities', null=True, full=False)
 
     class Meta(CommonMeta):
         queryset = SalesCycle.objects.all().prefetch_related('product_stats', 'product_stats__product', 'rel_activities', 'log')
@@ -1473,11 +1521,13 @@ class SalesCycleResource(CRMServiceModelResource):
             objects['sales_cycle'] = sales_cycle.id
             objects['activities'] = list(sales_cycle.rel_activities.all().values_list('id', flat=True))
             sales_cycle.delete()
-            return self.create_response(request, {'objects':objects}, response_class=http.HttpAccepted)
+            return self.create_response(request, {'objects': objects}, response_class=http.HttpAccepted)
 
-    def dehydrate_activities(self, bundle):
-        return [a.id for a in bundle.obj.rel_activities.all()]
-        # return list(bundle.obj.rel_activities.values_list('id', flat=True))
+    # def dehydrate_activities(self, bundle):
+    #     if '_config' in bundle.data and 'activities' in bundle.data['_config']['skip_fields']:
+    #         return None
+    #     return [a.id for a in bundle.obj.rel_activities.all()]
+    #     # return list(bundle.obj.rel_activities.values_list('id', flat=True))
 
     def obj_create(self, bundle, **kwargs):
         bundle = super(self.__class__, self).obj_create(bundle, **kwargs)
@@ -3241,6 +3291,80 @@ class AppStateResource(Resource):
         with RequestContext(self, request, allowed_methods=['get']):
             obj = AppStateObject(service_slug=kwargs['slug'], request=request)
             return self.create_response(request, {'objects': obj.get_session()}, response_class=http.HttpAccepted)
+
+
+class MobileStateObject(object):
+    '''
+    @undocumented: __init__, get_users, get_company, get_contacts,
+    get_sales_cycles, get_activities, get_shares, get_constants,
+    get_session
+    '''
+
+    def __init__(self, service_slug=None, bundle=None):
+        if service_slug is None:
+            return
+        request = bundle.request
+        self.request = request
+        self.current_user = request.user
+        self.subscription_id = get_subscr_id(request.user_env, service_slug)
+        self.company = request.user.get_company()
+        self.current_crmuser = request.user.get_subscr_user(self.subscription_id)
+
+
+        self.resources = {
+            'sales_cycles': SalesCycleResource,
+            'activities': ActivityResource
+        }
+
+        sales_cycles = SalesCycleResource().obj_get_list(bundle, limit_for='mobile')
+        activities = ActivityResource().obj_get_list(bundle, limit_for='mobile')
+
+        self.objects = {
+            'sales_cycles': sales_cycles,
+            'activities': activities
+        }
+
+
+class MobileStateResource(Resource):
+    '''
+    ALL Method
+    I{URL}:  U{alma.net/api/v1/mobile_state/}
+
+    B{Description}:
+    API resource to get all data of application initial state:
+    objects(users, contacts, activities, etc.), constants and session data
+
+    @undocumented: Meta
+    '''
+    # objects = fields.DictField(attribute='objects', readonly=True)
+    # # constants = fields.DictField(attribute='constants', readonly=True)
+    # # session = fields.DictField(attribute='session', readonly=True)
+
+    class Meta:
+        resource_name = 'mobile_state'
+        authorization = Authorization()
+
+    def get_detail(self, request, **kwargs):
+        base_bundle = self.build_bundle(request=request)
+
+        mobile_state = self.obj_get(bundle=base_bundle, **kwargs)        
+
+        serialized = {
+            'objects': {}
+        }
+
+        for resource_name, objects in mobile_state.objects.iteritems():
+            bundles = []
+            Resource = mobile_state.resources[resource_name]
+            for obj in objects:
+                bundle = self.build_bundle(obj=obj, data={'_skip': ['activities']}, request=request)
+                bundles.append(Resource().full_dehydrate(bundle, for_list=True))
+            serialized['objects'][resource_name] = bundles
+
+        return self.create_response(request, serialized)
+
+    def obj_get(self, bundle, **kwargs):
+        return MobileStateObject(service_slug=DEFAULT_SERVICE, bundle=bundle)
 
 
 class SalesCycleProductStatResource(CRMServiceModelResource):
