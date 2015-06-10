@@ -114,6 +114,74 @@ def _firstOfQuerySet(queryset):
         return None
 
 
+def use_in_field(field_name):
+    '''
+        tastypie's 'use_in' keywarg used for:
+             Optionally accepts ``use_in``. This may be one of ``list``, ``detail``
+            ``all`` 
+            or 
+            a callable which accepts a ``bundle`` and returns
+            ``True`` or ``False``. Indicates wheather this field will be included
+            during dehydration of a list of objects or a single object. If ``use_in``
+            is a callable, and returns ``True``, the field will be included during
+            dehydration.
+            Defaults to ``all``.
+
+        Example:
+            see MobileStateResource, where passed to omit 'activities' in SalesCycles
+            see SalesCycleResource, 'activities' CustomToManyField with this function
+    '''
+    def use_in(bundle):
+        if hasattr(bundle, 'skip_fields'):
+            if field_name in getattr(bundle, 'skip_fields'):
+                return False
+        return True
+
+    return use_in
+
+
+class CustomToManyField(fields.ToManyField):
+    """
+    used to add 'full_use_ids' flag for return objects 'ids' not 'resource_uri'
+    """
+    def __init__(self, to, attribute, related_name=None, default=None,
+                 null=False, blank=False, readonly=False, full=False,
+                 unique=False, help_text=None, use_in='all', full_list=True, full_detail=True,
+
+                 full_use_ids=False
+                 ):
+
+        super(self.__class__, self).__init__(
+            to, attribute, related_name=related_name, default=default,
+            null=null, blank=blank, readonly=readonly, full=full,
+            unique=unique, help_text=help_text, use_in=use_in,
+            full_list=full_list, full_detail=full_detail
+        )
+
+        self.full_use_ids = full_use_ids
+
+
+    def dehydrate_related(self, bundle, related_resource, for_list=True):
+        """
+        Based on the ``full_resource``, returns either the endpoint or the data
+        from ``full_dehydrate`` for the related resource.
+
+        CUSTOM:
+            return 'id' as endpoint if full_use_ids
+        """ 
+
+        if self.full_use_ids:
+            return related_resource.get_resource_id(bundle)
+        else:
+            return super(self.__class__, self).dehydrate_related(bundle, related_resource, for_list=for_list)
+
+
+    def build_related_resource(self, value, request=None, related_obj=None, related_name=None):
+        print '@@@@', value
+        return super(self.__class__, self).build_related_resource(value, request=request, 
+            related_obj=related_obj, related_name=related_name)
+
+
 class DummyPaginator(object):
     def __init__(self, request_data, objects, resource_uri=None,
                  limit=None, offset=0, max_limit=1000,
@@ -137,12 +205,15 @@ class CommonMeta:
 class CRMServiceModelResource(ModelResource):
 
     def apply_filters(self, request, applicable_filters):
-        # print 'applicable_filters:', applicable_filters
-        custom_Q = applicable_filters.pop('q', None)  # 'q' - key for Q() object
-
-        objects = super(ModelResource, self).apply_filters(request, applicable_filters)
+        '''
+            first 'q' is filter for limit by subscription_id;
+            additional filters (in one Q object) can be passed 
+            in applicable_filters as value of 'q'-key
+        '''
         q = Q(subscription_id=self.get_crmsubscr_id(request))
 
+        custom_Q = applicable_filters.pop('q', None)  # 'q' - key for Q() object
+        objects = super(ModelResource, self).apply_filters(request, applicable_filters)
         if custom_Q:
             q = q & custom_Q
 
@@ -178,16 +249,6 @@ class CRMServiceModelResource(ModelResource):
         '''
         bundle = self.build_bundle(obj=obj, request=request)
         bundle = self.full_dehydrate(bundle)
-        return bundle
-
-    def full_dehydrate(self, bundle, for_list=False):
-        '''
-            Delete '_config' key in bundle.data,
-            used to store flags for our custom tastypie function.
-            Should be deleted to prevent adding to responce data
-        '''
-        bundle = super(ModelResource, self).full_dehydrate(bundle, for_list=for_list)
-        bundle.data.pop('_config', None)
         return bundle
 
     def get_resource_id(self, bundle):
@@ -263,9 +324,11 @@ class ContactResource(CRMServiceModelResource):
     #                                null=True, full=False)
     # assignees = fields.ToManyField('alm_crm.api.CRMUserResource', 'assignees',
     #                                null=True, full=False)
-    sales_cycles = fields.ToManyField(
-        'alm_crm.api.SalesCycleResource', 'sales_cycles',
-        related_name='contact', null=True, full=False)
+    # sales_cycles = fields.ToManyField(
+    #     'alm_crm.api.SalesCycleResource', 'sales_cycles',
+    #     related_name='contact', null=True, full=False)
+    sales_cycles = CustomToManyField('alm_crm.api.SalesCycleResource', 'sales_cycles', 
+        null=True, full=False, full_use_ids=True)
     parent = fields.ToOneField(
         'alm_crm.api.ContactResource', 'parent',
         null=True, full=False
@@ -468,9 +531,6 @@ class ContactResource(CRMServiceModelResource):
 
     # def dehydrate_followers(self, bundle):
     #     return [follower.pk for follower in bundle.obj.followers.all()]
-
-    def dehydrate_sales_cycles(self, bundle):
-        return [sc.pk for sc in bundle.obj.sales_cycles.all()]
 
     def dehydrate_owner(self, bundle):
         return bundle.obj.owner.id
@@ -1251,41 +1311,6 @@ class ContactResource(CRMServiceModelResource):
             )
 
 
-class CustomToManyField(fields.ToManyField):
-    """
-    """
-    def __init__(self, to, attribute, related_name=None, default=None,
-                 null=False, blank=False, readonly=False, full=False,
-                 unique=False, help_text=None, use_in='all', full_list=True, full_detail=True,
-
-                 full_use_ids=False
-                 ):
-
-        super(self.__class__, self).__init__(
-            to, attribute, related_name=related_name, default=default,
-            null=null, blank=blank, readonly=readonly, full=full,
-            unique=unique, help_text=help_text, use_in=use_in,
-            full_list=full_list, full_detail=full_detail
-        )
-
-        self.full_use_ids = full_use_ids
-
-
-    def dehydrate_related(self, bundle, related_resource, for_list=True):
-        """
-        Based on the ``full_resource``, returns either the endpoint or the data
-        from ``full_dehydrate`` for the related resource.
-
-        CUSTOM:
-            return 'id' as endpoint if full_use_ids
-        """ 
-
-        if self.full_use_ids:
-            return related_resource.get_resource_id(bundle)
-        else:
-            return super(self.__class__, self).dehydrate_related(bundle, related_resource, for_list=for_list)
-
-
 class SalesCycleResource(CRMServiceModelResource):
     '''
     GET Method
@@ -1298,9 +1323,9 @@ class SalesCycleResource(CRMServiceModelResource):
     '''
     #contact = fields.ToOneField(ContactResource, 'contact')
     contact_id = fields.IntegerField(attribute='contact_id', null=True)
-    activities = CustomToManyField(
-        'alm_crm.api.ActivityResource', 'rel_activities',
-        related_name='sales_cycle', null=True, full=False, full_use_ids=True)
+    activities = CustomToManyField('alm_crm.api.ActivityResource', 'rel_activities',
+        related_name='sales_cycle', null=True, full=False, full_use_ids=True,
+        use_in=use_in_field('activities'))
     # products = fields.ToManyField(
     #     'alm_crm.api.ProductResource', 'products',
     #     related_name='sales_cycles', null=True, full=False, readonly=True)
@@ -1522,12 +1547,6 @@ class SalesCycleResource(CRMServiceModelResource):
             objects['activities'] = list(sales_cycle.rel_activities.all().values_list('id', flat=True))
             sales_cycle.delete()
             return self.create_response(request, {'objects': objects}, response_class=http.HttpAccepted)
-
-    # def dehydrate_activities(self, bundle):
-    #     if '_config' in bundle.data and 'activities' in bundle.data['_config']['skip_fields']:
-    #         return None
-    #     return [a.id for a in bundle.obj.rel_activities.all()]
-    #     # return list(bundle.obj.rel_activities.values_list('id', flat=True))
 
     def obj_create(self, bundle, **kwargs):
         bundle = super(self.__class__, self).obj_create(bundle, **kwargs)
@@ -2023,7 +2042,7 @@ class CRMUserResource(CRMServiceModelResource):
     @undocumented: Meta
     '''
 #    user = fields.ToOneField('alm_user.api.UserResource', 'user', null=True, full=True, readonly=True)
-    unfollow_list = fields.ToManyField(ContactResource, 'unfollow_list', null=True, full=False)
+    unfollow_list = CustomToManyField(ContactResource, 'unfollow_list', null=True, full=False, full_use_ids=True)
     vcard = fields.ToOneField('alm_vcard.api.VCardResource',
         attribute=lambda bundle: bundle.obj.get_billing_user(cache=True).vcard, null=True, full=True)
 
@@ -2040,9 +2059,6 @@ class CRMUserResource(CRMServiceModelResource):
                 name='api_follow_unfollow'
             ),
         ]
-
-    def dehydrate_unfollow_list(self, bundle):
-        return [c.id for c in bundle.obj.unfollow_list.all()]
 
     def full_dehydrate(self, bundle, for_list=False):
         bundle = super(self.__class__, self).full_dehydrate(bundle, for_list=True)
@@ -3310,7 +3326,6 @@ class MobileStateObject(object):
         self.company = request.user.get_company()
         self.current_crmuser = request.user.get_subscr_user(self.subscription_id)
 
-
         self.resources = {
             'sales_cycles': SalesCycleResource,
             'activities': ActivityResource
@@ -3346,19 +3361,18 @@ class MobileStateResource(Resource):
 
     def get_detail(self, request, **kwargs):
         base_bundle = self.build_bundle(request=request)
-
         mobile_state = self.obj_get(bundle=base_bundle, **kwargs)        
 
         serialized = {
             'objects': {}
         }
-
         for resource_name, objects in mobile_state.objects.iteritems():
             bundles = []
-            Resource = mobile_state.resources[resource_name]
+            ResourceInstance = mobile_state.resources[resource_name]()
             for obj in objects:
-                bundle = self.build_bundle(obj=obj, data={'_skip': ['activities']}, request=request)
-                bundles.append(Resource().full_dehydrate(bundle, for_list=True))
+                bundle = self.build_bundle(obj=obj, request=request)
+                setattr(bundle, 'skip_fields', ['activities'])
+                bundles.append(ResourceInstance.full_dehydrate(bundle, for_list=True))
             serialized['objects'][resource_name] = bundles
 
         return self.create_response(request, serialized)
@@ -3489,15 +3503,6 @@ class CustomFieldResource(CRMServiceModelResource):
         queryset = CustomField.objects.all()
         resource_name = 'custom_field'
 
-    def hydrate(self, bundle):
-        """
-        CustomField have property owner which is
-        content_object owner, we shouldn't set owner
-        """
-        crmuser = self.get_crmuser(bundle.request)
-        if not crmuser:
-            return
-        return bundle
 
 class ReportResource(Resource):
     '''
