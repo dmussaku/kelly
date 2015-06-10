@@ -80,7 +80,7 @@ from tastypie.authentication import (
     BasicAuthentication,
     )
 from tastypie.authorization import Authorization
-from tastypie.constants import ALL_WITH_RELATIONS
+from tastypie.constants import ALL, ALL_WITH_RELATIONS
 from tastypie.contrib.contenttypes.fields import GenericForeignKeyField
 from tastypie.exceptions import ImmediateHttpResponse, NotFound, Unauthorized
 from tastypie.resources import Resource, ModelResource
@@ -356,7 +356,8 @@ class ContactResource(CRMServiceModelResource):
         resource_name = 'contact'
         filtering = {
             'status': ['exact'],
-            'tp': ['exact']
+            'tp': ['exact'],
+            'id': ALL
         }
 
     def prepend_urls(self):
@@ -1614,7 +1615,7 @@ class ActivityResource(CRMServiceModelResource):
     author_id = fields.IntegerField(attribute='owner_id', null=True)
     description = fields.CharField(attribute='description')
     need_preparation = fields.BooleanField(attribute='need_preparation')
-    sales_cycle_id = fields.IntegerField(null=True)
+    sales_cycle_id = fields.IntegerField(attribute='sales_cycle_id', null=True)
     feedback_status = fields.CharField(null=True)
     comments_count = fields.IntegerField(attribute='comments_count', readonly=True)
 
@@ -1626,7 +1627,8 @@ class ActivityResource(CRMServiceModelResource):
         filtering = {
             'author_id': ('exact', ),
             'owner': ALL_WITH_RELATIONS,
-            'sales_cycle': ALL_WITH_RELATIONS}
+            'sales_cycle_id': ALL_WITH_RELATIONS
+            }
 
     def prepend_urls(self):
         return [
@@ -1696,9 +1698,6 @@ class ActivityResource(CRMServiceModelResource):
 
     # def hydrate_milestone(self, obj):
     #     return Milestone.objects.get(pk=bundle.data['milestone'])
-
-    def dehydrate_sales_cycle_id(self, bundle):
-        return bundle.obj.sales_cycle_id
 
     def dehydrate_feedback_status(self, bundle):
         return bundle.obj.feedback_status
@@ -2049,6 +2048,9 @@ class CRMUserResource(CRMServiceModelResource):
     class Meta(CommonMeta):
         queryset = CRMUser.objects.all().prefetch_related('unfollow_list')
         resource_name = 'crmuser'
+        filtering = {
+            "id": ALL,
+        }
 
     def prepend_urls(self):
         return [
@@ -3326,17 +3328,36 @@ class MobileStateObject(object):
         self.company = request.user.get_company()
         self.current_crmuser = request.user.get_subscr_user(self.subscription_id)
 
+        sales_cycles = SalesCycleResource().obj_get_list(bundle, limit_for='mobile')
+
+        sc_ids_param = ','.join([str(sc.id) for sc in sales_cycles])
+        activities = ActivityResource().obj_get_list(bundle, limit_for='mobile', 
+            sales_cycle_id__in=sc_ids_param)
+
+        contact_ids_param = ','.join(set([str(sc.contact_id) for sc in sales_cycles]))
+        contacts = ContactResource().obj_get_list(bundle, id__in=contact_ids_param)
+
+        cu_ids = set([str(a.owner_id) for a in activities])
+        cu_ids.union([str(sc.owner_id) for sc in sales_cycles])
+        cu_ids_param = ','.join(cu_ids)
+        users = CRMUserResource().obj_get_list(bundle, id__in=cu_ids_param)
+
+        milestones = MilestoneResource().obj_get_list(bundle)
+
         self.resources = {
             'sales_cycles': SalesCycleResource,
-            'activities': ActivityResource
+            'activities': ActivityResource,
+            'contacts': ContactResource,
+            'users': CRMUserResource,
+            'milestones': MilestoneResource
         }
-
-        sales_cycles = SalesCycleResource().obj_get_list(bundle, limit_for='mobile')
-        activities = ActivityResource().obj_get_list(bundle, limit_for='mobile')
 
         self.objects = {
             'sales_cycles': sales_cycles,
-            'activities': activities
+            'activities': activities,
+            'contacts': contacts,
+            'users': users,
+            'milestones': milestones
         }
 
 

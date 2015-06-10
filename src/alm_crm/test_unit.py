@@ -2012,19 +2012,14 @@ class MobileStateResourceTest(ResourceTestMixin, ResourceTestCase):
             format='json', HTTP_HOST='localhost')
         mobile_state_des = self.deserialize(mobile_state)
 
-        print mobile_state
-
         self.assertHttpOK(mobile_state)
         self.assertTrue('objects' in mobile_state_des)
-        # self.assertTrue('users' in mobile_state_des['objects'])
-        # self.assertTrue('company' in mobile_state_des['objects'])
-        # self.assertTrue('contacts' in mobile_state_des['objects'])
+        self.assertTrue('contacts' in mobile_state_des['objects'])
         self.assertTrue('sales_cycles' in mobile_state_des['objects'])
-        # self.assertTrue('shares' in mobile_state_des['objects'])
-        # self.assertTrue('activities' in mobile_state_des['objects'])
-
-        # for activity in mobile_state_des['objects']['activities']:
-        #     self.assertTrue('has_read' in activity)
+        self.assertTrue('activities' in mobile_state_des['objects'])
+        self.assertEqual(len(mobile_state_des['objects']['activities']), 1)
+        self.assertTrue('users' in mobile_state_des['objects'])
+        self.assertTrue('milestones' in mobile_state_des['objects'])
 
 
 
