@@ -3338,7 +3338,7 @@ class MobileStateObject(object):
         contacts = ContactResource().obj_get_list(bundle, id__in=contact_ids_param)
 
         cu_ids = set([str(a.owner_id) for a in activities])
-        cu_ids.union([str(sc.owner_id) for sc in sales_cycles])
+        cu_ids = cu_ids.union([str(sc.owner_id) for sc in sales_cycles])
         cu_ids_param = ','.join(cu_ids)
         users = CRMUserResource().obj_get_list(bundle, id__in=cu_ids_param)
 
