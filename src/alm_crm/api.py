@@ -128,15 +128,26 @@ def use_in_field(field_name):
             Defaults to ``all``.
 
         Example:
-            see MobileStateResource, where passed to omit 'activities' in SalesCycles
+            see MobileStateResource, where passed to skip 'activities' in SalesCycles
             see SalesCycleResource, 'activities' CustomToManyField with this function
+    '''
+    def use_in(bundle):
+        if hasattr(bundle, 'use_fields'):
+            if field_name in getattr(bundle, 'use_fields'):
+                return True
+        return False
+    return use_in
+
+
+def skip_in_field(field_name):
+    '''
+        works as use_in_field but opposite
     '''
     def use_in(bundle):
         if hasattr(bundle, 'skip_fields'):
             if field_name in getattr(bundle, 'skip_fields'):
                 return False
         return True
-
     return use_in
 
 
@@ -1326,7 +1337,9 @@ class SalesCycleResource(CRMServiceModelResource):
     contact_id = fields.IntegerField(attribute='contact_id', null=True)
     activities = CustomToManyField('alm_crm.api.ActivityResource', 'rel_activities',
         related_name='sales_cycle', null=True, full=False, full_use_ids=True,
-        use_in=use_in_field('activities'))
+        use_in=skip_in_field('activities'))
+    activities_count = fields.IntegerField(attribute='activities_count', readonly=True,
+        use_in=use_in_field('activities_count'))
     # products = fields.ToManyField(
     #     'alm_crm.api.ProductResource', 'products',
     #     related_name='sales_cycles', null=True, full=False, readonly=True)
@@ -3393,6 +3406,7 @@ class MobileStateResource(Resource):
             for obj in objects:
                 bundle = self.build_bundle(obj=obj, request=request)
                 setattr(bundle, 'skip_fields', ['activities'])
+                setattr(bundle, 'use_fields', ['activities_count'])
                 bundles.append(ResourceInstance.full_dehydrate(bundle, for_list=True))
             serialized['objects'][resource_name] = bundles
 

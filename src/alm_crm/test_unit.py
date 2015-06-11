@@ -2018,6 +2018,7 @@ class MobileStateResourceTest(ResourceTestMixin, ResourceTestCase):
         self.assertTrue('sales_cycles' in mobile_state_des['objects'])
         self.assertTrue('activities' in mobile_state_des['objects'])
         self.assertEqual(len(mobile_state_des['objects']['activities']), 1)
+        self.assertTrue('activities_cnt' in mobile_state_des['objects']['activities'][0])
         self.assertTrue('users' in mobile_state_des['objects'])
         self.assertTrue('milestones' in mobile_state_des['objects'])
 

@@ -1117,6 +1117,10 @@ class SalesCycle(SubscriptionObject):
     def __unicode__(self):
         return '%s [%s %s]' % (self.title, self.contact, self.status)
 
+    @property
+    def activities_count(self):
+        return self.rel_activities.count()
+
     @classmethod
     def get_global(cls, subscription_id, contact_id):
         return SalesCycle.objects.get(subscription_id=subscription_id, contact_id=contact_id,
