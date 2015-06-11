@@ -2647,6 +2647,73 @@ class ContactListResource(CRMServiceModelResource):
                 )
 
 
+class ConstantsObject(object):
+    '''
+    @undocumented: __init__
+    '''
+
+    def __init__(self, service_slug=None, bundle=None):
+        if service_slug is None:
+            return
+        # request = bundle.request
+
+        self.data = {
+            'sales_cycle': {
+                'statuses': SalesCycle.STATUSES_OPTIONS,
+                'statuses_hash': SalesCycle.STATUSES_DICT
+            },
+            'sales_cycle_log_entry': {
+                'types_hash': SalesCycleLogEntry.TYPES_DICT
+            },
+            'activity': {
+                'feedback_options': Feedback.STATUSES_OPTIONS,
+                'feedback_hash': Feedback.STATUSES_DICT
+            },
+            'contact': {
+                'statuses': Contact.STATUSES_OPTIONS,
+                'statuses_hash': Contact.STATUSES_DICT,
+                'tp': Contact.TYPES_OPTIONS,
+                'tp_hash': Contact.TYPES_DICT
+            },
+            'vcard': {
+                'email': {'types': Email.TYPE_CHOICES},
+                'adr': {'types': Adr.TYPE_CHOICES},
+                'phone': {'types': Tel.TYPE_CHOICES}
+            }
+        }
+
+    def to_dict(self):
+        return self.data
+
+
+class ConstantsResource(Resource):
+    '''
+    ALL Method
+    I{URL}:  U{alma.net/api/v1/constants/}
+
+    B{Description}:
+    API resource to get all data of application initial state:
+    objects(users, contacts, activities, etc.), constants and session data
+
+    @undocumented: Meta
+    '''
+    # objects = fields.DictField(attribute='objects', readonly=True)
+    # # constants = fields.DictField(attribute='constants', readonly=True)
+    # # session = fields.DictField(attribute='session', readonly=True)
+
+    class Meta:
+        resource_name = 'constants'
+        authorization = Authorization()
+
+    def get_detail(self, request, **kwargs):
+        base_bundle = self.build_bundle(request=request)
+        constants = self.obj_get(bundle=base_bundle, **kwargs)
+        return self.create_response(request, {"constants": constants.to_dict()})
+
+    def obj_get(self, bundle, **kwargs):
+        return ConstantsObject(service_slug=DEFAULT_SERVICE, bundle=bundle)
+
+
 class AppStateObject(object):
     '''
     @undocumented: __init__, get_users, get_company, get_contacts,
@@ -2658,6 +2725,7 @@ class AppStateObject(object):
         if service_slug is None:
             return
         self.request = request
+        self.service_slug = service_slug
         self.current_user = request.user
         self.subscription_id = get_subscr_id(request.user_env, service_slug)
         self.company = request.user.get_company()
@@ -2956,30 +3024,7 @@ class AppStateObject(object):
     #     # return ShareResource().get_bundle_list(shares, self.request)
 
     def get_constants(self):
-        return {
-            'sales_cycle': {
-                'statuses': SalesCycle.STATUSES_OPTIONS,
-                'statuses_hash': SalesCycle.STATUSES_DICT
-            },
-            'sales_cycle_log_entry': {
-                'types_hash': SalesCycleLogEntry.TYPES_DICT
-            },
-            'activity': {
-                'feedback_options': Feedback.STATUSES_OPTIONS,
-                'feedback_hash': Feedback.STATUSES_DICT
-            },
-            'contact': {
-                'statuses': Contact.STATUSES_OPTIONS,
-                'statuses_hash': Contact.STATUSES_DICT,
-                'tp': Contact.TYPES_OPTIONS,
-                'tp_hash': Contact.TYPES_DICT
-            },
-            'vcard': {
-                'email': {'types': Email.TYPE_CHOICES},
-                'adr': {'types': Adr.TYPE_CHOICES},
-                'phone': {'types': Tel.TYPE_CHOICES}
-            }
-        }
+        return ConstantsObject(service_slug=self.service_slug).to_dict
 
     def get_session(self):
         return {
@@ -3398,7 +3443,8 @@ class MobileStateResource(Resource):
         mobile_state = self.obj_get(bundle=base_bundle, **kwargs)        
 
         serialized = {
-            'objects': {}
+            'objects': {},
+            'constants': ConstantsObject(service_slug=DEFAULT_SERVICE).to_dict()
         }
         for resource_name, objects in mobile_state.objects.iteritems():
             bundles = []

@@ -2014,11 +2014,12 @@ class MobileStateResourceTest(ResourceTestMixin, ResourceTestCase):
 
         self.assertHttpOK(mobile_state)
         self.assertTrue('objects' in mobile_state_des)
+        self.assertTrue('constants' in mobile_state_des)
         self.assertTrue('contacts' in mobile_state_des['objects'])
         self.assertTrue('sales_cycles' in mobile_state_des['objects'])
+        self.assertTrue('activities_count' in mobile_state_des['objects']['sales_cycles'][0])
         self.assertTrue('activities' in mobile_state_des['objects'])
         self.assertEqual(len(mobile_state_des['objects']['activities']), 1)
-        self.assertTrue('activities_cnt' in mobile_state_des['objects']['activities'][0])
         self.assertTrue('users' in mobile_state_des['objects'])
         self.assertTrue('milestones' in mobile_state_des['objects'])
 
