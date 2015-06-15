@@ -3446,12 +3446,12 @@ class MobileStateResource(Resource):
 
     def get_detail(self, request, **kwargs):
         base_bundle = self.build_bundle(request=request)
-        mobile_state = self.obj_get(bundle=base_bundle, **kwargs)        
+        mobile_state = self.obj_get(bundle=base_bundle, **kwargs)
 
         serialized = {
             'objects': {},
             'constants': ConstantsObject(service_slug=DEFAULT_SERVICE).to_dict(),
-            'timestamp': datetime.now(request.user.timezone)
+            'timestamp': datetime.now(pytz.timezone(settings.TIME_ZONE)).__str__()
         }
         for resource_name, objects in mobile_state.objects.iteritems():
             bundles = []
