@@ -14,9 +14,10 @@ class Migration(DataMigration):
         for subscription in orm.Subscription.objects.all():
             contact = orm['alm_crm.Contact'].objects.filter(subscription_id = subscription.id).order_by('date_created').first()
             product = orm['alm_crm.Product'].objects.filter(subscription_id = subscription.id).order_by('date_created').first()
-            subscription.date_created = min(contact.date_created, product.date_created)
-            subscription.date_edited = subscription.date_created
-            subscription.save()
+            if contact and product:
+                subscription.date_created = min(contact.date_created, product.date_created)
+                subscription.date_edited = subscription.date_created
+                subscription.save()
 
     def backwards(self, orm):
         "Write your backwards methods here."

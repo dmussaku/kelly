@@ -83,8 +83,11 @@ class Migration(DataMigration):
             contact_list.save()
 
         for sc_prod_st in orm.SalesCycleProductStat.objects.all():
-            sc_prod_st.date_created = sc_prod_st.date_edited = max(sc_prod_st.sales_cycle.date_created, sc_prod_st.product.date_created)
-            sc_prod_st.save()
+            salescycle = sc_prod_st.sales_cycle
+            product = sc_prod_st.product
+            if salescycle and product:
+                sc_prod_st.date_created = sc_prod_st.date_edited = max(sales_cycle.date_created, product.date_created)
+                sc_prod_st.save()
 
         for ac_rec in orm.ActivityRecipient.objects.all():
             ac_rec.date_created = ac_rec.activity.date_created
