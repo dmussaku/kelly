@@ -211,6 +211,9 @@ class CommonMeta:
                                          BasicAuthentication())
     authorization = Authorization()
     paginator_class = DummyPaginator
+    filtering = {
+        'date_edited': ALL_WITH_RELATIONS
+    }
 
 
 class CRMServiceModelResource(ModelResource):
@@ -370,6 +373,7 @@ class ContactResource(CRMServiceModelResource):
             'tp': ['exact'],
             'id': ALL
         }
+        filtering.update(CommonMeta.filtering)
 
     def prepend_urls(self):
         return [
@@ -1635,13 +1639,14 @@ class ActivityResource(CRMServiceModelResource):
     class Meta(CommonMeta):
         queryset = Activity.objects.all().select_related('owner', 'feedback').prefetch_related('comments', 'recipients')
         resource_name = 'activity'
-        excludes = ['date_edited', 'subscription_id', 'title']
+        excludes = ['subscription_id', 'title']
         always_return_data = True
         filtering = {
             'author_id': ('exact', ),
             'owner': ALL_WITH_RELATIONS,
             'sales_cycle_id': ALL_WITH_RELATIONS
             }
+        filtering.update(CommonMeta.filtering)
 
     def prepend_urls(self):
         return [
@@ -2064,6 +2069,7 @@ class CRMUserResource(CRMServiceModelResource):
         filtering = {
             "id": ALL,
         }
+        filtering.update(CommonMeta.filtering)
 
     def prepend_urls(self):
         return [
@@ -3444,7 +3450,8 @@ class MobileStateResource(Resource):
 
         serialized = {
             'objects': {},
-            'constants': ConstantsObject(service_slug=DEFAULT_SERVICE).to_dict()
+            'constants': ConstantsObject(service_slug=DEFAULT_SERVICE).to_dict(),
+            'timestamp': datetime.now(request.user.timezone)
         }
         for resource_name, objects in mobile_state.objects.iteritems():
             bundles = []
