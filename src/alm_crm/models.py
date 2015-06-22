@@ -1951,16 +1951,6 @@ class HashTag(models.Model):
     def __unicode__(self):
         return u'%s' % (self.text)
 
-
-    def save(self, **kwargs):
-        import re
-        if not re.match("\B#\w*[a-zA-Z]+\w*", self.text):
-            return
-
-        self.text = self.text.lower()
-        super(self.__class__, self).save(**kwargs)
-
-
 class HashTagReference(SubscriptionObject):
     hashtag = models.ForeignKey(HashTag, related_name="references")
     content_type = models.ForeignKey(ContentType)
