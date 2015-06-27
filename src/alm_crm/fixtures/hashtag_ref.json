@@ -1,0 +1,62 @@
+[
+    {
+        "pk":1,
+        "model": "alm_crm.HashTagReference",
+        "fields": {
+            "hashtag":3,
+            "content_type":34,
+            "object_id":1,
+            "date_created": "2014-09-10T00:00:00Z"
+        }
+    },
+    {
+        "pk": 2,
+        "model": "alm_crm.HashTagReference",
+        "fields": {
+        	"hashtag":3,
+            "content_type":28,
+        	"object_id":2,
+            "date_created": "2014-09-10T00:00:00Z"
+        }
+    },
+    {
+        "pk": 3,
+        "model": "alm_crm.HashTagReference",
+        "fields": {
+        	"hashtag":3,
+            "content_type":41,
+        	"object_id":3,
+            "date_created": "2014-09-10T00:00:00Z"
+        }
+    },
+    {
+        "pk": 4,
+        "model": "alm_crm.HashTagReference",
+        "fields": {
+        	"hashtag":4,
+            "content_type":41,
+        	"object_id":4,
+            "date_created": "2014-09-10T00:00:00Z"
+        }
+    },
+    {
+        "pk": 5,
+        "model": "alm_crm.HashTagReference",
+        "fields": {
+            "hashtag":5,
+            "content_type":34,
+            "object_id":4,
+            "date_created": "2014-09-10T00:00:00Z"
+        }
+    },
+    {
+        "pk": 6,
+        "model": "alm_crm.HashTagReference",
+        "fields": {
+            "hashtag":5,
+            "content_type":34,
+            "object_id":1,
+            "date_created": "2014-09-10T00:00:00Z"
+        }
+    }
+]

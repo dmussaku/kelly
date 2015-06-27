@@ -1,0 +1,37 @@
+[
+    {
+        "pk":1,
+        "model": "alm_crm.HashTag",
+        "fields": {
+            "text": "#crm"
+        }
+    },
+    {
+        "pk": 2,
+        "model": "alm_crm.HashTag",
+        "fields": {
+        	"text":"#almanet"
+        }
+    },
+    {
+        "pk": 3,
+        "model": "alm_crm.HashTag",
+        "fields": {
+        	"text":"#nurlan"
+        }
+    },
+    {
+        "pk": 4,
+        "model": "alm_crm.HashTag",
+        "fields": {
+        	"text":"#askhat"
+        }
+    },
+    {
+        "pk": 5,
+        "model": "alm_crm.HashTag",
+        "fields": {
+            "text":"#hp"
+        }
+    }
+]
