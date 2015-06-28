@@ -1356,7 +1356,7 @@ class Activity(SubscriptionObject):
     owner = models.ForeignKey(CRMUser, related_name='activity_owner')
     mentions = generic.GenericRelation('Mention', null=True)
     comments = generic.GenericRelation('Comment', null=True)
-    milestone = models.ForeignKey(Milestone, related_name='activities', null=True)
+    #milestone = models.ForeignKey(Milestone, related_name='activities', null=True)
     hashtags = generic.GenericRelation('HashTagReference')
 
     class Meta:
