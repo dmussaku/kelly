@@ -808,6 +808,8 @@ class SalesCycleResourceTest(ResourceTestMixin, ResourceTestCase):
         self.get_des_res = lambda path: self.deserialize(self.get_resp(path))
         self.sales_cycle = SalesCycle.objects.first()
 
+        self.QUERYSET_OPEN_CYCLES = SalesCycle.objects.filter(subscription_id=1, is_global=False, status__in=[SalesCycle.NEW, SalesCycle.PENDING])
+
     def test_get_list_valid_json(self):
         self.assertValidJSONResponse(self.get_resp(''))
 
@@ -1060,6 +1062,11 @@ class SalesCycleResourceTest(ResourceTestMixin, ResourceTestCase):
         self.assertEqual(Product.objects.all().count(), products_count)
         self.assertEqual(Milestone.objects.all().count(), milestones_count)
         
+    def test_limit_for_mobile(self):
+        resp = self.api_client.get(self.api_path_sales_cycle + '?limit_for=mobile')
+        des_resp = self.deserialize(resp)
+
+        self.assertEqual(len(des_resp['objects']), self.QUERYSET_OPEN_CYCLES.count())
 
 
 class ActivityResourceTest(ResourceTestMixin, ResourceTestCase):
@@ -1089,7 +1096,11 @@ class ActivityResourceTest(ResourceTestMixin, ResourceTestCase):
 
         self.activity = Activity.objects.first()
 
-    def test_get_list_valid_json(self):
+        self.QUERYSET_ACTIVITIES_FOR_MOBILE = Activity.objects.filter(
+                subscription_id=1
+            ).filter(Activity.get_filter_for_mobile())
+
+    def test_get_list_valid_json(self):        
         self.assertValidJSONResponse(self.get_list_resp)
 
     def test_get_list_non_empty(self):
@@ -1367,6 +1378,11 @@ class ActivityResourceTest(ResourceTestMixin, ResourceTestCase):
 
         # resp =  self.api_client.post(self.api_path_activity + '%s/move/' % activity.pk)
         # self.assertHttpBadRequest(resp)
+
+    def test_limit_for_mobile(self):
+        resp = self.api_client.get(self.api_path_activity + '?limit_for=mobile')
+        des_resp = self.deserialize(resp)
+        self.assertEqual(len(des_resp['objects']), self.QUERYSET_ACTIVITIES_FOR_MOBILE.count())
 
 
 class ProductResourceTest(ResourceTestMixin, ResourceTestCase):
@@ -1976,6 +1992,37 @@ class AppStateResourceTest(ResourceTestMixin, ResourceTestCase):
 
         for activity in app_state['objects']['activities']:
             self.assertTrue('has_read' in activity)
+
+
+class MobileStateResourceTest(ResourceTestMixin, ResourceTestCase):
+
+    def setUp(self):
+        super(self.__class__, self).setUp()
+
+        # login user
+        self.get_credentials()
+
+        self.api_path_mobile_state_list = '/api/v1/mobile_state/'
+
+        self.subscription = Subscription.objects.first()
+
+    def test_get(self):
+        mobile_state = self.api_client.get(
+            self.api_path_mobile_state_list + self.subscription.service.slug + '/',
+            format='json', HTTP_HOST='localhost')
+        mobile_state_des = self.deserialize(mobile_state)
+
+        self.assertHttpOK(mobile_state)
+        self.assertTrue('objects' in mobile_state_des)
+        self.assertTrue('constants' in mobile_state_des)
+        self.assertTrue('contacts' in mobile_state_des['objects'])
+        self.assertTrue('sales_cycles' in mobile_state_des['objects'])
+        self.assertTrue('activities_count' in mobile_state_des['objects']['sales_cycles'][0])
+        self.assertTrue('activities' in mobile_state_des['objects'])
+        self.assertEqual(len(mobile_state_des['objects']['activities']), 1)
+        self.assertTrue('users' in mobile_state_des['objects'])
+        self.assertTrue('milestones' in mobile_state_des['objects'])
+
 
 
 class ShareResourceTest(ResourceTestMixin, ResourceTestCase):

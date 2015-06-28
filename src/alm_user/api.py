@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 import base64
-from tastypie import fields
+from tastypie import fields, http
 from tastypie.bundle import Bundle
 from tastypie.resources import Resource, ModelResource
 from tastypie.exceptions import NotFound, BadRequest
@@ -18,6 +18,7 @@ from tastypie.authentication import (
     BasicAuthentication,
     )
 from tastypie.authorization import Authorization
+from tastypie.authentication import Authentication
 from tastypie.exceptions import ImmediateHttpResponse, NotFound
 from tastypie.http import HttpNotFound
 from tastypie.serializers import Serializer
@@ -28,6 +29,21 @@ from alm_crm.api import CRMUserResource
 import json
 import datetime
 import ast
+
+
+
+class OpenAuthEndpoint(Authentication):
+
+    def is_authenticated(self, request, **kwargs):
+        """
+        Identifies if the user is authenticated to continue or not.
+        Should return either ``True`` if allowed, ``False`` if not or an
+        ``HttpResponse`` if you need something custom.
+        """
+
+        auth_endpoint = '/api/v1/%s/auth%s' % (UserResource._meta.resource_name, trailing_slash())
+
+        return request.path == auth_endpoint
 
 
 class UserSession(object):
@@ -89,8 +105,11 @@ class UserResource(ModelResource):
         list_allowed_methods = ['get', 'patch']
         detail_allowed_methods = ['get', 'patch']
         resource_name = 'user'
-        authentication = MultiAuthentication(BasicAuthentication(),
-                                             SessionAuthentication())
+        authentication = MultiAuthentication(
+            OpenAuthEndpoint(),
+            BasicAuthentication(),
+            SessionAuthentication()
+            )
         authorization = Authorization()
 
     def prepend_urls(self):
@@ -112,6 +131,12 @@ class UserResource(ModelResource):
                 (self._meta.resource_name, trailing_slash()),
                 self.wrap_view('upload_userpic'),
                 name='api_upload_userpic'
+            ),
+            url(
+                r"^(?P<resource_name>%s)/auth%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('authorization'),
+                name='api_authorization'
             ),
         ]
 
@@ -307,3 +332,28 @@ class UserResource(ModelResource):
         return self.create_response(request, user.get_subscriptions(flat=True))
 
 
+    def authorization(self, request, **kwargs):
+        with RequestContext(self, request, allowed_methods=['post']):
+            data = self.deserialize(request, request.body, format=request.META.get('CONTENT_TYPE', 'application/json'))
+
+            user = authenticate(username=data.get('email'), password=data.get('password'))
+            session_key = None
+            session_expire_date = None
+            if user is not None:
+                if user.is_active:
+                    login(request, user)  # will add session to request
+                    session_key = request.session.session_key
+                    session_expire_date = request.session.get_expiry_date()
+                else:
+                    data = {'message': "User is not activated"}
+                    return self.error_response(request, data, response_class=http.HttpForbidden)
+            else:
+                data = {'message': "Invalid login"}
+                return self.error_response(request, data, response_class=http.HttpUnauthorized)
+
+            bundle = self.build_bundle(obj=None, data={
+                'user': self.full_dehydrate(self.build_bundle(obj=request.user, request=request)),
+                'session_key': session_key,
+                'session_expire_date': session_expire_date
+                }, request=request)
+            return self.create_response(request, bundle)

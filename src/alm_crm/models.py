@@ -22,8 +22,10 @@ from django.db.models import signals, Q
 from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
 from django.utils import timezone
-import datetime
+from datetime import datetime, timedelta
 import xlrd
+import pytz
+
 
 ALLOWED_TIME_PERIODS = ['week', 'month', 'year']
 
@@ -157,7 +159,6 @@ class Contact(SubscriptionObject):
         _('contact type'),
         max_length=30,
         choices=TYPES_OPTIONS, default=USER_TP)
-    date_created = models.DateTimeField(blank=True, auto_now_add=True)
     vcard = models.OneToOneField('alm_vcard.VCard', blank=True, null=True,
                                  on_delete=models.SET_NULL, related_name='contact')
     parent = models.ForeignKey(
@@ -944,7 +945,6 @@ class Product(SubscriptionObject):
                                 default='KZT')
     owner = models.ForeignKey('CRMUser', related_name='crm_products',
                               null=True, blank=True)
-    date_created = models.DateTimeField(blank=True, auto_now_add=True)
     custom_sections = generic.GenericRelation('CustomSection')
     custom_fields = generic.GenericRelation('CustomField')
 
@@ -1035,7 +1035,6 @@ class ProductGroup(SubscriptionObject):
     title = models.CharField(max_length=150)
     products = models.ManyToManyField(Product, related_name='product_groups',
                                    null=True, blank=True)
-    date_created = models.DateTimeField(blank=True, auto_now_add=True)
 
     class Meta:
         verbose_name = _('product_group')
@@ -1080,7 +1079,6 @@ class SalesCycle(SubscriptionObject):
         null=True, blank=True,)
     status = models.CharField(max_length=2,
                               choices=STATUSES_OPTIONS, default=NEW)
-    date_created = models.DateTimeField(blank=True, auto_now_add=True)
     from_date = models.DateTimeField(blank=False, auto_now_add=True)
     to_date = models.DateTimeField(blank=False, auto_now_add=True)
     mentions = generic.GenericRelation('Mention')
@@ -1093,6 +1091,10 @@ class SalesCycle(SubscriptionObject):
 
     def __unicode__(self):
         return '%s [%s %s]' % (self.title, self.contact, self.status)
+
+    @property
+    def activities_count(self):
+        return self.rel_activities.count()
 
     @classmethod
     def get_global(cls, subscription_id, contact_id):
@@ -1340,18 +1342,12 @@ class SalesCycleLogEntry(SubscriptionObject):
     entry_type = models.CharField(max_length=2,
                               choices=TYPES_OPTIONS, default=MC)
     owner = models.ForeignKey(CRMUser, related_name='owner', null=True)
-    date_created = models.DateTimeField(blank=True, null=True,
-                                        auto_now_add=True)
-    date_edited = models.DateTimeField(blank=True, null=True, auto_now=True)
 
 
 class Activity(SubscriptionObject):
     title = models.CharField(max_length=100, null=True, blank=True)
     description = models.CharField(max_length=500)
     deadline = models.DateTimeField(blank=True, null=True)
-    date_created = models.DateTimeField(blank=True, null=True,
-                                        auto_now_add=True)
-    date_edited = models.DateTimeField(blank=True, null=True, auto_now=True)
     date_finished = models.DateTimeField(blank=True, null=True)
     need_preparation = models.BooleanField(default=False, blank=True)
     sales_cycle = models.ForeignKey(SalesCycle, related_name='rel_activities')
@@ -1447,6 +1443,15 @@ class Activity(SubscriptionObject):
         return True
 
     @classmethod
+    def get_filter_for_mobile(cls):
+        month = (datetime.now(pytz.timezone(settings.TIME_ZONE)) - timedelta(days=31))
+        return (
+            Q(deadline__isnull=False, date_finished__isnull=True) | 
+            Q(deadline__isnull=False, date_finished__isnull=False, date_finished__gte=month) |
+            Q(deadline__isnull=True,  date_edited__gte=month )
+            )
+
+    @classmethod
     def get_activities_by_contact(cls, contact_id):
         return Activity.objects.filter(sales_cycle__contact_id=contact_id)
 
@@ -1512,7 +1517,7 @@ class Activity(SubscriptionObject):
         need to implement the conversion to datetime object
         from input arguments
         '''
-        if (type(from_dt) and type(to_dt) == datetime.datetime):
+        if (type(from_dt) and type(to_dt) == datetime):
             pass
         activity_queryset = Activity.objects.filter(
             date_created__gte=from_dt, date_created__lte=to_dt, owner=crmuser)
@@ -1596,8 +1601,6 @@ class Feedback(SubscriptionObject):
 
     feedback = models.CharField(max_length=300, null=True)
     status = models.CharField(max_length=1, choices=STATUSES_OPTIONS, default=WAITING)
-    date_created = models.DateTimeField(blank=True, auto_now_add=True)
-    date_edited = models.DateTimeField(blank=True, auto_now_add=True)
     activity = models.OneToOneField(Activity)
     value = models.OneToOneField(Value, blank=True, null=True)
     mentions = generic.GenericRelation('Mention')
@@ -1623,7 +1626,6 @@ class Mention(SubscriptionObject):
     content_type = models.ForeignKey(ContentType)
     object_id = models.IntegerField()
     content_object = generic.GenericForeignKey('content_type', 'object_id')
-    date_created = models.DateTimeField(blank=True, auto_now_add=True)
 
     def __unicode__(self):
         return "%s %s" % (self.user, self.content_object)
@@ -1661,8 +1663,6 @@ class Mention(SubscriptionObject):
 class Comment(SubscriptionObject):
     comment = models.CharField(max_length=140)
     owner = models.ForeignKey(CRMUser, related_name='comment_owner')
-    date_created = models.DateTimeField(blank=True, auto_now_add=True)
-    date_edited = models.DateTimeField(blank=True, auto_now_add=True)
     object_id = models.IntegerField(null=True, blank=False)
     content_type = models.ForeignKey(ContentType)
     content_object = generic.GenericForeignKey('content_type', 'object_id')
@@ -1717,7 +1717,6 @@ class Share(SubscriptionObject):
     contact = models.ForeignKey(Contact, related_name='share_set', blank=True, null=True)
     share_to = models.ForeignKey(CRMUser, related_name='in_shares')
     share_from = models.ForeignKey(CRMUser, related_name='owned_shares')
-    date_created = models.DateTimeField(blank=True, auto_now_add=True)
     comments = generic.GenericRelation('Comment')
     note = models.CharField(max_length=500, null=True)
 
@@ -1811,7 +1810,6 @@ class ContactList(SubscriptionObject):
     title = models.CharField(max_length=150)
     contacts = models.ManyToManyField(Contact, related_name='contact_list',
                                    null=True, blank=True)
-    date_created = models.DateTimeField(blank=True, auto_now_add=True)
 
     class Meta:
         verbose_name = _('contact_list')
@@ -1901,7 +1899,6 @@ class Filter(SubscriptionObject):
     filter_text = models.CharField(max_length=500)
     owner = models.ForeignKey(CRMUser, related_name='owned_filter')
     base = models.CharField(max_length=6, choices=BASE_OPTIONS, default='all')
-    date_created = models.DateTimeField(blank=True, auto_now_add=True)
 
     class Meta:
         verbose_name = _('filter')
@@ -1922,6 +1919,8 @@ class Filter(SubscriptionObject):
 
 class HashTag(models.Model):
     text = models.CharField(max_length=500, unique=True)
+    date_created = models.DateTimeField(auto_now_add=True, blank=True)
+    date_edited = models.DateTimeField(auto_now=True, blank=True)
 
     class Meta:
         verbose_name = _('hashtag')
@@ -1945,7 +1944,6 @@ class HashTagReference(SubscriptionObject):
     content_type = models.ForeignKey(ContentType)
     object_id = models.IntegerField()
     content_object = generic.GenericForeignKey('content_type', 'object_id')
-    date_created = models.DateTimeField(blank=True, auto_now_add=True)
 
     @property
     def owner(self):
@@ -1979,7 +1977,6 @@ class CustomSection(SubscriptionObject):
     content_type = models.ForeignKey(ContentType)
     object_id = models.IntegerField()
     content_object = generic.GenericForeignKey('content_type', 'object_id')
-    date_created = models.DateTimeField(blank=True, auto_now_add=True)
 
     @property
     def owner(self):
@@ -2011,7 +2008,6 @@ class CustomField(SubscriptionObject):
     content_type = models.ForeignKey(ContentType, null=True, blank=True)
     object_id = models.IntegerField(null=True, blank=True)
     content_object = generic.GenericForeignKey('content_type', 'object_id')
-    date_created = models.DateTimeField(blank=True, auto_now_add=True)
     section = models.ForeignKey('CustomSection', related_name='custom_fields', null=True, blank=True)
 
     @property
