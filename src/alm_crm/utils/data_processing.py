@@ -29,26 +29,26 @@ def processing_custom_field_data(custom_fields_data, content_object):
 
 
 def from_section_object_to_data(content_object):
-    return processing_section_object_data(content_object.custom_sections.all())
+    return processing_section_object_data(list(content_object.custom_sections.all()))
 
 def from_field_object_to_data(content_object):
-    return processing_field_object_data(content_object.custom_fields.filter(section=None))
+    return processing_field_object_data(list(content_object.custom_fields.filter(section=None)))
 
-def processing_field_object_data(object_data):
+def processing_field_object_data(object_data_list):
     fields_list = []
-    for field in object_data.all():
+    for field in object_data_list:
         field_dict = {}
         field_dict['title'] = field.title
         field_dict['value'] = field.value
         fields_list.append(field_dict)
     return fields_list
 
-def processing_section_object_data(object_data):
+def processing_section_object_data(object_data_list):
     section_list = []
-    for section in object_data.all():
+    for section in object_data_list:
         section_dict = {}
         section_dict['title'] = section.title
-        section_dict['fields'] = processing_field_object_data(section.custom_fields.all())
+        section_dict['fields'] = processing_field_object_data(list(section.custom_fields.all()))
         section_list.append(section_dict)
     return section_list
 
