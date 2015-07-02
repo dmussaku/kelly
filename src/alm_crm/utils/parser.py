@@ -14,8 +14,8 @@ def text_parser(base_text, content_class=None, object_id=None):
 	hashtag_parser = re.compile(u'\B#\w*[а-яА-ЯёЁa-zA-Z]+\w*', re.U)
 	mention_parser = re.compile('\B@\[[0-9]*\:')
 
-	hashtags = hashtag_parser.findall(base_text.decode('utf-8'))
-	mentions = mention_parser.findall(base_text.decode('utf-8'))
+	hashtags = hashtag_parser.findall(base_text)
+	mentions = mention_parser.findall(base_text)
 
 	# delete hashtags and mention references in case of editing objects
 	content_class.objects.get(id=object_id).hashtags.clear()
