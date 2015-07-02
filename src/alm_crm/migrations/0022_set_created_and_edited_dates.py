@@ -23,7 +23,10 @@ class Migration(DataMigration):
 
         for contact in orm.Contact.objects.all():
             for salescycle in contact.sales_cycles.all():
-                contact.date_edited = salescycle.rel_activities.all().order_by("date_created").first().date_created
+                try:
+                    contact.date_edited = salescycle.rel_activities.all().order_by("date_created").first().date_created
+                except:
+                    contact.date_edited = contact.date_created
                 contact.save()
 
 
