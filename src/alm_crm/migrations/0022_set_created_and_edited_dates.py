@@ -76,7 +76,7 @@ class Migration(DataMigration):
                     value.date_edited = value.sales_cycle_as_real.rel_activities.all().order_by("date_created").last().date_created
                 except:
                     value.date_edited = datetime.datetime.utcnow()
-                value.save()
+            value.save()
 
         for product in orm.Product.objects.all():
             product.date_edited = product.date_created
