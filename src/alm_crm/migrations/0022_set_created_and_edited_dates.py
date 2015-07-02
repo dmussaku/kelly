@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import datetime
 from south.utils import datetime_utils as datetime
 from south.db import db
 from south.v2 import DataMigration
@@ -66,8 +67,15 @@ class Migration(DataMigration):
                 value.date_edited = value.sales_cycle_as_real.rel_activities.\
                                                 filter(description__istartswith="closed")[0].date_created
             except:
-                value.date_created = value.sales_cycle_as_real.rel_activities.all().order_by("date_created").last().date_created
-                value.date_edited = value.sales_cycle_as_real.rel_activities.all().order_by("date_created").last().date_created
+                try:
+                    value.date_created = value.sales_cycle_as_real.rel_activities.all().order_by("date_created").last().date_created
+                except:
+                    value.date_created = datetime.datetime.utcnow()
+
+                try:
+                    value.date_edited = value.sales_cycle_as_real.rel_activities.all().order_by("date_created").last().date_created
+                except:
+                    value.date_edited = datetime.datetime.utcnow()
 
         for product in orm.Product.objects.all():
             product.date_edited = product.date_created
@@ -106,8 +114,14 @@ class Migration(DataMigration):
             hashtagreference.save()
 
         for hashtag in orm.HashTag.objects.all():
-            hashtag.date_created = hashtag.references.order_by("date_created").first().date_created
-            hashtag.date_edited = hashtag.references.order_by("date_edited").first().date_edited
+            try:
+                hashtag.date_created = hashtag.references.order_by("date_created").first().date_created
+            except:
+                hashtag.date_created = datetime.datetime.utcnow()
+            try:
+                hashtag.date_edited = hashtag.references.order_by("date_edited").first().date_edited
+            except:
+                hashtag.date_edited = hashtag.date_created
             hashtag.save()
 
         for section in orm.CustomSection.objects.all():
