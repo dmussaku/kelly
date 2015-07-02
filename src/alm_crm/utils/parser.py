@@ -14,14 +14,9 @@ def text_parser(base_text, content_class=None, object_id=None):
 	hashtag_parser = re.compile(u'\B#\w*[а-яА-ЯёЁa-zA-Z]+\w*', re.U)
 	mention_parser = re.compile('\B@\[[0-9]*\:')
 
-<<<<<<< HEAD
-	hashtags = hashtag_parser.findall(base_text)
-	mentions = mention_parser.findall(base_text)
-=======
 	hashtags = hashtag_parser.findall(base_text.decode('utf-8'))
 	mentions = mention_parser.findall(base_text.decode('utf-8'))
 
->>>>>>> feature/hashtag_search
 	for hashtag_item in hashtags:
 		hashtag, created = HashTag.objects.get_or_create(text=hashtag_item)
 		if created:
