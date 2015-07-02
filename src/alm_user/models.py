@@ -6,6 +6,7 @@ from django.conf import settings
 from timezone_field import TimeZoneField
 from almanet.models import Subscription
 from alm_vcard.models import VCard, Email
+from datetime import datetime
 
 
 class UserManager(contrib_user_manager):
@@ -38,6 +39,8 @@ class User(AbstractBaseUser):
     vcard = models.OneToOneField(VCard, blank=True, null=True)
 
     userpic = models.ImageField(upload_to='userpics')
+    date_created = models.DateTimeField(auto_now_add=True, blank=True)
+    date_edited = models.DateTimeField(auto_now=True, blank=True)
 
     class Meta:
         verbose_name = _('user')

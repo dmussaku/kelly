@@ -15,6 +15,7 @@ from alm_vcard.models import (
     Category,
     Adr,
     Url,
+    Note,
     )
 from alm_user.models import User
 from django.template.loader import render_to_string
@@ -53,11 +54,14 @@ class CRMUser(SubscriptionObject):
         u = self.get_billing_user()
         return u and u.get_username() or None
 
-    def get_billing_user(self):
+    def get_billing_user(self, cache=False):
         """Returns a original user.
         Raises:
            User.DoesNotExist exception if no such relation exist"""
-        return User.objects.get(pk=self.user_id)
+        user = self.user if cache and hasattr(self, 'user') else User.objects.get(pk=self.user_id)
+        if cache:
+            self.user = user
+        return user
 
     def set_supervisor(self, save=False):
         self.is_supervisor = True
@@ -115,7 +119,7 @@ class Milestone(SubscriptionObject):
                         {'title':'Предоставление услуги', 'color_code': '#D4F49B'},
                         {'title':'Upsales', 'color_code': '#F4DC9C'}]
 
-        for data in default_data:   
+        for data in default_data:
             milestone = Milestone()
             milestone.title = data['title']
             milestone.color_code = data['color_code']
@@ -154,7 +158,6 @@ class Contact(SubscriptionObject):
         _('contact type'),
         max_length=30,
         choices=TYPES_OPTIONS, default=USER_TP)
-    date_created = models.DateTimeField(blank=True, auto_now_add=True)
     vcard = models.OneToOneField('alm_vcard.VCard', blank=True, null=True,
                                  on_delete=models.SET_NULL, related_name='contact')
     parent = models.ForeignKey(
@@ -902,7 +905,7 @@ class Contact(SubscriptionObject):
             2. status is NEW"""
         q = Q(subscription_id=subscription_id)
         q &= Q(status=cls.NEW)
-        return cls.objects.filter(q).order_by('-date_created')
+        return cls.objects.filter(q).order_by('-date_created')           
 
 
 class Value(SubscriptionObject):
@@ -941,7 +944,6 @@ class Product(SubscriptionObject):
                                 default='KZT')
     owner = models.ForeignKey('CRMUser', related_name='crm_products',
                               null=True, blank=True)
-    date_created = models.DateTimeField(blank=True, auto_now_add=True)
     custom_sections = generic.GenericRelation('CustomSection')
     custom_fields = generic.GenericRelation('CustomField')
 
@@ -959,7 +961,7 @@ class Product(SubscriptionObject):
 
     @property
     def author_id(self):
-        return self.owner.id
+        return self.owner_id
 
     @author_id.setter
     def author_id(self, author_id):
@@ -1032,7 +1034,6 @@ class ProductGroup(SubscriptionObject):
     title = models.CharField(max_length=150)
     products = models.ManyToManyField(Product, related_name='product_groups',
                                    null=True, blank=True)
-    date_created = models.DateTimeField(blank=True, auto_now_add=True)
 
     class Meta:
         verbose_name = _('product_group')
@@ -1077,7 +1078,6 @@ class SalesCycle(SubscriptionObject):
         null=True, blank=True,)
     status = models.CharField(max_length=2,
                               choices=STATUSES_OPTIONS, default=NEW)
-    date_created = models.DateTimeField(blank=True, auto_now_add=True)
     from_date = models.DateTimeField(blank=False, auto_now_add=True)
     to_date = models.DateTimeField(blank=False, auto_now_add=True)
     mentions = generic.GenericRelation('Mention')
@@ -1230,9 +1230,9 @@ class SalesCycle(SubscriptionObject):
         self.milestone = milestone
         self.save()
 
-        sc_log_entry = SalesCycleLogEntry(meta=meta, 
+        sc_log_entry = SalesCycleLogEntry(meta=meta,
                                           entry_type=SalesCycleLogEntry.MC,
-                                          sales_cycle=self, 
+                                          sales_cycle=self,
                                           owner=crmuser)
         sc_log_entry.save()
         return self
@@ -1330,30 +1330,27 @@ class SalesCycleLogEntry(SubscriptionObject):
     )
     TYPES = (MC, ) = ('MC', )
     TYPES_OPTIONS = zip(TYPES, TYPES_CAPS)
-    TYPES_DICT = dict(zip(('MC', ), TYPES))    
+    TYPES_DICT = dict(zip(('MC', ), TYPES))
 
     meta = models.TextField(null=True, blank=True)
     sales_cycle = models.ForeignKey(SalesCycle, related_name='log')
     entry_type = models.CharField(max_length=2,
                               choices=TYPES_OPTIONS, default=MC)
     owner = models.ForeignKey(CRMUser, related_name='owner', null=True)
-    date_created = models.DateTimeField(blank=True, null=True,
-                                        auto_now_add=True)
-    date_edited = models.DateTimeField(blank=True, null=True, auto_now=True)
+
 
 class Activity(SubscriptionObject):
     title = models.CharField(max_length=100, null=True, blank=True)
     description = models.CharField(max_length=500)
     deadline = models.DateTimeField(blank=True, null=True)
-    date_created = models.DateTimeField(blank=True, null=True,
-                                        auto_now_add=True)
-    date_edited = models.DateTimeField(blank=True, null=True, auto_now=True)
     date_finished = models.DateTimeField(blank=True, null=True)
     need_preparation = models.BooleanField(default=False, blank=True)
     sales_cycle = models.ForeignKey(SalesCycle, related_name='rel_activities')
     owner = models.ForeignKey(CRMUser, related_name='activity_owner')
     mentions = generic.GenericRelation('Mention', null=True)
     comments = generic.GenericRelation('Comment', null=True)
+    milestone = models.ForeignKey(Milestone, related_name='activities', null=True)
+    hashtags = generic.GenericRelation('HashTagReference')
 
     class Meta:
         verbose_name = 'activity'
@@ -1421,7 +1418,13 @@ class Activity(SubscriptionObject):
                 act_recip.save()
 
     def has_read(self, user_id):
-        recip = self.recipients.filter(user__pk=user_id).first()
+        recip = self.recipients.filter(user_id=user_id).first()
+        # # OPTIMIZE VERSION =D
+        # recip = None
+        # for r in self.recipients.all():
+        #     if r.user_id == user_id:
+        #         recip = r
+        #         break                
         return not recip or recip.has_read
 
     @classmethod
@@ -1586,8 +1589,6 @@ class Feedback(SubscriptionObject):
 
     feedback = models.CharField(max_length=300, null=True)
     status = models.CharField(max_length=1, choices=STATUSES_OPTIONS, default=WAITING)
-    date_created = models.DateTimeField(blank=True, auto_now_add=True)
-    date_edited = models.DateTimeField(blank=True, auto_now_add=True)
     activity = models.OneToOneField(Activity)
     value = models.OneToOneField(Value, blank=True, null=True)
     mentions = generic.GenericRelation('Mention')
@@ -1613,7 +1614,6 @@ class Mention(SubscriptionObject):
     content_type = models.ForeignKey(ContentType)
     object_id = models.IntegerField()
     content_object = generic.GenericForeignKey('content_type', 'object_id')
-    date_created = models.DateTimeField(blank=True, auto_now_add=True)
 
     def __unicode__(self):
         return "%s %s" % (self.user, self.content_object)
@@ -1651,12 +1651,11 @@ class Mention(SubscriptionObject):
 class Comment(SubscriptionObject):
     comment = models.CharField(max_length=140)
     owner = models.ForeignKey(CRMUser, related_name='comment_owner')
-    date_created = models.DateTimeField(blank=True, auto_now_add=True)
-    date_edited = models.DateTimeField(blank=True, auto_now_add=True)
     object_id = models.IntegerField(null=True, blank=False)
     content_type = models.ForeignKey(ContentType)
     content_object = generic.GenericForeignKey('content_type', 'object_id')
     mentions = generic.GenericRelation('Mention')
+    hashtags = generic.GenericRelation('HashTagReference')
 
     def __unicode__(self):
         return "%s's comment" % (self.owner)
@@ -1707,9 +1706,9 @@ class Share(SubscriptionObject):
     contact = models.ForeignKey(Contact, related_name='share_set', blank=True, null=True)
     share_to = models.ForeignKey(CRMUser, related_name='in_shares')
     share_from = models.ForeignKey(CRMUser, related_name='owned_shares')
-    date_created = models.DateTimeField(blank=True, auto_now_add=True)
     comments = generic.GenericRelation('Comment')
     note = models.CharField(max_length=500, null=True)
+    hashtags = generic.GenericRelation('HashTagReference')
 
     class Meta:
         verbose_name = 'share'
@@ -1742,8 +1741,15 @@ class Share(SubscriptionObject):
         return u'%s : %s -> %s' % (self.contact, self.share_from, self.share_to)
 
 
+def parse_note_text(sender, instance=None, **kwargs):
+    from utils.parser import text_parser
+    for note in Note.objects.filter(vcard = instance.vcard):
+        text_parser(base_text=note.data, content_class=instance.__class__,
+                    object_id=instance.id)
+
 signals.post_save.connect(
     Contact.upd_lst_activity_on_create, sender=Activity)
+signals.post_save.connect(parse_note_text, sender=Contact)
 signals.post_save.connect(
     Contact.upd_status_when_first_activity_created, sender=Activity)
 signals.post_save.connect(
@@ -1801,7 +1807,6 @@ class ContactList(SubscriptionObject):
     title = models.CharField(max_length=150)
     contacts = models.ManyToManyField(Contact, related_name='contact_list',
                                    null=True, blank=True)
-    date_created = models.DateTimeField(blank=True, auto_now_add=True)
 
     class Meta:
         verbose_name = _('contact_list')
@@ -1864,7 +1869,7 @@ class ContactList(SubscriptionObject):
 
 
 class SalesCycleProductStat(SubscriptionObject):
-    sales_cycle = models.ForeignKey(SalesCycle, related_name='product_stats', 
+    sales_cycle = models.ForeignKey(SalesCycle, related_name='product_stats',
                                 null=True, blank=True, on_delete=models.SET_NULL)
     product = models.ForeignKey(Product)
     value = models.IntegerField(default=0)
@@ -1891,7 +1896,6 @@ class Filter(SubscriptionObject):
     filter_text = models.CharField(max_length=500)
     owner = models.ForeignKey(CRMUser, related_name='owned_filter')
     base = models.CharField(max_length=6, choices=BASE_OPTIONS, default='all')
-    date_created = models.DateTimeField(blank=True, auto_now_add=True)
 
     class Meta:
         verbose_name = _('filter')
@@ -1912,6 +1916,8 @@ class Filter(SubscriptionObject):
 
 class HashTag(models.Model):
     text = models.CharField(max_length=500, unique=True)
+    date_created = models.DateTimeField(auto_now_add=True, blank=True)
+    date_edited = models.DateTimeField(auto_now=True, blank=True)
 
     class Meta:
         verbose_name = _('hashtag')
@@ -1920,22 +1926,11 @@ class HashTag(models.Model):
     def __unicode__(self):
         return u'%s' % (self.text)
 
-
-    def save(self, **kwargs):
-        import re
-        if not re.match("\B#\w*[a-zA-Z]+\w*", self.text):
-            return
-
-        self.text = self.text.lower()
-        super(self.__class__, self).save(**kwargs)
-
-
 class HashTagReference(SubscriptionObject):
     hashtag = models.ForeignKey(HashTag, related_name="references")
     content_type = models.ForeignKey(ContentType)
     object_id = models.IntegerField()
     content_object = generic.GenericForeignKey('content_type', 'object_id')
-    date_created = models.DateTimeField(blank=True, auto_now_add=True)
 
     @property
     def owner(self):
@@ -1969,7 +1964,6 @@ class CustomSection(SubscriptionObject):
     content_type = models.ForeignKey(ContentType)
     object_id = models.IntegerField()
     content_object = generic.GenericForeignKey('content_type', 'object_id')
-    date_created = models.DateTimeField(blank=True, auto_now_add=True)
 
     @property
     def owner(self):
@@ -2001,7 +1995,6 @@ class CustomField(SubscriptionObject):
     content_type = models.ForeignKey(ContentType, null=True, blank=True)
     object_id = models.IntegerField(null=True, blank=True)
     content_object = generic.GenericForeignKey('content_type', 'object_id')
-    date_created = models.DateTimeField(blank=True, auto_now_add=True)
     section = models.ForeignKey('CustomSection', related_name='custom_fields', null=True, blank=True)
 
     @property
