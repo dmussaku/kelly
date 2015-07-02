@@ -23,7 +23,7 @@ class Migration(DataMigration):
 
         for contact in orm.Contact.objects.all():
             for salescycle in contact.sales_cycles.all():
-                contact.date_edited = salescycle.rel_activities.all().order_by("date_created").first()
+                contact.date_edited = salescycle.rel_activities.all().order_by("date_created").first().date_created
                 contact.save()
 
 
@@ -63,8 +63,8 @@ class Migration(DataMigration):
                 value.date_edited = value.sales_cycle_as_real.rel_activities.\
                                                 filter(description__istartswith="closed")[0].date_created
             except:
-                value.date_created = value.sales_cycle_as_real.rel_activities.all().order_by("date_created").last()
-                value.date_edited = value.sales_cycle_as_real.rel_activities.all().order_by("date_created").last()
+                value.date_created = value.sales_cycle_as_real.rel_activities.all().order_by("date_created").last().date_created
+                value.date_edited = value.sales_cycle_as_real.rel_activities.all().order_by("date_created").last().date_created
 
         for product in orm.Product.objects.all():
             product.date_edited = product.date_created
@@ -114,8 +114,6 @@ class Migration(DataMigration):
         for field in orm.CustomField.objects.all():
             field.date_edited = field.date_created
             field.save()
-
-
 
     def backwards(self, orm):
         "Write your backwards methods here."
