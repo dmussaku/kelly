@@ -9,7 +9,8 @@
             1,2,3
         ],
         "title": "ALMA Cloud",
-        "date_created": "2014-09-10T00:00:00Z"
+        "date_created": "2014-09-10T00:00:00Z",
+        "date_edited": "2014-11-24T07:49:32.991Z"
     }
 },
 {
@@ -22,7 +23,8 @@
             2
         ],
         "title": "Arta",
-        "date_created": "2014-09-10T00:00:00Z"
+        "date_created": "2014-09-10T00:00:00Z",
+        "date_edited": "2014-11-24T07:49:32.991Z" 
     }
 },
 {
@@ -33,7 +35,8 @@
         "owner": 1, 
         "contacts": [],
         "title": "NASA",
-        "date_created": "2014-09-10T00:00:00Z"
+        "date_created": "2014-09-10T00:00:00Z",
+        "date_edited": "2014-11-24T07:49:32.991Z" 
     }
 }
 ]

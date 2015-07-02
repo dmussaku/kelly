@@ -5,7 +5,9 @@
         "fields": {
             "salary":"monthly",
             "amount":100000,
-            "currency":"KZT"
+            "currency":"KZT",
+            "date_created": "2014-09-10T00:00:00Z",
+            "date_edited": "2014-11-24T07:49:32.991Z" 
         }
     },
     {
@@ -14,7 +16,9 @@
         "fields": {
             "salary":"instant",
             "amount":120000,
-            "currency":"KZT"
+            "currency":"KZT",
+            "date_created": "2014-09-10T00:00:00Z",
+            "date_edited": "2014-11-24T07:49:32.991Z" 
         }
     },
     {
@@ -23,7 +27,9 @@
         "fields": {
             "salary":"annualy",
             "amount":100000,
-            "currency":"USD"
+            "currency":"USD",
+            "date_created": "2014-09-10T00:00:00Z",
+            "date_edited": "2014-11-24T07:49:32.991Z" 
         }
     },
     {
@@ -32,7 +38,9 @@
         "fields": {
             "salary":"monthly",
             "amount":1000000,
-            "currency":"KZT"
+            "currency":"KZT",
+            "date_created": "2014-09-10T00:00:00Z",
+            "date_edited": "2014-11-24T07:49:32.991Z" 
         }
     },
     {
@@ -41,7 +49,9 @@
         "fields": {
             "salary":"monthly",
             "amount":190000,
-            "currency":"KZT"
+            "currency":"KZT",
+            "date_created": "2014-09-10T00:00:00Z",
+            "date_edited": "2014-11-24T07:49:32.991Z" 
         }
     },
     {
@@ -50,7 +60,9 @@
         "fields": {
             "salary":"instant",
             "amount":1000000,
-            "currency":"KZT"
+            "currency":"KZT",
+            "date_created": "2014-09-10T00:00:00Z",
+            "date_edited": "2014-11-24T07:49:32.991Z" 
         }
     },
     {
@@ -59,7 +71,9 @@
         "fields": {
             "salary":"monthly",
             "amount":120000,
-            "currency":"KZT"
+            "currency":"KZT",
+            "date_created": "2014-09-10T00:00:00Z",
+            "date_edited": "2014-11-24T07:49:32.991Z" 
         }
     }
 ]

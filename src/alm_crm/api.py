@@ -3276,7 +3276,7 @@ class HashTagReferenceResource(CRMServiceModelResource):
 
     content_object = GenericForeignKeyField({
         Activity: ActivityResource,
-        Contact: ContactResource,
+        Share: ShareResource,
         Comment: CommentResource,
     }, 'content_object')
 
@@ -3288,7 +3288,7 @@ class HashTagReferenceResource(CRMServiceModelResource):
     def prepend_urls(self):
         return [
             url(
-                r"^(?P<resource_name>%s)/search%s$" %
+                r"^(?P<resource_name>%s)/search/(?P<pattern>\w+)%s$" %
                 (self._meta.resource_name, trailing_slash()),
                 self.wrap_view('search'),
                 name='api_search'
@@ -3297,7 +3297,7 @@ class HashTagReferenceResource(CRMServiceModelResource):
     def search(self, request, **kwargs):
         '''
         GET METHOD
-        I{URL}:  U{alma.net/api/v1/hashtag_reference/search}
+        I{URL}:  U{alma.net/api/v1/hashtag_reference/search/:hashtag/}
 
         Description:
         Api function to return Objects related with giver hashtag
@@ -3317,15 +3317,12 @@ class HashTagReferenceResource(CRMServiceModelResource):
 
         '''
         try:
-            if not request.GET.get('hashtag', None):
-                return self.create_response(
-                    request,
-                    {'success': False, 'error_string': 'HashTag text did not set'}
-                    )
+            if not kwargs.get('pattern', None):
+                return http.HttpBadRequest()
 
-            hashtag = HashTag.objects.get(text='#'+request.GET.get('hashtag', None))
+            hashtag = HashTag.objects.get(text='#'+kwargs.get('pattern', None))
             activities = []
-            contacts = []
+            shares = []
             comments = []
             sales_cycles = []
             for reference in hashtag.references.all():
@@ -3333,8 +3330,8 @@ class HashTagReferenceResource(CRMServiceModelResource):
                     activities.append(reference.content_object)
                     if reference.content_object.sales_cycle not in sales_cycles:
                         sales_cycles.append(reference.content_object.sales_cycle)
-                elif isinstance(reference.content_object, Contact):
-                    contacts.append(reference.content_object)
+                elif isinstance(reference.content_object, Share):
+                    shares.append(reference.content_object)
                 elif isinstance(reference.content_object, Comment):
                     comments.append(reference.content_object)
 
@@ -3344,10 +3341,10 @@ class HashTagReferenceResource(CRMServiceModelResource):
                 obj_dict['objects']['activities'] = \
                     activity_resource.get_bundle_list(activities, request)
 
-            if contacts:
-                contact_resource = ContactResource()
-                obj_dict['objects']['contacts'] = \
-                    contact_resource.get_bundle_list(contacts, request)
+            if shares:
+                share_resource = ShareResource()
+                obj_dict['objects']['shares'] = \
+                    share_resource.get_bundle_list(shares, request)
 
             if comments:
                 comment_resource = CommentResource()
@@ -3358,13 +3355,9 @@ class HashTagReferenceResource(CRMServiceModelResource):
                 salescycle_resource = SalesCycleResource()
                 obj_dict['objects']['sales_cycles'] = \
                     salescycle_resource.get_bundle_list(sales_cycles, request)
-            return self.create_response(request, obj_dict)
+            return self.create_response(request, obj_dict, response_class=http.HttpAccepted)
         except HashTag.DoesNotExist:
-            return self.create_response(
-                request,
-                {'success': False,
-                 'error_string': 'HashTag does not exits'}
-                )
+            return http.HttpNotFound()
 
 
 class CustomSectionResource(CRMServiceModelResource):

@@ -9,6 +9,7 @@
         "parent": null,
         "owner": 1,
         "date_created": "2014-09-10T00:00:00Z",
+        "date_edited": "2014-11-24T07:49:32.991Z", 
         "subscription_id": 1,
         "vcard": 1
     }
@@ -23,6 +24,7 @@
         "parent": null,
         "owner": 1,
         "date_created": "2014-09-10T00:00:00Z",
+        "date_edited": "2014-11-24T07:49:32.991Z", 
         "subscription_id": 1,
         "vcard": 2
     }
@@ -37,6 +39,7 @@
         "parent": null,
         "owner": 1,
         "date_created": "2014-09-10T00:00:00Z",
+        "date_edited": "2014-11-24T07:49:32.991Z", 
         "subscription_id": 1,
         "vcard": 3
     }
@@ -51,6 +54,7 @@
         "parent": null,
         "owner": 1,
         "date_created": "2014-09-10T00:00:00Z",
+        "date_edited": "2014-11-24T07:49:32.991Z", 
         "subscription_id": 1,
         "vcard": 4
     }
@@ -65,6 +69,7 @@
         "parent": null,
         "owner": 1,
         "date_created": "2014-12-27T09:50:00Z",
+        "date_edited": "2014-11-24T07:49:32.991Z", 
         "subscription_id": 1,
         "vcard": 5
     }

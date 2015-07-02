@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
+from datetime import datetime
 import re
 
 
@@ -8,6 +9,8 @@ class Company(models.Model):
     name = models.CharField(max_length=100, blank=False)
     owner = models.ManyToManyField('alm_user.User',
                                    related_name='owned_company')
+    date_created = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    date_edited = models.DateTimeField(auto_now=True, blank=True, null=True)
     subdomain = models.CharField(_('subdomain'), max_length=300,
                                  blank=False, unique=True)
 

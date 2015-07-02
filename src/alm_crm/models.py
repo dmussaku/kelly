@@ -158,7 +158,6 @@ class Contact(SubscriptionObject):
         _('contact type'),
         max_length=30,
         choices=TYPES_OPTIONS, default=USER_TP)
-    date_created = models.DateTimeField(blank=True, auto_now_add=True)
     vcard = models.OneToOneField('alm_vcard.VCard', blank=True, null=True,
                                  on_delete=models.SET_NULL, related_name='contact')
     parent = models.ForeignKey(
@@ -172,7 +171,6 @@ class Contact(SubscriptionObject):
         related_name='contact_latest_activity', null=True)
     mentions = generic.GenericRelation('Mention')
     comments = generic.GenericRelation('Comment')
-    hashtags = generic.GenericRelation('HashTagReference')
 
     class Meta:
         verbose_name = _('contact')
@@ -946,7 +944,6 @@ class Product(SubscriptionObject):
                                 default='KZT')
     owner = models.ForeignKey('CRMUser', related_name='crm_products',
                               null=True, blank=True)
-    date_created = models.DateTimeField(blank=True, auto_now_add=True)
     custom_sections = generic.GenericRelation('CustomSection')
     custom_fields = generic.GenericRelation('CustomField')
 
@@ -996,61 +993,40 @@ class Product(SubscriptionObject):
     @classmethod
     @transaction.atomic()
     def import_from_xls(cls, xls_file_data, creator):
+        '''
+        first column is name, second is description and third is price
+        '''
         book = xlrd.open_workbook(file_contents=xls_file_data)
         #book = xlrd.open_workbook(filename='medonica_products.xlsx')
         product_list = []
-        for sheet in book.sheets():
-            NUM_CELLS = sheet.nrows
-            a_col = sheet.col(0)
-            b_col = sheet.col(1)
-            c_col = sheet.col(2)
-            p = Product(
-                    name=b_col[0].value,
-                    description=b_col[1].value,
-                    price=b_col[2].value,
-                    subscription_id=creator.get_crmuser().subscription_id,
-                    owner=creator.get_crmuser()
-                    )
-            p.save()
-            i = 3
-            while (i<=NUM_CELLS):
-                if (a_col[i].value and b_col[i].value and not c_col[i].value):
+        sheet = book.sheets()[0]
+        col_names = [col_name.value for col_name in sheet.row(0)][3:]
+        for i in range(1, sheet.nrows):
+            row_vals = [val.value for val in sheet.row(i)]
+            if not row_vals[0]:
+                continue
+            product = Product(
+                name=row_vals[0],
+                subscription_id=creator.get_crmuser().subscription_id,
+                owner=creator.get_crmuser()
+                )
+            if row_vals[1]:
+                product.description = row_vals[1]
+            if row_vals[2]:
+                product.price = row_vals[2]
+            else:
+                product.price = 0
+            product.save()
+            for i in range(0, len(row_vals[3:])):
+                if row_vals[i]:
                     field = CustomField.build_new(
-                        title=a_col[i].value,
-                        value=b_col[i].value,
+                        title=col_names[i],
+                        value=row_vals[i],
                         content_class=Product,
-                        object_id=p.id,
+                        object_id=product.id,
                         save=True
                         )
-                    i+=1
-                elif(a_col[i].value and b_col[i].value and c_col[i].value):
-                    is_section = True
-                    section = CustomSection.build_new(
-                        title = a_col[i].value,
-                        content_class=Product,
-                        object_id=p.id,
-                        save=True
-                        )
-                    print section
-                    i += 1
-                    while(is_section):
-                        if (not a_col[i].value and not b_col[i].value and not b_col[i].value):
-                            is_section = False
-                            break
-                        else:
-                            field = CustomField.build_new(
-                                title=b_col[i].value,
-                                value=c_col[i].value,
-                                section = section,
-                                content_class=Product,
-                                object_id=p.id,
-                                save=True
-                                )
-                        i+=1
-                        if i==NUM_CELLS:
-                            break
-                i+=1
-            product_list.append(p)
+            product_list.append(product)
         return product_list
 
 class ProductGroup(SubscriptionObject):
@@ -1058,7 +1034,6 @@ class ProductGroup(SubscriptionObject):
     title = models.CharField(max_length=150)
     products = models.ManyToManyField(Product, related_name='product_groups',
                                    null=True, blank=True)
-    date_created = models.DateTimeField(blank=True, auto_now_add=True)
 
     class Meta:
         verbose_name = _('product_group')
@@ -1103,7 +1078,6 @@ class SalesCycle(SubscriptionObject):
         null=True, blank=True,)
     status = models.CharField(max_length=2,
                               choices=STATUSES_OPTIONS, default=NEW)
-    date_created = models.DateTimeField(blank=True, auto_now_add=True)
     from_date = models.DateTimeField(blank=False, auto_now_add=True)
     to_date = models.DateTimeField(blank=False, auto_now_add=True)
     mentions = generic.GenericRelation('Mention')
@@ -1363,18 +1337,12 @@ class SalesCycleLogEntry(SubscriptionObject):
     entry_type = models.CharField(max_length=2,
                               choices=TYPES_OPTIONS, default=MC)
     owner = models.ForeignKey(CRMUser, related_name='owner', null=True)
-    date_created = models.DateTimeField(blank=True, null=True,
-                                        auto_now_add=True)
-    date_edited = models.DateTimeField(blank=True, null=True, auto_now=True)
 
 
 class Activity(SubscriptionObject):
     title = models.CharField(max_length=100, null=True, blank=True)
     description = models.CharField(max_length=500)
     deadline = models.DateTimeField(blank=True, null=True)
-    date_created = models.DateTimeField(blank=True, null=True,
-                                        auto_now_add=True)
-    date_edited = models.DateTimeField(blank=True, null=True, auto_now=True)
     date_finished = models.DateTimeField(blank=True, null=True)
     need_preparation = models.BooleanField(default=False, blank=True)
     sales_cycle = models.ForeignKey(SalesCycle, related_name='rel_activities')
@@ -1621,8 +1589,6 @@ class Feedback(SubscriptionObject):
 
     feedback = models.CharField(max_length=300, null=True)
     status = models.CharField(max_length=1, choices=STATUSES_OPTIONS, default=WAITING)
-    date_created = models.DateTimeField(blank=True, auto_now_add=True)
-    date_edited = models.DateTimeField(blank=True, auto_now_add=True)
     activity = models.OneToOneField(Activity)
     value = models.OneToOneField(Value, blank=True, null=True)
     mentions = generic.GenericRelation('Mention')
@@ -1648,7 +1614,6 @@ class Mention(SubscriptionObject):
     content_type = models.ForeignKey(ContentType)
     object_id = models.IntegerField()
     content_object = generic.GenericForeignKey('content_type', 'object_id')
-    date_created = models.DateTimeField(blank=True, auto_now_add=True)
 
     def __unicode__(self):
         return "%s %s" % (self.user, self.content_object)
@@ -1686,8 +1651,6 @@ class Mention(SubscriptionObject):
 class Comment(SubscriptionObject):
     comment = models.CharField(max_length=140)
     owner = models.ForeignKey(CRMUser, related_name='comment_owner')
-    date_created = models.DateTimeField(blank=True, auto_now_add=True)
-    date_edited = models.DateTimeField(blank=True, auto_now_add=True)
     object_id = models.IntegerField(null=True, blank=False)
     content_type = models.ForeignKey(ContentType)
     content_object = generic.GenericForeignKey('content_type', 'object_id')
@@ -1743,9 +1706,9 @@ class Share(SubscriptionObject):
     contact = models.ForeignKey(Contact, related_name='share_set', blank=True, null=True)
     share_to = models.ForeignKey(CRMUser, related_name='in_shares')
     share_from = models.ForeignKey(CRMUser, related_name='owned_shares')
-    date_created = models.DateTimeField(blank=True, auto_now_add=True)
     comments = generic.GenericRelation('Comment')
     note = models.CharField(max_length=500, null=True)
+    hashtags = generic.GenericRelation('HashTagReference')
 
     class Meta:
         verbose_name = 'share'
@@ -1844,7 +1807,6 @@ class ContactList(SubscriptionObject):
     title = models.CharField(max_length=150)
     contacts = models.ManyToManyField(Contact, related_name='contact_list',
                                    null=True, blank=True)
-    date_created = models.DateTimeField(blank=True, auto_now_add=True)
 
     class Meta:
         verbose_name = _('contact_list')
@@ -1934,7 +1896,6 @@ class Filter(SubscriptionObject):
     filter_text = models.CharField(max_length=500)
     owner = models.ForeignKey(CRMUser, related_name='owned_filter')
     base = models.CharField(max_length=6, choices=BASE_OPTIONS, default='all')
-    date_created = models.DateTimeField(blank=True, auto_now_add=True)
 
     class Meta:
         verbose_name = _('filter')
@@ -1955,6 +1916,8 @@ class Filter(SubscriptionObject):
 
 class HashTag(models.Model):
     text = models.CharField(max_length=500, unique=True)
+    date_created = models.DateTimeField(auto_now_add=True, blank=True)
+    date_edited = models.DateTimeField(auto_now=True, blank=True)
 
     class Meta:
         verbose_name = _('hashtag')
@@ -1968,7 +1931,6 @@ class HashTagReference(SubscriptionObject):
     content_type = models.ForeignKey(ContentType)
     object_id = models.IntegerField()
     content_object = generic.GenericForeignKey('content_type', 'object_id')
-    date_created = models.DateTimeField(blank=True, auto_now_add=True)
 
     @property
     def owner(self):
@@ -2002,7 +1964,6 @@ class CustomSection(SubscriptionObject):
     content_type = models.ForeignKey(ContentType)
     object_id = models.IntegerField()
     content_object = generic.GenericForeignKey('content_type', 'object_id')
-    date_created = models.DateTimeField(blank=True, auto_now_add=True)
 
     @property
     def owner(self):
@@ -2034,7 +1995,6 @@ class CustomField(SubscriptionObject):
     content_type = models.ForeignKey(ContentType, null=True, blank=True)
     object_id = models.IntegerField(null=True, blank=True)
     content_object = generic.GenericForeignKey('content_type', 'object_id')
-    date_created = models.DateTimeField(blank=True, auto_now_add=True)
     section = models.ForeignKey('CustomSection', related_name='custom_fields', null=True, blank=True)
 
     @property
