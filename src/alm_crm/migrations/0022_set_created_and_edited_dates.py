@@ -98,7 +98,9 @@ class Migration(DataMigration):
             product = sc_prod_st.product
             if salescycle and product:
                 sc_prod_st.date_created = sc_prod_st.date_edited = max(sales_cycle.date_created, product.date_created)
-                sc_prod_st.save()
+            else:
+                sc_prod_st.date_created = sc_prod_st.date_edited = datetime.datetime.utcnow()
+            sc_prod_st.save()
 
         for ac_rec in orm.ActivityRecipient.objects.all():
             ac_rec.date_created = ac_rec.activity.date_created
