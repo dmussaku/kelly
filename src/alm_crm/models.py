@@ -173,7 +173,6 @@ class Contact(SubscriptionObject):
         related_name='contact_latest_activity', null=True)
     mentions = generic.GenericRelation('Mention')
     comments = generic.GenericRelation('Comment')
-    hashtags = generic.GenericRelation('HashTagReference')
 
     class Meta:
         verbose_name = _('contact')
@@ -1724,6 +1723,8 @@ class Share(SubscriptionObject):
     share_from = models.ForeignKey(CRMUser, related_name='owned_shares')
     comments = generic.GenericRelation('Comment')
     note = models.CharField(max_length=500, null=True)
+    hashtags = generic.GenericRelation('HashTagReference')
+    mentions = generic.GenericRelation('Mention')
 
     class Meta:
         verbose_name = 'share'

@@ -8,7 +8,7 @@ class Migration(DataMigration):
 
     def forwards(self, orm):
         "Write your forwards methods here."
-        # Note: Don't use "from appname.models import ModelName". 
+        # Note: Don't use "from appname.models import ModelName".
         # Use orm.ModelName to refer to models in this application,
         # and orm['appname.ModelName'] for models in other applications.
         for crm_user in orm.CRMUser.objects.all():
@@ -61,7 +61,7 @@ class Migration(DataMigration):
                 value.date_created = value.sales_cycle_as_real.rel_activities.\
                                                 filter(description__istartswith="closed")[0].date_created
                 value.date_edited = value.sales_cycle_as_real.rel_activities.\
-                                                filter(description__istartswith="closed")[0].date_created   
+                                                filter(description__istartswith="closed")[0].date_created
             except:
                 value.date_created = value.sales_cycle_as_real.rel_activities.all().order_by("date_created").last()
                 value.date_edited = value.sales_cycle_as_real.rel_activities.all().order_by("date_created").last()
