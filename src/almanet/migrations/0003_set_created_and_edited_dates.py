@@ -19,7 +19,7 @@ class Migration(DataMigration):
             elif contact:
                 subscription.date_created = contact.date_created
             elif product:
-                subscription.date_created = product.data_created
+                subscription.date_created = product.date_created
             else:
                 subscription.date_created = datetime.datetime.utcnow()
             subscription.date_edited = subscription.date_created
