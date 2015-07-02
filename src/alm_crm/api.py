@@ -2091,6 +2091,8 @@ class ShareResource(CRMServiceModelResource):
                 share_to=CRMUser.objects.get(id=int(json_obj.get('share_to')))
                 )
             s.save()
+            text_parser(base_text=s.note, content_class=s.__class__,
+                    object_id=s.id)
             share_list.append(s)
         return self.create_response(
             request, {
