@@ -2093,7 +2093,9 @@ class ShareResource(CRMServiceModelResource):
             s.save()
             text_parser(base_text=s.note, content_class=s.__class__,
                     object_id=s.id)
-            share_list.append(s)
+            if s.share_to.get_billing_user() == request.user:
+                share_list.append(s)
+                
         return self.create_response(
             request, {
                 'objects': self.get_bundle_list(share_list, request)
