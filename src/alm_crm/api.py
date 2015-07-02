@@ -3346,7 +3346,7 @@ class HashTagReferenceResource(CRMServiceModelResource):
             if shares:
                 share_resource = ShareResource()
                 obj_dict['objects']['shares'] = \
-                    share_resource.get_bundle_list(shares, request)
+                    share_resource.get_bundle_list(shares.filter(share_to=request.user), request)
 
             if comments:
                 comment_resource = CommentResource()
