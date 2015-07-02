@@ -1709,6 +1709,7 @@ class Share(SubscriptionObject):
     comments = generic.GenericRelation('Comment')
     note = models.CharField(max_length=500, null=True)
     hashtags = generic.GenericRelation('HashTagReference')
+    mentions = generic.GenericRelation('Mention')
 
     class Meta:
         verbose_name = 'share'

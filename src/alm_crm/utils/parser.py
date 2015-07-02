@@ -17,8 +17,9 @@ def text_parser(base_text, content_class=None, object_id=None):
 	hashtags = hashtag_parser.findall(base_text.decode('utf-8'))
 	mentions = mention_parser.findall(base_text.decode('utf-8'))
 
-	object = content_class.objects.get(id=object_id).hashtags.clear()
-	object.mentions.clear()
+	# delete hashtags and mention references in case of editing objects
+	content_class.objects.get(id=object_id).hashtags.clear()
+	content_class.objects.get(id=object_id).mentions.clear()
 	
 	for hashtag_item in hashtags:
 		hashtag, created = HashTag.objects.get_or_create(text=hashtag_item)
