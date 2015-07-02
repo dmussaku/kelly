@@ -22,7 +22,7 @@ class Migration(DataMigration):
                 subscription.date_created = product.data_created
             else:
                 subscription.date_created = datetime.datetime.utcnow()
-            subscipriont.date_edited = subscription.date_created
+            subscription.date_edited = subscription.date_created
             subscription.save()
 
     def backwards(self, orm):
