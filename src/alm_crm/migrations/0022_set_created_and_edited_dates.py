@@ -56,7 +56,7 @@ class Migration(DataMigration):
             sales_cycle.save()
 
         for value in orm.Value.objects.all():
-            if value.sales_cycle_as_real == None and value.sales_cycle_as_projected == None:
+            if not hasattr(value, 'sales_cycle_as_real') and not hasattr(value, 'sales_cycle_as_projected'):
                 value.delete()
                 continue
 
