@@ -1,11 +1,12 @@
 from django.db import models
 from django.contrib.auth.models import (
-    AbstractBaseUser, UserManager as contrib_user_manager)
+    AbstractBaseUser, PermissionsMixin, UserManager as contrib_user_manager)
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from timezone_field import TimeZoneField
 from almanet.models import Subscription
 from alm_vcard.models import VCard, Email
+from django.contrib.auth.models import Permission
 
 
 class UserManager(contrib_user_manager):
@@ -19,7 +20,7 @@ class UserManager(contrib_user_manager):
         return user
 
 
-class User(AbstractBaseUser):
+class User(AbstractBaseUser, PermissionsMixin):
 
     #REQUIRED_FIELDS = ['email']
     USERNAME_FIELD = 'email'
@@ -51,9 +52,9 @@ class User(AbstractBaseUser):
         # Simplest possible answer: All admins are staff
         return self.is_admin
 
-    @property
-    def is_superuser(self):
-        return self.is_admin
+    # @property
+    # def is_superuser(self):
+    #     return self.is_admin
 
     def save(self, *a, **kw):
         is_created = not hasattr(self, 'pk') or not self.pk
@@ -78,7 +79,14 @@ class User(AbstractBaseUser):
         return False
 
     def has_perm(self, perm, obj=None):
-        return self.is_admin
+        if self.is_admin and self.is_active:
+            return True
+        perm = Permission.objects.get(codename=perm)
+        if perm in self.user_permissions.all():
+            return True
+        else:
+            return False
+
 
     def get_short_name(self):
         return self.first_name

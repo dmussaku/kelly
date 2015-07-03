@@ -341,6 +341,13 @@ class ContactResource(CRMServiceModelResource):
         """
         A ORM-specific implementation of ``obj_create``.
         """
+        if not bundle.request.user.has_perm('add_contact'):
+            raise ImmediateHttpResponse(
+                HttpResponse(
+                    content=json.dumps({'success':False, 'message':'Not enough priveleges to perform that operation'}),
+                    content_type='application/json; charset=utf-8', status=403
+                    )
+                )
         bundle.obj = self._meta.object_class()
 
         for key, value in kwargs.items():
@@ -369,6 +376,7 @@ class ContactResource(CRMServiceModelResource):
         """
         A ORM-specific implementation of ``obj_update``.
         """
+        
         if not bundle.obj or not self.get_bundle_detail_data(bundle):
             try:
                 lookup_kwargs = self.lookup_kwargs_with_identifiers(bundle, kwargs)

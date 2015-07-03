@@ -7,6 +7,7 @@
     <title>Alma.Net • CRM</title>
     <link rel="shortcut icon" type="image/ico" href="img/favicon.ico" />
     <link rel="stylesheet" href="{% static 'css/app.min.css' %}" media="all">
+    <link rel='stylesheet' href="{% static 'css/colorpicker.css' %}" media='all'>
   </head>
   <body>
 
@@ -149,6 +150,7 @@
     </script>
 
     {% settings_value 'DEBUG' as debug_mode_on %}
+    <script type="text/javascript" src="{% static 'js/jscolor/jscolor.js' %}"></script>
     {% if debug_mode_on %}
     <script type="text/javascript" src="{% static 'js/bundle.js' %}"></script>
     {% else %}

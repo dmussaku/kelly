@@ -12,7 +12,8 @@
         "is_active": true, 
         "vcard": 1, 
         "last_login": "2014-11-11T07:51:02.253Z", 
-        "is_admin": false, 
+        "is_admin": true,
+        "is_superuser": true, 
         "timezone": "Asia/Almaty", 
         "password": "pbkdf2_sha256$12000$RfGiFmGJSeoz$063rfBSPM0AsFi1prglD5BW8qD1ElMYxBpRr5tO1M08=", 
         "email": "b.wayne@batman.bat"
@@ -31,7 +32,8 @@
         "is_active": true, 
         "vcard": 2, 
         "last_login": "2014-11-11T10:08:02.503Z", 
-        "is_admin": false, 
+        "is_admin": false,
+        "is_superuser": false, 
         "timezone": "Asia/Almaty", 
         "password": "pbkdf2_sha256$12000$RfGiFmGJSeoz$063rfBSPM0AsFi1prglD5BW8qD1ElMYxBpRr5tO1M08=", 
         "email": "abyken.nurlan@gmail.com"
@@ -50,7 +52,8 @@
         "is_active": true, 
         "vcard": 3, 
         "last_login": "2014-11-11T10:08:02.503Z", 
-        "is_admin": false, 
+        "is_admin": false,
+        "is_superuser": false, 
         "timezone": "Asia/Almaty", 
         "password": "pbkdf2_sha256$12000$RfGiFmGJSeoz$063rfBSPM0AsFi1prglD5BW8qD1ElMYxBpRr5tO1M08=", 
         "email": "dmussaku@gmail.com"
@@ -69,7 +72,8 @@
         "is_active": true, 
         "vcard": 4, 
         "last_login": "2014-11-11T10:08:02.503Z", 
-        "is_admin": false, 
+        "is_admin": false,
+        "is_superuser": false, 
         "timezone": "Asia/Almaty", 
         "password": "pbkdf2_sha256$12000$RfGiFmGJSeoz$063rfBSPM0AsFi1prglD5BW8qD1ElMYxBpRr5tO1M08=", 
         "email": "sattar94@outlook.com"
@@ -88,7 +92,8 @@
         "is_active": true, 
         "vcard": 5, 
         "last_login": "2015-01-22T10:10:03.205Z", 
-        "is_admin": false, 
+        "is_admin": false,
+        "is_superuser": false, 
         "timezone": "Asia/Almaty", 
         "password": "pbkdf2_sha256$12000$RfGiFmGJSeoz$063rfBSPM0AsFi1prglD5BW8qD1ElMYxBpRr5tO1M08=", 
         "email": "askar.money@gmail.com"

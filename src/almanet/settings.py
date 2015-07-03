@@ -113,7 +113,7 @@ class BaseConfiguration(SubdomainConfiguration, Configuration):
     # Application definition
     INSTALLED_APPS = (
         'django.contrib.admin',
-        # 'django.contrib.auth',
+        'django.contrib.auth',
         'mailviews',
         'djrill',
         'django.contrib.contenttypes',
@@ -132,7 +132,7 @@ class BaseConfiguration(SubdomainConfiguration, Configuration):
         'tastypie',
         'tastypie_swagger',
         'django_extensions',
-        'permission',
+        # 'permission',
     )
 
     MIDDLEWARE_CLASSES = (
