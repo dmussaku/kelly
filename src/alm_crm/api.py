@@ -1423,7 +1423,8 @@ class SalesCycleResource(CRMServiceModelResource):
                 return http.HttpAccepted()
             else:
                 return self.create_response(request, {
-                    'sales_cycle': SalesCycleResource().get_bundle_detail(sales_cycle, request),
+                    'sales_cycle': SalesCycleResource().get_bundle_detail(
+                        SalesCycle.objects.get(id=sales_cycle.id), request),
                 },
                 response_class=http.HttpAccepted)
 
