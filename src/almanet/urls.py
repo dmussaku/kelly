@@ -38,6 +38,7 @@ from alm_crm.api import (
     )
 from alm_user.api import UserResource
 from tastypie.resources import ModelResource
+from django.views.generic import TemplateView
 
 admin.autodiscover()
 
@@ -94,6 +95,7 @@ urlpatterns = patterns(
     url(r'^services/service_delete/(?P<pk>\d+)/$', ServiceDeleteView.as_view(), name='service_delete'),
     url(r'^api/', include(v1_api.urls)),
     url(r'api/doc/', include('tastypie_swagger.urls', namespace='tastypie_swagger')),
+    url(r'agreement/$', TemplateView.as_view(template_name='almanet/agreement.crm.html'), name='agreement'),
 
 )
 
