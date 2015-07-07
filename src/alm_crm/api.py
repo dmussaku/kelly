@@ -2876,7 +2876,8 @@ class AppStateObject(object):
             'vcard': {
                 'email': {'types': Email.TYPE_CHOICES},
                 'adr': {'types': Adr.TYPE_CHOICES},
-                'phone': {'types': Tel.TYPE_CHOICES}
+                'tel': {'types': Tel.TYPE_CHOICES},
+                'url': {'types': Url.TYPE_CHOICES}
             }
         }
 
