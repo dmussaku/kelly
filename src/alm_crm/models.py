@@ -23,8 +23,10 @@ from django.db.models import signals, Q
 from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
 from django.utils import timezone
-import datetime
+from datetime import datetime, timedelta
 import xlrd
+import pytz
+
 
 ALLOWED_TIME_PERIODS = ['week', 'month', 'year']
 
@@ -905,7 +907,7 @@ class Contact(SubscriptionObject):
             2. status is NEW"""
         q = Q(subscription_id=subscription_id)
         q &= Q(status=cls.NEW)
-        return cls.objects.filter(q).order_by('-date_created')           
+        return cls.objects.filter(q).order_by('-date_created')
 
 
 class Value(SubscriptionObject):
@@ -1090,6 +1092,10 @@ class SalesCycle(SubscriptionObject):
 
     def __unicode__(self):
         return '%s [%s %s]' % (self.title, self.contact, self.status)
+
+    @property
+    def activities_count(self):
+        return self.rel_activities.count()
 
     @classmethod
     def get_global(cls, subscription_id, contact_id):
@@ -1423,7 +1429,7 @@ class Activity(SubscriptionObject):
         # for r in self.recipients.all():
         #     if r.user_id == user_id:
         #         recip = r
-        #         break                
+        #         break
         return not recip or recip.has_read
 
     @classmethod
@@ -1437,6 +1443,15 @@ class Activity(SubscriptionObject):
             act.has_read = True
             act.save()
         return True
+
+    @classmethod
+    def get_filter_for_mobile(cls):
+        month = (datetime.now(pytz.timezone(settings.TIME_ZONE)) - timedelta(days=31))
+        return (
+            Q(deadline__isnull=False, date_finished__isnull=True) |
+            Q(deadline__isnull=False, date_finished__isnull=False, date_finished__gte=month) |
+            Q(deadline__isnull=True,  date_edited__gte=month )
+            )
 
     @classmethod
     def get_activities_by_contact(cls, contact_id):
@@ -1504,7 +1519,7 @@ class Activity(SubscriptionObject):
         need to implement the conversion to datetime object
         from input arguments
         '''
-        if (type(from_dt) and type(to_dt) == datetime.datetime):
+        if (type(from_dt) and type(to_dt) == datetime):
             pass
         activity_queryset = Activity.objects.filter(
             date_created__gte=from_dt, date_created__lte=to_dt, owner=crmuser)

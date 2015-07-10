@@ -8,13 +8,20 @@ class Migration(DataMigration):
 
     def forwards(self, orm):
         "Write your forwards methods here."
-        # Note: Don't use "from appname.models import ModelName". 
+        # Note: Don't use "from appname.models import ModelName".
         # Use orm.ModelName to refer to models in this application,
         # and orm['appname.ModelName'] for models in other applications.
         for subscription in orm.Subscription.objects.all():
             contact = orm['alm_crm.Contact'].objects.filter(subscription_id = subscription.id).order_by('date_created').first()
             product = orm['alm_crm.Product'].objects.filter(subscription_id = subscription.id).order_by('date_created').first()
-            subscription.date_created = min(contact.date_created, product.date_created)
+            if contact and product:
+                subscription.date_created = min(contact.date_created, product.date_created)
+            elif contact:
+                subscription.date_created = contact.date_created
+            elif product:
+                subscription.date_created = product.date_created
+            else:
+                subscription.date_created = datetime.datetime.utcnow()
             subscription.date_edited = subscription.date_created
             subscription.save()
 

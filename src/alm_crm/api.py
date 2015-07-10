@@ -70,8 +70,8 @@ from almanet.utils.env import get_subscr_id
 from django.conf.urls import url
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
-from django.db import models
-from django.db import transaction
+from django.db import models,transaction
+from django.db.models import Q
 from django.forms.models import model_to_dict
 from django.http import HttpResponse
 from django.utils import translation
@@ -82,14 +82,15 @@ from tastypie.authentication import (
     BasicAuthentication,
     )
 from tastypie.authorization import Authorization
-from tastypie.constants import ALL_WITH_RELATIONS
+from tastypie.constants import ALL, ALL_WITH_RELATIONS
 from tastypie.contrib.contenttypes.fields import GenericForeignKeyField
 from tastypie.exceptions import ImmediateHttpResponse, NotFound, Unauthorized
 from tastypie.resources import Resource, ModelResource
 from tastypie.serializers import Serializer
 from tastypie.utils import trailing_slash
 import ast
-import datetime
+from datetime import datetime, timedelta
+import pytz
 
 from .utils.parser import text_parser
 from .utils import report_builders
@@ -115,6 +116,85 @@ def _firstOfQuerySet(queryset):
         return None
 
 
+def use_in_field(field_name):
+    '''
+        tastypie's 'use_in' keywarg used for:
+             Optionally accepts ``use_in``. This may be one of ``list``, ``detail``
+            ``all``
+            or
+            a callable which accepts a ``bundle`` and returns
+            ``True`` or ``False``. Indicates wheather this field will be included
+            during dehydration of a list of objects or a single object. If ``use_in``
+            is a callable, and returns ``True``, the field will be included during
+            dehydration.
+            Defaults to ``all``.
+
+        Example:
+            see MobileStateResource, where passed to skip 'activities' in SalesCycles
+            see SalesCycleResource, 'activities' CustomToManyField with this function
+    '''
+    def use_in(bundle):
+        if hasattr(bundle, 'use_fields'):
+            if field_name in getattr(bundle, 'use_fields'):
+                return True
+        return False
+    return use_in
+
+
+def skip_in_field(field_name):
+    '''
+        works as use_in_field but opposite
+    '''
+    def use_in(bundle):
+        if hasattr(bundle, 'skip_fields'):
+            if field_name in getattr(bundle, 'skip_fields'):
+                return False
+        return True
+    return use_in
+
+
+class CustomToManyField(fields.ToManyField):
+    """
+    used to add 'full_use_ids' flag for return objects 'ids' not 'resource_uri'
+    """
+    def __init__(self, to, attribute, related_name=None, default=None,
+                 null=False, blank=False, readonly=False, full=False,
+                 unique=False, help_text=None, use_in='all', full_list=True, full_detail=True,
+
+                 full_use_ids=False
+                 ):
+
+        super(self.__class__, self).__init__(
+            to, attribute, related_name=related_name, default=default,
+            null=null, blank=blank, readonly=readonly, full=full,
+            unique=unique, help_text=help_text, use_in=use_in,
+            full_list=full_list, full_detail=full_detail
+        )
+
+        self.full_use_ids = full_use_ids
+
+
+    def dehydrate_related(self, bundle, related_resource, for_list=True):
+        """
+        Based on the ``full_resource``, returns either the endpoint or the data
+        from ``full_dehydrate`` for the related resource.
+
+        CUSTOM:
+            return 'id' as endpoint if full_use_ids
+        """
+
+        if self.full_use_ids:
+            return related_resource.get_resource_id(bundle)
+        else:
+            return super(self.__class__, self).dehydrate_related(bundle, related_resource, for_list=for_list)
+
+
+    def build_related_resource(self, value, request=None, related_obj=None, related_name=None):
+        print '@@@@', value
+        return super(self.__class__, self).build_related_resource(value, request=request,
+            related_obj=related_obj, related_name=related_name)
+
+
 class DummyPaginator(object):
     def __init__(self, request_data, objects, resource_uri=None,
                  limit=None, offset=0, max_limit=1000,
@@ -133,13 +213,27 @@ class CommonMeta:
                                          BasicAuthentication())
     authorization = Authorization()
     paginator_class = DummyPaginator
+    filtering = {
+        'date_edited': ALL_WITH_RELATIONS
+    }
 
 
 class CRMServiceModelResource(ModelResource):
 
     def apply_filters(self, request, applicable_filters):
+        '''
+            first 'q' is filter for limit by subscription_id;
+            additional filters (in one Q object) can be passed
+            in applicable_filters as value of 'q'-key
+        '''
+        q = Q(subscription_id=self.get_crmsubscr_id(request))
+
+        custom_Q = applicable_filters.pop('q', None)  # 'q' - key for Q() object
         objects = super(ModelResource, self).apply_filters(request, applicable_filters)
-        return objects.filter(subscription_id=self.get_crmsubscr_id(request))
+        if custom_Q:
+            q = q & custom_Q
+
+        return objects.filter(q)
 
     def hydrate(self, bundle):
         """
@@ -172,6 +266,9 @@ class CRMServiceModelResource(ModelResource):
         bundle = self.build_bundle(obj=obj, request=request)
         bundle = self.full_dehydrate(bundle)
         return bundle
+
+    def get_resource_id(self, bundle):
+        return self.detail_uri_kwargs(bundle)[self._meta.detail_uri_name]
 
     @classmethod
     def get_crmsubscr_id(cls, request):
@@ -243,9 +340,11 @@ class ContactResource(CRMServiceModelResource):
     #                                null=True, full=False)
     # assignees = fields.ToManyField('alm_crm.api.CRMUserResource', 'assignees',
     #                                null=True, full=False)
-    sales_cycles = fields.ToManyField(
-        'alm_crm.api.SalesCycleResource', 'sales_cycles',
-        related_name='contact', null=True, full=False)
+    # sales_cycles = fields.ToManyField(
+    #     'alm_crm.api.SalesCycleResource', 'sales_cycles',
+    #     related_name='contact', null=True, full=False)
+    sales_cycles = CustomToManyField('alm_crm.api.SalesCycleResource', 'sales_cycles',
+        null=True, full=False, full_use_ids=True)
     parent = fields.ToOneField(
         'alm_crm.api.ContactResource', 'parent',
         null=True, full=False
@@ -273,8 +372,10 @@ class ContactResource(CRMServiceModelResource):
         resource_name = 'contact'
         filtering = {
             'status': ['exact'],
-            'tp': ['exact']
+            'tp': ['exact'],
+            'id': ALL
         }
+        filtering.update(CommonMeta.filtering)
 
     def prepend_urls(self):
         return [
@@ -448,9 +549,6 @@ class ContactResource(CRMServiceModelResource):
 
     # def dehydrate_followers(self, bundle):
     #     return [follower.pk for follower in bundle.obj.followers.all()]
-
-    def dehydrate_sales_cycles(self, bundle):
-        return [sc.pk for sc in bundle.obj.sales_cycles.all()]
 
     def dehydrate_owner(self, bundle):
         return bundle.obj.owner.id
@@ -1230,6 +1328,7 @@ class ContactResource(CRMServiceModelResource):
             request, {'success':True}
             )
 
+
 class SalesCycleResource(CRMServiceModelResource):
     '''
     GET Method
@@ -1242,9 +1341,11 @@ class SalesCycleResource(CRMServiceModelResource):
     '''
     #contact = fields.ToOneField(ContactResource, 'contact')
     contact_id = fields.IntegerField(attribute='contact_id', null=True)
-    # activities = fields.ToManyField(
-    #     'alm_crm.api.ActivityResource', 'rel_activities',
-    #     related_name='sales_cycle', null=True, full=True)
+    activities = CustomToManyField('alm_crm.api.ActivityResource', 'rel_activities',
+        related_name='sales_cycle', null=True, full=False, full_use_ids=True,
+        use_in=skip_in_field('activities'))
+    activities_count = fields.IntegerField(attribute='activities_count', readonly=True,
+        use_in=use_in_field('activities_count'))
     # products = fields.ToManyField(
     #     'alm_crm.api.ProductResource', 'products',
     #     related_name='sales_cycles', null=True, full=False, readonly=True)
@@ -1265,7 +1366,6 @@ class SalesCycleResource(CRMServiceModelResource):
         null=True, blank=True, readonly=True, full=True)
     milestone_id = fields.IntegerField(null=True, attribute='milestone_id')
     log = fields.ToManyField('alm_crm.api.SalesCycleLogEntryResource', 'log', null=True, full=True)
-    activities = fields.ToManyField('alm_crm.api.ActivityResource', 'rel_activities', null=True, full=False)
 
     class Meta(CommonMeta):
         queryset = SalesCycle.objects.all().prefetch_related('product_stats', 'product_stats__product', 'rel_activities', 'log')
@@ -1301,6 +1401,20 @@ class SalesCycleResource(CRMServiceModelResource):
                 name='api_delete_sales_cycle'
             ),
         ]
+
+    def build_filters(self, filters=None):
+        if filters is None:
+            filters = {}
+        orm_filters = super(self.__class__, self).build_filters(filters=filters)
+
+        if 'limit_for' in filters:
+            if filters['limit_for'] == 'mobile':
+                orm_filters.update({
+                    'is_global': False,
+                    'status__in': [SalesCycle.NEW, SalesCycle.PENDING]
+                    })
+
+        return orm_filters
 
     def close(self, request, **kwargs):
         '''
@@ -1453,11 +1567,7 @@ class SalesCycleResource(CRMServiceModelResource):
             objects['sales_cycle'] = sales_cycle.id
             objects['activities'] = list(sales_cycle.rel_activities.all().values_list('id', flat=True))
             sales_cycle.delete()
-            return self.create_response(request, {'objects':objects}, response_class=http.HttpAccepted)
-
-    def dehydrate_activities(self, bundle):
-        return [a.id for a in bundle.obj.rel_activities.all()]
-        # return list(bundle.obj.rel_activities.values_list('id', flat=True))
+            return self.create_response(request, {'objects': objects}, response_class=http.HttpAccepted)
 
     def obj_create(self, bundle, **kwargs):
         bundle = super(self.__class__, self).obj_create(bundle, **kwargs)
@@ -1525,19 +1635,21 @@ class ActivityResource(CRMServiceModelResource):
     author_id = fields.IntegerField(attribute='owner_id', null=True)
     description = fields.CharField(attribute='description')
     need_preparation = fields.BooleanField(attribute='need_preparation')
-    sales_cycle_id = fields.IntegerField(null=True)
+    sales_cycle_id = fields.IntegerField(attribute='sales_cycle_id', null=True)
     feedback_status = fields.CharField(null=True)
     comments_count = fields.IntegerField(attribute='comments_count', readonly=True)
 
     class Meta(CommonMeta):
         queryset = Activity.objects.all().select_related('owner', 'feedback').prefetch_related('comments', 'recipients')
         resource_name = 'activity'
-        excludes = ['date_edited', 'subscription_id', 'title']
+        excludes = ['subscription_id', 'title']
         always_return_data = True
         filtering = {
             'author_id': ('exact', ),
             'owner': ALL_WITH_RELATIONS,
-            'sales_cycle': ALL_WITH_RELATIONS}
+            'sales_cycle_id': ALL_WITH_RELATIONS
+            }
+        filtering.update(CommonMeta.filtering)
 
     def prepend_urls(self):
         return [
@@ -1608,24 +1720,23 @@ class ActivityResource(CRMServiceModelResource):
     # def hydrate_milestone(self, obj):
     #     return Milestone.objects.get(pk=bundle.data['milestone'])
 
-    def dehydrate_sales_cycle_id(self, bundle):
-        return bundle.obj.sales_cycle_id
-
     def dehydrate_feedback_status(self, bundle):
         return bundle.obj.feedback_status
 
     def build_filters(self, filters=None):
-        filters = super(self.__class__, self).build_filters(filters=filters)
-        _add_filters, _del_keys = {}, set([])
+        if filters is None:
+            filters = {}
+        orm_filters = super(self.__class__, self).build_filters(filters=filters)
+
         for k, v in filters.iteritems():
             if k.startswith('author_id'):
-                _add_filters[k.replace('author_id', 'owner__id')] = v
-                _del_keys.add(k)
+                orm_filters[k.replace('author_id', 'owner__id')] = v
+                orm_filters.pop(k)
+            if k == 'limit_for' and  v == 'mobile':
+                orm_filters.update({'q': Activity.get_filter_for_mobile()})
 
-        for k in _del_keys:
-            filters.pop(k)
-        filters.update(_add_filters)
-        return filters
+        return orm_filters
+
 
     def get_comments(self, request, **kwargs):
         '''
@@ -1674,7 +1785,7 @@ class ActivityResource(CRMServiceModelResource):
                 format=request.META.get('CONTENT_TYPE', 'application/json'))
             activity = Activity.objects.get(id=data.get('id'))
             activity.description = data.get('description')
-            activity.date_finished = datetime.datetime.now(request.user.timezone)
+            activity.date_finished = datetime.now(request.user.timezone)
             activity.save()
         return self.create_response(
             request, {'activity': ActivityResource().full_dehydrate(
@@ -1951,13 +2062,17 @@ class CRMUserResource(CRMServiceModelResource):
     @undocumented: Meta
     '''
 #    user = fields.ToOneField('alm_user.api.UserResource', 'user', null=True, full=True, readonly=True)
-    unfollow_list = fields.ToManyField(ContactResource, 'unfollow_list', null=True, full=False)
+    unfollow_list = CustomToManyField(ContactResource, 'unfollow_list', null=True, full=False, full_use_ids=True)
     vcard = fields.ToOneField('alm_vcard.api.VCardResource',
         attribute=lambda bundle: bundle.obj.get_billing_user(cache=True).vcard, null=True, full=True)
 
     class Meta(CommonMeta):
         queryset = CRMUser.objects.all().prefetch_related('unfollow_list')
         resource_name = 'crmuser'
+        filtering = {
+            "id": ALL,
+        }
+        filtering.update(CommonMeta.filtering)
 
     def prepend_urls(self):
         return [
@@ -1968,9 +2083,6 @@ class CRMUserResource(CRMServiceModelResource):
                 name='api_follow_unfollow'
             ),
         ]
-
-    def dehydrate_unfollow_list(self, bundle):
-        return [c.id for c in bundle.obj.unfollow_list.all()]
 
     def full_dehydrate(self, bundle, for_list=False):
         bundle = super(self.__class__, self).full_dehydrate(bundle, for_list=True)
@@ -2098,7 +2210,7 @@ class ShareResource(CRMServiceModelResource):
                     object_id=s.id)
             if s.share_to.get_billing_user() == request.user:
                 share_list.append(s)
-                
+
         return self.create_response(
             request, {
                 'objects': self.get_bundle_list(share_list, request)
@@ -2548,6 +2660,73 @@ class ContactListResource(CRMServiceModelResource):
                 )
 
 
+class ConstantsObject(object):
+    '''
+    @undocumented: __init__
+    '''
+
+    def __init__(self, service_slug=None, bundle=None):
+        if service_slug is None:
+            return
+        # request = bundle.request
+
+        self.data = {
+            'sales_cycle': {
+                'statuses': SalesCycle.STATUSES_OPTIONS,
+                'statuses_hash': SalesCycle.STATUSES_DICT
+            },
+            'sales_cycle_log_entry': {
+                'types_hash': SalesCycleLogEntry.TYPES_DICT
+            },
+            'activity': {
+                'feedback_options': Feedback.STATUSES_OPTIONS,
+                'feedback_hash': Feedback.STATUSES_DICT
+            },
+            'contact': {
+                'statuses': Contact.STATUSES_OPTIONS,
+                'statuses_hash': Contact.STATUSES_DICT,
+                'tp': Contact.TYPES_OPTIONS,
+                'tp_hash': Contact.TYPES_DICT
+            },
+            'vcard': {
+                'email': {'types': Email.TYPE_CHOICES},
+                'adr': {'types': Adr.TYPE_CHOICES},
+                'phone': {'types': Tel.TYPE_CHOICES}
+            }
+        }
+
+    def to_dict(self):
+        return self.data
+
+
+class ConstantsResource(Resource):
+    '''
+    ALL Method
+    I{URL}:  U{alma.net/api/v1/constants/}
+
+    B{Description}:
+    API resource to get all data of application initial state:
+    objects(users, contacts, activities, etc.), constants and session data
+
+    @undocumented: Meta
+    '''
+    # objects = fields.DictField(attribute='objects', readonly=True)
+    # # constants = fields.DictField(attribute='constants', readonly=True)
+    # # session = fields.DictField(attribute='session', readonly=True)
+
+    class Meta:
+        resource_name = 'constants'
+        authorization = Authorization()
+
+    def get_detail(self, request, **kwargs):
+        base_bundle = self.build_bundle(request=request)
+        constants = self.obj_get(bundle=base_bundle, **kwargs)
+        return self.create_response(request, {"constants": constants.to_dict()})
+
+    def obj_get(self, bundle, **kwargs):
+        return ConstantsObject(service_slug=DEFAULT_SERVICE, bundle=bundle)
+
+
 class AppStateObject(object):
     '''
     @undocumented: __init__, get_users, get_company, get_contacts,
@@ -2559,6 +2738,7 @@ class AppStateObject(object):
         if service_slug is None:
             return
         self.request = request
+        self.service_slug = service_slug
         self.current_user = request.user
         self.subscription_id = get_subscr_id(request.user_env, service_slug)
         self.company = request.user.get_company()
@@ -3226,6 +3406,100 @@ class AppStateResource(Resource):
             return self.create_response(request, {'objects': obj.get_session()}, response_class=http.HttpAccepted)
 
 
+class MobileStateObject(object):
+    '''
+    @undocumented: __init__, get_users, get_company, get_contacts,
+    get_sales_cycles, get_activities, get_shares, get_constants,
+    get_session
+    '''
+
+    def __init__(self, service_slug=None, bundle=None):
+        if service_slug is None:
+            return
+        request = bundle.request
+        self.request = request
+        self.current_user = request.user
+        self.subscription_id = get_subscr_id(request.user_env, service_slug)
+        self.company = request.user.get_company()
+        self.current_crmuser = request.user.get_subscr_user(self.subscription_id)
+
+        sales_cycles = SalesCycleResource().obj_get_list(bundle, limit_for='mobile')
+
+        sc_ids_param = ','.join([str(sc.id) for sc in sales_cycles])
+        activities = ActivityResource().obj_get_list(bundle, limit_for='mobile',
+            sales_cycle_id__in=sc_ids_param)
+
+        contact_ids_param = ','.join(set([str(sc.contact_id) for sc in sales_cycles]))
+        contacts = ContactResource().obj_get_list(bundle, id__in=contact_ids_param)
+
+        cu_ids = set([str(a.owner_id) for a in activities])
+        cu_ids = cu_ids.union([str(sc.owner_id) for sc in sales_cycles])
+        cu_ids_param = ','.join(cu_ids)
+        users = CRMUserResource().obj_get_list(bundle, id__in=cu_ids_param)
+
+        milestones = MilestoneResource().obj_get_list(bundle)
+
+        self.resources = {
+            'sales_cycles': SalesCycleResource,
+            'activities': ActivityResource,
+            'contacts': ContactResource,
+            'users': CRMUserResource,
+            'milestones': MilestoneResource
+        }
+
+        self.objects = {
+            'sales_cycles': sales_cycles,
+            'activities': activities,
+            'contacts': contacts,
+            'users': users,
+            'milestones': milestones
+        }
+
+
+class MobileStateResource(Resource):
+    '''
+    ALL Method
+    I{URL}:  U{alma.net/api/v1/mobile_state/}
+
+    B{Description}:
+    API resource to get all data of application initial state:
+    objects(users, contacts, activities, etc.), constants and session data
+
+    @undocumented: Meta
+    '''
+    # objects = fields.DictField(attribute='objects', readonly=True)
+    # # constants = fields.DictField(attribute='constants', readonly=True)
+    # # session = fields.DictField(attribute='session', readonly=True)
+
+    class Meta:
+        resource_name = 'mobile_state'
+        authorization = Authorization()
+
+    def get_detail(self, request, **kwargs):
+        base_bundle = self.build_bundle(request=request)
+        mobile_state = self.obj_get(bundle=base_bundle, **kwargs)
+
+        serialized = {
+            'objects': {},
+            'constants': ConstantsObject(service_slug=DEFAULT_SERVICE).to_dict(),
+            'timestamp': datetime.now(pytz.timezone(settings.TIME_ZONE)).__str__()
+        }
+        for resource_name, objects in mobile_state.objects.iteritems():
+            bundles = []
+            ResourceInstance = mobile_state.resources[resource_name]()
+            for obj in objects:
+                bundle = self.build_bundle(obj=obj, request=request)
+                setattr(bundle, 'skip_fields', ['activities'])
+                setattr(bundle, 'use_fields', ['activities_count'])
+                bundles.append(ResourceInstance.full_dehydrate(bundle, for_list=True))
+            serialized['objects'][resource_name] = bundles
+
+        return self.create_response(request, serialized)
+
+    def obj_get(self, bundle, **kwargs):
+        return MobileStateObject(service_slug=DEFAULT_SERVICE, bundle=bundle)
+
+
 class SalesCycleProductStatResource(CRMServiceModelResource):
     '''
     ALL Method
@@ -3428,15 +3702,6 @@ class CustomFieldResource(CRMServiceModelResource):
         queryset = CustomField.objects.all()
         resource_name = 'custom_field'
 
-    def hydrate(self, bundle):
-        """
-        CustomField have property owner which is
-        content_object owner, we shouldn't set owner
-        """
-        crmuser = self.get_crmuser(bundle.request)
-        if not crmuser:
-            return
-        return bundle
 
 class ReportResource(Resource):
     '''

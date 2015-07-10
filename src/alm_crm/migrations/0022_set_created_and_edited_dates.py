@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import datetime
 from south.utils import datetime_utils as datetime
 from south.db import db
 from south.v2 import DataMigration
@@ -8,7 +9,7 @@ class Migration(DataMigration):
 
     def forwards(self, orm):
         "Write your forwards methods here."
-        # Note: Don't use "from appname.models import ModelName". 
+        # Note: Don't use "from appname.models import ModelName".
         # Use orm.ModelName to refer to models in this application,
         # and orm['appname.ModelName'] for models in other applications.
         for crm_user in orm.CRMUser.objects.all():
@@ -23,7 +24,10 @@ class Migration(DataMigration):
 
         for contact in orm.Contact.objects.all():
             for salescycle in contact.sales_cycles.all():
-                contact.date_edited = salescycle.rel_activities.all().order_by("date_created").first()
+                try:
+                    contact.date_edited = salescycle.rel_activities.all().order_by("date_created").first().date_created
+                except:
+                    contact.date_edited = contact.date_created
                 contact.save()
 
 
@@ -53,7 +57,7 @@ class Migration(DataMigration):
             sales_cycle.save()
 
         for value in orm.Value.objects.all():
-            if value.sales_cycle_as_real == None and value.sales_cycle_as_projected == None:
+            if not hasattr(value, 'sales_cycle_as_real') and not hasattr(value, 'sales_cycle_as_projected'):
                 value.delete()
                 continue
 
@@ -61,10 +65,18 @@ class Migration(DataMigration):
                 value.date_created = value.sales_cycle_as_real.rel_activities.\
                                                 filter(description__istartswith="closed")[0].date_created
                 value.date_edited = value.sales_cycle_as_real.rel_activities.\
-                                                filter(description__istartswith="closed")[0].date_created   
+                                                filter(description__istartswith="closed")[0].date_created
             except:
-                value.date_created = value.sales_cycle_as_real.rel_activities.all().order_by("date_created").last()
-                value.date_edited = value.sales_cycle_as_real.rel_activities.all().order_by("date_created").last()
+                try:
+                    value.date_created = value.sales_cycle_as_real.rel_activities.all().order_by("date_created").last().date_created
+                except:
+                    value.date_created = datetime.datetime.utcnow()
+
+                try:
+                    value.date_edited = value.sales_cycle_as_real.rel_activities.all().order_by("date_created").last().date_created
+                except:
+                    value.date_edited = datetime.datetime.utcnow()
+            value.save()
 
         for product in orm.Product.objects.all():
             product.date_edited = product.date_created
@@ -83,7 +95,12 @@ class Migration(DataMigration):
             contact_list.save()
 
         for sc_prod_st in orm.SalesCycleProductStat.objects.all():
-            sc_prod_st.date_created = sc_prod_st.date_edited = max(sc_prod_st.sales_cycle.date_created, sc_prod_st.product.date_created)
+            salescycle = sc_prod_st.sales_cycle
+            product = sc_prod_st.product
+            if salescycle and product:
+                sc_prod_st.date_created = sc_prod_st.date_edited = max(sales_cycle.date_created, product.date_created)
+            else:
+                sc_prod_st.date_created = sc_prod_st.date_edited = datetime.datetime.utcnow()
             sc_prod_st.save()
 
         for ac_rec in orm.ActivityRecipient.objects.all():
@@ -100,8 +117,14 @@ class Migration(DataMigration):
             hashtagreference.save()
 
         for hashtag in orm.HashTag.objects.all():
-            hashtag.date_created = hashtag.references.order_by("date_created").first().date_created
-            hashtag.date_edited = hashtag.references.order_by("date_edited").first().date_edited
+            try:
+                hashtag.date_created = hashtag.references.order_by("date_created").first().date_created
+            except:
+                hashtag.date_created = datetime.datetime.utcnow()
+            try:
+                hashtag.date_edited = hashtag.references.order_by("date_edited").first().date_edited
+            except:
+                hashtag.date_edited = hashtag.date_created
             hashtag.save()
 
         for section in orm.CustomSection.objects.all():
@@ -111,8 +134,6 @@ class Migration(DataMigration):
         for field in orm.CustomField.objects.all():
             field.date_edited = field.date_created
             field.save()
-
-
 
     def backwards(self, orm):
         "Write your backwards methods here."

@@ -9,6 +9,7 @@ venv
 api_docs/*
 src/static/js/bundle.js
 src/static/css/app.min.css
+src/temp_dir/*
 pids
 logs
 conf/supervisord.conf
