@@ -35,6 +35,8 @@ from alm_crm.api import (
     CustomFieldResource,
     ReportResource,
     HashTagReferenceResource,
+    EmbeddableContactFormResource,
+    EmbeddableFormFieldResource,
     )
 from alm_user.api import UserResource
 from tastypie.resources import ModelResource
@@ -69,6 +71,8 @@ v1_api.register(CustomFieldResource())
 v1_api.register(MilestoneResource())
 v1_api.register(ReportResource())
 v1_api.register(HashTagReferenceResource())
+v1_api.register(EmbeddableContactFormResource())
+v1_api.register(EmbeddableFormFieldResource())
 
 
 urlpatterns = patterns(

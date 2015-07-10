@@ -2026,3 +2026,36 @@ class CustomField(SubscriptionObject):
         if save:
             custom_field.save()
         return custom_field
+
+
+class EmbeddableContactForm(SubscriptionObject):
+    textSuccess = models.CharField(max_length=140, null=True, blank=True)
+    textShare = models.CharField(max_length=140, null=True, blank=True)
+    share_to = models.ForeignKey(CRMUser, null=True, blank=True)
+    inlineCSS = models.CharField(max_length=5000, null=True, blank=True)
+    owner = models.ForeignKey('CRMUser', null=True, blank=True, related_name='owned_embeddable_contact_forms')
+
+    class Meta:
+        verbose_name = 'embeddable_contact_form'
+        db_table = settings.DB_PREFIX.format('embeddable_contact_form')
+
+    def __unicode__(self):
+        return "created by %s" % (self.owner)
+
+    def get_fields(self):
+        return self.fields.order_by('order')
+
+
+class EmbeddableFormField(SubscriptionObject):
+    title = models.CharField(max_length=140)
+    type = models.CharField(max_length=30)
+    order = models.IntegerField()
+    form = models.ForeignKey(EmbeddableContactForm, related_name='form_fields', null=True)
+
+    class Meta:
+        verbose_name = 'embeddable_form_field'
+        db_table = settings.DB_PREFIX.format('embeddable_form_field')
+
+    def __unicode__(self):
+        return "%s-%s at %s" % (self.title, self.type, self.order)
+

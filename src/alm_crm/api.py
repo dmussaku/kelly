@@ -21,6 +21,8 @@ from .models import (
     HashTagReference,
     CustomSection,
     CustomField,
+    EmbeddableContactForm,
+    EmbeddableFormField,
     )
 from alm_vcard.api import (
     VCardResource,
@@ -3486,3 +3488,64 @@ class ReportResource(Resource):
         return self.create_response(
             request,
             report_builders.build_realtime_funnel(request.user.get_crmuser().subscription_id))
+
+
+class EmbeddableContactFormResource(CRMServiceModelResource):
+    '''
+    ALL Method
+    I{URL}:  U{alma.net/api/v1/embeddable_contact_form/}
+
+    B{Description}:
+    API resource to get data for embeddable_contact_form
+
+    @undocumented: Meta
+    '''
+
+    form_fields = fields.ToManyField(
+        'alm_crm.api.EmbeddableFormFieldResource', 'form_fields',
+        related_name='form', null=True, full=True)
+
+    class Meta:
+        resource_name = 'embeddable_contact_form'
+        object_class = EmbeddableContactForm
+        queryset = EmbeddableContactForm.objects.all()
+        authorization = Authorization()
+
+    # def hydrate_fields(self, bundle):
+    #     if ('fields' in bundle.data) and isinstance(bundle.data['fields'][0], dict):
+    #         fields = []
+    #         for index, field_data in enumerate(bundle.data['fields']):
+    #             fields.append( 
+    #                 EmbeddableFormField(order=index, title=field_data['title'], type=field_data['type'],
+    #                                     subscription_id=bundle.request.user.get_crmuser().subscription_id) 
+    #             )
+    #         bundle.data['fields'] = [EmbeddableFormFieldResource().build_bundle(obj=field) for field in fields]
+
+    #         print 'hydrate_fields:', fields
+
+    #     return bundle
+
+    # def dehydrate_fields(self, bundle):
+    #     return [{type: field.type, title: field.title} for field in bundle.obj.get_fields().all()]
+
+
+class EmbeddableFormFieldResource(CRMServiceModelResource):
+    '''
+    ALL Method
+    I{URL}:  U{alma.net/api/v1/embeddable_form_field/}
+
+    B{Description}:
+    API resource to get data for embeddable_form_field
+
+    @undocumented: Meta
+    '''
+
+    order = fields.IntegerField(attribute='order')
+    type = fields.CharField(attribute='type')
+    title = fields.CharField(attribute='title')
+
+    class Meta:
+        resource_name = 'embeddable_form_field'
+        object_class = EmbeddableFormField
+        queryset = EmbeddableFormField.objects.all()
+        authorization = Authorization()
