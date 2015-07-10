@@ -49,6 +49,9 @@ urlpatterns = patterns(
     url(r'^$', crmuser_required(
         CRMWelcomeView.as_view(template_name='crm/index.html')),
         name='crm_home'),
+    url(r'^embedded_contact_form/$', crmuser_required(
+        CRMWelcomeView.as_view(template_name='crm/embedded_contact_form.html')),
+        name='crm_embedded_contact_form'),
     # url(r'^feed/$', crmuser_required(
     #     FeedView.as_view(template_name='crm/feeds/feed.html')),
     #     name='feed'),
