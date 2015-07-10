@@ -4,6 +4,7 @@ venv
 *.pth
 *.save
 *.DS_store
+*.mo
 .coverage
 api_docs/*
 src/static/js/bundle.js

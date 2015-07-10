@@ -118,8 +118,8 @@ def use_in_field(field_name):
     '''
         tastypie's 'use_in' keywarg used for:
              Optionally accepts ``use_in``. This may be one of ``list``, ``detail``
-            ``all`` 
-            or 
+            ``all``
+            or
             a callable which accepts a ``bundle`` and returns
             ``True`` or ``False``. Indicates wheather this field will be included
             during dehydration of a list of objects or a single object. If ``use_in``
@@ -179,7 +179,7 @@ class CustomToManyField(fields.ToManyField):
 
         CUSTOM:
             return 'id' as endpoint if full_use_ids
-        """ 
+        """
 
         if self.full_use_ids:
             return related_resource.get_resource_id(bundle)
@@ -189,7 +189,7 @@ class CustomToManyField(fields.ToManyField):
 
     def build_related_resource(self, value, request=None, related_obj=None, related_name=None):
         print '@@@@', value
-        return super(self.__class__, self).build_related_resource(value, request=request, 
+        return super(self.__class__, self).build_related_resource(value, request=request,
             related_obj=related_obj, related_name=related_name)
 
 
@@ -221,7 +221,7 @@ class CRMServiceModelResource(ModelResource):
     def apply_filters(self, request, applicable_filters):
         '''
             first 'q' is filter for limit by subscription_id;
-            additional filters (in one Q object) can be passed 
+            additional filters (in one Q object) can be passed
             in applicable_filters as value of 'q'-key
         '''
         q = Q(subscription_id=self.get_crmsubscr_id(request))
@@ -341,7 +341,7 @@ class ContactResource(CRMServiceModelResource):
     # sales_cycles = fields.ToManyField(
     #     'alm_crm.api.SalesCycleResource', 'sales_cycles',
     #     related_name='contact', null=True, full=False)
-    sales_cycles = CustomToManyField('alm_crm.api.SalesCycleResource', 'sales_cycles', 
+    sales_cycles = CustomToManyField('alm_crm.api.SalesCycleResource', 'sales_cycles',
         null=True, full=False, full_use_ids=True)
     parent = fields.ToOneField(
         'alm_crm.api.ContactResource', 'parent',
@@ -1408,7 +1408,7 @@ class SalesCycleResource(CRMServiceModelResource):
         if 'limit_for' in filters:
             if filters['limit_for'] == 'mobile':
                 orm_filters.update({
-                    'is_global': False, 
+                    'is_global': False,
                     'status__in': [SalesCycle.NEW, SalesCycle.PENDING]
                     })
 
@@ -1537,7 +1537,8 @@ class SalesCycleResource(CRMServiceModelResource):
                 return http.HttpAccepted()
             else:
                 return self.create_response(request, {
-                    'sales_cycle': SalesCycleResource().get_bundle_detail(sales_cycle, request),
+                    'sales_cycle': SalesCycleResource().get_bundle_detail(
+                        SalesCycle.objects.get(id=sales_cycle.id), request),
                 },
                 response_class=http.HttpAccepted)
 
@@ -2207,7 +2208,7 @@ class ShareResource(CRMServiceModelResource):
                     object_id=s.id)
             if s.share_to.get_billing_user() == request.user:
                 share_list.append(s)
-                
+
         return self.create_response(
             request, {
                 'objects': self.get_bundle_list(share_list, request)
@@ -3034,7 +3035,31 @@ class AppStateObject(object):
     #     # return ShareResource().get_bundle_list(shares, self.request)
 
     def get_constants(self):
-        return ConstantsObject(service_slug=self.service_slug).to_dict
+        return {
+            'sales_cycle': {
+                'statuses': SalesCycle.STATUSES_OPTIONS,
+                'statuses_hash': SalesCycle.STATUSES_DICT
+            },
+            'sales_cycle_log_entry': {
+                'types_hash': SalesCycleLogEntry.TYPES_DICT
+            },
+            'activity': {
+                'feedback_options': Feedback.STATUSES_OPTIONS,
+                'feedback_hash': Feedback.STATUSES_DICT
+            },
+            'contact': {
+                'statuses': Contact.STATUSES_OPTIONS,
+                'statuses_hash': Contact.STATUSES_DICT,
+                'tp': Contact.TYPES_OPTIONS,
+                'tp_hash': Contact.TYPES_DICT
+            },
+            'vcard': {
+                'email': {'types': Email.TYPE_CHOICES},
+                'adr': {'types': Adr.TYPE_CHOICES},
+                'tel': {'types': Tel.TYPE_CHOICES},
+                'url': {'types': Url.TYPE_CHOICES}
+            }
+        }
 
     def get_session(self):
         return {
@@ -3399,7 +3424,7 @@ class MobileStateObject(object):
         sales_cycles = SalesCycleResource().obj_get_list(bundle, limit_for='mobile')
 
         sc_ids_param = ','.join([str(sc.id) for sc in sales_cycles])
-        activities = ActivityResource().obj_get_list(bundle, limit_for='mobile', 
+        activities = ActivityResource().obj_get_list(bundle, limit_for='mobile',
             sales_cycle_id__in=sc_ids_param)
 
         contact_ids_param = ','.join(set([str(sc.contact_id) for sc in sales_cycles]))

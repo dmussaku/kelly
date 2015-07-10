@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-21 06:55+0000\n"
+"POT-Creation-Date: 2015-07-07 18:47+0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -21,11 +21,11 @@ msgstr ""
 msgid "Cannot take this subdomain"
 msgstr ""
 
-#: alm_company/models.py:12
+#: alm_company/models.py:14
 msgid "subdomain"
 msgstr ""
 
-#: alm_company/models.py:16
+#: alm_company/models.py:18
 msgid "company"
 msgstr ""
 
@@ -33,138 +33,182 @@ msgstr ""
 msgid "Company Settings Page"
 msgstr ""
 
-#: alm_crm/models.py:18
-msgid "new_contact"
-msgstr ""
-
-#: alm_crm/models.py:19
-msgid "lead_contact"
-msgstr ""
-
-#: alm_crm/models.py:20
-msgid "opportunity_contact"
-msgstr ""
-
-#: alm_crm/models.py:21
-msgid "client_contact"
-msgstr ""
-
-#: alm_crm/models.py:38
+#: alm_crm/models.py:45
 msgid "user id"
 msgstr ""
 
-#: alm_crm/models.py:39
+#: alm_crm/models.py:46
 msgid "organization id"
 msgstr ""
 
-#: alm_crm/models.py:40
+#: alm_crm/models.py:47
 msgid "is supervisor"
 msgstr ""
 
-#: alm_crm/models.py:88
+#: alm_crm/models.py:100 alm_vcard/models.py:1045
+msgid "title"
+msgstr ""
+
+#: alm_crm/models.py:101
+msgid "color code"
+msgstr ""
+
+#: alm_crm/models.py:104
+msgid "milestone"
+msgstr ""
+
+#: alm_crm/models.py:138
+msgid "new_contact"
+msgstr ""
+
+#: alm_crm/models.py:139
+msgid "lead_contact"
+msgstr ""
+
+#: alm_crm/models.py:140
+msgid "opportunity_contact"
+msgstr ""
+
+#: alm_crm/models.py:141
+msgid "client_contact"
+msgstr ""
+
+#: alm_crm/models.py:147
 msgid "company type"
 msgstr ""
 
-#: alm_crm/models.py:89
+#: alm_crm/models.py:148
 msgid "user type"
 msgstr ""
 
-#: alm_crm/models.py:91
+#: alm_crm/models.py:151
+msgid "Imported at "
+msgstr ""
+
+#: alm_crm/models.py:154
 msgid "contact status"
 msgstr ""
 
-#: alm_crm/models.py:95
+#: alm_crm/models.py:158
 msgid "contact type"
 msgstr ""
 
-#: alm_crm/models.py:113
+#: alm_crm/models.py:176
 msgid "contact"
 msgstr ""
 
-#: alm_crm/models.py:134 alm_crm/models.py:139 alm_crm/models.py:145
-#: alm_crm/models.py:150
+#: alm_crm/models.py:197 alm_crm/models.py:202 alm_crm/models.py:208
+#: alm_crm/models.py:213
 msgid "Unknown"
 msgstr ""
 
-#: alm_crm/models.py:159 alm_crm/models.py:162
+#: alm_crm/models.py:222 alm_crm/models.py:225
 msgid "Unknown organization"
 msgstr ""
 
-#: alm_crm/models.py:372
+#: alm_crm/models.py:420
 msgid "incorrect modifier"
 msgstr ""
 
-#: alm_crm/models.py:566
+#: alm_crm/models.py:940
 msgid "product name"
 msgstr ""
 
-#: alm_crm/models.py:567
+#: alm_crm/models.py:941
 msgid "product description"
 msgstr ""
 
-#: alm_crm/models.py:575
+#: alm_crm/models.py:952
 msgid "product"
 msgstr ""
 
-#: alm_crm/models.py:815
+#: alm_crm/models.py:1039
+msgid "product_group"
+msgstr ""
+
+#: alm_crm/models.py:1052
+msgid "New"
+msgstr ""
+
+#: alm_crm/models.py:1053
+msgid "Pending"
+msgstr ""
+
+#: alm_crm/models.py:1054
+msgid "Completed"
+msgstr ""
+
+#: alm_crm/models.py:1256
 #, python-format
 msgid "Closed. Amount Value is %(amount)s"
 msgstr ""
 
-#: alm_crm/models.py:1115
-msgid "waiting"
+#: alm_crm/models.py:1329
+msgid "Milestone change"
 msgstr ""
 
-#: alm_crm/models.py:1116
-msgid "outcome"
+#: alm_crm/models.py:1579
+msgid "Waiting"
 msgstr ""
 
-#: alm_crm/models.py:1117
+#: alm_crm/models.py:1580
+msgid "Outcome"
+msgstr ""
+
+#: alm_crm/models.py:1581
 msgid "Client is happy"
 msgstr ""
 
-#: alm_crm/models.py:1118
+#: alm_crm/models.py:1582
 msgid "Client is OK"
 msgstr ""
 
-#: alm_crm/models.py:1119
-msgid "Client is neutral"
-msgstr ""
-
-#: alm_crm/models.py:1120
-msgid "Client is disappointed"
-msgstr ""
-
-#: alm_crm/models.py:1121
+#: alm_crm/models.py:1583
 msgid "Client is angry"
 msgstr ""
 
-#: alm_crm/models.py:1319
+#: alm_crm/models.py:1812
 msgid "contact_list"
 msgstr ""
 
-#: alm_crm/models.py:1387
+#: alm_crm/models.py:1882
 msgid "sales_cycle_product_stat"
 msgstr ""
 
-#: alm_crm/models.py:1396
+#: alm_crm/models.py:1891
 msgid "all"
 msgstr ""
 
-#: alm_crm/models.py:1397
+#: alm_crm/models.py:1892
 msgid "recent"
 msgstr ""
 
-#: alm_crm/models.py:1398
+#: alm_crm/models.py:1893
 msgid "cold"
 msgstr ""
 
-#: alm_crm/models.py:1399
+#: alm_crm/models.py:1894
 msgid "lead"
 msgstr ""
 
-#: alm_crm/models.py:1407
+#: alm_crm/models.py:1901
 msgid "filter"
+msgstr ""
+
+#: alm_crm/models.py:1923
+msgid "hashtag"
+msgstr ""
+
+#: alm_crm/models.py:1940
+msgid "hashtag_reference"
+msgstr ""
+
+#: alm_crm/models.py:1975
+msgid "custom_section"
+msgstr ""
+
+#: alm_crm/models.py:2009
+msgid "custom_field"
 msgstr ""
 
 #: alm_crm/templates/activity/activity_create.html:3
@@ -258,27 +302,27 @@ msgstr ""
 msgid "Email"
 msgstr ""
 
-#: alm_user/forms.py:75
+#: alm_user/forms.py:74
 msgid "User with such email is not registered."
 msgstr ""
 
-#: alm_user/forms.py:117
+#: alm_user/forms.py:116
 msgid "Old password"
 msgstr ""
 
-#: alm_user/forms.py:119
+#: alm_user/forms.py:118
 msgid "New Password"
 msgstr ""
 
-#: alm_user/forms.py:121
+#: alm_user/forms.py:120
 msgid "Repeat your password"
 msgstr ""
 
-#: alm_user/forms.py:124
+#: alm_user/forms.py:123
 msgid "New passwords are not equal"
 msgstr ""
 
-#: alm_user/forms.py:125
+#: alm_user/forms.py:124
 msgid "Enter valid old password."
 msgstr ""
 
@@ -298,11 +342,11 @@ msgstr ""
 msgid "active"
 msgstr ""
 
-#: alm_user/models.py:44
+#: alm_user/models.py:46
 msgid "user"
 msgstr ""
 
-#: alm_user/models.py:184
+#: alm_user/models.py:187
 msgid "referral"
 msgstr ""
 
@@ -370,26 +414,22 @@ msgstr ""
 msgid "Participate in beta"
 msgstr ""
 
-#: alm_user/templates/user/password_reset.html:5
-#: alm_user/templates/user/password_reset_confirm.html:4
+#: alm_user/templates/user/password_reset.html:9
+#: alm_user/templates/user/password_reset_done.html:9
 msgid "Password reset"
 msgstr ""
 
-#: alm_user/templates/user/password_reset.html:7
+#: alm_user/templates/user/password_reset.html:11
 msgid ""
 "Forgotten your password? Enter your email address below, and we'll email "
 "instructions for setting a new one."
 msgstr ""
 
-#: alm_user/templates/user/password_reset.html:11
-msgid "Email address:"
-msgstr ""
-
-#: alm_user/templates/user/password_reset.html:11
+#: alm_user/templates/user/password_reset.html:33
 msgid "Reset my password"
 msgstr ""
 
-#: alm_user/templates/user/password_reset_confirm.html:10
+#: alm_user/templates/user/password_reset_confirm.html:11
 msgid "Enter new password"
 msgstr ""
 
@@ -399,35 +439,27 @@ msgid ""
 "correctly."
 msgstr ""
 
-#: alm_user/templates/user/password_reset_confirm.html:16
-msgid "New password:"
-msgstr ""
-
-#: alm_user/templates/user/password_reset_confirm.html:18
-msgid "Confirm password:"
-msgstr ""
-
-#: alm_user/templates/user/password_reset_confirm.html:19
+#: alm_user/templates/user/password_reset_confirm.html:42
 msgid "Change my password"
 msgstr ""
 
-#: alm_user/templates/user/password_reset_confirm.html:24
+#: alm_user/templates/user/password_reset_confirm.html:55
 msgid "Password reset unsuccessful"
 msgstr ""
 
-#: alm_user/templates/user/password_reset_confirm.html:26
+#: alm_user/templates/user/password_reset_confirm.html:57
 msgid ""
 "The password reset link was invalid, possibly because it has already been "
 "used.  Please request a new password reset."
 msgstr ""
 
-#: alm_user/templates/user/password_reset_done.html:10
+#: alm_user/templates/user/password_reset_done.html:11
 msgid ""
 "We've emailed you instructions for setting your password. You should be "
 "receiving them shortly."
 msgstr ""
 
-#: alm_user/templates/user/password_reset_done.html:12
+#: alm_user/templates/user/password_reset_done.html:13
 msgid ""
 "If you don't receive an email, please make sure you've entered the address "
 "you registered with, and check your spam folder."
@@ -447,6 +479,10 @@ msgstr ""
 
 #: alm_user/templates/user/profile.html:3
 msgid "User Profile"
+msgstr ""
+
+#: alm_user/templates/user/referral-complete.html:9
+msgid "Thank you! Our managers will contact you."
 msgstr ""
 
 #: alm_user/templates/user/services.html:3
@@ -472,347 +508,347 @@ msgstr ""
 msgid "Login"
 msgstr ""
 
-#: alm_user/templates/user/referral-complete.html:9
-msgid "Thank you! Our managers will contact you."
-msgstr ""
-
 #: alm_vcard/admin.py:170
 msgid "Select VCF"
 msgstr ""
 
-#: alm_vcard/models.py:15
+#: alm_vcard/models.py:16
 msgid "The vCard could not be converted into a vObject"
 msgstr ""
 
-#: alm_vcard/models.py:47
+#: alm_vcard/models.py:52
 msgid "formatted name"
 msgstr ""
 
-#: alm_vcard/models.py:48
+#: alm_vcard/models.py:53
 msgid "The formatted string associated with the vCard object"
 msgstr ""
 
-#: alm_vcard/models.py:50
+#: alm_vcard/models.py:55
 msgid "family name"
 msgstr ""
 
-#: alm_vcard/models.py:52
+#: alm_vcard/models.py:57
 msgid "given name"
 msgstr ""
 
-#: alm_vcard/models.py:62
+#: alm_vcard/models.py:67
 msgid "additional name"
 msgstr ""
 
-#: alm_vcard/models.py:65
+#: alm_vcard/models.py:70
 msgid "honorific prefix"
 msgstr ""
 
-#: alm_vcard/models.py:68
+#: alm_vcard/models.py:73
 msgid "honorific suffix"
 msgstr ""
 
-#: alm_vcard/models.py:70
+#: alm_vcard/models.py:75
 msgid "birthday"
 msgstr ""
 
-#: alm_vcard/models.py:72
+#: alm_vcard/models.py:77
 msgid "class"
 msgstr ""
 
-#: alm_vcard/models.py:74
+#: alm_vcard/models.py:79
 msgid "last revision"
 msgstr ""
 
-#: alm_vcard/models.py:76
+#: alm_vcard/models.py:81
 msgid "sort string"
 msgstr ""
 
-#: alm_vcard/models.py:82
+#: alm_vcard/models.py:87
 msgid "unique identifier"
 msgstr ""
 
-#: alm_vcard/models.py:85
+#: alm_vcard/models.py:92
 msgid "vcard"
 msgstr ""
 
-#: alm_vcard/models.py:86
+#: alm_vcard/models.py:93
 msgid "vcards"
 msgstr ""
 
-#: alm_vcard/models.py:204
+#: alm_vcard/models.py:215
 msgid "name"
 msgstr ""
 
-#: alm_vcard/models.py:730 alm_vcard/models.py:823
+#: alm_vcard/models.py:724 alm_vcard/models.py:818
 msgid "INTL"
 msgstr ""
 
-#: alm_vcard/models.py:731 alm_vcard/models.py:828
+#: alm_vcard/models.py:725 alm_vcard/models.py:823
 msgid "home"
 msgstr ""
 
-#: alm_vcard/models.py:732
+#: alm_vcard/models.py:726
 msgid "message"
 msgstr ""
 
-#: alm_vcard/models.py:733 alm_vcard/models.py:826
+#: alm_vcard/models.py:727 alm_vcard/models.py:821
 msgid "work"
 msgstr ""
 
-#: alm_vcard/models.py:734
+#: alm_vcard/models.py:728
 msgid "prefered"
 msgstr ""
 
-#: alm_vcard/models.py:735
+#: alm_vcard/models.py:729
 msgid "fax"
 msgstr ""
 
-#: alm_vcard/models.py:736
+#: alm_vcard/models.py:730
 msgid "cell phone"
 msgstr ""
 
-#: alm_vcard/models.py:737
+#: alm_vcard/models.py:731
 msgid "video"
 msgstr ""
 
-#: alm_vcard/models.py:738
+#: alm_vcard/models.py:732
 msgid "pager"
 msgstr ""
 
-#: alm_vcard/models.py:739
+#: alm_vcard/models.py:733
 msgid "bbs"
 msgstr ""
 
-#: alm_vcard/models.py:740
+#: alm_vcard/models.py:734
 msgid "modem"
 msgstr ""
 
-#: alm_vcard/models.py:741
+#: alm_vcard/models.py:735
 msgid "car phone"
 msgstr ""
 
-#: alm_vcard/models.py:742
+#: alm_vcard/models.py:736
 msgid "isdn"
 msgstr ""
 
-#: alm_vcard/models.py:743
+#: alm_vcard/models.py:737
 msgid "pcs"
 msgstr ""
 
-#: alm_vcard/models.py:749
+#: alm_vcard/models.py:738
+msgid "xadditional"
+msgstr ""
+
+#: alm_vcard/models.py:744
 msgid "type of phone number"
 msgstr ""
 
-#: alm_vcard/models.py:749
+#: alm_vcard/models.py:744
 msgid "for instance WORK or HOME"
 msgstr ""
 
-#: alm_vcard/models.py:750 alm_vcard/models.py:770
+#: alm_vcard/models.py:745 alm_vcard/models.py:765
 msgid "value"
 msgstr ""
 
-#: alm_vcard/models.py:753
+#: alm_vcard/models.py:748
 msgid "telephone number"
 msgstr ""
 
-#: alm_vcard/models.py:754
+#: alm_vcard/models.py:749
 msgid "telephone numbers"
 msgstr ""
 
-#: alm_vcard/models.py:763
+#: alm_vcard/models.py:758
 msgid "internet"
 msgstr ""
 
-#: alm_vcard/models.py:764
+#: alm_vcard/models.py:759
 msgid "x400"
 msgstr ""
 
-#: alm_vcard/models.py:765 alm_vcard/models.py:829
+#: alm_vcard/models.py:760 alm_vcard/models.py:824
 msgid "pref"
 msgstr ""
 
-#: alm_vcard/models.py:769
+#: alm_vcard/models.py:764
 msgid "type of email"
 msgstr ""
 
-#: alm_vcard/models.py:773
+#: alm_vcard/models.py:768
 msgid "email"
 msgstr ""
 
-#: alm_vcard/models.py:774
+#: alm_vcard/models.py:769
 msgid "emails"
 msgstr ""
 
-#: alm_vcard/models.py:788 alm_vcard/models.py:791
+#: alm_vcard/models.py:783 alm_vcard/models.py:786
 msgid "geographic uri"
 msgstr ""
 
-#: alm_vcard/models.py:792
+#: alm_vcard/models.py:787
 msgid "geographic uri's"
 msgstr ""
 
-#: alm_vcard/models.py:800
+#: alm_vcard/models.py:795
 msgid "organization name"
 msgstr ""
 
-#: alm_vcard/models.py:801
+#: alm_vcard/models.py:796
 msgid "organization unit"
 msgstr ""
 
-#: alm_vcard/models.py:804
+#: alm_vcard/models.py:799
 msgid "organization"
 msgstr ""
 
-#: alm_vcard/models.py:805
+#: alm_vcard/models.py:800
 msgid "organizations"
 msgstr ""
 
-#: alm_vcard/models.py:824
+#: alm_vcard/models.py:819
 msgid "postal"
 msgstr ""
 
-#: alm_vcard/models.py:825
+#: alm_vcard/models.py:820
 msgid "parcel"
 msgstr ""
 
-#: alm_vcard/models.py:827
+#: alm_vcard/models.py:822
 msgid "dom"
 msgstr ""
 
-#: alm_vcard/models.py:833
-msgid "post office box"
+#: alm_vcard/models.py:825
+msgid "xlegal"
 msgstr ""
 
-#: alm_vcard/models.py:834
-msgid "extended address"
-msgstr ""
-
-#: alm_vcard/models.py:835
-msgid "street address"
-msgstr ""
-
-#: alm_vcard/models.py:836
-msgid "locality"
-msgstr ""
-
-#: alm_vcard/models.py:837
-msgid "region"
-msgstr ""
-
-#: alm_vcard/models.py:838
-msgid "postal code"
-msgstr ""
-
-#: alm_vcard/models.py:839
-msgid "country name"
-msgstr ""
-
-#: alm_vcard/models.py:840 alm_vcard/models.py:1064
+#: alm_vcard/models.py:829 alm_vcard/models.py:1077
 msgid "type"
 msgstr ""
 
-#: alm_vcard/models.py:844
+#: alm_vcard/models.py:830
+msgid "street address"
+msgstr ""
+
+#: alm_vcard/models.py:831
+msgid "locality"
+msgstr ""
+
+#: alm_vcard/models.py:832
+msgid "region"
+msgstr ""
+
+#: alm_vcard/models.py:833
+msgid "country name"
+msgstr ""
+
+#: alm_vcard/models.py:834
+msgid "post office box"
+msgstr ""
+
+#: alm_vcard/models.py:835
+msgid "extended address"
+msgstr ""
+
+#: alm_vcard/models.py:836
+msgid "postal code"
+msgstr ""
+
+#: alm_vcard/models.py:840
 msgid "address"
 msgstr ""
 
-#: alm_vcard/models.py:845
+#: alm_vcard/models.py:841
 msgid "addresses"
 msgstr ""
 
-#: alm_vcard/models.py:867
+#: alm_vcard/models.py:877
 msgid "agent"
 msgstr ""
 
-#: alm_vcard/models.py:868
+#: alm_vcard/models.py:878
 msgid "agents"
 msgstr ""
 
-#: alm_vcard/models.py:880
+#: alm_vcard/models.py:890
 msgid "category"
 msgstr ""
 
-#: alm_vcard/models.py:881
+#: alm_vcard/models.py:891
 msgid "categories"
 msgstr ""
 
-#: alm_vcard/models.py:893
+#: alm_vcard/models.py:906
 msgid "key"
 msgstr ""
 
-#: alm_vcard/models.py:894
+#: alm_vcard/models.py:907
 msgid "keys"
 msgstr ""
 
-#: alm_vcard/models.py:906
+#: alm_vcard/models.py:919
 msgid "label"
 msgstr ""
 
-#: alm_vcard/models.py:907
+#: alm_vcard/models.py:920
 msgid "labels"
 msgstr ""
 
-#: alm_vcard/models.py:939
+#: alm_vcard/models.py:952
 msgid "mailer"
 msgstr ""
 
-#: alm_vcard/models.py:940
+#: alm_vcard/models.py:953
 msgid "mailers"
 msgstr ""
 
-#: alm_vcard/models.py:952
+#: alm_vcard/models.py:965
 msgid "nickname"
 msgstr ""
 
-#: alm_vcard/models.py:953
+#: alm_vcard/models.py:966
 msgid "nicknames"
 msgstr ""
 
-#: alm_vcard/models.py:965
+#: alm_vcard/models.py:978
 msgid "note"
 msgstr ""
 
-#: alm_vcard/models.py:966
+#: alm_vcard/models.py:979
 msgid "notes"
 msgstr ""
 
-#: alm_vcard/models.py:1000
+#: alm_vcard/models.py:1013
 msgid "role"
 msgstr ""
 
-#: alm_vcard/models.py:1001
+#: alm_vcard/models.py:1014
 msgid "roles"
 msgstr ""
 
-#: alm_vcard/models.py:1032
-msgid "title"
-msgstr ""
-
-#: alm_vcard/models.py:1033
+#: alm_vcard/models.py:1046
 msgid "titles"
 msgstr ""
 
-#: alm_vcard/models.py:1051
+#: alm_vcard/models.py:1064
 msgid "time zone"
 msgstr ""
 
-#: alm_vcard/models.py:1052
+#: alm_vcard/models.py:1065
 msgid "time zones"
 msgstr ""
 
-#: alm_vcard/models.py:1060
+#: alm_vcard/models.py:1073
 msgid "website"
 msgstr ""
 
-#: alm_vcard/models.py:1061
+#: alm_vcard/models.py:1074
 msgid "github"
 msgstr ""
 
-#: alm_vcard/models.py:1068
+#: alm_vcard/models.py:1081
 msgid "url"
 msgstr ""
 
-#: alm_vcard/models.py:1069
+#: alm_vcard/models.py:1082
 msgid "url's"
 msgstr ""
 
@@ -825,28 +861,33 @@ msgstr ""
 msgid "To access this page subdomain required"
 msgstr ""
 
-#: almanet/models.py:11
+#: almanet/models.py:13
 msgid "service title"
 msgstr ""
 
-#: almanet/models.py:12
+#: almanet/models.py:14
 msgid "service description"
 msgstr ""
 
-#: almanet/models.py:14
+#: almanet/models.py:16
 msgid "service slug"
 msgstr ""
 
-#: almanet/models.py:17
+#: almanet/models.py:19
 msgid "service"
 msgstr ""
 
-#: almanet/models.py:43
+#: almanet/models.py:48
 msgid "subscription"
 msgstr ""
 
-#: almanet/models.py:60
+#: almanet/models.py:65
 msgid "subscription id"
+msgstr ""
+
+#: almanet/utils/gcal.py:49
+#, python-format
+msgid "Activity was created at %(cycle)s for contact %(contact)s."
 msgstr ""
 
 #: templates/layout.crm.html:63

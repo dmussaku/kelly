@@ -907,7 +907,7 @@ class Contact(SubscriptionObject):
             2. status is NEW"""
         q = Q(subscription_id=subscription_id)
         q &= Q(status=cls.NEW)
-        return cls.objects.filter(q).order_by('-date_created')           
+        return cls.objects.filter(q).order_by('-date_created')
 
 
 class Value(SubscriptionObject):
@@ -1355,7 +1355,6 @@ class Activity(SubscriptionObject):
     owner = models.ForeignKey(CRMUser, related_name='activity_owner')
     mentions = generic.GenericRelation('Mention', null=True)
     comments = generic.GenericRelation('Comment', null=True)
-    #milestone = models.ForeignKey(Milestone, related_name='activities', null=True)
     hashtags = generic.GenericRelation('HashTagReference')
 
     class Meta:
@@ -1430,7 +1429,7 @@ class Activity(SubscriptionObject):
         # for r in self.recipients.all():
         #     if r.user_id == user_id:
         #         recip = r
-        #         break                
+        #         break
         return not recip or recip.has_read
 
     @classmethod
@@ -1449,7 +1448,7 @@ class Activity(SubscriptionObject):
     def get_filter_for_mobile(cls):
         month = (datetime.now(pytz.timezone(settings.TIME_ZONE)) - timedelta(days=31))
         return (
-            Q(deadline__isnull=False, date_finished__isnull=True) | 
+            Q(deadline__isnull=False, date_finished__isnull=True) |
             Q(deadline__isnull=False, date_finished__isnull=False, date_finished__gte=month) |
             Q(deadline__isnull=True,  date_edited__gte=month )
             )
