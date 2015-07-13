@@ -1,11 +1,15 @@
+#!/usr/bin/env python2
+# -*- coding: utf-8 -*-
 from django.views.generic import TemplateView, ListView, DetailView, RedirectView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
-from django.http import Http404, HttpResponseRedirect
+from django.http import Http404, HttpResponseRedirect, HttpResponse
 from django.core.urlresolvers import reverse_lazy
 from almanet.url_resolvers import reverse_lazy as almanet_reverse_lazy
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from alm_company.models import Company
+from alm_crm.models import Contact, ContactList
+from alm_vcard.models import *
 from alm_user.models import User
 from .models import Service
 from .forms import ServiceCreateForm
@@ -109,3 +113,30 @@ def disconnect_service(request, slug, *args, **kwargs):
             return HttpResponseRedirect(
                 almanet_reverse_lazy('user_profile_url',
                                      subdomain=settings.MY_SD))
+
+from django.views.decorators.csrf import csrf_exempt
+from urlparse import parse_qs
+
+@csrf_exempt
+def landing_form(request):
+    if request.method == 'POST':
+        response = parse_qs(request.body, keep_blank_values=True)
+        print response
+        vcard = VCard(fn=response.get('fn')[0])
+        vcard.save()
+        if response.get('tel', None):
+            tel = Tel(value=response.get('tel', None)[0], vcard=vcard)
+            tel.save()
+        if response.get('email', None):
+            email = Email(value=response.get('email', None)[0], vcard=vcard)
+            email.save()
+        try:
+            contact_list = ContactList.objects.get(title='С лэндинга')
+        except:
+            contact_list = ContactList(title='С лэндинга', subscription_id=4, owner_id=128)
+            contact_list.save()
+        c = Contact(subscription_id=4, vcard=vcard, owner_id=128)
+        c.save()
+        return HttpResponse('Cool')
+    else:
+        return HttpResponse('None')

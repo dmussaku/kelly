@@ -11,7 +11,8 @@ from almanet.views import (
     ServiceUpdateView,
     ServiceDeleteView,
     ServiceDetailView,
-    RedirectHomeView
+    RedirectHomeView,
+    landing_form
     )
 from tastypie.api import Api
 from alm_vcard import api as vcard_api
@@ -100,6 +101,7 @@ urlpatterns = patterns(
     url(r'^api/', include(v1_api.urls)),
     url(r'api/doc/', include('tastypie_swagger.urls', namespace='tastypie_swagger')),
     url(r'agreement/$', TemplateView.as_view(template_name='almanet/agreement.crm.html'), name='agreement'),
+    url(r'landing_form/$', landing_form, name='landing_form'),
 
 )
 
