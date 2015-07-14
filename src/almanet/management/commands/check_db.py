@@ -31,7 +31,7 @@ def check_is_cycle_has_contact():
             if not contact:
                 logging.warning("SalesCycle with ID: %s doesn't have contact"%(sales_cycle.id))
             if contact.subscription_id != sales_cycle.subscription_id:
-                logging.warning("SalesCycle with ID: %s and contact with ID: %s have different subscription_ids"%(sales_cycle.id, contact.id))
+                logging.warning("SalesCycle with ID: %s and contact with ID: %s have different subscription_ids: %s and %s"%(sales_cycle.id, contact.id, sales_cycle.subscription_id, contact.subscription_id))
         except Contact.DoesNotExist:
             logging.warning("SalesCycle with ID: %s doesn't have contact"%(sales_cycle.id))
     print "******** Checking finished ******** \n"
@@ -44,7 +44,7 @@ def check_is_activity_on_cycle():
             if not sales_cycle:
                 logging.warning("Activity with ID: %s doesn't have sales_cycle"%(activity.id))
             if activity.subscription_id != sales_cycle.subscription_id:
-                logging.warning("Activity with ID: %s and SalesCycle with ID: %s have different subscription_ids"%(activity.id, sales_cycle.id))
+                logging.warning("Activity with ID: %s and SalesCycle with ID: %s have different subscription_ids: %s and %s"%(activity.id, sales_cycle.id, activity.subscription_id, sales_cycle.subscription_id))
         except SalesCycle.DoesNotExist:
             logging.warning("Activity with ID: %s doesn't have sales_cycle"%(activity.id))
     print "******** Checking finished ******** \n"
@@ -57,7 +57,7 @@ def check_is_contact_has_owner():
             if not owner:
                 logging.warning("Contact with ID: %s doesn't have owner"%(contact.id))
             if contact.subscription_id != owner.subscription_id:
-                logging.warning("Contact with ID: %s and his owner with ID: %s have different subscription_ids"%(contact.id, owner.id))
+                logging.warning("Contact with ID: %s and his owner with ID: %s have different subscription_ids: %s and %s"%(contact.id, owner.id, contact.subscription_id, owner.subscription_id))
         except CRMUser.DoesNotExist:
             logging.warning("Contact with ID: %s doesn't have owner"%(contact.id))
     print "******** Checking finished ******** \n"
@@ -72,7 +72,7 @@ def check_is_product_has_sales_cycles():
             else:
                 for sales_cycle in sales_cycles.all():
                     if product.subscription_id != sales_cycle.subscription_id:
-                        logging.warning("Product with ID: %s and sales_cycle with ID: %s have different subscription_ids"%(product.id, sales_cycle.id))
+                        logging.warning("Product with ID: %s and sales_cycle with ID: %s have different subscription_ids: %s and %s"%(product.id, sales_cycle.id, product.subscription_id, sales_cycle.subscription_id))
 
         except SalesCycle.DoesNotExist:
             logging.warning("Product with ID: %s doesn't have sales_cycles"%(product.id))
@@ -93,7 +93,7 @@ def check_are_contact_in_contactlist_exist():
     print "******** Check are Contacts in ContactList exist  ********"
     for contact_list in ContactList.objects.all():
         try:
-            contacts = contact_list.users
+            contacts = contact_list.contacts
             for contact in contacts.all():
                 if not contact.pk:
                     logging.warning("ContactList with ID: %s has nonexistent contact %s"%(contact_list.id, contact))
