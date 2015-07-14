@@ -8,7 +8,7 @@ from almanet.url_resolvers import reverse_lazy as almanet_reverse_lazy
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from alm_company.models import Company
-from alm_crm.models import Contact, ContactList, Share
+from alm_crm.models import Contact, ContactList, Share, SalesCycle
 from alm_vcard.models import *
 from alm_user.models import User
 from .models import Service
@@ -149,6 +149,12 @@ def landing_form(request):
         else:
             share.note='Контакт созданный из формы лэндинга'
         share.save()
+        SalesCycle.create_globalcycle(
+            **{'subscription_id': c.subscription_id,
+                     'owner_id': c.owner.id,
+                     'contact_id': c.id
+                    }
+            )
         return HttpResponse('Cool')
     else:
         return HttpResponse('None')
