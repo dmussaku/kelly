@@ -87,3 +87,8 @@ Attention: '+' indicates add it to original STATICFILES_DIRS. The final constant
  '/home/anguix/work/projects/alma.net/frontend/almanet-frontend')
  ```
 
+
+MAC OSX deps
+-----------
+
+Memcached (pylibmc) -- `brew install libmemcached`
