@@ -138,6 +138,12 @@ class UserResource(ModelResource):
                 self.wrap_view('authorization'),
                 name='api_authorization'
             ),
+            url(
+                r"^(?P<resource_name>%s)/change_password%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('change_password'),
+                name='api_change_password'
+            ),
         ]
 
     def upload_userpic(self, request, **kwargs):
@@ -157,6 +163,30 @@ class UserResource(ModelResource):
                         ),
                     content_type='application/json; charset=utf-8', status=200)
             )
+
+    def change_password(self, request, **kwargs):
+        with RequestContext(self, request, allowed_methods=['post']):
+            data = self.deserialize(request, request.body, format=request.META.get('CONTENT_TYPE', 'application/json'))
+            old_password = data.get('old_password', None)
+            new_password = data.get('new_password', None)
+            user = request.user
+
+            if old_password is None or new_password is None:
+                self.error_response(request, {}, response_class=HttpBadRequest)
+
+            print old_password, new_password
+            if user.check_password(old_password):
+                user.set_password(new_password)
+                user.save()
+                return HttpAccepted()
+            else:
+                return self.create_response(
+                    request,
+                    {
+                        'success': False,
+                        'error_message': _("current password is incorrect")
+                    }
+                )
 
     def dehydrate(self, bundle):
         bundle.data['crm_user_id'] = bundle.obj.get_crmuser().pk
