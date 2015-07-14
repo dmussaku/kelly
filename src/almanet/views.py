@@ -125,12 +125,11 @@ def landing_form(request):
         vcard = VCard(fn=response.get('fn')[0])
         vcard.save()
         if response.get('tel', None):
-            tel = Tel(value=response.get('tel', None)[0], vcard=vcard)
+            tel = Tel(value=response.get('tel', None)[0], vcard=vcard, type='WORK')
             tel.save()
         if response.get('email', None):
-            email = Email(value=response.get('email', None)[0], vcard=vcard)
+            email = Email(value=response.get('email', None)[0], vcard=vcard, type='INTERNET')
             email.save()
-
         try:
             contact_list = ContactList.objects.get(title='С лэндинга')
         except:
@@ -138,6 +137,8 @@ def landing_form(request):
             contact_list.save()
         c = Contact(subscription_id=4, vcard=vcard, owner_id=128)
         c.save()
+        contact_list.add_contact(c.id)
+        contact_list.save()
         share = Share(
                 contact=c,
                 share_to_id=128,
