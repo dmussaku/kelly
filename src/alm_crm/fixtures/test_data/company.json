@@ -5,7 +5,9 @@
     "fields": {
         "owner": [1],
         "subdomain": "almacloud",
-        "name": "ALMACloud"
+        "name": "ALMACloud",
+        "date_created": "2014-09-10T00:00:00Z",
+        "date_edited": "2014-11-24T07:49:32.991Z"
     }
 },
 {
@@ -14,7 +16,9 @@
     "fields": {
         "owner": [6],
         "subdomain": "solutionfairy",
-        "name": "SolutionFairy"
+        "name": "SolutionFairy",
+        "date_created": "2014-09-10T00:00:00Z",
+        "date_edited": "2014-11-24T07:49:32.991Z"
     }
 }
 ]
