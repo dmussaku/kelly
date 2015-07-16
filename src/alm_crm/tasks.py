@@ -158,7 +158,7 @@ def finish_add_contacts(list_of_responses, filename, import_task_id, creator_id)
             subject=EMAIL_SUBJECT_PREFIX+'файл с ошибками , do not reply',
             body='Исправьте файл и загрузите его снова',
             from_email=SUPPORT_EMAIL,
-            to=['dmussaku@gmail.com']
+            to=[creator.email]
             )
         msg.attach_file(filename)
         msg.send()
