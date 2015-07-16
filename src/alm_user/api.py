@@ -178,13 +178,18 @@ class UserResource(ModelResource):
             if user.check_password(old_password):
                 user.set_password(new_password)
                 user.save()
-                return HttpAccepted()
+                return self.create_response(
+                    request,
+                    {
+                        'success': True
+                    }
+                )
             else:
                 return self.create_response(
                     request,
                     {
                         'success': False,
-                        'error_message': _("current password is incorrect")
+                        'error_message': "current password is incorrect"
                     }
                 )
 
