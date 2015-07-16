@@ -2063,7 +2063,6 @@ class ContactList(SubscriptionObject):
                                    null=True, blank=True)
     import_task = models.OneToOneField('alm_crm.ImportTask', 
         blank=True, null=True, on_delete=models.SET_NULL)
-    date_created = models.DateTimeField(blank=True, auto_now_add=True)
 
     class Meta:
         verbose_name = _('contact_list')

@@ -107,7 +107,7 @@ from .utils.data_processing import (
 import base64
 import simplejson as json
 from collections import OrderedDict
-<<<<<<< HEAD
+from .tasks import grouped_contact_import_task, check_task_status
 import time
 
 
@@ -207,9 +207,6 @@ class DummyPaginator(object):
     def page(self):
         return {self.collection_name: self.objects}
 
-=======
-from .tasks import grouped_contact_import_task, check_task_status
->>>>>>> feature/new_contact_import
 
 class CommonMeta:
     list_allowed_methods = ['get', 'post', 'patch']
@@ -450,12 +447,7 @@ class ContactResource(CRMServiceModelResource):
 
 
     @undocumented: prepend_urls, Meta
-<<<<<<< HEAD
-    """
-
-=======
     '''
->>>>>>> feature/new_contact_import
     vcard = fields.ToOneField('alm_vcard.api.VCardResource', 'vcard',
         null=True, full=True)
     owner = fields.ToOneField('alm_crm.api.CRMUserResource', 'owner',
@@ -576,13 +568,12 @@ class ContactResource(CRMServiceModelResource):
                 name='api_delete_contacts_from_vcard'
             ),
             url(
-<<<<<<< HEAD
                 r"^(?P<resource_name>%s)/contacts_merge%s$" %
                 (self._meta.resource_name, trailing_slash()),
                 self.wrap_view('contacts_merge'),
                 name='api_contacts_merge'
             ),
-=======
+            url(
                 r"^(?P<resource_name>%s)/import_from_structure%s$" %
                 (self._meta.resource_name, trailing_slash()),
                 self.wrap_view('import_from_structure'),
@@ -594,8 +585,6 @@ class ContactResource(CRMServiceModelResource):
                 self.wrap_view('check_import_status'),
                 name='api_check_import_status'
             ),
-
->>>>>>> feature/new_contact_import
         ]
 
     def get_meta_dict(self, limit, offset, count, url):
