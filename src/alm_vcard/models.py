@@ -100,13 +100,14 @@ class VCard(models.Model):
         return self.fn
 
     def save(self, **kwargs):
-        if not self.fn:
-            self.fill_fn()
+        # if not self.fn:
+        #     self.fill_fn()
+        self.fill_fn()
         super(self.__class__, self).save(**kwargs)
 
     def fill_fn(self):
-        if self.fn:
-            return
+        # if self.fn:
+        #     return
         self.fn = ''
         if self.given_name:
             self.fn += self.given_name
@@ -168,6 +169,7 @@ class VCard(models.Model):
             return self.toVObject()
 
     @classmethod
+    @transaction.atomic
     def fromVObject(cls, vObject, autocommit=False):
         """
         Contact sets its properties as specified by the supplied
