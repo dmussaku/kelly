@@ -1004,7 +1004,7 @@ class Contact(SubscriptionObject):
         except:
             return {'success':False}
         ext = filename.split('.')[len(filename.split('.')) - 1]
-        new_filename = filename.strip('.' + ext) + datetime.datetime.now().__str__() + '.' + ext
+        new_filename = filename.strip('.' + ext) + datetime.now().__str__() + '.' + ext
         myfile = open(
             TEMP_DIR + new_filename,
             'wb'
