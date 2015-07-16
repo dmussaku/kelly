@@ -6,6 +6,7 @@
         "title":"activity #1 of SalesCycle #2",
         "description":"activity #1 of SalesCycle #2",
         "date_created":"2014-02-01 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 2,
         "owner":4,
         "subscription_id": 1
@@ -18,6 +19,7 @@
         "title":"activity #2 of SalesCycle #2",
         "description":"activity #2 of SalesCycle #2",
         "date_created":"2014-02-03 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 2,
         "owner":1,
         "subscription_id": 1
@@ -30,6 +32,7 @@
         "title":"activity #3 of SalesCycle #2",
         "description":"activity #3 of SalesCycle #2",
         "date_created":"2014-02-05 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 2,
         "owner":2,
         "subscription_id": 1
@@ -42,6 +45,7 @@
         "title":"activity #4 of SalesCycle #2",
         "description":"activity #4 of SalesCycle #2",
         "date_created":"2014-02-07 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 2,
         "owner":1,
         "subscription_id": 1
@@ -54,6 +58,7 @@
         "title":"activity #5 of SalesCycle #2",
         "description":"activity #5 of SalesCycle #2",
         "date_created":"2014-02-09 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 2,
         "owner":2,
         "subscription_id": 1
@@ -66,6 +71,7 @@
         "title":"activity #6 of SalesCycle #2",
         "description":"activity #6 of SalesCycle #2",
         "date_created":"2014-02-11 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 2,
         "owner":1,
         "subscription_id": 1
@@ -78,6 +84,7 @@
         "title":"activity #7 of SalesCycle #2",
         "description":"activity #7 of SalesCycle #2",
         "date_created":"2014-02-13 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 2,
         "owner":3,
         "subscription_id": 1
@@ -90,6 +97,7 @@
         "title":"activity #8 of SalesCycle #2",
         "description":"activity #8 of SalesCycle #2",
         "date_created":"2014-02-15 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 2,
         "owner":4,
         "subscription_id": 1
@@ -102,6 +110,7 @@
         "title":"activity #9 of SalesCycle #2",
         "description":"activity #9 of SalesCycle #2",
         "date_created":"2014-02-17 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 2,
         "owner":4,
         "subscription_id": 1
@@ -114,6 +123,7 @@
         "title":"activity #10 of SalesCycle #2",
         "description":"activity #10 of SalesCycle #2",
         "date_created":"2014-02-19 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 2,
         "owner":3,
         "subscription_id": 1
@@ -126,6 +136,7 @@
         "title":"activity #1 of SalesCycle #3",
         "description":"activity #1 of SalesCycle #3",
         "date_created":"2014-03-01 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 3,
         "owner":3,
         "subscription_id": 1
@@ -138,6 +149,7 @@
         "title":"activity #2 of SalesCycle #3",
         "description":"activity #2 of SalesCycle #3",
         "date_created":"2014-03-03 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 3,
         "owner":1,
         "subscription_id": 1
@@ -150,6 +162,7 @@
         "title":"activity #3 of SalesCycle #3",
         "description":"activity #3 of SalesCycle #3",
         "date_created":"2014-03-05 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 3,
         "owner":2,
         "subscription_id": 1
@@ -162,6 +175,7 @@
         "title":"activity #4 of SalesCycle #3",
         "description":"activity #4 of SalesCycle #3",
         "date_created":"2014-03-07 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 3,
         "owner":1,
         "subscription_id": 1
@@ -174,6 +188,7 @@
         "title":"activity #5 of SalesCycle #3",
         "description":"activity #5 of SalesCycle #3",
         "date_created":"2014-03-09 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 3,
         "owner":1,
         "subscription_id": 1
@@ -186,6 +201,7 @@
         "title":"activity #6 of SalesCycle #3",
         "description":"activity #6 of SalesCycle #3",
         "date_created":"2014-03-11 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 3,
         "owner":5,
         "subscription_id": 1
@@ -198,6 +214,7 @@
         "title":"activity #7 of SalesCycle #3",
         "description":"activity #7 of SalesCycle #3",
         "date_created":"2014-03-13 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 3,
         "owner":5,
         "subscription_id": 1
@@ -210,6 +227,7 @@
         "title":"activity #8 of SalesCycle #3",
         "description":"activity #8 of SalesCycle #3",
         "date_created":"2014-03-15 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 3,
         "owner":4,
         "subscription_id": 1
@@ -222,6 +240,7 @@
         "title":"activity #9 of SalesCycle #3",
         "description":"activity #9 of SalesCycle #3",
         "date_created":"2014-03-17 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 3,
         "owner":3,
         "subscription_id": 1
@@ -234,6 +253,7 @@
         "title":"activity #10 of SalesCycle #3",
         "description":"activity #10 of SalesCycle #3",
         "date_created":"2014-03-19 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 3,
         "owner":2,
         "subscription_id": 1
@@ -246,6 +266,7 @@
         "title":"activity #1 of SalesCycle #4",
         "description":"activity #1 of SalesCycle #4",
         "date_created":"2014-04-01 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 4,
         "owner":2,
         "subscription_id": 1
@@ -258,6 +279,7 @@
         "title":"activity #2 of SalesCycle #4",
         "description":"activity #2 of SalesCycle #4",
         "date_created":"2014-04-03 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 4,
         "owner":3,
         "subscription_id": 1
@@ -270,6 +292,7 @@
         "title":"activity #3 of SalesCycle #4",
         "description":"activity #3 of SalesCycle #4",
         "date_created":"2014-04-05 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 4,
         "owner":5,
         "subscription_id": 1
@@ -282,6 +305,7 @@
         "title":"activity #4 of SalesCycle #4",
         "description":"activity #4 of SalesCycle #4",
         "date_created":"2014-04-07 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 4,
         "owner":2,
         "subscription_id": 1
@@ -294,6 +318,7 @@
         "title":"activity #5 of SalesCycle #4",
         "description":"activity #5 of SalesCycle #4",
         "date_created":"2014-04-09 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 4,
         "owner":2,
         "subscription_id": 1
@@ -306,6 +331,7 @@
         "title":"activity #6 of SalesCycle #4",
         "description":"activity #6 of SalesCycle #4",
         "date_created":"2014-04-11 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 4,
         "owner":5,
         "subscription_id": 1
@@ -318,6 +344,7 @@
         "title":"activity #7 of SalesCycle #4",
         "description":"activity #7 of SalesCycle #4",
         "date_created":"2014-04-13 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 4,
         "owner":5,
         "subscription_id": 1
@@ -330,6 +357,7 @@
         "title":"activity #8 of SalesCycle #4",
         "description":"activity #8 of SalesCycle #4",
         "date_created":"2014-04-15 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 4,
         "owner":1,
         "subscription_id": 1
@@ -342,6 +370,7 @@
         "title":"activity #9 of SalesCycle #4",
         "description":"activity #9 of SalesCycle #4",
         "date_created":"2014-04-17 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 4,
         "owner":2,
         "subscription_id": 1
@@ -354,6 +383,7 @@
         "title":"activity #10 of SalesCycle #4",
         "description":"activity #10 of SalesCycle #4",
         "date_created":"2014-04-19 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 4,
         "owner":5,
         "subscription_id": 1
@@ -366,6 +396,7 @@
         "title":"activity #1 of SalesCycle #5",
         "description":"activity #1 of SalesCycle #5",
         "date_created":"2014-01-01 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 5,
         "owner":1,
         "subscription_id": 1
@@ -378,6 +409,7 @@
         "title":"activity #2 of SalesCycle #5",
         "description":"activity #2 of SalesCycle #5",
         "date_created":"2014-01-03 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 5,
         "owner":4,
         "subscription_id": 1
@@ -390,6 +422,7 @@
         "title":"activity #3 of SalesCycle #5",
         "description":"activity #3 of SalesCycle #5",
         "date_created":"2014-01-05 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 5,
         "owner":1,
         "subscription_id": 1
@@ -402,6 +435,7 @@
         "title":"activity #4 of SalesCycle #5",
         "description":"activity #4 of SalesCycle #5",
         "date_created":"2014-01-07 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 5,
         "owner":1,
         "subscription_id": 1
@@ -414,6 +448,7 @@
         "title":"activity #5 of SalesCycle #5",
         "description":"activity #5 of SalesCycle #5",
         "date_created":"2014-01-09 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 5,
         "owner":3,
         "subscription_id": 1
@@ -426,6 +461,7 @@
         "title":"activity #6 of SalesCycle #5",
         "description":"activity #6 of SalesCycle #5",
         "date_created":"2014-01-11 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 5,
         "owner":2,
         "subscription_id": 1
@@ -438,6 +474,7 @@
         "title":"activity #7 of SalesCycle #5",
         "description":"activity #7 of SalesCycle #5",
         "date_created":"2014-01-13 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 5,
         "owner":4,
         "subscription_id": 1
@@ -450,6 +487,7 @@
         "title":"activity #8 of SalesCycle #5",
         "description":"activity #8 of SalesCycle #5",
         "date_created":"2014-01-15 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 5,
         "owner":2,
         "subscription_id": 1
@@ -462,6 +500,7 @@
         "title":"activity #9 of SalesCycle #5",
         "description":"activity #9 of SalesCycle #5",
         "date_created":"2014-01-17 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 5,
         "owner":5,
         "subscription_id": 1
@@ -474,6 +513,7 @@
         "title":"activity #10 of SalesCycle #5",
         "description":"activity #10 of SalesCycle #5",
         "date_created":"2014-01-19 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 5,
         "owner":3,
         "subscription_id": 1
@@ -486,6 +526,7 @@
         "title":"activity #1 of SalesCycle #6",
         "description":"activity #1 of SalesCycle #6",
         "date_created":"2014-02-01 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 6,
         "owner":2,
         "subscription_id": 1
@@ -498,6 +539,7 @@
         "title":"activity #2 of SalesCycle #6",
         "description":"activity #2 of SalesCycle #6",
         "date_created":"2014-02-03 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 6,
         "owner":2,
         "subscription_id": 1
@@ -510,6 +552,7 @@
         "title":"activity #3 of SalesCycle #6",
         "description":"activity #3 of SalesCycle #6",
         "date_created":"2014-02-05 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 6,
         "owner":2,
         "subscription_id": 1
@@ -522,6 +565,7 @@
         "title":"activity #4 of SalesCycle #6",
         "description":"activity #4 of SalesCycle #6",
         "date_created":"2014-02-07 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 6,
         "owner":4,
         "subscription_id": 1
@@ -534,6 +578,7 @@
         "title":"activity #5 of SalesCycle #6",
         "description":"activity #5 of SalesCycle #6",
         "date_created":"2014-02-09 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 6,
         "owner":3,
         "subscription_id": 1
@@ -546,6 +591,7 @@
         "title":"activity #6 of SalesCycle #6",
         "description":"activity #6 of SalesCycle #6",
         "date_created":"2014-02-11 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 6,
         "owner":3,
         "subscription_id": 1
@@ -558,6 +604,7 @@
         "title":"activity #7 of SalesCycle #6",
         "description":"activity #7 of SalesCycle #6",
         "date_created":"2014-02-13 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 6,
         "owner":3,
         "subscription_id": 1
@@ -570,6 +617,7 @@
         "title":"activity #8 of SalesCycle #6",
         "description":"activity #8 of SalesCycle #6",
         "date_created":"2014-02-15 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 6,
         "owner":4,
         "subscription_id": 1
@@ -582,6 +630,7 @@
         "title":"activity #9 of SalesCycle #6",
         "description":"activity #9 of SalesCycle #6",
         "date_created":"2014-02-17 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 6,
         "owner":5,
         "subscription_id": 1
@@ -594,6 +643,7 @@
         "title":"activity #10 of SalesCycle #6",
         "description":"activity #10 of SalesCycle #6",
         "date_created":"2014-02-19 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 6,
         "owner":1,
         "subscription_id": 1
@@ -606,6 +656,7 @@
         "title":"activity #1 of SalesCycle #7",
         "description":"activity #1 of SalesCycle #7",
         "date_created":"2014-03-01 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 7,
         "owner":4,
         "subscription_id": 1
@@ -618,6 +669,7 @@
         "title":"activity #2 of SalesCycle #7",
         "description":"activity #2 of SalesCycle #7",
         "date_created":"2014-03-03 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 7,
         "owner":1,
         "subscription_id": 1
@@ -630,6 +682,7 @@
         "title":"activity #3 of SalesCycle #7",
         "description":"activity #3 of SalesCycle #7",
         "date_created":"2014-03-05 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 7,
         "owner":5,
         "subscription_id": 1
@@ -642,6 +695,7 @@
         "title":"activity #4 of SalesCycle #7",
         "description":"activity #4 of SalesCycle #7",
         "date_created":"2014-03-07 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 7,
         "owner":1,
         "subscription_id": 1
@@ -654,6 +708,7 @@
         "title":"activity #5 of SalesCycle #7",
         "description":"activity #5 of SalesCycle #7",
         "date_created":"2014-03-09 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 7,
         "owner":1,
         "subscription_id": 1
@@ -666,6 +721,7 @@
         "title":"activity #6 of SalesCycle #7",
         "description":"activity #6 of SalesCycle #7",
         "date_created":"2014-03-11 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 7,
         "owner":3,
         "subscription_id": 1
@@ -678,6 +734,7 @@
         "title":"activity #7 of SalesCycle #7",
         "description":"activity #7 of SalesCycle #7",
         "date_created":"2014-03-13 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 7,
         "owner":5,
         "subscription_id": 1
@@ -690,6 +747,7 @@
         "title":"activity #8 of SalesCycle #7",
         "description":"activity #8 of SalesCycle #7",
         "date_created":"2014-03-15 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 7,
         "owner":4,
         "subscription_id": 1
@@ -702,6 +760,7 @@
         "title":"activity #9 of SalesCycle #7",
         "description":"activity #9 of SalesCycle #7",
         "date_created":"2014-03-17 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 7,
         "owner":2,
         "subscription_id": 1
@@ -714,6 +773,7 @@
         "title":"activity #10 of SalesCycle #7",
         "description":"activity #10 of SalesCycle #7",
         "date_created":"2014-03-19 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 7,
         "owner":2,
         "subscription_id": 1
@@ -726,6 +786,7 @@
         "title":"activity #1 of SalesCycle #8",
         "description":"activity #1 of SalesCycle #8",
         "date_created":"2014-04-01 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 8,
         "owner":3,
         "subscription_id": 1
@@ -738,6 +799,7 @@
         "title":"activity #2 of SalesCycle #8",
         "description":"activity #2 of SalesCycle #8",
         "date_created":"2014-04-03 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 8,
         "owner":4,
         "subscription_id": 1
@@ -750,6 +812,7 @@
         "title":"activity #3 of SalesCycle #8",
         "description":"activity #3 of SalesCycle #8",
         "date_created":"2014-04-05 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 8,
         "owner":5,
         "subscription_id": 1
@@ -762,6 +825,7 @@
         "title":"activity #4 of SalesCycle #8",
         "description":"activity #4 of SalesCycle #8",
         "date_created":"2014-04-07 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 8,
         "owner":3,
         "subscription_id": 1
@@ -774,6 +838,7 @@
         "title":"activity #5 of SalesCycle #8",
         "description":"activity #5 of SalesCycle #8",
         "date_created":"2014-04-09 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 8,
         "owner":1,
         "subscription_id": 1
@@ -786,6 +851,7 @@
         "title":"activity #6 of SalesCycle #8",
         "description":"activity #6 of SalesCycle #8",
         "date_created":"2014-04-11 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 8,
         "owner":4,
         "subscription_id": 1
@@ -798,6 +864,7 @@
         "title":"activity #7 of SalesCycle #8",
         "description":"activity #7 of SalesCycle #8",
         "date_created":"2014-04-13 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 8,
         "owner":4,
         "subscription_id": 1
@@ -810,6 +877,7 @@
         "title":"activity #8 of SalesCycle #8",
         "description":"activity #8 of SalesCycle #8",
         "date_created":"2014-04-15 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 8,
         "owner":2,
         "subscription_id": 1
@@ -822,6 +890,7 @@
         "title":"activity #9 of SalesCycle #8",
         "description":"activity #9 of SalesCycle #8",
         "date_created":"2014-04-17 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 8,
         "owner":3,
         "subscription_id": 1
@@ -834,6 +903,7 @@
         "title":"activity #10 of SalesCycle #8",
         "description":"activity #10 of SalesCycle #8",
         "date_created":"2014-04-19 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 8,
         "owner":2,
         "subscription_id": 1
@@ -846,6 +916,7 @@
         "title":"activity #1 of SalesCycle #9",
         "description":"activity #1 of SalesCycle #9",
         "date_created":"2014-01-01 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 9,
         "owner":4,
         "subscription_id": 1
@@ -858,6 +929,7 @@
         "title":"activity #2 of SalesCycle #9",
         "description":"activity #2 of SalesCycle #9",
         "date_created":"2014-01-03 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 9,
         "owner":2,
         "subscription_id": 1
@@ -870,6 +942,7 @@
         "title":"activity #3 of SalesCycle #9",
         "description":"activity #3 of SalesCycle #9",
         "date_created":"2014-01-05 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 9,
         "owner":4,
         "subscription_id": 1
@@ -882,6 +955,7 @@
         "title":"activity #4 of SalesCycle #9",
         "description":"activity #4 of SalesCycle #9",
         "date_created":"2014-01-07 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 9,
         "owner":2,
         "subscription_id": 1
@@ -894,6 +968,7 @@
         "title":"activity #5 of SalesCycle #9",
         "description":"activity #5 of SalesCycle #9",
         "date_created":"2014-01-09 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 9,
         "owner":1,
         "subscription_id": 1
@@ -906,6 +981,7 @@
         "title":"activity #6 of SalesCycle #9",
         "description":"activity #6 of SalesCycle #9",
         "date_created":"2014-01-11 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 9,
         "owner":3,
         "subscription_id": 1
@@ -918,6 +994,7 @@
         "title":"activity #7 of SalesCycle #9",
         "description":"activity #7 of SalesCycle #9",
         "date_created":"2014-01-13 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 9,
         "owner":2,
         "subscription_id": 1
@@ -930,6 +1007,7 @@
         "title":"activity #8 of SalesCycle #9",
         "description":"activity #8 of SalesCycle #9",
         "date_created":"2014-01-15 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 9,
         "owner":2,
         "subscription_id": 1
@@ -942,6 +1020,7 @@
         "title":"activity #9 of SalesCycle #9",
         "description":"activity #9 of SalesCycle #9",
         "date_created":"2014-01-17 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 9,
         "owner":4,
         "subscription_id": 1
@@ -954,6 +1033,7 @@
         "title":"activity #10 of SalesCycle #9",
         "description":"activity #10 of SalesCycle #9",
         "date_created":"2014-01-19 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 9,
         "owner":3,
         "subscription_id": 1
@@ -966,6 +1046,7 @@
         "title":"activity #1 of SalesCycle #10",
         "description":"activity #1 of SalesCycle #10",
         "date_created":"2014-02-01 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 10,
         "owner":4,
         "subscription_id": 1
@@ -978,6 +1059,7 @@
         "title":"activity #2 of SalesCycle #10",
         "description":"activity #2 of SalesCycle #10",
         "date_created":"2014-02-03 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 10,
         "owner":3,
         "subscription_id": 1
@@ -990,6 +1072,7 @@
         "title":"activity #3 of SalesCycle #10",
         "description":"activity #3 of SalesCycle #10",
         "date_created":"2014-02-05 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 10,
         "owner":2,
         "subscription_id": 1
@@ -1002,6 +1085,7 @@
         "title":"activity #4 of SalesCycle #10",
         "description":"activity #4 of SalesCycle #10",
         "date_created":"2014-02-07 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 10,
         "owner":5,
         "subscription_id": 1
@@ -1014,6 +1098,7 @@
         "title":"activity #5 of SalesCycle #10",
         "description":"activity #5 of SalesCycle #10",
         "date_created":"2014-02-09 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 10,
         "owner":5,
         "subscription_id": 1
@@ -1026,6 +1111,7 @@
         "title":"activity #6 of SalesCycle #10",
         "description":"activity #6 of SalesCycle #10",
         "date_created":"2014-02-11 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 10,
         "owner":5,
         "subscription_id": 1
@@ -1038,6 +1124,7 @@
         "title":"activity #7 of SalesCycle #10",
         "description":"activity #7 of SalesCycle #10",
         "date_created":"2014-02-13 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 10,
         "owner":1,
         "subscription_id": 1
@@ -1050,6 +1137,7 @@
         "title":"activity #8 of SalesCycle #10",
         "description":"activity #8 of SalesCycle #10",
         "date_created":"2014-02-15 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 10,
         "owner":3,
         "subscription_id": 1
@@ -1062,6 +1150,7 @@
         "title":"activity #9 of SalesCycle #10",
         "description":"activity #9 of SalesCycle #10",
         "date_created":"2014-02-17 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 10,
         "owner":2,
         "subscription_id": 1
@@ -1074,6 +1163,7 @@
         "title":"activity #10 of SalesCycle #10",
         "description":"activity #10 of SalesCycle #10",
         "date_created":"2014-02-19 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 10,
         "owner":2,
         "subscription_id": 1
@@ -1086,6 +1176,7 @@
         "title":"activity #1 of SalesCycle #11",
         "description":"activity #1 of SalesCycle #11",
         "date_created":"2014-03-01 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 11,
         "owner":5,
         "subscription_id": 1
@@ -1098,6 +1189,7 @@
         "title":"activity #2 of SalesCycle #11",
         "description":"activity #2 of SalesCycle #11",
         "date_created":"2014-03-03 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 11,
         "owner":3,
         "subscription_id": 1
@@ -1110,6 +1202,7 @@
         "title":"activity #3 of SalesCycle #11",
         "description":"activity #3 of SalesCycle #11",
         "date_created":"2014-03-05 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 11,
         "owner":5,
         "subscription_id": 1
@@ -1122,6 +1215,7 @@
         "title":"activity #4 of SalesCycle #11",
         "description":"activity #4 of SalesCycle #11",
         "date_created":"2014-03-07 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 11,
         "owner":5,
         "subscription_id": 1
@@ -1134,6 +1228,7 @@
         "title":"activity #5 of SalesCycle #11",
         "description":"activity #5 of SalesCycle #11",
         "date_created":"2014-03-09 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 11,
         "owner":2,
         "subscription_id": 1
@@ -1146,6 +1241,7 @@
         "title":"activity #6 of SalesCycle #11",
         "description":"activity #6 of SalesCycle #11",
         "date_created":"2014-03-11 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 11,
         "owner":1,
         "subscription_id": 1
@@ -1158,6 +1254,7 @@
         "title":"activity #7 of SalesCycle #11",
         "description":"activity #7 of SalesCycle #11",
         "date_created":"2014-03-13 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 11,
         "owner":3,
         "subscription_id": 1
@@ -1170,6 +1267,7 @@
         "title":"activity #8 of SalesCycle #11",
         "description":"activity #8 of SalesCycle #11",
         "date_created":"2014-03-15 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 11,
         "owner":1,
         "subscription_id": 1
@@ -1182,6 +1280,7 @@
         "title":"activity #9 of SalesCycle #11",
         "description":"activity #9 of SalesCycle #11",
         "date_created":"2014-03-17 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 11,
         "owner":1,
         "subscription_id": 1
@@ -1194,6 +1293,7 @@
         "title":"activity #10 of SalesCycle #11",
         "description":"activity #10 of SalesCycle #11",
         "date_created":"2014-03-19 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 11,
         "owner":2,
         "subscription_id": 1
@@ -1206,6 +1306,7 @@
         "title":"activity #1 of SalesCycle #12",
         "description":"activity #1 of SalesCycle #12",
         "date_created":"2014-04-01 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 12,
         "owner":5,
         "subscription_id": 1
@@ -1218,6 +1319,7 @@
         "title":"activity #2 of SalesCycle #12",
         "description":"activity #2 of SalesCycle #12",
         "date_created":"2014-04-03 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 12,
         "owner":3,
         "subscription_id": 1
@@ -1230,6 +1332,7 @@
         "title":"activity #3 of SalesCycle #12",
         "description":"activity #3 of SalesCycle #12",
         "date_created":"2014-04-05 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 12,
         "owner":4,
         "subscription_id": 1
@@ -1242,6 +1345,7 @@
         "title":"activity #4 of SalesCycle #12",
         "description":"activity #4 of SalesCycle #12",
         "date_created":"2014-04-07 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 12,
         "owner":2,
         "subscription_id": 1
@@ -1254,6 +1358,7 @@
         "title":"activity #5 of SalesCycle #12",
         "description":"activity #5 of SalesCycle #12",
         "date_created":"2014-04-09 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 12,
         "owner":5,
         "subscription_id": 1
@@ -1266,6 +1371,7 @@
         "title":"activity #6 of SalesCycle #12",
         "description":"activity #6 of SalesCycle #12",
         "date_created":"2014-04-11 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 12,
         "owner":1,
         "subscription_id": 1
@@ -1278,6 +1384,7 @@
         "title":"activity #7 of SalesCycle #12",
         "description":"activity #7 of SalesCycle #12",
         "date_created":"2014-04-13 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 12,
         "owner":3,
         "subscription_id": 1
@@ -1290,6 +1397,7 @@
         "title":"activity #8 of SalesCycle #12",
         "description":"activity #8 of SalesCycle #12",
         "date_created":"2014-04-15 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 12,
         "owner":1,
         "subscription_id": 1
@@ -1302,6 +1410,7 @@
         "title":"activity #9 of SalesCycle #12",
         "description":"activity #9 of SalesCycle #12",
         "date_created":"2014-04-17 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 12,
         "owner":4,
         "subscription_id": 1
@@ -1314,6 +1423,7 @@
         "title":"activity #10 of SalesCycle #12",
         "description":"activity #10 of SalesCycle #12",
         "date_created":"2014-04-19 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 12,
         "owner":4,
         "subscription_id": 1
@@ -1326,6 +1436,7 @@
         "title":"activity #1 of SalesCycle #13",
         "description":"activity #1 of SalesCycle #13",
         "date_created":"2014-01-01 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 13,
         "owner":3,
         "subscription_id": 1
@@ -1338,6 +1449,7 @@
         "title":"activity #2 of SalesCycle #13",
         "description":"activity #2 of SalesCycle #13",
         "date_created":"2014-01-03 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 13,
         "owner":1,
         "subscription_id": 1
@@ -1350,6 +1462,7 @@
         "title":"activity #3 of SalesCycle #13",
         "description":"activity #3 of SalesCycle #13",
         "date_created":"2014-01-05 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 13,
         "owner":4,
         "subscription_id": 1
@@ -1362,6 +1475,7 @@
         "title":"activity #4 of SalesCycle #13",
         "description":"activity #4 of SalesCycle #13",
         "date_created":"2014-01-07 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 13,
         "owner":2,
         "subscription_id": 1
@@ -1374,6 +1488,7 @@
         "title":"activity #5 of SalesCycle #13",
         "description":"activity #5 of SalesCycle #13",
         "date_created":"2014-01-09 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 13,
         "owner":3,
         "subscription_id": 1
@@ -1386,6 +1501,7 @@
         "title":"activity #6 of SalesCycle #13",
         "description":"activity #6 of SalesCycle #13",
         "date_created":"2014-01-11 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 13,
         "owner":1,
         "subscription_id": 1
@@ -1398,6 +1514,7 @@
         "title":"activity #7 of SalesCycle #13",
         "description":"activity #7 of SalesCycle #13",
         "date_created":"2014-01-13 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 13,
         "owner":3,
         "subscription_id": 1
@@ -1410,6 +1527,7 @@
         "title":"activity #8 of SalesCycle #13",
         "description":"activity #8 of SalesCycle #13",
         "date_created":"2014-01-15 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 13,
         "owner":1,
         "subscription_id": 1
@@ -1422,6 +1540,7 @@
         "title":"activity #9 of SalesCycle #13",
         "description":"activity #9 of SalesCycle #13",
         "date_created":"2014-01-17 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 13,
         "owner":4,
         "subscription_id": 1
@@ -1434,6 +1553,7 @@
         "title":"activity #10 of SalesCycle #13",
         "description":"activity #10 of SalesCycle #13",
         "date_created":"2014-01-19 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 13,
         "owner":2,
         "subscription_id": 1
@@ -1446,6 +1566,7 @@
         "title":"activity #1 of SalesCycle #14",
         "description":"activity #1 of SalesCycle #14",
         "date_created":"2014-02-01 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 14,
         "owner":4,
         "subscription_id": 1
@@ -1458,6 +1579,7 @@
         "title":"activity #2 of SalesCycle #14",
         "description":"activity #2 of SalesCycle #14",
         "date_created":"2014-02-03 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 14,
         "owner":4,
         "subscription_id": 1
@@ -1470,6 +1592,7 @@
         "title":"activity #3 of SalesCycle #14",
         "description":"activity #3 of SalesCycle #14",
         "date_created":"2014-02-05 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 14,
         "owner":2,
         "subscription_id": 1
@@ -1482,6 +1605,7 @@
         "title":"activity #4 of SalesCycle #14",
         "description":"activity #4 of SalesCycle #14",
         "date_created":"2014-02-07 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 14,
         "owner":4,
         "subscription_id": 1
@@ -1494,6 +1618,7 @@
         "title":"activity #5 of SalesCycle #14",
         "description":"activity #5 of SalesCycle #14",
         "date_created":"2014-02-09 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 14,
         "owner":1,
         "subscription_id": 1
@@ -1506,6 +1631,7 @@
         "title":"activity #6 of SalesCycle #14",
         "description":"activity #6 of SalesCycle #14",
         "date_created":"2014-02-11 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 14,
         "owner":2,
         "subscription_id": 1
@@ -1518,6 +1644,7 @@
         "title":"activity #7 of SalesCycle #14",
         "description":"activity #7 of SalesCycle #14",
         "date_created":"2014-02-13 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 14,
         "owner":1,
         "subscription_id": 1
@@ -1530,6 +1657,7 @@
         "title":"activity #8 of SalesCycle #14",
         "description":"activity #8 of SalesCycle #14",
         "date_created":"2014-02-15 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 14,
         "owner":2,
         "subscription_id": 1
@@ -1542,6 +1670,7 @@
         "title":"activity #9 of SalesCycle #14",
         "description":"activity #9 of SalesCycle #14",
         "date_created":"2014-02-17 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 14,
         "owner":2,
         "subscription_id": 1
@@ -1554,6 +1683,7 @@
         "title":"activity #10 of SalesCycle #14",
         "description":"activity #10 of SalesCycle #14",
         "date_created":"2014-02-19 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 14,
         "owner":5,
         "subscription_id": 1
@@ -1566,6 +1696,7 @@
         "title":"activity #1 of SalesCycle #16",
         "description":"activity #1 of SalesCycle #16",
         "date_created":"2014-04-01 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 16,
         "owner":3,
         "subscription_id": 1
@@ -1578,6 +1709,7 @@
         "title":"activity #2 of SalesCycle #16",
         "description":"activity #2 of SalesCycle #16",
         "date_created":"2014-04-03 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 16,
         "owner":2,
         "subscription_id": 1
@@ -1590,6 +1722,7 @@
         "title":"activity #3 of SalesCycle #16",
         "description":"activity #3 of SalesCycle #16",
         "date_created":"2014-04-05 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 16,
         "owner":1,
         "subscription_id": 1
@@ -1602,6 +1735,7 @@
         "title":"activity #4 of SalesCycle #16",
         "description":"activity #4 of SalesCycle #16",
         "date_created":"2014-04-07 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 16,
         "owner":3,
         "subscription_id": 1
@@ -1614,6 +1748,7 @@
         "title":"activity #5 of SalesCycle #16",
         "description":"activity #5 of SalesCycle #16",
         "date_created":"2014-04-09 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 16,
         "owner":2,
         "subscription_id": 1
@@ -1626,6 +1761,7 @@
         "title":"activity #6 of SalesCycle #16",
         "description":"activity #6 of SalesCycle #16",
         "date_created":"2014-04-11 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 16,
         "owner":3,
         "subscription_id": 1
@@ -1638,6 +1774,7 @@
         "title":"activity #7 of SalesCycle #16",
         "description":"activity #7 of SalesCycle #16",
         "date_created":"2014-04-13 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 16,
         "owner":1,
         "subscription_id": 1
@@ -1650,6 +1787,7 @@
         "title":"activity #8 of SalesCycle #16",
         "description":"activity #8 of SalesCycle #16",
         "date_created":"2014-04-15 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 16,
         "owner":1,
         "subscription_id": 1
@@ -1662,6 +1800,7 @@
         "title":"activity #9 of SalesCycle #16",
         "description":"activity #9 of SalesCycle #16",
         "date_created":"2014-04-17 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 16,
         "owner":2,
         "subscription_id": 1
@@ -1674,6 +1813,7 @@
         "title":"activity #10 of SalesCycle #16",
         "description":"activity #10 of SalesCycle #16",
         "date_created":"2014-04-19 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 16,
         "owner":2,
         "subscription_id": 1
@@ -1686,6 +1826,7 @@
         "title":"activity #1 of SalesCycle #17",
         "description":"activity #1 of SalesCycle #17",
         "date_created":"2014-01-01 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 17,
         "owner":4,
         "subscription_id": 1
@@ -1698,6 +1839,7 @@
         "title":"activity #2 of SalesCycle #17",
         "description":"activity #2 of SalesCycle #17",
         "date_created":"2014-01-03 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 17,
         "owner":3,
         "subscription_id": 1
@@ -1710,6 +1852,7 @@
         "title":"activity #3 of SalesCycle #17",
         "description":"activity #3 of SalesCycle #17",
         "date_created":"2014-01-05 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 17,
         "owner":4,
         "subscription_id": 1
@@ -1722,6 +1865,7 @@
         "title":"activity #4 of SalesCycle #17",
         "description":"activity #4 of SalesCycle #17",
         "date_created":"2014-01-07 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 17,
         "owner":3,
         "subscription_id": 1
@@ -1734,6 +1878,7 @@
         "title":"activity #5 of SalesCycle #17",
         "description":"activity #5 of SalesCycle #17",
         "date_created":"2014-01-09 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 17,
         "owner":3,
         "subscription_id": 1
@@ -1746,6 +1891,7 @@
         "title":"activity #6 of SalesCycle #17",
         "description":"activity #6 of SalesCycle #17",
         "date_created":"2014-01-11 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 17,
         "owner":5,
         "subscription_id": 1
@@ -1758,6 +1904,7 @@
         "title":"activity #7 of SalesCycle #17",
         "description":"activity #7 of SalesCycle #17",
         "date_created":"2014-01-13 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 17,
         "owner":5,
         "subscription_id": 1
@@ -1770,6 +1917,7 @@
         "title":"activity #8 of SalesCycle #17",
         "description":"activity #8 of SalesCycle #17",
         "date_created":"2014-01-15 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 17,
         "owner":3,
         "subscription_id": 1
@@ -1782,6 +1930,7 @@
         "title":"activity #9 of SalesCycle #17",
         "description":"activity #9 of SalesCycle #17",
         "date_created":"2014-01-17 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 17,
         "owner":1,
         "subscription_id": 1
@@ -1794,6 +1943,7 @@
         "title":"activity #10 of SalesCycle #17",
         "description":"activity #10 of SalesCycle #17",
         "date_created":"2014-01-19 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 17,
         "owner":4,
         "subscription_id": 1
@@ -1806,6 +1956,7 @@
         "title":"activity #1 of SalesCycle #18",
         "description":"activity #1 of SalesCycle #18",
         "date_created":"2014-02-01 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 18,
         "owner":5,
         "subscription_id": 1
@@ -1818,6 +1969,7 @@
         "title":"activity #2 of SalesCycle #18",
         "description":"activity #2 of SalesCycle #18",
         "date_created":"2014-02-03 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 18,
         "owner":1,
         "subscription_id": 1
@@ -1830,6 +1982,7 @@
         "title":"activity #3 of SalesCycle #18",
         "description":"activity #3 of SalesCycle #18",
         "date_created":"2014-02-05 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 18,
         "owner":5,
         "subscription_id": 1
@@ -1842,6 +1995,7 @@
         "title":"activity #4 of SalesCycle #18",
         "description":"activity #4 of SalesCycle #18",
         "date_created":"2014-02-07 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 18,
         "owner":1,
         "subscription_id": 1
@@ -1854,6 +2008,7 @@
         "title":"activity #5 of SalesCycle #18",
         "description":"activity #5 of SalesCycle #18",
         "date_created":"2014-02-09 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 18,
         "owner":5,
         "subscription_id": 1
@@ -1866,6 +2021,7 @@
         "title":"activity #6 of SalesCycle #18",
         "description":"activity #6 of SalesCycle #18",
         "date_created":"2014-02-11 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 18,
         "owner":1,
         "subscription_id": 1
@@ -1878,6 +2034,7 @@
         "title":"activity #7 of SalesCycle #18",
         "description":"activity #7 of SalesCycle #18",
         "date_created":"2014-02-13 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 18,
         "owner":3,
         "subscription_id": 1
@@ -1890,6 +2047,7 @@
         "title":"activity #8 of SalesCycle #18",
         "description":"activity #8 of SalesCycle #18",
         "date_created":"2014-02-15 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 18,
         "owner":5,
         "subscription_id": 1
@@ -1902,6 +2060,7 @@
         "title":"activity #9 of SalesCycle #18",
         "description":"activity #9 of SalesCycle #18",
         "date_created":"2014-02-17 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 18,
         "owner":2,
         "subscription_id": 1
@@ -1914,6 +2073,7 @@
         "title":"activity #10 of SalesCycle #18",
         "description":"activity #10 of SalesCycle #18",
         "date_created":"2014-02-19 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 18,
         "owner":2,
         "subscription_id": 1
@@ -1926,6 +2086,7 @@
         "title":"activity #1 of SalesCycle #20",
         "description":"activity #1 of SalesCycle #20",
         "date_created":"2014-04-01 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 20,
         "owner":4,
         "subscription_id": 1
@@ -1938,6 +2099,7 @@
         "title":"activity #2 of SalesCycle #20",
         "description":"activity #2 of SalesCycle #20",
         "date_created":"2014-04-03 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 20,
         "owner":2,
         "subscription_id": 1
@@ -1950,6 +2112,7 @@
         "title":"activity #3 of SalesCycle #20",
         "description":"activity #3 of SalesCycle #20",
         "date_created":"2014-04-05 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 20,
         "owner":1,
         "subscription_id": 1
@@ -1962,6 +2125,7 @@
         "title":"activity #4 of SalesCycle #20",
         "description":"activity #4 of SalesCycle #20",
         "date_created":"2014-04-07 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 20,
         "owner":2,
         "subscription_id": 1
@@ -1974,6 +2138,7 @@
         "title":"activity #5 of SalesCycle #20",
         "description":"activity #5 of SalesCycle #20",
         "date_created":"2014-04-09 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 20,
         "owner":3,
         "subscription_id": 1
@@ -1986,6 +2151,7 @@
         "title":"activity #6 of SalesCycle #20",
         "description":"activity #6 of SalesCycle #20",
         "date_created":"2014-04-11 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 20,
         "owner":1,
         "subscription_id": 1
@@ -1998,6 +2164,7 @@
         "title":"activity #7 of SalesCycle #20",
         "description":"activity #7 of SalesCycle #20",
         "date_created":"2014-04-13 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 20,
         "owner":4,
         "subscription_id": 1
@@ -2010,6 +2177,7 @@
         "title":"activity #8 of SalesCycle #20",
         "description":"activity #8 of SalesCycle #20",
         "date_created":"2014-04-15 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 20,
         "owner":1,
         "subscription_id": 1
@@ -2022,6 +2190,7 @@
         "title":"activity #9 of SalesCycle #20",
         "description":"activity #9 of SalesCycle #20",
         "date_created":"2014-04-17 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 20,
         "owner":4,
         "subscription_id": 1
@@ -2034,6 +2203,7 @@
         "title":"activity #10 of SalesCycle #20",
         "description":"activity #10 of SalesCycle #20",
         "date_created":"2014-04-19 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 20,
         "owner":3,
         "subscription_id": 1
@@ -2046,6 +2216,7 @@
         "title":"activity #1 of SalesCycle #22",
         "description":"activity #1 of SalesCycle #22",
         "date_created":"2014-02-01 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 22,
         "owner":2,
         "subscription_id": 1
@@ -2058,6 +2229,7 @@
         "title":"activity #2 of SalesCycle #22",
         "description":"activity #2 of SalesCycle #22",
         "date_created":"2014-02-03 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 22,
         "owner":4,
         "subscription_id": 1
@@ -2070,6 +2242,7 @@
         "title":"activity #3 of SalesCycle #22",
         "description":"activity #3 of SalesCycle #22",
         "date_created":"2014-02-05 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 22,
         "owner":5,
         "subscription_id": 1
@@ -2082,6 +2255,7 @@
         "title":"activity #4 of SalesCycle #22",
         "description":"activity #4 of SalesCycle #22",
         "date_created":"2014-02-07 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 22,
         "owner":4,
         "subscription_id": 1
@@ -2094,6 +2268,7 @@
         "title":"activity #5 of SalesCycle #22",
         "description":"activity #5 of SalesCycle #22",
         "date_created":"2014-02-09 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 22,
         "owner":2,
         "subscription_id": 1
@@ -2106,6 +2281,7 @@
         "title":"activity #6 of SalesCycle #22",
         "description":"activity #6 of SalesCycle #22",
         "date_created":"2014-02-11 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 22,
         "owner":4,
         "subscription_id": 1
@@ -2118,6 +2294,7 @@
         "title":"activity #7 of SalesCycle #22",
         "description":"activity #7 of SalesCycle #22",
         "date_created":"2014-02-13 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 22,
         "owner":1,
         "subscription_id": 1
@@ -2130,6 +2307,7 @@
         "title":"activity #8 of SalesCycle #22",
         "description":"activity #8 of SalesCycle #22",
         "date_created":"2014-02-15 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 22,
         "owner":3,
         "subscription_id": 1
@@ -2142,6 +2320,7 @@
         "title":"activity #9 of SalesCycle #22",
         "description":"activity #9 of SalesCycle #22",
         "date_created":"2014-02-17 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 22,
         "owner":5,
         "subscription_id": 1
@@ -2154,6 +2333,7 @@
         "title":"activity #10 of SalesCycle #22",
         "description":"activity #10 of SalesCycle #22",
         "date_created":"2014-02-19 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 22,
         "owner":1,
         "subscription_id": 1
@@ -2166,6 +2346,7 @@
         "title":"activity #1 of SalesCycle #25",
         "description":"activity #1 of SalesCycle #25",
         "date_created":"2014-01-01 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 25,
         "owner":4,
         "subscription_id": 1
@@ -2178,6 +2359,7 @@
         "title":"activity #2 of SalesCycle #25",
         "description":"activity #2 of SalesCycle #25",
         "date_created":"2014-01-03 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 25,
         "owner":4,
         "subscription_id": 1
@@ -2190,6 +2372,7 @@
         "title":"activity #3 of SalesCycle #25",
         "description":"activity #3 of SalesCycle #25",
         "date_created":"2014-01-05 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 25,
         "owner":3,
         "subscription_id": 1
@@ -2202,6 +2385,7 @@
         "title":"activity #4 of SalesCycle #25",
         "description":"activity #4 of SalesCycle #25",
         "date_created":"2014-01-07 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 25,
         "owner":3,
         "subscription_id": 1
@@ -2214,6 +2398,7 @@
         "title":"activity #5 of SalesCycle #25",
         "description":"activity #5 of SalesCycle #25",
         "date_created":"2014-01-09 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 25,
         "owner":4,
         "subscription_id": 1
@@ -2226,6 +2411,7 @@
         "title":"activity #6 of SalesCycle #25",
         "description":"activity #6 of SalesCycle #25",
         "date_created":"2014-01-11 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 25,
         "owner":2,
         "subscription_id": 1
@@ -2238,6 +2424,7 @@
         "title":"activity #7 of SalesCycle #25",
         "description":"activity #7 of SalesCycle #25",
         "date_created":"2014-01-13 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 25,
         "owner":4,
         "subscription_id": 1
@@ -2250,6 +2437,7 @@
         "title":"activity #8 of SalesCycle #25",
         "description":"activity #8 of SalesCycle #25",
         "date_created":"2014-01-15 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 25,
         "owner":3,
         "subscription_id": 1
@@ -2262,6 +2450,7 @@
         "title":"activity #9 of SalesCycle #25",
         "description":"activity #9 of SalesCycle #25",
         "date_created":"2014-01-17 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 25,
         "owner":5,
         "subscription_id": 1
@@ -2274,6 +2463,7 @@
         "title":"activity #10 of SalesCycle #25",
         "description":"activity #10 of SalesCycle #25",
         "date_created":"2014-01-19 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 25,
         "owner":4,
         "subscription_id": 1
@@ -2286,6 +2476,7 @@
         "title":"activity #1 of SalesCycle #26",
         "description":"activity #1 of SalesCycle #26",
         "date_created":"2014-02-01 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 26,
         "owner":1,
         "subscription_id": 1
@@ -2298,6 +2489,7 @@
         "title":"activity #2 of SalesCycle #26",
         "description":"activity #2 of SalesCycle #26",
         "date_created":"2014-02-03 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 26,
         "owner":3,
         "subscription_id": 1
@@ -2310,6 +2502,7 @@
         "title":"activity #3 of SalesCycle #26",
         "description":"activity #3 of SalesCycle #26",
         "date_created":"2014-02-05 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 26,
         "owner":2,
         "subscription_id": 1
@@ -2322,6 +2515,7 @@
         "title":"activity #4 of SalesCycle #26",
         "description":"activity #4 of SalesCycle #26",
         "date_created":"2014-02-07 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 26,
         "owner":5,
         "subscription_id": 1
@@ -2334,6 +2528,7 @@
         "title":"activity #5 of SalesCycle #26",
         "description":"activity #5 of SalesCycle #26",
         "date_created":"2014-02-09 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 26,
         "owner":5,
         "subscription_id": 1
@@ -2346,6 +2541,7 @@
         "title":"activity #6 of SalesCycle #26",
         "description":"activity #6 of SalesCycle #26",
         "date_created":"2014-02-11 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 26,
         "owner":3,
         "subscription_id": 1
@@ -2358,6 +2554,7 @@
         "title":"activity #7 of SalesCycle #26",
         "description":"activity #7 of SalesCycle #26",
         "date_created":"2014-02-13 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 26,
         "owner":2,
         "subscription_id": 1
@@ -2370,6 +2567,7 @@
         "title":"activity #8 of SalesCycle #26",
         "description":"activity #8 of SalesCycle #26",
         "date_created":"2014-02-15 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 26,
         "owner":2,
         "subscription_id": 1
@@ -2382,6 +2580,7 @@
         "title":"activity #9 of SalesCycle #26",
         "description":"activity #9 of SalesCycle #26",
         "date_created":"2014-02-17 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 26,
         "owner":3,
         "subscription_id": 1
@@ -2394,6 +2593,7 @@
         "title":"activity #10 of SalesCycle #26",
         "description":"activity #10 of SalesCycle #26",
         "date_created":"2014-02-19 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 26,
         "owner":2,
         "subscription_id": 1
@@ -2406,6 +2606,7 @@
         "title":"activity #1 of SalesCycle #30",
         "description":"activity #1 of SalesCycle #30",
         "date_created":"2014-02-01 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 30,
         "owner":1,
         "subscription_id": 1
@@ -2418,6 +2619,7 @@
         "title":"activity #2 of SalesCycle #30",
         "description":"activity #2 of SalesCycle #30",
         "date_created":"2014-02-03 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 30,
         "owner":1,
         "subscription_id": 1
@@ -2430,6 +2632,7 @@
         "title":"activity #3 of SalesCycle #30",
         "description":"activity #3 of SalesCycle #30",
         "date_created":"2014-02-05 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 30,
         "owner":3,
         "subscription_id": 1
@@ -2442,6 +2645,7 @@
         "title":"activity #4 of SalesCycle #30",
         "description":"activity #4 of SalesCycle #30",
         "date_created":"2014-02-07 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 30,
         "owner":5,
         "subscription_id": 1
@@ -2454,6 +2658,7 @@
         "title":"activity #5 of SalesCycle #30",
         "description":"activity #5 of SalesCycle #30",
         "date_created":"2014-02-09 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 30,
         "owner":3,
         "subscription_id": 1
@@ -2466,6 +2671,7 @@
         "title":"activity #6 of SalesCycle #30",
         "description":"activity #6 of SalesCycle #30",
         "date_created":"2014-02-11 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 30,
         "owner":1,
         "subscription_id": 1
@@ -2478,6 +2684,7 @@
         "title":"activity #7 of SalesCycle #30",
         "description":"activity #7 of SalesCycle #30",
         "date_created":"2014-02-13 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 30,
         "owner":4,
         "subscription_id": 1
@@ -2490,6 +2697,7 @@
         "title":"activity #8 of SalesCycle #30",
         "description":"activity #8 of SalesCycle #30",
         "date_created":"2014-02-15 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 30,
         "owner":4,
         "subscription_id": 1
@@ -2502,6 +2710,7 @@
         "title":"activity #9 of SalesCycle #30",
         "description":"activity #9 of SalesCycle #30",
         "date_created":"2014-02-17 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 30,
         "owner":1,
         "subscription_id": 1
@@ -2514,6 +2723,7 @@
         "title":"activity #10 of SalesCycle #30",
         "description":"activity #10 of SalesCycle #30",
         "date_created":"2014-02-19 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 30,
         "owner":3,
         "subscription_id": 1
@@ -2526,6 +2736,7 @@
         "title":"activity #1 of SalesCycle #31",
         "description":"activity #1 of SalesCycle #31",
         "date_created":"2014-03-01 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 31,
         "owner":1,
         "subscription_id": 1
@@ -2538,6 +2749,7 @@
         "title":"activity #2 of SalesCycle #31",
         "description":"activity #2 of SalesCycle #31",
         "date_created":"2014-03-03 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 31,
         "owner":5,
         "subscription_id": 1
@@ -2550,6 +2762,7 @@
         "title":"activity #3 of SalesCycle #31",
         "description":"activity #3 of SalesCycle #31",
         "date_created":"2014-03-05 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 31,
         "owner":4,
         "subscription_id": 1
@@ -2562,6 +2775,7 @@
         "title":"activity #4 of SalesCycle #31",
         "description":"activity #4 of SalesCycle #31",
         "date_created":"2014-03-07 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 31,
         "owner":2,
         "subscription_id": 1
@@ -2574,6 +2788,7 @@
         "title":"activity #5 of SalesCycle #31",
         "description":"activity #5 of SalesCycle #31",
         "date_created":"2014-03-09 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 31,
         "owner":2,
         "subscription_id": 1
@@ -2586,6 +2801,7 @@
         "title":"activity #6 of SalesCycle #31",
         "description":"activity #6 of SalesCycle #31",
         "date_created":"2014-03-11 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 31,
         "owner":5,
         "subscription_id": 1
@@ -2598,6 +2814,7 @@
         "title":"activity #7 of SalesCycle #31",
         "description":"activity #7 of SalesCycle #31",
         "date_created":"2014-03-13 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 31,
         "owner":2,
         "subscription_id": 1
@@ -2610,6 +2827,7 @@
         "title":"activity #8 of SalesCycle #31",
         "description":"activity #8 of SalesCycle #31",
         "date_created":"2014-03-15 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 31,
         "owner":1,
         "subscription_id": 1
@@ -2622,6 +2840,7 @@
         "title":"activity #9 of SalesCycle #31",
         "description":"activity #9 of SalesCycle #31",
         "date_created":"2014-03-17 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 31,
         "owner":2,
         "subscription_id": 1
@@ -2634,6 +2853,7 @@
         "title":"activity #10 of SalesCycle #31",
         "description":"activity #10 of SalesCycle #31",
         "date_created":"2014-03-19 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 31,
         "owner":1,
         "subscription_id": 1
@@ -2646,6 +2866,7 @@
         "title":"activity #1 of SalesCycle #32",
         "description":"activity #1 of SalesCycle #32",
         "date_created":"2014-04-01 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 32,
         "owner":2,
         "subscription_id": 1
@@ -2658,6 +2879,7 @@
         "title":"activity #2 of SalesCycle #32",
         "description":"activity #2 of SalesCycle #32",
         "date_created":"2014-04-03 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 32,
         "owner":3,
         "subscription_id": 1
@@ -2670,6 +2892,7 @@
         "title":"activity #3 of SalesCycle #32",
         "description":"activity #3 of SalesCycle #32",
         "date_created":"2014-04-05 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 32,
         "owner":2,
         "subscription_id": 1
@@ -2682,6 +2905,7 @@
         "title":"activity #4 of SalesCycle #32",
         "description":"activity #4 of SalesCycle #32",
         "date_created":"2014-04-07 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 32,
         "owner":4,
         "subscription_id": 1
@@ -2694,6 +2918,7 @@
         "title":"activity #5 of SalesCycle #32",
         "description":"activity #5 of SalesCycle #32",
         "date_created":"2014-04-09 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 32,
         "owner":1,
         "subscription_id": 1
@@ -2706,6 +2931,7 @@
         "title":"activity #6 of SalesCycle #32",
         "description":"activity #6 of SalesCycle #32",
         "date_created":"2014-04-11 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 32,
         "owner":3,
         "subscription_id": 1
@@ -2718,6 +2944,7 @@
         "title":"activity #7 of SalesCycle #32",
         "description":"activity #7 of SalesCycle #32",
         "date_created":"2014-04-13 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 32,
         "owner":4,
         "subscription_id": 1
@@ -2730,6 +2957,7 @@
         "title":"activity #8 of SalesCycle #32",
         "description":"activity #8 of SalesCycle #32",
         "date_created":"2014-04-15 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 32,
         "owner":2,
         "subscription_id": 1
@@ -2742,6 +2970,7 @@
         "title":"activity #9 of SalesCycle #32",
         "description":"activity #9 of SalesCycle #32",
         "date_created":"2014-04-17 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 32,
         "owner":2,
         "subscription_id": 1
@@ -2754,6 +2983,7 @@
         "title":"activity #10 of SalesCycle #32",
         "description":"activity #10 of SalesCycle #32",
         "date_created":"2014-04-19 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 32,
         "owner":1,
         "subscription_id": 1
@@ -2766,6 +2996,7 @@
         "title":"activity #1 of SalesCycle #33",
         "description":"activity #1 of SalesCycle #33",
         "date_created":"2014-01-01 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 33,
         "owner":4,
         "subscription_id": 1
@@ -2778,6 +3009,7 @@
         "title":"activity #2 of SalesCycle #33",
         "description":"activity #2 of SalesCycle #33",
         "date_created":"2014-01-03 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 33,
         "owner":4,
         "subscription_id": 1
@@ -2790,6 +3022,7 @@
         "title":"activity #3 of SalesCycle #33",
         "description":"activity #3 of SalesCycle #33",
         "date_created":"2014-01-05 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 33,
         "owner":2,
         "subscription_id": 1
@@ -2802,6 +3035,7 @@
         "title":"activity #4 of SalesCycle #33",
         "description":"activity #4 of SalesCycle #33",
         "date_created":"2014-01-07 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 33,
         "owner":1,
         "subscription_id": 1
@@ -2814,6 +3048,7 @@
         "title":"activity #5 of SalesCycle #33",
         "description":"activity #5 of SalesCycle #33",
         "date_created":"2014-01-09 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 33,
         "owner":3,
         "subscription_id": 1
@@ -2826,6 +3061,7 @@
         "title":"activity #6 of SalesCycle #33",
         "description":"activity #6 of SalesCycle #33",
         "date_created":"2014-01-11 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 33,
         "owner":5,
         "subscription_id": 1
@@ -2838,6 +3074,7 @@
         "title":"activity #7 of SalesCycle #33",
         "description":"activity #7 of SalesCycle #33",
         "date_created":"2014-01-13 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 33,
         "owner":3,
         "subscription_id": 1
@@ -2850,6 +3087,7 @@
         "title":"activity #8 of SalesCycle #33",
         "description":"activity #8 of SalesCycle #33",
         "date_created":"2014-01-15 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 33,
         "owner":5,
         "subscription_id": 1
@@ -2862,6 +3100,7 @@
         "title":"activity #9 of SalesCycle #33",
         "description":"activity #9 of SalesCycle #33",
         "date_created":"2014-01-17 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 33,
         "owner":5,
         "subscription_id": 1
@@ -2874,6 +3113,7 @@
         "title":"activity #10 of SalesCycle #33",
         "description":"activity #10 of SalesCycle #33",
         "date_created":"2014-01-19 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 33,
         "owner":1,
         "subscription_id": 1
@@ -2886,6 +3126,7 @@
         "title":"activity #1 of SalesCycle #35",
         "description":"activity #1 of SalesCycle #35",
         "date_created":"2014-03-01 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 35,
         "owner":3,
         "subscription_id": 1
@@ -2898,6 +3139,7 @@
         "title":"activity #2 of SalesCycle #35",
         "description":"activity #2 of SalesCycle #35",
         "date_created":"2014-03-03 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 35,
         "owner":5,
         "subscription_id": 1
@@ -2910,6 +3152,7 @@
         "title":"activity #3 of SalesCycle #35",
         "description":"activity #3 of SalesCycle #35",
         "date_created":"2014-03-05 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 35,
         "owner":1,
         "subscription_id": 1
@@ -2922,6 +3165,7 @@
         "title":"activity #4 of SalesCycle #35",
         "description":"activity #4 of SalesCycle #35",
         "date_created":"2014-03-07 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 35,
         "owner":5,
         "subscription_id": 1
@@ -2934,6 +3178,7 @@
         "title":"activity #5 of SalesCycle #35",
         "description":"activity #5 of SalesCycle #35",
         "date_created":"2014-03-09 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 35,
         "owner":3,
         "subscription_id": 1
@@ -2946,6 +3191,7 @@
         "title":"activity #6 of SalesCycle #35",
         "description":"activity #6 of SalesCycle #35",
         "date_created":"2014-03-11 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 35,
         "owner":1,
         "subscription_id": 1
@@ -2958,6 +3204,7 @@
         "title":"activity #7 of SalesCycle #35",
         "description":"activity #7 of SalesCycle #35",
         "date_created":"2014-03-13 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 35,
         "owner":1,
         "subscription_id": 1
@@ -2970,6 +3217,7 @@
         "title":"activity #8 of SalesCycle #35",
         "description":"activity #8 of SalesCycle #35",
         "date_created":"2014-03-15 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 35,
         "owner":1,
         "subscription_id": 1
@@ -2982,6 +3230,7 @@
         "title":"activity #9 of SalesCycle #35",
         "description":"activity #9 of SalesCycle #35",
         "date_created":"2014-03-17 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 35,
         "owner":1,
         "subscription_id": 1
@@ -2994,6 +3243,7 @@
         "title":"activity #10 of SalesCycle #35",
         "description":"activity #10 of SalesCycle #35",
         "date_created":"2014-03-19 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 35,
         "owner":1,
         "subscription_id": 1
@@ -3006,6 +3256,7 @@
         "title":"activity #1 of SalesCycle #36",
         "description":"activity #1 of SalesCycle #36",
         "date_created":"2014-04-01 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 36,
         "owner":5,
         "subscription_id": 1
@@ -3018,6 +3269,7 @@
         "title":"activity #2 of SalesCycle #36",
         "description":"activity #2 of SalesCycle #36",
         "date_created":"2014-04-03 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 36,
         "owner":4,
         "subscription_id": 1
@@ -3030,6 +3282,7 @@
         "title":"activity #3 of SalesCycle #36",
         "description":"activity #3 of SalesCycle #36",
         "date_created":"2014-04-05 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 36,
         "owner":2,
         "subscription_id": 1
@@ -3042,6 +3295,7 @@
         "title":"activity #4 of SalesCycle #36",
         "description":"activity #4 of SalesCycle #36",
         "date_created":"2014-04-07 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 36,
         "owner":5,
         "subscription_id": 1
@@ -3054,6 +3308,7 @@
         "title":"activity #5 of SalesCycle #36",
         "description":"activity #5 of SalesCycle #36",
         "date_created":"2014-04-09 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 36,
         "owner":5,
         "subscription_id": 1
@@ -3066,6 +3321,7 @@
         "title":"activity #6 of SalesCycle #36",
         "description":"activity #6 of SalesCycle #36",
         "date_created":"2014-04-11 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 36,
         "owner":3,
         "subscription_id": 1
@@ -3078,6 +3334,7 @@
         "title":"activity #7 of SalesCycle #36",
         "description":"activity #7 of SalesCycle #36",
         "date_created":"2014-04-13 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 36,
         "owner":4,
         "subscription_id": 1
@@ -3090,6 +3347,7 @@
         "title":"activity #8 of SalesCycle #36",
         "description":"activity #8 of SalesCycle #36",
         "date_created":"2014-04-15 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 36,
         "owner":1,
         "subscription_id": 1
@@ -3102,6 +3360,7 @@
         "title":"activity #9 of SalesCycle #36",
         "description":"activity #9 of SalesCycle #36",
         "date_created":"2014-04-17 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 36,
         "owner":2,
         "subscription_id": 1
@@ -3114,6 +3373,7 @@
         "title":"activity #10 of SalesCycle #36",
         "description":"activity #10 of SalesCycle #36",
         "date_created":"2014-04-19 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 36,
         "owner":1,
         "subscription_id": 1
@@ -3126,6 +3386,7 @@
         "title":"activity #1 of SalesCycle #37",
         "description":"activity #1 of SalesCycle #37",
         "date_created":"2014-01-01 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 37,
         "owner":2,
         "subscription_id": 1
@@ -3138,6 +3399,7 @@
         "title":"activity #2 of SalesCycle #37",
         "description":"activity #2 of SalesCycle #37",
         "date_created":"2014-01-03 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 37,
         "owner":5,
         "subscription_id": 1
@@ -3150,6 +3412,7 @@
         "title":"activity #3 of SalesCycle #37",
         "description":"activity #3 of SalesCycle #37",
         "date_created":"2014-01-05 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 37,
         "owner":3,
         "subscription_id": 1
@@ -3162,6 +3425,7 @@
         "title":"activity #4 of SalesCycle #37",
         "description":"activity #4 of SalesCycle #37",
         "date_created":"2014-01-07 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 37,
         "owner":5,
         "subscription_id": 1
@@ -3174,6 +3438,7 @@
         "title":"activity #5 of SalesCycle #37",
         "description":"activity #5 of SalesCycle #37",
         "date_created":"2014-01-09 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 37,
         "owner":1,
         "subscription_id": 1
@@ -3186,6 +3451,7 @@
         "title":"activity #6 of SalesCycle #37",
         "description":"activity #6 of SalesCycle #37",
         "date_created":"2014-01-11 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 37,
         "owner":2,
         "subscription_id": 1
@@ -3198,6 +3464,7 @@
         "title":"activity #7 of SalesCycle #37",
         "description":"activity #7 of SalesCycle #37",
         "date_created":"2014-01-13 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 37,
         "owner":5,
         "subscription_id": 1
@@ -3210,6 +3477,7 @@
         "title":"activity #8 of SalesCycle #37",
         "description":"activity #8 of SalesCycle #37",
         "date_created":"2014-01-15 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 37,
         "owner":4,
         "subscription_id": 1
@@ -3222,6 +3490,7 @@
         "title":"activity #9 of SalesCycle #37",
         "description":"activity #9 of SalesCycle #37",
         "date_created":"2014-01-17 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 37,
         "owner":2,
         "subscription_id": 1
@@ -3234,6 +3503,7 @@
         "title":"activity #10 of SalesCycle #37",
         "description":"activity #10 of SalesCycle #37",
         "date_created":"2014-01-19 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 37,
         "owner":5,
         "subscription_id": 1
@@ -3246,6 +3516,7 @@
         "title":"activity #1 of SalesCycle #38",
         "description":"activity #1 of SalesCycle #38",
         "date_created":"2014-02-01 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 38,
         "owner":4,
         "subscription_id": 1
@@ -3258,6 +3529,7 @@
         "title":"activity #2 of SalesCycle #38",
         "description":"activity #2 of SalesCycle #38",
         "date_created":"2014-02-03 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 38,
         "owner":4,
         "subscription_id": 1
@@ -3270,6 +3542,7 @@
         "title":"activity #3 of SalesCycle #38",
         "description":"activity #3 of SalesCycle #38",
         "date_created":"2014-02-05 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 38,
         "owner":5,
         "subscription_id": 1
@@ -3282,6 +3555,7 @@
         "title":"activity #4 of SalesCycle #38",
         "description":"activity #4 of SalesCycle #38",
         "date_created":"2014-02-07 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 38,
         "owner":2,
         "subscription_id": 1
@@ -3294,6 +3568,7 @@
         "title":"activity #5 of SalesCycle #38",
         "description":"activity #5 of SalesCycle #38",
         "date_created":"2014-02-09 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 38,
         "owner":5,
         "subscription_id": 1
@@ -3306,6 +3581,7 @@
         "title":"activity #6 of SalesCycle #38",
         "description":"activity #6 of SalesCycle #38",
         "date_created":"2014-02-11 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 38,
         "owner":5,
         "subscription_id": 1
@@ -3318,6 +3594,7 @@
         "title":"activity #7 of SalesCycle #38",
         "description":"activity #7 of SalesCycle #38",
         "date_created":"2014-02-13 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 38,
         "owner":1,
         "subscription_id": 1
@@ -3330,6 +3607,7 @@
         "title":"activity #8 of SalesCycle #38",
         "description":"activity #8 of SalesCycle #38",
         "date_created":"2014-02-15 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 38,
         "owner":4,
         "subscription_id": 1
@@ -3342,6 +3620,7 @@
         "title":"activity #9 of SalesCycle #38",
         "description":"activity #9 of SalesCycle #38",
         "date_created":"2014-02-17 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 38,
         "owner":3,
         "subscription_id": 1
@@ -3354,6 +3633,7 @@
         "title":"activity #10 of SalesCycle #38",
         "description":"activity #10 of SalesCycle #38",
         "date_created":"2014-02-19 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 38,
         "owner":5,
         "subscription_id": 1
@@ -3366,6 +3646,7 @@
         "title":"activity #1 of SalesCycle #39",
         "description":"activity #1 of SalesCycle #39",
         "date_created":"2014-03-01 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 39,
         "owner":5,
         "subscription_id": 1
@@ -3378,6 +3659,7 @@
         "title":"activity #2 of SalesCycle #39",
         "description":"activity #2 of SalesCycle #39",
         "date_created":"2014-03-03 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 39,
         "owner":1,
         "subscription_id": 1
@@ -3390,6 +3672,7 @@
         "title":"activity #3 of SalesCycle #39",
         "description":"activity #3 of SalesCycle #39",
         "date_created":"2014-03-05 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 39,
         "owner":5,
         "subscription_id": 1
@@ -3402,6 +3685,7 @@
         "title":"activity #4 of SalesCycle #39",
         "description":"activity #4 of SalesCycle #39",
         "date_created":"2014-03-07 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 39,
         "owner":1,
         "subscription_id": 1
@@ -3414,6 +3698,7 @@
         "title":"activity #5 of SalesCycle #39",
         "description":"activity #5 of SalesCycle #39",
         "date_created":"2014-03-09 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 39,
         "owner":5,
         "subscription_id": 1
@@ -3426,6 +3711,7 @@
         "title":"activity #6 of SalesCycle #39",
         "description":"activity #6 of SalesCycle #39",
         "date_created":"2014-03-11 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 39,
         "owner":1,
         "subscription_id": 1
@@ -3438,6 +3724,7 @@
         "title":"activity #7 of SalesCycle #39",
         "description":"activity #7 of SalesCycle #39",
         "date_created":"2014-03-13 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 39,
         "owner":2,
         "subscription_id": 1
@@ -3450,6 +3737,7 @@
         "title":"activity #8 of SalesCycle #39",
         "description":"activity #8 of SalesCycle #39",
         "date_created":"2014-03-15 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 39,
         "owner":4,
         "subscription_id": 1
@@ -3462,6 +3750,7 @@
         "title":"activity #9 of SalesCycle #39",
         "description":"activity #9 of SalesCycle #39",
         "date_created":"2014-03-17 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 39,
         "owner":2,
         "subscription_id": 1
@@ -3474,6 +3763,7 @@
         "title":"activity #10 of SalesCycle #39",
         "description":"activity #10 of SalesCycle #39",
         "date_created":"2014-03-19 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 39,
         "owner":4,
         "subscription_id": 1
@@ -3486,6 +3776,7 @@
         "title":"activity #1 of SalesCycle #40",
         "description":"activity #1 of SalesCycle #40",
         "date_created":"2014-04-01 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 40,
         "owner":4,
         "subscription_id": 1
@@ -3498,6 +3789,7 @@
         "title":"activity #2 of SalesCycle #40",
         "description":"activity #2 of SalesCycle #40",
         "date_created":"2014-04-03 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 40,
         "owner":5,
         "subscription_id": 1
@@ -3510,6 +3802,7 @@
         "title":"activity #3 of SalesCycle #40",
         "description":"activity #3 of SalesCycle #40",
         "date_created":"2014-04-05 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 40,
         "owner":2,
         "subscription_id": 1
@@ -3522,6 +3815,7 @@
         "title":"activity #4 of SalesCycle #40",
         "description":"activity #4 of SalesCycle #40",
         "date_created":"2014-04-07 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 40,
         "owner":1,
         "subscription_id": 1
@@ -3534,6 +3828,7 @@
         "title":"activity #5 of SalesCycle #40",
         "description":"activity #5 of SalesCycle #40",
         "date_created":"2014-04-09 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 40,
         "owner":2,
         "subscription_id": 1
@@ -3546,6 +3841,7 @@
         "title":"activity #6 of SalesCycle #40",
         "description":"activity #6 of SalesCycle #40",
         "date_created":"2014-04-11 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 40,
         "owner":3,
         "subscription_id": 1
@@ -3558,6 +3854,7 @@
         "title":"activity #7 of SalesCycle #40",
         "description":"activity #7 of SalesCycle #40",
         "date_created":"2014-04-13 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 40,
         "owner":4,
         "subscription_id": 1
@@ -3570,6 +3867,7 @@
         "title":"activity #8 of SalesCycle #40",
         "description":"activity #8 of SalesCycle #40",
         "date_created":"2014-04-15 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 40,
         "owner":2,
         "subscription_id": 1
@@ -3582,6 +3880,7 @@
         "title":"activity #9 of SalesCycle #40",
         "description":"activity #9 of SalesCycle #40",
         "date_created":"2014-04-17 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 40,
         "owner":2,
         "subscription_id": 1
@@ -3594,6 +3893,7 @@
         "title":"activity #10 of SalesCycle #40",
         "description":"activity #10 of SalesCycle #40",
         "date_created":"2014-04-19 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 40,
         "owner":1,
         "subscription_id": 1
@@ -3606,6 +3906,7 @@
         "title":"activity #1 of SalesCycle #42",
         "description":"activity #1 of SalesCycle #42",
         "date_created":"2014-02-01 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 42,
         "owner":4,
         "subscription_id": 1
@@ -3618,6 +3919,7 @@
         "title":"activity #2 of SalesCycle #42",
         "description":"activity #2 of SalesCycle #42",
         "date_created":"2014-02-03 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 42,
         "owner":4,
         "subscription_id": 1
@@ -3630,6 +3932,7 @@
         "title":"activity #3 of SalesCycle #42",
         "description":"activity #3 of SalesCycle #42",
         "date_created":"2014-02-05 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 42,
         "owner":4,
         "subscription_id": 1
@@ -3642,6 +3945,7 @@
         "title":"activity #4 of SalesCycle #42",
         "description":"activity #4 of SalesCycle #42",
         "date_created":"2014-02-07 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 42,
         "owner":5,
         "subscription_id": 1
@@ -3654,6 +3958,7 @@
         "title":"activity #5 of SalesCycle #42",
         "description":"activity #5 of SalesCycle #42",
         "date_created":"2014-02-09 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 42,
         "owner":2,
         "subscription_id": 1
@@ -3666,6 +3971,7 @@
         "title":"activity #6 of SalesCycle #42",
         "description":"activity #6 of SalesCycle #42",
         "date_created":"2014-02-11 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 42,
         "owner":3,
         "subscription_id": 1
@@ -3678,6 +3984,7 @@
         "title":"activity #7 of SalesCycle #42",
         "description":"activity #7 of SalesCycle #42",
         "date_created":"2014-02-13 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 42,
         "owner":5,
         "subscription_id": 1
@@ -3690,6 +3997,7 @@
         "title":"activity #8 of SalesCycle #42",
         "description":"activity #8 of SalesCycle #42",
         "date_created":"2014-02-15 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 42,
         "owner":2,
         "subscription_id": 1
@@ -3702,6 +4010,7 @@
         "title":"activity #9 of SalesCycle #42",
         "description":"activity #9 of SalesCycle #42",
         "date_created":"2014-02-17 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 42,
         "owner":3,
         "subscription_id": 1
@@ -3714,6 +4023,7 @@
         "title":"activity #10 of SalesCycle #42",
         "description":"activity #10 of SalesCycle #42",
         "date_created":"2014-02-19 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 42,
         "owner":1,
         "subscription_id": 1
@@ -3726,6 +4036,7 @@
         "title":"activity #1 of SalesCycle #43",
         "description":"activity #1 of SalesCycle #43",
         "date_created":"2014-03-01 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 43,
         "owner":2,
         "subscription_id": 1
@@ -3738,6 +4049,7 @@
         "title":"activity #2 of SalesCycle #43",
         "description":"activity #2 of SalesCycle #43",
         "date_created":"2014-03-03 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 43,
         "owner":1,
         "subscription_id": 1
@@ -3750,6 +4062,7 @@
         "title":"activity #3 of SalesCycle #43",
         "description":"activity #3 of SalesCycle #43",
         "date_created":"2014-03-05 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 43,
         "owner":3,
         "subscription_id": 1
@@ -3762,6 +4075,7 @@
         "title":"activity #4 of SalesCycle #43",
         "description":"activity #4 of SalesCycle #43",
         "date_created":"2014-03-07 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 43,
         "owner":1,
         "subscription_id": 1
@@ -3774,6 +4088,7 @@
         "title":"activity #5 of SalesCycle #43",
         "description":"activity #5 of SalesCycle #43",
         "date_created":"2014-03-09 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 43,
         "owner":3,
         "subscription_id": 1
@@ -3786,6 +4101,7 @@
         "title":"activity #6 of SalesCycle #43",
         "description":"activity #6 of SalesCycle #43",
         "date_created":"2014-03-11 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 43,
         "owner":3,
         "subscription_id": 1
@@ -3798,6 +4114,7 @@
         "title":"activity #7 of SalesCycle #43",
         "description":"activity #7 of SalesCycle #43",
         "date_created":"2014-03-13 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 43,
         "owner":1,
         "subscription_id": 1
@@ -3810,6 +4127,7 @@
         "title":"activity #8 of SalesCycle #43",
         "description":"activity #8 of SalesCycle #43",
         "date_created":"2014-03-15 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 43,
         "owner":1,
         "subscription_id": 1
@@ -3822,6 +4140,7 @@
         "title":"activity #9 of SalesCycle #43",
         "description":"activity #9 of SalesCycle #43",
         "date_created":"2014-03-17 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 43,
         "owner":1,
         "subscription_id": 1
@@ -3834,6 +4153,7 @@
         "title":"activity #10 of SalesCycle #43",
         "description":"activity #10 of SalesCycle #43",
         "date_created":"2014-03-19 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 43,
         "owner":4,
         "subscription_id": 1
@@ -3846,6 +4166,7 @@
         "title":"activity #1 of SalesCycle #45",
         "description":"activity #1 of SalesCycle #45",
         "date_created":"2014-01-01 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 45,
         "owner":6,
         "subscription_id": 2
@@ -3858,6 +4179,7 @@
         "title":"activity #2 of SalesCycle #45",
         "description":"activity #2 of SalesCycle #45",
         "date_created":"2014-01-03 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 45,
         "owner":7,
         "subscription_id": 2
@@ -3870,6 +4192,7 @@
         "title":"activity #3 of SalesCycle #45",
         "description":"activity #3 of SalesCycle #45",
         "date_created":"2014-01-05 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 45,
         "owner":6,
         "subscription_id": 2
@@ -3882,6 +4205,7 @@
         "title":"activity #4 of SalesCycle #45",
         "description":"activity #4 of SalesCycle #45",
         "date_created":"2014-01-07 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 45,
         "owner":6,
         "subscription_id": 2
@@ -3894,6 +4218,7 @@
         "title":"activity #1 of SalesCycle #46",
         "description":"activity #1 of SalesCycle #46",
         "date_created":"2014-02-01 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 46,
         "owner":6,
         "subscription_id": 2
@@ -3906,6 +4231,7 @@
         "title":"activity #2 of SalesCycle #46",
         "description":"activity #2 of SalesCycle #46",
         "date_created":"2014-02-03 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 46,
         "owner":7,
         "subscription_id": 2
@@ -3918,6 +4244,7 @@
         "title":"activity #3 of SalesCycle #46",
         "description":"activity #3 of SalesCycle #46",
         "date_created":"2014-02-05 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 46,
         "owner":6,
         "subscription_id": 2
@@ -3930,6 +4257,7 @@
         "title":"activity #4 of SalesCycle #46",
         "description":"activity #4 of SalesCycle #46",
         "date_created":"2014-02-07 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 46,
         "owner":6,
         "subscription_id": 2
@@ -3942,6 +4270,7 @@
         "title":"activity #1 of SalesCycle #48",
         "description":"activity #1 of SalesCycle #48",
         "date_created":"2014-02-01 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 48,
         "owner":7,
         "subscription_id": 2
@@ -3954,6 +4283,7 @@
         "title":"activity #2 of SalesCycle #48",
         "description":"activity #2 of SalesCycle #48",
         "date_created":"2014-02-03 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 48,
         "owner":7,
         "subscription_id": 2
@@ -3966,6 +4296,7 @@
         "title":"activity #3 of SalesCycle #48",
         "description":"activity #3 of SalesCycle #48",
         "date_created":"2014-02-05 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 48,
         "owner":7,
         "subscription_id": 2
@@ -3978,6 +4309,7 @@
         "title":"activity #4 of SalesCycle #48",
         "description":"activity #4 of SalesCycle #48",
         "date_created":"2014-02-07 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 48,
         "owner":7,
         "subscription_id": 2
@@ -3990,6 +4322,7 @@
         "title":"activity #1 of SalesCycle #50",
         "description":"activity #1 of SalesCycle #50",
         "date_created":"2014-02-01 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 50,
         "owner":7,
         "subscription_id": 2
@@ -4002,6 +4335,7 @@
         "title":"activity #2 of SalesCycle #50",
         "description":"activity #2 of SalesCycle #50",
         "date_created":"2014-02-03 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 50,
         "owner":6,
         "subscription_id": 2
@@ -4014,6 +4348,7 @@
         "title":"activity #3 of SalesCycle #50",
         "description":"activity #3 of SalesCycle #50",
         "date_created":"2014-02-05 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 50,
         "owner":7,
         "subscription_id": 2
@@ -4026,6 +4361,7 @@
         "title":"activity #4 of SalesCycle #50",
         "description":"activity #4 of SalesCycle #50",
         "date_created":"2014-02-07 00:00:00+00:00",
+        "date_edited": "2014-11-24T07:49:32.991Z",
         "sales_cycle": 50,
         "owner":7,
         "subscription_id": 2

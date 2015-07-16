@@ -6,9 +6,7 @@
         "organization_id": 1, 
         "is_supervisor": false, 
         "subscription_id": 1, 
-        "user_id": 1,
-        "date_created": "2014-11-24T07:49:32.991Z",
-        "date_edited": "2014-11-24T07:49:32.991Z" 
+        "user_id": 1 
     }
 },
 {
@@ -18,9 +16,7 @@
         "organization_id": 1, 
         "is_supervisor": false, 
         "subscription_id": 1, 
-        "user_id": 2,
-        "date_created": "2014-11-24T07:49:32.991Z",
-        "date_edited": "2014-11-24T07:49:32.991Z" 
+        "user_id": 2 
     }
 },
 {
@@ -30,9 +26,7 @@
         "organization_id": 1, 
         "is_supervisor": false, 
         "subscription_id": 1, 
-        "user_id": 3,
-        "date_created": "2014-11-24T07:49:32.991Z",
-        "date_edited": "2014-11-24T07:49:32.991Z" 
+        "user_id": 3 
     }
 },
 {
@@ -42,9 +36,7 @@
         "organization_id": 1, 
         "is_supervisor": false, 
         "subscription_id": 1, 
-        "user_id": 4,
-        "date_created": "2014-11-24T07:49:32.991Z",
-        "date_edited": "2014-11-24T07:49:32.991Z" 
+        "user_id": 4 
     }
 },
 {
@@ -54,9 +46,7 @@
         "organization_id": 1, 
         "is_supervisor": false, 
         "subscription_id": 1, 
-        "user_id": 5,
-        "date_created": "2014-11-24T07:49:32.991Z",
-        "date_edited": "2014-11-24T07:49:32.991Z" 
+        "user_id": 5 
     }
 }
 ]
