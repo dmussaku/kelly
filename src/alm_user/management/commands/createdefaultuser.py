@@ -12,10 +12,10 @@ class Command(BaseCommand):
     help = 'Create user with email b.wayne@batman.bat and password 123, also creates \
     associated company with subdomain bwayne. Also creates a Service object called AlmCRM \
     and a subscription object thus connecting bwayne to almacrm service'
-    option_list = BaseCommand.option_list + (
-        make_option('--is_admin', dest='is_admin', default=False,
-                    help='Enter is the user admin of the company, False by default')
-    )
+    # option_list = BaseCommand.option_list + (
+    #     make_option('--is_admin', dest='is_admin', default=False,
+    #                 help='Enter is the user admin of the company, False by default')
+    # )
 
     def handle(self, *args, **options):
         is_admin = options.get('is_admin', False)
