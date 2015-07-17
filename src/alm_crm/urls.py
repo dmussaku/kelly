@@ -43,6 +43,12 @@ from models import Contact, SalesCycle, Activity, Comment
 
 urlpatterns = patterns(
     '',
+
+    url(r'^embedded_contact_form/$',
+        TemplateView.as_view(template_name='crm/embedded_contact_form.html'),
+        name='crm_embedded_contact_form'),
+
+
     url(r'^contacts/excerpt/$', ContactListView.as_view(
             queryset = Contact.objects.all(),
             context_object_name="contacts",

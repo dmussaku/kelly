@@ -65,7 +65,7 @@ from alm_vcard.api import (
 from alm_vcard.models import *
 from almanet.settings import DEFAULT_SERVICE
 from almanet.settings import TIME_ZONE
-from almanet.utils.api import RequestContext
+from almanet.utils.api import RequestContext, OpenAuthentication
 from almanet.utils.env import get_subscr_id
 from django.conf.urls import url
 from django.contrib.contenttypes.models import ContentType
@@ -226,14 +226,17 @@ class CRMServiceModelResource(ModelResource):
             additional filters (in one Q object) can be passed
             in applicable_filters as value of 'q'-key
         '''
-        q = Q(subscription_id=self.get_crmsubscr_id(request))
-
-        custom_Q = applicable_filters.pop('q', None)  # 'q' - key for Q() object
-        objects = super(ModelResource, self).apply_filters(request, applicable_filters)
-        if custom_Q:
-            q = q & custom_Q
-
-        return objects.filter(q)
+        try:
+            q = Q(subscription_id=self.get_crmsubscr_id(request))
+        except Exception, e:
+            objects = super(ModelResource, self).apply_filters(request, applicable_filters)
+            return objects
+        else:
+            custom_Q = applicable_filters.pop('q', None)  # 'q' - key for Q() object
+            objects = super(ModelResource, self).apply_filters(request, applicable_filters)
+            if custom_Q:
+                q = q & custom_Q
+            return objects.filter(q)
 
     def hydrate(self, bundle):
         """
@@ -3774,6 +3777,10 @@ class EmbeddableContactFormResource(CRMServiceModelResource):
         resource_name = 'embeddable_contact_form'
         object_class = EmbeddableContactForm
         queryset = EmbeddableContactForm.objects.all()
+        authentication = MultiAuthentication(
+            OpenAuthentication(),
+            BasicAuthentication(),
+            SessionAuthentication())
         authorization = Authorization()
 
     # def hydrate_fields(self, bundle):
