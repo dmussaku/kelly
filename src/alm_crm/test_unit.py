@@ -2814,5 +2814,5 @@ class MilestoneResourceTest(ResourceTestMixin, ResourceTestCase):
 
         resp = self.api_client.post(self.api_path_milestone+'bulk_edit/', format='json', data=post_data)
         self.assertHttpAccepted(resp)
-        self.assertEqual(Milestone.objects.all().count(), 5)
+        self.assertEqual(Milestone.objects.filter(subscription_id=CRMUser.objects.first().subscription_id).count(), 5)
 

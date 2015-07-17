@@ -1900,7 +1900,7 @@ class MilestoneResource(CRMServiceModelResource):
             data = self.deserialize(
                 request, request.body,
                 format=request.META.get('CONTENT_TYPE', 'application/json'))
-            milestones = Milestone.objects.all()
+            milestones = Milestone.objects.filter(subscription_id=request.user.get_crmuser().subscription_id)
             new_milestone_set = []
             for milestone_data in data:
                 try:
@@ -4134,7 +4134,6 @@ class CustomFieldResource(CRMServiceModelResource):
     class Meta(CommonMeta):
         queryset = CustomField.objects.all()
         resource_name = 'custom_field'
-
 
 class ReportResource(Resource):
     '''
