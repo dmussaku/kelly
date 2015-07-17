@@ -2783,3 +2783,36 @@ class MilestoneResourceTest(ResourceTestMixin, ResourceTestCase):
         self.assertEqual(self.get_detail_des(self.milestone.pk)['title'], milestone_title)
 
 
+    def test_bulk_edit(self):
+        milestones = Milestone.objects.filter(id__in=[1, 2, 3, 4])
+        post_data = [
+            {
+                'id': milestones[0].id,
+                'title': milestones[0].title,
+                'color_code': milestones[0].color_code
+            },
+            {
+                'id': milestones[1].id,
+                'title': 'NEW TEST TITLE',
+                'color_code': milestones[1].color_code
+            },
+            {
+                'id': milestones[2].id,
+                'title': milestones[2].title,
+                'color_code': "#6245FD"
+            },
+            {
+                'id': milestones[3].id,
+                'title': 'TEST TITLE',
+                'color_code': "#6245FD"
+            },
+            {
+                'title': "NEW ONE",
+                'color_code': '#FFFFFF'
+            }
+        ]
+
+        resp = self.api_client.post(self.api_path_milestone+'bulk_edit/', format='json', data=post_data)
+        self.assertHttpAccepted(resp)
+        self.assertEqual(Milestone.objects.all().count(), 5)
+

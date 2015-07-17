@@ -1885,6 +1885,42 @@ class MilestoneResource(CRMServiceModelResource):
         detail_allowed_methods = ['get', 'post', 'put', 'patch', 'delete']
         always_return_data = True
 
+    def prepend_urls(self):
+        return [
+            url(
+                r"^(?P<resource_name>%s)/bulk_edit%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('bulk_edit'),
+                name='api_bulk_edit'
+            )
+        ]
+
+    def bulk_edit(self, request, **kwargs):
+        with RequestContext(self, request, allowed_methods=['post']):
+            data = self.deserialize(
+                request, request.body,
+                format=request.META.get('CONTENT_TYPE', 'application/json'))
+            milestones = Milestone.objects.all()
+            new_milestone_set = []
+            for milestone_data in data:
+                try:
+                    milestone = milestones.get(id=milestone_data.get('id', -1))
+                except Milestone.DoesNotExist:
+                    milestone = Milestone()
+                finally:
+                    milestone.title = milestone_data['title']
+                    milestone.color_code = milestone_data['color_code']
+                    milestone.subscription_id = request.user.get_crmuser().subscription_id
+                    milestone.save()
+                    new_milestone_set.append(milestone)
+
+            for milestone in milestones:
+                if milestone not in new_milestone_set:
+                    milestone.delete()
+
+            return self.create_response(request, 
+                        [self.full_dehydrate(self.build_bundle(obj=milestone)) for milestone in new_milestone_set], 
+                        response_class=http.HttpAccepted)
 
 class ActivityResource(CRMServiceModelResource):
     '''
