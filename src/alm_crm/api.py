@@ -485,8 +485,7 @@ class ContactResource(CRMServiceModelResource):
                 'sales_cycles', 'children', 'share_set',
                 'vcard__tel_set', 'vcard__category_set',
                 'vcard__adr_set', 'vcard__title_set', 'vcard__url_set',
-                'vcard__org_set', 'vcard__email_set',
-                'vcard__custom_sections', 'vcard__custom_fields')
+                'vcard__org_set', 'vcard__email_set')
         resource_name = 'contact'
         filtering = {
             'status': ['exact'],
@@ -2352,14 +2351,9 @@ class ProductResource(CRMServiceModelResource):
 #    sales_cycles = fields.ToManyField(SalesCycleResource, 'sales_cycles', readonly=True)
 
     class Meta(CommonMeta):
-        queryset = Product.objects.all().prefetch_related('custom_sections', 'custom_fields')
+        queryset = Product.objects.all().prefetch_related('custom_field_values')
         resource_name = 'product'
         always_return_data = True
-
-    def dehydrate(self, bundle):
-        bundle.data['custom_sections'] = processing_section_object_data(list(bundle.obj.custom_sections.all()))
-        bundle.data['custom_fields'] = processing_field_object_data(filter(lambda f: f.section == None, bundle.obj.custom_fields.all()))
-        return bundle
 
     def prepend_urls(self):
         return [

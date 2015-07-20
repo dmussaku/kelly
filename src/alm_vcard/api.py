@@ -77,7 +77,7 @@ class VCardResource(ModelResource):
                               related_name='vcard', null=True, full=True)
 
     class Meta(CommonMeta):
-        queryset = VCard.objects.all().prefetch_related('custom_sections', 'custom_fields', 'email_set', 'tel_set', 'org_set', 'adr_set', 'category_set', 'title_set', 'url_set')
+        queryset = VCard.objects.all().prefetch_related('email_set', 'tel_set', 'org_set', 'adr_set', 'category_set', 'title_set', 'url_set')
         excludes = ['id','resource_uri']
         resource_name = 'vcard'
 
@@ -86,10 +86,6 @@ class VCardResource(ModelResource):
     #     del bundle.data['resource_uri']
     #     return bundle
 
-    def dehydrate(self, bundle):
-        bundle.data['custom_sections'] = processing_section_object_data(list(bundle.obj.custom_sections.all()))
-        bundle.data['custom_fields'] = processing_field_object_data(filter(lambda f: f.section == None, bundle.obj.custom_fields.all()))
-        return bundle
 
     @transaction.atomic()
     def obj_create(self, bundle, **kwargs):

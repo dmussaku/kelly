@@ -88,8 +88,6 @@ class VCard(models.Model):
     # a common CharField was used
     uid = models.CharField(max_length=256, blank=True,
                            null=True, verbose_name=_("unique identifier"))
-    custom_sections = generic.GenericRelation('alm_crm.CustomSection')
-    custom_fields = generic.GenericRelation('alm_crm.CustomField')
 
     class Meta:
         verbose_name = _("vcard")

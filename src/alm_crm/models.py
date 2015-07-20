@@ -1257,15 +1257,19 @@ class Product(SubscriptionObject):
             else:
                 product.price = 0
             product.save()
-            for i in range(0, len(row_vals[3:])):
-                if row_vals[i]:
-                    field = CustomField.build_new(
-                        title=col_names[i],
-                        value=row_vals[i],
-                        content_class=Product,
-                        object_id=product.id,
-                        save=True
-                        )
+            # for i in range(0, len(row_vals[3:])):
+            #     if row_vals[i]:
+            #         field = CustomField(title=col_names[i], content_type=ContentType.objects.get_for_model(Product))
+            #         field.save()
+            #         field_value = CustomFieldValue.build_new(field=field, value=row_vals[i],
+            #                                                 object_id=product.id, save=True)
+            #         field = CustomField.build_new(
+            #             title=col_names[i],
+            #             value=row_vals[i],
+            #             content_class=Product,
+            #             object_id=product.id,
+            #             save=True
+            #             )
             product_list.append(product)
         return product_list
 
