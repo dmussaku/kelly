@@ -1817,6 +1817,73 @@ class ContactResourceTest(ResourceTestMixin, ResourceTestCase):
         self.assertTrue('contact_list' in des_resp)
         self.assertEqual(des_resp['contact_list']['title'], 'nurlan.vcf')
 
+    def test_delete_contacts(self):
+        contact_count = Contact.objects.all().count()
+        sales_cycle_count = SalesCycle.objects.all().count()
+        activities_count = Activity.objects.all().count()
+        shares_count = Share.objects.all().count()
+        obj_ids = [3, 2, 1, 6]
+        objects = {
+                "contacts": [],
+                "sales_cycles": [],
+                "activities": [],
+                "shares": [],
+                "does_not_exist": []
+            }
+        # print [contact.sales_cycles.all().values_list("id", flat=True) for contact in Contact.objects.filter(id__in=obj_ids)]
+        for id in obj_ids:
+            try:
+                obj = Contact.objects.get(id=id)
+                objects['contacts'].append(id)
+                objects['sales_cycles'] += list(obj.sales_cycles.all().values_list("id", flat=True))
+                for sales_cycle in obj.sales_cycles.all():
+                    objects['activities'] += list(sales_cycle.rel_activities.all().values_list("id", flat=True))
+                objects['shares'] += list(obj.share_set.all().values_list("id", flat=True))
+            except Contact.DoesNotExist:
+                objects['does_not_exist'].append(id)
+
+        post_data = {"ids": obj_ids}
+
+        resp = self.api_client.post(
+            self.api_path_contact+"delete_contacts/", format='json', data=post_data)
+        self.assertHttpAccepted(resp)
+        self.assertEqual(contact_count - len(objects['contacts']), Contact.objects.all().count())
+        self.assertEqual(sales_cycle_count - len(objects['sales_cycles']), SalesCycle.objects.all().count())
+        self.assertEqual(activities_count - len(objects['activities']), Activity.objects.all().count())
+        self.assertEqual(shares_count - len(objects['shares']), Share.objects.all().count())
+
+    def test_delete_contact(self):
+        contact_count = Contact.objects.all().count()
+        sales_cycle_count = SalesCycle.objects.all().count()
+        activities_count = Activity.objects.all().count()
+        shares_count = Share.objects.all().count()
+        contact_id = 2
+        objects = {
+                "sales_cycles": [],
+                "activities": [],
+                "shares": [],
+                "does_not_exist": []
+            }
+        # print [contact.sales_cycles.all().values_list("id", flat=True) for contact in Contact.objects.filter(id__in=obj_ids)]
+        try:
+            obj = Contact.objects.get(id=contact_id)
+            objects['sales_cycles'] += list(obj.sales_cycles.filter(is_global=False).values_list("id", flat=True))
+            for sales_cycle in obj.sales_cycles.all():
+                objects['activities'] += list(sales_cycle.rel_activities.all().values_list("id", flat=True))
+            objects['shares'] += list(obj.share_set.all().values_list("id", flat=True))
+        except Contact.DoesNotExist:
+            objects['does_not_exist'].append(id)
+
+        resp = self.api_client.post(
+            self.api_path_contact+"2/delete/", format='json')
+        self.assertHttpAccepted(resp)
+        self.assertEqual(contact_count - 1, Contact.objects.all().count())
+        self.assertEqual(sales_cycle_count - len(objects['sales_cycles']), SalesCycle.objects.all().count())
+        self.assertEqual(activities_count - len(objects['activities']), Activity.objects.all().count())
+        self.assertEqual(shares_count - len(objects['shares']), Share.objects.all().count())
+
+
+
 
 class ContactListResourceTest(ResourceTestMixin, ResourceTestCase):
 

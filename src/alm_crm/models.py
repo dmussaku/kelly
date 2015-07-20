@@ -19,6 +19,7 @@ from alm_vcard.models import (
     )
 from alm_user.models import User
 from django.template.loader import render_to_string
+from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import signals, Q
 from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
@@ -974,6 +975,31 @@ class Contact(SubscriptionObject):
         return response
 
 
+    @classmethod
+    def delete_contacts(cls, obj_ids):
+        if isinstance(obj_ids, int):
+            obj_ids = [obj_ids]
+        assert isinstance(obj_ids, (tuple, list)), "must be a list"
+        with transaction.atomic():
+            objects = {
+                "contacts": [],
+                "sales_cycles": [],
+                "activities": [],
+                "shares": [],
+                "does_not_exist": []
+            }
+            for contact_id in obj_ids:
+                try:
+                    obj = Contact.objects.get(id=contact_id)
+                    objects['contacts'].append(contact_id)
+                    objects['sales_cycles'] += list(obj.sales_cycles.all().values_list("id", flat=True))
+                    for sales_cycle in obj.sales_cycles.all():
+                        objects['activities'] += list(sales_cycle.rel_activities.all().values_list("id", flat=True))
+                    objects['shares'] += list(obj.share_set.all().values_list("id", flat=True))
+                    obj.delete()
+                except ObjectDoesNotExist:
+                    objects['does_not_exist'].append(contact_id)
+            return objects
 
 class Value(SubscriptionObject):
     # Type of payment
