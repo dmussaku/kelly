@@ -22,6 +22,8 @@ from alm_crm.models import (
     Filter,
     HashTag,
     HashTagReference,
+    CustomField,
+    CustomFieldValue
     )
 from alm_vcard.models import VCard, Tel, Email, Org
 from alm_user.models import User
@@ -261,6 +263,11 @@ class ProductTestCase(TestCase):
         self.assertEqual(len(Product.objects.all()),
                          len(Product.get_products(self.crm_subscr_id)))
 
+class CustomFieldValueTestCase(TestCase):
+    fixtures = ['custom_field.json', 'custom_field_value.json, products.json, contacts.json']
+
+    def setUp(self):
+        super(self.__class__, self).setUp()
 
 class ActivityTestCase(TestCase):
     fixtures = ['crmusers.json', 'vcards.json', 'contacts.json',
@@ -782,7 +789,7 @@ class ResourceTestMixin(object):
                 'salescycles.json', 'activities.json', 'products.json',
                 'mentions.json', 'values.json', 'emails.json', 'contactlist.json', 'share.json',
                 'hashtag.json', 'hashtag_ref.json', 'feedbacks.json', 'salescycle_product_stat.json', 
-                'filters.json', 'milestones.json', 'sc_log_entry.json']
+                'filters.json', 'milestones.json', 'sc_log_entry.json', 'custom_fields.json']
 
     def get_user(self):
         from alm_user.models import User
@@ -2815,4 +2822,76 @@ class MilestoneResourceTest(ResourceTestMixin, ResourceTestCase):
         resp = self.api_client.post(self.api_path_milestone+'bulk_edit/', format='json', data=post_data)
         self.assertHttpAccepted(resp)
         self.assertEqual(Milestone.objects.filter(subscription_id=CRMUser.objects.first().subscription_id).count(), 5)
+
+
+
+class CustomFieldResourceTest(ResourceTestMixin, ResourceTestCase):
+
+    def setUp(self):
+        super(self.__class__, self).setUp()
+
+        # login user
+        self.get_credentials()
+
+        self.api_path_custom_field = '/api/v1/custom_field/'
+
+        # get_list
+        self.get_list_resp = self.api_client.get(self.api_path_custom_field,
+                                                 format='json',
+                                                 charset='utf-8',
+                                                 HTTP_HOST='localhost')
+        self.get_list_des = self.deserialize(self.get_list_resp)
+
+        # get_detail(pk)
+        self.get_detail_resp = \
+            lambda pk: self.api_client.get(self.api_path_custom_field+str(pk)+'/',
+                                           format='json',
+                                           charset='utf-8',
+                                           HTTP_HOST='localhost')
+        self.get_detail_des = \
+            lambda pk: self.deserialize(self.get_detail_resp(pk))
+
+        self.custom_field = CustomField.objects.first()
+
+    def test_get_list_valid_json(self):
+        self.assertValidJSONResponse(self.get_list_resp)
+
+    def test_get_list_non_empty(self):
+        self.assertTrue(self.get_list_des['meta']['total_count'] > 0)
+
+    def test_get_detail(self):
+        self.assertEqual(
+            self.get_detail_des(self.custom_field.pk)['title'],
+            self.custom_field.title
+            )
+
+    def test_bulk_edit(self):
+        product = Product.objects.first()
+        custom_fields = CustomField.objects.filter(content_object=product)
+        post_data = {
+            "content_class": 'Product',
+            "object_id": product.id,
+            "fields":[
+                {
+                    "id": 
+                    "title":                
+                    "value":
+                },
+                {
+                    "id": 
+                    "title":                
+                    "value":
+                },
+                {
+                    "id": 
+                    "title":                
+                    "value":
+                }
+            ]
+        }
+
+        resp = self.api_client.post(self.api_path_custom_field+'bulk_edit/', format='json', data=post_data)
+        self.assertHttpAccepted(resp)
+        # self.assertEqual(Milestone.objects.filter(subscription_id=CRMUser.objects.first().subscription_id).count(), 5)
+
 

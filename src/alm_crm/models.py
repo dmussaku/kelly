@@ -179,6 +179,7 @@ class Contact(SubscriptionObject):
     comments = generic.GenericRelation('Comment')
     import_task = models.ForeignKey(
         'ImportTask', blank=True, null=True, related_name='contacts', on_delete=models.SET_NULL)
+    custom_field_values = generic.GenericRelation('CustomFieldValue')
 
     class Meta:
         verbose_name = _('contact')
@@ -1185,9 +1186,7 @@ class Product(SubscriptionObject):
                                 default='KZT')
     owner = models.ForeignKey('CRMUser', related_name='crm_products',
                               null=True, blank=True)
-    custom_sections = generic.GenericRelation('CustomSection')
-    custom_fields = generic.GenericRelation('CustomField')
-
+    custom_field_values = generic.GenericRelation('CustomFieldValue')
 
     class Meta:
         verbose_name = _('product')
@@ -1594,7 +1593,7 @@ class Activity(SubscriptionObject):
     owner = models.ForeignKey(CRMUser, related_name='activity_owner')
     mentions = generic.GenericRelation('Mention', null=True)
     comments = generic.GenericRelation('Comment', null=True)
-    hashtags = generic.GenericRelation('HashTagReference')
+    hashtags = generic.GenericRelation('HashTagReference', null=True, blank=True)
 
     class Meta:
         verbose_name = 'activity'
@@ -1908,7 +1907,7 @@ class Comment(SubscriptionObject):
     content_type = models.ForeignKey(ContentType)
     content_object = generic.GenericForeignKey('content_type', 'object_id')
     mentions = generic.GenericRelation('Mention')
-    hashtags = generic.GenericRelation('HashTagReference')
+    hashtags = generic.GenericRelation('HashTagReference', null=True, blank=True)
 
     def __unicode__(self):
         return "%s's comment" % (self.owner)
@@ -1961,7 +1960,7 @@ class Share(SubscriptionObject):
     share_from = models.ForeignKey(CRMUser, related_name='owned_shares')
     comments = generic.GenericRelation('Comment')
     note = models.CharField(max_length=500, null=True)
-    hashtags = generic.GenericRelation('HashTagReference')
+    hashtags = generic.GenericRelation('HashTagReference', null=True, blank=True)
     mentions = generic.GenericRelation('Mention')
 
     class Meta:
@@ -2247,41 +2246,51 @@ class CustomSection(SubscriptionObject):
 
 class CustomField(SubscriptionObject):
     title = models.CharField(max_length=255, null=True, blank=True)
-    value = models.TextField(null=True, blank=True)
     content_type = models.ForeignKey(ContentType, null=True, blank=True)
-    object_id = models.IntegerField(null=True, blank=True)
-    content_object = generic.GenericForeignKey('content_type', 'object_id')
-    section = models.ForeignKey('CustomSection', related_name='custom_fields', null=True, blank=True)
-
-    @property
-    def owner(self):
-        if self.section:
-            return self.section.owner
-        if self.content_object.__class__ == VCard:
-            return self.content_object.contact.owner
-        return self.content_object.owner
 
     class Meta:
         verbose_name = _('custom_field')
         db_table = settings.DB_PREFIX.format('custom_fields')
 
     def __unicode__(self):
-        return u'%s: %s' % (self.title, self.value)
+        return u'%s' % (self.title)
 
     @classmethod
-    def build_new(cls, section=None, title=None, value=None, content_class=None,
-                  object_id=None, save=False):
-        custom_field = cls(title=title, value=value)
-        if section:
-            custom_field.section=section
-            custom_field.content_type = section.content_type
-            custom_field.object_id = section.object_id
-        if content_class and object_id:
+    def build_new(cls, title=None, content_class=None, save=False):
+        custom_field = cls(title=title)
+        if content_class:
             custom_field.content_type = ContentType.objects.get_for_model(content_class)
-            custom_field.object_id = object_id
         if save:
             custom_field.save()
         return custom_field
+
+class CustomFieldValue(SubscriptionObject):
+    custom_field = models.ForeignKey('CustomField', related_name="values")
+    value = models.TextField(null=True, blank=True)
+    content_type = models.ForeignKey(ContentType, null=True, blank=True)
+    object_id = models.IntegerField(null=True, blank=True)
+    content_object = generic.GenericForeignKey('content_type', 'object_id')
+
+    @property
+    def owner(self):
+        return self.content_object.owner
+
+    class Meta:
+        verbose_name = _('custom_field_value')
+        db_table = settings.DB_PREFIX.format('custom_field_values')
+
+    def __unicode__(self):
+        return u'%s: %s' % (self.custom_field.title, self.value)
+
+    @classmethod
+    def build_new(cls, field, value=None, object_id=None, save=False):
+        custom_field_val = cls(custom_field=field, value=value)
+        if object_id:
+            custom_field_val.content_type = field.content_type
+            custom_field_val.object_id = object_id
+        if save:
+            custom_field_val.save()
+        return custom_field_val
 
 class ImportTask(models.Model):
     uuid = models.CharField(blank=True, null=True, max_length=100)

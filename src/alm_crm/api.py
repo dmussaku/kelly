@@ -21,6 +21,7 @@ from .models import (
     HashTagReference,
     CustomSection,
     CustomField,
+    CustomFieldValue,
     ImportTask,
     ErrorCell
     )
@@ -88,6 +89,7 @@ from tastypie.exceptions import ImmediateHttpResponse, NotFound, Unauthorized
 from tastypie.resources import Resource, ModelResource
 from tastypie.serializers import Serializer
 from tastypie.utils import trailing_slash
+from django.db.models.loading import get_model
 import ast
 from datetime import datetime, timedelta
 import pytz
@@ -4121,19 +4123,83 @@ class CustomFieldResource(CRMServiceModelResource):
     (GenericRelation with VCard, Product)
     @undocumented: Meta
     '''
-    # field_values = fields.ToManyField('alm_crm.api.CustomFieldValueResource', 'field_values',
-    #                            related_name='product', null=True,
-    #                            full=True, readonly=True)
-    section = fields.ToOneField('alm_crm.api.CustomSectionResource', 'section',
-                              null=True, blank=True, full=False)
-    content_object = GenericForeignKeyField({
-        Product: ProductResource,
-        VCard: VCardResource,
-    }, 'content_object')
 
     class Meta(CommonMeta):
         queryset = CustomField.objects.all()
         resource_name = 'custom_field'
+
+    def prepend_urls(self):
+        return [
+            url(
+                r"^(?P<resource_name>%s)/bulk_edit%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('bulk_edit'),
+                name='api_bulk_edit'
+            ),
+            url(
+                r"^(?P<resource_name>%s)/get_for_model/(?P<class>\w+)%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('get_for_model'),
+                name='api_get_for_model'
+            )
+        ]
+
+    def bulk_edit(self, request, **kwargs):
+        with RequestContext(self, request, allowed_methods=['post']):
+            data = self.deserialize(
+                request, request.body,
+                format=request.META.get('CONTENT_TYPE', 'application/json'))
+
+            fields_set = []       
+
+            for object in data:
+                try:
+                    field = CustomField.objects.get(id=object.get('id', -1))
+                except CustomField.DoesNotExist:
+                    field = CustomField()
+                finally:
+                    field.title = object.title
+                    field.content_type = ContentType.objects.get(app_label="alm_crm", model=object['content_class'])
+                    field.subscription_id = request.user.get_crmuser().subscription_id
+                    field.save()
+                    fields_set.append(field)
+
+            for field in CustomField.object.filter(subscription_id=request.user.get_crmuser().subscription_id):
+                if field not in fields_set:
+                    field.delete()
+
+            return self.create_response(request, 
+                        [self.full_dehydrate(self.build_bundle(obj=field)) for field in fields_set], 
+                        response_class=http.HttpAccepted)
+
+    def get_for_model(self, request, **kwargs):
+        with RequestContext(self, request, allowed_methods=['get']):
+            try:
+                content_type = ContentType.objects.get(app_label='alm_crm', model=kwargs.get("class", ""))
+            except ContentType.DoesNotExist:
+                return http.HttpNotFound()
+            else:
+                objects = CustomField.objects.filter(subscription_id=request.user.get_crmuser().subscription_id,
+                                                    content_type=content_type)
+
+                return self.create_response(request, 
+                        [self.full_dehydrate(self.build_bundle(obj=obj)) for obj in objects], 
+                        response_class=http.HttpAccepted)
+           
+
+class CustomFieldValueResource(CRMServiceModelResource):
+
+    content_object = GenericForeignKeyField({
+        Product: ProductResource,
+        Contact: ContactResource,
+    }, 'content_object')
+
+    custom_field = fields.ToOneField('alm_crm.api.CustomFieldResource', 'custom_field',
+        null=True, full=True)
+
+    class Meta(CommonMeta):
+        queryset = CustomFieldValue.objects.all()
+        resource_name = 'field_value'
 
 class ReportResource(Resource):
     '''
