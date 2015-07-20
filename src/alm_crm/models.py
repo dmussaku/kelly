@@ -2040,7 +2040,8 @@ def check_is_title_empty(sender, instance=None, **kwargs):
         raise Exception("Requires non empty value")
 
 def create_milestones(sender, instance, **kwargs):
-    milestones = Milestone.create_default_milestones(instance.id)
+    if instance.id == None:
+        milestones = Milestone.create_default_milestones(instance.id)
 
 def delete_related_milestones(sender, instance, **kwargs):
     for milestone in Milestone.objects.filter(subscription_id=instance.id):
@@ -2048,7 +2049,7 @@ def delete_related_milestones(sender, instance, **kwargs):
 
 signals.post_delete.connect(on_activity_delete, sender=Activity)
 signals.pre_save.connect(check_is_title_empty, sender=SalesCycle)
-signals.post_save.connect(create_milestones, sender=Subscription)
+signals.pre_save.connect(create_milestones, sender=Subscription)
 signals.pre_delete.connect(delete_related_milestones, sender=Subscription)
 
 '''

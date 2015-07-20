@@ -1914,6 +1914,8 @@ class MilestoneResource(CRMServiceModelResource):
                        milestone.color_code != milestone_data['color_code']:
 
                         for sales_cycle in milestone.sales_cycles.all():
+                            sales_cycle.milestone = None
+                            sales_cycle.save()
                             sales_cycles.append(sales_cycle)
                             meta = {"prev_milestone_color_code": milestone.color_code,
                                     "prev_milestone_title": milestone.title}
@@ -1932,14 +1934,16 @@ class MilestoneResource(CRMServiceModelResource):
             for milestone in milestones:
                 if milestone not in new_milestone_set:
                     for sales_cycle in milestone.sales_cycles.all():
-                            sales_cycles.append(sales_cycle)
-                            meta = {"prev_milestone_color_code": milestone.color_code,
-                                    "prev_milestone_title": milestone.title}
-                            log_entry = SalesCycleLogEntry(sales_cycle=sales_cycle, 
-                                                            owner=request.user.get_crmuser(),
-                                                            entry_type=SalesCycleLogEntry.MD,
-                                                            meta=json.dumps(meta))
-                            log_entry.save()
+                        sales_cycle.milestone = None
+                        sales_cycle.save()
+                        sales_cycles.append(sales_cycle)
+                        meta = {"prev_milestone_color_code": milestone.color_code,
+                                "prev_milestone_title": milestone.title}
+                        log_entry = SalesCycleLogEntry(sales_cycle=sales_cycle, 
+                                                        owner=request.user.get_crmuser(),
+                                                        entry_type=SalesCycleLogEntry.MD,
+                                                        meta=json.dumps(meta))
+                        log_entry.save()
                     milestone.delete()
             bundle = {
                 "milestones": [self.full_dehydrate(self.build_bundle(obj=milestone)) 
