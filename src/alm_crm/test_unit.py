@@ -2792,6 +2792,9 @@ class MilestoneResourceTest(ResourceTestMixin, ResourceTestCase):
 
     def test_bulk_edit(self):
         milestones = Milestone.objects.filter(id__in=[1, 2, 3, 4])
+        subs_milestones = Milestone.objects.filter(subscription_id=CRMUser.objects.first().subscription_id).count()
+        log_entry = SalesCycleLogEntry.objects.all().count()
+
         post_data = [
             {
                 'id': milestones[0].id,
@@ -2821,7 +2824,9 @@ class MilestoneResourceTest(ResourceTestMixin, ResourceTestCase):
 
         resp = self.api_client.post(self.api_path_milestone+'bulk_edit/', format='json', data=post_data)
         self.assertHttpAccepted(resp)
-        self.assertEqual(Milestone.objects.filter(subscription_id=CRMUser.objects.first().subscription_id).count(), 5)
+        after_subs_milestones = Milestone.objects.filter(subscription_id=CRMUser.objects.first().subscription_id).count()
+        log_entry_diff = SalesCycleLogEntry.objects.all().count() - log_entry
+        self.assertEqual(subs_milestones-2, log_entry_diff)
 
 
 
@@ -2865,33 +2870,33 @@ class CustomFieldResourceTest(ResourceTestMixin, ResourceTestCase):
             self.custom_field.title
             )
 
-    def test_bulk_edit(self):
-        product = Product.objects.first()
-        custom_fields = CustomField.objects.filter(content_object=product)
-        post_data = {
-            "content_class": 'Product',
-            "object_id": product.id,
-            "fields":[
-                {
-                    "id": 
-                    "title":                
-                    "value":
-                },
-                {
-                    "id": 
-                    "title":                
-                    "value":
-                },
-                {
-                    "id": 
-                    "title":                
-                    "value":
-                }
-            ]
-        }
+    # def test_bulk_edit(self):
+    #     product = Product.objects.first()
+    #     custom_fields = CustomField.objects.filter(content_object=product)
+    #     post_data = {
+    #         "content_class": 'Product',
+    #         "object_id": product.id,
+    #         "fields":[
+    #             {
+    #                 "id": 
+    #                 "title":                
+    #                 "value":
+    #             },
+    #             {
+    #                 "id": 
+    #                 "title":                
+    #                 "value":
+    #             },
+    #             {
+    #                 "id": 
+    #                 "title":                
+    #                 "value":
+    #             }
+    #         ]
+    #     }
 
-        resp = self.api_client.post(self.api_path_custom_field+'bulk_edit/', format='json', data=post_data)
-        self.assertHttpAccepted(resp)
-        # self.assertEqual(Milestone.objects.filter(subscription_id=CRMUser.objects.first().subscription_id).count(), 5)
+    #     resp = self.api_client.post(self.api_path_custom_field+'bulk_edit/', format='json', data=post_data)
+    #     self.assertHttpAccepted(resp)
+    #     # self.assertEqual(Milestone.objects.filter(subscription_id=CRMUser.objects.first().subscription_id).count(), 5)
 
 

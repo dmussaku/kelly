@@ -1474,6 +1474,11 @@ class SalesCycle(SubscriptionObject):
         self.milestone = milestone
         self.save()
 
+        for log_entry in self.log.all():
+            if log_entry.entry_type == SalesCycleLogEntry.ME or \
+               log_entry.entry_type == SalesCycleLogEntry.MD:
+               log_entry.delete()
+
         sc_log_entry = SalesCycleLogEntry(meta=meta,
                                           entry_type=SalesCycleLogEntry.MC,
                                           sales_cycle=self,
@@ -1572,9 +1577,9 @@ class SalesCycleLogEntry(SubscriptionObject):
     TYPES_CAPS = (
         _('Milestone change'),
     )
-    TYPES = (MC, ) = ('MC', )
+    TYPES = (MC, ME, MD) = ('MC', 'ME', 'MD')
     TYPES_OPTIONS = zip(TYPES, TYPES_CAPS)
-    TYPES_DICT = dict(zip(('MC', ), TYPES))
+    TYPES_DICT = dict(zip(('MC', 'ME', 'MD'), TYPES))
 
     meta = models.TextField(null=True, blank=True)
     sales_cycle = models.ForeignKey(SalesCycle, related_name='log')

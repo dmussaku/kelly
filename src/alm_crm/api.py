@@ -1882,7 +1882,7 @@ class SalesCycleLogEntryResource(CRMServiceModelResource):
 class MilestoneResource(CRMServiceModelResource):
 
     class Meta(CommonMeta):
-        queryset = Milestone.objects.all()
+        queryset = Milestone.objects.all().prefetch_related('sales_cycles')
         resource_name = 'milestone'
         detail_allowed_methods = ['get', 'post', 'put', 'patch', 'delete']
         always_return_data = True
@@ -1904,11 +1904,25 @@ class MilestoneResource(CRMServiceModelResource):
                 format=request.META.get('CONTENT_TYPE', 'application/json'))
             milestones = Milestone.objects.filter(subscription_id=request.user.get_crmuser().subscription_id)
             new_milestone_set = []
+            sales_cycles = []
             for milestone_data in data:
                 try:
                     milestone = milestones.get(id=milestone_data.get('id', -1))
                 except Milestone.DoesNotExist:
                     milestone = Milestone()
+                else:
+                    if milestone.title != milestone_data['title'] or \
+                       milestone.color_code != milestone_data['color_code']:
+
+                        for sales_cycle in milestone.sales_cycles.all():
+                            sales_cycles.append(sales_cycle)
+                            meta = {"prev_milestone_color_code": milestone.color_code,
+                                    "prev_milestone_title": milestone.title}
+                            log_entry = SalesCycleLogEntry(sales_cycle=sales_cycle, 
+                                                            owner=request.user.get_crmuser(),
+                                                            entry_type=SalesCycleLogEntry.ME,
+                                                            meta=json.dumps(meta))
+                            log_entry.save()
                 finally:
                     milestone.title = milestone_data['title']
                     milestone.color_code = milestone_data['color_code']
@@ -1918,10 +1932,24 @@ class MilestoneResource(CRMServiceModelResource):
 
             for milestone in milestones:
                 if milestone not in new_milestone_set:
+                    for sales_cycle in milestone.sales_cycles.all():
+                            sales_cycles.append(sales_cycle)
+                            meta = {"prev_milestone_color_code": milestone.color_code,
+                                    "prev_milestone_title": milestone.title}
+                            log_entry = SalesCycleLogEntry(sales_cycle=sales_cycle, 
+                                                            owner=request.user.get_crmuser(),
+                                                            entry_type=SalesCycleLogEntry.MD,
+                                                            meta=json.dumps(meta))
+                            log_entry.save()
                     milestone.delete()
+            bundle = {
+                "milestones": [self.full_dehydrate(self.build_bundle(obj=milestone)) 
+                                                            for milestone in new_milestone_set],
+                "sales_cycles": [SalesCycleResource().full_dehydrate(SalesCycleResource().build_bundle(obj=sc)) 
+                                                            for sc in sales_cycles]
+            }
 
-            return self.create_response(request, 
-                        [self.full_dehydrate(self.build_bundle(obj=milestone)) for milestone in new_milestone_set], 
+            return self.create_response(request, bundle, 
                         response_class=http.HttpAccepted)
 
 class ActivityResource(CRMServiceModelResource):
