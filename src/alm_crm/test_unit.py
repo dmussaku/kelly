@@ -2791,7 +2791,7 @@ class MilestoneResourceTest(ResourceTestMixin, ResourceTestCase):
 
 
     def test_bulk_edit(self):
-        milestones = Milestone.objects.filter(id__in=[1, 2, 3, 4])
+        milestones = Milestone.objects.filter(id__in=[1, 2, 3])
         subs_milestones = Milestone.objects.filter(subscription_id=CRMUser.objects.first().subscription_id).count()
         log_entry = SalesCycleLogEntry.objects.all().count()
 
@@ -2826,7 +2826,7 @@ class MilestoneResourceTest(ResourceTestMixin, ResourceTestCase):
         self.assertHttpAccepted(resp)
         after_subs_milestones = Milestone.objects.filter(subscription_id=CRMUser.objects.first().subscription_id).count()
         log_entry_diff = SalesCycleLogEntry.objects.all().count() - log_entry
-        self.assertEqual(subs_milestones-2, log_entry_diff)
+        self.assertEqual(subs_milestones-1, log_entry_diff)
 
 
 
