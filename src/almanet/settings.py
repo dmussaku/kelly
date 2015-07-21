@@ -179,7 +179,7 @@ class BaseConfiguration(SubdomainConfiguration, Configuration):
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': rel('../..', 'qadb.sqlite3'),
+            'NAME': rel('../..', 'db.sqlite3'),
         },
         'test': {
             'ENGINE': 'django.db.backends.sqlite3',
