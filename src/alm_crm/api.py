@@ -4214,17 +4214,17 @@ class CustomFieldResource(CRMServiceModelResource):
             for field in CustomField.objects.filter(subscription_id=request.user.get_crmuser().subscription_id,
                                                     content_type=ContentType.objects.get(app_label="alm_crm", model=content_class)):
                 if field not in fields_set:
-                    if field.content_type == ContentType.objects.get_for_model(Contact):
-                        if field.values.all().count() != 0:
-                            for field_value in field.values.all():
+                    if field.values.all().count() != 0:
+                        for field_value in field.values.all():
+                            if content_class.lower() == "contact":
                                 if field_value.content_object not in changed_objects:
-                                    changed_objects.append(field_value.content_object)
                                     vcard_note = Note(vcard=field_value.content_object.vcard, data='')
                                 else:
                                     vcard_note = field_value.content_object.vcard.note_set.last()
                                 vcard_note.data += field.title+': '+field_value.value+'\n'
                                 vcard_note.save()
-                                field_value.delete()
+                            changed_objects.append(field_value.content_object)
+                            field_value.delete()
                     field.delete()
 
             changed_objects_bundle = []
