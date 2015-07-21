@@ -209,7 +209,7 @@ class CommonMeta:
     authentication = MultiAuthentication(SessionAuthentication(),
                                          BasicAuthentication())
     authorization = Authorization()
-    # paginator_class = DummyPaginator
+    paginator_class = DummyPaginator
     filtering = {
         'date_edited': ALL_WITH_RELATIONS
     }
