@@ -4215,7 +4215,7 @@ class CustomFieldResource(CRMServiceModelResource):
 
 
             bundle = {'content_class': content_class,
-                        'fields': [self.full_dehydrate(self.build_bundle(obj=field)) for field in fields_set]}
+                        'custom_fields': [self.full_dehydrate(self.build_bundle(obj=field)) for field in fields_set]}
 
             return self.create_response(request, 
                         bundle, 
