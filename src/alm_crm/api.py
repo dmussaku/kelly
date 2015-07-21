@@ -188,7 +188,6 @@ class CustomToManyField(fields.ToManyField):
 
 
     def build_related_resource(self, value, request=None, related_obj=None, related_name=None):
-        print '@@@@', value
         return super(self.__class__, self).build_related_resource(value, request=request,
             related_obj=related_obj, related_name=related_name)
 
@@ -210,7 +209,7 @@ class CommonMeta:
     authentication = MultiAuthentication(SessionAuthentication(),
                                          BasicAuthentication())
     authorization = Authorization()
-    paginator_class = DummyPaginator
+    # paginator_class = DummyPaginator
     filtering = {
         'date_edited': ALL_WITH_RELATIONS
     }
@@ -354,7 +353,7 @@ class ContactResource(CRMServiceModelResource):
 
     share = fields.ToOneField('alm_crm.api.ShareResource',
         attribute=lambda bundle: _firstOfQuerySet(bundle.obj.share_set),
-        null=True, blank=True, readonly=True, full=True)
+        null=True, blank=True, readonly=True, full=False)
 
     author_id = fields.IntegerField(attribute='owner_id', null=True)
     parent_id = fields.IntegerField(attribute='parent_id', null=True)
@@ -2061,11 +2060,12 @@ class CRMUserResource(CRMServiceModelResource):
     '''
 #    user = fields.ToOneField('alm_user.api.UserResource', 'user', null=True, full=True, readonly=True)
     unfollow_list = CustomToManyField(ContactResource, 'unfollow_list', null=True, full=False, full_use_ids=True)
+    # unfollow_list = fields.ListField(attribute=lambda bundle: bundle.obj.values_list('unfollow_list__id', flat=True))
     vcard = fields.ToOneField('alm_vcard.api.VCardResource',
         attribute=lambda bundle: bundle.obj.get_billing_user(cache=True).vcard, null=True, full=True)
 
     class Meta(CommonMeta):
-        queryset = CRMUser.objects.all().prefetch_related('unfollow_list')
+        queryset = CRMUser.objects.all().prefetch_related('unfollow_list').select_related('unfollow_list__vcard')
         resource_name = 'crmuser'
         filtering = {
             "id": ALL,
@@ -2136,14 +2136,14 @@ class ShareResource(CRMServiceModelResource):
 
     @undocumented: prepend_urls, Meta
     '''
-    contact = fields.ToOneField(ContactResource, 'contact')
+    contact = fields.ToOneField(ContactResource, 'contact', full=False)
     share_to = fields.ToOneField(CRMUserResource, 'share_to',
-                                 full=True, null=True)
+                                 full=False, null=True)
     share_from = fields.ToOneField(CRMUserResource, 'share_from',
-                                   full=True, null=True)
+                                   full=False, null=True)
 
     class Meta(CommonMeta):
-        queryset = Share.objects.all()
+        queryset = Share.objects.all().select_related('contact', 'share_to', 'share_from')
         resource_name = 'share'
         excludes = ['subscription_id', 'description']
 
@@ -2237,13 +2237,13 @@ class ShareResource(CRMServiceModelResource):
             )
 
     def dehydrate_contact(self, bundle):
-        return bundle.obj.contact.id
+        return bundle.obj.contact_id
 
     def dehydrate_share_from(self, bundle):
-        return bundle.obj.share_from.id
+        return bundle.obj.share_from_id
 
     def dehydrate_share_to(self, bundle):
-        return bundle.obj.share_to.id
+        return bundle.obj.share_to_id
 
     def hydrate_contact(self, bundle):
         contact = Contact.objects.get(id=bundle.data['contact'])

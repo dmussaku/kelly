@@ -345,7 +345,8 @@ class DevConfiguration(
 
 class QAConfiguration(DevConfiguration):
     USE_PROFILER = True
-
+    # DEBUG_TOOLBAR_PATCH_SETTINGS = False
+    
     @classmethod
     def pre_setup(cls):
         cls.INSTALLED_APPS += ('debug_toolbar', 'debug_panel',)
