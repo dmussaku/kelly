@@ -1437,10 +1437,9 @@ class ProductResourceTest(ResourceTestMixin, ResourceTestCase):
             'name': 'new product',
             'description': 'new product by test_unit',
             'price': 100,
-            'custom_fields':[{
-                'id': 1,
-                'value': "value of the custom_field"
-            }]
+            'custom_fields':{
+                1: "value of the custom_field"
+            }
         }
 
         count = sales_cycle.products.count()
@@ -1584,10 +1583,9 @@ class ContactResourceTest(ResourceTestMixin, ResourceTestCase):
             'vcard': {"fn": "Nurlan Abiken",
             'notes': [{'data':'#some text #almacloud @[1:Bruce Wayne] @[2:Nurlan Abiken]'}]
             },
-            'custom_fields':[{
-                'id': 6,
-                'value': "value of the custom_field"
-            }]
+            'custom_fields':{
+                6: "value of the custom_field"
+            }
         }
         count = Contact.objects.count()
         # print resp
