@@ -679,9 +679,10 @@ class ContactResource(CRMServiceModelResource):
         '''Custom representation of followers, assignees etc.'''
         bundle = super(self.__class__, self).full_dehydrate(bundle, for_list=for_list)
         bundle.data['children'] = [contact.id for contact in bundle.obj.children.all()]
-        bundle.data['custom_fields'] = [{'id': field.custom_field.id, 
-                                         "value": field.value} 
-                                         for field in bundle.obj.custom_field_values.all()]
+        bundle.data['custom_fields'] = {}
+        for field in bundle.obj.custom_field_values.all():
+            bundle.data['custom_fields'][field.custom_field.id] = field.value
+
         return bundle
 
     # def dehydrate_assignees(self, bundle):
@@ -2382,9 +2383,9 @@ class ProductResource(CRMServiceModelResource):
     def full_dehydrate(self, bundle, for_list=False):
         '''Custom representation of followers, assignees etc.'''
         bundle = super(self.__class__, self).full_dehydrate(bundle, for_list=for_list)
-        bundle.data['custom_fields'] = [{'id': field.custom_field.id, 
-                                         "value": field.value} 
-                                         for field in bundle.obj.custom_field_values.all()]
+        bundle.data['custom_fields'] = {}
+        for field in bundle.obj.custom_field_values.all():
+            bundle.data['custom_fields'][field.custom_field.id] = field.value
         return bundle
 
     def import_products(self, request, **kwargs):
