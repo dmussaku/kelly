@@ -9,7 +9,7 @@
         "object_id":1,
         "content_type":["alm_crm", "product"],
         "subscription_id": 1,
-        "field": 1
+        "custom_field": 1
     }
 },
 {
@@ -22,7 +22,7 @@
         "object_id":1,
         "content_type":["alm_crm", "product"],
         "subscription_id": 1,
-        "field": 2
+        "custom_field": 2
     }
 },
 {
@@ -35,7 +35,7 @@
         "object_id":2,
         "content_type":["alm_crm", "product"],
         "subscription_id": 1,
-        "field": 3
+        "custom_field": 3
     }
 },
 {
@@ -48,7 +48,7 @@
         "object_id":2,
         "content_type":["alm_crm", "product"],
         "subscription_id": 1,
-        "field": 4
+        "custom_field": 4
     }
 },
 {
@@ -61,7 +61,7 @@
         "object_id":1,
         "content_type":["alm_crm", "product"],
         "subscription_id": 1,
-        "field": 5
+        "custom_field": 5
     }
 },
 {
@@ -72,9 +72,9 @@
         "date_created":"2014-02-01T06:36:00.827Z",
         "date_edited":"2014-02-01T06:36:00.827Z",
         "object_id":1,
-        "content_type":["alm_vcard", "vcard"],
+        "content_type":["alm_crm", "contact"],
         "subscription_id": 1,
-        "field": 6
+        "custom_field": 6
     }
 },
 {
@@ -85,9 +85,9 @@
         "date_created":"2014-02-01T07:01:00.827Z",
         "date_edited":"2014-02-01T07:01:00.827Z",
         "object_id":2,
-        "content_type":["alm_vcard", "vcard"],
+        "content_type":["alm_crm", "contact"],
         "subscription_id": 1,
-        "field": 7
+        "custom_field": 7
     }
 },
 {
@@ -98,9 +98,9 @@
         "date_created":"2014-02-01T08:17:00.827Z",
         "date_edited":"2014-02-01T08:17:00.827Z",
         "object_id":1,
-        "content_type":["alm_vcard", "vcard"],
+        "content_type":["alm_crm", "contact"],
         "subscription_id": 1,
-        "field": 8
+        "custom_field": 8
     }
 },
 {
@@ -111,9 +111,9 @@
         "date_created":"2014-02-01T09:12:00.827Z",
         "date_edited":"2014-02-01T09:12:00.827Z",
         "object_id":3,
-        "content_type":["alm_vcard", "vcard"],
+        "content_type":["alm_crm", "contact"],
         "subscription_id": 1,
-        "field": 9
+        "custom_field": 9
     }
 },
 {
@@ -126,7 +126,7 @@
         "object_id":3,
         "content_type":["alm_crm", "product"],
         "subscription_id": 1,
-        "field": 10
+        "custom_field": 10
     }
 }
 ]

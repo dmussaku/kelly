@@ -789,7 +789,7 @@ class ResourceTestMixin(object):
                 'salescycles.json', 'activities.json', 'products.json',
                 'mentions.json', 'values.json', 'emails.json', 'contactlist.json', 'share.json',
                 'hashtag.json', 'hashtag_ref.json', 'feedbacks.json', 'salescycle_product_stat.json', 
-                'filters.json', 'milestones.json', 'sc_log_entry.json', 'custom_fields.json']
+                'filters.json', 'milestones.json', 'sc_log_entry.json', 'custom_fields.json', 'custom_field_values.json']
 
     def get_user(self):
         from alm_user.models import User
@@ -2868,33 +2868,24 @@ class CustomFieldResourceTest(ResourceTestMixin, ResourceTestCase):
             self.custom_field.title
             )
 
-    # def test_bulk_edit(self):
-    #     product = Product.objects.first()
-    #     custom_fields = CustomField.objects.filter(content_object=product)
-    #     post_data = {
-    #         "content_class": 'Product',
-    #         "object_id": product.id,
-    #         "fields":[
-    #             {
-    #                 "id": 
-    #                 "title":                
-    #                 "value":
-    #             },
-    #             {
-    #                 "id": 
-    #                 "title":                
-    #                 "value":
-    #             },
-    #             {
-    #                 "id": 
-    #                 "title":                
-    #                 "value":
-    #             }
-    #         ]
-    #     }
+    def test_bulk_edit(self):
+        contact = Contact.objects.first()
+        post_data = {
+            "content_class": 'contact',
+            "custom_fields":[
+                {
+                    "id": 7,
+                    "title": "test title"        
+                },
+                {
+                    "title": "title"               
+                }
+            ]
+        }
 
-    #     resp = self.api_client.post(self.api_path_custom_field+'bulk_edit/', format='json', data=post_data)
-    #     self.assertHttpAccepted(resp)
-    #     # self.assertEqual(Milestone.objects.filter(subscription_id=CRMUser.objects.first().subscription_id).count(), 5)
+        resp = self.api_client.post(self.api_path_custom_field+'bulk_edit/', format='json', data=post_data)
+        print resp
+        self.assertHttpAccepted(resp)
+        # self.assertEqual(Milestone.objects.filter(subscription_id=CRMUser.objects.first().subscription_id).count(), 5)
 
 
