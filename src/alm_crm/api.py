@@ -4182,11 +4182,11 @@ class CustomFieldResource(CRMServiceModelResource):
             )
         ]
 
-    def full_dehydrate(self, bundle, for_list=False):
-        '''Custom representation of followers, assignees etc.'''
-        bundle = super(self.__class__, self).full_dehydrate(bundle, for_list=for_list)
-        bundle.data['content_type'] = bundle.obj.content_type
-        return bundle
+    # def full_dehydrate(self, bundle, for_list=False):
+    #     '''Custom representation of followers, assignees etc.'''
+    #     bundle = super(self.__class__, self).full_dehydrate(bundle, for_list=for_list)
+    #     bundle.data['content_type'] = bundle.obj.content_type
+    #     return bundle
 
     def bulk_edit(self, request, **kwargs):
         with RequestContext(self, request, allowed_methods=['post']):
@@ -4213,8 +4213,12 @@ class CustomFieldResource(CRMServiceModelResource):
                 if field not in fields_set:
                     field.delete()
 
+
+            bundle = {'content_class': content_class,
+                        'fields': [self.full_dehydrate(self.build_bundle(obj=field)) for field in fields_set]}
+
             return self.create_response(request, 
-                        [self.full_dehydrate(self.build_bundle(obj=field)) for field in fields_set], 
+                        bundle, 
                         response_class=http.HttpAccepted)
 
     def get_for_model(self, request, **kwargs):
