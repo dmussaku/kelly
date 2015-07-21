@@ -684,6 +684,9 @@ class ContactResource(CRMServiceModelResource):
         '''Custom representation of followers, assignees etc.'''
         bundle = super(self.__class__, self).full_dehydrate(bundle, for_list=for_list)
         bundle.data['children'] = [contact.id for contact in bundle.obj.children.all()]
+        bundle.data['custom_fields'] = [{'id': field.custom_field.id, 
+                                         "value": field.value} 
+                                         for field in bundle.obj.custom_field_values.all()]
         return bundle
 
     # def dehydrate_assignees(self, bundle):
@@ -2385,7 +2388,8 @@ class ProductResource(CRMServiceModelResource):
         '''Custom representation of followers, assignees etc.'''
         bundle = super(self.__class__, self).full_dehydrate(bundle, for_list=for_list)
         bundle.data['custom_fields'] = [{'id': field.custom_field.id, 
-                                         "value": field.value} for field in bundle.obj.custom_field_values.all()]
+                                         "value": field.value} 
+                                         for field in bundle.obj.custom_field_values.all()]
         return bundle
 
     def import_products(self, request, **kwargs):
@@ -4190,7 +4194,7 @@ class CustomFieldResource(CRMServiceModelResource):
             fields_set = []       
             content_class = data['content_class']
 
-            for object in data['fields']:
+            for object in data['custom_fields']:
                 try:
                     field = CustomField.objects.get(id=object.get('id', -1))
                 except CustomField.DoesNotExist:
