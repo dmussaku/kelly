@@ -622,6 +622,9 @@ class ContactResource(CRMServiceModelResource):
         for key, value in kwargs.items():
             setattr(bundle.obj, key, value)
 
+        if bundle.data.get('custom_fields', None):
+            processing_custom_field_data(bundle.data['custom_fields'], bundle.obj)
+
         bundle = self.full_hydrate(bundle)
         new_bundle = self.full_dehydrate(
                         self.build_bundle(
@@ -658,6 +661,9 @@ class ContactResource(CRMServiceModelResource):
                 bundle.obj = self.obj_get(bundle=bundle, **lookup_kwargs)
             except ObjectDoesNotExist:
                 raise NotFound("A model instance matching the provided arguments could not be found.")
+
+        if bundle.data.get('custom_fields', None):
+            processing_custom_field_data(bundle.data['custom_fields'], bundle.obj)
 
         bundle = self.full_hydrate(bundle, **kwargs)
         #return self.save(bundle, skip_errors=skip_errors)
@@ -2375,6 +2381,13 @@ class ProductResource(CRMServiceModelResource):
             ),
         ]
 
+    def full_dehydrate(self, bundle, for_list=False):
+        '''Custom representation of followers, assignees etc.'''
+        bundle = super(self.__class__, self).full_dehydrate(bundle, for_list=for_list)
+        bundle.data['custom_fields'] = [{'id': field.custom_field.id, 
+                                         "value": field.value} for field in bundle.obj.custom_field_values.all()]
+        return bundle
+
     def import_products(self, request, **kwargs):
     	objects = []
         product_resource = ProductResource()
@@ -2435,8 +2448,6 @@ class ProductResource(CRMServiceModelResource):
 
     def save(self, bundle, **kwargs):
         bundle = super(self.__class__, self).save(bundle, **kwargs)
-        if bundle.data.get('custom_sections', None):
-            processing_custom_section_data(bundle.data['custom_sections'], bundle.obj)
         if bundle.data.get('custom_fields', None):
             processing_custom_field_data(bundle.data['custom_fields'], bundle.obj)
         return bundle
@@ -4177,15 +4188,16 @@ class CustomFieldResource(CRMServiceModelResource):
                 format=request.META.get('CONTENT_TYPE', 'application/json'))
 
             fields_set = []       
+            content_class = data['content_class']
 
-            for object in data:
+            for object in data['fields']:
                 try:
                     field = CustomField.objects.get(id=object.get('id', -1))
                 except CustomField.DoesNotExist:
                     field = CustomField()
                 finally:
-                    field.title = object.title
-                    field.content_type = ContentType.objects.get(app_label="alm_crm", model=object['content_class'])
+                    field.title = object['title']
+                    field.content_type = ContentType.objects.get(app_label="alm_crm", model=content_class)
                     field.subscription_id = request.user.get_crmuser().subscription_id
                     field.save()
                     fields_set.append(field)
