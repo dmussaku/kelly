@@ -4197,6 +4197,7 @@ class CustomFieldResource(CRMServiceModelResource):
 
             fields_set = []       
             content_class = data['content_class']
+            changed_objects = []
 
             for object in data['custom_fields']:
                 try:
@@ -4210,13 +4211,32 @@ class CustomFieldResource(CRMServiceModelResource):
                     field.save()
                     fields_set.append(field)
 
-            for field in CustomField.objects.filter(subscription_id=request.user.get_crmuser().subscription_id):
+            for field in CustomField.objects.filter(subscription_id=request.user.get_crmuser().subscription_id,
+                                                    content_type=ContentType.objects.get(app_label="alm_crm", model=content_class)):
                 if field not in fields_set:
+                    if field.content_type == ContentType.objects.get_for_model(Contact):
+                        if field.values.all().count() != 0:
+                            for field_value in field.values.all():
+                                if field_value.content_object not in changed_objects:
+                                    changed_objects.append(field_value.content_object)
+                                    vcard_note = Note(vcard=field_value.content_object.vcard, data='')
+                                else:
+                                    vcard_note = field_value.content_object.vcard.note_set.last()
+                                vcard_note.data += field.title+': '+field_value.value+'\n'
+                                vcard_note.save()
+                                field_value.delete()
                     field.delete()
 
+            changed_objects_bundle = []
+
+            if content_class.lower() == "product":
+                changed_objects_bundle = [ProductResource().full_dehydrate(ProductResource().build_bundle(obj=obj)) for obj in changed_objects]
+            elif content_class.lower() == "contact":
+                changed_objects_bundle = [ContactResource().full_dehydrate(ContactResource().build_bundle(obj=obj)) for obj in changed_objects]
 
             bundle = {'content_class': content_class,
-                        'custom_fields': [self.full_dehydrate(self.build_bundle(obj=field)) for field in fields_set]}
+                        'custom_fields': [self.full_dehydrate(self.build_bundle(obj=field)) for field in fields_set],
+                        'changed_objects': changed_objects_bundle}
 
             return self.create_response(request, 
                         bundle, 
