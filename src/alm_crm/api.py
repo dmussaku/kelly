@@ -21,6 +21,7 @@ from .models import (
     HashTagReference,
     CustomSection,
     CustomField,
+    CustomFieldValue,
     ImportTask,
     ErrorCell
     )
@@ -88,6 +89,7 @@ from tastypie.exceptions import ImmediateHttpResponse, NotFound, Unauthorized
 from tastypie.resources import Resource, ModelResource
 from tastypie.serializers import Serializer
 from tastypie.utils import trailing_slash
+from django.db.models.loading import get_model
 import ast
 from datetime import datetime, timedelta
 import pytz
@@ -95,12 +97,7 @@ import pytz
 from .utils.parser import text_parser
 from .utils import report_builders
 from .utils.data_processing import (
-    processing_custom_section_data,
     processing_custom_field_data,
-    from_section_object_to_data,
-    from_field_object_to_data,
-    processing_field_object_data,
-    processing_section_object_data,
     )
 
 
@@ -483,8 +480,7 @@ class ContactResource(CRMServiceModelResource):
                 'sales_cycles', 'children', 'share_set',
                 'vcard__tel_set', 'vcard__category_set',
                 'vcard__adr_set', 'vcard__title_set', 'vcard__url_set',
-                'vcard__org_set', 'vcard__email_set',
-                'vcard__custom_sections', 'vcard__custom_fields')
+                'vcard__org_set', 'vcard__email_set')
         resource_name = 'contact'
         filtering = {
             'status': ['exact'],
@@ -627,7 +623,10 @@ class ContactResource(CRMServiceModelResource):
         for key, value in kwargs.items():
             setattr(bundle.obj, key, value)
 
+
         bundle = self.full_hydrate(bundle)
+        if bundle.data.get('custom_fields', None):
+            processing_custom_field_data(bundle.data['custom_fields'], bundle.obj)
         new_bundle = self.full_dehydrate(
                         self.build_bundle(
                             obj=Contact.objects.get(id=bundle.obj.id))
@@ -664,8 +663,11 @@ class ContactResource(CRMServiceModelResource):
             except ObjectDoesNotExist:
                 raise NotFound("A model instance matching the provided arguments could not be found.")
 
+
         bundle = self.full_hydrate(bundle, **kwargs)
         #return self.save(bundle, skip_errors=skip_errors)
+        if bundle.data.get('custom_fields', None):
+            processing_custom_field_data(bundle.data['custom_fields'], bundle.obj)
         raise ImmediateHttpResponse(
             HttpResponse(
                 content=Serializer().to_json(
@@ -683,6 +685,10 @@ class ContactResource(CRMServiceModelResource):
         '''Custom representation of followers, assignees etc.'''
         bundle = super(self.__class__, self).full_dehydrate(bundle, for_list=for_list)
         bundle.data['children'] = [contact.id for contact in bundle.obj.children.all()]
+        bundle.data['custom_fields'] = {}
+        for field in bundle.obj.custom_field_values.all():
+            bundle.data['custom_fields'][field.custom_field.id] = field.value
+
         return bundle
 
     # def dehydrate_assignees(self, bundle):
@@ -1882,11 +1888,79 @@ class SalesCycleLogEntryResource(CRMServiceModelResource):
 class MilestoneResource(CRMServiceModelResource):
 
     class Meta(CommonMeta):
-        queryset = Milestone.objects.all()
+        queryset = Milestone.objects.all().prefetch_related('sales_cycles')
         resource_name = 'milestone'
         detail_allowed_methods = ['get', 'post', 'put', 'patch', 'delete']
         always_return_data = True
 
+    def prepend_urls(self):
+        return [
+            url(
+                r"^(?P<resource_name>%s)/bulk_edit%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('bulk_edit'),
+                name='api_bulk_edit'
+            )
+        ]
+
+    def bulk_edit(self, request, **kwargs):
+        with RequestContext(self, request, allowed_methods=['post']):
+            data = self.deserialize(
+                request, request.body,
+                format=request.META.get('CONTENT_TYPE', 'application/json'))
+            milestones = Milestone.objects.filter(subscription_id=request.user.get_crmuser().subscription_id)
+            new_milestone_set = []
+            sales_cycles = []
+            for milestone_data in data:
+                try:
+                    milestone = milestones.get(id=milestone_data.get('id', -1))
+                except Milestone.DoesNotExist:
+                    milestone = Milestone()
+                else:
+                    if milestone.title != milestone_data['title'] or \
+                       milestone.color_code != milestone_data['color_code']:
+
+                        for sales_cycle in milestone.sales_cycles.all():
+                            sales_cycle.milestone = None
+                            sales_cycle.save()
+                            sales_cycles.append(sales_cycle)
+                            meta = {"prev_milestone_color_code": milestone.color_code,
+                                    "prev_milestone_title": milestone.title}
+                            log_entry = SalesCycleLogEntry(sales_cycle=sales_cycle, 
+                                                            owner=request.user.get_crmuser(),
+                                                            entry_type=SalesCycleLogEntry.ME,
+                                                            meta=json.dumps(meta))
+                            log_entry.save()
+                finally:
+                    milestone.title = milestone_data['title']
+                    milestone.color_code = milestone_data['color_code']
+                    milestone.subscription_id = request.user.get_crmuser().subscription_id
+                    milestone.save()
+                    new_milestone_set.append(milestone)
+
+            for milestone in milestones:
+                if milestone not in new_milestone_set:
+                    for sales_cycle in milestone.sales_cycles.all():
+                        sales_cycle.milestone = None
+                        sales_cycle.save()
+                        sales_cycles.append(sales_cycle)
+                        meta = {"prev_milestone_color_code": milestone.color_code,
+                                "prev_milestone_title": milestone.title}
+                        log_entry = SalesCycleLogEntry(sales_cycle=sales_cycle, 
+                                                        owner=request.user.get_crmuser(),
+                                                        entry_type=SalesCycleLogEntry.MD,
+                                                        meta=json.dumps(meta))
+                        log_entry.save()
+                    milestone.delete()
+            bundle = {
+                "milestones": [self.full_dehydrate(self.build_bundle(obj=milestone)) 
+                                                            for milestone in new_milestone_set],
+                "sales_cycles": [SalesCycleResource().full_dehydrate(SalesCycleResource().build_bundle(obj=sc)) 
+                                                            for sc in sales_cycles]
+            }
+
+            return self.create_response(request, bundle, 
+                        response_class=http.HttpAccepted)
 
 class ActivityResource(CRMServiceModelResource):
     '''
@@ -2288,14 +2362,9 @@ class ProductResource(CRMServiceModelResource):
 #    sales_cycles = fields.ToManyField(SalesCycleResource, 'sales_cycles', readonly=True)
 
     class Meta(CommonMeta):
-        queryset = Product.objects.all().prefetch_related('custom_sections', 'custom_fields')
+        queryset = Product.objects.all().prefetch_related('custom_field_values')
         resource_name = 'product'
         always_return_data = True
-
-    def dehydrate(self, bundle):
-        bundle.data['custom_sections'] = processing_section_object_data(list(bundle.obj.custom_sections.all()))
-        bundle.data['custom_fields'] = processing_field_object_data(filter(lambda f: f.section == None, bundle.obj.custom_fields.all()))
-        return bundle
 
     def prepend_urls(self):
         return [
@@ -2312,6 +2381,14 @@ class ProductResource(CRMServiceModelResource):
                 name='api_import_products'
             ),
         ]
+
+    def full_dehydrate(self, bundle, for_list=False):
+        '''Custom representation of followers, assignees etc.'''
+        bundle = super(self.__class__, self).full_dehydrate(bundle, for_list=for_list)
+        bundle.data['custom_fields'] = {}
+        for field in bundle.obj.custom_field_values.all():
+            bundle.data['custom_fields'][field.custom_field.id] = field.value
+        return bundle
 
     def import_products(self, request, **kwargs):
     	objects = []
@@ -2373,8 +2450,6 @@ class ProductResource(CRMServiceModelResource):
 
     def save(self, bundle, **kwargs):
         bundle = super(self.__class__, self).save(bundle, **kwargs)
-        if bundle.data.get('custom_sections', None):
-            processing_custom_section_data(bundle.data['custom_sections'], bundle.obj)
         if bundle.data.get('custom_fields', None):
             processing_custom_field_data(bundle.data['custom_fields'], bundle.obj)
         return bundle
@@ -4087,20 +4162,116 @@ class CustomFieldResource(CRMServiceModelResource):
     (GenericRelation with VCard, Product)
     @undocumented: Meta
     '''
-    # field_values = fields.ToManyField('alm_crm.api.CustomFieldValueResource', 'field_values',
-    #                            related_name='product', null=True,
-    #                            full=True, readonly=True)
-    section = fields.ToOneField('alm_crm.api.CustomSectionResource', 'section',
-                              null=True, blank=True, full=False)
-    content_object = GenericForeignKeyField({
-        Product: ProductResource,
-        VCard: VCardResource,
-    }, 'content_object')
+
+    content_type = fields.CharField()
 
     class Meta(CommonMeta):
         queryset = CustomField.objects.all()
         resource_name = 'custom_field'
 
+    def prepend_urls(self):
+        return [
+            url(
+                r"^(?P<resource_name>%s)/bulk_edit%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('bulk_edit'),
+                name='api_bulk_edit'
+            ),
+            url(
+                r"^(?P<resource_name>%s)/get_for_model/(?P<class>\w+)%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('get_for_model'),
+                name='api_get_for_model'
+            )
+        ]
+
+    # def full_dehydrate(self, bundle, for_list=False):
+    #     '''Custom representation of followers, assignees etc.'''
+    #     bundle = super(self.__class__, self).full_dehydrate(bundle, for_list=for_list)
+    #     bundle.data['content_type'] = bundle.obj.content_type
+    #     return bundle
+
+    def bulk_edit(self, request, **kwargs):
+        with RequestContext(self, request, allowed_methods=['post']):
+            data = self.deserialize(
+                request, request.body,
+                format=request.META.get('CONTENT_TYPE', 'application/json'))
+
+            fields_set = []       
+            content_class = data['content_class']
+            changed_objects = []
+
+            for object in data['custom_fields']:
+                try:
+                    field = CustomField.objects.get(id=object.get('id', -1))
+                except CustomField.DoesNotExist:
+                    field = CustomField()
+                finally:
+                    field.title = object['title']
+                    field.content_type = ContentType.objects.get(app_label="alm_crm", model=content_class)
+                    field.subscription_id = request.user.get_crmuser().subscription_id
+                    field.save()
+                    fields_set.append(field)
+
+            for field in CustomField.objects.filter(subscription_id=request.user.get_crmuser().subscription_id,
+                                                    content_type=ContentType.objects.get(app_label="alm_crm", model=content_class)):
+                if field not in fields_set:
+                    if field.values.all().count() != 0:
+                        for field_value in field.values.all():
+                            if content_class.lower() == "contact":
+                                if field_value.content_object not in changed_objects:
+                                    vcard_note = Note(vcard=field_value.content_object.vcard, data='')
+                                else:
+                                    vcard_note = field_value.content_object.vcard.note_set.last()
+                                vcard_note.data += field.title+': '+field_value.value+'\n'
+                                vcard_note.save()
+                            changed_objects.append(field_value.content_object)
+                            field_value.delete()
+                    field.delete()
+
+            changed_objects_bundle = []
+
+            if content_class.lower() == "product":
+                changed_objects_bundle = [ProductResource().full_dehydrate(ProductResource().build_bundle(obj=obj)) for obj in changed_objects]
+            elif content_class.lower() == "contact":
+                changed_objects_bundle = [ContactResource().full_dehydrate(ContactResource().build_bundle(obj=obj)) for obj in changed_objects]
+
+            bundle = {'content_class': content_class,
+                        'custom_fields': [self.full_dehydrate(self.build_bundle(obj=field)) for field in fields_set],
+                        'changed_objects': changed_objects_bundle}
+
+            return self.create_response(request, 
+                        bundle, 
+                        response_class=http.HttpAccepted)
+
+    def get_for_model(self, request, **kwargs):
+        with RequestContext(self, request, allowed_methods=['get']):
+            try:
+                content_type = ContentType.objects.get(app_label='alm_crm', model=kwargs.get("class", ""))
+            except ContentType.DoesNotExist:
+                return http.HttpNotFound()
+            else:
+                objects = CustomField.objects.filter(subscription_id=request.user.get_crmuser().subscription_id,
+                                                    content_type=content_type)
+
+                return self.create_response(request, 
+                        [self.full_dehydrate(self.build_bundle(obj=obj)) for obj in objects], 
+                        response_class=http.HttpAccepted)
+           
+
+class CustomFieldValueResource(CRMServiceModelResource):
+
+    content_object = GenericForeignKeyField({
+        Product: ProductResource,
+        Contact: ContactResource,
+    }, 'content_object')
+
+    custom_field = fields.ToOneField('alm_crm.api.CustomFieldResource', 'custom_field',
+        null=True, full=True)
+
+    class Meta(CommonMeta):
+        queryset = CustomFieldValue.objects.all()
+        resource_name = 'field_value'
 
 class ReportResource(Resource):
     '''

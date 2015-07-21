@@ -88,8 +88,6 @@ class VCard(models.Model):
     # a common CharField was used
     uid = models.CharField(max_length=256, blank=True,
                            null=True, verbose_name=_("unique identifier"))
-    custom_sections = generic.GenericRelation('alm_crm.CustomSection')
-    custom_fields = generic.GenericRelation('alm_crm.CustomField')
 
     class Meta:
         verbose_name = _("vcard")
@@ -100,9 +98,8 @@ class VCard(models.Model):
         return self.fn
 
     def save(self, **kwargs):
-        # if not self.fn:
-        #     self.fill_fn()
-        self.fill_fn()
+        if not self.fn or self.fn == '':
+            self.fill_fn()
         super(self.__class__, self).save(**kwargs)
 
     def fill_fn(self):

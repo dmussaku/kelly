@@ -1,0 +1,132 @@
+[
+{
+    "pk": 1,
+    "model": "alm_crm.CustomFieldValue",
+    "fields": {
+        "value": "Field Value #1",
+        "date_created":"2014-02-01T01:43:00.827Z",
+        "date_edited":"2014-02-01T01:43:00.827Z",
+        "object_id":1,
+        "content_type":["alm_crm", "product"],
+        "subscription_id": 1,
+        "custom_field": 1
+    }
+},
+{
+    "pk": 2,
+    "model": "alm_crm.CustomFieldValue",
+    "fields": {
+        "value": "Field Value #2",
+        "date_created":"2014-02-01T02:18:00.827Z",
+        "date_edited":"2014-02-01T02:18:00.827Z",
+        "object_id":1,
+        "content_type":["alm_crm", "product"],
+        "subscription_id": 1,
+        "custom_field": 2
+    }
+},
+{
+    "pk": 3,
+    "model": "alm_crm.CustomFieldValue",
+    "fields": {
+        "value": "Field Value #3",
+        "date_created":"2014-02-01T03:19:00.827Z",
+        "date_edited":"2014-02-01T03:19:00.827Z",
+        "object_id":2,
+        "content_type":["alm_crm", "product"],
+        "subscription_id": 1,
+        "custom_field": 3
+    }
+},
+{
+    "pk": 4,
+    "model": "alm_crm.CustomFieldValue",
+    "fields": {
+        "value": "Field Value #4",
+        "date_created":"2014-02-01T04:57:00.827Z",
+        "date_edited":"2014-02-01T04:57:00.827Z",
+        "object_id":2,
+        "content_type":["alm_crm", "product"],
+        "subscription_id": 1,
+        "custom_field": 4
+    }
+},
+{
+    "pk": 5,
+    "model": "alm_crm.CustomFieldValue",
+    "fields": {
+        "value": "Field Value #5",
+        "date_created":"2014-02-01T05:55:00.827Z",
+        "date_edited":"2014-02-01T05:55:00.827Z",
+        "object_id":1,
+        "content_type":["alm_crm", "product"],
+        "subscription_id": 1,
+        "custom_field": 5
+    }
+},
+{
+    "pk": 6,
+    "model": "alm_crm.CustomFieldValue",
+    "fields": {
+        "value": "Field Value #6",
+        "date_created":"2014-02-01T06:36:00.827Z",
+        "date_edited":"2014-02-01T06:36:00.827Z",
+        "object_id":1,
+        "content_type":["alm_crm", "contact"],
+        "subscription_id": 1,
+        "custom_field": 6
+    }
+},
+{
+    "pk": 7,
+    "model": "alm_crm.CustomFieldValue",
+    "fields": {
+        "value": "Field Value #7",
+        "date_created":"2014-02-01T07:01:00.827Z",
+        "date_edited":"2014-02-01T07:01:00.827Z",
+        "object_id":2,
+        "content_type":["alm_crm", "contact"],
+        "subscription_id": 1,
+        "custom_field": 7
+    }
+},
+{
+    "pk": 8,
+    "model": "alm_crm.CustomFieldValue",
+    "fields": {
+        "value": "Field Value #8",
+        "date_created":"2014-02-01T08:17:00.827Z",
+        "date_edited":"2014-02-01T08:17:00.827Z",
+        "object_id":1,
+        "content_type":["alm_crm", "contact"],
+        "subscription_id": 1,
+        "custom_field": 8
+    }
+},
+{
+    "pk": 9,
+    "model": "alm_crm.CustomFieldValue",
+    "fields": {
+        "value": "Field Value #9",
+        "date_created":"2014-02-01T09:12:00.827Z",
+        "date_edited":"2014-02-01T09:12:00.827Z",
+        "object_id":3,
+        "content_type":["alm_crm", "contact"],
+        "subscription_id": 1,
+        "custom_field": 9
+    }
+},
+{
+    "pk": 10,
+    "model": "alm_crm.CustomFieldValue",
+    "fields": {
+        "value": "Field Value #10",
+        "date_created":"2014-02-01T10:48:00.827Z",
+        "date_edited":"2014-02-01T10:48:00.827Z",
+        "object_id":3,
+        "content_type":["alm_crm", "product"],
+        "subscription_id": 1,
+        "custom_field": 10
+    }
+}
+]
