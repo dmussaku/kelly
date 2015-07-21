@@ -13,3 +13,4 @@ src/temp_dir/*
 pids
 logs
 conf/supervisord.conf
+alma
