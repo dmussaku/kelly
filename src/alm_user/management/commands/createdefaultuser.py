@@ -24,8 +24,8 @@ class Command(BaseCommand):
         email = 'b.wayne@batman.bat'
         password = '123'
 
-        subdomain = 'bwayne'
-        name = 'Wayne Enterprise'
+        subdomain = 'almacloud'
+        name = 'AlmaCloud'
         try:
             service = Service.objects.get(slug='crm')
         except:

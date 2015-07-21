@@ -781,13 +781,8 @@ class ResourceTestMixin(object):
                 'crmusers.json', 'vcards.json', 'contacts.json',
                 'salescycles.json', 'activities.json', 'products.json',
                 'mentions.json', 'values.json', 'emails.json', 'contactlist.json', 'share.json',
-<<<<<<< HEAD
-                'feedbacks.json', 'salescycle_product_stat.json', 'filters.json', 'milestones.json',
-                'sc_log_entry.json', 'hashtag.json', 'hashtag_ref.json']
-=======
                 'hashtag.json', 'hashtag_ref.json', 'feedbacks.json', 'salescycle_product_stat.json', 
                 'filters.json', 'milestones.json', 'sc_log_entry.json']
->>>>>>> feature/hashtag_search
 
     def get_user(self):
         from alm_user.models import User
@@ -2710,63 +2705,37 @@ class UserResourceTest(ResourceTestMixin, ResourceTestCase):
             self.user.email
             )
 
-<<<<<<< HEAD
 
-class MilestoneResourceTest(ResourceTestMixin, ResourceTestCase):
-=======
 class HashTagReferenceResourceTest(ResourceTestMixin, ResourceTestCase):
 
->>>>>>> feature/hashtag_search
     def setUp(self):
         super(self.__class__, self).setUp()
 
         # login user
         self.get_credentials()
 
-<<<<<<< HEAD
-        self.api_path_milestone = '/api/v1/milestone/'
-
-        # get_list
-        self.get_list_resp = self.api_client.get(self.api_path_milestone,
-                                                 format='json',
-                                                 charset='utf-8',
-=======
         self.api_path_ht_ref = '/api/v1/hashtag_reference/'
 
         # get_list
         self.get_list_resp = self.api_client.get(self.api_path_ht_ref,
                                                  format='json',
->>>>>>> feature/hashtag_search
                                                  HTTP_HOST='localhost')
         self.get_list_des = self.deserialize(self.get_list_resp)
 
         # get_detail(pk)
         self.get_detail_resp = \
-<<<<<<< HEAD
-            lambda pk: self.api_client.get(self.api_path_milestone+str(pk)+'/',
-                                           format='json',
-                                           charset='utf-8',
-=======
             lambda pk: self.api_client.get(self.api_path_ht_ref+str(pk)+'/',
                                            format='json',
->>>>>>> feature/hashtag_search
                                            HTTP_HOST='localhost')
         self.get_detail_des = \
             lambda pk: self.deserialize(self.get_detail_resp(pk))
-
-<<<<<<< HEAD
-        self.milestone = Milestone.objects.first()
-=======
         self.ht_ref = HashTagReference.objects.first()
->>>>>>> feature/hashtag_search
 
     def test_get_list_valid_json(self):
         self.assertValidJSONResponse(self.get_list_resp)
 
     def test_get_detail(self):
         self.assertEqual(
-<<<<<<< HEAD
-=======
             self.get_detail_des(self.ht_ref.pk)['object_id'],
             self.ht_ref.object_id
             )
@@ -2830,7 +2799,6 @@ class MilestoneResourceTest(ResourceTestMixin, ResourceTestCase):
 
     def test_get_detail(self):
         self.assertEqual(
->>>>>>> feature/hashtag_search
             self.get_detail_des(self.milestone.pk)['title'],
             self.milestone.title
             )
@@ -2879,70 +2847,6 @@ class MilestoneResourceTest(ResourceTestMixin, ResourceTestCase):
                               format='json', charset='utf-8', data={'title': milestone_title})
         # check
         self.assertHttpAccepted(resp)
-<<<<<<< HEAD
         self.assertEqual(self.get_detail_des(self.milestone.pk)['title'], milestone_title)
 
 
-class HashTagReferenceResourceTest(ResourceTestMixin, ResourceTestCase):
-
-    def setUp(self):
-        super(self.__class__, self).setUp()
-
-        # login user
-        self.get_credentials()
-
-        self.api_path_ht_ref = '/api/v1/hashtag_reference/'
-
-        # get_list
-        self.get_list_resp = self.api_client.get(self.api_path_ht_ref,
-                                                 format='json',
-                                                 HTTP_HOST='localhost')
-        self.get_list_des = self.deserialize(self.get_list_resp)
-
-        # get_detail(pk)
-        self.get_detail_resp = \
-            lambda pk: self.api_client.get(self.api_path_ht_ref+str(pk)+'/',
-                                           format='json',
-                                           HTTP_HOST='localhost')
-        self.get_detail_des = \
-            lambda pk: self.deserialize(self.get_detail_resp(pk))
-
-        self.ht_ref = HashTagReference.objects.first()
-
-    def test_get_list_valid_json(self):
-        self.assertValidJSONResponse(self.get_list_resp)
-
-    def test_get_list_non_empty(self):
-        self.assertTrue(self.get_list_des['meta']['total_count'] > 0)
-
-    def test_get_detail(self):
-        self.assertEqual(
-            self.get_detail_des(self.ht_ref.pk)['object_id'],
-            self.ht_ref.object_id
-            )
-
-    def test_search(self):
-        get_list_search_resp = self.api_client.get(self.api_path_ht_ref+
-                                            "search/?hashtag=nurlan",
-                                            format='json',
-                                            HTTP_HOST='localhost')
-        des_resp = self.deserialize(get_list_search_resp)['objects']
-        self.assertTrue(des_resp['activities'])
-        self.assertTrue(des_resp['contacts'])
-        self.assertTrue(des_resp['sales_cycles'])
-        self.assertTrue(des_resp['comments'])
-
-        get_list_search_resp = self.api_client.get(self.api_path_ht_ref+
-                                            "search/?hashtag=hp",
-                                            format='json',
-                                            HTTP_HOST='localhost')
-        des_resp = self.deserialize(get_list_search_resp)['objects']
-
-        self.assertTrue(des_resp['activities'])
-        self.assertTrue(des_resp['sales_cycles'])
-        self.assertEqual(len(des_resp['activities']), 2)
-        self.assertEqual(len(des_resp['sales_cycles']), 1)
-
-=======
-        self.assertEqual(self.get_detail_des(self.milestone.pk)['title'], milestone_title)
->>>>>>> feature/hashtag_search

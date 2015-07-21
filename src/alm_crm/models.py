@@ -28,6 +28,10 @@ from datetime import datetime, timedelta
 import xlrd
 import pytz
 import time
+from almanet.settings import TEMP_DIR, BASE_DIR
+from alm_vcard import models as vcard_models
+from celery import group, Task, result
+# from .tasks import create_failed_contacts_xls
 
 ALLOWED_TIME_PERIODS = ['week', 'month', 'year']
 
@@ -174,6 +178,8 @@ class Contact(SubscriptionObject):
         related_name='contact_latest_activity', null=True)
     mentions = generic.GenericRelation('Mention')
     comments = generic.GenericRelation('Comment')
+    import_task = models.ForeignKey(
+        'ImportTask', blank=True, null=True, related_name='contacts', on_delete=models.SET_NULL)
 
     class Meta:
         verbose_name = _('contact')
@@ -611,7 +617,152 @@ class Contact(SubscriptionObject):
                 # print contact_list
         return contact_list
 
+    '''
+    Creates contact from data which is row from xls file and file_structure
+    which has a specific format, here's the example of both 
+    file_structure:
+    [
+        {'num':0, 'model':'VCard', 'attr':'fn'},
+        {'num':1, 'model':'Adr', 'attr':'postal'},
+        {'num':2, 'model':'Org'},
+        {'num':3, 'model':'Email', 'attr':'internet'}
+    ]
+    data:
+    ['John Smith', 'Black water Valley;Chicago;60616;USA;;Home County;Almaty;000100;Kazakhstan',
+    'Microsoft', 'sam@gmail.com;at@gmail.com'
+    ]
 
+    The result is the response {'error':True/False, 'contact_id':n, 'error_col':m}
+    where error is boolean, n and m are integers
+    '''
+
+    @classmethod
+    def create_from_structure(cls, data, file_structure, creator, import_task):
+        contact = cls()
+        vcard = VCard()
+        response = {}
+        for structure_dict in file_structure:
+            col_num = int(structure_dict.get('num'))
+            model = getattr(vcard_models, structure_dict.get('model'))
+            if type(data[col_num].value) == float:
+                data[col_num].value = str(data[col_num].value)
+            if model == vcard_models.VCard:
+                attr = structure_dict.get('attr',"")
+                try:
+                    if type(data[col_num].value) == unicode:
+                        setattr(vcard, attr, data[col_num].value)
+                    else:
+                        setattr(vcard, attr, str(data[col_num].value))
+                    try:
+                        vcard.save()
+                    except:
+                        pass
+                except:
+                    # transaction.savepoint_rollback(sid)
+                    try:
+                        vcard.delete()
+                    except:
+                        pass
+                    response['error'] = True
+                    response['error_col'] = col_num
+                    return response
+            elif (model == vcard_models.Tel or model == vcard_models.Email 
+                        or model == vcard_models.Url):
+                try:
+                    if data[col_num].value:
+                        objects = data[col_num].value.split(';')
+                        for object in objects:
+                            v_type = structure_dict.get('attr','')
+                            obj = model(type=v_type, value = object)
+                            obj.vcard = vcard
+                            obj.save()
+                except:
+                    # transaction.savepoint_rollback(sid)
+                    try:
+                        vcard.delete()
+                    except:
+                        pass
+                    response['error'] = True
+                    response['error_col'] = col_num
+                    return response
+            elif model == vcard_models.Org:
+                try:
+                    if data[col_num].value:
+                        objects = data[col_num].value.split(';')
+                        for object in objects:
+                            v_type = structure_dict.get('attr','')
+                            obj = model(organization_name = object)
+                            obj.vcard = vcard
+                            obj.save()
+                except:
+                    # transaction.savepoint_rollback(sid)
+                    try:
+                        vcard.delete()
+                    except:
+                        pass
+                    response['error'] = True
+                    response['error_col'] = col_num
+                    return response
+            elif model == vcard_models.Adr:
+                adr_type = structure_dict.get('attr','')
+                try:
+                    if data[col_num].value:
+                        adresses = type_cast(data[col_num].value).split(';;')
+                        for address_str in adresses:
+                            addr_objs = address_str.split(';')
+                            addr_objs = [vcard, adr_type] + addr_objs
+                            address = Adr.create_from_list(addr_objs)
+                except:
+                    # transaction.savepoint_rollback(sid)
+                    try:
+                        vcard.delete()
+                    except:
+                        pass
+                    response['error'] = True
+                    response['error_col'] = col_num
+                    return response
+            elif (model == vcard_models.Geo or model == vcard_models.Agent 
+                    or model == vcard_models.Category or model == vcard_models.Key 
+                    or model == vcard_models.Label or model == vcard_models.Mailer 
+                    or model == vcard_models.Nickname or model == vcard_models.Note 
+                    or model == vcard_models.Role or model == vcard_models.Title 
+                    or model == vcard_models.Tz):
+                try:
+                    if data[col_num].value:
+                        objects = data[col_num].value.split(';')
+                        for object in objects:
+                            v_type = structure_dict.get('attr','')
+                            obj = model(data = object)
+                            obj.vcard = vcard
+                            obj.save()
+                except:
+                    # transaction.savepoint_rollback(sid)
+                    try:
+                        vcard.delete()
+                    except:
+                        pass
+                    response['error'] = True
+                    response['error_col'] = col_num
+                    return response
+        crmuser = creator.get_crmuser()
+        try:
+            vcard.save()
+        except:
+            response['error'] = True
+            response['error_col'] = 0
+            return response
+        contact.vcard = vcard
+        contact.import_task = import_task
+        contact.owner = crmuser
+        contact.subscription_id = crmuser.subscription_id
+        contact.save()
+        SalesCycle.create_globalcycle(
+                        **{'subscription_id':contact.subscription_id,
+                         'owner_id':crmuser.id,
+                         'contact_id':contact.id
+                        }
+                    )
+        return {'error':False, 'contact_id':contact.id}
 
     @classmethod
     @transaction.atomic
@@ -622,9 +773,9 @@ class Contact(SubscriptionObject):
         sid = transaction.savepoint()
         for sheet in book.sheets():
             i = 1
-            header_row = sheet.row(0)
             while(sheets_left):
                 try:
+                    header_row = sheet.row(0)
                     data = sheet.row(i)
                 except IndexError:
                     sheets_left = False
@@ -844,6 +995,29 @@ class Contact(SubscriptionObject):
                 i = i+1
         transaction.savepoint_commit(sid)
         return contacts
+
+    @classmethod
+    def get_xls_structure(cls, filename, xls_file_data):
+        book = xlrd.open_workbook(file_contents=xls_file_data)
+        sheet = book.sheets()[0]
+        try:
+            data=sheet.row(0)
+        except:
+            return {'success':False}
+        ext = filename.split('.')[len(filename.split('.')) - 1]
+        new_filename = filename.strip('.' + ext) + datetime.now().__str__() + '.' + ext
+        myfile = open(
+            TEMP_DIR + new_filename,
+            'wb'
+            )
+        myfile.write(xls_file_data)
+        myfile.close()
+        return {
+            'success':True,
+            'col_num':sheet.ncols,
+            'filename':new_filename,
+            'data':[d.value for d in data]
+        }
 
     @classmethod
     def get_contacts_by_last_activity_date(
@@ -1913,6 +2087,8 @@ class ContactList(SubscriptionObject):
     title = models.CharField(max_length=150)
     contacts = models.ManyToManyField(Contact, related_name='contact_list',
                                    null=True, blank=True)
+    import_task = models.OneToOneField('alm_crm.ImportTask', 
+        blank=True, null=True, on_delete=models.SET_NULL)
 
     class Meta:
         verbose_name = _('contact_list')
@@ -2132,3 +2308,22 @@ class CustomField(SubscriptionObject):
         if save:
             custom_field.save()
         return custom_field
+
+class ImportTask(models.Model):
+    uuid = models.CharField(blank=True, null=True, max_length=100)
+    finished = models.BooleanField(default=False)
+    filename = models.CharField(max_length=250)
+    imported_num = models.IntegerField(default=0, blank=True, null=True)
+    not_imported_num = models.IntegerField(default=0, blank=True, null=True)
+
+    def __unicode__(self):
+        if not self.uuid:
+            return str(self.finished)
+        return self.uuid + ' ' + str(self.finished)
+
+
+class ErrorCell(models.Model):
+    import_task = models.ForeignKey(ImportTask)
+    row = models.IntegerField()
+    col = models.IntegerField()
+    data = models.CharField(max_length=10000)
