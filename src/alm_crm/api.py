@@ -1429,7 +1429,7 @@ class ContactResource(CRMServiceModelResource):
 
     def delete_contact(self, request, **kwargs):
         with RequestContext(self, request, allowed_methods=['post']):
-            objects = Contact.delete_contacts(list(kwargs.get('id')))
+            objects = Contact.delete_contacts([kwargs.get('id')])
             objects['contact'] = int(objects['contacts'][0]) if len(objects['contacts']) > 0 else None
             objects.pop('contacts')
             return self.create_response(request, {'objects':objects}, response_class=http.HttpAccepted)

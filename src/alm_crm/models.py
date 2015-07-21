@@ -1164,6 +1164,7 @@ class Contact(SubscriptionObject):
             }
             for contact_id in obj_ids:
                 try:
+                    print contact_id
                     obj = Contact.objects.get(id=contact_id)
                     objects['contacts'].append(contact_id)
                     objects['sales_cycles'] += list(obj.sales_cycles.all().values_list("id", flat=True))
