@@ -4160,6 +4160,8 @@ class CustomFieldResource(CRMServiceModelResource):
     @undocumented: Meta
     '''
 
+    content_type = fields.CharField()
+
     class Meta(CommonMeta):
         queryset = CustomField.objects.all()
         resource_name = 'custom_field'
@@ -4179,6 +4181,12 @@ class CustomFieldResource(CRMServiceModelResource):
                 name='api_get_for_model'
             )
         ]
+
+    def full_dehydrate(self, bundle, for_list=False):
+        '''Custom representation of followers, assignees etc.'''
+        bundle = super(self.__class__, self).full_dehydrate(bundle, for_list=for_list)
+        bundle.data['content_type'] = bundle.obj.content_type
+        return bundle
 
     def bulk_edit(self, request, **kwargs):
         with RequestContext(self, request, allowed_methods=['post']):
