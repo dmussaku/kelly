@@ -97,12 +97,7 @@ import pytz
 from .utils.parser import text_parser
 from .utils import report_builders
 from .utils.data_processing import (
-    processing_custom_section_data,
     processing_custom_field_data,
-    from_section_object_to_data,
-    from_field_object_to_data,
-    processing_field_object_data,
-    processing_section_object_data,
     )
 
 
@@ -622,10 +617,10 @@ class ContactResource(CRMServiceModelResource):
         for key, value in kwargs.items():
             setattr(bundle.obj, key, value)
 
-        if bundle.data.get('custom_fields', None):
-            processing_custom_field_data(bundle.data['custom_fields'], bundle.obj)
 
         bundle = self.full_hydrate(bundle)
+        if bundle.data.get('custom_fields', None):
+            processing_custom_field_data(bundle.data['custom_fields'], bundle.obj)
         new_bundle = self.full_dehydrate(
                         self.build_bundle(
                             obj=Contact.objects.get(id=bundle.obj.id))
@@ -662,11 +657,11 @@ class ContactResource(CRMServiceModelResource):
             except ObjectDoesNotExist:
                 raise NotFound("A model instance matching the provided arguments could not be found.")
 
-        if bundle.data.get('custom_fields', None):
-            processing_custom_field_data(bundle.data['custom_fields'], bundle.obj)
 
         bundle = self.full_hydrate(bundle, **kwargs)
         #return self.save(bundle, skip_errors=skip_errors)
+        if bundle.data.get('custom_fields', None):
+            processing_custom_field_data(bundle.data['custom_fields'], bundle.obj)
         raise ImmediateHttpResponse(
             HttpResponse(
                 content=Serializer().to_json(
@@ -4206,7 +4201,7 @@ class CustomFieldResource(CRMServiceModelResource):
                     field.save()
                     fields_set.append(field)
 
-            for field in CustomField.object.filter(subscription_id=request.user.get_crmuser().subscription_id):
+            for field in CustomField.objects.filter(subscription_id=request.user.get_crmuser().subscription_id):
                 if field not in fields_set:
                     field.delete()
 

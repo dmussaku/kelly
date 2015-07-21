@@ -1437,11 +1437,17 @@ class ProductResourceTest(ResourceTestMixin, ResourceTestCase):
             'name': 'new product',
             'description': 'new product by test_unit',
             'price': 100,
+            'custom_fields':[{
+                'id': 1,
+                'value': "value of the custom_field"
+            }]
         }
 
         count = sales_cycle.products.count()
-        self.assertHttpCreated(self.api_client.post(
-            self.api_path_product, format='json', data=post_data))
+        resp = self.api_client.post(
+            self.api_path_product, format='json', data=post_data)
+        print resp
+        self.assertHttpCreated(resp)
         product = Product.objects.last()
         self.assertEqual(product.name, 'new product')
         self.assertIsInstance(product.subscription_id, int)
@@ -1578,27 +1584,21 @@ class ContactResourceTest(ResourceTestMixin, ResourceTestCase):
             'vcard': {"fn": "Nurlan Abiken",
             'notes': [{'data':'#some text #almacloud @[1:Bruce Wayne] @[2:Nurlan Abiken]'}]
             },
+            'custom_fields':[{
+                'id': 6,
+                'value': "value of the custom_field"
+            }]
         }
         count = Contact.objects.count()
         # print resp
-        hashtag_count = HashTag.objects.all().count()
-        hashtag_reference_count = HashTagReference.objects.all().count()
         mention_count = Mention.objects.all().count()
         resp = self.api_client.post(
             self.api_path_contact, format='json', data=post_data)
+        print resp
         self.assertHttpOK(resp)
-        hashtag = HashTag.objects.first()
-        for reference in hashtag.references.all():
-            print reference.content_object.__class__
-        # verify that new one has been added.
         self.assertEqual(Contact.objects.count(), count + 1)
         created_contact = Contact.objects.last()
         self.assertEqual(created_contact.sales_cycles.first().title, GLOBAL_CYCLE_TITLE.decode('utf-8'))
-        self.assertEqual(hashtag_count+2, HashTag.objects.all().count())
-        self.assertEqual(hashtag_reference_count+2, HashTagReference.objects.all().count())
-        self.assertEqual(mention_count+2, Mention.objects.all().count())
-        self.assertEqual(HashTagReference.objects.last().hashtag, 
-                        HashTag.objects.get(text=HashTagReference.objects.last().hashtag.text))
 
     def test_delete_contact(self):
         count = Contact.objects.count()
