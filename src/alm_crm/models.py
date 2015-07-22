@@ -65,11 +65,18 @@ class CRMUser(SubscriptionObject):
         """Returns a original user.
         Raises:
            User.DoesNotExist exception if no such relation exist"""
-        user = self.user if cache and hasattr(self, 'user') else User.objects.get(pk=self.user_id)
+        
+        if cache and hasattr(self, 'user'):
+            return self.user
+
+        user = User.objects.filter(pk=self.user_id).select_related('vcard').prefetch_related(
+            'vcard__tel_set', 'vcard__category_set',
+            'vcard__adr_set', 'vcard__title_set', 'vcard__url_set',
+            'vcard__org_set', 'vcard__email_set').first()
         if cache:
             self.user = user
         return user
-
+        
     def set_supervisor(self, save=False):
         self.is_supervisor = True
         if save:

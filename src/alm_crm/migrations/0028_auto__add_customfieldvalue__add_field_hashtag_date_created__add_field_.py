@@ -20,115 +20,6 @@ class Migration(SchemaMigration):
             ('object_id', self.gf('django.db.models.fields.IntegerField')(null=True, blank=True)),
         ))
         db.send_create_signal(u'alm_crm', ['CustomFieldValue'])
-
-        # Adding field 'HashTag.date_created'
-        db.add_column('alma_hashtag', 'date_created',
-                      self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, default=datetime.datetime(2015, 7, 20, 0, 0), blank=True),
-                      keep_default=False)
-
-        # Adding field 'HashTag.date_edited'
-        db.add_column('alma_hashtag', 'date_edited',
-                      self.gf('django.db.models.fields.DateTimeField')(auto_now=True, default=datetime.datetime(2015, 7, 20, 0, 0), blank=True),
-                      keep_default=False)
-
-        # Adding field 'SalesCycleProductStat.date_created'
-        db.add_column('alma_cycle_prod_stat', 'date_created',
-                      self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, default=datetime.datetime(2015, 7, 20, 0, 0), blank=True),
-                      keep_default=False)
-
-        # Adding field 'SalesCycleProductStat.date_edited'
-        db.add_column('alma_cycle_prod_stat', 'date_edited',
-                      self.gf('django.db.models.fields.DateTimeField')(auto_now=True, default=datetime.datetime(2015, 7, 20, 0, 0), blank=True),
-                      keep_default=False)
-
-
-        # Changing field 'Feedback.date_edited'
-        db.alter_column(u'alm_crm_feedback', 'date_edited', self.gf('django.db.models.fields.DateTimeField')(auto_now=True))
-
-        # Changing field 'SalesCycleLogEntry.date_created'
-        db.alter_column(u'alm_crm_salescyclelogentry', 'date_created', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, default=datetime.datetime(2015, 7, 20, 0, 0)))
-
-        # Changing field 'SalesCycleLogEntry.date_edited'
-        db.alter_column(u'alm_crm_salescyclelogentry', 'date_edited', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, default=datetime.datetime(2015, 7, 20, 0, 0)))
-
-        # Changing field 'Comment.date_edited'
-        db.alter_column(u'alm_crm_comment', 'date_edited', self.gf('django.db.models.fields.DateTimeField')(auto_now=True))
-        # Adding field 'Milestone.date_created'
-        db.add_column('alma_milestone', 'date_created',
-                      self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, default=datetime.datetime(2015, 7, 20, 0, 0), blank=True),
-                      keep_default=False)
-
-        # Adding field 'Milestone.date_edited'
-        db.add_column('alma_milestone', 'date_edited',
-                      self.gf('django.db.models.fields.DateTimeField')(auto_now=True, default=datetime.datetime(2015, 7, 20, 0, 0), blank=True),
-                      keep_default=False)
-
-        # Adding field 'CRMUser.date_created'
-        db.add_column(u'alm_crm_crmuser', 'date_created',
-                      self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, default=datetime.datetime(2015, 7, 20, 0, 0), blank=True),
-                      keep_default=False)
-
-        # Adding field 'CRMUser.date_edited'
-        db.add_column(u'alm_crm_crmuser', 'date_edited',
-                      self.gf('django.db.models.fields.DateTimeField')(auto_now=True, default=datetime.datetime(2015, 7, 20, 0, 0), blank=True),
-                      keep_default=False)
-
-        # Adding field 'Filter.date_edited'
-        db.add_column('alma_filter', 'date_edited',
-                      self.gf('django.db.models.fields.DateTimeField')(auto_now=True, default=datetime.datetime(2015, 7, 20, 0, 0), blank=True),
-                      keep_default=False)
-
-        # Adding field 'ActivityRecipient.date_created'
-        db.add_column('alma_activity_recipient', 'date_created',
-                      self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, default=datetime.datetime(2015, 7, 20, 0, 0), blank=True),
-                      keep_default=False)
-
-        # Adding field 'ActivityRecipient.date_edited'
-        db.add_column('alma_activity_recipient', 'date_edited',
-                      self.gf('django.db.models.fields.DateTimeField')(auto_now=True, default=datetime.datetime(2015, 7, 20, 0, 0), blank=True),
-                      keep_default=False)
-
-        # Adding field 'Mention.date_edited'
-        db.add_column(u'alm_crm_mention', 'date_edited',
-                      self.gf('django.db.models.fields.DateTimeField')(auto_now=True, default=datetime.datetime(2015, 7, 20, 0, 0), blank=True),
-                      keep_default=False)
-
-        # Adding field 'HashTagReference.date_edited'
-        db.add_column('alma_hashtag_reference', 'date_edited',
-                      self.gf('django.db.models.fields.DateTimeField')(auto_now=True, default=datetime.datetime(2015, 7, 20, 0, 0), blank=True),
-                      keep_default=False)
-
-        # Adding field 'SalesCycle.date_edited'
-        db.add_column('alma_sales_cycle', 'date_edited',
-                      self.gf('django.db.models.fields.DateTimeField')(auto_now=True, default=datetime.datetime(2015, 7, 20, 0, 0), blank=True),
-                      keep_default=False)
-
-        # Adding field 'ContactList.date_edited'
-        db.add_column('alma_contact_list', 'date_edited',
-                      self.gf('django.db.models.fields.DateTimeField')(auto_now=True, default=datetime.datetime(2015, 7, 20, 0, 0), blank=True),
-                      keep_default=False)
-
-        # Adding field 'Value.date_created'
-        db.add_column('alma_value', 'date_created',
-                      self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, default=datetime.datetime(2015, 7, 20, 0, 0), blank=True),
-                      keep_default=False)
-
-        # Adding field 'Value.date_edited'
-        db.add_column('alma_value', 'date_edited',
-                      self.gf('django.db.models.fields.DateTimeField')(auto_now=True, default=datetime.datetime(2015, 7, 20, 0, 0), blank=True),
-                      keep_default=False)
-
-
-        # Changing field 'Activity.date_created'
-        db.alter_column('alma_activity', 'date_created', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, default=datetime.datetime(2015, 7, 20, 0, 0)))
-
-        # Changing field 'Activity.date_edited'
-        db.alter_column('alma_activity', 'date_edited', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, default=datetime.datetime(2015, 7, 20, 0, 0)))
-        # Adding field 'Share.date_edited'
-        db.add_column('alma_share', 'date_edited',
-                      self.gf('django.db.models.fields.DateTimeField')(auto_now=True, default=datetime.datetime(2015, 7, 20, 0, 0), blank=True),
-                      keep_default=False)
-
         # Deleting field 'CustomField.value'
         db.delete_column('alma_custom_fields', 'value')
 
@@ -138,30 +29,140 @@ class Migration(SchemaMigration):
         # Deleting field 'CustomField.object_id'
         db.delete_column('alma_custom_fields', 'object_id')
 
-        # Adding field 'CustomField.date_edited'
-        db.add_column('alma_custom_fields', 'date_edited',
-                      self.gf('django.db.models.fields.DateTimeField')(auto_now=True, default=datetime.datetime(2015, 7, 20, 0, 0), blank=True),
-                      keep_default=False)
+        # # Adding field 'HashTag.date_created'
+        # db.add_column('alma_hashtag', 'date_created',
+        #               self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, default=datetime.datetime(2015, 7, 20, 0, 0), blank=True),
+        #               keep_default=False)
 
-        # Adding field 'Contact.date_edited'
-        db.add_column('alma_contact', 'date_edited',
-                      self.gf('django.db.models.fields.DateTimeField')(auto_now=True, default=datetime.datetime(2015, 7, 20, 0, 0), blank=True),
-                      keep_default=False)
+        # # Adding field 'HashTag.date_edited'
+        # db.add_column('alma_hashtag', 'date_edited',
+        #               self.gf('django.db.models.fields.DateTimeField')(auto_now=True, default=datetime.datetime(2015, 7, 20, 0, 0), blank=True),
+        #               keep_default=False)
 
-        # Adding field 'Product.date_edited'
-        db.add_column('alma_product', 'date_edited',
-                      self.gf('django.db.models.fields.DateTimeField')(auto_now=True, default=datetime.datetime(2015, 7, 20, 0, 0), blank=True),
-                      keep_default=False)
+        # # Adding field 'SalesCycleProductStat.date_created'
+        # db.add_column('alma_cycle_prod_stat', 'date_created',
+        #               self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, default=datetime.datetime(2015, 7, 20, 0, 0), blank=True),
+        #               keep_default=False)
 
-        # Adding field 'CustomSection.date_edited'
-        db.add_column('alma_custom_sections', 'date_edited',
-                      self.gf('django.db.models.fields.DateTimeField')(auto_now=True, default=datetime.datetime(2015, 7, 20, 0, 0), blank=True),
-                      keep_default=False)
+        # # Adding field 'SalesCycleProductStat.date_edited'
+        # db.add_column('alma_cycle_prod_stat', 'date_edited',
+        #               self.gf('django.db.models.fields.DateTimeField')(auto_now=True, default=datetime.datetime(2015, 7, 20, 0, 0), blank=True),
+        #               keep_default=False)
 
-        # Adding field 'ProductGroup.date_edited'
-        db.add_column('alma_product_group', 'date_edited',
-                      self.gf('django.db.models.fields.DateTimeField')(auto_now=True, default=datetime.datetime(2015, 7, 20, 0, 0), blank=True),
-                      keep_default=False)
+
+        # # Changing field 'Feedback.date_edited'
+        # db.alter_column(u'alm_crm_feedback', 'date_edited', self.gf('django.db.models.fields.DateTimeField')(auto_now=True))
+
+        # # Changing field 'SalesCycleLogEntry.date_created'
+        # db.alter_column(u'alm_crm_salescyclelogentry', 'date_created', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, default=datetime.datetime(2015, 7, 20, 0, 0)))
+
+        # # Changing field 'SalesCycleLogEntry.date_edited'
+        # db.alter_column(u'alm_crm_salescyclelogentry', 'date_edited', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, default=datetime.datetime(2015, 7, 20, 0, 0)))
+
+        # # Changing field 'Comment.date_edited'
+        # db.alter_column(u'alm_crm_comment', 'date_edited', self.gf('django.db.models.fields.DateTimeField')(auto_now=True))
+        # # Adding field 'Milestone.date_created'
+        # db.add_column('alma_milestone', 'date_created',
+        #               self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, default=datetime.datetime(2015, 7, 20, 0, 0), blank=True),
+        #               keep_default=False)
+
+        # # Adding field 'Milestone.date_edited'
+        # db.add_column('alma_milestone', 'date_edited',
+        #               self.gf('django.db.models.fields.DateTimeField')(auto_now=True, default=datetime.datetime(2015, 7, 20, 0, 0), blank=True),
+        #               keep_default=False)
+
+        # # Adding field 'CRMUser.date_created'
+        # db.add_column(u'alm_crm_crmuser', 'date_created',
+        #               self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, default=datetime.datetime(2015, 7, 20, 0, 0), blank=True),
+        #               keep_default=False)
+
+        # # Adding field 'CRMUser.date_edited'
+        # db.add_column(u'alm_crm_crmuser', 'date_edited',
+        #               self.gf('django.db.models.fields.DateTimeField')(auto_now=True, default=datetime.datetime(2015, 7, 20, 0, 0), blank=True),
+        #               keep_default=False)
+
+        # # Adding field 'Filter.date_edited'
+        # db.add_column('alma_filter', 'date_edited',
+        #               self.gf('django.db.models.fields.DateTimeField')(auto_now=True, default=datetime.datetime(2015, 7, 20, 0, 0), blank=True),
+        #               keep_default=False)
+
+        # # Adding field 'ActivityRecipient.date_created'
+        # db.add_column('alma_activity_recipient', 'date_created',
+        #               self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, default=datetime.datetime(2015, 7, 20, 0, 0), blank=True),
+        #               keep_default=False)
+
+        # # Adding field 'ActivityRecipient.date_edited'
+        # db.add_column('alma_activity_recipient', 'date_edited',
+        #               self.gf('django.db.models.fields.DateTimeField')(auto_now=True, default=datetime.datetime(2015, 7, 20, 0, 0), blank=True),
+        #               keep_default=False)
+
+        # # Adding field 'Mention.date_edited'
+        # db.add_column(u'alm_crm_mention', 'date_edited',
+        #               self.gf('django.db.models.fields.DateTimeField')(auto_now=True, default=datetime.datetime(2015, 7, 20, 0, 0), blank=True),
+        #               keep_default=False)
+
+        # # Adding field 'HashTagReference.date_edited'
+        # db.add_column('alma_hashtag_reference', 'date_edited',
+        #               self.gf('django.db.models.fields.DateTimeField')(auto_now=True, default=datetime.datetime(2015, 7, 20, 0, 0), blank=True),
+        #               keep_default=False)
+
+        # # Adding field 'SalesCycle.date_edited'
+        # db.add_column('alma_sales_cycle', 'date_edited',
+        #               self.gf('django.db.models.fields.DateTimeField')(auto_now=True, default=datetime.datetime(2015, 7, 20, 0, 0), blank=True),
+        #               keep_default=False)
+
+        # # Adding field 'ContactList.date_edited'
+        # db.add_column('alma_contact_list', 'date_edited',
+        #               self.gf('django.db.models.fields.DateTimeField')(auto_now=True, default=datetime.datetime(2015, 7, 20, 0, 0), blank=True),
+        #               keep_default=False)
+
+        # # Adding field 'Value.date_created'
+        # db.add_column('alma_value', 'date_created',
+        #               self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, default=datetime.datetime(2015, 7, 20, 0, 0), blank=True),
+        #               keep_default=False)
+
+        # # Adding field 'Value.date_edited'
+        # db.add_column('alma_value', 'date_edited',
+        #               self.gf('django.db.models.fields.DateTimeField')(auto_now=True, default=datetime.datetime(2015, 7, 20, 0, 0), blank=True),
+        #               keep_default=False)
+
+
+        # # Changing field 'Activity.date_created'
+        # db.alter_column('alma_activity', 'date_created', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, default=datetime.datetime(2015, 7, 20, 0, 0)))
+
+        # # Changing field 'Activity.date_edited'
+        # db.alter_column('alma_activity', 'date_edited', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, default=datetime.datetime(2015, 7, 20, 0, 0)))
+        # # Adding field 'Share.date_edited'
+        # db.add_column('alma_share', 'date_edited',
+        #               self.gf('django.db.models.fields.DateTimeField')(auto_now=True, default=datetime.datetime(2015, 7, 20, 0, 0), blank=True),
+        #               keep_default=False)
+
+        
+
+        # # Adding field 'CustomField.date_edited'
+        # db.add_column('alma_custom_fields', 'date_edited',
+        #               self.gf('django.db.models.fields.DateTimeField')(auto_now=True, default=datetime.datetime(2015, 7, 20, 0, 0), blank=True),
+        #               keep_default=False)
+
+        # # Adding field 'Contact.date_edited'
+        # db.add_column('alma_contact', 'date_edited',
+        #               self.gf('django.db.models.fields.DateTimeField')(auto_now=True, default=datetime.datetime(2015, 7, 20, 0, 0), blank=True),
+        #               keep_default=False)
+
+        # # Adding field 'Product.date_edited'
+        # db.add_column('alma_product', 'date_edited',
+        #               self.gf('django.db.models.fields.DateTimeField')(auto_now=True, default=datetime.datetime(2015, 7, 20, 0, 0), blank=True),
+        #               keep_default=False)
+
+        # # Adding field 'CustomSection.date_edited'
+        # db.add_column('alma_custom_sections', 'date_edited',
+        #               self.gf('django.db.models.fields.DateTimeField')(auto_now=True, default=datetime.datetime(2015, 7, 20, 0, 0), blank=True),
+        #               keep_default=False)
+
+        # # Adding field 'ProductGroup.date_edited'
+        # db.add_column('alma_product_group', 'date_edited',
+        #               self.gf('django.db.models.fields.DateTimeField')(auto_now=True, default=datetime.datetime(2015, 7, 20, 0, 0), blank=True),
+        #               keep_default=False)
 
 
     def backwards(self, orm):

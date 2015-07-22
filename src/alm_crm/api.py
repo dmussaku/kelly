@@ -68,6 +68,7 @@ from almanet.settings import DEFAULT_SERVICE
 from almanet.settings import TIME_ZONE
 from almanet.utils.api import RequestContext
 from almanet.utils.env import get_subscr_id
+from almanet.utils.ds import StreamList
 from django.conf.urls import url
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
@@ -189,7 +190,6 @@ class CustomToManyField(fields.ToManyField):
 
 
     def build_related_resource(self, value, request=None, related_obj=None, related_name=None):
-        print '@@@@', value
         return super(self.__class__, self).build_related_resource(value, request=request,
             related_obj=related_obj, related_name=related_name)
 
@@ -211,7 +211,10 @@ class CommonMeta:
     authentication = MultiAuthentication(SessionAuthentication(),
                                          BasicAuthentication())
     authorization = Authorization()
-    paginator_class = DummyPaginator
+    
+    if not settings.RUSTEM_SETTINGS:
+        paginator_class = DummyPaginator
+    
     filtering = {
         'date_edited': ALL_WITH_RELATIONS
     }
@@ -469,7 +472,7 @@ class ContactResource(CRMServiceModelResource):
 
     share = fields.ToOneField('alm_crm.api.ShareResource',
         attribute=lambda bundle: _firstOfQuerySet(bundle.obj.share_set),
-        null=True, blank=True, readonly=True, full=True)
+        null=True, blank=True, readonly=True, full=False)
 
     author_id = fields.IntegerField(attribute='owner_id', null=True)
     parent_id = fields.IntegerField(attribute='parent_id', null=True)
@@ -587,6 +590,12 @@ class ContactResource(CRMServiceModelResource):
                 self.wrap_view('check_import_status'),
                 name='api_check_import_status'
             ),
+            url(
+                r"^(?P<resource_name>%s)/state%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('get_contact_state'),
+                name='api_get_contact_state'
+            )   
         ]
 
     def get_meta_dict(self, limit, offset, count, url):
@@ -967,6 +976,29 @@ class ContactResource(CRMServiceModelResource):
             obj_dict['activities'] = self.get_bundle_list(contacts[1], request)
             obj_dict['dict'] = contacts[2]
             return self.create_response(request, obj_dict)
+
+    def get_contact_state(self, request, **kwargs):
+        with RequestContext(self, request, allowed_methods=['get']):
+            base_bundle = self.build_bundle(request=request)
+            objects = self.obj_get_list(bundle=base_bundle, **self.remove_api_resource_names(kwargs))
+            bundles = []
+            vcard_rsr = VCardResource()
+            bundles = (
+                {
+                    'id': obj.id,
+                    'author_id': obj.owner_id,
+                    'date_created': obj.date_created,
+                    'date_edited': obj.date_edited,
+                    'owner': obj.owner_id,
+                    'parent_id': obj.parent_id,
+                    'status': obj.status,
+                    'tp': obj.tp,
+                    'subscription_id': obj.subscription_id,
+                    'children': list(contact.id for contact in obj.children.all()),
+                    'sales_cycles': list(cycle.id for cycle in obj.sales_cycles.all()),
+                    'vcard': vcard_rsr.full_dehydrate(vcard_rsr.build_bundle(obj=obj.vcard, request=request))
+                } for obj in objects)
+        return self.create_response(request, StreamList(bundles))
 
     def get_cold_base(self, request, **kwargs):
         '''
@@ -2537,11 +2569,12 @@ class CRMUserResource(CRMServiceModelResource):
     '''
 #    user = fields.ToOneField('alm_user.api.UserResource', 'user', null=True, full=True, readonly=True)
     unfollow_list = CustomToManyField(ContactResource, 'unfollow_list', null=True, full=False, full_use_ids=True)
+    # unfollow_list = fields.ListField(attribute=lambda bundle: bundle.obj.values_list('unfollow_list__id', flat=True))
     vcard = fields.ToOneField('alm_vcard.api.VCardResource',
         attribute=lambda bundle: bundle.obj.get_billing_user(cache=True).vcard, null=True, full=True)
 
     class Meta(CommonMeta):
-        queryset = CRMUser.objects.all().prefetch_related('unfollow_list')
+        queryset = CRMUser.objects.all().prefetch_related('unfollow_list').select_related('unfollow_list__vcard')
         resource_name = 'crmuser'
         filtering = {
             "id": ALL,
@@ -2612,14 +2645,14 @@ class ShareResource(CRMServiceModelResource):
 
     @undocumented: prepend_urls, Meta
     '''
-    contact = fields.ToOneField(ContactResource, 'contact')
+    contact = fields.ToOneField(ContactResource, 'contact', full=False)
     share_to = fields.ToOneField(CRMUserResource, 'share_to',
-                                 full=True, null=True)
+                                 full=False, null=True)
     share_from = fields.ToOneField(CRMUserResource, 'share_from',
-                                   full=True, null=True)
+                                   full=False, null=True)
 
     class Meta(CommonMeta):
-        queryset = Share.objects.all()
+        queryset = Share.objects.all().select_related('contact', 'share_to', 'share_from')
         resource_name = 'share'
         excludes = ['subscription_id', 'description']
 
@@ -2713,13 +2746,13 @@ class ShareResource(CRMServiceModelResource):
             )
 
     def dehydrate_contact(self, bundle):
-        return bundle.obj.contact.id
+        return bundle.obj.contact_id
 
     def dehydrate_share_from(self, bundle):
-        return bundle.obj.share_from.id
+        return bundle.obj.share_from_id
 
     def dehydrate_share_to(self, bundle):
-        return bundle.obj.share_to.id
+        return bundle.obj.share_to_id
 
     def hydrate_contact(self, bundle):
         contact = Contact.objects.get(id=bundle.data['contact'])
@@ -3343,10 +3376,14 @@ class AppStateObject(object):
     #     # return CRMUserResource().get_bundle_list(crmusers, self.request)
 
     def get_company(self):
-        data = model_to_dict(self.company, fields=['name', 'subdomain', 'id'])
-        crmuser = \
-            self.company.owner.first().get_subscr_user(self.subscription_id)
-        data.update({'owner_id': crmuser.pk})
+        data = {
+            'id': self.company.id,
+            'name': self.company.name,
+            'subdomain': self.company.subdomain}
+        crmuser = CRMUser.objects.get(
+            user_id=self.company.owner.first().pk,
+            subscription_id=self.subscription_id)
+        data['owner_id'] = crmuser.pk
         return [data]
 
     # def get_contacts(self):
@@ -3467,11 +3504,8 @@ class AppStateObject(object):
     #     # return FilterResource().get_bundle_list(filters, self.request)
 
     def get_categories(self):
-        seq = [x.data for x in Category.objects.filter(
+        return [x.data for x in Category.objects.filter(
             vcard__contact__subscription_id=self.subscription_id)]
-        categories = [x for x in list(OrderedDict.fromkeys(seq))]
-        return categories
-
     # def get_products(self):
     #     products = Product.get_products(self.subscription_id)
 
@@ -3498,11 +3532,12 @@ class AppStateObject(object):
     #     return map(_map, product_groups)
 
     def get_sales_cycle2products_map(self):
-        sales_cycles = SalesCycle.get_salescycles_by_last_activity_date(
-            self.subscription_id, all=True, include_activities=False).prefetch_related('products')
         data = {}
-        for sc in sales_cycles:
-            data[sc.id] = [p.id for p in sc.products.all()]
+        for p in Product.get_products(self.subscription_id).prefetch_related('sales_cycles'):
+            for cycle in p.sales_cycles.all():
+                if not cycle.id in data:
+                    data[cycle.id] = []
+                data[cycle.id].append(p.id)
         return data
 
     # def get_shares(self):

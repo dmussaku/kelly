@@ -14,3 +14,4 @@ src/htmlcov/*
 pids
 logs
 conf/supervisord.conf
+alma

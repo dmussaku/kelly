@@ -17,6 +17,7 @@ django-mailviews==0.6.3
 django-model-utils==2.2
 django-nose2==0.1.1
 django-tastypie==0.12.1
+-e git+git@github.com:Rustem/django-tastypie.git@v0.12.5#egg=tastypie
 django-tastypie-swagger==0.1.2
 django-timezone-field==1.1
 git+https://github.com/Rustem/django-vcard.git@1402d6c89378c026f2fd45f1ac8ccbfeebc0305f#egg=django_vcard-master
