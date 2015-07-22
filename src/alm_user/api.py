@@ -172,7 +172,7 @@ class UserResource(ModelResource):
             user = request.user
 
             if old_password is None or new_password is None:
-                self.error_response(request, {}, response_class=HttpBadRequest)
+                self.error_response(request, {}, response_class=http.HttpBadRequest)
 
             print old_password, new_password
             if user.check_password(old_password):

@@ -1867,7 +1867,7 @@ class SalesCycleResource(CRMServiceModelResource):
 
     def save(self, bundle, **kwargs):
         bundle = super(SalesCycleResource, self).save(bundle, **kwargs)
-        if 'milestone_id' in bundle.data:
+        if 'milestone_id' in bundle.data and bundle.data['milestone_id'] is not None:
             milestone = Milestone.objects.get(pk=bundle.data.get('milestone_id'))
             bundle.obj.milestone = milestone
         bundle.obj.save()
