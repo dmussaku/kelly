@@ -65,6 +65,7 @@ from almanet.settings import DEFAULT_SERVICE
 from almanet.settings import TIME_ZONE
 from almanet.utils.api import RequestContext
 from almanet.utils.env import get_subscr_id
+from almanet.utils.ds import StreamList
 from django.conf.urls import url
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
@@ -209,7 +210,10 @@ class CommonMeta:
     authentication = MultiAuthentication(SessionAuthentication(),
                                          BasicAuthentication())
     authorization = Authorization()
-    paginator_class = DummyPaginator
+    
+    if not settings.RUSTEM_SETTINGS:
+        paginator_class = DummyPaginator
+    
     filtering = {
         'date_edited': ALL_WITH_RELATIONS
     }
@@ -448,6 +452,12 @@ class ContactResource(CRMServiceModelResource):
                 self.wrap_view('delete_contacts'),
                 name='api_delete_contacts_from_vcard'
             ),
+            url(
+                r"^(?P<resource_name>%s)/state%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('get_contact_state'),
+                name='api_get_contact_state'
+            )
         ]
 
     def get_meta_dict(self, limit, offset, count, url):
@@ -535,6 +545,7 @@ class ContactResource(CRMServiceModelResource):
                 )
             )
         return bundle
+
     def full_dehydrate(self, bundle, for_list=False):
         '''Custom representation of followers, assignees etc.'''
         bundle = super(self.__class__, self).full_dehydrate(bundle, for_list=for_list)
@@ -816,6 +827,29 @@ class ContactResource(CRMServiceModelResource):
             obj_dict['activities'] = self.get_bundle_list(contacts[1], request)
             obj_dict['dict'] = contacts[2]
             return self.create_response(request, obj_dict)
+
+    def get_contact_state(self, request, **kwargs):
+        with RequestContext(self, request, allowed_methods=['get']):
+            base_bundle = self.build_bundle(request=request)
+            objects = self.obj_get_list(bundle=base_bundle, **self.remove_api_resource_names(kwargs))
+            bundles = []
+            vcard_rsr = VCardResource()
+            bundles = (
+                {
+                    'id': obj.id,
+                    'author_id': obj.owner_id,
+                    'date_created': obj.date_created,
+                    'date_edited': obj.date_edited,
+                    'owner': obj.owner_id,
+                    'parent_id': obj.parent_id,
+                    'status': obj.status,
+                    'tp': obj.tp,
+                    'subscription_id': obj.subscription_id,
+                    'children': list(contact.id for contact in obj.children.all()),
+                    'sales_cycles': list(cycle.id for cycle in obj.sales_cycles.all()),
+                    'vcard': vcard_rsr.full_dehydrate(vcard_rsr.build_bundle(obj=obj.vcard, request=request))
+                } for obj in objects)
+        return self.create_response(request, StreamList(bundles))
 
     def get_cold_base(self, request, **kwargs):
         '''
@@ -2867,10 +2901,14 @@ class AppStateObject(object):
     #     # return CRMUserResource().get_bundle_list(crmusers, self.request)
 
     def get_company(self):
-        data = model_to_dict(self.company, fields=['name', 'subdomain', 'id'])
-        crmuser = \
-            self.company.owner.first().get_subscr_user(self.subscription_id)
-        data.update({'owner_id': crmuser.pk})
+        data = {
+            'id': self.company.id,
+            'name': self.company.name,
+            'subdomain': self.company.subdomain}
+        crmuser = CRMUser.objects.get(
+            user_id=self.company.owner.first().pk,
+            subscription_id=self.subscription_id)
+        data['owner_id'] = crmuser.pk
         return [data]
 
     # def get_contacts(self):
@@ -2991,11 +3029,8 @@ class AppStateObject(object):
     #     # return FilterResource().get_bundle_list(filters, self.request)
 
     def get_categories(self):
-        seq = [x.data for x in Category.objects.filter(
+        return [x.data for x in Category.objects.filter(
             vcard__contact__subscription_id=self.subscription_id)]
-        categories = [x for x in list(OrderedDict.fromkeys(seq))]
-        return categories
-
     # def get_products(self):
     #     products = Product.get_products(self.subscription_id)
 
@@ -3022,11 +3057,12 @@ class AppStateObject(object):
     #     return map(_map, product_groups)
 
     def get_sales_cycle2products_map(self):
-        sales_cycles = SalesCycle.get_salescycles_by_last_activity_date(
-            self.subscription_id, all=True, include_activities=False).prefetch_related('products')
         data = {}
-        for sc in sales_cycles:
-            data[sc.id] = [p.id for p in sc.products.all()]
+        for p in Product.get_products(self.subscription_id).prefetch_related('sales_cycles'):
+            for cycle in p.sales_cycles.all():
+                if not cycle.id in data:
+                    data[cycle.id] = []
+                data[cycle.id].append(p.id)
         return data
 
     # def get_shares(self):
