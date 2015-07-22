@@ -1060,6 +1060,9 @@ class Note(models.Model):
     vcard = models.ForeignKey(VCard)
     data = models.TextField()
 
+    def __unicode__(self):
+        return self.data
+
     class Meta:
         verbose_name = _("note")
         verbose_name_plural = _("notes")
