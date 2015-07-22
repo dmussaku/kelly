@@ -65,8 +65,8 @@ class VCardResource(ModelResource):
     #                           related_name='vcard', null=True, full=True)
     # nicknames = fields.ToManyField('alm_vcard.api.VCardNicknameResource', 'nickname_set',
     #                           related_name='vcard', null=True, full=True)
-    # notes = fields.ToManyField('alm_vcard.api.VCardNoteResource', 'note_set',
-    #                           related_name='vcard', null=True, full=True)
+    notes = fields.ToManyField('alm_vcard.api.VCardNoteResource', 'note_set',
+                              related_name='vcard', null=True, full=True)
     # roles = fields.ToManyField('alm_vcard.api.VCardRoleResource', 'role_set',
     #                           related_name='vcard', null=True, full=True)
     titles = fields.ToManyField('alm_vcard.api.VCardTitleResource', 'title_set',

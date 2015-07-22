@@ -1103,6 +1103,13 @@ class Contact(SubscriptionObject):
         activities = []
         sales_cycles = []
         shares = []
+        try:
+            note_data = self.vcard.note_set.last().data
+        except:
+            note_data = ""
+        for obj in alias_objects:
+            if obj.vcard.note_set.all():
+                note_data += '|||||| ' + obj.vcard.note_set.last().data
         with transaction.atomic():
             for obj in alias_objects:
                 for sales_cycle in obj.sales_cycles.all():
@@ -1119,6 +1126,10 @@ class Contact(SubscriptionObject):
 
         # Merging vcards
         VCard.merge_model_objects(self.vcard, [c.vcard for c in alias_objects])
+        self.vcard.note_set.all().delete()
+        if note_data:
+            note = Note(data=note_data, vcard=self.vcard)
+            note.save()
         #mergin shares
         with transaction.atomic():
             for obj in alias_objects:
