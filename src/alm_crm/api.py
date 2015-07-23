@@ -595,6 +595,12 @@ class ContactResource(CRMServiceModelResource):
                 (self._meta.resource_name, trailing_slash()),
                 self.wrap_view('get_contact_state'),
                 name='api_get_contact_state'
+            ),
+            url(
+                r"^(?P<resource_name>%s)/vcardstate%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('get_vcard_state'),
+                name='api_get_vcard_state'
             )   
         ]
 
@@ -982,10 +988,6 @@ class ContactResource(CRMServiceModelResource):
         with RequestContext(self, request, allowed_methods=['get']):
             base_bundle = self.build_bundle(request=request)
             objects = self.obj_get_list(bundle=base_bundle, **self.remove_api_resource_names(kwargs))
-            bundles, vcard_bundles = [], {
-                vcard_raw['id']: vcard_raw for vcard_raw in 
-                serialize_objs((obj.vcard for obj in objects))}
-            # vcard_rsr = VCardResource()
             bundles = (
                 {
                     'id': obj.id,
@@ -999,9 +1001,16 @@ class ContactResource(CRMServiceModelResource):
                     'subscription_id': obj.subscription_id,
                     'children': list(contact.id for contact in obj.children.all()),
                     'sales_cycles': list(cycle.id for cycle in obj.sales_cycles.all()),
-                    'vcard': vcard_bundles[obj.vcard_id]
+                    'vcard_id': obj.vcard_id
                 } for obj in objects)
         return self.create_response(request, StreamList(bundles))
+
+    def get_vcard_state(self, request, **kwargs):
+        with RequestContext(self, request, allowed_methods=['get']):
+            base_bundle = self.build_bundle(request=request)
+            objects = self.obj_get_list(bundle=base_bundle, **self.remove_api_resource_names(kwargs))
+            vcard_bundles = serialize_objs((obj.vcard for obj in objects))
+        return self.create_response(request, vcard_bundles)
 
     def get_cold_base(self, request, **kwargs):
         '''
