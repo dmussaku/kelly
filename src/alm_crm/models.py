@@ -1117,7 +1117,7 @@ class Contact(SubscriptionObject):
             note_data = ""
         for obj in alias_objects:
             if obj.vcard.note_set.all():
-                note_data += '|||||| ' + obj.vcard.note_set.last().data
+                note_data += "\n" + obj.vcard.note_set.last().data
         with transaction.atomic():
             for obj in alias_objects:
                 for sales_cycle in obj.sales_cycles.all():
