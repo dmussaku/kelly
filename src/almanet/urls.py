@@ -36,6 +36,7 @@ from alm_crm.api import (
     CommentResource,
     CustomSectionResource,
     CustomFieldResource,
+    CustomFieldValueResource,
     ReportResource,
     HashTagReferenceResource,
     )
@@ -71,6 +72,7 @@ v1_api.register(FilterResource())
 v1_api.register(CommentResource())
 v1_api.register(CustomSectionResource())
 v1_api.register(CustomFieldResource())
+v1_api.register(CustomFieldValueResource())
 v1_api.register(MilestoneResource())
 v1_api.register(ReportResource())
 v1_api.register(HashTagReferenceResource())

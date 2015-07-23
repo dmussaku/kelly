@@ -65,11 +65,18 @@ class CRMUser(SubscriptionObject):
         """Returns a original user.
         Raises:
            User.DoesNotExist exception if no such relation exist"""
-        user = self.user if cache and hasattr(self, 'user') else User.objects.get(pk=self.user_id)
+        
+        if cache and hasattr(self, 'user'):
+            return self.user
+
+        user = User.objects.filter(pk=self.user_id).select_related('vcard').prefetch_related(
+            'vcard__tel_set', 'vcard__category_set',
+            'vcard__adr_set', 'vcard__title_set', 'vcard__url_set',
+            'vcard__org_set', 'vcard__email_set').first()
         if cache:
             self.user = user
         return user
-
+        
     def set_supervisor(self, save=False):
         self.is_supervisor = True
         if save:
@@ -180,6 +187,7 @@ class Contact(SubscriptionObject):
     comments = generic.GenericRelation('Comment')
     import_task = models.ForeignKey(
         'ImportTask', blank=True, null=True, related_name='contacts', on_delete=models.SET_NULL)
+    custom_field_values = generic.GenericRelation('CustomFieldValue')
 
     class Meta:
         verbose_name = _('contact')
@@ -1103,6 +1111,13 @@ class Contact(SubscriptionObject):
         activities = []
         sales_cycles = []
         shares = []
+        try:
+            note_data = self.vcard.note_set.last().data
+        except:
+            note_data = ""
+        for obj in alias_objects:
+            if obj.vcard.note_set.all():
+                note_data += '|||||| ' + obj.vcard.note_set.last().data
         with transaction.atomic():
             for obj in alias_objects:
                 for sales_cycle in obj.sales_cycles.all():
@@ -1119,6 +1134,10 @@ class Contact(SubscriptionObject):
 
         # Merging vcards
         VCard.merge_model_objects(self.vcard, [c.vcard for c in alias_objects])
+        self.vcard.note_set.all().delete()
+        if note_data:
+            note = Note(data=note_data, vcard=self.vcard)
+            note.save()
         #mergin shares
         with transaction.atomic():
             for obj in alias_objects:
@@ -1212,9 +1231,7 @@ class Product(SubscriptionObject):
                                 default='KZT')
     owner = models.ForeignKey('CRMUser', related_name='crm_products',
                               null=True, blank=True)
-    custom_sections = generic.GenericRelation('CustomSection')
-    custom_fields = generic.GenericRelation('CustomField')
-
+    custom_field_values = generic.GenericRelation('CustomFieldValue')
 
     class Meta:
         verbose_name = _('product')
@@ -1285,15 +1302,19 @@ class Product(SubscriptionObject):
             else:
                 product.price = 0
             product.save()
-            for i in range(0, len(row_vals[3:])):
-                if row_vals[i]:
-                    field = CustomField.build_new(
-                        title=col_names[i],
-                        value=row_vals[i],
-                        content_class=Product,
-                        object_id=product.id,
-                        save=True
-                        )
+            # for i in range(0, len(row_vals[3:])):
+            #     if row_vals[i]:
+            #         field = CustomField(title=col_names[i], content_type=ContentType.objects.get_for_model(Product))
+            #         field.save()
+            #         field_value = CustomFieldValue.build_new(field=field, value=row_vals[i],
+            #                                                 object_id=product.id, save=True)
+            #         field = CustomField.build_new(
+            #             title=col_names[i],
+            #             value=row_vals[i],
+            #             content_class=Product,
+            #             object_id=product.id,
+            #             save=True
+            #             )
             product_list.append(product)
         return product_list
 
@@ -1502,6 +1523,11 @@ class SalesCycle(SubscriptionObject):
         self.milestone = milestone
         self.save()
 
+        for log_entry in self.log.all():
+            if log_entry.entry_type == SalesCycleLogEntry.ME or \
+               log_entry.entry_type == SalesCycleLogEntry.MD:
+               log_entry.delete()
+
         sc_log_entry = SalesCycleLogEntry(meta=meta,
                                           entry_type=SalesCycleLogEntry.MC,
                                           sales_cycle=self,
@@ -1600,9 +1626,9 @@ class SalesCycleLogEntry(SubscriptionObject):
     TYPES_CAPS = (
         _('Milestone change'),
     )
-    TYPES = (MC, ) = ('MC', )
+    TYPES = (MC, ME, MD) = ('MC', 'ME', 'MD')
     TYPES_OPTIONS = zip(TYPES, TYPES_CAPS)
-    TYPES_DICT = dict(zip(('MC', ), TYPES))
+    TYPES_DICT = dict(zip(('MC', 'ME', 'MD'), TYPES))
 
     meta = models.TextField(null=True, blank=True)
     sales_cycle = models.ForeignKey(SalesCycle, related_name='log')
@@ -1621,7 +1647,7 @@ class Activity(SubscriptionObject):
     owner = models.ForeignKey(CRMUser, related_name='activity_owner')
     mentions = generic.GenericRelation('Mention', null=True)
     comments = generic.GenericRelation('Comment', null=True)
-    hashtags = generic.GenericRelation('HashTagReference')
+    hashtags = generic.GenericRelation('HashTagReference', null=True, blank=True)
 
     class Meta:
         verbose_name = 'activity'
@@ -1935,7 +1961,7 @@ class Comment(SubscriptionObject):
     content_type = models.ForeignKey(ContentType)
     content_object = generic.GenericForeignKey('content_type', 'object_id')
     mentions = generic.GenericRelation('Mention')
-    hashtags = generic.GenericRelation('HashTagReference')
+    hashtags = generic.GenericRelation('HashTagReference', null=True, blank=True)
 
     def __unicode__(self):
         return "%s's comment" % (self.owner)
@@ -1988,7 +2014,7 @@ class Share(SubscriptionObject):
     share_from = models.ForeignKey(CRMUser, related_name='owned_shares')
     comments = generic.GenericRelation('Comment')
     note = models.CharField(max_length=500, null=True)
-    hashtags = generic.GenericRelation('HashTagReference')
+    hashtags = generic.GenericRelation('HashTagReference', null=True, blank=True)
     mentions = generic.GenericRelation('Mention')
 
     class Meta:
@@ -2053,7 +2079,8 @@ def check_is_title_empty(sender, instance=None, **kwargs):
         raise Exception("Requires non empty value")
 
 def create_milestones(sender, instance, **kwargs):
-    milestones = Milestone.create_default_milestones(instance.id)
+    if Milestone.objects.filter(subscription_id=instance.id).count() == 0:
+        milestones = Milestone.create_default_milestones(instance.id)
 
 def delete_related_milestones(sender, instance, **kwargs):
     for milestone in Milestone.objects.filter(subscription_id=instance.id):
@@ -2268,41 +2295,51 @@ class CustomSection(SubscriptionObject):
 
 class CustomField(SubscriptionObject):
     title = models.CharField(max_length=255, null=True, blank=True)
-    value = models.TextField(null=True, blank=True)
     content_type = models.ForeignKey(ContentType, null=True, blank=True)
-    object_id = models.IntegerField(null=True, blank=True)
-    content_object = generic.GenericForeignKey('content_type', 'object_id')
-    section = models.ForeignKey('CustomSection', related_name='custom_fields', null=True, blank=True)
-
-    @property
-    def owner(self):
-        if self.section:
-            return self.section.owner
-        if self.content_object.__class__ == VCard:
-            return self.content_object.contact.owner
-        return self.content_object.owner
 
     class Meta:
         verbose_name = _('custom_field')
         db_table = settings.DB_PREFIX.format('custom_fields')
 
     def __unicode__(self):
-        return u'%s: %s' % (self.title, self.value)
+        return u'%s' % (self.title)
 
     @classmethod
-    def build_new(cls, section=None, title=None, value=None, content_class=None,
-                  object_id=None, save=False):
-        custom_field = cls(title=title, value=value)
-        if section:
-            custom_field.section=section
-            custom_field.content_type = section.content_type
-            custom_field.object_id = section.object_id
-        if content_class and object_id:
+    def build_new(cls, title=None, content_class=None, save=False):
+        custom_field = cls(title=title)
+        if content_class:
             custom_field.content_type = ContentType.objects.get_for_model(content_class)
-            custom_field.object_id = object_id
         if save:
             custom_field.save()
         return custom_field
+
+class CustomFieldValue(SubscriptionObject):
+    custom_field = models.ForeignKey('CustomField', related_name="values")
+    value = models.TextField(null=True, blank=True)
+    content_type = models.ForeignKey(ContentType, null=True, blank=True)
+    object_id = models.IntegerField(null=True, blank=True)
+    content_object = generic.GenericForeignKey('content_type', 'object_id')
+
+    @property
+    def owner(self):
+        return self.content_object.owner
+
+    class Meta:
+        verbose_name = _('custom_field_value')
+        db_table = settings.DB_PREFIX.format('custom_field_values')
+
+    def __unicode__(self):
+        return u'%s: %s' % (self.custom_field.title, self.value)
+
+    @classmethod
+    def build_new(cls, field, value=None, object_id=None, save=False):
+        custom_field_val = cls(custom_field=field, value=value)
+        if object_id:
+            custom_field_val.content_type = field.content_type
+            custom_field_val.object_id = object_id
+        if save:
+            custom_field_val.save()
+        return custom_field_val
 
 class ImportTask(models.Model):
     uuid = models.CharField(blank=True, null=True, max_length=100)

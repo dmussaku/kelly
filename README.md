@@ -88,7 +88,29 @@ Attention: '+' indicates add it to original STATICFILES_DIRS. The final constant
  ```
 
 
+Restore from dump
+-----------------
+
+1. Drop database: `dropdb almanet`
+2. Create database:
+  2.1 `sudo -u postgres psql`
+  2.2 `CREATE DATABASE almanet WITH OWNER = xepa4ep ENCODING = 'UTF-8'`
+  2.3 test session - `sudo -u postgres psql -d almanet`
+3. Grant all privilleges
+  3.1 `sudo -u postgres psql -d almanet`
+  3.2 `GRANT ALL ON SCHEMA PUBLIC TO almanet`
+  3.3 check permissions - `\dn+`
+4. Restore data
+  4.1 `sudo -u postgres psql -U xepa4ep -d almanet -W -f dbdumps/almanet.sql`
+5. Post restore
+  5.1 enter postres user mode - `su postgres`
+  5.2 execute post restore script - `./postgres_restore_post.sh almanet xepa4ep`
+
+
 MAC OSX deps
 -----------
 
 Memcached (pylibmc) -- `brew install libmemcached`
+
+Load postgres libraries into path, for ex for Postgres 9.4
+`sudo ln -sf /Library/PostgreSQL/9.4/lib/YOUR_LIB.dylib /usr/lib`
