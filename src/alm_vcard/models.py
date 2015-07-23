@@ -11,6 +11,11 @@ from django.conf import settings
 from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
 
+from django.db import transaction
+from django.db.models import get_models, Model
+from django.contrib.contenttypes.generic import GenericForeignKey
+from almanet.utils.metaprogramming import SerializableModel
+
 
 class VObjectImportException(Exception):
     message = _("The vCard could not be converted into a vObject")
@@ -716,7 +721,8 @@ class VCard(models.Model):
         return self.toVObject().serialize()
 
 
-class Tel(models.Model):
+
+class Tel(SerializableModel):
     """
     A telephone number of a contact
     """
@@ -748,8 +754,12 @@ class Tel(models.Model):
         verbose_name = _("telephone number")
         verbose_name_plural = _("telephone numbers")
 
+    class SerializerMeta:
+        exclude = ['vcard']
+        alias = 'tels'
 
-class Email(models.Model):
+
+class Email(SerializableModel):
     """
     An email of a contact
     """
@@ -771,6 +781,10 @@ class Email(models.Model):
     def __unicode__(self):
         return '%s' % self.value
 
+    class SerializerMeta:
+        exclude = ['vcard']
+        alias = 'emails'
+
 
 class Geo(models.Model):
     """
@@ -787,7 +801,7 @@ class Geo(models.Model):
         verbose_name_plural = _("geographic uri's")
 
 
-class Org(models.Model):
+class Org(SerializableModel):
     """
     An organization and unit the contact is affiliated with.
     """
@@ -809,8 +823,12 @@ class Org(models.Model):
     def name(self):
         return self.organization_name
 
+    class SerializerMeta:
+        exclude = ['vcard']
+        alias = 'orgs'
 
-class Adr(models.Model):
+
+class Adr(SerializableModel):
     """
     An address
     """
@@ -865,6 +883,10 @@ class Adr(models.Model):
         adr.save()
         return adr
 
+    class SerializerMeta:
+        exclude = ['vcard']
+        alias = 'adrs'
+
 
 class Agent(models.Model):
     """
@@ -878,7 +900,7 @@ class Agent(models.Model):
         verbose_name_plural = _("agents")
 
 
-class Category(models.Model):
+class Category(SerializableModel):
     """
     Specifies application category information about the
     contact.  Also known as "tags".
@@ -892,6 +914,10 @@ class Category(models.Model):
 
     def __unicode__(self):
         return self.data
+
+    class SerializerMeta:
+        exclude = ['vcard']
+        alias = 'categories'
 
 
 class Key(models.Model):
@@ -966,7 +992,7 @@ class Nickname(models.Model):
         verbose_name_plural = _("nicknames")
 
 
-class Note(models.Model):
+class Note(SerializableModel):
     """
     Supplemental information or a comment that is
     associated with the vCard.
@@ -977,6 +1003,10 @@ class Note(models.Model):
     class Meta:
         verbose_name = _("note")
         verbose_name_plural = _("notes")
+
+    class SerializerMeta:
+        exclude = ['vcard']
+        alias = 'notes'
 
 
 # class Photo(models.Model):
@@ -1034,7 +1064,7 @@ class Role(models.Model):
 #    data = models.TextField()
 
 
-class Title(models.Model):
+class Title(SerializableModel):
     """
     The position or job of the contact
     """
@@ -1048,6 +1078,10 @@ class Title(models.Model):
     def __eq__(self, r):
         l = self
         return l.data == r.data
+
+    class SerializerMeta:
+        exclude = ['vcard']
+        alias = 'titles'
 
 
 class Tz(models.Model):
@@ -1065,7 +1099,7 @@ class Tz(models.Model):
         verbose_name_plural = _("time zones")
 
 
-class Url(models.Model):
+class Url(SerializableModel):
     """
     A Url associted with a contact.
     """
@@ -1080,3 +1114,7 @@ class Url(models.Model):
     class Meta:
         verbose_name = _("url")
         verbose_name_plural = _("url's")
+
+    class SerializerMeta:
+        exclude = ['vcard']
+        alias = 'urls'
