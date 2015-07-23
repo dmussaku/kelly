@@ -1534,6 +1534,8 @@ class SalesCycle(SubscriptionObject):
             prev_milestone_color_code = self.milestone.color_code
 
         self.milestone = milestone
+        self.real_value = None
+        self.projected_value = None
         self.save()
 
         for log_entry in self.log.all():

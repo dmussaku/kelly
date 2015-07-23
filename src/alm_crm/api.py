@@ -1695,7 +1695,7 @@ class SalesCycleResource(CRMServiceModelResource):
     def prepend_urls(self):
         return [
             url(
-                r"^(?P<resource_name>%s)/(?P<id>\d+)/(?P<status>\w+)%s$" %
+                r"^(?P<resource_name>%s)/(?P<id>\d+)/close/(?P<status>\w+)%s$" %
                 (self._meta.resource_name, trailing_slash()),
                 self.wrap_view('close'),
                 name='api_close'
@@ -1884,8 +1884,7 @@ class SalesCycleResource(CRMServiceModelResource):
                 format=request.META.get('CONTENT_TYPE', 'application/json'))
 
             sales_cycle = obj.change_milestone(crmuser=request.user.get_crmuser(),
-                                               milestone_id=deserialized['milestone_id'],
-                                               meta=json.dumps(deserialized['meta']))
+                                               milestone_id=deserialized['milestone_id'])
 
             if not self._meta.always_return_data:
                 return http.HttpAccepted()
