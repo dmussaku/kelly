@@ -2022,15 +2022,9 @@ class Share(SubscriptionObject):
         return u'%s : %s -> %s' % (self.contact, self.share_from, self.share_to)
 
 
-def parse_note_text(sender, instance=None, **kwargs):
-    from utils.parser import text_parser
-    for note in Note.objects.filter(vcard = instance.vcard):
-        text_parser(base_text=note.data, content_class=instance.__class__,
-                    object_id=instance.id)
 
 signals.post_save.connect(
     Contact.upd_lst_activity_on_create, sender=Activity)
-signals.post_save.connect(parse_note_text, sender=Contact)
 signals.post_save.connect(
     Contact.upd_status_when_first_activity_created, sender=Activity)
 signals.post_save.connect(
