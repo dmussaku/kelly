@@ -4397,7 +4397,7 @@ class ReportResource(Resource):
 
         return self.create_response(
             request,
-            report_builders.build_funnel(request.user.get_crmuser().subscription_id), data)
+            report_builders.build_funnel(request.user.get_crmuser().subscription_id, data))
 
     def realtime_funnel(self, request, **kwargs):
         '''
@@ -4412,7 +4412,7 @@ class ReportResource(Resource):
 
         return self.create_response(
             request,
-            report_builders.build_realtime_funnel(request.user.get_crmuser().subscription_id), data)
+            report_builders.build_realtime_funnel(request.user.get_crmuser().subscription_id, data))
 
 
     def user_report(self, request, **kwargs):
