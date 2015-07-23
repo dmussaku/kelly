@@ -18,15 +18,11 @@ def build_funnel(subscription_id, data={}):
 	rv = {
 		'report_name': 'funnel'
 	}
+	sales_cycles = SalesCycle.objects.filter(subscription_id=subscription_id, is_global=False)
 	if data:
-		product_ids = data.get('product_ids', [])
-		if product_ids:
-			sales_cycles = SalesCycle.objects.filter(
-				subscription_id=subscription_id, 
-				products__in=product_ids, 
-				is_global=False)
-	else:
-		sales_cycles = SalesCycle.objects.filter(subscription_id=subscription_id, is_global=False)
+		products = data.get('products', [])
+		if products:
+			sales_cycles = sales_cycles.filter(products__in=products)
 	rv['total'] = len(sales_cycles)
 
 	rv['undefined'] = len(filter(lambda sc: sc.milestone == None, sales_cycles))
@@ -44,15 +40,12 @@ def build_realtime_funnel(subscription_id, data={}):
 	rv = {
 		'report_name': 'realtime_funnel'
 	}
+	sales_cycles = SalesCycle.objects.filter(subscription_id=subscription_id, is_global=False)
 	if data:
-		product_ids = data.get('product_ids', [])
-		if product_ids:
-			sales_cycles = SalesCycle.objects.filter(
-				subscription_id=subscription_id, 
-				products__in=product_ids, 
-				is_global=False)
-	else:
-		sales_cycles = SalesCycle.objects.filter(subscription_id=subscription_id, is_global=False)
+		products = data.get('products', [])
+		if products:
+			sales_cycles = sales_cycles.filter(products__in=products)
+
 	rv['total'] = len(sales_cycles)
 
 	rv['undefined'] = len(filter(lambda sc: sc.milestone == None, sales_cycles))
