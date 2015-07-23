@@ -14,15 +14,17 @@ from datetime import datetime
 from django.utils import timezone
 import pytz
 
-def build_funnel(subscription_id, product_ids=[]):
+def build_funnel(subscription_id, data={}):
 	rv = {
 		'report_name': 'funnel'
 	}
-	if product_ids:
-		sales_cycles = SalesCycle.objects.filter(
-			subscription_id=subscription_id, 
-			products__in=product_ids, 
-			is_global=False)
+	if data:
+		product_ids = data.get('product_ids', [])
+		if product_ids:
+			sales_cycles = SalesCycle.objects.filter(
+				subscription_id=subscription_id, 
+				products__in=product_ids, 
+				is_global=False)
 	else:
 		sales_cycles = SalesCycle.objects.filter(subscription_id=subscription_id, is_global=False)
 	rv['total'] = len(sales_cycles)
@@ -38,15 +40,17 @@ def build_funnel(subscription_id, product_ids=[]):
 		sc_in_funnel = [sc for sc in sc_in_funnel if sc.milestone.id != m.id]
 	return rv
 
-def build_realtime_funnel(subscription_id, product_ids=[]):
+def build_realtime_funnel(subscription_id, data={}):
 	rv = {
 		'report_name': 'realtime_funnel'
 	}
-	if product_ids:
-		sales_cycles = SalesCycle.objects.filter(
-			subscription_id=subscription_id, 
-			products__in=product_ids, 
-			is_global=False)
+	if data:
+		product_ids = data.get('product_ids', [])
+		if product_ids:
+			sales_cycles = SalesCycle.objects.filter(
+				subscription_id=subscription_id, 
+				products__in=product_ids, 
+				is_global=False)
 	else:
 		sales_cycles = SalesCycle.objects.filter(subscription_id=subscription_id, is_global=False)
 	rv['total'] = len(sales_cycles)
