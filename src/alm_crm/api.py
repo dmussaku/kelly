@@ -4388,21 +4388,32 @@ class ReportResource(Resource):
         '''
         retrieves data for building sales funnel
         '''
+        data = self.deserialize(
+            request, request.body,
+            format=request.META.get('CONTENT_TYPE', 'application/json'))
 
+        product_ids = data.get('product_ids', [])
+
+        assert isinstance(product_ids, (list, tuple)), 'Must be a list'
 
         return self.create_response(
             request,
-            report_builders.build_funnel(request.user.get_crmuser().subscription_id))
+            report_builders.build_funnel(request.user.get_crmuser().subscription_id), product_ids)
 
     def realtime_funnel(self, request, **kwargs):
         '''
         retrieves data for building sales funnel
         '''
+        data = self.deserialize(
+            request, request.body,
+            format=request.META.get('CONTENT_TYPE', 'application/json'))
 
+        product_ids = data.get('product_ids', [])
+        assert isinstance(product_ids, (list, tuple)), 'Must be a list'
 
         return self.create_response(
             request,
-            report_builders.build_realtime_funnel(request.user.get_crmuser().subscription_id))
+            report_builders.build_realtime_funnel(request.user.get_crmuser().subscription_id), product_ids)
 
 
     def user_report(self, request, **kwargs):
