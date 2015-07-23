@@ -59,3 +59,4 @@ vobject==0.8.1rc0
 Werkzeug==0.9.6
 xlrd==0.9.3
 XlsxWriter==0.7.3
+django-preserialize==1.1.0
