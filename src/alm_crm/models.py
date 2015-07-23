@@ -15,15 +15,24 @@ from alm_vcard.models import (
     Category,
     Adr,
     Url,
+    Note,
     )
 from alm_user.models import User
 from django.template.loader import render_to_string
+from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import signals, Q
 from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
 from django.utils import timezone
-import datetime
+from datetime import datetime, timedelta
 import xlrd
+import pytz
+import time
+from almanet.settings import TEMP_DIR, BASE_DIR
+from alm_vcard import models as vcard_models
+from celery import group, Task, result
+import simplejson as json
+# from .tasks import create_failed_contacts_xls
 
 ALLOWED_TIME_PERIODS = ['week', 'month', 'year']
 
@@ -53,12 +62,22 @@ class CRMUser(SubscriptionObject):
         u = self.get_billing_user()
         return u and u.get_username() or None
 
-    def get_billing_user(self):
+    def get_billing_user(self, cache=False):
         """Returns a original user.
         Raises:
            User.DoesNotExist exception if no such relation exist"""
-        return User.objects.get(pk=self.user_id)
+        
+        if cache and hasattr(self, 'user'):
+            return self.user
 
+        user = User.objects.filter(pk=self.user_id).select_related('vcard').prefetch_related(
+            'vcard__tel_set', 'vcard__category_set',
+            'vcard__adr_set', 'vcard__title_set', 'vcard__url_set',
+            'vcard__org_set', 'vcard__email_set').first()
+        if cache:
+            self.user = user
+        return user
+        
     def set_supervisor(self, save=False):
         self.is_supervisor = True
         if save:
@@ -94,6 +113,7 @@ class CRMUser(SubscriptionObject):
 class Milestone(SubscriptionObject):
 
     title = models.CharField(_("title"), max_length=1024, null=True, blank=True)
+    is_system = models.IntegerField(default=0)
     color_code = models.CharField(_('color code'), max_length=1024, null=True, blank=True)
 
     class Meta:
@@ -115,7 +135,7 @@ class Milestone(SubscriptionObject):
                         {'title':'Предоставление услуги', 'color_code': '#D4F49B'},
                         {'title':'Upsales', 'color_code': '#F4DC9C'}]
 
-        for data in default_data:   
+        for data in default_data:
             milestone = Milestone()
             milestone.title = data['title']
             milestone.color_code = data['color_code']
@@ -154,7 +174,6 @@ class Contact(SubscriptionObject):
         _('contact type'),
         max_length=30,
         choices=TYPES_OPTIONS, default=USER_TP)
-    date_created = models.DateTimeField(blank=True, auto_now_add=True)
     vcard = models.OneToOneField('alm_vcard.VCard', blank=True, null=True,
                                  on_delete=models.SET_NULL, related_name='contact')
     parent = models.ForeignKey(
@@ -168,6 +187,9 @@ class Contact(SubscriptionObject):
         related_name='contact_latest_activity', null=True)
     mentions = generic.GenericRelation('Mention')
     comments = generic.GenericRelation('Comment')
+    import_task = models.ForeignKey(
+        'ImportTask', blank=True, null=True, related_name='contacts', on_delete=models.SET_NULL)
+    custom_field_values = generic.GenericRelation('CustomFieldValue')
 
     class Meta:
         verbose_name = _('contact')
@@ -605,7 +627,152 @@ class Contact(SubscriptionObject):
                 # print contact_list
         return contact_list
 
+    '''
+    Creates contact from data which is row from xls file and file_structure
+    which has a specific format, here's the example of both 
+    file_structure:
+    [
+        {'num':0, 'model':'VCard', 'attr':'fn'},
+        {'num':1, 'model':'Adr', 'attr':'postal'},
+        {'num':2, 'model':'Org'},
+        {'num':3, 'model':'Email', 'attr':'internet'}
+    ]
+    data:
+    ['John Smith', 'Black water Valley;Chicago;60616;USA;;Home County;Almaty;000100;Kazakhstan',
+    'Microsoft', 'sam@gmail.com;at@gmail.com'
+    ]
 
+    The result is the response {'error':True/False, 'contact_id':n, 'error_col':m}
+    where error is boolean, n and m are integers
+    '''
+
+    @classmethod
+    def create_from_structure(cls, data, file_structure, creator, import_task):
+        contact = cls()
+        vcard = VCard()
+        response = {}
+        for structure_dict in file_structure:
+            col_num = int(structure_dict.get('num'))
+            model = getattr(vcard_models, structure_dict.get('model'))
+            if type(data[col_num].value) == float:
+                data[col_num].value = str(data[col_num].value)
+            if model == vcard_models.VCard:
+                attr = structure_dict.get('attr',"")
+                try:
+                    if type(data[col_num].value) == unicode:
+                        setattr(vcard, attr, data[col_num].value)
+                    else:
+                        setattr(vcard, attr, str(data[col_num].value))
+                    try:
+                        vcard.save()
+                    except:
+                        pass
+                except:
+                    # transaction.savepoint_rollback(sid)
+                    try:
+                        vcard.delete()
+                    except:
+                        pass
+                    response['error'] = True
+                    response['error_col'] = col_num
+                    return response
+            elif (model == vcard_models.Tel or model == vcard_models.Email 
+                        or model == vcard_models.Url):
+                try:
+                    if data[col_num].value:
+                        objects = data[col_num].value.split(';')
+                        for object in objects:
+                            v_type = structure_dict.get('attr','')
+                            obj = model(type=v_type, value = object)
+                            obj.vcard = vcard
+                            obj.save()
+                except:
+                    # transaction.savepoint_rollback(sid)
+                    try:
+                        vcard.delete()
+                    except:
+                        pass
+                    response['error'] = True
+                    response['error_col'] = col_num
+                    return response
+            elif model == vcard_models.Org:
+                try:
+                    if data[col_num].value:
+                        objects = data[col_num].value.split(';')
+                        for object in objects:
+                            v_type = structure_dict.get('attr','')
+                            obj = model(organization_name = object)
+                            obj.vcard = vcard
+                            obj.save()
+                except:
+                    # transaction.savepoint_rollback(sid)
+                    try:
+                        vcard.delete()
+                    except:
+                        pass
+                    response['error'] = True
+                    response['error_col'] = col_num
+                    return response
+            elif model == vcard_models.Adr:
+                adr_type = structure_dict.get('attr','')
+                try:
+                    if data[col_num].value:
+                        adresses = type_cast(data[col_num].value).split(';;')
+                        for address_str in adresses:
+                            addr_objs = address_str.split(';')
+                            addr_objs = [vcard, adr_type] + addr_objs
+                            address = Adr.create_from_list(addr_objs)
+                except:
+                    # transaction.savepoint_rollback(sid)
+                    try:
+                        vcard.delete()
+                    except:
+                        pass
+                    response['error'] = True
+                    response['error_col'] = col_num
+                    return response
+            elif (model == vcard_models.Geo or model == vcard_models.Agent 
+                    or model == vcard_models.Category or model == vcard_models.Key 
+                    or model == vcard_models.Label or model == vcard_models.Mailer 
+                    or model == vcard_models.Nickname or model == vcard_models.Note 
+                    or model == vcard_models.Role or model == vcard_models.Title 
+                    or model == vcard_models.Tz):
+                try:
+                    if data[col_num].value:
+                        objects = data[col_num].value.split(';')
+                        for object in objects:
+                            v_type = structure_dict.get('attr','')
+                            obj = model(data = object)
+                            obj.vcard = vcard
+                            obj.save()
+                except:
+                    # transaction.savepoint_rollback(sid)
+                    try:
+                        vcard.delete()
+                    except:
+                        pass
+                    response['error'] = True
+                    response['error_col'] = col_num
+                    return response
+        crmuser = creator.get_crmuser()
+        try:
+            vcard.save()
+        except:
+            response['error'] = True
+            response['error_col'] = 0
+            return response
+        contact.vcard = vcard
+        contact.import_task = import_task
+        contact.owner = crmuser
+        contact.subscription_id = crmuser.subscription_id
+        contact.save()
+        SalesCycle.create_globalcycle(
+                        **{'subscription_id':contact.subscription_id,
+                         'owner_id':crmuser.id,
+                         'contact_id':contact.id
+                        }
+                    )
+        return {'error':False, 'contact_id':contact.id}
 
     @classmethod
     @transaction.atomic
@@ -616,9 +783,9 @@ class Contact(SubscriptionObject):
         sid = transaction.savepoint()
         for sheet in book.sheets():
             i = 1
-            header_row = sheet.row(0)
             while(sheets_left):
                 try:
+                    header_row = sheet.row(0)
                     data = sheet.row(i)
                 except IndexError:
                     sheets_left = False
@@ -840,6 +1007,29 @@ class Contact(SubscriptionObject):
         return contacts
 
     @classmethod
+    def get_xls_structure(cls, filename, xls_file_data):
+        book = xlrd.open_workbook(file_contents=xls_file_data)
+        sheet = book.sheets()[0]
+        try:
+            data=sheet.row(0)
+        except:
+            return {'success':False}
+        ext = filename.split('.')[len(filename.split('.')) - 1]
+        new_filename = filename.strip('.' + ext) + datetime.now().__str__() + '.' + ext
+        myfile = open(
+            TEMP_DIR + new_filename,
+            'wb'
+            )
+        myfile.write(xls_file_data)
+        myfile.close()
+        return {
+            'success':True,
+            'col_num':sheet.ncols,
+            'filename':new_filename,
+            'data':[d.value for d in data]
+        }
+
+    @classmethod
     def get_contacts_by_last_activity_date(
             cls, subscription_id, user_id=None, owned=True, mentioned=False,
             in_shares=False, all=False, include_activities=False):
@@ -904,6 +1094,108 @@ class Contact(SubscriptionObject):
         q &= Q(status=cls.NEW)
         return cls.objects.filter(q).order_by('-date_created')
 
+    def merge_contacts(self, alias_objects=[], delete_merged=True):
+        t = time.time()
+        if not alias_objects:
+            return {'success':False, 'message':'No alias objects appended'}
+        for obj in alias_objects:
+            if not isinstance(obj, self.__class__):
+                return {'success':False, 'message':'Not Instance of Contact'}
+
+        # original_sales_cycles = self.sales_cycles.filter(
+        #     is_global=False) 
+        # original_activities = [obj.id for obj in Activity.objects.filter(
+        #             sales_cycle__in=self.sales_cycles.all())] 
+        # original_shares = [ obj.id for obj in self.share_set.all() ]
+        global_sales_cycle = SalesCycle.get_global(self.subscription_id, self.id)
+        deleted_sales_cycle_ids = [ obj.sales_cycles.get(is_global=True).id for obj in alias_objects ]
+        # Merging sales Cycles
+        activities = []
+        sales_cycles = []
+        shares = []
+        try:
+            note_data = self.vcard.note_set.last().data
+        except:
+            note_data = ""
+        for obj in alias_objects:
+            if obj.vcard.note_set.all():
+                note_data += '|||||| ' + obj.vcard.note_set.last().data
+        with transaction.atomic():
+            for obj in alias_objects:
+                for sales_cycle in obj.sales_cycles.all():
+                    if sales_cycle.is_global:
+                        for activity in sales_cycle.rel_activities.all():
+                            activity.sales_cycle = global_sales_cycle
+                            activity.save()
+                            activities.append(activity)
+                    else:
+                        sales_cycle.contact = self
+                        sales_cycle.save()
+                        sales_cycles.append(sales_cycle)
+                        # [activities.append(obj) for obj in sales_cycle.rel_activities.all()]
+
+        # Merging vcards
+        VCard.merge_model_objects(self.vcard, [c.vcard for c in alias_objects])
+        self.vcard.note_set.all().delete()
+        if note_data:
+            note = Note(data=note_data, vcard=self.vcard)
+            note.save()
+        #mergin shares
+        with transaction.atomic():
+            for obj in alias_objects:
+                for share in obj.share_set.all():
+                    share.contact = self
+                    share.save()
+                    shares.append(share)
+        if delete_merged:
+            deleted_contacts = [contact.id for contact in alias_objects]
+            alias_objects.delete()
+        else:
+            deleted_contacts = []
+        # sales_cycles = self.sales_cycles.all().exclude(
+        #     id__in=original_sales_cycles).prefetch_related('rel_activities')
+        # activities = Activity.objects.filter(
+        #     sales_cycle__in=self.sales_cycles.all()).exclude(id__in=original_activities)
+        # shares = self.share_set.all().exclude(id__in=original_shares)
+        response = {
+            'success':True,
+            'contact':self,
+            'deleted_contacts_ids':deleted_contacts,
+            'deleted_sales_cycle_ids':deleted_sales_cycle_ids,
+            'sales_cycles':sales_cycles,
+            'activities':activities,
+            'shares':shares,
+        }
+        # print "Approximate time of merging contacts %s " % str(time.time()-t)
+        return response
+
+
+    @classmethod
+    def delete_contacts(cls, obj_ids):
+        if isinstance(obj_ids, int):
+            obj_ids = [obj_ids]
+        assert isinstance(obj_ids, (tuple, list)), "must be a list"
+        with transaction.atomic():
+            objects = {
+                "contacts": [],
+                "sales_cycles": [],
+                "activities": [],
+                "shares": [],
+                "does_not_exist": []
+            }
+            for contact_id in obj_ids:
+                try:
+                    print contact_id
+                    obj = Contact.objects.get(id=contact_id)
+                    objects['contacts'].append(contact_id)
+                    objects['sales_cycles'] += list(obj.sales_cycles.all().values_list("id", flat=True))
+                    for sales_cycle in obj.sales_cycles.all():
+                        objects['activities'] += list(sales_cycle.rel_activities.all().values_list("id", flat=True))
+                    objects['shares'] += list(obj.share_set.all().values_list("id", flat=True))
+                    obj.delete()
+                except ObjectDoesNotExist:
+                    objects['does_not_exist'].append(contact_id)
+            return objects
 
 class Value(SubscriptionObject):
     # Type of payment
@@ -941,10 +1233,7 @@ class Product(SubscriptionObject):
                                 default='KZT')
     owner = models.ForeignKey('CRMUser', related_name='crm_products',
                               null=True, blank=True)
-    date_created = models.DateTimeField(blank=True, auto_now_add=True)
-    custom_sections = generic.GenericRelation('CustomSection')
-    custom_fields = generic.GenericRelation('CustomField')
-
+    custom_field_values = generic.GenericRelation('CustomFieldValue')
 
     class Meta:
         verbose_name = _('product')
@@ -959,7 +1248,7 @@ class Product(SubscriptionObject):
 
     @property
     def author_id(self):
-        return self.owner.id
+        return self.owner_id
 
     @author_id.setter
     def author_id(self, author_id):
@@ -1015,15 +1304,19 @@ class Product(SubscriptionObject):
             else:
                 product.price = 0
             product.save()
-            for i in range(0, len(row_vals[3:])):
-                if row_vals[i]:
-                    field = CustomField.build_new(
-                        title=col_names[i],
-                        value=row_vals[i],
-                        content_class=Product,
-                        object_id=product.id,
-                        save=True
-                        )
+            # for i in range(0, len(row_vals[3:])):
+            #     if row_vals[i]:
+            #         field = CustomField(title=col_names[i], content_type=ContentType.objects.get_for_model(Product))
+            #         field.save()
+            #         field_value = CustomFieldValue.build_new(field=field, value=row_vals[i],
+            #                                                 object_id=product.id, save=True)
+            #         field = CustomField.build_new(
+            #             title=col_names[i],
+            #             value=row_vals[i],
+            #             content_class=Product,
+            #             object_id=product.id,
+            #             save=True
+            #             )
             product_list.append(product)
         return product_list
 
@@ -1032,7 +1325,6 @@ class ProductGroup(SubscriptionObject):
     title = models.CharField(max_length=150)
     products = models.ManyToManyField(Product, related_name='product_groups',
                                    null=True, blank=True)
-    date_created = models.DateTimeField(blank=True, auto_now_add=True)
 
     class Meta:
         verbose_name = _('product_group')
@@ -1077,7 +1369,6 @@ class SalesCycle(SubscriptionObject):
         null=True, blank=True,)
     status = models.CharField(max_length=2,
                               choices=STATUSES_OPTIONS, default=NEW)
-    date_created = models.DateTimeField(blank=True, auto_now_add=True)
     from_date = models.DateTimeField(blank=False, auto_now_add=True)
     to_date = models.DateTimeField(blank=False, auto_now_add=True)
     mentions = generic.GenericRelation('Mention')
@@ -1090,6 +1381,10 @@ class SalesCycle(SubscriptionObject):
 
     def __unicode__(self):
         return '%s [%s %s]' % (self.title, self.contact, self.status)
+
+    @property
+    def activities_count(self):
+        return self.rel_activities.count()
 
     @classmethod
     def get_global(cls, subscription_id, contact_id):
@@ -1201,11 +1496,14 @@ class SalesCycle(SubscriptionObject):
         if save:
             self.save()
 
-    def set_result_by_amount(self, amount):
+    def set_result_by_amount(self, amount, succeed):
         v = Value(amount=amount, owner=self.owner)
         v.save()
 
-        self.real_value = v
+        if succeed:
+            self.real_value = v
+        else:
+            self.projected_value = v
         self.save()
 
     def add_follower(self, user_id, **kw):
@@ -1225,39 +1523,63 @@ class SalesCycle(SubscriptionObject):
                 status.append(False)
         return status
 
-    def change_milestone(self, crmuser, milestone_id, meta):
+    def change_milestone(self, crmuser, milestone_id):
         milestone = Milestone.objects.get(id=milestone_id)
+
+        prev_milestone_title = None
+        prev_milestone_color_code = None
+
+        if self.milestone != None:
+            prev_milestone_title = self.milestone.title
+            prev_milestone_color_code = self.milestone.color_code
+
         self.milestone = milestone
+        self.real_value = None
+        self.projected_value = None
         self.save()
 
-        sc_log_entry = SalesCycleLogEntry(meta=meta, 
+        for log_entry in self.log.all():
+            if log_entry.entry_type == SalesCycleLogEntry.ME or \
+               log_entry.entry_type == SalesCycleLogEntry.MD:
+               log_entry.delete()
+
+        meta = {
+            "prev_milestone_title": prev_milestone_title,
+            "prev_milestone_color_code": prev_milestone_color_code,
+            "next_milestone_title": milestone.title,
+            "next_milestone_color_code": milestone.color_code
+        }
+
+        sc_log_entry = SalesCycleLogEntry(meta=json.dumps(meta),
                                           entry_type=SalesCycleLogEntry.MC,
-                                          sales_cycle=self, 
+                                          sales_cycle=self,
                                           owner=crmuser)
         sc_log_entry.save()
         return self
 
-    def close(self, products_with_values):
+    def close(self, products_with_values, succeed):
         amount = 0
         for product, value in products_with_values.iteritems():
             amount += value
             s = SalesCycleProductStat.objects.get(sales_cycle=self,
                                                   product=Product.objects.get(id=product))
-            s.value = value
+            if succeed:
+                s.real_value = value
+            else:
+                s.projected_value = value
             s.save()
 
         self.status = self.COMPLETED
-        self.set_result_by_amount(amount)
+        self.set_result_by_amount(amount, succeed)
         self.save()
 
-        activity = Activity(
-            sales_cycle=self,
-            owner=self.owner,
-            description=_('Closed. Amount Value is %(amount)s') % {'amount': amount}
-            )
-        activity.save()
-        activity.set_feedback_status(Feedback.OUTCOME, save_feedback=True)
-        return [self, activity]
+        log_entry = SalesCycleLogEntry(sales_cycle=self, meta=json.dumps({"amount": amount}))
+        if succeed:
+            log_entry.entry_type = SalesCycleLogEntry.SC
+        else:
+            log_entry.entry_type = SalesCycleLogEntry.FC
+
+        return [self, log_entry]
 
     @classmethod
     def upd_lst_activity_on_create(cls, sender,
@@ -1328,32 +1650,28 @@ class SalesCycleLogEntry(SubscriptionObject):
     TYPES_CAPS = (
         _('Milestone change'),
     )
-    TYPES = (MC, ) = ('MC', )
+    TYPES = (MC, ME, MD, PC, SC, FC) = ('MC', 'ME', 'MD', 'PC', 'SC', 'FC')
     TYPES_OPTIONS = zip(TYPES, TYPES_CAPS)
-    TYPES_DICT = dict(zip(('MC', ), TYPES))    
+    TYPES_DICT = dict(zip(('MC', 'ME', 'MD', 'PC', 'SC', 'FC'), TYPES))
 
     meta = models.TextField(null=True, blank=True)
     sales_cycle = models.ForeignKey(SalesCycle, related_name='log')
     entry_type = models.CharField(max_length=2,
                               choices=TYPES_OPTIONS, default=MC)
     owner = models.ForeignKey(CRMUser, related_name='owner', null=True)
-    date_created = models.DateTimeField(blank=True, null=True,
-                                        auto_now_add=True)
-    date_edited = models.DateTimeField(blank=True, null=True, auto_now=True)
+
 
 class Activity(SubscriptionObject):
     title = models.CharField(max_length=100, null=True, blank=True)
     description = models.CharField(max_length=500)
     deadline = models.DateTimeField(blank=True, null=True)
-    date_created = models.DateTimeField(blank=True, null=True,
-                                        auto_now_add=True)
-    date_edited = models.DateTimeField(blank=True, null=True, auto_now=True)
     date_finished = models.DateTimeField(blank=True, null=True)
     need_preparation = models.BooleanField(default=False, blank=True)
     sales_cycle = models.ForeignKey(SalesCycle, related_name='rel_activities')
     owner = models.ForeignKey(CRMUser, related_name='activity_owner')
     mentions = generic.GenericRelation('Mention', null=True)
     comments = generic.GenericRelation('Comment', null=True)
+    hashtags = generic.GenericRelation('HashTagReference', null=True, blank=True)
 
     class Meta:
         verbose_name = 'activity'
@@ -1421,7 +1739,13 @@ class Activity(SubscriptionObject):
                 act_recip.save()
 
     def has_read(self, user_id):
-        recip = self.recipients.filter(user__pk=user_id).first()
+        recip = self.recipients.filter(user_id=user_id).first()
+        # # OPTIMIZE VERSION =D
+        # recip = None
+        # for r in self.recipients.all():
+        #     if r.user_id == user_id:
+        #         recip = r
+        #         break
         return not recip or recip.has_read
 
     @classmethod
@@ -1435,6 +1759,15 @@ class Activity(SubscriptionObject):
             act.has_read = True
             act.save()
         return True
+
+    @classmethod
+    def get_filter_for_mobile(cls):
+        month = (datetime.now(pytz.timezone(settings.TIME_ZONE)) - timedelta(days=31))
+        return (
+            Q(deadline__isnull=False, date_finished__isnull=True) |
+            Q(deadline__isnull=False, date_finished__isnull=False, date_finished__gte=month) |
+            Q(deadline__isnull=True,  date_edited__gte=month )
+            )
 
     @classmethod
     def get_activities_by_contact(cls, contact_id):
@@ -1502,7 +1835,7 @@ class Activity(SubscriptionObject):
         need to implement the conversion to datetime object
         from input arguments
         '''
-        if (type(from_dt) and type(to_dt) == datetime.datetime):
+        if (type(from_dt) and type(to_dt) == datetime):
             pass
         activity_queryset = Activity.objects.filter(
             date_created__gte=from_dt, date_created__lte=to_dt, owner=crmuser)
@@ -1586,8 +1919,6 @@ class Feedback(SubscriptionObject):
 
     feedback = models.CharField(max_length=300, null=True)
     status = models.CharField(max_length=1, choices=STATUSES_OPTIONS, default=WAITING)
-    date_created = models.DateTimeField(blank=True, auto_now_add=True)
-    date_edited = models.DateTimeField(blank=True, auto_now_add=True)
     activity = models.OneToOneField(Activity)
     value = models.OneToOneField(Value, blank=True, null=True)
     mentions = generic.GenericRelation('Mention')
@@ -1613,7 +1944,6 @@ class Mention(SubscriptionObject):
     content_type = models.ForeignKey(ContentType)
     object_id = models.IntegerField()
     content_object = generic.GenericForeignKey('content_type', 'object_id')
-    date_created = models.DateTimeField(blank=True, auto_now_add=True)
 
     def __unicode__(self):
         return "%s %s" % (self.user, self.content_object)
@@ -1651,12 +1981,11 @@ class Mention(SubscriptionObject):
 class Comment(SubscriptionObject):
     comment = models.CharField(max_length=140)
     owner = models.ForeignKey(CRMUser, related_name='comment_owner')
-    date_created = models.DateTimeField(blank=True, auto_now_add=True)
-    date_edited = models.DateTimeField(blank=True, auto_now_add=True)
     object_id = models.IntegerField(null=True, blank=False)
     content_type = models.ForeignKey(ContentType)
     content_object = generic.GenericForeignKey('content_type', 'object_id')
     mentions = generic.GenericRelation('Mention')
+    hashtags = generic.GenericRelation('HashTagReference', null=True, blank=True)
 
     def __unicode__(self):
         return "%s's comment" % (self.owner)
@@ -1707,9 +2036,10 @@ class Share(SubscriptionObject):
     contact = models.ForeignKey(Contact, related_name='share_set', blank=True, null=True)
     share_to = models.ForeignKey(CRMUser, related_name='in_shares')
     share_from = models.ForeignKey(CRMUser, related_name='owned_shares')
-    date_created = models.DateTimeField(blank=True, auto_now_add=True)
     comments = generic.GenericRelation('Comment')
     note = models.CharField(max_length=500, null=True)
+    hashtags = generic.GenericRelation('HashTagReference', null=True, blank=True)
+    mentions = generic.GenericRelation('Mention')
 
     class Meta:
         verbose_name = 'share'
@@ -1742,6 +2072,7 @@ class Share(SubscriptionObject):
         return u'%s : %s -> %s' % (self.contact, self.share_from, self.share_to)
 
 
+
 signals.post_save.connect(
     Contact.upd_lst_activity_on_create, sender=Activity)
 signals.post_save.connect(
@@ -1772,7 +2103,8 @@ def check_is_title_empty(sender, instance=None, **kwargs):
         raise Exception("Requires non empty value")
 
 def create_milestones(sender, instance, **kwargs):
-    milestones = Milestone.create_default_milestones(instance.id)
+    if Milestone.objects.filter(subscription_id=instance.id).count() == 0:
+        milestones = Milestone.create_default_milestones(instance.id)
 
 def delete_related_milestones(sender, instance, **kwargs):
     for milestone in Milestone.objects.filter(subscription_id=instance.id):
@@ -1801,7 +2133,8 @@ class ContactList(SubscriptionObject):
     title = models.CharField(max_length=150)
     contacts = models.ManyToManyField(Contact, related_name='contact_list',
                                    null=True, blank=True)
-    date_created = models.DateTimeField(blank=True, auto_now_add=True)
+    import_task = models.OneToOneField('alm_crm.ImportTask', 
+        blank=True, null=True, on_delete=models.SET_NULL)
 
     class Meta:
         verbose_name = _('contact_list')
@@ -1864,10 +2197,11 @@ class ContactList(SubscriptionObject):
 
 
 class SalesCycleProductStat(SubscriptionObject):
-    sales_cycle = models.ForeignKey(SalesCycle, related_name='product_stats', 
+    sales_cycle = models.ForeignKey(SalesCycle, related_name='product_stats',
                                 null=True, blank=True, on_delete=models.SET_NULL)
     product = models.ForeignKey(Product)
-    value = models.IntegerField(default=0)
+    real_value = models.IntegerField(default=0)
+    projected_value = models.IntegerField(default=0)
 
     @property
     def owner(self):
@@ -1891,7 +2225,6 @@ class Filter(SubscriptionObject):
     filter_text = models.CharField(max_length=500)
     owner = models.ForeignKey(CRMUser, related_name='owned_filter')
     base = models.CharField(max_length=6, choices=BASE_OPTIONS, default='all')
-    date_created = models.DateTimeField(blank=True, auto_now_add=True)
 
     class Meta:
         verbose_name = _('filter')
@@ -1912,6 +2245,8 @@ class Filter(SubscriptionObject):
 
 class HashTag(models.Model):
     text = models.CharField(max_length=500, unique=True)
+    date_created = models.DateTimeField(auto_now_add=True, blank=True)
+    date_edited = models.DateTimeField(auto_now=True, blank=True)
 
     class Meta:
         verbose_name = _('hashtag')
@@ -1920,22 +2255,11 @@ class HashTag(models.Model):
     def __unicode__(self):
         return u'%s' % (self.text)
 
-
-    def save(self, **kwargs):
-        import re
-        if not re.match("\B#\w*[a-zA-Z]+\w*", self.text):
-            return
-
-        self.text = self.text.lower()
-        super(self.__class__, self).save(**kwargs)
-
-
 class HashTagReference(SubscriptionObject):
     hashtag = models.ForeignKey(HashTag, related_name="references")
     content_type = models.ForeignKey(ContentType)
     object_id = models.IntegerField()
     content_object = generic.GenericForeignKey('content_type', 'object_id')
-    date_created = models.DateTimeField(blank=True, auto_now_add=True)
 
     @property
     def owner(self):
@@ -1969,7 +2293,6 @@ class CustomSection(SubscriptionObject):
     content_type = models.ForeignKey(ContentType)
     object_id = models.IntegerField()
     content_object = generic.GenericForeignKey('content_type', 'object_id')
-    date_created = models.DateTimeField(blank=True, auto_now_add=True)
 
     @property
     def owner(self):
@@ -1997,39 +2320,67 @@ class CustomSection(SubscriptionObject):
 
 class CustomField(SubscriptionObject):
     title = models.CharField(max_length=255, null=True, blank=True)
-    value = models.TextField(null=True, blank=True)
     content_type = models.ForeignKey(ContentType, null=True, blank=True)
-    object_id = models.IntegerField(null=True, blank=True)
-    content_object = generic.GenericForeignKey('content_type', 'object_id')
-    date_created = models.DateTimeField(blank=True, auto_now_add=True)
-    section = models.ForeignKey('CustomSection', related_name='custom_fields', null=True, blank=True)
-
-    @property
-    def owner(self):
-        if self.section:
-            return self.section.owner
-        if self.content_object.__class__ == VCard:
-            return self.content_object.contact.owner
-        return self.content_object.owner
 
     class Meta:
         verbose_name = _('custom_field')
         db_table = settings.DB_PREFIX.format('custom_fields')
 
     def __unicode__(self):
-        return u'%s: %s' % (self.title, self.value)
+        return u'%s' % (self.title)
 
     @classmethod
-    def build_new(cls, section=None, title=None, value=None, content_class=None,
-                  object_id=None, save=False):
-        custom_field = cls(title=title, value=value)
-        if section:
-            custom_field.section=section
-            custom_field.content_type = section.content_type
-            custom_field.object_id = section.object_id
-        if content_class and object_id:
+    def build_new(cls, title=None, content_class=None, save=False):
+        custom_field = cls(title=title)
+        if content_class:
             custom_field.content_type = ContentType.objects.get_for_model(content_class)
-            custom_field.object_id = object_id
         if save:
             custom_field.save()
         return custom_field
+
+class CustomFieldValue(SubscriptionObject):
+    custom_field = models.ForeignKey('CustomField', related_name="values")
+    value = models.TextField(null=True, blank=True)
+    content_type = models.ForeignKey(ContentType, null=True, blank=True)
+    object_id = models.IntegerField(null=True, blank=True)
+    content_object = generic.GenericForeignKey('content_type', 'object_id')
+
+    @property
+    def owner(self):
+        return self.content_object.owner
+
+    class Meta:
+        verbose_name = _('custom_field_value')
+        db_table = settings.DB_PREFIX.format('custom_field_values')
+
+    def __unicode__(self):
+        return u'%s: %s' % (self.custom_field.title, self.value)
+
+    @classmethod
+    def build_new(cls, field, value=None, object_id=None, save=False):
+        custom_field_val = cls(custom_field=field, value=value)
+        if object_id:
+            custom_field_val.content_type = field.content_type
+            custom_field_val.object_id = object_id
+        if save:
+            custom_field_val.save()
+        return custom_field_val
+
+class ImportTask(models.Model):
+    uuid = models.CharField(blank=True, null=True, max_length=100)
+    finished = models.BooleanField(default=False)
+    filename = models.CharField(max_length=250)
+    imported_num = models.IntegerField(default=0, blank=True, null=True)
+    not_imported_num = models.IntegerField(default=0, blank=True, null=True)
+
+    def __unicode__(self):
+        if not self.uuid:
+            return str(self.finished)
+        return self.uuid + ' ' + str(self.finished)
+
+
+class ErrorCell(models.Model):
+    import_task = models.ForeignKey(ImportTask)
+    row = models.IntegerField()
+    col = models.IntegerField()
+    data = models.CharField(max_length=10000)

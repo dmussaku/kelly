@@ -10,9 +10,10 @@ if __name__ == "__main__":
     if len(sys.argv) > 1:
         if sys.argv[1] == 'test':
             os.environ['DJANGO_CONFIGURATION'] = 'TestConfiguration'
-
+    
     from django.core import urlresolvers
     from almanet.url_resolvers import reverse, reverse_lazy
     urlresolvers.reverse = reverse
     urlresolvers.reverse_lazy = reverse_lazy
     execute_from_command_line(sys.argv)
+    

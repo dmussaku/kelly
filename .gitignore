@@ -4,10 +4,14 @@ venv
 *.pth
 *.save
 *.DS_store
+*.mo
 .coverage
 api_docs/*
 src/static/js/bundle.js
 src/static/css/app.min.css
+src/temp_dir/*
+src/htmlcov/*
 pids
 logs
 conf/supervisord.conf
+alma

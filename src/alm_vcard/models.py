@@ -10,6 +10,9 @@ from django.utils.translation import ugettext as _
 from django.conf import settings
 from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
+from django.db import transaction
+from django.db.models import get_models, Model
+from django.contrib.contenttypes.generic import GenericForeignKey
 
 
 class VObjectImportException(Exception):
@@ -85,8 +88,6 @@ class VCard(models.Model):
     # a common CharField was used
     uid = models.CharField(max_length=256, blank=True,
                            null=True, verbose_name=_("unique identifier"))
-    custom_sections = generic.GenericRelation('alm_crm.CustomSection')
-    custom_fields = generic.GenericRelation('alm_crm.CustomField')
 
     class Meta:
         verbose_name = _("vcard")
@@ -97,7 +98,7 @@ class VCard(models.Model):
         return self.fn
 
     def save(self, **kwargs):
-        if not self.fn:
+        if not self.fn or self.fn == '':
             self.fill_fn()
         super(self.__class__, self).save(**kwargs)
 
@@ -165,6 +166,7 @@ class VCard(models.Model):
             return self.toVObject()
 
     @classmethod
+    @transaction.atomic
     def fromVObject(cls, vObject, autocommit=False):
         """
         Contact sets its properties as specified by the supplied
@@ -705,7 +707,7 @@ class VCard(models.Model):
 
         for j in self.url_set.all():
             i = v.add('x-url')
-            i.value = j.data
+            i.value = j.dataf
 
         return v
 
@@ -714,6 +716,90 @@ class VCard(models.Model):
         returns a cast of the Contact to a string in vCard format.
         """
         return self.toVObject().serialize()
+
+    @classmethod
+    @transaction.atomic
+    def merge_model_objects(cls, primary_object, alias_objects=[], keep_old=True):
+        """
+
+        """
+        if not isinstance(alias_objects, list):
+            alias_objects = [alias_objects]
+        
+        # check that all aliases are the same class as primary one and that
+        # they are subclass of model
+        primary_class = primary_object.__class__
+        
+        if not issubclass(primary_class, Model):
+            raise TypeError('Only django.db.models.Model subclasses can be merged')
+        
+        for alias_object in alias_objects:
+            if not isinstance(alias_object, primary_class):
+                raise TypeError('Only models of same class can be merged')
+        
+        # Get a list of all GenericForeignKeys in all models
+        # TODO: this is a bit of a hack, since the generics framework should provide a similar
+        # method to the ForeignKey field for accessing the generic related fields.
+        generic_fields = []
+        for model in get_models():
+            for field_name, field in filter(lambda x: isinstance(x[1], GenericForeignKey), model.__dict__.iteritems()):
+                generic_fields.append(field)
+                
+        blank_local_fields = set([field.attname for field in primary_object._meta.local_fields if getattr(primary_object, field.attname) in [None, '']])
+        
+        # Loop through all alias objects and migrate their data to the primary object.
+        for alias_object in alias_objects:
+            # Migrate all foreign key references from alias object to primary object.
+            for related_object in alias_object._meta.get_all_related_objects():
+                try:
+                    # The variable name on the alias_object model.
+                    alias_varname = related_object.get_accessor_name()
+                    # The variable name on the related model.
+                    obj_varname = related_object.field.name
+                    related_objects = getattr(alias_object, alias_varname)
+                    for obj in related_objects.all():
+                        setattr(obj, obj_varname, primary_object)
+                        obj.save()
+                except:
+                    pass
+    
+            # Migrate all many to many references from alias object to primary object.
+            for related_many_object in alias_object._meta.get_all_related_many_to_many_objects():
+                alias_varname = related_many_object.get_accessor_name()
+                obj_varname = related_many_object.field.name
+                
+                if alias_varname is not None:
+                    # standard case
+                    related_many_objects = getattr(alias_object, alias_varname).all()
+                else:
+                    # special case, symmetrical relation, no reverse accessor
+                    related_many_objects = getattr(alias_object, obj_varname).all()
+                for obj in related_many_objects.all():
+                    getattr(obj, obj_varname).remove(alias_object)
+                    getattr(obj, obj_varname).add(primary_object)
+    
+            # Migrate all generic foreign key references from alias object to primary object.
+            for field in generic_fields:
+                filter_kwargs = {}
+                filter_kwargs[field.fk_field] = alias_object._get_pk_val()
+                filter_kwargs[field.ct_field] = field.get_content_type(alias_object)
+                for generic_related_object in field.model.objects.filter(**filter_kwargs):
+                    setattr(generic_related_object, field.name, primary_object)
+                    generic_related_object.save()
+                    
+            # Try to fill all missing values in primary object by values of duplicates
+            filled_up = set()
+            for field_name in blank_local_fields:
+                val = getattr(alias_object, field_name) 
+                if val not in [None, '']:
+                    setattr(primary_object, field_name, val)
+                    filled_up.add(field_name)
+            blank_local_fields -= filled_up
+                
+            if not keep_old:
+                alias_object.delete()
+        primary_object.save()
+        return primary_object
 
 
 class Tel(models.Model):
@@ -973,6 +1059,9 @@ class Note(models.Model):
     """
     vcard = models.ForeignKey(VCard)
     data = models.TextField()
+
+    def __unicode__(self):
+        return self.data
 
     class Meta:
         verbose_name = _("note")

@@ -5,7 +5,9 @@
     "fields": {
         "user_id": 1,
         "organization_id": 1,
-        "subscription_id": 1
+        "subscription_id": 1,
+        "date_created": "2014-09-10T00:00:00Z",
+        "date_edited": "2014-11-24T07:49:32.991Z"
     }
 },
 {
@@ -14,7 +16,9 @@
     "fields": {
         "user_id": 2,
         "organization_id": 1,
-        "subscription_id": 1
+        "subscription_id": 1,
+        "date_created": "2014-09-10T00:00:00Z",
+        "date_edited": "2014-11-24T07:49:32.991Z"
     }
 },
 {
@@ -23,7 +27,9 @@
     "fields": {
         "user_id": 3,
         "organization_id": 1,
-        "subscription_id": 1
+        "subscription_id": 1,
+        "date_created": "2014-09-10T00:00:00Z",
+        "date_edited": "2014-11-24T07:49:32.991Z"
     }
 },
 {
@@ -32,7 +38,9 @@
     "fields": {
         "user_id": 4,
         "organization_id": 1,
-        "subscription_id": 1
+        "subscription_id": 1,
+        "date_created": "2014-09-10T00:00:00Z",
+        "date_edited": "2014-11-24T07:49:32.991Z"
     }
 },
 {
@@ -41,7 +49,9 @@
     "fields": {
         "user_id": 5,
         "organization_id": 1,
-        "subscription_id": 1
+        "subscription_id": 1,
+        "date_created": "2014-09-10T00:00:00Z",
+        "date_edited": "2014-11-24T07:49:32.991Z"
     }
 },
 {
@@ -50,7 +60,9 @@
     "fields": {
         "user_id": 6,
         "organization_id": 2,
-        "subscription_id": 2
+        "subscription_id": 2,
+        "date_created": "2014-09-10T00:00:00Z",
+        "date_edited": "2014-11-24T07:49:32.991Z"
     }
 },
 {
@@ -59,7 +71,9 @@
     "fields": {
         "user_id": 7,
         "organization_id": 2,
-        "subscription_id": 2
+        "subscription_id": 2,
+        "date_created": "2014-09-10T00:00:00Z",
+        "date_edited": "2014-11-24T07:49:32.991Z"
     }
 }
 ]

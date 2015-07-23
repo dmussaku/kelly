@@ -15,6 +15,7 @@ from django.utils.functional import lazy
 from configurations import Configuration, pristinemethod
 from configurations.utils import uppercase_attributes
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+TEMP_DIR = BASE_DIR + '/temp_dir/'
 
 
 def rel(*x):
@@ -86,6 +87,16 @@ def FileSettings(path):
 
 class BaseConfiguration(SubdomainConfiguration, Configuration):
 
+    # Celery settings
+
+    BROKER_URL = 'amqp://guest:guest@localhost//'
+
+    #: Only add pickle to this list if your broker is secured
+    #: from unwanted access (see userguide/security.html)
+    CELERY_ACCEPT_CONTENT = ['json']
+    CELERY_TASK_SERIALIZER = 'json'
+    CELERY_RESULT_SERIALIZER = 'json'
+
     @pristinemethod
     def reverse_lazy(viewname, **kw):
         def __inner():
@@ -132,6 +143,7 @@ class BaseConfiguration(SubdomainConfiguration, Configuration):
         'tastypie',
         'tastypie_swagger',
         'django_extensions',
+        'djcelery',
     )
 
     MIDDLEWARE_CLASSES = (
@@ -168,7 +180,6 @@ class BaseConfiguration(SubdomainConfiguration, Configuration):
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
             'NAME': rel('../..', 'db.sqlite3'),
-            'ATOMIC_REQUEST': True,
         },
         'test': {
             'ENGINE': 'django.db.backends.sqlite3',
@@ -328,6 +339,8 @@ class BaseConfiguration(SubdomainConfiguration, Configuration):
     GCALSYNC_APIKEY = 'AIzaSyAlLnRj_quAiDlXs3G07Xn1yGL2L_dJwuI'
     GCALSYNC_CREDENTIALS = rel('google_api_cred.json')
 
+    RUSTEM_SETTINGS = False
+
 
 class DevConfiguration(
         FileSettings('~/.almanet/almanet.conf.py'), BaseConfiguration):
@@ -345,7 +358,8 @@ class DevConfiguration(
 
 class QAConfiguration(DevConfiguration):
     USE_PROFILER = True
-
+    # DEBUG_TOOLBAR_PATCH_SETTINGS = False
+    
     @classmethod
     def pre_setup(cls):
         cls.INSTALLED_APPS += ('debug_toolbar', 'debug_panel',)
@@ -389,13 +403,13 @@ class TestConfiguration(
 
 class StagingConfiguration(FileSettings('~/.almanet/almanet.conf.py'), BaseConfiguration):
     DEBUG = False
-    PARENT_HOST = 'almasales.kz:3082'
-    HOSTCONF_REGEX = r'almasales\.kz:3082'
+    PARENT_HOST = 'almasales.qa:3082'
+    HOSTCONF_REGEX = r'almasales\.qa:3082'
 
-    SITE_NAME = 'almasales.kz:3082'
-    SITE_DOMAIN = 'http://almasales.kz:3082'
-    CSRF_COOKIE_DOMAIN = '.almasales.kz'
-    SESSION_COOKIE_DOMAIN = '.almasales.kz'
+    SITE_NAME = 'almasales.qa:3082'
+    SITE_DOMAIN = 'http://almasales.qa:3082'
+    CSRF_COOKIE_DOMAIN = '.almasales.qa'
+    SESSION_COOKIE_DOMAIN = '.almasales.qa'
     # CORS_ORIGIN_WHITELIST = (
     #     'almasales.kz',
     #     'almacloud.almasales.kz',
