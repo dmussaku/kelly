@@ -30,6 +30,7 @@ from alm_user.models import User
 from almanet.models import Subscription, Service
 from alm_crm.models import GLOBAL_CYCLE_TITLE
 from alm_company.models import Company
+import datetime
 
 
 class CRMUserTestCase(TestCase):
@@ -2958,27 +2959,66 @@ class ReportResourceTest(ResourceTestMixin, ResourceTestCase):
 
         self.api_path_reports = '/api/v1/reports/'
 
-    def test_user_report(self):
-        path = self.api_path_reports+'user_report/'
-        resp = self.api_client.get(path)
-        des = self.deserialize(resp)
-
+    def test_user_report(self):   
         from alm_crm.utils import report_builders
-        ur = report_builders.build_user_report()
-
-        self.assertEqual(des['open_sales_cycles'], ur['open_sales_cycles'])
-        self.assertEqual(des['closed_sales_cycles'], ur['closed_sales_cycles'])
-        self.assertEqual(des['earned_money'], ur['earned_money'])
-        self.assertEqual(des['user_ids'], ur['user_ids'])
-
-        user_ids = [1,2,3]
-
-        resp = self.api_client.get(path+'?user_ids=[1,2,3]')
+        import pytz
+        path = self.api_path_reports+'user_report/'
+        resp = self.api_client.post(path)
         des = self.deserialize(resp)
 
-        ur = report_builders.build_user_report(user_ids)
+        ur = report_builders.build_user_report(subscription_id=1)
 
         self.assertEqual(des['open_sales_cycles'], ur['open_sales_cycles'])
         self.assertEqual(des['closed_sales_cycles'], ur['closed_sales_cycles'])
         self.assertEqual(des['earned_money'], ur['earned_money'])
         self.assertEqual(des['user_ids'], ur['user_ids'])
+
+        from_date =  datetime.datetime(2014, 1, 1).replace(tzinfo=pytz.UTC)
+        to_date = datetime.datetime(2015, 1, 1).replace(tzinfo=pytz.UTC)
+        post_data = {
+            'user_ids': [1, 2],
+            'from_date': from_date,
+            'to_date': to_date
+        }
+
+        resp = self.api_client.post(path, format='json', data=post_data)
+        des = self.deserialize(resp)
+
+        ur = report_builders.build_user_report(subscription_id=1, user_ids = [1,2], from_date=from_date, to_date=to_date)
+
+        self.assertEqual(des['open_sales_cycles'], ur['open_sales_cycles'])
+        self.assertEqual(des['closed_sales_cycles'], ur['closed_sales_cycles'])
+        self.assertEqual(des['earned_money'], ur['earned_money'])
+        self.assertEqual(des['user_ids'], ur['user_ids'])
+
+    def test_product_report(self):   
+        from alm_crm.utils import report_builders
+        import pytz
+        path = self.api_path_reports+'product_report/'
+        resp = self.api_client.post(path)
+        des = self.deserialize(resp)
+
+        ur = report_builders.build_product_report(subscription_id=1)
+
+        self.assertEqual(des['open_sales_cycles'], ur['open_sales_cycles'])
+        self.assertEqual(des['closed_sales_cycles'], ur['closed_sales_cycles'])
+        self.assertEqual(des['earned_money'], ur['earned_money'])
+        self.assertEqual(des['product_ids'], ur['product_ids'])
+
+        from_date =  datetime.datetime(2014, 1, 1).replace(tzinfo=pytz.UTC)
+        to_date = datetime.datetime(2015, 1, 1).replace(tzinfo=pytz.UTC)
+        post_data = {
+            'product_ids': [1,2],
+            'from_date': from_date,
+            'to_date': to_date
+        }
+
+        resp = self.api_client.post(path, format='json', data=post_data)
+        des = self.deserialize(resp)
+
+        ur = report_builders.build_product_report(subscription_id=1, product_ids = [1,2], from_date=from_date, to_date=to_date)
+
+        self.assertEqual(des['open_sales_cycles'], ur['open_sales_cycles'])
+        self.assertEqual(des['closed_sales_cycles'], ur['closed_sales_cycles'])
+        self.assertEqual(des['earned_money'], ur['earned_money'])
+        self.assertEqual(des['product_ids'], ur['product_ids'])
