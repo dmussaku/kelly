@@ -984,10 +984,10 @@ class ContactResource(CRMServiceModelResource):
             return self.create_response(request, obj_dict)
 
     def get_contact_state(self, request, **kwargs):
-
         with RequestContext(self, request, allowed_methods=['get']):
             base_bundle = self.build_bundle(request=request)
             objects = self.obj_get_list(bundle=base_bundle, **self.remove_api_resource_names(kwargs))
+            t1 = time.time()
             bundles = (
                 {
                     'id': obj.id,
@@ -1006,6 +1006,7 @@ class ContactResource(CRMServiceModelResource):
         return self.create_response(request, StreamList(bundles))
 
     def get_vcard_state(self, request, **kwargs):
+        t1 = time.time()
         with RequestContext(self, request, allowed_methods=['get']):
             base_bundle = self.build_bundle(request=request)
             objects = self.obj_get_list(bundle=base_bundle, **self.remove_api_resource_names(kwargs))
