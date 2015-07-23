@@ -1523,8 +1523,16 @@ class SalesCycle(SubscriptionObject):
                 status.append(False)
         return status
 
-    def change_milestone(self, crmuser, milestone_id, meta):
+    def change_milestone(self, crmuser, milestone_id):
         milestone = Milestone.objects.get(id=milestone_id)
+
+        prev_milestone_title = None
+        prev_milestone_color_code = None
+
+        if self.milestone != None:
+            prev_milestone_title = self.milestone.title
+            prev_milestone_color_code = self.milestone.color_code
+
         self.milestone = milestone
         self.save()
 
@@ -1533,7 +1541,14 @@ class SalesCycle(SubscriptionObject):
                log_entry.entry_type == SalesCycleLogEntry.MD:
                log_entry.delete()
 
-        sc_log_entry = SalesCycleLogEntry(meta=meta,
+        meta = {
+            "prev_milestone_title": prev_milestone_title,
+            "prev_milestone_color_code": prev_milestone_color_code,
+            "next_milestone_title": milestone.title,
+            "next_milestone_color_code": milestone.color_code
+        }
+
+        sc_log_entry = SalesCycleLogEntry(meta=json.dumps(meta),
                                           entry_type=SalesCycleLogEntry.MC,
                                           sales_cycle=self,
                                           owner=crmuser)

@@ -33,8 +33,8 @@ class Migration(DataMigration):
                 sales_cycle.projected_value = sales_cycle.real_value
 
             sales_cycle.save()
-            prev_milestone_title = ''
-            prev_milestone_color_code = ''
+            prev_milestone_title = None
+            prev_milestone_color_code = None
             if prev_milestone != None:
                 prev_milestone_title = prev_milestone.title
                 prev_milestone_color_code = prev_milestone.color_code
