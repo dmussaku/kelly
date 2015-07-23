@@ -1695,7 +1695,7 @@ class SalesCycleResource(CRMServiceModelResource):
     def prepend_urls(self):
         return [
             url(
-                r"^(?P<resource_name>%s)/(?P<id>\d+)/close%s$" %
+                r"^(?P<resource_name>%s)/(?P<id>\d+)/(?P<status>\w+)%s$" %
                 (self._meta.resource_name, trailing_slash()),
                 self.wrap_view('close'),
                 name='api_close'
@@ -1743,15 +1743,14 @@ class SalesCycleResource(CRMServiceModelResource):
         close SalesCycle, set value of SalesCycleProductStat
         update status to 'C'('Completed')
 
-        @return: updated SalesCycle and close Activity
+        @return: updated SalesCycle
 
         '''
         with RequestContext(self, request, allowed_methods=['post', 'get', 'put']):
             basic_bundle = self.build_bundle(request=request)
             # get sales_cycle
             try:
-                obj = self.cached_obj_get(bundle=basic_bundle,
-                                          **self.remove_api_resource_names(kwargs))
+                obj = SalesCycle.objects.get(id=kwargs['id'])
             except ObjectDoesNotExist:
                 return http.HttpNotFound()
             except MultipleObjectsReturned:
@@ -1767,12 +1766,20 @@ class SalesCycleResource(CRMServiceModelResource):
                 request, request.body,
                 format=request.META.get('CONTENT_TYPE', 'application/json'))
             deserialized = self.alter_deserialized_list_data(request, deserialized)
-            sales_cycle, activity = bundle.obj.close(products_with_values=deserialized)
+            if kwargs['status'] == 'succeed':
+                sales_cycle, log_entry = bundle.obj.close(products_with_values=deserialized, succeed=True)
+                log_entry.owner = request.user.get_crmuser()
+                log_entry.save()
+            elif kwargs['status'] == 'fail':
+                sales_cycle, log_entry = bundle.obj.close(products_with_values=deserialized, succeed=False)
+                log_entry.owner = request.user.get_crmuser()
+                log_entry.save()
+            else:
+                return http.HttpBadRequest()
 
         return self.create_response(
             request, {
-                'sales_cycle': SalesCycleResource().get_bundle_detail(sales_cycle, request),
-                'activity': ActivityResource().get_bundle_detail(activity, request)
+                'sales_cycle': SalesCycleResource().get_bundle_detail(sales_cycle, request)
             },
             response_class=http.HttpAccepted)
 

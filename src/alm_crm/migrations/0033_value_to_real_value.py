@@ -3,7 +3,6 @@ from south.utils import datetime_utils as datetime
 from south.db import db
 from south.v2 import DataMigration
 from django.db import models
-import simplejson as json
 
 class Migration(DataMigration):
 
@@ -12,54 +11,15 @@ class Migration(DataMigration):
         # Note: Don't use "from appname.models import ModelName". 
         # Use orm.ModelName to refer to models in this application,
         # and orm['appname.ModelName'] for models in other applications.
-        for sales_cycle in orm.SalesCycle.objects.filter(status='C'):
-            activity_closed_list = sales_cycle.rel_activities.filter(description__istartswith="closed")
-            if len(activity_closed_list) > 0:
-                activity_closed = activity_closed_list[0]
-            else:
-                continue
-
-            prev_milestone = sales_cycle.milestone
-            log_entry = orm.SalesCycleLogEntry(owner=activity_closed.owner, sales_cycle=sales_cycle)
-
-            if sales_cycle.real_value.amount > 0:
-                sales_cycle.milestone = orm.Milestone.objects.get(is_system=1, 
-                                                                    subscription_id=sales_cycle.subscription_id)
-                log_entry.entry_type = 'SC'
-            else:
-                sales_cycle.milestone = orm.Milestone.objects.get(is_system=2, 
-                                                                    subscription_id=sales_cycle.subscription_id)
-                log_entry.entry_type = 'FC'
-                sales_cycle.projected_value = sales_cycle.real_value
-
-            sales_cycle.save()
-            prev_milestone_title = ''
-            prev_milestone_color_code = ''
-            if prev_milestone != None:
-                prev_milestone_title = prev_milestone.title
-                prev_milestone_color_code = prev_milestone.color_code
-                
-            meta = {
-                        "prev_milestone_title": prev_milestone_title,
-                        "prev_milestone_color_code": prev_milestone_color_code,
-                        "next_milestone_title": sales_cycle.milestone.title,
-                        "next_milestone_color_code": sales_cycle.milestone.color_code
-                    }
-            log_entry.meta = json.dumps(meta)
-            log_entry.save()
-            log_entry.date_created = activity_closed.date_created
-            log_entry.save()
-            log_entry_amount = orm.SalesCycleLogEntry(owner=activity_closed.owner,
-                                                        sales_cycle=sales_cycle,
-                                                        entry_type=log_entry.entry_type,
-                                                        meta=json.dumps({"amount": sales_cycle.real_value.amount}))
-            log_entry_amount.date_created = activity_closed.date_created
-            log_entry_amount.save()
-            activity_closed.delete()
+        for prod_stat in orm.SalesCycleProductStat.objects.all():
+            prod_stat.real_value = prod_stat.value
+            prod_stat.save()
 
     def backwards(self, orm):
         "Write your backwards methods here."
-        pass
+        for prod_stat in orm.SalesCycleProductStat.objects.all():
+            prod_stat.value = prod_stat.real_value
+            prod_stat.save()
 
     models = {
         u'alm_crm.activity': {
@@ -301,6 +261,8 @@ class Migration(DataMigration):
             'date_edited': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'product': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['alm_crm.Product']"}),
+            'projected_value': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
+            'real_value': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
             'sales_cycle': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'product_stats'", 'null': 'True', 'on_delete': 'models.SET_NULL', 'to': u"orm['alm_crm.SalesCycle']"}),
             'subscription_id': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'value': ('django.db.models.fields.IntegerField', [], {'default': '0'})

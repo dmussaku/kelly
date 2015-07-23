@@ -31,6 +31,7 @@ import time
 from almanet.settings import TEMP_DIR, BASE_DIR
 from alm_vcard import models as vcard_models
 from celery import group, Task, result
+import simplejson as json
 # from .tasks import create_failed_contacts_xls
 
 ALLOWED_TIME_PERIODS = ['week', 'month', 'year']
@@ -1495,11 +1496,14 @@ class SalesCycle(SubscriptionObject):
         if save:
             self.save()
 
-    def set_result_by_amount(self, amount):
+    def set_result_by_amount(self, amount, succeed):
         v = Value(amount=amount, owner=self.owner)
         v.save()
 
-        self.real_value = v
+        if succeed:
+            self.real_value = v
+        else:
+            self.projected_value = v
         self.save()
 
     def add_follower(self, user_id, **kw):
@@ -1536,27 +1540,29 @@ class SalesCycle(SubscriptionObject):
         sc_log_entry.save()
         return self
 
-    def close(self, products_with_values):
+    def close(self, products_with_values, succeed):
         amount = 0
         for product, value in products_with_values.iteritems():
             amount += value
             s = SalesCycleProductStat.objects.get(sales_cycle=self,
                                                   product=Product.objects.get(id=product))
-            s.value = value
+            if succeed:
+                s.real_value = value
+            else:
+                s.projected_value = value
             s.save()
 
         self.status = self.COMPLETED
-        self.set_result_by_amount(amount)
+        self.set_result_by_amount(amount, succeed)
         self.save()
 
-        activity = Activity(
-            sales_cycle=self,
-            owner=self.owner,
-            description=_('Closed. Amount Value is %(amount)s') % {'amount': amount}
-            )
-        activity.save()
-        activity.set_feedback_status(Feedback.OUTCOME, save_feedback=True)
-        return [self, activity]
+        log_entry = SalesCycleLogEntry(sales_cycle=self, meta=json.dumps({"amount": amount}))
+        if succeed:
+            log_entry.entry_type = SalesCycleLogEntry.SC
+        else:
+            log_entry.entry_type = SalesCycleLogEntry.FC
+
+        return [self, log_entry]
 
     @classmethod
     def upd_lst_activity_on_create(cls, sender,
@@ -2177,7 +2183,8 @@ class SalesCycleProductStat(SubscriptionObject):
     sales_cycle = models.ForeignKey(SalesCycle, related_name='product_stats',
                                 null=True, blank=True, on_delete=models.SET_NULL)
     product = models.ForeignKey(Product)
-    value = models.IntegerField(default=0)
+    real_value = models.IntegerField(default=0)
+    projected_value = models.IntegerField(default=0)
 
     @property
     def owner(self):

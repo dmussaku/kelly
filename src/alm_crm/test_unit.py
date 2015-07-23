@@ -967,11 +967,10 @@ class SalesCycleResourceTest(ResourceTestMixin, ResourceTestCase):
             "2": 13500
         }
         resp = self.api_client.put(
-            self.api_path_sales_cycle+str(self.sales_cycle.pk)+'/close/',
+            self.api_path_sales_cycle+str(self.sales_cycle.pk)+'/succeed/',
             format='json', data=put_data)
         self.assertHttpAccepted(resp)
         resp = self.deserialize(resp)
-        self.assertTrue('activity' in resp)
         self.assertTrue('sales_cycle' in resp)
 
         self.assertEqual(resp['sales_cycle']['status'], 'C')
@@ -979,9 +978,9 @@ class SalesCycleResourceTest(ResourceTestMixin, ResourceTestCase):
                          sum(put_data.values()))
         self.assertEqual(resp['activity']['feedback_status'], Feedback.OUTCOME)
         stat1 = SalesCycleProductStat.objects.get(sales_cycle=self.sales_cycle,
-                                                  product=Product.objects.get(id=1)).value
+                                                  product=Product.objects.get(id=1)).real_value
         stat2 = SalesCycleProductStat.objects.get(sales_cycle=self.sales_cycle,
-                                                  product=Product.objects.get(id=2)).value
+                                                  product=Product.objects.get(id=2)).real_value
         self.assertEqual(stat1, 15000)
         self.assertEqual(stat2, 13500)
         self.sales_cycle.is_global = True
