@@ -22,6 +22,8 @@ from alm_crm.models import (
     Filter,
     HashTag,
     HashTagReference,
+    CustomField,
+    CustomFieldValue
     )
 from alm_vcard.models import VCard, Tel, Email, Org
 from alm_user.models import User
@@ -261,6 +263,11 @@ class ProductTestCase(TestCase):
         self.assertEqual(len(Product.objects.all()),
                          len(Product.get_products(self.crm_subscr_id)))
 
+class CustomFieldValueTestCase(TestCase):
+    fixtures = ['custom_field.json', 'custom_field_value.json, products.json, contacts.json']
+
+    def setUp(self):
+        super(self.__class__, self).setUp()
 
 class ActivityTestCase(TestCase):
     fixtures = ['crmusers.json', 'vcards.json', 'contacts.json',
@@ -781,13 +788,8 @@ class ResourceTestMixin(object):
                 'crmusers.json', 'vcards.json', 'contacts.json',
                 'salescycles.json', 'activities.json', 'products.json',
                 'mentions.json', 'values.json', 'emails.json', 'contactlist.json', 'share.json',
-<<<<<<< HEAD
-                'feedbacks.json', 'salescycle_product_stat.json', 'filters.json', 'milestones.json',
-                'sc_log_entry.json', 'hashtag.json', 'hashtag_ref.json']
-=======
                 'hashtag.json', 'hashtag_ref.json', 'feedbacks.json', 'salescycle_product_stat.json', 
-                'filters.json', 'milestones.json', 'sc_log_entry.json']
->>>>>>> feature/hashtag_search
+                'filters.json', 'milestones.json', 'sc_log_entry.json', 'custom_fields.json', 'custom_field_values.json']
 
     def get_user(self):
         from alm_user.models import User
@@ -1435,11 +1437,16 @@ class ProductResourceTest(ResourceTestMixin, ResourceTestCase):
             'name': 'new product',
             'description': 'new product by test_unit',
             'price': 100,
+            'custom_fields':{
+                1: "value of the custom_field"
+            }
         }
 
         count = sales_cycle.products.count()
-        self.assertHttpCreated(self.api_client.post(
-            self.api_path_product, format='json', data=post_data))
+        resp = self.api_client.post(
+            self.api_path_product, format='json', data=post_data)
+        print resp
+        self.assertHttpCreated(resp)
         product = Product.objects.last()
         self.assertEqual(product.name, 'new product')
         self.assertIsInstance(product.subscription_id, int)
@@ -1576,27 +1583,20 @@ class ContactResourceTest(ResourceTestMixin, ResourceTestCase):
             'vcard': {"fn": "Nurlan Abiken",
             'notes': [{'data':'#some text #almacloud @[1:Bruce Wayne] @[2:Nurlan Abiken]'}]
             },
+            'custom_fields':{
+                6: "value of the custom_field"
+            }
         }
         count = Contact.objects.count()
         # print resp
-        hashtag_count = HashTag.objects.all().count()
-        hashtag_reference_count = HashTagReference.objects.all().count()
         mention_count = Mention.objects.all().count()
         resp = self.api_client.post(
             self.api_path_contact, format='json', data=post_data)
+        print resp
         self.assertHttpOK(resp)
-        hashtag = HashTag.objects.first()
-        for reference in hashtag.references.all():
-            print reference.content_object.__class__
-        # verify that new one has been added.
         self.assertEqual(Contact.objects.count(), count + 1)
         created_contact = Contact.objects.last()
         self.assertEqual(created_contact.sales_cycles.first().title, GLOBAL_CYCLE_TITLE.decode('utf-8'))
-        self.assertEqual(hashtag_count+2, HashTag.objects.all().count())
-        self.assertEqual(hashtag_reference_count+2, HashTagReference.objects.all().count())
-        self.assertEqual(mention_count+2, Mention.objects.all().count())
-        self.assertEqual(HashTagReference.objects.last().hashtag, 
-                        HashTag.objects.get(text=HashTagReference.objects.last().hashtag.text))
 
     def test_delete_contact(self):
         count = Contact.objects.count()
@@ -1816,6 +1816,73 @@ class ContactResourceTest(ResourceTestMixin, ResourceTestCase):
         des_resp = self.deserialize(resp)
         self.assertTrue('contact_list' in des_resp)
         self.assertEqual(des_resp['contact_list']['title'], 'nurlan.vcf')
+
+    def test_delete_contacts(self):
+        contact_count = Contact.objects.all().count()
+        sales_cycle_count = SalesCycle.objects.all().count()
+        activities_count = Activity.objects.all().count()
+        shares_count = Share.objects.all().count()
+        obj_ids = [3, 2, 1, 6]
+        objects = {
+                "contacts": [],
+                "sales_cycles": [],
+                "activities": [],
+                "shares": [],
+                "does_not_exist": []
+            }
+        # print [contact.sales_cycles.all().values_list("id", flat=True) for contact in Contact.objects.filter(id__in=obj_ids)]
+        for id in obj_ids:
+            try:
+                obj = Contact.objects.get(id=id)
+                objects['contacts'].append(id)
+                objects['sales_cycles'] += list(obj.sales_cycles.all().values_list("id", flat=True))
+                for sales_cycle in obj.sales_cycles.all():
+                    objects['activities'] += list(sales_cycle.rel_activities.all().values_list("id", flat=True))
+                objects['shares'] += list(obj.share_set.all().values_list("id", flat=True))
+            except Contact.DoesNotExist:
+                objects['does_not_exist'].append(id)
+
+        post_data = {"ids": obj_ids}
+
+        resp = self.api_client.post(
+            self.api_path_contact+"delete_contacts/", format='json', data=post_data)
+        self.assertHttpAccepted(resp)
+        self.assertEqual(contact_count - len(objects['contacts']), Contact.objects.all().count())
+        self.assertEqual(sales_cycle_count - len(objects['sales_cycles']), SalesCycle.objects.all().count())
+        self.assertEqual(activities_count - len(objects['activities']), Activity.objects.all().count())
+        self.assertEqual(shares_count - len(objects['shares']), Share.objects.all().count())
+
+    def test_delete_contact(self):
+        contact_count = Contact.objects.all().count()
+        sales_cycle_count = SalesCycle.objects.all().count()
+        activities_count = Activity.objects.all().count()
+        shares_count = Share.objects.all().count()
+        contact_id = 2
+        objects = {
+                "sales_cycles": [],
+                "activities": [],
+                "shares": [],
+                "does_not_exist": []
+            }
+        # print [contact.sales_cycles.all().values_list("id", flat=True) for contact in Contact.objects.filter(id__in=obj_ids)]
+        try:
+            obj = Contact.objects.get(id=contact_id)
+            objects['sales_cycles'] += list(obj.sales_cycles.filter(is_global=False).values_list("id", flat=True))
+            for sales_cycle in obj.sales_cycles.all():
+                objects['activities'] += list(sales_cycle.rel_activities.all().values_list("id", flat=True))
+            objects['shares'] += list(obj.share_set.all().values_list("id", flat=True))
+        except Contact.DoesNotExist:
+            objects['does_not_exist'].append(id)
+
+        resp = self.api_client.post(
+            self.api_path_contact+"2/delete/", format='json')
+        self.assertHttpAccepted(resp)
+        self.assertEqual(contact_count - 1, Contact.objects.all().count())
+        self.assertEqual(sales_cycle_count - len(objects['sales_cycles']), SalesCycle.objects.all().count())
+        self.assertEqual(activities_count - len(objects['activities']), Activity.objects.all().count())
+        self.assertEqual(shares_count - len(objects['shares']), Share.objects.all().count())
+
+
 
 
 class ContactListResourceTest(ResourceTestMixin, ResourceTestCase):
@@ -2643,63 +2710,37 @@ class UserResourceTest(ResourceTestMixin, ResourceTestCase):
             self.user.email
             )
 
-<<<<<<< HEAD
 
-class MilestoneResourceTest(ResourceTestMixin, ResourceTestCase):
-=======
 class HashTagReferenceResourceTest(ResourceTestMixin, ResourceTestCase):
 
->>>>>>> feature/hashtag_search
     def setUp(self):
         super(self.__class__, self).setUp()
 
         # login user
         self.get_credentials()
 
-<<<<<<< HEAD
-        self.api_path_milestone = '/api/v1/milestone/'
-
-        # get_list
-        self.get_list_resp = self.api_client.get(self.api_path_milestone,
-                                                 format='json',
-                                                 charset='utf-8',
-=======
         self.api_path_ht_ref = '/api/v1/hashtag_reference/'
 
         # get_list
         self.get_list_resp = self.api_client.get(self.api_path_ht_ref,
                                                  format='json',
->>>>>>> feature/hashtag_search
                                                  HTTP_HOST='localhost')
         self.get_list_des = self.deserialize(self.get_list_resp)
 
         # get_detail(pk)
         self.get_detail_resp = \
-<<<<<<< HEAD
-            lambda pk: self.api_client.get(self.api_path_milestone+str(pk)+'/',
-                                           format='json',
-                                           charset='utf-8',
-=======
             lambda pk: self.api_client.get(self.api_path_ht_ref+str(pk)+'/',
                                            format='json',
->>>>>>> feature/hashtag_search
                                            HTTP_HOST='localhost')
         self.get_detail_des = \
             lambda pk: self.deserialize(self.get_detail_resp(pk))
-
-<<<<<<< HEAD
-        self.milestone = Milestone.objects.first()
-=======
         self.ht_ref = HashTagReference.objects.first()
->>>>>>> feature/hashtag_search
 
     def test_get_list_valid_json(self):
         self.assertValidJSONResponse(self.get_list_resp)
 
     def test_get_detail(self):
         self.assertEqual(
-<<<<<<< HEAD
-=======
             self.get_detail_des(self.ht_ref.pk)['object_id'],
             self.ht_ref.object_id
             )
@@ -2763,7 +2804,6 @@ class MilestoneResourceTest(ResourceTestMixin, ResourceTestCase):
 
     def test_get_detail(self):
         self.assertEqual(
->>>>>>> feature/hashtag_search
             self.get_detail_des(self.milestone.pk)['title'],
             self.milestone.title
             )
@@ -2812,11 +2852,50 @@ class MilestoneResourceTest(ResourceTestMixin, ResourceTestCase):
                               format='json', charset='utf-8', data={'title': milestone_title})
         # check
         self.assertHttpAccepted(resp)
-<<<<<<< HEAD
         self.assertEqual(self.get_detail_des(self.milestone.pk)['title'], milestone_title)
 
 
-class HashTagReferenceResourceTest(ResourceTestMixin, ResourceTestCase):
+    def test_bulk_edit(self):
+        milestones = Milestone.objects.filter(id__in=[1, 2, 3])
+        subs_milestones = Milestone.objects.filter(subscription_id=CRMUser.objects.first().subscription_id).count()
+        log_entry = SalesCycleLogEntry.objects.all().count()
+
+        post_data = [
+            {
+                'id': milestones[0].id,
+                'title': milestones[0].title,
+                'color_code': milestones[0].color_code
+            },
+            {
+                'id': milestones[1].id,
+                'title': 'NEW TEST TITLE',
+                'color_code': milestones[1].color_code
+            },
+            {
+                'id': milestones[2].id,
+                'title': milestones[2].title,
+                'color_code': "#6245FD"
+            },
+            {
+                'id': milestones[3].id,
+                'title': 'TEST TITLE',
+                'color_code': "#6245FD"
+            },
+            {
+                'title': "NEW ONE",
+                'color_code': '#FFFFFF'
+            }
+        ]
+
+        resp = self.api_client.post(self.api_path_milestone+'bulk_edit/', format='json', data=post_data)
+        self.assertHttpAccepted(resp)
+        after_subs_milestones = Milestone.objects.filter(subscription_id=CRMUser.objects.first().subscription_id).count()
+        log_entry_diff = SalesCycleLogEntry.objects.all().count() - log_entry
+        self.assertEqual(subs_milestones-1, log_entry_diff)
+
+
+
+class CustomFieldResourceTest(ResourceTestMixin, ResourceTestCase):
 
     def setUp(self):
         super(self.__class__, self).setUp()
@@ -2824,23 +2903,25 @@ class HashTagReferenceResourceTest(ResourceTestMixin, ResourceTestCase):
         # login user
         self.get_credentials()
 
-        self.api_path_ht_ref = '/api/v1/hashtag_reference/'
+        self.api_path_custom_field = '/api/v1/custom_field/'
 
         # get_list
-        self.get_list_resp = self.api_client.get(self.api_path_ht_ref,
+        self.get_list_resp = self.api_client.get(self.api_path_custom_field,
                                                  format='json',
+                                                 charset='utf-8',
                                                  HTTP_HOST='localhost')
         self.get_list_des = self.deserialize(self.get_list_resp)
 
         # get_detail(pk)
         self.get_detail_resp = \
-            lambda pk: self.api_client.get(self.api_path_ht_ref+str(pk)+'/',
+            lambda pk: self.api_client.get(self.api_path_custom_field+str(pk)+'/',
                                            format='json',
+                                           charset='utf-8',
                                            HTTP_HOST='localhost')
         self.get_detail_des = \
             lambda pk: self.deserialize(self.get_detail_resp(pk))
 
-        self.ht_ref = HashTagReference.objects.first()
+        self.custom_field = CustomField.objects.first()
 
     def test_get_list_valid_json(self):
         self.assertValidJSONResponse(self.get_list_resp)
@@ -2850,32 +2931,28 @@ class HashTagReferenceResourceTest(ResourceTestMixin, ResourceTestCase):
 
     def test_get_detail(self):
         self.assertEqual(
-            self.get_detail_des(self.ht_ref.pk)['object_id'],
-            self.ht_ref.object_id
+            self.get_detail_des(self.custom_field.pk)['title'],
+            self.custom_field.title
             )
 
-    def test_search(self):
-        get_list_search_resp = self.api_client.get(self.api_path_ht_ref+
-                                            "search/?hashtag=nurlan",
-                                            format='json',
-                                            HTTP_HOST='localhost')
-        des_resp = self.deserialize(get_list_search_resp)['objects']
-        self.assertTrue(des_resp['activities'])
-        self.assertTrue(des_resp['contacts'])
-        self.assertTrue(des_resp['sales_cycles'])
-        self.assertTrue(des_resp['comments'])
+    def test_bulk_edit(self):
+        contact = Contact.objects.first()
+        post_data = {
+            "content_class": 'contact',
+            "custom_fields":[
+                {
+                    "id": 7,
+                    "title": "test title"        
+                },
+                {
+                    "title": "title"               
+                }
+            ]
+        }
 
-        get_list_search_resp = self.api_client.get(self.api_path_ht_ref+
-                                            "search/?hashtag=hp",
-                                            format='json',
-                                            HTTP_HOST='localhost')
-        des_resp = self.deserialize(get_list_search_resp)['objects']
+        resp = self.api_client.post(self.api_path_custom_field+'bulk_edit/', format='json', data=post_data)
+        print resp
+        self.assertHttpAccepted(resp)
+        # self.assertEqual(Milestone.objects.filter(subscription_id=CRMUser.objects.first().subscription_id).count(), 5)
 
-        self.assertTrue(des_resp['activities'])
-        self.assertTrue(des_resp['sales_cycles'])
-        self.assertEqual(len(des_resp['activities']), 2)
-        self.assertEqual(len(des_resp['sales_cycles']), 1)
 
-=======
-        self.assertEqual(self.get_detail_des(self.milestone.pk)['title'], milestone_title)
->>>>>>> feature/hashtag_search

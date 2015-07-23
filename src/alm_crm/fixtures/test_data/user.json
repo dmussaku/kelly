@@ -12,7 +12,9 @@
         "timezone": "Asia/Almaty",
         "password": "pbkdf2_sha256$12000$RfGiFmGJSeoz$063rfBSPM0AsFi1prglD5BW8qD1ElMYxBpRr5tO1M08=",
         "email": "b.wayne@batman.bat",
-        "vcard": 1
+        "vcard": 1,
+        "date_created": "2014-09-10T00:00:00Z",
+        "date_edited": "2014-11-24T07:49:32.991Z"
     }
 },
 {
@@ -28,7 +30,9 @@
         "timezone": "Asia/Almaty",
         "password": "pbkdf2_sha256$12000$RfGiFmGJSeoz$063rfBSPM0AsFi1prglD5BW8qD1ElMYxBpRr5tO1M08=",
         "email": "kot.dosov869@alma.net",
-        "vcard": 2
+        "vcard": 2,
+        "date_created": "2014-09-10T00:00:00Z",
+        "date_edited": "2014-11-24T07:49:32.991Z"
     }
 },
 {
@@ -44,7 +48,9 @@
         "timezone": "Asia/Almaty",
         "password": "pbkdf2_sha256$12000$RfGiFmGJSeoz$063rfBSPM0AsFi1prglD5BW8qD1ElMYxBpRr5tO1M08=",
         "email": "zhan.sattarov744@alma.net",
-        "vcard": 3
+        "vcard": 3,
+        "date_created": "2014-09-10T00:00:00Z",
+        "date_edited": "2014-11-24T07:49:32.991Z"
     }
 },
 {
@@ -60,7 +66,9 @@
         "timezone": "Asia/Almaty",
         "password": "pbkdf2_sha256$12000$RfGiFmGJSeoz$063rfBSPM0AsFi1prglD5BW8qD1ElMYxBpRr5tO1M08=",
         "email": "usman.sanzharov215@alma.net",
-        "vcard": 4
+        "vcard": 4,
+        "date_created": "2014-09-10T00:00:00Z",
+        "date_edited": "2014-11-24T07:49:32.991Z"
     }
 },
 {
@@ -76,7 +84,9 @@
         "timezone": "Asia/Almaty",
         "password": "pbkdf2_sha256$12000$RfGiFmGJSeoz$063rfBSPM0AsFi1prglD5BW8qD1ElMYxBpRr5tO1M08=",
         "email": "yerlan.kotov1190@alma.net",
-        "vcard": 5
+        "vcard": 5,
+        "date_created": "2014-09-10T00:00:00Z",
+        "date_edited": "2014-11-24T07:49:32.991Z"
     }
 },
 {
@@ -92,7 +102,9 @@
         "timezone": "Asia/Almaty",
         "password": "pbkdf2_sha256$12000$RfGiFmGJSeoz$063rfBSPM0AsFi1prglD5BW8qD1ElMYxBpRr5tO1M08=",
         "email": "yerlan.kotov1834@alma.net",
-        "vcard": 17
+        "vcard": 17,
+        "date_created": "2014-09-10T00:00:00Z",
+        "date_edited": "2014-11-24T07:49:32.991Z"
     }
 },
 {
@@ -108,7 +120,9 @@
         "timezone": "Asia/Almaty",
         "password": "pbkdf2_sha256$12000$RfGiFmGJSeoz$063rfBSPM0AsFi1prglD5BW8qD1ElMYxBpRr5tO1M08=",
         "email": "ivan.nurlanov449@alma.net",
-        "vcard": 18
+        "vcard": 18,
+        "date_created": "2014-09-10T00:00:00Z",
+        "date_edited": "2014-11-24T07:49:32.991Z"
     }
 }
 ]

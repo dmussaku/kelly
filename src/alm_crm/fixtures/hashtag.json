@@ -3,6 +3,8 @@
         "pk":1,
         "model": "alm_crm.HashTag",
         "fields": {
+            "date_created": "2014-09-10T00:00:00Z",
+            "date_edited": "2014-11-24T07:49:32.991Z", 
             "text": "#crm"
         }
     },
@@ -10,6 +12,8 @@
         "pk": 2,
         "model": "alm_crm.HashTag",
         "fields": {
+            "date_created": "2014-09-10T00:00:00Z",
+            "date_edited": "2014-11-24T07:49:32.991Z", 
         	"text":"#almanet"
         }
     },
@@ -17,6 +21,8 @@
         "pk": 3,
         "model": "alm_crm.HashTag",
         "fields": {
+            "date_created": "2014-09-10T00:00:00Z",
+            "date_edited": "2014-11-24T07:49:32.991Z", 
         	"text":"#nurlan"
         }
     },
@@ -24,6 +30,8 @@
         "pk": 4,
         "model": "alm_crm.HashTag",
         "fields": {
+            "date_created": "2014-09-10T00:00:00Z",
+            "date_edited": "2014-11-24T07:49:32.991Z", 
         	"text":"#askhat"
         }
     },
@@ -31,6 +39,8 @@
         "pk": 5,
         "model": "alm_crm.HashTag",
         "fields": {
+            "date_created": "2014-09-10T00:00:00Z",
+            "date_edited": "2014-11-24T07:49:32.991Z", 
             "text":"#hp"
         }
     }

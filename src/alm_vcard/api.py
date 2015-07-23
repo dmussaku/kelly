@@ -11,14 +11,6 @@ from django.db import transaction
 from django.core.exceptions import ObjectDoesNotExist
 from tastypie.exceptions import NotFound
 from collections import OrderedDict
-from alm_crm.utils.data_processing import (
-    processing_custom_section_data,
-    processing_custom_field_data,
-    from_section_object_to_data,
-    from_field_object_to_data,
-    processing_section_object_data,
-    processing_field_object_data,
-    )
 
 def vcard_rel_dehydrate(bundle):
     if bundle.data.get('vcard'):
@@ -65,8 +57,8 @@ class VCardResource(ModelResource):
     #                           related_name='vcard', null=True, full=True)
     # nicknames = fields.ToManyField('alm_vcard.api.VCardNicknameResource', 'nickname_set',
     #                           related_name='vcard', null=True, full=True)
-    # notes = fields.ToManyField('alm_vcard.api.VCardNoteResource', 'note_set',
-    #                           related_name='vcard', null=True, full=True)
+    notes = fields.ToManyField('alm_vcard.api.VCardNoteResource', 'note_set',
+                              related_name='vcard', null=True, full=True)
     # roles = fields.ToManyField('alm_vcard.api.VCardRoleResource', 'role_set',
     #                           related_name='vcard', null=True, full=True)
     titles = fields.ToManyField('alm_vcard.api.VCardTitleResource', 'title_set',
@@ -77,7 +69,7 @@ class VCardResource(ModelResource):
                               related_name='vcard', null=True, full=True)
 
     class Meta(CommonMeta):
-        queryset = VCard.objects.all().prefetch_related('custom_sections', 'custom_fields', 'email_set', 'tel_set', 'org_set', 'adr_set', 'category_set', 'title_set', 'url_set')
+        queryset = VCard.objects.all().prefetch_related('email_set', 'tel_set', 'org_set', 'adr_set', 'category_set', 'title_set', 'url_set')
         excludes = ['id','resource_uri']
         resource_name = 'vcard'
 
@@ -86,10 +78,6 @@ class VCardResource(ModelResource):
     #     del bundle.data['resource_uri']
     #     return bundle
 
-    def dehydrate(self, bundle):
-        bundle.data['custom_sections'] = processing_section_object_data(list(bundle.obj.custom_sections.all()))
-        bundle.data['custom_fields'] = processing_field_object_data(filter(lambda f: f.section == None, bundle.obj.custom_fields.all()))
-        return bundle
 
     @transaction.atomic()
     def obj_create(self, bundle, **kwargs):
@@ -112,14 +100,6 @@ class VCardResource(ModelResource):
 
     def obj_delete(self, bundle, **kwargs):
         return super(self.__class__, self).obj_delete(bundle, **kwargs)
-
-    def save(self, bundle, **kwargs):
-        bundle = super(self.__class__, self).save(bundle, **kwargs)
-        if bundle.data.get('custom_sections', None):
-            processing_custom_section_data(bundle.data['custom_sections'], bundle.obj)
-        if bundle.data.get('custom_fields', None):
-            processing_custom_field_data(bundle.data['custom_fields'], bundle.obj)
-        return bundle
 
 
 class VCardRelatedResource(ModelResource):

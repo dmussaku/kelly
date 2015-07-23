@@ -6,7 +6,7 @@ from django.utils.translation import ugettext as _
 from alm_company.models import Company
 from almanet.settings import DEFAULT_SERVICE
 from almanet.models import Service, Subscription
-from alm_crm.models import Contact, SalesCycle, Activity, CRMUser, Product, ContactList
+from alm_crm.models import Contact, SalesCycle, Activity, CRMUser, Product, ContactList, Share
 from alm_vcard.models import VCard
 import logging
 
@@ -101,6 +101,21 @@ def check_are_contact_in_contactlist_exist():
             logging.warning("Contact with ID: %s doesn't have vcard"%(contact.id))
     print "******** Checking finished ******** \n"
 
+def check_is_share_has_contact():
+    print "******** Check is Share has Contact and shared user ********"
+    for share in Share.objects.all():
+
+        contact = share.contact
+        shared_from = share.share_from
+
+        if contact == None:
+            logging.warning("Share with ID: %s has no contact"%(share.id))
+
+        if shared_from == None:
+            logging.warning("Share with ID: %s has no shared user"%(share.id))
+
+    print "******** Checking finished ******** \n"
+
 class Command(BaseCommand):
     help = 'Check database for existense main fields of objects, as is contact has \
      default cycle, is cycle has contact, is activity on cycle, is contact has owner \
@@ -114,5 +129,6 @@ class Command(BaseCommand):
         check_is_product_has_sales_cycles()
         check_is_contact_has_vcard()
         check_are_contact_in_contactlist_exist()
+        check_is_share_has_contact()
 
         self.stdout.write('DATABASE CHECKING HAS BEEN FINISHED')
