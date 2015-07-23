@@ -116,6 +116,21 @@ def check_is_share_has_contact():
 
     print "******** Checking finished ******** \n"
 
+def check_subscription_milestones():
+    print "******** Check is Subscription has a success and a fail Milestone ********"
+    for subscription in Subscription.objects.all():
+        success_milestones_amount = Milestone.objects.filter(subscription_id=subscription.id, is_system = 1).count()
+        fail_milestones_amount = Milestone.objects.filter(subscription_id=subscription.id, is_system = 2).count()
+
+        if success_milestones_amount != 1:
+            logging.warning("Subscription with ID: %s has %i success milestones"%(subscription.id, success_milestones_amount))
+
+        if fail_milestones_amount != 1:
+            logging.warning("Subscription with ID: %s has %i success milestones"%(subscription.id, fail_milestones_amount))
+
+
+    print "******** Checking finished ******** \n"
+
 class Command(BaseCommand):
     help = 'Check database for existense main fields of objects, as is contact has \
      default cycle, is cycle has contact, is activity on cycle, is contact has owner \
@@ -130,5 +145,6 @@ class Command(BaseCommand):
         check_is_contact_has_vcard()
         check_are_contact_in_contactlist_exist()
         check_is_share_has_contact()
+        check_subscription_milestones()
 
         self.stdout.write('DATABASE CHECKING HAS BEEN FINISHED')

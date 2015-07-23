@@ -112,6 +112,7 @@ class CRMUser(SubscriptionObject):
 class Milestone(SubscriptionObject):
 
     title = models.CharField(_("title"), max_length=1024, null=True, blank=True)
+    is_system = models.IntegerField(default=0)
     color_code = models.CharField(_('color code'), max_length=1024, null=True, blank=True)
 
     class Meta:
@@ -1626,9 +1627,9 @@ class SalesCycleLogEntry(SubscriptionObject):
     TYPES_CAPS = (
         _('Milestone change'),
     )
-    TYPES = (MC, ME, MD, PC) = ('MC', 'ME', 'MD', 'PC')
+    TYPES = (MC, ME, MD, PC, SC, FC) = ('MC', 'ME', 'MD', 'PC', 'SC', 'FC')
     TYPES_OPTIONS = zip(TYPES, TYPES_CAPS)
-    TYPES_DICT = dict(zip(('MC', 'ME', 'MD', 'PC'), TYPES))
+    TYPES_DICT = dict(zip(('MC', 'ME', 'MD', 'PC', 'SC', 'FC'), TYPES))
 
     meta = models.TextField(null=True, blank=True)
     sales_cycle = models.ForeignKey(SalesCycle, related_name='log')
