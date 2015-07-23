@@ -1,6 +1,8 @@
 import inspect
 import sys
+import time
 from django.db.models import Model
+from django.db import connection
 from alm_vcard import models
 from preserialize.serialize import serialize
 from almanet.utils.metaprogramming import SerializableModel
@@ -22,7 +24,8 @@ def build_tmpl_for(vcard_comp):
 def serialize_objs(vcards):
 	comps = vcard_rel_components()
 	related_tmpls, aliases = {}, {}
-	for comp_name, comp in comps:
+	for i in xrange(len(comps)):
+		comp_name, comp = comps[i]
 		key = "{}_set".format(comp._meta.model_name)
 		aliases[comp._ser_meta.alias] = key
 		related_tmpls[key] = build_tmpl_for(comp)
@@ -35,3 +38,14 @@ def serialize_objs(vcards):
 
 def test():
 	return serialize_objs(models.VCard.objects.first())
+
+def stress_test():
+	t1 = time.time()
+	vcs = models.VCard.objects.all().prefetch_related(
+		'tel_set', 'category_set',
+		'adr_set', 'title_set', 'url_set',
+		'org_set', 'email_set', 'custom_sections',
+		'note_set')[1:1000]
+	serialize_objs(vcs)
+	t2 = time.time()
+	print "Objects: {}, SQL Queries: {}, seconds: {}".format(len(vcs), len(connection.queries), (t2 - t1))

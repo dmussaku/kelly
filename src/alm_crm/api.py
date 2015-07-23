@@ -101,7 +101,7 @@ from .utils.data_processing import (
     processing_field_object_data,
     processing_section_object_data,
     )
-
+from alm_vcard.serializer import serialize_objs
 
 import base64
 import simplejson as json
@@ -829,11 +829,14 @@ class ContactResource(CRMServiceModelResource):
             return self.create_response(request, obj_dict)
 
     def get_contact_state(self, request, **kwargs):
+
         with RequestContext(self, request, allowed_methods=['get']):
             base_bundle = self.build_bundle(request=request)
             objects = self.obj_get_list(bundle=base_bundle, **self.remove_api_resource_names(kwargs))
-            bundles = []
-            vcard_rsr = VCardResource()
+            bundles, vcard_bundles = [], {
+                vcard_raw['id']: vcard_raw for vcard_raw in 
+                serialize_objs((obj.vcard for obj in objects))}
+            # vcard_rsr = VCardResource()
             bundles = (
                 {
                     'id': obj.id,
@@ -847,7 +850,7 @@ class ContactResource(CRMServiceModelResource):
                     'subscription_id': obj.subscription_id,
                     'children': list(contact.id for contact in obj.children.all()),
                     'sales_cycles': list(cycle.id for cycle in obj.sales_cycles.all()),
-                    'vcard': vcard_rsr.full_dehydrate(vcard_rsr.build_bundle(obj=obj.vcard, request=request))
+                    'vcard': vcard_bundles[obj.vcard_id]
                 } for obj in objects)
         return self.create_response(request, StreamList(bundles))
 
