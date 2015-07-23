@@ -1626,9 +1626,9 @@ class SalesCycleLogEntry(SubscriptionObject):
     TYPES_CAPS = (
         _('Milestone change'),
     )
-    TYPES = (MC, ME, MD) = ('MC', 'ME', 'MD')
+    TYPES = (MC, ME, MD, PC) = ('MC', 'ME', 'MD', 'PC')
     TYPES_OPTIONS = zip(TYPES, TYPES_CAPS)
-    TYPES_DICT = dict(zip(('MC', 'ME', 'MD'), TYPES))
+    TYPES_DICT = dict(zip(('MC', 'ME', 'MD', 'PC'), TYPES))
 
     meta = models.TextField(null=True, blank=True)
     sales_cycle = models.ForeignKey(SalesCycle, related_name='log')

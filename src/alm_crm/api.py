@@ -1812,13 +1812,30 @@ class SalesCycleResource(CRMServiceModelResource):
                 format=request.META.get('CONTENT_TYPE', 'application/json'))
             deserialized = self.alter_deserialized_list_data(request, deserialized)
 
+            new_objects_list = deserialized['object_ids']
+            last_objects_list = obj.products.all().values_list('id', flat=True)
+            
+            added = [Product.objects.get(id=item).name for item in new_objects_list if item not in last_objects_list]
+            deleted = [Product.objects.get(id=item).name for item in last_objects_list if item not in new_objects_list]
+
+            meta = {"added": added,
+                    "deleted": deleted}
+            log_entry = SalesCycleLogEntry(sales_cycle=obj, 
+                                            owner=request.user.get_crmuser(),
+                                            entry_type=SalesCycleLogEntry.PC,
+                                            meta=json.dumps(meta))
+            log_entry.save()
+
             obj.products.clear()
             obj.add_products(deserialized['object_ids'])
+
+            bundle = get_product_ids()
+            bundle['log'] = SalesCycleLogEntryResource().get_bundle_detail(log_entry, request)
 
             if not self._meta.always_return_data:
                 return http.HttpAccepted(location=location)
             else:
-                return self.create_response(request, get_product_ids(),
+                return self.create_response(request, bundle,
                                             response_class=http.HttpAccepted)
 
     def change_milestone(self, request, **kwargs):

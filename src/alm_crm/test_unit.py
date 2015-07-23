@@ -896,14 +896,13 @@ class SalesCycleResourceTest(ResourceTestMixin, ResourceTestCase):
 
     def test_update_product_ids(self):
         put_data = {
-            'object_ids': [1, 2, 3]
+            'object_ids': [2, 3]
         }
         before = self.sales_cycle.products.count()
         resp = self.api_client.put(
             self.api_path_sales_cycle+str(self.sales_cycle.pk)+'/products/',
             format='json', data=put_data)
         self.assertHttpAccepted(resp)
-        self.assertNotEqual(before, self.sales_cycle.products.count())
         resp = self.deserialize(resp)
         self.assertEqual(len(resp['object_ids']), self.sales_cycle.products.count())
 
