@@ -18,7 +18,7 @@ def text_parser(base_text, content_class=None, object_id=None):
 	mentions = mention_parser.findall(base_text)
 
 	# delete hashtags and mention references in case of editing objects
-	content_class.objects.get(id=object_id).hashtags.clear()
+	# content_class.objects.get(id=object_id).hashtags.clear()
 	content_class.objects.get(id=object_id).mentions.clear()
 	
 	for hashtag_item in hashtags:

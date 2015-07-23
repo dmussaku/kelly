@@ -1897,6 +1897,10 @@ class SalesCycleResource(CRMServiceModelResource):
         bundle.data['obj_created'] = True
         return bundle
 
+    def obj_update(self, bundle, **kwargs):
+        del(bundle.data['activities'])
+        return super(self.__class__, self).obj_update(bundle, **kwargs)
+
     def save(self, bundle, **kwargs):
         bundle = super(SalesCycleResource, self).save(bundle, **kwargs)
         if 'milestone_id' in bundle.data and bundle.data['milestone_id'] is not None:
