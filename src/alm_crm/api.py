@@ -1817,17 +1817,27 @@ class SalesCycleResource(CRMServiceModelResource):
             
             added = [Product.objects.get(id=item).name for item in new_objects_list if item not in last_objects_list]
             deleted = [Product.objects.get(id=item).name for item in last_objects_list if item not in new_objects_list]
+            products = []
+
+            obj.products.clear()
+            obj.add_products(deserialized['object_ids'])
+
+            for product in obj.products.all():
+                products.append(
+                    {
+                        'id': product.id,
+                        'name': product.name
+                    }
+                )
 
             meta = {"added": added,
-                    "deleted": deleted}
+                    "deleted": deleted,
+                    "products": products}
             log_entry = SalesCycleLogEntry(sales_cycle=obj, 
                                             owner=request.user.get_crmuser(),
                                             entry_type=SalesCycleLogEntry.PC,
                                             meta=json.dumps(meta))
             log_entry.save()
-
-            obj.products.clear()
-            obj.add_products(deserialized['object_ids'])
 
             bundle = get_product_ids()
             bundle['log'] = SalesCycleLogEntryResource().get_bundle_detail(log_entry, request)

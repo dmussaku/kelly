@@ -904,6 +904,7 @@ class SalesCycleResourceTest(ResourceTestMixin, ResourceTestCase):
             format='json', data=put_data)
         self.assertHttpAccepted(resp)
         resp = self.deserialize(resp)
+        print resp, "RESPONSE"
         self.assertEqual(len(resp['object_ids']), self.sales_cycle.products.count())
 
     @skipIf(True, "now, activities is not presented in SalesCycleResource")
