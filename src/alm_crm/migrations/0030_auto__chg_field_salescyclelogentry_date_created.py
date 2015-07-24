@@ -257,10 +257,9 @@ class Migration(SchemaMigration):
             'date_edited': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'product': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['alm_crm.Product']"}),
-            'projected_value': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
-            'real_value': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
             'sales_cycle': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'product_stats'", 'null': 'True', 'on_delete': 'models.SET_NULL', 'to': u"orm['alm_crm.SalesCycle']"}),
-            'subscription_id': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'})
+            'subscription_id': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
+            'value': ('django.db.models.fields.IntegerField', [], {'default': '0'})
         },
         u'alm_crm.share': {
             'Meta': {'object_name': 'Share', 'db_table': "'alma_share'"},
