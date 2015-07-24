@@ -8,19 +8,6 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Deleting field 'SalesCycleProductStat.value'
-        db.delete_column('alma_cycle_prod_stat', 'value')
-
-        # Adding field 'SalesCycleProductStat.real_value'
-        db.add_column('alma_cycle_prod_stat', 'real_value',
-                      self.gf('django.db.models.fields.IntegerField')(default=0),
-                      keep_default=False)
-
-        # Adding field 'SalesCycleProductStat.projected_value'
-        db.add_column('alma_cycle_prod_stat', 'projected_value',
-                      self.gf('django.db.models.fields.IntegerField')(default=0),
-                      keep_default=False)
-
         # Adding field 'Milestone.is_system'
         db.add_column('alma_milestone', 'is_system',
                       self.gf('django.db.models.fields.IntegerField')(default=0),
@@ -31,17 +18,6 @@ class Migration(SchemaMigration):
 
 
     def backwards(self, orm):
-        # Adding field 'SalesCycleProductStat.value'
-        db.add_column('alma_cycle_prod_stat', 'value',
-                      self.gf('django.db.models.fields.IntegerField')(default=0),
-                      keep_default=False)
-
-        # Deleting field 'SalesCycleProductStat.real_value'
-        db.delete_column('alma_cycle_prod_stat', 'real_value')
-
-        # Deleting field 'SalesCycleProductStat.projected_value'
-        db.delete_column('alma_cycle_prod_stat', 'projected_value')
-
         # Deleting field 'Milestone.is_system'
         db.delete_column('alma_milestone', 'is_system')
 
@@ -288,10 +264,9 @@ class Migration(SchemaMigration):
             'date_edited': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'product': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['alm_crm.Product']"}),
-            'projected_value': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
-            'real_value': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
             'sales_cycle': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'product_stats'", 'null': 'True', 'on_delete': 'models.SET_NULL', 'to': u"orm['alm_crm.SalesCycle']"}),
-            'subscription_id': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'})
+            'subscription_id': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
+            'value': ('django.db.models.fields.IntegerField', [], {'default': '0'})
         },
         u'alm_crm.share': {
             'Meta': {'object_name': 'Share', 'db_table': "'alma_share'"},
