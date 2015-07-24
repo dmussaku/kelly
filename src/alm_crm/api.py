@@ -4418,10 +4418,12 @@ class ReportResource(Resource):
     def user_report(self, request, **kwargs):
         with RequestContext(self, request, allowed_methods=['post']):
 
-            data = self.deserialize(
-                request, request.body,
-                format=request.META.get('CONTENT_TYPE', 'application/json')) if request.body else {}
-
+            if request.body:
+                data = self.deserialize(
+                    request, request.body,
+                    format=request.META.get('CONTENT_TYPE', 'application/json')) if request.body else {}
+            else:
+                data = {}
 
             return self.create_response(request, report_builders.build_user_report(
                 subscription_id=request.user.get_crmuser().subscription_id,

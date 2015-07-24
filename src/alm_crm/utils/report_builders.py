@@ -71,7 +71,8 @@ def build_user_report(subscription_id, user_ids=[-1], from_date=None, to_date=No
 													date_created__range=(from_date, to_date), is_global=False)
 	close_activities = Activity.objects.filter(owner_id__in=user_ids, description__startswith='Closed')
 	closed_sales_cycles = SalesCycle.objects.filter(status__in='C', rel_activities__in=close_activities, date_created__range=(from_date, to_date), is_global=False)
-	earned_money = sum(SalesCycleProductStat.objects.filter(sales_cycle__in=closed_sales_cycles).values_list('value', flat=True))
+	earned_money = sum(SalesCycleProductStat.objects.filter(
+		sales_cycle__in=closed_sales_cycles).values_list('real_value', flat=True))
 
 	activity_dates = Activity.objects.filter(owner_id__in=user_ids if user_ids[0] != -1 
 													else CRMUser.objects.filter(subscription_id=subscription_id).values_list('id', 
