@@ -70,7 +70,7 @@ class SubscriptionObject(models.Model):
     class Meta:
         abstract = True
 
-    def save(self, **kwargs):
-        if not self.subscription_id and self.owner:
+    def save(self, **kwargs):    
+        if not self.subscription_id and self.owner or (self.subscription_id != self.owner.subscription_id):
             self.subscription_id = self.owner.subscription_id
         super(SubscriptionObject, self).save(**kwargs)
