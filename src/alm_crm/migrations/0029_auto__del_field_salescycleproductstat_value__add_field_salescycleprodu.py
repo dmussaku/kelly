@@ -8,19 +8,6 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Deleting field 'SalesCycleProductStat.value'
-        db.delete_column('alma_cycle_prod_stat', 'value')
-
-        # Adding field 'SalesCycleProductStat.real_value'
-        db.add_column('alma_cycle_prod_stat', 'real_value',
-                      self.gf('django.db.models.fields.IntegerField')(default=0),
-                      keep_default=False)
-
-        # Adding field 'SalesCycleProductStat.projected_value'
-        db.add_column('alma_cycle_prod_stat', 'projected_value',
-                      self.gf('django.db.models.fields.IntegerField')(default=0),
-                      keep_default=False)
-
         # Adding field 'Milestone.is_system'
         db.add_column('alma_milestone', 'is_system',
                       self.gf('django.db.models.fields.IntegerField')(default=0),
@@ -31,17 +18,6 @@ class Migration(SchemaMigration):
 
 
     def backwards(self, orm):
-        # Adding field 'SalesCycleProductStat.value'
-        db.add_column('alma_cycle_prod_stat', 'value',
-                      self.gf('django.db.models.fields.IntegerField')(default=0),
-                      keep_default=False)
-
-        # Deleting field 'SalesCycleProductStat.real_value'
-        db.delete_column('alma_cycle_prod_stat', 'real_value')
-
-        # Deleting field 'SalesCycleProductStat.projected_value'
-        db.delete_column('alma_cycle_prod_stat', 'projected_value')
-
         # Deleting field 'Milestone.is_system'
         db.delete_column('alma_milestone', 'is_system')
 
