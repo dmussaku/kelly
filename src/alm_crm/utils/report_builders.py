@@ -127,7 +127,7 @@ def build_product_report(subscription_id, product_ids=[-1], from_date=None, to_d
 								status='C',
 								is_global=False, date_created__range=(from_date, to_date)
 							)
-	earned_money = sum(SalesCycleProductStat.objects.filter(sales_cycle__in=closed_sales_cycles).values_list('value', flat=True))
+	earned_money = sum(SalesCycleProductStat.objects.filter(sales_cycle__in=closed_sales_cycles).values_list('real_value', flat=True))
 
 	user_report = {
 		'report_name': 'product_report',
