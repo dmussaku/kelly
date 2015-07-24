@@ -31,6 +31,7 @@ import time
 from almanet.settings import TEMP_DIR, BASE_DIR
 from alm_vcard import models as vcard_models
 from celery import group, Task, result
+import simplejson as json
 # from .tasks import create_failed_contacts_xls
 
 ALLOWED_TIME_PERIODS = ['week', 'month', 'year']
@@ -112,6 +113,7 @@ class CRMUser(SubscriptionObject):
 class Milestone(SubscriptionObject):
 
     title = models.CharField(_("title"), max_length=1024, null=True, blank=True)
+    is_system = models.IntegerField(default=0)
     color_code = models.CharField(_('color code'), max_length=1024, null=True, blank=True)
 
     class Meta:
@@ -1494,11 +1496,14 @@ class SalesCycle(SubscriptionObject):
         if save:
             self.save()
 
-    def set_result_by_amount(self, amount):
+    def set_result_by_amount(self, amount, succeed):
         v = Value(amount=amount, owner=self.owner)
         v.save()
 
-        self.real_value = v
+        if succeed:
+            self.real_value = v
+        else:
+            self.projected_value = v
         self.save()
 
     def add_follower(self, user_id, **kw):
@@ -1518,9 +1523,19 @@ class SalesCycle(SubscriptionObject):
                 status.append(False)
         return status
 
-    def change_milestone(self, crmuser, milestone_id, meta):
+    def change_milestone(self, crmuser, milestone_id):
         milestone = Milestone.objects.get(id=milestone_id)
+
+        prev_milestone_title = None
+        prev_milestone_color_code = None
+
+        if self.milestone != None:
+            prev_milestone_title = self.milestone.title
+            prev_milestone_color_code = self.milestone.color_code
+
         self.milestone = milestone
+        self.real_value = None
+        self.projected_value = None
         self.save()
 
         for log_entry in self.log.all():
@@ -1528,34 +1543,43 @@ class SalesCycle(SubscriptionObject):
                log_entry.entry_type == SalesCycleLogEntry.MD:
                log_entry.delete()
 
-        sc_log_entry = SalesCycleLogEntry(meta=meta,
+        meta = {
+            "prev_milestone_title": prev_milestone_title,
+            "prev_milestone_color_code": prev_milestone_color_code,
+            "next_milestone_title": milestone.title,
+            "next_milestone_color_code": milestone.color_code
+        }
+
+        sc_log_entry = SalesCycleLogEntry(meta=json.dumps(meta),
                                           entry_type=SalesCycleLogEntry.MC,
                                           sales_cycle=self,
                                           owner=crmuser)
         sc_log_entry.save()
         return self
 
-    def close(self, products_with_values):
+    def close(self, products_with_values, succeed):
         amount = 0
         for product, value in products_with_values.iteritems():
             amount += value
             s = SalesCycleProductStat.objects.get(sales_cycle=self,
                                                   product=Product.objects.get(id=product))
-            s.value = value
+            if succeed:
+                s.real_value = value
+            else:
+                s.projected_value = value
             s.save()
 
         self.status = self.COMPLETED
-        self.set_result_by_amount(amount)
+        self.set_result_by_amount(amount, succeed)
         self.save()
 
-        activity = Activity(
-            sales_cycle=self,
-            owner=self.owner,
-            description=_('Closed. Amount Value is %(amount)s') % {'amount': amount}
-            )
-        activity.save()
-        activity.set_feedback_status(Feedback.OUTCOME, save_feedback=True)
-        return [self, activity]
+        log_entry = SalesCycleLogEntry(sales_cycle=self, meta=json.dumps({"amount": amount}))
+        if succeed:
+            log_entry.entry_type = SalesCycleLogEntry.SC
+        else:
+            log_entry.entry_type = SalesCycleLogEntry.FC
+
+        return [self, log_entry]
 
     @classmethod
     def upd_lst_activity_on_create(cls, sender,
@@ -1626,9 +1650,9 @@ class SalesCycleLogEntry(SubscriptionObject):
     TYPES_CAPS = (
         _('Milestone change'),
     )
-    TYPES = (MC, ME, MD) = ('MC', 'ME', 'MD')
+    TYPES = (MC, ME, MD, PC, SC, FC) = ('MC', 'ME', 'MD', 'PC', 'SC', 'FC')
     TYPES_OPTIONS = zip(TYPES, TYPES_CAPS)
-    TYPES_DICT = dict(zip(('MC', 'ME', 'MD'), TYPES))
+    TYPES_DICT = dict(zip(('MC', 'ME', 'MD', 'PC', 'SC', 'FC'), TYPES))
 
     meta = models.TextField(null=True, blank=True)
     sales_cycle = models.ForeignKey(SalesCycle, related_name='log')
@@ -2176,7 +2200,8 @@ class SalesCycleProductStat(SubscriptionObject):
     sales_cycle = models.ForeignKey(SalesCycle, related_name='product_stats',
                                 null=True, blank=True, on_delete=models.SET_NULL)
     product = models.ForeignKey(Product)
-    value = models.IntegerField(default=0)
+    real_value = models.IntegerField(default=0)
+    projected_value = models.IntegerField(default=0)
 
     @property
     def owner(self):

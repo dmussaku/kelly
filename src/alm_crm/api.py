@@ -1695,7 +1695,7 @@ class SalesCycleResource(CRMServiceModelResource):
     def prepend_urls(self):
         return [
             url(
-                r"^(?P<resource_name>%s)/(?P<id>\d+)/close%s$" %
+                r"^(?P<resource_name>%s)/(?P<id>\d+)/close/(?P<status>\w+)%s$" %
                 (self._meta.resource_name, trailing_slash()),
                 self.wrap_view('close'),
                 name='api_close'
@@ -1743,15 +1743,14 @@ class SalesCycleResource(CRMServiceModelResource):
         close SalesCycle, set value of SalesCycleProductStat
         update status to 'C'('Completed')
 
-        @return: updated SalesCycle and close Activity
+        @return: updated SalesCycle
 
         '''
         with RequestContext(self, request, allowed_methods=['post', 'get', 'put']):
             basic_bundle = self.build_bundle(request=request)
             # get sales_cycle
             try:
-                obj = self.cached_obj_get(bundle=basic_bundle,
-                                          **self.remove_api_resource_names(kwargs))
+                obj = SalesCycle.objects.get(id=kwargs['id'])
             except ObjectDoesNotExist:
                 return http.HttpNotFound()
             except MultipleObjectsReturned:
@@ -1767,12 +1766,20 @@ class SalesCycleResource(CRMServiceModelResource):
                 request, request.body,
                 format=request.META.get('CONTENT_TYPE', 'application/json'))
             deserialized = self.alter_deserialized_list_data(request, deserialized)
-            sales_cycle, activity = bundle.obj.close(products_with_values=deserialized)
+            if kwargs['status'] == 'succeed':
+                sales_cycle, log_entry = bundle.obj.close(products_with_values=deserialized, succeed=True)
+                log_entry.owner = request.user.get_crmuser()
+                log_entry.save()
+            elif kwargs['status'] == 'fail':
+                sales_cycle, log_entry = bundle.obj.close(products_with_values=deserialized, succeed=False)
+                log_entry.owner = request.user.get_crmuser()
+                log_entry.save()
+            else:
+                return http.HttpBadRequest()
 
         return self.create_response(
             request, {
-                'sales_cycle': SalesCycleResource().get_bundle_detail(sales_cycle, request),
-                'activity': ActivityResource().get_bundle_detail(activity, request)
+                'sales_cycle': SalesCycleResource().get_bundle_detail(sales_cycle, request)
             },
             response_class=http.HttpAccepted)
 
@@ -1812,13 +1819,40 @@ class SalesCycleResource(CRMServiceModelResource):
                 format=request.META.get('CONTENT_TYPE', 'application/json'))
             deserialized = self.alter_deserialized_list_data(request, deserialized)
 
+            new_objects_list = deserialized['object_ids']
+            last_objects_list = obj.products.all().values_list('id', flat=True)
+            
+            added = [Product.objects.get(id=item).name for item in new_objects_list if item not in last_objects_list]
+            deleted = [Product.objects.get(id=item).name for item in last_objects_list if item not in new_objects_list]
+            products = []
+
             obj.products.clear()
             obj.add_products(deserialized['object_ids'])
+
+            for product in obj.products.all():
+                products.append(
+                    {
+                        'id': product.id,
+                        'name': product.name
+                    }
+                )
+
+            meta = {"added": added,
+                    "deleted": deleted,
+                    "products": products}
+            log_entry = SalesCycleLogEntry(sales_cycle=obj, 
+                                            owner=request.user.get_crmuser(),
+                                            entry_type=SalesCycleLogEntry.PC,
+                                            meta=json.dumps(meta))
+            log_entry.save()
+
+            bundle = get_product_ids()
+            bundle['log'] = SalesCycleLogEntryResource().get_bundle_detail(log_entry, request)
 
             if not self._meta.always_return_data:
                 return http.HttpAccepted(location=location)
             else:
-                return self.create_response(request, get_product_ids(),
+                return self.create_response(request, bundle,
                                             response_class=http.HttpAccepted)
 
     def change_milestone(self, request, **kwargs):
@@ -1850,8 +1884,7 @@ class SalesCycleResource(CRMServiceModelResource):
                 format=request.META.get('CONTENT_TYPE', 'application/json'))
 
             sales_cycle = obj.change_milestone(crmuser=request.user.get_crmuser(),
-                                               milestone_id=deserialized['milestone_id'],
-                                               meta=json.dumps(deserialized['meta']))
+                                               milestone_id=deserialized['milestone_id'])
 
             if not self._meta.always_return_data:
                 return http.HttpAccepted()
@@ -2427,7 +2460,7 @@ class ProductResource(CRMServiceModelResource):
         return bundle
 
     def import_products(self, request, **kwargs):
-    	objects = []
+        objects = []
         product_resource = ProductResource()
         self.method_check(request, allowed=['post'])
         self.is_authenticated(request)
@@ -4341,24 +4374,81 @@ class ReportResource(Resource):
                 (self._meta.resource_name, trailing_slash()),
                 self.wrap_view('realtime_funnel'),
                 name='api_realtime_funnel'
+            ),
+            url(
+                r"^(?P<resource_name>%s)/user_report%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('user_report'),
+                name='api_user_report'
+            ),
+            url(
+                r"^(?P<resource_name>%s)/product_report%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('product_report'),
+                name='api_product_report'
             )]
 
     def funnel(self, request, **kwargs):
         '''
         retrieves data for building sales funnel
         '''
-
+        if request.body:
+            data = self.deserialize(
+                request, request.body,
+                format=request.META.get('CONTENT_TYPE', 'application/json'))
+        else:
+            data = {}
 
         return self.create_response(
             request,
-            report_builders.build_funnel(request.user.get_crmuser().subscription_id))
+            report_builders.build_funnel(request.user.get_crmuser().subscription_id, data))
 
     def realtime_funnel(self, request, **kwargs):
         '''
         retrieves data for building sales funnel
         '''
-
+        if request.body:
+            data = self.deserialize(
+                request, request.body,
+                format=request.META.get('CONTENT_TYPE', 'application/json'))
+        else:
+            data = {}
 
         return self.create_response(
             request,
-            report_builders.build_realtime_funnel(request.user.get_crmuser().subscription_id))
+            report_builders.build_realtime_funnel(request.user.get_crmuser().subscription_id, data))
+
+
+    def user_report(self, request, **kwargs):
+        with RequestContext(self, request, allowed_methods=['post']):
+
+            if request.body:
+                data = self.deserialize(
+                    request, request.body,
+                    format=request.META.get('CONTENT_TYPE', 'application/json')) if request.body else {}
+            else:
+                data = {}
+
+            return self.create_response(request, report_builders.build_user_report(
+                subscription_id=request.user.get_crmuser().subscription_id,
+                user_ids=data.get('user_ids', [-1]),
+                from_date=data.get('from_date', None), 
+                to_date=data.get('to_date', None)), 
+                response_class=http.HttpAccepted)
+        
+
+    def product_report(self, request, **kwargs):
+        with RequestContext(self, request, allowed_methods=['post']):
+            if request.body:
+                data = self.deserialize(
+                    request, request.body,
+                    format=request.META.get('CONTENT_TYPE', 'application/json')) if request.body else {}
+            else:
+                data = {}
+
+            return self.create_response(request, report_builders.build_product_report(
+                subscription_id=request.user.get_crmuser().subscription_id,
+                product_ids=data.get('product_ids', [-1]),
+                from_date=data.get('from_date', None), 
+                to_date=data.get('to_date', None)), 
+                response_class=http.HttpAccepted)

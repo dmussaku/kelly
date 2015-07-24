@@ -30,6 +30,7 @@ from alm_user.models import User
 from almanet.models import Subscription, Service
 from alm_crm.models import GLOBAL_CYCLE_TITLE
 from alm_company.models import Company
+import datetime
 
 
 class CRMUserTestCase(TestCase):
@@ -896,14 +897,13 @@ class SalesCycleResourceTest(ResourceTestMixin, ResourceTestCase):
 
     def test_update_product_ids(self):
         put_data = {
-            'object_ids': [1, 2, 3]
+            'object_ids': [2, 3]
         }
         before = self.sales_cycle.products.count()
         resp = self.api_client.put(
             self.api_path_sales_cycle+str(self.sales_cycle.pk)+'/products/',
             format='json', data=put_data)
         self.assertHttpAccepted(resp)
-        self.assertNotEqual(before, self.sales_cycle.products.count())
         resp = self.deserialize(resp)
         self.assertEqual(len(resp['object_ids']), self.sales_cycle.products.count())
 
@@ -967,11 +967,10 @@ class SalesCycleResourceTest(ResourceTestMixin, ResourceTestCase):
             "2": 13500
         }
         resp = self.api_client.put(
-            self.api_path_sales_cycle+str(self.sales_cycle.pk)+'/close/',
+            self.api_path_sales_cycle+str(self.sales_cycle.pk)+'/succeed/',
             format='json', data=put_data)
         self.assertHttpAccepted(resp)
         resp = self.deserialize(resp)
-        self.assertTrue('activity' in resp)
         self.assertTrue('sales_cycle' in resp)
 
         self.assertEqual(resp['sales_cycle']['status'], 'C')
@@ -979,9 +978,9 @@ class SalesCycleResourceTest(ResourceTestMixin, ResourceTestCase):
                          sum(put_data.values()))
         self.assertEqual(resp['activity']['feedback_status'], Feedback.OUTCOME)
         stat1 = SalesCycleProductStat.objects.get(sales_cycle=self.sales_cycle,
-                                                  product=Product.objects.get(id=1)).value
+                                                  product=Product.objects.get(id=1)).real_value
         stat2 = SalesCycleProductStat.objects.get(sales_cycle=self.sales_cycle,
-                                                  product=Product.objects.get(id=2)).value
+                                                  product=Product.objects.get(id=2)).real_value
         self.assertEqual(stat1, 15000)
         self.assertEqual(stat2, 13500)
         self.sales_cycle.is_global = True
@@ -1360,7 +1359,6 @@ class ActivityResourceTest(ResourceTestMixin, ResourceTestCase):
         self.assertEqual(mention_count+1, Mention.objects.all().count())
         self.assertEqual(HashTagReference.objects.last().hashtag, 
                         HashTag.objects.get(text=HashTagReference.objects.last().hashtag.text))
-    print HashTag.objects.last()   
 
     def test_move(self):
         activity = Activity.objects.first()
@@ -1445,7 +1443,6 @@ class ProductResourceTest(ResourceTestMixin, ResourceTestCase):
         count = sales_cycle.products.count()
         resp = self.api_client.post(
             self.api_path_product, format='json', data=post_data)
-        print resp
         self.assertHttpCreated(resp)
         product = Product.objects.last()
         self.assertEqual(product.name, 'new product')
@@ -1592,7 +1589,6 @@ class ContactResourceTest(ResourceTestMixin, ResourceTestCase):
         mention_count = Mention.objects.all().count()
         resp = self.api_client.post(
             self.api_path_contact, format='json', data=post_data)
-        print resp
         self.assertHttpOK(resp)
         self.assertEqual(Contact.objects.count(), count + 1)
         created_contact = Contact.objects.last()
@@ -2854,7 +2850,6 @@ class MilestoneResourceTest(ResourceTestMixin, ResourceTestCase):
         self.assertHttpAccepted(resp)
         self.assertEqual(self.get_detail_des(self.milestone.pk)['title'], milestone_title)
 
-
     def test_bulk_edit(self):
         milestones = Milestone.objects.filter(id__in=[1, 2, 3])
         subs_milestones = Milestone.objects.filter(subscription_id=CRMUser.objects.first().subscription_id).count()
@@ -2951,8 +2946,79 @@ class CustomFieldResourceTest(ResourceTestMixin, ResourceTestCase):
         }
 
         resp = self.api_client.post(self.api_path_custom_field+'bulk_edit/', format='json', data=post_data)
-        print resp
         self.assertHttpAccepted(resp)
         # self.assertEqual(Milestone.objects.filter(subscription_id=CRMUser.objects.first().subscription_id).count(), 5)
 
 
+class ReportResourceTest(ResourceTestMixin, ResourceTestCase):
+    def setUp(self):
+        super(self.__class__, self).setUp()
+
+        # login user
+        self.get_credentials()
+
+        self.api_path_reports = '/api/v1/reports/'
+
+    def test_user_report(self):   
+        from alm_crm.utils import report_builders
+        import pytz
+        path = self.api_path_reports+'user_report/'
+        resp = self.api_client.post(path)
+        des = self.deserialize(resp)
+
+        ur = report_builders.build_user_report(subscription_id=1)
+
+        self.assertEqual(des['open_sales_cycles'], ur['open_sales_cycles'])
+        self.assertEqual(des['closed_sales_cycles'], ur['closed_sales_cycles'])
+        self.assertEqual(des['earned_money'], ur['earned_money'])
+        self.assertEqual(des['user_ids'], ur['user_ids'])
+
+        from_date =  datetime.datetime(2014, 1, 1).replace(tzinfo=pytz.UTC)
+        to_date = datetime.datetime(2015, 1, 1).replace(tzinfo=pytz.UTC)
+        post_data = {
+            'user_ids': [1, 2],
+            'from_date': from_date,
+            'to_date': to_date
+        }
+
+        resp = self.api_client.post(path, format='json', data=post_data)
+        des = self.deserialize(resp)
+
+        ur = report_builders.build_user_report(subscription_id=1, user_ids = [1,2], from_date=from_date, to_date=to_date)
+
+        self.assertEqual(des['open_sales_cycles'], ur['open_sales_cycles'])
+        self.assertEqual(des['closed_sales_cycles'], ur['closed_sales_cycles'])
+        self.assertEqual(des['earned_money'], ur['earned_money'])
+        self.assertEqual(des['user_ids'], ur['user_ids'])
+
+    def test_product_report(self):   
+        from alm_crm.utils import report_builders
+        import pytz
+        path = self.api_path_reports+'product_report/'
+        resp = self.api_client.post(path)
+        des = self.deserialize(resp)
+
+        ur = report_builders.build_product_report(subscription_id=1)
+
+        self.assertEqual(des['open_sales_cycles'], ur['open_sales_cycles'])
+        self.assertEqual(des['closed_sales_cycles'], ur['closed_sales_cycles'])
+        self.assertEqual(des['earned_money'], ur['earned_money'])
+        self.assertEqual(des['product_ids'], ur['product_ids'])
+
+        from_date =  datetime.datetime(2014, 1, 1).replace(tzinfo=pytz.UTC)
+        to_date = datetime.datetime(2015, 1, 1).replace(tzinfo=pytz.UTC)
+        post_data = {
+            'product_ids': [1,2],
+            'from_date': from_date,
+            'to_date': to_date
+        }
+
+        resp = self.api_client.post(path, format='json', data=post_data)
+        des = self.deserialize(resp)
+
+        ur = report_builders.build_product_report(subscription_id=1, product_ids = [1,2], from_date=from_date, to_date=to_date)
+
+        self.assertEqual(des['open_sales_cycles'], ur['open_sales_cycles'])
+        self.assertEqual(des['closed_sales_cycles'], ur['closed_sales_cycles'])
+        self.assertEqual(des['earned_money'], ur['earned_money'])
+        self.assertEqual(des['product_ids'], ur['product_ids'])
