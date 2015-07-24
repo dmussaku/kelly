@@ -2034,14 +2034,12 @@ class MilestoneResource(CRMServiceModelResource):
                                                             for sc in sales_cycles]
             }
 
-            return self.create_response(request, bundle, 
-                        response_class=http.HttpAccepted)
-                r"^(?P<resource_name>%s)/update%s$" %
-                (self._meta.resource_name, trailing_slash()),
-                self.wrap_view('update'),
-                name='api_update'
-            ),
-        ]
+            if not self._meta.always_return_data:
+                return http.HttpAccepted()
+            else:
+                return self.create_response(request, bundle,
+                    response_class=http.HttpAccepted)
+
 
     def update(self, request, **kwargs):
         with RequestContext(self, request, allowed_methods=['post', 'get']):
