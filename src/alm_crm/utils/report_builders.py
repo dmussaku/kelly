@@ -62,7 +62,10 @@ def build_realtime_funnel(subscription_id, data={}):
 		rv['funnel'][m.id] = len([sc for sc in sc_in_funnel if sc.milestone.id == m.id])
 	return rv
 		
-def build_user_report(subscription_id, user_ids=[-1], from_date=None, to_date=None):
+def build_user_report(subscription_id, data):
+	user_ids=data.get('user_ids', [-1])
+	from_date=data.get('from_date', None) 
+	to_date=data.get('to_date', None)
 	if from_date == None:
 		from_date = datetime(2014, 1, 1).replace(tzinfo=pytz.UTC)
 
@@ -111,7 +114,10 @@ def build_user_report(subscription_id, user_ids=[-1], from_date=None, to_date=No
 		'to_date': to_date}
 	return user_report
 
-def build_product_report(subscription_id, product_ids=[-1], from_date=None, to_date=None):
+def build_product_report(subscription_id, data):
+	product_ids=data.get('product_ids', [-1])
+    from_date=data.get('from_date', None)
+    to_date=data.get('to_date', None)
 	if from_date == None:
 		from_date = datetime(2014, 1, 1).replace(tzinfo=pytz.UTC)
 
@@ -132,7 +138,23 @@ def build_product_report(subscription_id, product_ids=[-1], from_date=None, to_d
 								is_global=False, date_created__range=(from_date, to_date)
 							)
 	earned_money = sum(SalesCycleProductStat.objects.filter(sales_cycle__in=closed_sales_cycles).values_list('real_value', flat=True))
+	
 
+	if product_ids == [-1]:
+		products = Product.objects.filter(subscription_id=subscription_id, date_created__range=(from_date, to_date))
+	else:
+		products = Product.objects.filter(subscription_id=subscription_id, id__in=product_ids, date_created__range=(from_date, to_date))
+
+	product_stat_array = []
+
+	for product in products:
+		product_obj = {}
+		product_obj['id'] = product.id
+		obj = []
+		for prod_stat in product.salescycleproductstat_set.all():
+			obj.append({'date_edited':prod_stat.date_edited, 'real_value':prod_stat.real_value})
+		product_obj['object'] = obj
+		product_stat_array.append(product_obj)
 	user_report = {
 		'report_name': 'product_report',
 		'product_ids': product_ids if not product_ids[0] == -1 else None,
@@ -140,6 +162,7 @@ def build_product_report(subscription_id, product_ids=[-1], from_date=None, to_d
 		'open_sales_cycles':open_sales_cycles,
 		'closed_sales_cycles':closed_sales_cycles.count(),
 		'earned_money': earned_money,
+		'product_stat_array':product_stat_array,
 		'from_date': from_date,
 		'to_date': to_date}
 	return user_report

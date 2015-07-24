@@ -4472,13 +4472,11 @@ class ReportResource(Resource):
                     format=request.META.get('CONTENT_TYPE', 'application/json')) if request.body else {}
             else:
                 data = {}
-
-            return self.create_response(request, report_builders.build_user_report(
-                subscription_id=request.user.get_crmuser().subscription_id,
-                user_ids=data.get('user_ids', [-1]),
-                from_date=data.get('from_date', None), 
-                to_date=data.get('to_date', None)), 
-                response_class=http.HttpAccepted)
+            return self.create_response(
+                request, report_builders.build_user_report(
+                    subscription_id=request.user.get_crmuser().subscription_id,
+                    data=data), response_class=http.HttpAccepted
+                )
         
 
     def product_report(self, request, **kwargs):
@@ -4489,10 +4487,8 @@ class ReportResource(Resource):
                     format=request.META.get('CONTENT_TYPE', 'application/json')) if request.body else {}
             else:
                 data = {}
-
-            return self.create_response(request, report_builders.build_product_report(
-                subscription_id=request.user.get_crmuser().subscription_id,
-                product_ids=data.get('product_ids', [-1]),
-                from_date=data.get('from_date', None), 
-                to_date=data.get('to_date', None)), 
-                response_class=http.HttpAccepted)
+            return self.create_response(
+                request, report_builders.build_product_report(
+                    subscription_id=request.user.get_crmuser().subscription_id,
+                    data=data), response_class=http.HttpAccepted
+                )
