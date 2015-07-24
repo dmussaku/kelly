@@ -100,7 +100,7 @@ from .utils import report_builders
 from .utils.data_processing import (
     processing_custom_field_data,
     )
-
+from alm_vcard.serializer import serialize_objs
 
 import base64
 import simplejson as json
@@ -595,6 +595,12 @@ class ContactResource(CRMServiceModelResource):
                 (self._meta.resource_name, trailing_slash()),
                 self.wrap_view('get_contact_state'),
                 name='api_get_contact_state'
+            ),
+            url(
+                r"^(?P<resource_name>%s)/vcardstate%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('get_vcard_state'),
+                name='api_get_vcard_state'
             )   
         ]
 
@@ -981,8 +987,7 @@ class ContactResource(CRMServiceModelResource):
         with RequestContext(self, request, allowed_methods=['get']):
             base_bundle = self.build_bundle(request=request)
             objects = self.obj_get_list(bundle=base_bundle, **self.remove_api_resource_names(kwargs))
-            bundles = []
-            vcard_rsr = VCardResource()
+            t1 = time.time()
             bundles = (
                 {
                     'id': obj.id,
@@ -996,9 +1001,17 @@ class ContactResource(CRMServiceModelResource):
                     'subscription_id': obj.subscription_id,
                     'children': list(contact.id for contact in obj.children.all()),
                     'sales_cycles': list(cycle.id for cycle in obj.sales_cycles.all()),
-                    'vcard': vcard_rsr.full_dehydrate(vcard_rsr.build_bundle(obj=obj.vcard, request=request))
+                    'vcard_id': obj.vcard_id
                 } for obj in objects)
         return self.create_response(request, StreamList(bundles))
+
+    def get_vcard_state(self, request, **kwargs):
+        t1 = time.time()
+        with RequestContext(self, request, allowed_methods=['get']):
+            base_bundle = self.build_bundle(request=request)
+            objects = self.obj_get_list(bundle=base_bundle, **self.remove_api_resource_names(kwargs))
+            vcard_bundles = serialize_objs((obj.vcard for obj in objects))
+        return self.create_response(request, vcard_bundles)
 
     def get_cold_base(self, request, **kwargs):
         '''

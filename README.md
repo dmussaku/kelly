@@ -114,3 +114,7 @@ Memcached (pylibmc) -- `brew install libmemcached`
 
 Load postgres libraries into path, for ex for Postgres 9.4
 `sudo ln -sf /Library/PostgreSQL/9.4/lib/YOUR_LIB.dylib /usr/lib`
+
+
+Start uwsgi on dev:
+uwsgi --ini uwsgi.ini --check-static /Users/rustem/projects/almacloud/alma.net/src --static-map /static=/Users/rustem/projects/almacloud/almanet-frontend/
