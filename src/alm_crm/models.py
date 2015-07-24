@@ -1650,6 +1650,11 @@ class SalesCycle(SubscriptionObject):
 class SalesCycleLogEntry(SubscriptionObject):
     TYPES_CAPS = (
         _('Milestone change'),
+        _('Milestone edited'),
+        _('Milestone deleted'),
+        _('Products changed'),
+        _('Success close'),
+        _('Fail close'),
     )
     TYPES = (MC, ME, MD, PC, SC, FC) = ('MC', 'ME', 'MD', 'PC', 'SC', 'FC')
     TYPES_OPTIONS = zip(TYPES, TYPES_CAPS)
@@ -1659,7 +1664,7 @@ class SalesCycleLogEntry(SubscriptionObject):
     sales_cycle = models.ForeignKey(SalesCycle, related_name='log')
     entry_type = models.CharField(max_length=2,
                               choices=TYPES_OPTIONS, default=MC)
-    owner = models.ForeignKey(CRMUser, related_name='owner', null=True)
+    owner = models.ForeignKey(CRMUser, related_name='owned_logentries', null=True)
 
 
 class Activity(SubscriptionObject):
