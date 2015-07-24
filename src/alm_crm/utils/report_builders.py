@@ -14,15 +14,19 @@ from datetime import datetime
 from django.utils import timezone
 import pytz
 
-def build_funnel(subscription_id, data={}):
+def build_funnel(subscription_id, data=None):
+	data = {} if data is None else data
 	rv = {
 		'report_name': 'funnel'
 	}
-	sales_cycles = SalesCycle.objects.filter(subscription_id=subscription_id, is_global=False)
+	# only those cycles that has products
+	sales_cycles = SalesCycle.objects.filter(
+		subscription_id=subscription_id,
+		is_global=False).exclude(products=None)
 	if data:
 		products = data.get('products', [])
 		if products:
-			sales_cycles = sales_cycles.filter(products__in=products)
+			sales_cycles = sales_cycles.filter(products__pk__in=products)
 	rv['total'] = len(sales_cycles)
 
 	rv['undefined'] = len(filter(lambda sc: sc.milestone == None, sales_cycles))
@@ -31,7 +35,6 @@ def build_funnel(subscription_id, data={}):
 	milestones = Milestone.objects.filter(subscription_id=subscription_id)
 	system_milestones = milestones.filter(is_system__in=[1,2]).order_by('is_system')
 	milestones = milestones.exclude(is_system__in=[1,2]).order_by('sort')
-	
 	sc_in_funnel = [sc for sc in sales_cycles if sc.milestone != None]
 	for m in milestones:
 		rv['funnel'][m.id] = len(sc_in_funnel)
@@ -44,7 +47,9 @@ def build_realtime_funnel(subscription_id, data={}):
 	rv = {
 		'report_name': 'realtime_funnel'
 	}
-	sales_cycles = SalesCycle.objects.filter(subscription_id=subscription_id, is_global=False)
+	sales_cycles = SalesCycle.objects.filter(
+		subscription_id=subscription_id,
+		is_global=False).exclude(products=None)
 	if data:
 		products = data.get('products', [])
 		if products:

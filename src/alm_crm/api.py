@@ -4455,7 +4455,6 @@ class ReportResource(Resource):
                 format=request.META.get('CONTENT_TYPE', 'application/json'))
         else:
             data = {}
-
         return self.create_response(
             request,
             report_builders.build_funnel(request.user.get_crmuser().subscription_id, data))
