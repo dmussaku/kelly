@@ -25,6 +25,7 @@ from tastypie.serializers import Serializer
 from django.http import HttpResponse
 from almanet.settings import DEFAULT_SERVICE
 from almanet.utils.api import RequestContext
+from almanet.utils.env import get_subscr_id
 from alm_crm.api import CRMUserResource
 import json
 import datetime
@@ -194,7 +195,9 @@ class UserResource(ModelResource):
                 )
 
     def dehydrate(self, bundle):
-        bundle.data['crm_user_id'] = bundle.obj.get_crmuser().pk
+        subscription_id = get_subscr_id(bundle.request.user_env, DEFAULT_SERVICE)
+        bundle.data['crm_user_id'] = bundle.obj.get_subscr_user(subscription_id=subscription_id).pk
+        bundle.data['is_supervisor'] = bundle.obj.get_subscr_user(subscription_id=subscription_id).is_supervisor
         return bundle
 
     def get_current_user(self, request, **kwargs):
