@@ -29,11 +29,15 @@ def build_funnel(subscription_id, data={}):
 	
 	rv['funnel'] = {}
 	milestones = Milestone.objects.filter(subscription_id=subscription_id)
+	system_milestones = milestones.filter(is_system__in=[1,2]).order_by('is_system')
+	milestones = milestones.exclude(is_system__in=[1,2]).order_by('sort')
 	
 	sc_in_funnel = [sc for sc in sales_cycles if sc.milestone != None]
 	for m in milestones:
 		rv['funnel'][m.id] = len(sc_in_funnel)
 		sc_in_funnel = [sc for sc in sc_in_funnel if sc.milestone.id != m.id]
+	for m in system_milestones:
+		rv['funnel'][m.id] = len(m.sales_cycles.all())
 	return rv
 
 def build_realtime_funnel(subscription_id, data={}):
