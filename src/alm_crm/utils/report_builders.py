@@ -116,8 +116,8 @@ def build_user_report(subscription_id, data):
 
 def build_product_report(subscription_id, data):
 	product_ids=data.get('product_ids', [-1])
-    from_date=data.get('from_date', None)
-    to_date=data.get('to_date', None)
+	from_date=data.get('from_date', None)
+	to_date=data.get('to_date', None)
 	if from_date == None:
 		from_date = datetime(2014, 1, 1).replace(tzinfo=pytz.UTC)
 
