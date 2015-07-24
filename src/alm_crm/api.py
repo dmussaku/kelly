@@ -1969,6 +1969,12 @@ class MilestoneResource(CRMServiceModelResource):
                 (self._meta.resource_name, trailing_slash()),
                 self.wrap_view('bulk_edit'),
                 name='api_bulk_edit'
+            ),
+            url(
+                r"^(?P<resource_name>%s)/update%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('update'),
+                name='api_update'
             )
         ]
 
@@ -2030,6 +2036,46 @@ class MilestoneResource(CRMServiceModelResource):
 
             return self.create_response(request, bundle, 
                         response_class=http.HttpAccepted)
+                r"^(?P<resource_name>%s)/update%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('update'),
+                name='api_update'
+            ),
+        ]
+
+    def update(self, request, **kwargs):
+        with RequestContext(self, request, allowed_methods=['post', 'get']):
+            if request.method == "POST":
+                request_data = self.deserialize(
+                    request, request.body,
+                    format=request.META.get('CONTENT_TYPE', 'application/json'))
+                changed_milestones = []
+                for data in request_data:
+                    milestone = Milestone.objects.get(id=data['id'])
+                    if milestone.sort != data['sort']:
+                        try:
+                            milestone_2 = Milestone.objects.get(subscription_id=data['subscription_id'], 
+                                                            sort=data['sort'])
+                        except MultipleObjectsReturned:
+                            return http.HttpBadRequest()
+                        temp = milestone.sort
+                        milestone.sort = data['sort']
+                        milestone_2.sort = temp
+                        changed_milestones.append(milestone)
+                        changed_milestones.append(milestone_2)
+
+                for milestone in changed_milestones:
+                    milestone.save()
+
+            if not self._meta.always_return_data:
+                return http.HttpAccepted()
+            else:
+                return self.create_response(request,
+                    [MilestoneResource().get_bundle_detail(milestone, request) \
+                    for milestone in Milestone.objects.filter(
+                                        subscription_id=request.user.get_crmuser().subscription_id
+                                        )],
+                    response_class=http.HttpAccepted)
 
 class ActivityResource(CRMServiceModelResource):
     '''

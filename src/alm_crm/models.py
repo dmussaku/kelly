@@ -115,6 +115,7 @@ class Milestone(SubscriptionObject):
     title = models.CharField(_("title"), max_length=1024, null=True, blank=True)
     is_system = models.IntegerField(default=0)
     color_code = models.CharField(_('color code'), max_length=1024, null=True, blank=True)
+    sort = models.IntegerField(null=True, blank=True)
 
     class Meta:
         verbose_name = _('milestone')
