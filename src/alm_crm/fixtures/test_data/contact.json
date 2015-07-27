@@ -10,7 +10,9 @@
         "owner": 5,
         "date_created": "2014-09-10T00:00:00Z",
         "subscription_id": 1,
-        "vcard": 6
+        "vcard": 6,
+        "date_created": "2014-09-10T00:00:00Z",
+        "date_edited": "2014-11-24T07:49:32.991Z"
     }
 },
 {
@@ -24,7 +26,9 @@
         "owner": 5,
         "date_created": "2014-09-10T00:00:00Z",
         "subscription_id": 1,
-        "vcard": 7
+        "vcard": 7,
+        "date_created": "2014-09-10T00:00:00Z",
+        "date_edited": "2014-11-24T07:49:32.991Z"
     }
 },
 {
@@ -38,7 +42,9 @@
         "owner": 5,
         "date_created": "2014-09-10T00:00:00Z",
         "subscription_id": 1,
-        "vcard": 8
+        "vcard": 8,
+        "date_created": "2014-09-10T00:00:00Z",
+        "date_edited": "2014-11-24T07:49:32.991Z"
     }
 },
 {
@@ -52,7 +58,9 @@
         "owner": 5,
         "date_created": "2014-09-10T00:00:00Z",
         "subscription_id": 1,
-        "vcard": 9
+        "vcard": 9,
+        "date_created": "2014-09-10T00:00:00Z",
+        "date_edited": "2014-11-24T07:49:32.991Z"
     }
 },
 {
@@ -66,7 +74,9 @@
         "owner": 1,
         "date_created": "2014-09-10T00:00:00Z",
         "subscription_id": 1,
-        "vcard": 10
+        "vcard": 10,
+        "date_created": "2014-09-10T00:00:00Z",
+        "date_edited": "2014-11-24T07:49:32.991Z"
     }
 },
 {
@@ -80,7 +90,9 @@
         "owner": 2,
         "date_created": "2014-09-10T00:00:00Z",
         "subscription_id": 1,
-        "vcard": 11
+        "vcard": 11,
+        "date_created": "2014-09-10T00:00:00Z",
+        "date_edited": "2014-11-24T07:49:32.991Z"
     }
 },
 {
@@ -94,7 +106,9 @@
         "owner": 5,
         "date_created": "2014-09-10T00:00:00Z",
         "subscription_id": 1,
-        "vcard": 12
+        "vcard": 12,
+        "date_created": "2014-09-10T00:00:00Z",
+        "date_edited": "2014-11-24T07:49:32.991Z"
     }
 },
 {
@@ -108,7 +122,9 @@
         "owner": 3,
         "date_created": "2014-09-10T00:00:00Z",
         "subscription_id": 1,
-        "vcard": 13
+        "vcard": 13,
+        "date_created": "2014-09-10T00:00:00Z",
+        "date_edited": "2014-11-24T07:49:32.991Z"
     }
 },
 {
@@ -122,7 +138,9 @@
         "owner": 3,
         "date_created": "2014-09-10T00:00:00Z",
         "subscription_id": 1,
-        "vcard": 14
+        "vcard": 14,
+        "date_created": "2014-09-10T00:00:00Z",
+        "date_edited": "2014-11-24T07:49:32.991Z"
     }
 },
 {
@@ -136,7 +154,9 @@
         "owner": 1,
         "date_created": "2014-09-10T00:00:00Z",
         "subscription_id": 1,
-        "vcard": 15
+        "vcard": 15,
+        "date_created": "2014-09-10T00:00:00Z",
+        "date_edited": "2014-11-24T07:49:32.991Z"
     }
 },
 {
@@ -150,7 +170,9 @@
         "owner": 5,
         "date_created": "2014-09-10T00:00:00Z",
         "subscription_id": 1,
-        "vcard": 16
+        "vcard": 16,
+        "date_created": "2014-09-10T00:00:00Z",
+        "date_edited": "2014-11-24T07:49:32.991Z"
     }
 },
 {
@@ -164,7 +186,9 @@
         "owner": 7,
         "date_created": "2014-09-10T00:00:00Z",
         "subscription_id": 2,
-        "vcard": 19
+        "vcard": 19,
+        "date_created": "2014-09-10T00:00:00Z",
+        "date_edited": "2014-11-24T07:49:32.991Z"
     }
 },
 {
@@ -178,7 +202,9 @@
         "owner": 6,
         "date_created": "2014-09-10T00:00:00Z",
         "subscription_id": 2,
-        "vcard": 20
+        "vcard": 20,
+        "date_created": "2014-09-10T00:00:00Z",
+        "date_edited": "2014-11-24T07:49:32.991Z"
     }
 },
 {
@@ -192,7 +218,9 @@
         "owner": 6,
         "date_created": "2014-09-10T00:00:00Z",
         "subscription_id": 2,
-        "vcard": 21
+        "vcard": 21,
+        "date_created": "2014-09-10T00:00:00Z",
+        "date_edited": "2014-11-24T07:49:32.991Z"
     }
 }
 ]

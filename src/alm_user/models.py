@@ -58,6 +58,10 @@ class User(AbstractBaseUser):
     def is_superuser(self):
         return self.is_admin
 
+    @property
+    def is_supervisor(self):
+        return self.get_crmuser().is_supervisor
+
     def save(self, *a, **kw):
         is_created = not hasattr(self, 'pk') or not self.pk
         super(User, self).save(*a, **kw)
@@ -165,11 +169,11 @@ class User(AbstractBaseUser):
         self.save()
         return crmuser  # self.crmuser
 
-    def get_subscr_user(self, subscr_id):
+    def get_subscr_user(self, subscription_id):
         from alm_crm.models import CRMUser
         try:
             return CRMUser.objects.get(user_id=self.pk,
-                                       subscription_id=subscr_id)
+                                       subscription_id=subscription_id)
         except CRMUser.DoesNotExist:
             return None
 

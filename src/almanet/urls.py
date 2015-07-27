@@ -11,7 +11,8 @@ from almanet.views import (
     ServiceUpdateView,
     ServiceDeleteView,
     ServiceDetailView,
-    RedirectHomeView
+    RedirectHomeView,
+    landing_form
     )
 from tastypie.api import Api
 from alm_vcard import api as vcard_api
@@ -35,6 +36,7 @@ from alm_crm.api import (
     CommentResource,
     CustomSectionResource,
     CustomFieldResource,
+    CustomFieldValueResource,
     ReportResource,
     HashTagReferenceResource,
     EmbeddableContactFormResource,
@@ -72,6 +74,7 @@ v1_api.register(FilterResource())
 v1_api.register(CommentResource())
 v1_api.register(CustomSectionResource())
 v1_api.register(CustomFieldResource())
+v1_api.register(CustomFieldValueResource())
 v1_api.register(MilestoneResource())
 v1_api.register(ReportResource())
 v1_api.register(HashTagReferenceResource())
@@ -104,6 +107,7 @@ urlpatterns = patterns(
     url(r'^api/', include(v1_api.urls)),
     url(r'api/doc/', include('tastypie_swagger.urls', namespace='tastypie_swagger')),
     url(r'agreement/$', TemplateView.as_view(template_name='almanet/agreement.crm.html'), name='agreement'),
+    url(r'landing_form/$', landing_form, name='landing_form'),
 
 )
 

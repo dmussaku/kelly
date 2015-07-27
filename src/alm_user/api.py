@@ -25,6 +25,7 @@ from tastypie.serializers import Serializer
 from django.http import HttpResponse
 from almanet.settings import DEFAULT_SERVICE
 from almanet.utils.api import RequestContext, OpenAuthentication
+from almanet.utils.env import get_subscr_id
 from alm_crm.api import CRMUserResource
 import json
 import datetime
@@ -124,6 +125,12 @@ class UserResource(ModelResource):
                 self.wrap_view('authorization'),
                 name='api_authorization'
             ),
+            url(
+                r"^(?P<resource_name>%s)/change_password%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('change_password'),
+                name='api_change_password'
+            ),
         ]
 
     def upload_userpic(self, request, **kwargs):
@@ -144,8 +151,39 @@ class UserResource(ModelResource):
                     content_type='application/json; charset=utf-8', status=200)
             )
 
+    def change_password(self, request, **kwargs):
+        with RequestContext(self, request, allowed_methods=['post']):
+            data = self.deserialize(request, request.body, format=request.META.get('CONTENT_TYPE', 'application/json'))
+            old_password = data.get('old_password', None)
+            new_password = data.get('new_password', None)
+            user = request.user
+
+            if old_password is None or new_password is None:
+                self.error_response(request, {}, response_class=http.HttpBadRequest)
+
+            print old_password, new_password
+            if user.check_password(old_password):
+                user.set_password(new_password)
+                user.save()
+                return self.create_response(
+                    request,
+                    {
+                        'success': True
+                    }
+                )
+            else:
+                return self.create_response(
+                    request,
+                    {
+                        'success': False,
+                        'error_message': "current password is incorrect"
+                    }
+                )
+
     def dehydrate(self, bundle):
-        bundle.data['crm_user_id'] = bundle.obj.get_crmuser().pk
+        subscription_id = get_subscr_id(bundle.request.user_env, DEFAULT_SERVICE)
+        bundle.data['crm_user_id'] = bundle.obj.get_subscr_user(subscription_id=subscription_id).pk
+        bundle.data['is_supervisor'] = bundle.obj.get_subscr_user(subscription_id=subscription_id).is_supervisor
         return bundle
 
     def get_current_user(self, request, **kwargs):

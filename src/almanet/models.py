@@ -71,6 +71,7 @@ class SubscriptionObject(models.Model):
         abstract = True
 
     def save(self, **kwargs):
-        if not self.subscription_id and self.owner:
-            self.subscription_id = self.owner.subscription_id
+        if hasattr(self, 'owner') and self.owner:
+            if not self.subscription_id or self.subscription_id != self.owner.subscription_id:
+                self.subscription_id = self.owner.subscription_id
         super(SubscriptionObject, self).save(**kwargs)
