@@ -2393,6 +2393,7 @@ class ErrorCell(models.Model):
 
 
 class EmbeddableContactForm(SubscriptionObject):
+    textLegend = models.CharField(max_length=140, null=True, blank=True)
     textSuccess = models.CharField(max_length=140, null=True, blank=True)
     textShare = models.CharField(max_length=140, null=True, blank=True)
     share_to = models.ForeignKey(CRMUser, null=True, blank=True)
@@ -2411,8 +2412,11 @@ class EmbeddableContactForm(SubscriptionObject):
 
 
 class EmbeddableFormField(SubscriptionObject):
-    title = models.CharField(max_length=140)
     type = models.CharField(max_length=30)
+    name = models.CharField(max_length=140)
+    label = models.CharField(max_length=140)
+    placeholder = models.CharField(max_length=140)
+    default_value = models.CharField(max_length=140, null=True, blank=True)
     order = models.IntegerField()
     form = models.ForeignKey(EmbeddableContactForm, related_name='form_fields', null=True)
 
@@ -2421,4 +2425,4 @@ class EmbeddableFormField(SubscriptionObject):
         db_table = settings.DB_PREFIX.format('embeddable_form_field')
 
     def __unicode__(self):
-        return "%s-%s at %s" % (self.title, self.type, self.order)
+        return "%s-%s at %s" % (self.name, self.type, self.order)

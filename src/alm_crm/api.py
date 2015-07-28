@@ -221,6 +221,8 @@ class CommonMeta:
         'date_edited': ALL_WITH_RELATIONS
     }
 
+    always_return_data = True
+
 
 class CRMServiceModelResource(ModelResource):
 
@@ -4526,7 +4528,7 @@ class EmbeddableContactFormResource(CRMServiceModelResource):
         'alm_crm.api.EmbeddableFormFieldResource', 'form_fields',
         related_name='form', null=True, full=True)
 
-    class Meta:
+    class Meta(CommonMeta):
         resource_name = 'embeddable_contact_form'
         object_class = EmbeddableContactForm
         queryset = EmbeddableContactForm.objects.all()
@@ -4534,7 +4536,7 @@ class EmbeddableContactFormResource(CRMServiceModelResource):
             OpenAuthentication(),
             BasicAuthentication(),
             SessionAuthentication())
-        authorization = Authorization()
+
 
     # def hydrate_fields(self, bundle):
     #     if ('fields' in bundle.data) and isinstance(bundle.data['fields'][0], dict):
@@ -4565,12 +4567,14 @@ class EmbeddableFormFieldResource(CRMServiceModelResource):
     @undocumented: Meta
     '''
 
-    order = fields.IntegerField(attribute='order')
     type = fields.CharField(attribute='type')
-    title = fields.CharField(attribute='title')
+    name = fields.CharField(attribute='name')
+    label = fields.CharField(attribute='label')
+    placeholder = fields.CharField(attribute='placeholder')
+    default_value = fields.CharField(attribute='default_value', null=True)
+    order = fields.IntegerField(attribute='order')
 
-    class Meta:
+    class Meta(CommonMeta):
         resource_name = 'embeddable_form_field'
         object_class = EmbeddableFormField
         queryset = EmbeddableFormField.objects.all()
-        authorization = Authorization()

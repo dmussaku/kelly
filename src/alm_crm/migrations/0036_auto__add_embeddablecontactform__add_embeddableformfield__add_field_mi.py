@@ -8,18 +8,53 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
+        # Adding model 'EmbeddableContactForm'
+        db.create_table('alma_embeddable_contact_form', (
+            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('subscription_id', self.gf('django.db.models.fields.IntegerField')(null=True, blank=True)),
+            ('date_created', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
+            ('date_edited', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, blank=True)),
+            ('textLegend', self.gf('django.db.models.fields.CharField')(max_length=140, null=True, blank=True)),
+            ('textSuccess', self.gf('django.db.models.fields.CharField')(max_length=140, null=True, blank=True)),
+            ('textShare', self.gf('django.db.models.fields.CharField')(max_length=140, null=True, blank=True)),
+            ('share_to', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['alm_crm.CRMUser'], null=True, blank=True)),
+            ('inlineCSS', self.gf('django.db.models.fields.CharField')(max_length=5000, null=True, blank=True)),
+            ('owner', self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='owned_embeddable_contact_forms', null=True, to=orm['alm_crm.CRMUser'])),
+        ))
+        db.send_create_signal(u'alm_crm', ['EmbeddableContactForm'])
 
-        # Changing field 'EmbeddableFormField.form'
-        db.alter_column('alma_embeddable_form_field', 'form_id', self.gf('django.db.models.fields.related.ForeignKey')(null=True, to=orm['alm_crm.EmbeddableContactForm']))
+        # Adding model 'EmbeddableFormField'
+        db.create_table('alma_embeddable_form_field', (
+            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('subscription_id', self.gf('django.db.models.fields.IntegerField')(null=True, blank=True)),
+            ('date_created', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
+            ('date_edited', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, blank=True)),
+            ('type', self.gf('django.db.models.fields.CharField')(max_length=30)),
+            ('name', self.gf('django.db.models.fields.CharField')(max_length=140)),
+            ('label', self.gf('django.db.models.fields.CharField')(max_length=140)),
+            ('placeholder', self.gf('django.db.models.fields.CharField')(max_length=140)),
+            ('default_value', self.gf('django.db.models.fields.CharField')(max_length=140, null=True, blank=True)),
+            ('order', self.gf('django.db.models.fields.IntegerField')()),
+            ('form', self.gf('django.db.models.fields.related.ForeignKey')(related_name='form_fields', null=True, to=orm['alm_crm.EmbeddableContactForm'])),
+        ))
+        db.send_create_signal(u'alm_crm', ['EmbeddableFormField'])
+
+        # Adding field 'Milestone.sort'
+        db.add_column('alma_milestone', 'sort',
+                      self.gf('django.db.models.fields.IntegerField')(null=True, blank=True),
+                      keep_default=False)
+
 
     def backwards(self, orm):
+        # Deleting model 'EmbeddableContactForm'
+        db.delete_table('alma_embeddable_contact_form')
 
-        # User chose to not deal with backwards NULL issues for 'EmbeddableFormField.form'
-        raise RuntimeError("Cannot reverse this migration. 'EmbeddableFormField.form' and its values cannot be restored.")
-        
-        # The following code is provided here to aid in writing a correct migration
-        # Changing field 'EmbeddableFormField.form'
-        db.alter_column('alma_embeddable_form_field', 'form_id', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['alm_crm.EmbeddableContactForm']))
+        # Deleting model 'EmbeddableFormField'
+        db.delete_table('alma_embeddable_form_field')
+
+        # Deleting field 'Milestone.sort'
+        db.delete_column('alma_milestone', 'sort')
+
 
     models = {
         u'alm_crm.activity': {
@@ -62,6 +97,7 @@ class Migration(SchemaMigration):
             'date_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'date_edited': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'import_task': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'contacts'", 'null': 'True', 'on_delete': 'models.SET_NULL', 'to': u"orm['alm_crm.ImportTask']"}),
             'latest_activity': ('django.db.models.fields.related.OneToOneField', [], {'related_name': "'contact_latest_activity'", 'unique': 'True', 'null': 'True', 'on_delete': 'models.SET_NULL', 'to': u"orm['alm_crm.Activity']"}),
             'owner': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'owned_contacts'", 'null': 'True', 'to': u"orm['alm_crm.CRMUser']"}),
             'parent': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'children'", 'null': 'True', 'to': u"orm['alm_crm.Contact']"}),
@@ -76,6 +112,7 @@ class Migration(SchemaMigration):
             'date_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'date_edited': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'import_task': ('django.db.models.fields.related.OneToOneField', [], {'to': u"orm['alm_crm.ImportTask']", 'unique': 'True', 'null': 'True', 'on_delete': 'models.SET_NULL', 'blank': 'True'}),
             'owner': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'owned_list'", 'null': 'True', 'to': u"orm['alm_crm.CRMUser']"}),
             'subscription_id': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'title': ('django.db.models.fields.CharField', [], {'max_length': '150'})
@@ -97,10 +134,18 @@ class Migration(SchemaMigration):
             'date_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'date_edited': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'object_id': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
-            'section': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'custom_fields'", 'null': 'True', 'to': u"orm['alm_crm.CustomSection']"}),
             'subscription_id': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
-            'title': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
+            'title': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'})
+        },
+        u'alm_crm.customfieldvalue': {
+            'Meta': {'object_name': 'CustomFieldValue', 'db_table': "'alma_custom_field_values'"},
+            'content_type': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['contenttypes.ContentType']", 'null': 'True', 'blank': 'True'}),
+            'custom_field': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'values'", 'to': u"orm['alm_crm.CustomField']"}),
+            'date_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
+            'date_edited': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'object_id': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
+            'subscription_id': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'value': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'})
         },
         u'alm_crm.customsection': {
@@ -122,6 +167,7 @@ class Migration(SchemaMigration):
             'owner': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'owned_embeddable_contact_forms'", 'null': 'True', 'to': u"orm['alm_crm.CRMUser']"}),
             'share_to': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['alm_crm.CRMUser']", 'null': 'True', 'blank': 'True'}),
             'subscription_id': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
+            'textLegend': ('django.db.models.fields.CharField', [], {'max_length': '140', 'null': 'True', 'blank': 'True'}),
             'textShare': ('django.db.models.fields.CharField', [], {'max_length': '140', 'null': 'True', 'blank': 'True'}),
             'textSuccess': ('django.db.models.fields.CharField', [], {'max_length': '140', 'null': 'True', 'blank': 'True'})
         },
@@ -129,12 +175,23 @@ class Migration(SchemaMigration):
             'Meta': {'object_name': 'EmbeddableFormField', 'db_table': "'alma_embeddable_form_field'"},
             'date_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'date_edited': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
+            'default_value': ('django.db.models.fields.CharField', [], {'max_length': '140', 'null': 'True', 'blank': 'True'}),
             'form': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'form_fields'", 'null': 'True', 'to': u"orm['alm_crm.EmbeddableContactForm']"}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'label': ('django.db.models.fields.CharField', [], {'max_length': '140'}),
+            'name': ('django.db.models.fields.CharField', [], {'max_length': '140'}),
             'order': ('django.db.models.fields.IntegerField', [], {}),
+            'placeholder': ('django.db.models.fields.CharField', [], {'max_length': '140'}),
             'subscription_id': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
-            'title': ('django.db.models.fields.CharField', [], {'max_length': '140'}),
             'type': ('django.db.models.fields.CharField', [], {'max_length': '30'})
+        },
+        u'alm_crm.errorcell': {
+            'Meta': {'object_name': 'ErrorCell'},
+            'col': ('django.db.models.fields.IntegerField', [], {}),
+            'data': ('django.db.models.fields.CharField', [], {'max_length': '10000'}),
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'import_task': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['alm_crm.ImportTask']"}),
+            'row': ('django.db.models.fields.IntegerField', [], {})
         },
         u'alm_crm.feedback': {
             'Meta': {'object_name': 'Feedback'},
@@ -176,6 +233,15 @@ class Migration(SchemaMigration):
             'object_id': ('django.db.models.fields.IntegerField', [], {}),
             'subscription_id': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'})
         },
+        u'alm_crm.importtask': {
+            'Meta': {'object_name': 'ImportTask'},
+            'filename': ('django.db.models.fields.CharField', [], {'max_length': '250'}),
+            'finished': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'imported_num': ('django.db.models.fields.IntegerField', [], {'default': '0', 'null': 'True', 'blank': 'True'}),
+            'not_imported_num': ('django.db.models.fields.IntegerField', [], {'default': '0', 'null': 'True', 'blank': 'True'}),
+            'uuid': ('django.db.models.fields.CharField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'})
+        },
         u'alm_crm.mention': {
             'Meta': {'object_name': 'Mention'},
             'content_type': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['contenttypes.ContentType']"}),
@@ -193,6 +259,8 @@ class Migration(SchemaMigration):
             'date_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'date_edited': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'is_system': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
+            'sort': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'subscription_id': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'title': ('django.db.models.fields.CharField', [], {'max_length': '1024', 'null': 'True', 'blank': 'True'})
         },
@@ -246,7 +314,7 @@ class Migration(SchemaMigration):
             'entry_type': ('django.db.models.fields.CharField', [], {'default': "'MC'", 'max_length': '2'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'meta': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
-            'owner': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'owner'", 'null': 'True', 'to': u"orm['alm_crm.CRMUser']"}),
+            'owner': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'owned_logentries'", 'null': 'True', 'to': u"orm['alm_crm.CRMUser']"}),
             'sales_cycle': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'log'", 'to': u"orm['alm_crm.SalesCycle']"}),
             'subscription_id': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'})
         },
@@ -256,9 +324,10 @@ class Migration(SchemaMigration):
             'date_edited': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'product': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['alm_crm.Product']"}),
+            'projected_value': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
+            'real_value': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
             'sales_cycle': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'product_stats'", 'null': 'True', 'on_delete': 'models.SET_NULL', 'to': u"orm['alm_crm.SalesCycle']"}),
-            'subscription_id': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
-            'value': ('django.db.models.fields.IntegerField', [], {'default': '0'})
+            'subscription_id': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'})
         },
         u'alm_crm.share': {
             'Meta': {'object_name': 'Share', 'db_table': "'alma_share'"},
