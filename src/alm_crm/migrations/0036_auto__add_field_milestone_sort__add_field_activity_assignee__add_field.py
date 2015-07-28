@@ -9,9 +9,9 @@ class Migration(SchemaMigration):
 
     def forwards(self, orm):
         # Adding field 'Milestone.sort'
-        db.add_column('alma_milestone', 'sort',
-                      self.gf('django.db.models.fields.IntegerField')(null=True, blank=True),
-                      keep_default=False)
+        # db.add_column('alma_milestone', 'sort',
+        #               self.gf('django.db.models.fields.IntegerField')(null=True, blank=True),
+        #               keep_default=False)
 
         # Adding field 'Activity.assignee'
         db.add_column('alma_activity', 'assignee',
@@ -26,7 +26,7 @@ class Migration(SchemaMigration):
 
     def backwards(self, orm):
         # Deleting field 'Milestone.sort'
-        db.delete_column('alma_milestone', 'sort')
+        # db.delete_column('alma_milestone', 'sort')
 
         # Deleting field 'Activity.assignee'
         db.delete_column('alma_activity', 'assignee_id')
