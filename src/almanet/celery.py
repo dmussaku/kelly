@@ -10,21 +10,10 @@ from django.conf import settings
 
 from configurations import importer
 importer.install()
-# configurations.setup()
 
-# app = Celery('almanet')
-app = Celery('almanet',
-     broker='amqp://guest@localhost//',
-     backend='djcelery.backends.database:DatabaseBackend',
-     include=['alm_crm.tasks'] #References your tasks. Donc forget to put the whole absolute path.
-     )
+app = Celery('almanet')
 
-# app.conf.update(
-#     CELERY_RESULT_BACKEND='djcelery.backends.database:DatabaseBackend',
-# )
-
-# Using a string here means the worker will not have to
-# pickle the object when using Windows.
+# override application level settings
 app.config_from_object(settings)
 app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)
 

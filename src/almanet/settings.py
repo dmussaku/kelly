@@ -15,8 +15,6 @@ from django.utils.functional import lazy
 from configurations import Configuration, pristinemethod
 from configurations.utils import uppercase_attributes
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
-TEMP_DIR = BASE_DIR + '/temp_dir/'
-
 
 def rel(*x):
     return os.path.join(BASE_DIR, *x)
@@ -108,6 +106,8 @@ class BaseConfiguration(SubdomainConfiguration, Configuration):
     TEST_RUNNER = "djnose2.TestRunner"
 
     BASE_DIR = BASE_DIR
+    TEMP_DIR = rel(BASE_DIR, 'temp_dir')
+
     # Quick-start development settings - unsuitable for production
     # See https://docs.djangoproject.com/en/1.6/howto/deployment/checklist/
 
@@ -354,12 +354,16 @@ class DevConfiguration(
     SITE_NAME = 'alma.net:8000'
     CSRF_COOKIE_DOMAIN = '.alma.net'
     CORS_ALLOW_CREDENTIALS = True
+    BROKER_URL = 'amqp://dev:dev@almasales.kz:5672//almasales/dev'
+    CELERY_RESULT_BACKEND = 'djcelery.backends.database:DatabaseBackend'
+
+    RUSTEM_SETTINGS = True
 
 
 class QAConfiguration(DevConfiguration):
     USE_PROFILER = True
     # DEBUG_TOOLBAR_PATCH_SETTINGS = False
-    
+
     @classmethod
     def pre_setup(cls):
         cls.INSTALLED_APPS += ('debug_toolbar', 'debug_panel',)
