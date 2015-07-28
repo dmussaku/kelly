@@ -16,3 +16,5 @@ logs
 conf/supervisord.conf
 alma
 bundle/vundle
+*.pid
+supervisord.conf
