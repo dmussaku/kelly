@@ -1674,6 +1674,8 @@ class Activity(SubscriptionObject):
     date_finished = models.DateTimeField(blank=True, null=True)
     need_preparation = models.BooleanField(default=False, blank=True)
     sales_cycle = models.ForeignKey(SalesCycle, related_name='rel_activities')
+    assignee = models.ForeignKey(CRMUser, related_name='activity_assignee', null=True)
+    result = models.TextField(null=True, blank=True)
     owner = models.ForeignKey(CRMUser, related_name='activity_owner')
     mentions = generic.GenericRelation('Mention', null=True)
     comments = generic.GenericRelation('Comment', null=True)
