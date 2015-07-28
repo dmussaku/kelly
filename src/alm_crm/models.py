@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import functools
+import os
 from django.db import models, transaction, IntegrityError
 from django.utils.translation import ugettext_lazy as _
 from almanet import settings
@@ -28,7 +29,9 @@ from datetime import datetime, timedelta
 import xlrd
 import pytz
 import time
-from almanet.settings import TEMP_DIR, BASE_DIR
+from django.conf import settings
+TEMP_DIR = getattr(settings, 'TEMP_DIR')
+
 from alm_vcard import models as vcard_models
 from celery import group, Task, result
 import simplejson as json
@@ -1017,8 +1020,10 @@ class Contact(SubscriptionObject):
             return {'success':False}
         ext = filename.split('.')[len(filename.split('.')) - 1]
         new_filename = filename.strip('.' + ext) + datetime.now().__str__() + '.' + ext
+        if not os.path.exists(os.path.join(TEMP_DIR)):
+            os.makedirs(TEMP_DIR)
         myfile = open(
-            TEMP_DIR + new_filename,
+            os.path.join(TEMP_DIR, new_filename),
             'wb'
             )
         myfile.write(xls_file_data)
