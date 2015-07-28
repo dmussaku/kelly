@@ -744,7 +744,7 @@ class ContactResource(CRMServiceModelResource):
                     bundle.data.get('vcard', '{}')
                     )
                 )
-        if not vcard_instance.get('fn'):
+        if not vcard_instance.get('fn') and not vcard_instance.get('given_name') and not vcard_instance.get('family_name'):
             raise Exception
         contact_id = kwargs.get('pk', None)
         subscription_id = self.get_crmsubscr_id(bundle.request)
