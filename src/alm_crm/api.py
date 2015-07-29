@@ -987,7 +987,6 @@ class ContactResource(CRMServiceModelResource):
         with RequestContext(self, request, allowed_methods=['get']):
             base_bundle = self.build_bundle(request=request)
             objects = self.obj_get_list(bundle=base_bundle, **self.remove_api_resource_names(kwargs))
-            t1 = time.time()
             bundles = (
                 {
                     'id': obj.id,
@@ -1007,11 +1006,11 @@ class ContactResource(CRMServiceModelResource):
 
     def get_vcard_state(self, request, **kwargs):
         t1 = time.time()
+
         with RequestContext(self, request, allowed_methods=['get']):
             base_bundle = self.build_bundle(request=request)
-            objects = self.obj_get_list(bundle=base_bundle, **self.remove_api_resource_names(kwargs))
-            vcard_bundles = serialize_objs((obj.vcard for obj in objects))
-        return self.create_response(request, vcard_bundles)
+            vcard_ids = self.obj_get_list(bundle=base_bundle, **self.remove_api_resource_names(kwargs)).values_list('vcard_id', flat=True)
+            return self.create_response(request, VCard.get_by_ids(*vcard_ids))
 
     def get_cold_base(self, request, **kwargs):
         '''

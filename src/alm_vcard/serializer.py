@@ -3,7 +3,6 @@ import sys
 import time
 from django.db.models import Model
 from django.db import connection
-from alm_vcard import models
 from preserialize.serialize import serialize
 from almanet.utils.metaprogramming import SerializableModel
 
@@ -15,7 +14,11 @@ def is_target(obj):
 	)
 
 def vcard_rel_components():
-	return inspect.getmembers(sys.modules[models.__name__], is_target)
+	return inspect.getmembers(sys.modules['alm_vcard.models'], is_target)
+
+def vcard_rel_fields():
+	return ["{}_set".format(comp[1]._meta.model_name)
+	        for comp in vcard_rel_components()]
 
 def build_tmpl_for(vcard_comp):
 	meta = vcard_comp._ser_meta
@@ -35,17 +38,16 @@ def serialize_objs(vcards):
 		'aliases': aliases
 	})
 
+# def test():
+# 	return serialize_objs(models.VCard.objects.first())
 
-def test():
-	return serialize_objs(models.VCard.objects.first())
-
-def stress_test():
-	t1 = time.time()
-	vcs = models.VCard.objects.all().prefetch_related(
-		'tel_set', 'category_set',
-		'adr_set', 'title_set', 'url_set',
-		'org_set', 'email_set', 'custom_sections',
-		'note_set')[1:1000]
-	serialize_objs(vcs)
-	t2 = time.time()
-	print "Objects: {}, SQL Queries: {}, seconds: {}".format(len(vcs), len(connection.queries), (t2 - t1))
+# def stress_test():
+# 	t1 = time.time()
+# 	vcs = models.VCard.objects.all().prefetch_related(
+# 		'tel_set', 'category_set',
+# 		'adr_set', 'title_set', 'url_set',
+# 		'org_set', 'email_set', 'custom_sections',
+# 		'note_set')[1:1000]
+# 	serialize_objs(vcs)
+# 	t2 = time.time()
+# 	print "Objects: {}, SQL Queries: {}, seconds: {}".format(len(vcs), len(connection.queries), (t2 - t1))

@@ -5,6 +5,7 @@ import os
 from django.db import models, transaction, IntegrityError
 from django.utils.translation import ugettext_lazy as _
 from almanet import settings
+from almanet.utils.metaprogramming import DirtyFieldsMixin
 from almanet.models import SubscriptionObject, Subscription
 from alm_vcard.models import (
     VCard,
