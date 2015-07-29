@@ -2383,15 +2383,13 @@ class ActivityResource(CRMServiceModelResource):
                 request, request.body,
                 format=request.META.get('CONTENT_TYPE', 'application/json'))
             activity = Activity.objects.get(id=data.get('id'))
-            activity.description = data.get('description')
+            activity.result = data.get('result')
             activity.date_finished = datetime.now(request.user.timezone)
             activity.save()
         return self.create_response(
-            request, {'activity': ActivityResource().full_dehydrate(
-                    ActivityResource().build_bundle(
-                        obj=activity, request=request
-                        )
-                    )})
+            request, {
+                'activity': ActivityResource().full_dehydrate(
+                        ActivityResource().build_bundle(obj=activity, request=request) )})
 
     def move_activity(self, request, **kwargs):
         with RequestContext(self, request, allowed_methods=['post']):
