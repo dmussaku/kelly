@@ -809,9 +809,7 @@ class ContactResource(CRMServiceModelResource):
         # print "Time to finish vcard hydration %s" % t3
         bundle.obj.save()
         with transaction.atomic():
-            if bundle.data.get('note') and not kwargs.get('pk'):
-                bundle.obj.create_share_to(self.get_crmuser(bundle.request).id,
-                                           bundle.data.get('note'))
+             data.get('note'))
             if not kwargs.get('pk'):
                 SalesCycle.create_globalcycle(
                     **{

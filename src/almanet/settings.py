@@ -401,6 +401,8 @@ class TestConfiguration(
         #     'NAME': rel('../..', 'test_db.sqlite3'),
         # },
     }
+    BROKER_URL = 'amqp://stage:n0easyway1n@10.10.10.245:5672//almasales/stage'
+    CELERY_RESULT_BACKEND = 'djcelery.backends.database:DatabaseBackend'
 
     DEBUG = True
 
