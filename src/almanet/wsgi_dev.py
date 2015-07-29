@@ -8,6 +8,7 @@ https://docs.djangoproject.com/en/1.6/howto/deployment/wsgi/
 """
 
 import os
+from . import preparations
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "almanet.settings")
 os.environ.setdefault('DJANGO_CONFIGURATION', 'DevConfiguration')
@@ -18,3 +19,6 @@ application = get_wsgi_application()
 
 from configurations import importer
 importer.install()
+
+# todo! may be in future it s better to make an async task.
+preparations.pre()

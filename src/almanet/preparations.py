@@ -7,4 +7,5 @@ def prepopulate_cache():
 	VCard.cache_all()
 
 
-def patch():
+def pre():
+	prepopulate_cache()
