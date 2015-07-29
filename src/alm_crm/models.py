@@ -22,9 +22,11 @@ from alm_vcard.models import (
 from alm_user.models import User
 from django.template.loader import render_to_string
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.cache import cache
 from django.db.models import signals, Q
 from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
+from django.db.models.signals import post_save
 from django.utils import timezone
 from datetime import datetime, timedelta
 import xlrd
@@ -35,7 +37,9 @@ TEMP_DIR = getattr(settings, 'TEMP_DIR')
 
 from alm_vcard import models as vcard_models
 from celery import group, Task, result
-import simplejson as json
+import json
+from almanet.utils.cache import build_key, extract_id
+from almanet.utils.json import date_handler
 # from .tasks import create_failed_contacts_xls
 
 ALLOWED_TIME_PERIODS = ['week', 'month', 'year']
@@ -1204,6 +1208,65 @@ class Contact(SubscriptionObject):
                     objects['does_not_exist'].append(contact_id)
             return objects
 
+    def serialize(self):
+        return {
+            'author_id': self.owner_id,
+            'date_created': self.date_created,
+            'date_edited': self.date_edited,
+            'id': self.pk,
+            'pk': self.pk,
+            'owner': self.owner_id,
+            'parent_id': hasattr(self, 'parent_id') and self.parent_id or None,
+            'children': [child.pk for child in self.children.all()],
+            'sales_cycles': [cycle.pk for cycle in self.sales_cycles.all()],
+            'status': self.status,
+            'subscription_id': self.subscription_id,
+            'tp': self.tp,
+            'vcard_id': self.vcard_id
+        }
+
+    @classmethod
+    def after_save(cls, sender, instance, **kwargs):
+        cache.set(build_key(cls._meta.model_name, instance.pk), json.dumps(instance.serialize(), default=date_handler))
+    
+        # TODO: each time when contact is updated vcard is recreated. So if it is the case then reinvalidate cache
+        vcard = instance.vcard
+        cache.set(build_key(vcard.__class__._meta.model_name, vcard.id), json.dumps(vcard.serialize(), default=date_handler))
+        # vcard_id = vcard.id
+        # cached_vcard = cache.get(build_key(vcard.__class__._meta.model_name, vcard_id))
+        # if cached_vcard is None:
+        #     return
+        # cached_vcard = json.loads(cached_vcard)
+        # old_id = cached_vcard['vcard_id']
+        # cached_vcard['vcard_id'] = instance.pk
+        # cache.set(build_key(contact.__class__._meta.model_name, contact_id), json.dumps(cached_vcard))
+        # cache.delete(build_key(cls._meta.model_name, old_id))
+
+    @classmethod
+    def get_by_ids(cls, *ids):
+        """Get vcard by ids from cache with fallback to postgres."""
+        rv = cache.get_many([build_key(cls._meta.model_name, cid) for cid in ids])
+        rv = {extract_id(k, coerce=int): json.loads(v) for k, v in rv.iteritems()}
+
+        not_found_ids = [cid for cid in ids if not cid in rv]
+        if not not_found_ids:
+            return rv.values()
+        contact_qs = cls.objects.filter(pk__in=not_found_ids).prefetch_related('sales_cycles', 'children')
+        more_rv = list(c.serialize() for c in contact_qs)
+        cache.set_many({build_key(cls._meta.model_name, contact_raw['id']): json.dumps(contact_raw, default=date_handler)
+                        for contact_raw in more_rv})
+        return rv.values() + more_rv
+
+    @classmethod
+    def cache_all(cls):
+        contact_qs = cls.objects.all().prefetch_related('sales_cycles', 'children')
+        contact_raws = [c.serialize() for c in contact_qs]
+        cache.set_many({build_key(cls._meta.model_name, contact_raw['id']): json.dumps(contact_raw, default=date_handler) for contact_raw in contact_raws})
+
+
+post_save.connect(Contact.after_save, sender=Contact)
+
+
 class Value(SubscriptionObject):
     # Type of payment
     SALARY_OPTIONS = (
@@ -1326,6 +1389,8 @@ class Product(SubscriptionObject):
             #             )
             product_list.append(product)
         return product_list
+
+post_save.connect(VCard.after_save, sender=VCard)
 
 class ProductGroup(SubscriptionObject):
     owner = models.ForeignKey(CRMUser, related_name='owned_product_groups', blank=True, null=True)

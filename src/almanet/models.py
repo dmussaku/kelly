@@ -3,6 +3,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from django.utils.text import slugify
 from almanet.url_resolvers import reverse as almanet_reverse
+from almanet.utils.metaprogramming import SerializableModel
 from django.db.models import signals
 from django.utils import timezone
 from datetime import datetime
@@ -75,3 +76,9 @@ class SubscriptionObject(models.Model):
             if not self.subscription_id or self.subscription_id != self.owner.subscription_id:
                 self.subscription_id = self.owner.subscription_id
         super(SubscriptionObject, self).save(**kwargs)
+
+
+class SerializableSubscriptionObject(SubscriptionObject, SerializableModel):
+
+    class Meta:
+        abstract = True

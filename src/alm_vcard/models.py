@@ -20,6 +20,7 @@ import vobject
 from vobject.vcard import *
 from almanet.utils.metaprogramming import SerializableModel
 from almanet.utils.cache import build_key, extract_id
+from almanet.utils.json import date_handler
 from .serializer import serialize_objs, vcard_rel_fields
 
 class VObjectImportException(Exception):
@@ -724,6 +725,9 @@ class VCard(models.Model):
         """
         return self.toVObject().serialize()
 
+    def serialize(self):
+        return serialize_objs(self)
+
     @classmethod
     @transaction.atomic
     def merge_model_objects(cls, primary_object, alias_objects=[], keep_old=True):
@@ -811,7 +815,19 @@ class VCard(models.Model):
 
     @classmethod
     def after_save(cls, sender, instance, **kwargs):
-        cache.set(build_key(cls._meta.model_name, instance.pk), serialize_objs(instance))
+        cache.set(build_key(cls._meta.model_name, instance.pk), json.dumps(serialize_objs(instance), default=date_handler))
+        # TODO: each time when contact is updated vcard is recreated. So if it is the case then reinvalidate cache
+        if hasattr(instance, 'contact'):
+            contact = instance.contact
+            contact_id = contact.id
+            cached_contact = cache.get(build_key(contact.__class__._meta.model_name, contact_id))
+            if cached_contact is None:
+                return
+            cached_contact = json.loads(cached_contact)
+            old_id = cached_contact['vcard_id']
+            cached_contact['vcard_id'] = instance.pk
+            cache.set(build_key(contact.__class__._meta.model_name, contact_id), json.dumps(cached_contact, default=date_handler))
+            cache.delete(build_key(cls._meta.model_name, old_id))
 
     @classmethod
     def get_by_ids(cls, *ids):
@@ -824,14 +840,14 @@ class VCard(models.Model):
             return rv.values()
         vcards_qs = cls.objects.filter(pk__in=not_found_ids).prefetch_related(*vcard_rel_fields())
         more_rv = serialize_objs(vcards_qs)
-        cache.set_many({build_key(cls._meta.model_name, vcard_raw['id']): json.dumps(vcard_raw) for vcard_raw in more_rv})
+        cache.set_many({build_key(cls._meta.model_name, vcard_raw['id']): json.dumps(vcard_raw, default=date_handler) for vcard_raw in more_rv})
         return rv.values() + more_rv
 
     @classmethod
     def cache_all(cls):
         vcard_qs = VCard.objects.all().prefetch_related(*vcard_rel_fields())
         vcards_raw = serialize_objs(vcard_qs)
-        cache.set_many({build_key(cls._meta.model_name, vcard_raw['id']): vcard_raw for vcard_raw in vcards_raw})
+        cache.set_many({build_key(cls._meta.model_name, vcard_raw['id']): json.dumps(vcard_raw, default=date_handler) for vcard_raw in vcards_raw})
 
 
 post_save.connect(VCard.after_save, sender=VCard)
