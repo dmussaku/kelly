@@ -18,3 +18,4 @@ alma
 bundle/vundle
 *.pid
 supervisord.conf
+*.ini

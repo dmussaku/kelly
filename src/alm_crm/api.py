@@ -810,8 +810,9 @@ class ContactResource(CRMServiceModelResource):
         bundle.obj.save()
         with transaction.atomic():
             if bundle.data.get('note') and not kwargs.get('pk'):
-                bundle.obj.create_share_to(self.get_crmuser(bundle.request).id,
-                                           bundle.data.get('note'))
+                bundle.obj.create_share_to(
+                    self.get_crmuser(bundle.request).id,
+                    bundle.data.get('note'))
             if not kwargs.get('pk'):
                 SalesCycle.create_globalcycle(
                     **{
@@ -986,32 +987,33 @@ class ContactResource(CRMServiceModelResource):
     def get_contact_state(self, request, **kwargs):
         with RequestContext(self, request, allowed_methods=['get']):
             base_bundle = self.build_bundle(request=request)
-            objects = self.obj_get_list(bundle=base_bundle, **self.remove_api_resource_names(kwargs))
-            t1 = time.time()
-            bundles = (
-                {
-                    'id': obj.id,
-                    'author_id': obj.owner_id,
-                    'date_created': obj.date_created,
-                    'date_edited': obj.date_edited,
-                    'owner': obj.owner_id,
-                    'parent_id': obj.parent_id,
-                    'status': obj.status,
-                    'tp': obj.tp,
-                    'subscription_id': obj.subscription_id,
-                    'children': list(contact.id for contact in obj.children.all()),
-                    'sales_cycles': list(cycle.id for cycle in obj.sales_cycles.all()),
-                    'vcard_id': obj.vcard_id
-                } for obj in objects)
-        return self.create_response(request, StreamList(bundles))
+            contact_ids = self.obj_get_list(bundle=base_bundle, **self.remove_api_resource_names(kwargs)
+                ).values_list('id', flat=True)
+            contacts = Contact.get_by_ids(*contact_ids)
+            # bundles = (
+            #     {
+            #         'id': obj.id,
+            #         'author_id': obj.owner_id,
+            #         'date_created': obj.date_created,
+            #         'date_edited': obj.date_edited,
+            #         'owner': obj.owner_id,
+            #         'parent_id': obj.parent_id,
+            #         'status': obj.status,
+            #         'tp': obj.tp,
+            #         'subscription_id': obj.subscription_id,
+            #         'children': list(contact.id for contact in obj.children.all()),
+            #         'sales_cycles': list(cycle.id for cycle in obj.sales_cycles.all()),
+            #         'vcard_id': obj.vcard_id
+            #     } for obj in objects)
+        return self.create_response(request, contacts)
 
     def get_vcard_state(self, request, **kwargs):
         t1 = time.time()
+
         with RequestContext(self, request, allowed_methods=['get']):
             base_bundle = self.build_bundle(request=request)
-            objects = self.obj_get_list(bundle=base_bundle, **self.remove_api_resource_names(kwargs))
-            vcard_bundles = serialize_objs((obj.vcard for obj in objects))
-        return self.create_response(request, vcard_bundles)
+            vcard_ids = self.obj_get_list(bundle=base_bundle, **self.remove_api_resource_names(kwargs)).values_list('vcard_id', flat=True)
+            return self.create_response(request, VCard.get_by_ids(*vcard_ids))
 
     def get_cold_base(self, request, **kwargs):
         '''

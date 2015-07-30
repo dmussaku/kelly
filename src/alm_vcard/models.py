@@ -1,24 +1,27 @@
+import re
 from os import *
 import datetime
+import json
 from datetime import *
 from time import *
-import re
 from django.db import models, transaction as tx
-import vobject
-from vobject.vcard import *
 from django.utils.translation import ugettext as _
 from django.conf import settings
 from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
 from django.db import transaction
 from django.db.models import get_models, Model
+from django.db.models.signals import post_save
+from django.contrib.contenttypes.generic import GenericForeignKey
+from django.core.cache import cache
 from django.contrib.contenttypes.generic import GenericForeignKey
 
-from django.db import transaction
-from django.db.models import get_models, Model
-from django.contrib.contenttypes.generic import GenericForeignKey
+import vobject
+from vobject.vcard import *
 from almanet.utils.metaprogramming import SerializableModel
-
+from almanet.utils.cache import build_key, extract_id
+from almanet.utils.json import date_handler
+from .serializer import serialize_objs, vcard_rel_fields
 
 class VObjectImportException(Exception):
     message = _("The vCard could not be converted into a vObject")
@@ -722,6 +725,9 @@ class VCard(models.Model):
         """
         return self.toVObject().serialize()
 
+    def serialize(self):
+        return serialize_objs(self)
+
     @classmethod
     @transaction.atomic
     def merge_model_objects(cls, primary_object, alias_objects=[], keep_old=True):
@@ -805,6 +811,46 @@ class VCard(models.Model):
                 alias_object.delete()
         primary_object.save()
         return primary_object
+
+
+    @classmethod
+    def after_save(cls, sender, instance, **kwargs):
+        cache.set(build_key(cls._meta.model_name, instance.pk), json.dumps(serialize_objs(instance), default=date_handler))
+        # TODO: each time when contact is updated vcard is recreated. So if it is the case then reinvalidate cache
+        if hasattr(instance, 'contact'):
+            contact = instance.contact
+            contact_id = contact.id
+            cached_contact = cache.get(build_key(contact.__class__._meta.model_name, contact_id))
+            if cached_contact is None:
+                return
+            cached_contact = json.loads(cached_contact)
+            old_id = cached_contact['vcard_id']
+            cached_contact['vcard_id'] = instance.pk
+            cache.set(build_key(contact.__class__._meta.model_name, contact_id), json.dumps(cached_contact, default=date_handler))
+            cache.delete(build_key(cls._meta.model_name, old_id))
+
+    @classmethod
+    def get_by_ids(cls, *ids):
+        """Get vcard by ids from cache with fallback to postgres."""
+        rv = cache.get_many([build_key(cls._meta.model_name, vcard_id) for vcard_id in ids])
+        rv = {extract_id(k, coerce=int): json.loads(v) for k, v in rv.iteritems()}
+
+        not_found_ids = [vcard_id for vcard_id in ids if not vcard_id in rv]
+        if not not_found_ids:
+            return rv.values()
+        vcards_qs = cls.objects.filter(pk__in=not_found_ids).prefetch_related(*vcard_rel_fields())
+        more_rv = serialize_objs(vcards_qs)
+        cache.set_many({build_key(cls._meta.model_name, vcard_raw['id']): json.dumps(vcard_raw, default=date_handler) for vcard_raw in more_rv})
+        return rv.values() + more_rv
+
+    @classmethod
+    def cache_all(cls):
+        vcard_qs = VCard.objects.all().prefetch_related(*vcard_rel_fields())
+        vcards_raw = serialize_objs(vcard_qs)
+        cache.set_many({build_key(cls._meta.model_name, vcard_raw['id']): json.dumps(vcard_raw, default=date_handler) for vcard_raw in vcards_raw})
+
+
+post_save.connect(VCard.after_save, sender=VCard)
 
 
 
