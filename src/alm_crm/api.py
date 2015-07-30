@@ -2234,6 +2234,7 @@ class ActivityResource(CRMServiceModelResource):
     '''
 
     author_id = fields.IntegerField(attribute='owner_id', null=True)
+    assignee_id = fields.IntegerField(attribute='assignee_id', null=True)
     description = fields.CharField(attribute='description')
     need_preparation = fields.BooleanField(attribute='need_preparation')
     sales_cycle_id = fields.IntegerField(attribute='sales_cycle_id', null=True)
@@ -2385,15 +2386,13 @@ class ActivityResource(CRMServiceModelResource):
                 request, request.body,
                 format=request.META.get('CONTENT_TYPE', 'application/json'))
             activity = Activity.objects.get(id=data.get('id'))
-            activity.description = data.get('description')
+            activity.result = data.get('result')
             activity.date_finished = datetime.now(request.user.timezone)
             activity.save()
         return self.create_response(
-            request, {'activity': ActivityResource().full_dehydrate(
-                    ActivityResource().build_bundle(
-                        obj=activity, request=request
-                        )
-                    )})
+            request, {
+                'activity': ActivityResource().full_dehydrate(
+                        ActivityResource().build_bundle(obj=activity, request=request) )})
 
     def move_activity(self, request, **kwargs):
         with RequestContext(self, request, allowed_methods=['post']):
@@ -2429,11 +2428,12 @@ class ActivityResource(CRMServiceModelResource):
 
             return self.create_response(request, {'objects':objects}, response_class=http.HttpAccepted)
 
-    def obj_create(self, bundle, **kwargs):
+    def obj_create(self, bundle, **kwargs): ## TODO
         act = bundle.obj = self._meta.object_class()
         act.author_id = bundle.data.get('author_id')
         act.description = bundle.data.get('description')
         act.sales_cycle_id = bundle.data.get('sales_cycle_id')
+        act.assignee_id = bundle.data.get('assignee_id')
         if 'deadline' in bundle.data:
             act.deadline = bundle.data.get('deadline')
         if 'need_preparation' in bundle.data:
