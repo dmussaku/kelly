@@ -6,7 +6,7 @@ from django.utils.translation import ugettext as _
 from alm_company.models import Company
 from almanet.settings import DEFAULT_SERVICE
 from almanet.models import Service, Subscription
-from alm_crm.models import Contact, SalesCycle, Activity, CRMUser, Product, ContactList, Share
+from alm_crm.models import Contact, SalesCycle, Activity, CRMUser, Product, ContactList, Share, Milestone
 from alm_vcard.models import VCard
 import logging
 
@@ -126,7 +126,7 @@ def check_subscription_milestones():
             logging.warning("Subscription with ID: %s has %i success milestones"%(subscription.id, success_milestones_amount))
 
         if fail_milestones_amount != 1:
-            logging.warning("Subscription with ID: %s has %i success milestones"%(subscription.id, fail_milestones_amount))
+            logging.warning("Subscription with ID: %s has %i fail milestones"%(subscription.id, fail_milestones_amount))
 
 
     print "******** Checking finished ******** \n"
