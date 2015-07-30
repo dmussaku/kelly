@@ -8,7 +8,8 @@ https://docs.djangoproject.com/en/1.6/howto/deployment/wsgi/
 """
 
 import os
-from . import preparations
+from django.conf import settings
+from . import celery
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "almanet.settings")
 os.environ.setdefault('DJANGO_CONFIGURATION', 'DemoConfiguration')
@@ -20,5 +21,6 @@ application = get_wsgi_application()
 from configurations import importer
 importer.install()
 
-# todo! may be in future it s better to make an async task.
-preparations.pre()
+# # todo! may be in future it s better to make an async task.
+# preparations.pre()
+celery.prepare_cache.delay()
