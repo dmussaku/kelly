@@ -186,15 +186,19 @@
     </div>
     <script src="{% static 'js/webfont.min.js' %}"></script>
     <script>
-     WebFont.load({
-      custom: {
-        families: ['Roboto', 'Roboto Condensed'],
-        urls: ["{% static 'css/fonts.css' %}"]
-      },
-      // google: { families: [ 'Roboto:400,700:latin,cyrillic', 'Roboto+Condensed::latin,cyrillic' ] },
-      active: function(familyName, fvd) {
-      }
-    });
+    var WebFontConfig = ({
+        google: { families: [ 'Open+Sans:400,700:latin,cyrillic' ] }
+      });
+      (function() {
+        'use strict';
+        var wf = document.createElement('script');
+        wf.src = ('https:' === document.location.protocol ? 'https' : 'http') +
+                  '://ajax.googleapis.com/ajax/libs/webfont/1.5.6/webfont.js';
+        wf.type = 'text/javascript';
+        wf.async = 'true';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(wf, s);
+      })();
     </script>
 
     {% settings_value 'DEBUG' as debug_mode_on %}
