@@ -435,7 +435,7 @@ class StagingConfiguration(FileSettings('~/.almanet/almanet.conf.py'), BaseConfi
     CACHES = {
         'default': {
             'BACKEND': 'django.core.cache.backends.memcached.PyLibMCCache',
-            'LOCATION': 'db.alma.net:11211'
+            'LOCATION': '127.0.0.1:11211'
         }
     }
 
