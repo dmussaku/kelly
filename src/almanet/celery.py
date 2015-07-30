@@ -4,7 +4,6 @@ import os
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'almanet.settings')
 os.environ.setdefault('DJANGO_CONFIGURATION', 'DevConfiguration')
 
-from . import preparations
 
 from celery import Celery
 from django.conf import settings
@@ -17,6 +16,8 @@ app = Celery('almanet')
 # override application level settings
 app.config_from_object(settings)
 app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)
+
+from . import preparations
 
 @app.task(bind=True)
 def debug_task(self):

@@ -439,8 +439,8 @@ class StagingConfiguration(FileSettings('~/.almanet/almanet.conf.py'), BaseConfi
         }
     }
 
-    MEDIA_ROOT = os.path.expanduser('~/.almanet/media/')
-    STATIC_ROOT = os.path.expanduser('~/.almanet/static/')
+    MEDIA_ROOT = os.path.expanduser('~/.almanet/stagemedia/')
+    STATIC_ROOT = os.path.expanduser('~/.almanet/stagestatic/')
     BROKER_URL = 'amqp://stage:n0easyway1n@10.10.10.245:5672//almasales/stage'
     CELERY_RESULT_BACKEND = 'djcelery.backends.database:DatabaseBackend'
 
