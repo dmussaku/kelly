@@ -2234,6 +2234,7 @@ class ActivityResource(CRMServiceModelResource):
     '''
 
     author_id = fields.IntegerField(attribute='owner_id', null=True)
+    assignee_id = fields.IntegerField(attribute='assignee_id', null=True)
     description = fields.CharField(attribute='description')
     need_preparation = fields.BooleanField(attribute='need_preparation')
     sales_cycle_id = fields.IntegerField(attribute='sales_cycle_id', null=True)
@@ -2427,11 +2428,12 @@ class ActivityResource(CRMServiceModelResource):
 
             return self.create_response(request, {'objects':objects}, response_class=http.HttpAccepted)
 
-    def obj_create(self, bundle, **kwargs):
+    def obj_create(self, bundle, **kwargs): ## TODO
         act = bundle.obj = self._meta.object_class()
         act.author_id = bundle.data.get('author_id')
         act.description = bundle.data.get('description')
         act.sales_cycle_id = bundle.data.get('sales_cycle_id')
+        act.assignee_id = bundle.data.get('assignee_id')
         if 'deadline' in bundle.data:
             act.deadline = bundle.data.get('deadline')
         if 'need_preparation' in bundle.data:
