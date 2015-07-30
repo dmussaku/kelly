@@ -1196,7 +1196,7 @@ class Contact(SubscriptionObject):
             }
             for contact_id in obj_ids:
                 try:
-                    print contact_id
+                    # print contact_id
                     obj = Contact.objects.get(id=contact_id)
                     objects['contacts'].append(contact_id)
                     objects['sales_cycles'] += list(obj.sales_cycles.all().values_list("id", flat=True))
@@ -1231,7 +1231,8 @@ class Contact(SubscriptionObject):
     
         # TODO: each time when contact is updated vcard is recreated. So if it is the case then reinvalidate cache
         vcard = instance.vcard
-        cache.set(build_key(vcard.__class__._meta.model_name, vcard.id), json.dumps(vcard.serialize(), default=date_handler))
+        if vcard:
+            cache.set(build_key(vcard.__class__._meta.model_name, vcard.id), json.dumps(vcard.serialize(), default=date_handler))
         # vcard_id = vcard.id
         # cached_vcard = cache.get(build_key(vcard.__class__._meta.model_name, vcard_id))
         # if cached_vcard is None:
