@@ -13,7 +13,7 @@ class Migration(DataMigration):
         # and orm['appname.ModelName'] for models in other applications.
 
         for act in orm.Activity.objects.all():
-            if act.assignee is None:
+            if act.assignee is None and act.deadline is not None:
                 act.assignee_id = act.owner_id
                 act.save()
 
