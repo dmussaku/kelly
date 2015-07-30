@@ -136,18 +136,22 @@ class Milestone(SubscriptionObject):
     @classmethod
     def create_default_milestones(cls, subscription_id):
         milestones = []
-        default_data = [{'title':'Звонок/Заявка', 'color_code': '#F4B59C'},
-                        {'title':'Отправка КП', 'color_code': '#F59CC8'},
-                        {'title':'Согласование договора', 'color_code': '#A39CF4'},
-                        {'title':'Выставление счета', 'color_code': '#9CE5F4'},
-                        {'title':'Контроль оплаты', 'color_code': '#9CF4A7'},
-                        {'title':'Предоставление услуги', 'color_code': '#D4F49B'},
-                        {'title':'Upsales', 'color_code': '#F4DC9C'}]
+        default_data = [{'title':'Звонок/Заявка', 'color_code': '#F4B59C', 'is_system':0, 'sort':1},
+                        {'title':'Отправка КП', 'color_code': '#F59CC8', 'is_system':0, 'sort':2},
+                        {'title':'Согласование договора', 'color_code': '#A39CF4', 'is_system':0, 'sort':3},
+                        {'title':'Выставление счета', 'color_code': '#9CE5F4', 'is_system':0, 'sort':4},
+                        {'title':'Контроль оплаты', 'color_code': '#9CF4A7', 'is_system':0, 'sort':5},
+                        {'title':'Предоставление услуги', 'color_code': '#D4F49B', 'is_system':0, 'sort':6},
+                        {'title':'Upsales', 'color_code': '#F4DC9C', 'is_system':0, 'sort':7},
+                        {'title':'Успешно завершено', 'color_code':'#9CF4A7', 'is_system':1, 'sort':8},
+                        {'title':'Не реализовано', 'color_code':'#F4A09C', 'is_system':2, 'sort':9}]
 
         for data in default_data:
             milestone = Milestone()
             milestone.title = data['title']
             milestone.color_code = data['color_code']
+            milestone.is_system = data['is_system']
+            milestone.sort = data['sort']
             milestone.subscription_id = subscription_id
             milestone.save()
             milestones.append(milestone)
