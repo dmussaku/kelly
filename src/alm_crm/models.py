@@ -26,7 +26,7 @@ from django.core.cache import cache
 from django.db.models import signals, Q
 from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, post_delete
 from django.utils import timezone
 from datetime import datetime, timedelta
 import xlrd
@@ -1722,6 +1722,44 @@ class SalesCycle(SubscriptionObject):
             .order_by('-latest_activity__date_created')
         return sales_cycles
 
+    def serialize(self):
+        projected_value_id = None
+        real_value_id = None
+        if self.projected_value:
+            projected_value_id = self.projected_value.id
+        if self.real_value:
+            real_value_id = self.real_value.id
+
+        return {
+            'activities': [activity.id for activity in self.rel_activities.all()],
+            'author_id': self.owner_id,
+            'contact_id': self.contact_id,
+            'date_created': self.date_created,
+            'date_edited': self.date_edited,
+            'description': self.description,
+            'id': self.pk,
+            'is_global': self.is_global,
+            'log': [l.id for l in self.log.all()],
+            'milestone_id': self.milestone_id,
+            'pk': self.pk,
+            "projected_value": projected_value_id,
+            "real_value": real_value_id,
+            "stat": [stat.id for stat in self.product_stats.all()],
+            "status": self.status,
+            'subscription_id': self.subscription_id,
+            "title": self.title
+        }
+
+    @classmethod
+    def after_save(cls, sender, instance, **kwargs):
+        cache.set(build_key(cls._meta.model_name, instance.pk), json.dumps(instance.serialize(), default=date_handler))
+    
+    @classmethod
+    def after_delete(cls, sender, instance, **kwargs):
+        cache.delete(build_key(cls._meta.model_name, instance.pk))
+
+post_save.connect(SalesCycle.after_save, sender=SalesCycle)
+post_delete.connect(SalesCycle.after_delete, sender=SalesCycle)
 
 class SalesCycleLogEntry(SubscriptionObject):
     TYPES_CAPS = (
