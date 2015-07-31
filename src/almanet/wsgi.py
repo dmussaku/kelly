@@ -22,6 +22,10 @@ importer.install()
 
 from . import celery
 
+for i in xrange(100):
+	print "PLEASE DONT FORGET PRECACHE"
+
+
 # # todo! may be in future it s better to make an async task.
 # preparations.pre()
-celery.prepare_cache.delay()
+#celery.prepare_cache.delay()
