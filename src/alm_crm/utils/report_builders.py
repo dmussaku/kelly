@@ -19,18 +19,19 @@ def build_funnel(subscription_id, data=None):
 	rv = {
 		'report_name': 'funnel'
 	}
-	# only those cycles that has products
 	sales_cycles = SalesCycle.objects.filter(
+		products__isnull=False,
 		subscription_id=subscription_id,
-		is_global=False).exclude(products=None)
-	if data:
-		products = data.get('products', [])
-		if products:
-			sales_cycles = sales_cycles.filter(products__pk__in=products)
+		is_global=False)
+	if 'products' in data:
+		sales_cycles = SalesCycle.objects.filter(
+			products__isnull=False,
+			subscription_id=subscription_id,
+			is_global=False,
+			products__pk__in=data.get('products', []))
+		
 	rv['total'] = len(sales_cycles)
-
 	rv['undefined'] = len(filter(lambda sc: sc.milestone == None, sales_cycles))
-	
 	rv['funnel'] = {}
 	milestones = Milestone.objects.filter(subscription_id=subscription_id)
 	system_milestones = milestones.filter(is_system__in=[1,2]).order_by('is_system')
@@ -40,7 +41,10 @@ def build_funnel(subscription_id, data=None):
 		rv['funnel'][m.id] = len(sc_in_funnel)
 		sc_in_funnel = [sc for sc in sc_in_funnel if sc.milestone.id != m.id]
 	for m in system_milestones:
-		rv['funnel'][m.id] = len(m.sales_cycles.all())
+		scs = m.sales_cycles.all()
+		if 'products' in data:
+			scs = scs.filter(products__pk__in=data.get('products', []))
+		rv['funnel'][m.id] = len(scs)
 	return rv
 
 def build_realtime_funnel(subscription_id, data={}):
@@ -49,12 +53,14 @@ def build_realtime_funnel(subscription_id, data={}):
 	}
 	sales_cycles = SalesCycle.objects.filter(
 		subscription_id=subscription_id,
-		is_global=False).exclude(products=None)
-	if data:
-		products = data.get('products', [])
-		if products:
-			sales_cycles = sales_cycles.filter(products__in=products)
-
+		is_global=False,
+		products__isnull=False)
+	if 'products' in data:
+		sales_cycles = SalesCycle.objects.filter(
+			products__isnull=False,
+			subscription_id=subscription_id,
+			is_global=False,
+			products__pk__in=data.get('products', []))
 	rv['total'] = len(sales_cycles)
 
 	rv['undefined'] = len(filter(lambda sc: sc.milestone == None, sales_cycles))
