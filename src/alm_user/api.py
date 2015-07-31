@@ -33,18 +33,18 @@ import ast
 
 
 
-class OpenAuthEndpoint(Authentication):
+# class OpenAuthEndpoint(Authentication):
 
-    def is_authenticated(self, request, **kwargs):
-        """
-        Identifies if the user is authenticated to continue or not.
-        Should return either ``True`` if allowed, ``False`` if not or an
-        ``HttpResponse`` if you need something custom.
-        """
+#     def is_authenticated(self, request, **kwargs):
+#         """
+#         Identifies if the user is authenticated to continue or not.
+#         Should return either ``True`` if allowed, ``False`` if not or an
+#         ``HttpResponse`` if you need something custom.
+#         """
 
-        auth_endpoint = '/api/v1/%s/auth%s' % (UserResource._meta.resource_name, trailing_slash())
+#         auth_endpoint = '/api/v1/%s/auth%s' % (UserResource._meta.resource_name, trailing_slash())
 
-        return request.path == auth_endpoint
+#         # return request.path == auth_endpoint
 
 
 class UserSession(object):
@@ -107,7 +107,7 @@ class UserResource(ModelResource):
         detail_allowed_methods = ['get', 'patch']
         resource_name = 'user'
         authentication = MultiAuthentication(
-            OpenAuthEndpoint(),
+            # OpenAuthEndpoint(),
             BasicAuthentication(),
             SessionAuthentication()
             )
@@ -372,7 +372,7 @@ class UserResource(ModelResource):
 
 
     def authorization(self, request, **kwargs):
-        with RequestContext(self, request, allowed_methods=['post']):
+        with RequestContext(self, request, auth=False, allowed_methods=['post']):
             data = self.deserialize(request, request.body, format=request.META.get('CONTENT_TYPE', 'application/json'))
 
             user = authenticate(username=data.get('email'), password=data.get('password'))
