@@ -195,10 +195,8 @@ class UserResource(ModelResource):
                 )
 
     def dehydrate(self, bundle):
-        if bundle.request.user.is_authenticated():
-            subscription_id = get_subscr_id(bundle.request.user_env, DEFAULT_SERVICE)
-            bundle.data['crm_user_id'] = bundle.obj.get_subscr_user(subscription_id=subscription_id).pk
-            bundle.data['is_supervisor'] = bundle.obj.get_subscr_user(subscription_id=subscription_id).is_supervisor
+        bundle.data['crm_user_id'] = bundle.obj.get_crmuser().pk
+        bundle.data['is_supervisor'] = bundle.obj.get_crmuser().is_supervisor
         return bundle
 
     def get_current_user(self, request, **kwargs):
@@ -390,6 +388,7 @@ class UserResource(ModelResource):
                 data = {'message': "Invalid login"}
                 return self.error_response(request, data, response_class=http.HttpUnauthorized)
 
+            # request.user = user
             bundle = self.build_bundle(obj=None, data={
                 'user': self.full_dehydrate(self.build_bundle(obj=request.user, request=request)),
                 'session_key': session_key,
