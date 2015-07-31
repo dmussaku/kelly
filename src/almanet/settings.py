@@ -435,12 +435,12 @@ class StagingConfiguration(FileSettings('~/.almanet/almanet.conf.py'), BaseConfi
     CACHES = {
         'default': {
             'BACKEND': 'django.core.cache.backends.memcached.PyLibMCCache',
-            'LOCATION': 'db.alma.net:11211'
+            'LOCATION': '127.0.0.1:11211'
         }
     }
 
-    MEDIA_ROOT = os.path.expanduser('~/.almanet/media/')
-    STATIC_ROOT = os.path.expanduser('~/.almanet/static/')
+    MEDIA_ROOT = os.path.expanduser('~/.almanet/stagemedia/')
+    STATIC_ROOT = os.path.expanduser('~/.almanet/stagestatic/')
     BROKER_URL = 'amqp://stage:n0easyway1n@10.10.10.245:5672//almasales/stage'
     CELERY_RESULT_BACKEND = 'djcelery.backends.database:DatabaseBackend'
 
