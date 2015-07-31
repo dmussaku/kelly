@@ -38,13 +38,13 @@ def build_funnel(subscription_id, data=None):
 	milestones = milestones.exclude(is_system__in=[1,2]).order_by('sort')
 	sc_in_funnel = [sc for sc in sales_cycles if sc.milestone != None]
 	for m in milestones:
-		rv['funnel'][m.id] = len(sc_in_funnel)
+		rv['funnel'][m.id] = [sc.id for sc in sc_in_funnel]
 		sc_in_funnel = [sc for sc in sc_in_funnel if sc.milestone.id != m.id]
 	for m in system_milestones:
 		scs = m.sales_cycles.all()
 		if 'products' in data:
 			scs = scs.filter(products__pk__in=data.get('products', []))
-		rv['funnel'][m.id] = len(scs)
+		rv['funnel'][m.id] = [sc.id for sc in scs]
 	return rv
 
 def build_realtime_funnel(subscription_id, data={}):
@@ -70,7 +70,7 @@ def build_realtime_funnel(subscription_id, data={}):
 	
 	sc_in_funnel = [sc for sc in sales_cycles if sc.milestone != None]
 	for m in milestones:
-		rv['funnel'][m.id] = len([sc for sc in sc_in_funnel if sc.milestone.id == m.id])
+		rv['funnel'][m.id] = [sc.id for sc in sc_in_funnel if sc.milestone.id == m.id]
 	return rv
 		
 def build_user_report(subscription_id, data):
