@@ -195,9 +195,10 @@ class UserResource(ModelResource):
                 )
 
     def dehydrate(self, bundle):
-        subscription_id = get_subscr_id(bundle.request.user_env, DEFAULT_SERVICE)
-        bundle.data['crm_user_id'] = bundle.obj.get_subscr_user(subscription_id=subscription_id).pk
-        bundle.data['is_supervisor'] = bundle.obj.get_subscr_user(subscription_id=subscription_id).is_supervisor
+        if bundle.request.user.is_authenticated():
+            subscription_id = get_subscr_id(bundle.request.user_env, DEFAULT_SERVICE)
+            bundle.data['crm_user_id'] = bundle.obj.get_subscr_user(subscription_id=subscription_id).pk
+            bundle.data['is_supervisor'] = bundle.obj.get_subscr_user(subscription_id=subscription_id).is_supervisor
         return bundle
 
     def get_current_user(self, request, **kwargs):

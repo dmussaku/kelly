@@ -245,6 +245,7 @@ class CRMServiceModelResource(ModelResource):
         which doesn't have session
         """
         crmuser = self.get_crmuser(bundle.request)
+        print "------------\n{}\n------".format(bundle.obj.owner)
         if crmuser:
             bundle.obj.owner = crmuser
 
