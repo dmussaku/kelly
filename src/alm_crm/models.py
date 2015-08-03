@@ -26,7 +26,7 @@ from django.core.cache import cache
 from django.db.models import signals, Q
 from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
-from django.db.models.signals import post_save, post_delete
+from django.db.models.signals import post_save, post_delete, pre_delete
 from django.utils import timezone
 from datetime import datetime, timedelta
 import xlrd
@@ -1248,6 +1248,11 @@ class Contact(SubscriptionObject):
         # cache.delete(build_key(cls._meta.model_name, old_id))
 
     @classmethod
+    def after_delete(cls, sender, instance, **kwargs):
+        cache.delete(build_key(cls._meta.model_name, instance.pk))
+
+
+    @classmethod
     def get_by_ids(cls, *ids):
         """Get vcard by ids from cache with fallback to postgres."""
         rv = cache.get_many([build_key(cls._meta.model_name, cid) for cid in ids])
@@ -1270,6 +1275,7 @@ class Contact(SubscriptionObject):
 
 
 post_save.connect(Contact.after_save, sender=Contact)
+post_delete.connect(Contact.after_delete, sender=Contact)
 
 
 class Value(SubscriptionObject):
@@ -1458,6 +1464,10 @@ class SalesCycle(SubscriptionObject):
 
     def __unicode__(self):
         return '%s [%s %s]' % (self.title, self.contact, self.status)
+
+    def delete(self):
+        print 'at salescycle delete'
+        super(self.__class__, self).delete()
 
     @property
     def activities_count(self):
@@ -1757,6 +1767,12 @@ class SalesCycle(SubscriptionObject):
     @classmethod
     def after_delete(cls, sender, instance, **kwargs):
         cache.delete(build_key(cls._meta.model_name, instance.pk))
+
+    @classmethod
+    def cache_all(cls):
+        sales_cycles_qs = cls.objects.all().prefetch_related('rel_activities')
+        sales_cycle_raws = [c.serialize() for c in sales_cycles_qs]
+        cache.set_many({build_key(cls._meta.model_name, sales_cycle_raw['id']): json.dumps(sales_cycle_raw, default=date_handler) for sales_cycle_raw in sales_cycle_raws})
 
 post_save.connect(SalesCycle.after_save, sender=SalesCycle)
 post_delete.connect(SalesCycle.after_delete, sender=SalesCycle)
