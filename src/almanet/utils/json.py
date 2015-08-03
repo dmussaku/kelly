@@ -1,2 +1,5 @@
 def date_handler(obj):
-    return obj.isoformat() if hasattr(obj, 'isoformat') else obj
+    if hasattr(obj, 'isoformat'):
+        return obj.isoformat()
+    else:
+        raise TypeError("Unserializable object {} of type {}".format(obj,type(obj)))

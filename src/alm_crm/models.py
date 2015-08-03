@@ -2026,6 +2026,49 @@ class Activity(SubscriptionObject):
                 s2a_map[sc.id] = sc.rel_activities.values_list('pk', flat=True)
             return (activities, sales_cycles, s2a_map)
 
+    def serialize(self):
+        return {
+            'assignee_id': self.assignee_id,            
+            'author_id': self.owner_id,
+            'comments_count': self.comments_count,
+            'date_created': self.date_created,
+            'date_edited': self.date_edited,
+            'date_finished': self.date_finished,
+            'deadline': self.deadline,
+            'description': self.description,
+            'feedback_status': self.feedback_status,
+            'id': self.pk,
+            'need_preparation': self.need_preparation,
+            'pk': self.pk,
+            'result': self.result,
+            'sales_cycle_id': self.sales_cycle_id
+        }
+
+    @classmethod
+    def after_save(cls, sender, instance, **kwargs):
+        cache.set(build_key(cls._meta.model_name, instance.pk), json.dumps(instance.serialize(), default=date_handler))
+    
+    @classmethod
+    def after_delete(cls, sender, instance, **kwargs):
+        cache.delete(build_key(cls._meta.model_name, instance.pk))
+
+    '''
+    @classmethod
+    def cache_all(cls):
+        contact_qs = cls.objects.all().prefetch_related('sales_cycles', 'children')
+        contact_raws = [c.serialize() for c in contact_qs]
+        cache.set_many({build_key(cls._meta.model_name, contact_raw['id']): json.dumps(contact_raw, default=date_handler) for contact_raw in contact_raws})
+    '''
+
+    @classmethod
+    def cache_all(cls):
+        activities = cls.objects.all()
+        activity_raws = [activity.serialize() for activity in activities]
+        cache.set_many({build_key(cls._meta.model_name, activity_raw['id']): json.dumps(activity_raw, default=date_handler) for activity_raw in activity_raws})
+
+post_save.connect(Activity.after_save, sender=Activity)
+post_delete.connect(Activity.after_delete, sender=Activity)
+
 
 class ActivityRecipient(SubscriptionObject):
     activity = models.ForeignKey(Activity, related_name='recipients')
