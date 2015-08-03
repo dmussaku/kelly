@@ -245,7 +245,6 @@ class CRMServiceModelResource(ModelResource):
         which doesn't have session
         """
         crmuser = self.get_crmuser(bundle.request)
-        print "------------\n{}\n------".format(bundle.obj.owner)
         if crmuser:
             bundle.obj.owner = crmuser
 
@@ -803,11 +802,7 @@ class ContactResource(CRMServiceModelResource):
                             bundle=vcard_bundle,
                             **kwargs
                             )
-        # t2=time.time()-t1
-        # print "Time to finish contact hydration %s" % t2
         bundle.obj.vcard = vcard_bundle.obj
-        # t3=time.time()-t2
-        # print "Time to finish vcard hydration %s" % t3
         bundle.obj.save()
         with transaction.atomic():
             if bundle.data.get('note') and not kwargs.get('pk'):
@@ -822,8 +817,6 @@ class ContactResource(CRMServiceModelResource):
                      'contact_id':bundle.obj.id
                     }
                 )
-        # t4=time.time()-t3
-        # print "Time to finish creating share and sales_cycle objects %s" % t4
         return bundle
 
     def follow_contacts(self, request, **kwargs):
@@ -1497,8 +1490,6 @@ class ContactResource(CRMServiceModelResource):
         data = self.deserialize(
             request, request.body,
             format=request.META.get('CONTENT_TYPE', 'application/json'))
-        # print request.body
-        # data = eval(request.body)
         merged_contacts_ids = data.get("merged_contacts", [])
         merge_into_contact_id = data.get("merge_into_contact", "")
         delete_merged = data.get("merged_contacts", [])
@@ -1548,7 +1539,6 @@ class ContactResource(CRMServiceModelResource):
                     ), for_list=True
                 )  for share in response['shares']
         ]
-        # print "Time to dehydrate resources %s " % str(time.time()-t)
         return self.create_response(
                 request,
                 {
