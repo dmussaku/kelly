@@ -14,13 +14,12 @@ def subdomain_required(fn):
     def inner(request, *a, **kw):
         if hasattr(request, 'subdomain') and not request.subdomain is None:
             flag = Company.verify_company_by_subdomain(
-                request.user.get_company(), request.subdomain)
+                request.account.company, request.subdomain)
             if flag:
                 return fn(request, *a, **kw)
         messages.warning(request, _("To access this page subdomain required"))
         # redirect_url = settings.LOGIN_REDIRECT_URL
-        return HttpResponseRedirect(reverse('user_profile_url',
-                                    subdomain=settings.MY_SD))
+        return HttpResponseRedirect(reverse('user_profile_url', subdomain=settings.MY_SD))
 
     return inner
 

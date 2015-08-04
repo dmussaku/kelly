@@ -3,6 +3,7 @@ from optparse import make_option
 from django.core.management.base import BaseCommand
 from django.utils.translation import ugettext as _
 
+from alm_account.models import Account
 from alm_user.models import User, UserManager
 from alm_company.models import Company
 from almanet.models import Service, Subscription
@@ -35,34 +36,20 @@ class Command(BaseCommand):
         subscription = Subscription()
         subscription.service = service
         try:
-            u = User.objects.get(email=email)
-        except (User.DoesNotExist, KeyError):
-            u = UserManager().create_user(
-                    first_name=first_name, 
-                    last_name=last_name, 
-                    email=email, 
-                    password=password,
-                    is_admin=True)
-            try:
-                c=Company.objects.get(subdomain=subdomain)
-                u.owned_company.add(c)
-            except (Company.DoesNotExist, KeyError):
-                c = Company(name=name, subdomain=subdomain)
-                c.save()
-                c.users.add(u)
-                u.owned_company.add(c)
-                sys.stderr.write("User and company created successfully.\n")
-            else:
-                sys.stderr.write("Error: bwayne subdomain is already taken. Did not created anything.\n")
-        else:
+            c=Company.objects.get(subdomain=subdomain)
+        except (Company.DoesNotExist, KeyError):
+            c = Company.build_company(name=name, subdomain=subdomain)
+            sys.stderr.write("Company created successfully.\n")
+        try:
+            acc = Account.objects.get(email=email, company=c)
+            u = acc.user
             sys.stderr.write("Error: bwayne@batman.bat email is already taken.\n")
-        c=Company.objects.get(subdomain=subdomain)
+        except (Account.DoesNotExist, KeyError):
+            u = UserManager.create_user(first_name=first_name, last_name=last_name)
+            acc = Account.objects.create_user(
+                email=email, password=password, user=u, company=c, is_admin=True)
+                sys.stderr.write("Account and User created successfully.\n")        
         subscription.user = u
         subscription.organization = c
         subscription.is_active = True
         subscription.save()
-        u.create_crmuser(
-            subscription_pk=subscription.pk,
-            organization_pk=c.pk
-            ) 
-        u.connect_service(service)

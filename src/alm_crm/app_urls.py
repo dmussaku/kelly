@@ -11,6 +11,7 @@ from .forms import (
     CommentForm,
     SalesCycle,
     )
+from django.views.generic.base import TemplateView
 from .views import (
     CRMWelcomeView,
     FeedView,
@@ -47,7 +48,7 @@ from .views import (
 urlpatterns = patterns(
     '',
     url(r'^$', crmuser_required(
-        CRMWelcomeView.as_view(template_name='crm/index.html')),
+        TemplateView.as_view(template_name='crm/index.html')),
         name='crm_home'),
     # url(r'^feed/$', crmuser_required(
     #     FeedView.as_view(template_name='crm/feeds/feed.html')),

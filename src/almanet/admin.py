@@ -23,7 +23,7 @@ class SubscriptionAdmin(admin.ModelAdmin):
 
     def save_model(self, request, obj, form, change):
         obj.save()
-        obj.user.connect_service(obj.service)
+        # obj.user.connect_service(obj.service)
 
 class ContactAdmin(admin.ModelAdmin):
 

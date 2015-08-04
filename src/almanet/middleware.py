@@ -1,4 +1,15 @@
 import tldextract
+from django.contrib.auth.middleware import get_user
+from django.utils.functional import SimpleLazyObject
+
+
+class MyAuthenticationMiddleware(object):
+    def process_request(self, request):
+        assert hasattr(request, 'session'), "The Django authentication middleware requires session middleware to be installed. Edit your MIDDLEWARE_CLASSES setting to insert 'django.contrib.sessions.middleware.SessionMiddleware'."
+
+        request.account = SimpleLazyObject(lambda: get_user(request))
+        request.user = SimpleLazyObject(lambda: get_user(request) if get_user(request).is_anonymous() else get_user(request).user)
+
 
 
 class GetSubdomainMiddleware(object):
@@ -9,17 +20,17 @@ class GetSubdomainMiddleware(object):
 
 
 def set_user_env(user):
-    env = {'user_id': user.pk}
     subscrs = user.get_subscriptions()
-    env['subscriptions'] = map(lambda s: s.pk, subscrs)
-    co = user.get_company()
-    if co:
-        env['company_id'] = co.pk
-        env['subdomain'] = co.subdomain
+
+    env = {
+        'user_id': user.pk,
+        'account_ids': [acc.id for acc in user.accounts.all()],
+        'subscriptions': map(lambda s: s.pk, subscrs)
+    }
     for subscr in subscrs:
         env['subscription_{}'.format(subscr.pk)] = {
             'is_active': subscr.is_active,
-            'user_id': user.get_subscr_user(subscr.pk).pk,
+            'user_id': user.pk,
             'slug': subscr.service.slug,
         }
     return env
@@ -32,11 +43,10 @@ def set_user_env(user):
 
 class UserEnvMiddleware(object):
     def process_request(self, request):
-        if not request.user.is_authenticated():
+        if request.user.is_anonymous() or not request.account.is_authenticated():
             request.user_env = {}
             return
         request.user_env = set_user_env(request.user)
-
 
 
 # https://gist.github.com/barrabinfc/426829

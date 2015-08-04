@@ -9,13 +9,62 @@ from alm_vcard.models import VCard, Email
 from datetime import datetime
 
 
+
+class AccountManager(contrib_user_manager):
+    def create_user(self, email, password, user, company, is_admin=False):
+        acc = Account(email=email, is_admin=is_admin, user=user, company=company)
+        acc.set_password(password)
+        acc.save()
+        return acc
+
+
+class Account(AbstractBaseUser):
+
+    REQUIRED_FIELDS = ['email']
+    USERNAME_FIELD = 'email'
+
+    email = models.EmailField(unique=True, blank=False)
+
+    is_active = models.BooleanField(default=True)
+    is_admin = models.BooleanField(default=False)
+
+    date_created = models.DateTimeField(auto_now_add=True, blank=True)
+    date_edited = models.DateTimeField(auto_now=True, blank=True)
+
+    company = models.ForeignKey('alm_company.Company', related_name='accounts')
+    user = models.ForeignKey('User', related_name='accounts')
+
+    class Meta:
+        verbose_name = 'account'
+        db_table = settings.DB_PREFIX.format('account')
+
+    objects = AccountManager()
+
+    @property
+    def is_staff(self):
+        "Is the user a member of staff?"
+        # Simplest possible answer: All admins are staff
+        return self.is_admin
+
+    @property
+    def is_superuser(self):
+        return self.is_admin
+
+    def get_short_name(self):
+        return self.user.first_name
+
+    def get_full_name(self):
+        return self.user.first_name + ' ' + self.user.last_name
+
+    def get_username(self):
+        return self.email
+
+
+
+
 class UserManager(contrib_user_manager):
-    """
-    had to override just because of missing username field in model
-    """
-    def create_user(self, first_name, last_name, email, password, is_admin=False):
-        user = User(first_name=first_name, last_name=last_name, email=email, is_admin=is_admin)
-        user.set_password(password)
+    def create_user(self, first_name, last_name):
+        user = User(first_name=first_name, last_name=last_name)
         user.save()
         return user
 
@@ -37,30 +86,22 @@ class User(AbstractBaseUser):
     is_admin = models.BooleanField(default=False)
 
     vcard = models.OneToOneField(VCard, blank=True, null=True)
-
     userpic = models.ImageField(upload_to='userpics')
+
     date_created = models.DateTimeField(auto_now_add=True, blank=True)
     date_edited = models.DateTimeField(auto_now=True, blank=True)
+
+    is_supervisor = models.BooleanField(_('is supervisor'), default=False)
+    unfollow_list = models.ManyToManyField(
+        'alm_crm.Contact', #related_name='followers',
+        null=True, blank=True
+        )
 
     class Meta:
         verbose_name = _('user')
         db_table = settings.DB_PREFIX.format('user')
 
     objects = UserManager()
-
-    @property
-    def is_staff(self):
-        "Is the user a member of staff?"
-        # Simplest possible answer: All admins are staff
-        return self.is_admin
-
-    @property
-    def is_superuser(self):
-        return self.is_admin
-
-    @property
-    def is_supervisor(self):
-        return self.get_crmuser().is_supervisor
 
     def save(self, *a, **kw):
         is_created = not hasattr(self, 'pk') or not self.pk
@@ -96,17 +137,8 @@ class User(AbstractBaseUser):
     def get_username(self):
         return "%s %s" % (self.first_name, self.last_name)
 
-    def say_hi(self):
-        return 'hi'
-
-    def get_company(self):
-        return self.company.first()
-
-    def get_owned_company(self):
-        return self.owned_company.first()
-
     def get_subscriptions(self, flat=False):
-        subscriptions = self.get_company().subscriptions.all()
+        subscriptions = self.subscriptions.all()
         if not flat:
             return subscriptions
         else:
@@ -116,17 +148,15 @@ class User(AbstractBaseUser):
             return data
 
     def get_active_subscriptions(self, flat=False):
-        return self.get_company().get_connected_services()
+        return self.subscriptions.filter(is_active=True)
 
     def connected_services(self):
-        rv = []
-        for s in self.get_active_subscriptions():
-            rv.append(s.service)
-        return rv
+        return [subscr.service for subscr in self.get_active_subscriptions()]
 
     def is_service_connected(self, service):
         return service in self.connected_services()
 
+'''
     def connect_service(self, service):
         co = self.company.first()
         try:
@@ -152,34 +182,33 @@ class User(AbstractBaseUser):
             s.save()
 
     def get_subscr_by_service(self, service):
-        return Subscription.objects.get(
-            service=service, organization=self.company.first())
+        return Subscription.objects.get(service=service, organization=self.company.first())
+'''
+    # def create_crmuser(self, subscription_pk, organization_pk):
+    #     from alm_crm.models import CRMUser
+    #     # this should be further resolved when multiple database will be configured
+    #     # and DecoupledModel applied to connect User and CRMUser
+    #     # if not self.crmuser and self.is_active:
+    #     crmuser = CRMUser(user_id=self.pk,
+    #                       is_supervisor=True,
+    #                       subscription_id=subscription_pk,
+    #                       organization_id=organization_pk)
+    #     crmuser.save()
+    #     # self.crmuser = crmuser
+    #     self.save()
+    #     return crmuser  # self.crmuser
 
-    def create_crmuser(self, subscription_pk, organization_pk):
-        from alm_crm.models import CRMUser
-        # this should be further resolved when multiple database will be configured
-        # and DecoupledModel applied to connect User and CRMUser
-        # if not self.crmuser and self.is_active:
-        crmuser = CRMUser(user_id=self.pk,
-                          is_supervisor=True,
-                          subscription_id=subscription_pk,
-                          organization_id=organization_pk)
-        crmuser.save()
-        # self.crmuser = crmuser
-        self.save()
-        return crmuser  # self.crmuser
+    # def get_subscr_user(self, subscription_id):
+    #     from alm_crm.models import CRMUser
+    #     try:
+    #         return CRMUser.objects.get(user_id=self.pk,
+    #                                    subscription_id=subscription_id)
+    #     except CRMUser.DoesNotExist:
+    #         return None
 
-    def get_subscr_user(self, subscription_id):
-        from alm_crm.models import CRMUser
-        try:
-            return CRMUser.objects.get(user_id=self.pk,
-                                       subscription_id=subscription_id)
-        except CRMUser.DoesNotExist:
-            return None
-
-    def get_crmuser(self):
-        from alm_crm.models import CRMUser
-        return CRMUser.objects.get(user_id=self.pk)
+    # def get_crmuser(self):
+    #     from alm_crm.models import CRMUser
+    #     return CRMUser.objects.get(user_id=self.pk)
 
 
 class Referral(models.Model):

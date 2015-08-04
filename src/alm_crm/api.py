@@ -283,7 +283,7 @@ class CRMServiceModelResource(ModelResource):
         subscription_pk = self.get_crmsubscr_id(request)
         self.crmuser = None
         if subscription_pk:
-            self.crmuser = request.user.get_subscr_user(subscription_pk)
+            self.crmuser = request.user
         return self.crmuser
 
     class Meta:
@@ -2526,7 +2526,7 @@ class ProductResource(CRMServiceModelResource):
         data = self.deserialize(
             request, request.body,
             format=request.META.get('CONTENT_TYPE', 'application/json'))
-        current_crmuser = request.user.get_crmuser()
+        current_crmuser = request.user
         decoded_string = base64.b64decode(data['uploaded_file'])
         file_extension = data['filename'].split('.')[1]
         if file_extension=='xls' or file_extension=='xlsx':
@@ -3343,16 +3343,15 @@ class AppStateObject(object):
         self.service_slug = service_slug
         self.current_user = request.user
         self.subscription_id = get_subscr_id(request.user_env, service_slug)
-        self.company = request.user.get_company()
-        self.current_crmuser = \
-            request.user.get_subscr_user(self.subscription_id)
+        self.company = request.account.company
+        self.user = request.user
 
     @classmethod
     def create_object(cls, service_slug=None, request=None):
         obj = AppStateObject(service_slug=service_slug, request=request)
         obj.objects = {
             'categories': obj.get_categories(),
-            'company': obj.get_company(),
+            'company': obj.company,
         }
         obj.constants = obj.get_constants()
         obj.session = obj.get_session()
@@ -3402,7 +3401,7 @@ class AppStateObject(object):
 
     def get_session(self):
         return {
-            'user_id': self.current_crmuser.pk,
+            'user_id': self.user.pk,
             'session_key': self.request.session.session_key,
             'logged_in': self.current_user.is_authenticated(),
             'language': translation.get_language(),
@@ -3628,7 +3627,7 @@ class MobileStateObject(object):
         self.current_user = request.user
         self.subscription_id = get_subscr_id(request.user_env, service_slug)
         self.company = request.user.get_company()
-        self.current_crmuser = request.user.get_subscr_user(self.subscription_id)
+        self.current_crmuser = request.account
 
         sales_cycles = SalesCycleResource().obj_get_list(bundle, limit_for='mobile')
 
@@ -3875,16 +3874,6 @@ class CustomSectionResource(CRMServiceModelResource):
     class Meta(CommonMeta):
         queryset = CustomSection.objects.all()
         resource_name = 'custom_section'
-
-    def hydrate(self, bundle):
-        """
-        CustomField have property owner which is
-        content_object owner, we shouldn't set owner
-        """
-        crmuser = self.get_crmuser(bundle.request)
-        if not crmuser:
-            return
-        return bundle
 
 class CustomFieldResource(CRMServiceModelResource):
     '''

@@ -51,8 +51,10 @@ def login(request, template_name='registration/login.html',
             # Okay, security check complete. Log the user in.
             auth_login(request, form.get_user())
             if request.user:
-                subscr = request.user.get_subscriptions()[0]
-                print subscr.get_home_url()
+                request.account = request.user
+                request.user = request.account.user
+
+                subscr = request.user.get_active_subscriptions().first()
                 if not subscr is None:
                     return HttpResponseRedirect(subscr.get_home_url())
             return HttpResponseRedirect(redirect_to)
