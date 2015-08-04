@@ -127,17 +127,48 @@ def build_product_report(subscription_id, data={}):
 		'products': {},
 	}
 	products = Product.objects.filter(subscription_id=subscription_id)
+	milestones = Milestone.objects.filter(subscription_id=subscription_id).order_by('is_system', 'sort')
 
 	for product in products:
+		'''
+			{
+				1: {
+					'earned_money': 500,
+					'total_cycles': 5,
+					'by_milestone': {
+						0: [], // cycles with no milestone chosen
+						1: [1,3],
+						2: [],
+						3: [4,5,6]
+					}
+				}
+			}
+		'''
+		by_milestone = {
+			0: [sc.id for sc in SalesCycle.objects.filter(products__pk__in=[product.id],
+																milestone_id=None,
+																subscription_id=subscription_id,
+																is_global=False)]
+		}
+
+		for m in milestones:
+			by_milestone[m.id] = [sc.id for sc in SalesCycle.objects.filter(products__pk__in=[product.id],
+																milestone_id=m.id,
+																subscription_id=subscription_id,
+																is_global=False)]
 		rv['products'][product.id] = {
 			'earned_money': sum(SalesCycleProductStat.objects.filter(
 									subscription_id=subscription_id,
 									product_id=product.id,
 									sales_cycle__milestone__is_system=1).values_list('real_value', flat=True)),
 			'total_cycles': SalesCycle.objects.filter(products__pk__in=[product.id],
-															subscription_id=subscription_id,
-															is_global=False).count()
+														subscription_id=subscription_id,
+														is_global=False).count(),
+			'by_milestone': by_milestone,
 		}
+
+
+
 	
 	# open_sales_cycles = SalesCycle.objects.filter(
 	# 						products__in = product_ids if product_ids[0] != -1 
@@ -196,4 +227,5 @@ def build_product_report(subscription_id, data={}):
 	# 	'unsuccessfull_cycles': unsuccessfull_cycles.count(),
 	# 	'from_date': from_date,
 	# 	'to_date': to_date}
+	print rv
 	return rv
