@@ -1761,6 +1761,21 @@ class SalesCycle(SubscriptionObject):
         }
 
     @classmethod
+    def get_by_ids(cls, *ids):
+        """Get sales cycles by ids from cache with fallback to postgres."""
+        rv = cache.get_many([build_key(cls._meta.model_name, sid) for sid in ids])
+        rv = {extract_id(k, coerce=int): json.loads(v) for k, v in rv.iteritems()}
+
+        not_found_ids = [cid for cid in ids if not cid in rv]
+        if not not_found_ids:
+            return rv.values()
+        sales_cycles = cls.objects.filter(pk__in=not_found_ids).prefetch_related('rel_activities')
+        more_rv = list(s.serialize() for s in sales_cycles)
+        cache.set_many({build_key(cls._meta.model_name, salescycle_raw['id']): json.dumps(salescycle_raw, default=date_handler)
+                        for salescycle_raw in more_rv})
+        return rv.values() + more_rv
+
+    @classmethod
     def after_save(cls, sender, instance, **kwargs):
         cache.set(build_key(cls._meta.model_name, instance.pk), json.dumps(instance.serialize(), default=date_handler))
     
@@ -2034,7 +2049,7 @@ class Activity(SubscriptionObject):
             'date_created': self.date_created,
             'date_edited': self.date_edited,
             'date_finished': self.date_finished,
-            'deadline': self.deadline,
+            'deadlien': self.deadline,
             'description': self.description,
             'feedback_status': self.feedback_status,
             'id': self.pk,
@@ -2052,13 +2067,6 @@ class Activity(SubscriptionObject):
     def after_delete(cls, sender, instance, **kwargs):
         cache.delete(build_key(cls._meta.model_name, instance.pk))
 
-    '''
-    @classmethod
-    def cache_all(cls):
-        contact_qs = cls.objects.all().prefetch_related('sales_cycles', 'children')
-        contact_raws = [c.serialize() for c in contact_qs]
-        cache.set_many({build_key(cls._meta.model_name, contact_raw['id']): json.dumps(contact_raw, default=date_handler) for contact_raw in contact_raws})
-    '''
 
     @classmethod
     def cache_all(cls):
