@@ -12,7 +12,7 @@ from almanet.settings import MY_SD
 
 from alm_user.models import User, Referral
 from alm_user.forms import(
-    RegistrationForm, 
+    # RegistrationForm, 
     UserBaseSettingsForm, 
     UserPasswordSettingsForm, 
     ReferralForm, 
@@ -80,12 +80,13 @@ class UserListView(ListView):
     def get_context_data(self, **kwargs):
         return super(UserListView, self).get_context_data(**kwargs)
 
-
+'''
 class UserRegistrationView(CreateView):
 
     form_class = RegistrationForm
     success_url = reverse_lazy('user_profile_url', subdomain=settings.MY_SD)
     template_name = 'user/user_registration.html'
+'''
 
 @sensitive_post_parameters()
 @never_cache

@@ -13,9 +13,9 @@ class MyAuthBackend(object):
         except Account.DoesNotExist:
             return None
 
-    def get_user(self, user_id):
-        """ Get a User object from the user_id. """
+    def get_user(self, acc_id):
+        """ Get a User object from the acc_id. """
         try:
-            return Account.objects.select_related('company', 'user').get(pk=user_id)
+            return Account.objects.select_related('company', 'user').get(id=acc_id)
         except Account.DoesNotExist:
             return None

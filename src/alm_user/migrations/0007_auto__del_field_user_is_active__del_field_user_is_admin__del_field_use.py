@@ -1,29 +1,51 @@
 # -*- coding: utf-8 -*-
 from south.utils import datetime_utils as datetime
 from south.db import db
-from south.v2 import DataMigration
+from south.v2 import SchemaMigration
 from django.db import models
 
-class Migration(DataMigration):
+
+class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        "Write your forwards methods here."
-        # Note: Don't use "from appname.models import ModelName". 
-        # Use orm.ModelName to refer to models in this application,
-        # and orm['appname.ModelName'] for models in other applications.
-        for u in orm.User.objects.all():
-            acc = orm.Account(email=u.email, password=u.password, is_admin=u.is_admin, 
-                              user=u, company=u.company.first())
-            acc.save()
-        for cu in orm['alm_crm.CRMUser'].objects.all():
-            u = orm.User.objects.get(pk=cu.user_id)
-            u.is_supervisor = cu.is_supervisor
-            u.unfollow_list = cu.unfollow_list.all()
-            u.save()
+        # Deleting field 'User.is_active'
+        db.delete_column('alma_user', 'is_active')
+
+        # Deleting field 'User.is_admin'
+        db.delete_column('alma_user', 'is_admin')
+
+        # Deleting field 'User.email'
+        db.delete_column('alma_user', 'email')
+
+        # Removing M2M table for field company on 'User'
+        db.delete_table(db.shorten_name('alma_user_company'))
+
 
     def backwards(self, orm):
-        "Write your backwards methods here."
-        pass
+        # Adding field 'User.is_active'
+        db.add_column('alma_user', 'is_active',
+                      self.gf('django.db.models.fields.BooleanField')(default=True),
+                      keep_default=False)
+
+        # Adding field 'User.is_admin'
+        db.add_column('alma_user', 'is_admin',
+                      self.gf('django.db.models.fields.BooleanField')(default=False),
+                      keep_default=False)
+
+        # Adding field 'User.email'
+        db.add_column('alma_user', 'email',
+                      self.gf('django.db.models.fields.EmailField')(default='', max_length=75, unique=True),
+                      keep_default=False)
+
+        # Adding M2M table for field company on 'User'
+        m2m_table_name = db.shorten_name('alma_user_company')
+        db.create_table(m2m_table_name, (
+            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
+            ('user', models.ForeignKey(orm[u'alm_user.user'], null=False)),
+            ('company', models.ForeignKey(orm[u'alm_company.company'], null=False))
+        ))
+        db.create_unique(m2m_table_name, ['user_id', 'company_id'])
+
 
     models = {
         u'alm_company.company': {
@@ -173,14 +195,10 @@ class Migration(DataMigration):
         },
         u'alm_user.user': {
             'Meta': {'object_name': 'User', 'db_table': "'alma_user'"},
-            'company': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'users'", 'symmetrical': 'False', 'to': u"orm['alm_company.Company']"}),
             'date_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'date_edited': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
-            'email': ('django.db.models.fields.EmailField', [], {'unique': 'True', 'max_length': '75'}),
             'first_name': ('django.db.models.fields.CharField', [], {'max_length': '31'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'is_active': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
-            'is_admin': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'is_supervisor': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'last_login': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
             'last_name': ('django.db.models.fields.CharField', [], {'max_length': '30'}),
@@ -208,4 +226,3 @@ class Migration(DataMigration):
     }
 
     complete_apps = ['alm_user']
-    symmetrical = True

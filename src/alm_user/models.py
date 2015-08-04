@@ -51,14 +51,25 @@ class Account(AbstractBaseUser):
         return self.is_admin
 
     def get_short_name(self):
-        return self.user.first_name
+        return self.user.get_short_name()
 
     def get_full_name(self):
-        return self.user.first_name + ' ' + self.user.last_name
+        return self.user.get_full_name()
 
     def get_username(self):
         return self.email
 
+
+    def is_authenticated(self):
+        return True
+
+    def has_module_perms(self, module):
+        if self.is_admin:
+            return True
+        return False
+
+    def has_perm(self, perm, obj=None):
+        return self.is_admin
 
 
 
@@ -72,18 +83,18 @@ class UserManager(contrib_user_manager):
 class User(AbstractBaseUser):
 
     #REQUIRED_FIELDS = ['email']
-    USERNAME_FIELD = 'email'
+    USERNAME_FIELD = 'id'
     first_name = models.CharField(_('first name'), max_length=31,
                                   null=False, blank=False)
     last_name = models.CharField(_('last name'), max_length=30, blank=False)
-    email = models.EmailField(_('email address'), unique=True, blank=False)
-    is_active = models.BooleanField(_('active'), default=True)
+    # email = models.EmailField(_('email address'), unique=True, blank=False)
+    # is_active = models.BooleanField(_('active'), default=True)
 
     timezone = TimeZoneField(default='Asia/Almaty')
 
-    company = models.ManyToManyField('alm_company.Company',
-                                     related_name='users')
-    is_admin = models.BooleanField(default=False)
+    # company = models.ManyToManyField('alm_company.Company',
+    #                                  related_name='users')
+    # is_admin = models.BooleanField(default=False)
 
     vcard = models.OneToOneField(VCard, blank=True, null=True)
     userpic = models.ImageField(upload_to='userpics')
@@ -112,21 +123,11 @@ class User(AbstractBaseUser):
                 family_name=self.last_name,
                 given_name=self.first_name)
             vc.save()
-            email = Email(vcard=vc, type=Email.PREF, value=self.email)
-            email.save()
+            ## TODO: how get self.email
+            # email = Email(vcard=vc, type=Email.PREF, value=self.email)
+            # email.save()
             self.vcard = vc
             self.save()
-
-    def is_authenticated(self):
-        return True
-
-    def has_module_perms(self, module):
-        if self.is_admin:
-            return True
-        return False
-
-    def has_perm(self, perm, obj=None):
-        return self.is_admin
 
     def get_short_name(self):
         return self.first_name

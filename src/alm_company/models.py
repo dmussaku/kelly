@@ -2,15 +2,14 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from datetime import datetime
+from alm_user.models import User
 import re
 
 
 class Company(models.Model):
     name = models.CharField(max_length=100, blank=False)
-    owner = models.ManyToManyField('alm_user.User',
-                                   related_name='owned_company')
-    date_created = models.DateTimeField(auto_now_add=True, blank=True, null=True)
-    date_edited = models.DateTimeField(auto_now=True, blank=True, null=True)
+    date_created = models.DateTimeField(auto_now_add=True, blank=True)
+    date_edited = models.DateTimeField(auto_now=True, blank=True)
     subdomain = models.CharField(_('subdomain'), max_length=300,
                                  blank=False, unique=True)
 
@@ -38,14 +37,8 @@ class Company(models.Model):
                 i += 1
         return test_sd
 
-    def get_owner(self):
-        return self.owner.first()
-
     def get_users(self):
-        return self.users.all()
-
-    def get_connected_services(self):
-        return self.subscriptions.filter(is_active=True)
+        return User.objects.filter(id__in=[a.id for a in self.accounts.all()])
 
     @classmethod
     def verify_company_by_subdomain(cls, company, subdomain):
@@ -59,11 +52,8 @@ class Company(models.Model):
         return lco.pk == rco.pk
 
     @classmethod
-    def build_company(cls, name, owner):
+    def build_company(cls, name):
         subdomain = Company.generate_subdomain(name)
         company = Company(name=name, subdomain=subdomain)
         company.save()
-        company.owner.add(owner)
-        owner.is_admin = True
-        owner.save()
         return company
