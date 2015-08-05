@@ -227,5 +227,4 @@ def build_product_report(subscription_id, data={}):
 	# 	'unsuccessfull_cycles': unsuccessfull_cycles.count(),
 	# 	'from_date': from_date,
 	# 	'to_date': to_date}
-	print rv
 	return rv
