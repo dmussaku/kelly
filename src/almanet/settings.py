@@ -129,7 +129,7 @@ class BaseConfiguration(SubdomainConfiguration, Configuration):
         'djrill',
         'django.contrib.contenttypes',
         'django.contrib.sessions',
-        'django.contrib.messages',
+        # 'django.contrib.messages',
         'django.contrib.staticfiles',
         'django_hosts',
         'south',
@@ -147,20 +147,15 @@ class BaseConfiguration(SubdomainConfiguration, Configuration):
     )
 
     MIDDLEWARE_CLASSES = (
-        'django.contrib.sessions.middleware.SessionMiddleware',
+        'almanet.middleware.GetSubdomainMiddleware',
+        'almanet.middleware.AlmanetSessionMiddleware',
         'django.middleware.common.CommonMiddleware',
         'corsheaders.middleware.CorsMiddleware',
         'django.middleware.csrf.CsrfViewMiddleware',
-        'almanet.middleware.MyAuthenticationMiddleware',
-            # instead 'django.contrib.auth.middleware.AuthenticationMiddleware',
-        'django.contrib.messages.middleware.MessageMiddleware',
         'almanet.middleware.ForceDefaultLanguageMiddleware',
         'django.middleware.locale.LocaleMiddleware',
-        # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
         'django_hosts.middleware.HostsMiddleware',
-        #'almanet.middleware.XsSharingMiddleware',
-        'almanet.middleware.GetSubdomainMiddleware',
-        'almanet.middleware.UserEnvMiddleware'
+        'almanet.middleware.UserEnvMiddleware',
     )
 
     SESSION_COOKIE_DOMAIN = '.alma.net'

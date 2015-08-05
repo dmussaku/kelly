@@ -18,11 +18,7 @@ from .forms import ServiceCreateForm
 class RedirectHomeView(RedirectView):
 
     def get(self, request, *a, **kw):
-        if request.user.is_authenticated():
-            subscr = request.user.get_subscriptions()[0]
-            return HttpResponseRedirect(subscr.get_home_url())
-        else:
-            return HttpResponseRedirect(
+        return HttpResponseRedirect(
                 almanet_reverse_lazy('user_login', subdomain=None))
 
 

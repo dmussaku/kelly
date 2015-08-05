@@ -1,5 +1,5 @@
 {% extends "user/base.html" %}
-{% load i18n %}
+{% load i18n almanet_tags %}
 {% block head_title %} Login page {% endblock %}
 {% block content %}
     {{ message }}
@@ -12,6 +12,17 @@
             <div class="login-form">
             <form name="login-form" action="" method="post">
                 {% csrf_token %}
+                <div class="login-fieldset">
+                    <label class="login-fieldset-icon" for="login-subdomain">
+                        <figure class="icon icon--organization">
+                          <svg version="1.1">
+                            <use xlink:href="#icon-organization"></use>
+                          </svg>
+                        </figure>
+                    </label>
+
+                    <input class="login-input" id="login-subdomain" name="subdomain" type="text" placeholder="Subdomain">
+                </div>
                 <div class="login-fieldset {% if form.username.errors or form.non_field_errors %}has-error{% endif %}">
                     <label class="login-fieldset-icon" for="login-email">
                         <figure class="icon icon--mail">
@@ -56,7 +67,15 @@
     </form>
             </div>
 
-  </div>
+    <div>
+        {% if logged_in_companies %}
+            <p>Компании, в которые вы залогинены</p>
+            {% for company in logged_in_companies %}
+                <a href="" class="login-submit">{{ company.name }}</a>
+            {% endfor %}
+        {% endif %}
+    </div>
 
   </div>
+</div>
 {% endblock %}

@@ -10,6 +10,7 @@ from django.views.decorators.cache import never_cache
 from django.conf import settings
 from almanet.settings import MY_SD
 
+from alm_company.models import Company
 from alm_user.models import User, Referral
 from alm_user.forms import(
     # RegistrationForm, 
@@ -17,24 +18,27 @@ from alm_user.forms import(
     UserPasswordSettingsForm, 
     ReferralForm, 
     PasswordResetForm,
+    AuthenticationForm,
 ) 
+from alm_user.auth_backend import login, logout
 from almanet.models import Service
 from almanet.url_resolvers import reverse_lazy
 
 # for testing, need to be deleted
 from datetime import datetime
+# from django.contrib.auth.forms import AuthenticationForm
 from django.views.decorators.csrf import csrf_protect
-from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.sites.models import get_current_site
 from django.utils.http import is_safe_url
 from django.shortcuts import resolve_url
-from django.contrib.auth import REDIRECT_FIELD_NAME, login as auth_login, logout as auth_logout, get_user_model
+from django.contrib.auth import REDIRECT_FIELD_NAME
 from almanet.url_resolvers import reverse as almanet_reverse
+from almanet.middleware import AlmanetSessionMiddleware
 
 @sensitive_post_parameters()
 @csrf_protect
 @never_cache
-def login(request, template_name='registration/login.html',
+def login_view(request, template_name='registration/login.html',
           redirect_field_name=REDIRECT_FIELD_NAME,
           authentication_form=AuthenticationForm,
           current_app=None, extra_context=None):
@@ -49,25 +53,32 @@ def login(request, template_name='registration/login.html',
             if not is_safe_url(url=redirect_to, host=request.get_host()):
                 redirect_to = resolve_url(settings.LOGIN_REDIRECT_URL)
             # Okay, security check complete. Log the user in.
-            auth_login(request, form.get_user())
-            if request.user:
-                request.account = request.user
-                request.user = request.account.user
+            login(request, form.get_user())
 
-                subscr = request.user.get_active_subscriptions().first()
-                if not subscr is None:
-                    return HttpResponseRedirect(subscr.get_home_url())
-            return HttpResponseRedirect(redirect_to)
+                # TODO: check if subscription is active
+                # subscr = request.user.get_active_subscriptions().first()
+                # if not subscr is None:
+                #     return HttpResponseRedirect(subscr.get_home_url())
+            return HttpResponseRedirect('/auth/signin')
     else:
         form = authentication_form(request)
 
-    current_site = get_current_site(request)
+    comps = request.COOKIES.get('comps', None)
+
+    logged_in_companies = []
+
+    if comps is not None:
+        cookie_comps = comps.split(',')
+        for cookie_comp in cookie_comps:
+            session = AlmanetSessionMiddleware.get_session(request, cookie_comp).load()
+            company = Company.objects.get(id=session['company_id'])
+            logged_in_companies.append(company)
+
 
     context = {
         'form': form,
         redirect_field_name: redirect_to,
-        'site': current_site,
-        'site_name': current_site.name,
+        'logged_in_companies': logged_in_companies
     }
     if extra_context is not None:
         context.update(extra_context)

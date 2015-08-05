@@ -7,7 +7,7 @@ from django.contrib.auth.views import (
 
 from alm_user.forms import PasswordResetForm
 # from alm_user.views import UserListView, UserRegistrationView 
-from alm_user.views import login, password_reset_confirm, referral, referral_complete, password_reset_success
+from alm_user.views import login_view, password_reset_confirm, referral, referral_complete, password_reset_success
 from alm_user.models import User
 
 login_url = reverse_lazy('user_login')
@@ -21,7 +21,7 @@ urlpatterns = patterns(
     # url(r'^signup/$', UserRegistrationView.as_view(),
     #     name='user_registration'),
     url(r'^signin/$',
-        login, {'template_name': 'user/user_login.html'},
+        login_view, {'template_name': 'user/user_login.html'},
         name='user_login'),
     url(r'^referral/$',
         referral, {'template_name': 'user/login-register.html'},

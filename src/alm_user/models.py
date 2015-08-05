@@ -23,7 +23,7 @@ class Account(AbstractBaseUser):
     REQUIRED_FIELDS = ['email']
     USERNAME_FIELD = 'email'
 
-    email = models.EmailField(unique=True, blank=False)
+    email = models.EmailField(blank=False)
 
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)

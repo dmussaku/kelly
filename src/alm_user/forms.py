@@ -1,7 +1,9 @@
 from django import forms
 from django.forms import ModelForm
 from django.conf import settings
+from django.utils.text import capfirst
 from django.utils.translation import ugettext_lazy as _
+from django.contrib.auth import authenticate
 from django.contrib.auth.hashers import check_password
 from django.contrib.auth.tokens import default_token_generator
 from alm_user.models import Account, User, Referral
@@ -66,6 +68,75 @@ from alm_company.models import Company
 #                 to=(user.email,),
 #                 bcc=settings.BCC_EMAILS)
 #         return user
+
+class AuthenticationForm(forms.Form):
+    """
+    Base class for authenticating users. Extend this to get a form that accepts
+    username/password logins.
+    """
+    subdomain = forms.CharField(max_length=300)
+    username = forms.CharField(max_length=254)
+    password = forms.CharField(label=_("Password"), widget=forms.PasswordInput)
+
+    error_messages = {
+        'invalid_subdomain': _("Please enter a correct subdomain."),
+        'invalid_login': _("Please enter a correct %(username)s and password. "
+                           "Note that both fields may be case-sensitive."),
+        'inactive': _("This account is inactive."),
+    }
+
+    def __init__(self, request=None, *args, **kwargs):
+        """
+        The 'request' parameter is set for custom auth use by subclasses.
+        The form data comes in via the standard 'data' kwarg.
+        """
+        self.request = request
+        self.user_cache = None
+        super(AuthenticationForm, self).__init__(*args, **kwargs)
+
+        # Set the label for the "username" field.
+        self.username_field = Account._meta.get_field(Account.USERNAME_FIELD)
+        if self.fields['username'].label is None:
+            self.fields['username'].label = capfirst(self.username_field.verbose_name)
+
+    def clean(self):
+        subdomain = self.cleaned_data.get('subdomain')
+        username = self.cleaned_data.get('username')
+        password = self.cleaned_data.get('password')
+
+        if username and password:
+            self.user_cache = authenticate(subdomain=subdomain,
+                                           username=username,
+                                           password=password)
+            if self.user_cache == -1:
+                raise forms.ValidationError(
+                    self.error_messages['invalid_subdomain'],
+                    code='invalid_subdomain',
+                )
+            if self.user_cache is None:
+                raise forms.ValidationError(
+                    self.error_messages['invalid_login'],
+                    code='invalid_login',
+                    params={'username': self.username_field.verbose_name},
+                )
+            elif not self.user_cache.is_active:
+                raise forms.ValidationError(
+                    self.error_messages['inactive'],
+                    code='inactive',
+                )
+        return self.cleaned_data
+
+    def check_for_test_cookie(self):
+        warnings.warn("check_for_test_cookie is deprecated; ensure your login "
+                "view is CSRF-protected.", DeprecationWarning)
+
+    def get_user_id(self):
+        if self.user_cache:
+            return self.user_cache.id
+        return None
+
+    def get_user(self):
+        return self.user_cache
 
 
 class PasswordResetForm(forms.Form):

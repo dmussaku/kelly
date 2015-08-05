@@ -47,8 +47,7 @@ from .views import (
 
 urlpatterns = patterns(
     '',
-    url(r'^$', crmuser_required(
-        TemplateView.as_view(template_name='crm/index.html')),
+    url(r'^$', TemplateView.as_view(template_name='crm/index.html'),
         name='crm_home'),
     # url(r'^feed/$', crmuser_required(
     #     FeedView.as_view(template_name='crm/feeds/feed.html')),
