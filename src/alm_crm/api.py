@@ -1732,7 +1732,45 @@ class SalesCycleResource(CRMServiceModelResource):
                 self.wrap_view('delete_sales_cycle'),
                 name='api_delete_sales_cycle'
             ),
+            url(
+                r"^(?P<resource_name>%s)/sales_cycle_state%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('sales_cycle_state'),
+                name='api_sales_cycle_state'
+            ),
         ]
+    '''
+def get_contact_state(self, request, **kwargs):
+        with RequestContext(self, request, allowed_methods=['get']):
+            base_bundle = self.build_bundle(request=request)
+            contact_ids = self.obj_get_list(bundle=base_bundle, **self.remove_api_resource_names(kwargs)
+                ).values_list('id', flat=True)
+            contacts = Contact.get_by_ids(*contact_ids)
+            # bundles = (
+            #     {
+            #         'id': obj.id,
+            #         'author_id': obj.owner_id,
+            #         'date_created': obj.date_created,
+            #         'date_edited': obj.date_edited,
+            #         'owner': obj.owner_id,
+            #         'parent_id': obj.parent_id,
+            #         'status': obj.status,
+            #         'tp': obj.tp,
+            #         'subscription_id': obj.subscription_id,
+            #         'children': list(contact.id for contact in obj.children.all()),
+            #         'sales_cycles': list(cycle.id for cycle in obj.sales_cycles.all()),
+            #         'vcard_id': obj.vcard_id
+            #     } for obj in objects)
+        return self.create_response(request, contacts)
+    '''
+    def sales_cycle_state(self, request, **kwargs):
+        with RequestContext(self, request, allowed_methods=['get']):
+            base_bundle = self.build_bundle(request=request)
+            sales_cycle_ids = self.obj_get_list(bundle=base_bundle, **self.remove_api_resource_names(kwargs)
+                ).values_list('id', flat=True)
+            sales_cycles = SalesCycle.get_by_ids(*sales_cycle_ids)
+        return self.create_response(request, sales_cycles)
+
 
     def build_filters(self, filters=None):
         if filters is None:
@@ -2296,7 +2334,21 @@ class ActivityResource(CRMServiceModelResource):
                 self.wrap_view('move_activity'),
                 name='api_move_activity'
             ),
+            url(
+                r"^(?P<resource_name>%s)/activity_state%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('activity_state'),
+                name='api_activity_state'
+            ),
         ]
+
+    def activity_state(self, request, **kwargs):
+        with RequestContext(self, request, allowed_methods=['get']):
+            base_bundle = self.build_bundle(request=request)
+            activity_ids = self.obj_get_list(bundle=base_bundle, **self.remove_api_resource_names(kwargs)
+                ).values_list('id', flat=True)
+            activities = Activity.get_by_ids(*activity_ids)
+        return self.create_response(request, activities)
 
     def dehydrate(self, bundle):
         crmuser = self.get_crmuser(bundle.request)

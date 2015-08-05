@@ -4,13 +4,13 @@ import json
 
 def prepopulate_cache():
 	Contact.cache_all()
-	print 'Contacts have been cached'
+	print '{} Contacts have been cached'.format(Contact.objects.count())
 	VCard.cache_all()
-	print 'VCards have been cached'
+	print '{} VCards have been cached'.format(VCard.objects.count())
 	SalesCycle.cache_all()
-	print 'SalesCycles have been cached'
+	print '{} SalesCycles have been cached'.format(SalesCycle.objects.count())
 	Activity.cache_all()
-	print 'Activities have been cached'
+	print '{} Activities have been cached'.format(Activity.objects.count())
 
 
 def pre():

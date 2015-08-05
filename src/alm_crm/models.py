@@ -1752,6 +1752,7 @@ class SalesCycle(SubscriptionObject):
             'log': [l.id for l in self.log.all()],
             'milestone_id': self.milestone_id,
             'pk': self.pk,
+            'product_ids': [p.id for p in self.products.all()],
             "projected_value": projected_value_id,
             "real_value": real_value_id,
             "stat": [stat.id for stat in self.product_stats.all()],
@@ -2049,7 +2050,7 @@ class Activity(SubscriptionObject):
             'date_created': self.date_created,
             'date_edited': self.date_edited,
             'date_finished': self.date_finished,
-            'deadlien': self.deadline,
+            'deadline': self.deadline,
             'description': self.description,
             'feedback_status': self.feedback_status,
             'id': self.pk,
@@ -2058,6 +2059,21 @@ class Activity(SubscriptionObject):
             'result': self.result,
             'sales_cycle_id': self.sales_cycle_id
         }
+
+    @classmethod
+    def get_by_ids(cls, *ids):
+        """Get sales cycles by ids from cache with fallback to postgres."""
+        rv = cache.get_many([build_key(cls._meta.model_name, aid) for aid in ids])
+        rv = {extract_id(k, coerce=int): json.loads(v) for k, v in rv.iteritems()}
+
+        not_found_ids = [aid for aid in ids if not aid in rv]
+        if not not_found_ids:
+            return rv.values()
+        activities = cls.objects.filter(pk__in=not_found_ids)
+        more_rv = list(a.serialize() for a in activities)
+        cache.set_many({build_key(cls._meta.model_name, activity_raw['id']): json.dumps(activity_raw, default=date_handler)
+                        for activity_raw in more_rv})
+        return rv.values() + more_rv
 
     @classmethod
     def after_save(cls, sender, instance, **kwargs):
