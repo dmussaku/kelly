@@ -15,7 +15,6 @@ class Migration(SchemaMigration):
         for model in models.get_models():
             if (issubclass(model, SubscriptionObject) and 
                 issubclass(model, models.Model) and not model._meta.abstract):
-                print model
                 try:
                     model._meta.get_field('owner')
                     for obj in model.objects.all():
