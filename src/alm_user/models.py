@@ -74,6 +74,7 @@ class Account(AbstractBaseUser):
 
 
 class UserManager(contrib_user_manager):
+    @classmethod
     def create_user(self, first_name, last_name):
         user = User(first_name=first_name, last_name=last_name)
         user.save()

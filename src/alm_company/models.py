@@ -52,7 +52,7 @@ class Company(models.Model):
         return lco.pk == rco.pk
 
     @classmethod
-    def build_company(cls, name):
+    def build_company(cls, name=None, subdomain=None):
         subdomain = Company.generate_subdomain(name)
         company = Company(name=name, subdomain=subdomain)
         company.save()

@@ -26,4 +26,5 @@ def debug_task(self):
 
 @app.task(bind=True)
 def prepare_cache(self):
-	preparations.pre()
+	# preparations.pre()
+	pass
