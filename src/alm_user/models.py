@@ -72,9 +72,25 @@ class Account(AbstractBaseUser):
     def has_perm(self, perm, obj=None):
         return self.is_admin
 
+    '''
+    Check if the account has unique email inside one company
+    '''
+    def save(self, **kwargs):
+        if self.check_email_uniqueness():
+            return super(self.__class__, self).save(**kwargs)
+        else:
+            raise Exception
+
+    def check_email_uniqueness(self):
+        qs = Account.objects.filter(company=self.company)
+        if (self.email,) in qs.values_list('email'):
+            return False
+        else:
+            return True
 
 
 class UserManager(contrib_user_manager):
+    @classmethod
     def create_user(self, first_name, last_name):
         user = User(first_name=first_name, last_name=last_name)
         user.save()

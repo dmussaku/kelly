@@ -3,8 +3,7 @@ from optparse import make_option
 from django.core.management.base import BaseCommand
 from django.utils.translation import ugettext as _
 
-from alm_account.models import Account
-from alm_user.models import User, UserManager
+from alm_user.models import User, UserManager, Account
 from alm_company.models import Company
 from almanet.models import Service, Subscription
 from alm_crm.models import CRMUser
@@ -48,7 +47,7 @@ class Command(BaseCommand):
             u = UserManager.create_user(first_name=first_name, last_name=last_name)
             acc = Account.objects.create_user(
                 email=email, password=password, user=u, company=c, is_admin=True)
-                sys.stderr.write("Account and User created successfully.\n")        
+            sys.stderr.write("Account and User created successfully.\n")        
         subscription.user = u
         subscription.organization = c
         subscription.is_active = True

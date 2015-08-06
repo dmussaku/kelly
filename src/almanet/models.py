@@ -58,8 +58,9 @@ class Subscription(models.Model):
 
 
 class SubscriptionObject(models.Model):
-    subscription_id = models.IntegerField(_('subscription id'),
-                                          null=True, blank=True)
+    # subscription_id = models.IntegerField(_('subscription id'),
+    #                                       null=True, blank=True)
+    company_id = models.IntegerField(_('company_id'), null=True, blank=True)
     date_created = models.DateTimeField(auto_now_add=True, blank=True)
     date_edited = models.DateTimeField(auto_now=True, blank=True)
 
@@ -67,12 +68,10 @@ class SubscriptionObject(models.Model):
         abstract = True
 
     def save(self, **kwargs):
-        if not self.subscription_id and self.owner:
-            self.subscription_id = self.owner.subscription_id
         super(SubscriptionObject, self).save(**kwargs)
 
 
 class SerializableSubscriptionObject(SubscriptionObject, SerializableModel):
-
+    
     class Meta:
         abstract = True
