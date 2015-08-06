@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import re
+from django.contrib.contenttypes.models import ContentType
 from alm_crm.models import (
 	HashTag, 
 	HashTagReference, 
@@ -27,10 +28,16 @@ def text_parser(base_text, content_class=None, object_id=None):
 			hashtag.save()
 
 		if(hashtag):
-			hashtag_reference = HashTagReference.build_new(hashtag_id=hashtag.id, 
-															content_class=content_class,
-															object_id=object_id,
-															save=True)
+			# check for prevent adding already added reference
+			newRef = ContentType.objects.get_for_model(content_class).__str__()+str(object_id)
+			refs = [r.content_type.__str__()+str(r.object_id) for r in hashtag.references.all()]
+
+			if not newRef in refs:
+				hashtag_reference = HashTagReference.build_new(
+					hashtag_id=hashtag.id, 
+					content_class=content_class,
+					object_id=object_id,
+					save=True)
 
 	user_id_parser = re.compile('\d[0-9]*')
 	for mention_item in mentions:
