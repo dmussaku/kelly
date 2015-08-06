@@ -16,9 +16,12 @@ class Migration(SchemaMigration):
                 issubclass(model, models.Model) and not model._meta.abstract):
                 print model
                 for obj in model.objects.all():
-                    subscription = Subscription.objects.get(id=obj.subscription_id)
-                    obj.company_id = subscription.organization_id
-                    obj.save()
+                    try:
+                        subscription = Subscription.objects.get(id=obj.subscription_id)
+                        obj.company_id = subscription.organization_id
+                        obj.save(update_fields=['company_id'])
+                    except Subscription.DoesNotExist:
+                        pass
 
     def backwards(self, orm):        
         for model in models.get_models():
@@ -28,6 +31,7 @@ class Migration(SchemaMigration):
                     company = Company.objects.get(id = obj.company_id)
                     subscription_id = company.subscriptions.first().id
                     obj.subscription_id = subscription_id
+                    obj.save(update_fields=['subscription_id'])
 
     models = {
         u'alm_company.company': {

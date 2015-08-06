@@ -22,7 +22,7 @@ class Migration(SchemaMigration):
                         crmuser = CRMUser.objects.get(id=owner_id)
                         user = User.objects.get(id=crmuser.user_id)
                         obj.owner_id = user.id
-                        obj.save() 
+                        obj.save(update_fields=['owner_id']) 
                 except FieldDoesNotExist:
                     pass
 
