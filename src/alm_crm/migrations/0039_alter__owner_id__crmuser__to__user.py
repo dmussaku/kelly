@@ -11,37 +11,80 @@ from django.db.models.fields import FieldDoesNotExist
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Picking up user ids from crmuser ids and changing them to User.id
-        for model in models.get_models():
-            if (issubclass(model, SubscriptionObject) and 
-                issubclass(model, models.Model) and not model._meta.abstract):
-                try:
-                    model._meta.get_field('owner')
-                    for obj in model.objects.all():
-                        owner_id = obj.owner_id
-                        crmuser = CRMUser.objects.get(id=owner_id)
-                        user = User.objects.get(id=crmuser.user_id)
-                        obj.owner_id = user.id
-                        obj.save(update_fields=['owner_id']) 
-                except FieldDoesNotExist:
-                    pass
+
+        # Changing field 'Feedback.owner'
+        db.alter_column(u'alm_crm_feedback', 'owner_id', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['alm_user.User']))
+
+        # Changing field 'SalesCycleLogEntry.owner'
+        db.alter_column(u'alm_crm_salescyclelogentry', 'owner_id', self.gf('django.db.models.fields.related.ForeignKey')(null=True, to=orm['alm_user.User']))
+
+        # Changing field 'Comment.owner'
+        db.alter_column(u'alm_crm_comment', 'owner_id', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['alm_user.User']))
+
+        # Changing field 'Filter.owner'
+        db.alter_column('alma_filter', 'owner_id', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['alm_user.User']))
+
+        # Changing field 'Mention.owner'
+        db.alter_column(u'alm_crm_mention', 'owner_id', self.gf('django.db.models.fields.related.ForeignKey')(null=True, to=orm['alm_user.User']))
+
+        # Changing field 'SalesCycle.owner'
+        db.alter_column('alma_sales_cycle', 'owner_id', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['alm_user.User']))
+
+        # Changing field 'ContactList.owner'
+        db.alter_column('alma_contact_list', 'owner_id', self.gf('django.db.models.fields.related.ForeignKey')(null=True, to=orm['alm_user.User']))
+
+        # Changing field 'Value.owner'
+        db.alter_column('alma_value', 'owner_id', self.gf('django.db.models.fields.related.ForeignKey')(null=True, to=orm['alm_user.User']))
+        
+        # Changing field 'Activity.owner'
+        db.alter_column('alma_activity', 'owner_id', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['alm_user.User']))
+
+        # Changing field 'Contact.owner'
+        db.alter_column('alma_contact', 'owner_id', self.gf('django.db.models.fields.related.ForeignKey')(null=True, to=orm['alm_user.User']))
+
+        # Changing field 'Product.owner'
+        db.alter_column('alma_product', 'owner_id', self.gf('django.db.models.fields.related.ForeignKey')(null=True, to=orm['alm_user.User']))
+
+        # Changing field 'ProductGroup.owner'
+        db.alter_column('alma_product_group', 'owner_id', self.gf('django.db.models.fields.related.ForeignKey')(null=True, to=orm['alm_user.User']))
 
     def backwards(self, orm):
-        # Picking up crmuser ids from user.ids for backwards migration
-        for model in models.get_models():
-            if (issubclass(model, SubscriptionObject) and 
-                issubclass(model, models.Model) and not model._meta.abstract):
-                print model
-                try:
-                    model._meta.get_field('owner')
-                    for obj in model.objects.all():
-                        owner_id = obj.owner_id
-                        user = User.objects.get(id=owner_id)
-                        crmuser = CRMUser.objects.get(user_id=user.id)
-                        obj.owner_id = crmuser.id
-                        obj.save()
-                except FieldDoesNotExist:
-                    pass   
+
+        # Changing field 'Feedback.owner'
+        db.alter_column(u'alm_crm_feedback', 'owner_id', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['alm_crm.CRMUser']))
+
+        # Changing field 'SalesCycleLogEntry.owner'
+        db.alter_column(u'alm_crm_salescyclelogentry', 'owner_id', self.gf('django.db.models.fields.related.ForeignKey')(null=True, to=orm['alm_crm.CRMUser']))
+
+        # Changing field 'Comment.owner'
+        db.alter_column(u'alm_crm_comment', 'owner_id', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['alm_crm.CRMUser']))
+
+        # Changing field 'Filter.owner'
+        db.alter_column('alma_filter', 'owner_id', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['alm_crm.CRMUser']))
+
+        # Changing field 'Mention.owner'
+        db.alter_column(u'alm_crm_mention', 'owner_id', self.gf('django.db.models.fields.related.ForeignKey')(null=True, to=orm['alm_crm.CRMUser']))
+
+        # Changing field 'SalesCycle.owner'
+        db.alter_column('alma_sales_cycle', 'owner_id', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['alm_crm.CRMUser']))
+
+        # Changing field 'ContactList.owner'
+        db.alter_column('alma_contact_list', 'owner_id', self.gf('django.db.models.fields.related.ForeignKey')(null=True, to=orm['alm_crm.CRMUser']))
+
+        # Changing field 'Value.owner'
+        db.alter_column('alma_value', 'owner_id', self.gf('django.db.models.fields.related.ForeignKey')(null=True, to=orm['alm_crm.CRMUser']))
+
+        # Changing field 'Activity.owner'
+        db.alter_column('alma_activity', 'owner_id', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['alm_crm.CRMUser']))
+
+        # Changing field 'Contact.owner'
+        db.alter_column('alma_contact', 'owner_id', self.gf('django.db.models.fields.related.ForeignKey')(null=True, to=orm['alm_crm.CRMUser']))
+
+        # Changing field 'Product.owner'
+        db.alter_column('alma_product', 'owner_id', self.gf('django.db.models.fields.related.ForeignKey')(null=True, to=orm['alm_crm.CRMUser']))
+
+        # Changing field 'ProductGroup.owner'
+        db.alter_column('alma_product_group', 'owner_id', self.gf('django.db.models.fields.related.ForeignKey')(null=True, to=orm['alm_crm.CRMUser']))
 
     models = {
         u'alm_crm.activity': {
