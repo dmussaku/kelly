@@ -192,7 +192,7 @@ class Contact(SubscriptionObject):
     parent = models.ForeignKey(
         'Contact', blank=True, null=True, related_name='children')
     owner = models.ForeignKey(
-        CRMUser, related_name='owned_contacts',
+        User, related_name='owned_contacts',
         null=True, blank=True)
 
     latest_activity = models.OneToOneField(
@@ -1224,7 +1224,6 @@ class Contact(SubscriptionObject):
             'children': [child.pk for child in self.children.all()],
             'sales_cycles': [cycle.pk for cycle in self.sales_cycles.all()],
             'status': self.status,
-            'subscription_id': self.subscription_id,
             'tp': self.tp,
             'vcard_id': self.vcard_id
         }
@@ -1284,7 +1283,7 @@ class Value(SubscriptionObject):
     amount = models.IntegerField()
     currency = models.CharField(max_length=3, choices=CURRENCY_OPTIONS,
                                 default='KZT')
-    owner = models.ForeignKey('CRMUser', null=True, blank=True,
+    owner = models.ForeignKey(User, null=True, blank=True,
                               related_name='owned_values')
 
     class Meta:
@@ -1306,7 +1305,7 @@ class Product(SubscriptionObject):
     price = models.IntegerField()
     currency = models.CharField(max_length=3, choices=CURRENCY_OPTIONS,
                                 default='KZT')
-    owner = models.ForeignKey('CRMUser', related_name='crm_products',
+    owner = models.ForeignKey(User, related_name='crm_products',
                               null=True, blank=True)
     custom_field_values = generic.GenericRelation('CustomFieldValue')
 
@@ -1398,7 +1397,7 @@ class Product(SubscriptionObject):
 post_save.connect(VCard.after_save, sender=VCard)
 
 class ProductGroup(SubscriptionObject):
-    owner = models.ForeignKey(CRMUser, related_name='owned_product_groups', blank=True, null=True)
+    owner = models.ForeignKey(User, related_name='owned_product_groups', blank=True, null=True)
     title = models.CharField(max_length=150)
     products = models.ManyToManyField(Product, related_name='product_groups',
                                    null=True, blank=True)
@@ -1431,7 +1430,7 @@ class SalesCycle(SubscriptionObject):
     products = models.ManyToManyField(Product, related_name='sales_cycles',
                                       null=True, blank=True,
                                       through='SalesCycleProductStat')
-    owner = models.ForeignKey(CRMUser, related_name='owned_sales_cycles')
+    owner = models.ForeignKey(User, related_name='owned_sales_cycles')
     followers = models.ManyToManyField(
         CRMUser, related_name='follow_sales_cycles',
         null=True, blank=True)
@@ -1740,7 +1739,7 @@ class SalesCycleLogEntry(SubscriptionObject):
     sales_cycle = models.ForeignKey(SalesCycle, related_name='log')
     entry_type = models.CharField(max_length=2,
                               choices=TYPES_OPTIONS, default=MC)
-    owner = models.ForeignKey(CRMUser, related_name='owned_logentries', null=True)
+    owner = models.ForeignKey(User, related_name='owned_logentries', null=True)
 
 
 class Activity(SubscriptionObject):
@@ -1752,7 +1751,7 @@ class Activity(SubscriptionObject):
     sales_cycle = models.ForeignKey(SalesCycle, related_name='rel_activities')
     assignee = models.ForeignKey(CRMUser, related_name='activity_assignee', null=True)
     result = models.TextField(null=True, blank=True)
-    owner = models.ForeignKey(CRMUser, related_name='activity_owner')
+    owner = models.ForeignKey(User, related_name='activity_owner')
     mentions = generic.GenericRelation('Mention', null=True)
     comments = generic.GenericRelation('Comment', null=True)
     hashtags = generic.GenericRelation('HashTagReference', null=True, blank=True)
@@ -1975,7 +1974,7 @@ class Activity(SubscriptionObject):
 
 class ActivityRecipient(SubscriptionObject):
     activity = models.ForeignKey(Activity, related_name='recipients')
-    user = models.ForeignKey(CRMUser, related_name='activities')
+    user = models.ForeignKey(User, related_name='activities')
     has_read = models.BooleanField(default=False)
 
     @property
@@ -2007,7 +2006,7 @@ class Feedback(SubscriptionObject):
     value = models.OneToOneField(Value, blank=True, null=True)
     mentions = generic.GenericRelation('Mention')
     comments = generic.GenericRelation('Comment')
-    owner = models.ForeignKey(CRMUser, related_name='feedback_owner')
+    owner = models.ForeignKey(User, related_name='feedback_owner')
 
     def __unicode__(self):
         return u"%s: %s" % (self.activity, self.status)
@@ -2024,7 +2023,7 @@ class Feedback(SubscriptionObject):
 
 class Mention(SubscriptionObject):
     user = models.ForeignKey(CRMUser, related_name='mentions', null=True)
-    owner = models.ForeignKey(CRMUser, related_name='owned_mentions', null=True)
+    owner = models.ForeignKey(User, related_name='owned_mentions', null=True)
     content_type = models.ForeignKey(ContentType)
     object_id = models.IntegerField()
     content_object = generic.GenericForeignKey('content_type', 'object_id')
@@ -2064,7 +2063,7 @@ class Mention(SubscriptionObject):
 
 class Comment(SubscriptionObject):
     comment = models.CharField(max_length=140)
-    owner = models.ForeignKey(CRMUser, related_name='comment_owner')
+    owner = models.ForeignKey(User, related_name='comment_owner')
     object_id = models.IntegerField(null=True, blank=False)
     content_type = models.ForeignKey(ContentType)
     content_object = generic.GenericForeignKey('content_type', 'object_id')
@@ -2213,7 +2212,7 @@ def get_mentions(user_id=None, content_class=None, object_id=None):
 
 
 class ContactList(SubscriptionObject):
-    owner = models.ForeignKey(CRMUser, related_name='owned_list', blank=True, null=True)
+    owner = models.ForeignKey(User, related_name='owned_list', blank=True, null=True)
     title = models.CharField(max_length=150)
     contacts = models.ManyToManyField(Contact, related_name='contact_list',
                                    null=True, blank=True)
@@ -2307,7 +2306,7 @@ class Filter(SubscriptionObject):
         ('LD', _('lead')))
     title = models.CharField(max_length=100, default='')
     filter_text = models.CharField(max_length=500)
-    owner = models.ForeignKey(CRMUser, related_name='owned_filter')
+    owner = models.ForeignKey(User, related_name='owned_filter')
     base = models.CharField(max_length=6, choices=BASE_OPTIONS, default='all')
 
     class Meta:
