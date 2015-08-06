@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import (
     AbstractBaseUser, UserManager as contrib_user_manager)
+from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from timezone_field import TimeZoneField
@@ -224,3 +225,50 @@ class Referral(models.Model):
     def __unicode__(self):
         return u'%s'%self.email
 
+@python_2_unicode_compatible
+class AnonymousAccount(object):
+    id = None
+    pk = None
+    email = ''
+    is_active = False
+
+    def __init__(self):
+        pass
+
+    def __str__(self):
+        return 'AnonymousAccount'
+
+    def __eq__(self, other):
+        return isinstance(other, self.__class__)
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+    def __hash__(self):
+        return 1  # instances always return the same hash value
+
+    @property 
+    def user(self): # needed to return something when SimpleLazyObject executed in MyAuthenticationMiddleware for request.user
+        return None
+
+    @property 
+    def company(self): # needed to return something when SimpleLazyObject executed in MyAuthenticationMiddleware for request.company
+        return None
+
+    def save(self):
+        raise NotImplementedError
+
+    def delete(self):
+        raise NotImplementedError
+
+    def set_password(self, raw_password):
+        raise NotImplementedError
+
+    def check_password(self, raw_password):
+        raise NotImplementedError
+
+    def is_anonymous(self):
+        return True
+
+    def is_authenticated(self):
+        return False

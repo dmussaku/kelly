@@ -49,11 +49,6 @@ class Subscription(models.Model):
         verbose_name = _('subscription')
         db_table = settings.DB_PREFIX.format('subscription')
 
-    @property
-    def backend(self):
-        # TODO backend pattern
-        return self
-
     def get_home_url(self):
         url_key = '{}_home'.format(settings.DEFAULT_SERVICE)
         return almanet_reverse(

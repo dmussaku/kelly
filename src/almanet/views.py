@@ -39,7 +39,7 @@ class TestView2(TemplateView):
 
 
 def fork_index(request):
-    if request.user.is_authenticated():
+    if request.account.is_authenticated():
         return HttpResponseRedirect(settings.LOGIN_REDIRECT_URL)
     else:
         return HttpResponseRedirect(reverse_lazy('user_login'))

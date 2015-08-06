@@ -148,14 +148,14 @@ class BaseConfiguration(SubdomainConfiguration, Configuration):
 
     MIDDLEWARE_CLASSES = (
         'almanet.middleware.GetSubdomainMiddleware',
-        'almanet.middleware.AlmanetSessionMiddleware',
         'django.middleware.common.CommonMiddleware',
         'corsheaders.middleware.CorsMiddleware',
         'django.middleware.csrf.CsrfViewMiddleware',
         'almanet.middleware.ForceDefaultLanguageMiddleware',
         'django.middleware.locale.LocaleMiddleware',
         'django_hosts.middleware.HostsMiddleware',
-        'almanet.middleware.UserEnvMiddleware',
+        'almanet.middleware.AlmanetSessionMiddleware',
+        'almanet.middleware.MyAuthenticationMiddleware',
     )
 
     SESSION_COOKIE_DOMAIN = '.alma.net'

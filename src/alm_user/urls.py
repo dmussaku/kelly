@@ -1,7 +1,6 @@
 from django.conf.urls import patterns, url
 from django.core.urlresolvers import reverse_lazy
 from django.contrib.auth.views import (
-    logout as django_logout,
     password_reset as django_password_reset,
     password_reset_done as django_password_reset_done,)
 
@@ -49,8 +48,5 @@ urlpatterns = patterns(
         {'template_name': 'user/password_reset_confirm.html',
          'post_reset_redirect': 'user_login'},
         name='password_reset_confirm'),
-
-    url(r'^logout/$', django_logout, {'next_page': login_url},
-        name='user_logout'),
 )
 

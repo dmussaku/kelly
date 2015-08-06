@@ -71,7 +71,7 @@
         {% if logged_in_companies %}
             <p>Компании, в которые вы залогинены</p>
             {% for company in logged_in_companies %}
-                <a href="" class="login-submit">{{ company.name }}</a>
+                <a href="{% subdomain_url 'crm_home' subdomain=company.subdomain service_slug='crm'  %}" class="login-submit">{{ company.name }}</a>
             {% endfor %}
         {% endif %}
     </div>

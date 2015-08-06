@@ -2,7 +2,7 @@ from models import Account
 from alm_company.models import Company
 from almanet.middleware import AlmanetSessionMiddleware
 from django.core.exceptions import PermissionDenied
-from django.contrib.auth.signals import user_logged_in
+from django.contrib.auth.signals import user_logged_in, user_logged_out
 from django.middleware.csrf import rotate_token
 
 def login(request, account):
@@ -15,28 +15,16 @@ def login(request, account):
 
 
 def logout(request):
-    """
-    Removes the authenticated user's ID from the request and flushes their
-    session data.
-    """
-    # Dispatch the signal before the user is logged out so the receivers have a
-    # chance to find out *who* logged out.
-    user = getattr(request, 'user', None)
-    if hasattr(user, 'is_authenticated') and not user.is_authenticated():
-        user = None
-    user_logged_out.send(sender=user.__class__, request=request, user=user)
-
-    # remember language choice saved to session
-    language = request.session.get('django_language')
+    account = getattr(request, 'account', None)
+    if hasattr(account, 'is_authenticated') and not account.is_authenticated():
+        account = None
+    user_logged_out.send(sender=account.__class__, request=request, user=account)
 
     request.session.flush()
 
-    if language is not None:
-        request.session['django_language'] = language
-
-    if hasattr(request, 'user'):
-        from django.contrib.auth.models import AnonymousUser
-        request.user = AnonymousUser()
+    if hasattr(request, 'account'):
+        from alm_user.models import AnonymousAccount
+        request.account = AnonymousAccount()
 
 
 class MyAuthBackend(object):

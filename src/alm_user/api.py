@@ -5,7 +5,7 @@ from tastypie import fields, http
 from tastypie.bundle import Bundle
 from tastypie.resources import Resource, ModelResource
 from tastypie.exceptions import NotFound, BadRequest
-from django.contrib.auth import login, logout, authenticate
+from django.contrib.auth import login, authenticate
 from django.conf.urls import url
 from tastypie.utils import trailing_slash
 from alm_vcard.models import *

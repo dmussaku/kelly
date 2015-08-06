@@ -1,16 +1,31 @@
 import string
 import time
 import tldextract
-from django.contrib.auth.middleware import get_user
-from django.contrib.auth.models import AnonymousUser
+from django.contrib.auth import load_backend
 from django.conf import settings
 from django.utils.functional import SimpleLazyObject
 from django.utils.importlib import import_module
 from django.utils.cache import patch_vary_headers
 from django.utils.http import cookie_date
-from django.utils.module_loading import import_by_path
 
 from alm_company.models import Company
+
+def get_account(request):
+    if not hasattr(request, '_cached_account'):
+        from alm_user.models import AnonymousAccount
+        if not hasattr(request, 'session'):
+            account = AnonymousAccount()
+        else:
+            try:
+                account_id = request.session.load()['account_id']
+                backend_path = request.session.load()['backend_path']
+                assert backend_path in settings.AUTHENTICATION_BACKENDS
+                backend = load_backend(backend_path)
+                account = backend.get_account(account_id) or AnonymousAccount()
+            except (KeyError, AssertionError):
+                account = AnonymousAccount()
+        request._cached_account = account
+    return request._cached_account
 
 
 class AlmanetSessionMiddleware(object):
@@ -25,6 +40,7 @@ class AlmanetSessionMiddleware(object):
             'account_id': account.id,
             'company_id': account.company_id,
             'user_id': account.user_id,
+            'backend_path': account.backend,
         })
         current_session.save()
         return current_session
@@ -76,27 +92,44 @@ class AlmanetSessionMiddleware(object):
                 # Skip session save for 500 responses, refs #3881.
                 if response.status_code != 500:
                     request.session.save()
+                    current_session = request.session.load()
 
-                    company = request.account.company
+                    comps_cookie = request.COOKIES.get('comps', None)
+                    comps = comps_cookie.split(',') if comps_cookie is not None else []
 
-                    comps = request.COOKIES.get('comps', None)
-                    comps_cookie = comps.split(',') if comps is not None else []
-                    comps_cookie.append('c'+str(company.id))
-                    comps_cookie = ','.join(set(comps_cookie))
+                    if current_session:
+                        company = request.account.company
 
-                    response.set_cookie('comps',
-                            comps_cookie, max_age=max_age,
-                            expires=expires, domain=settings.SESSION_COOKIE_DOMAIN,
-                            path=settings.SESSION_COOKIE_PATH,
-                            secure=settings.SESSION_COOKIE_SECURE or None,
-                            httponly=settings.SESSION_COOKIE_HTTPONLY or None)
+                        
+                        comps.append('c'+str(company.id))
+                        comps = ','.join(set(comps))
 
-                    response.set_cookie('c'+str(company.id),
-                            request.session.session_key, max_age=max_age,
-                            expires=expires, domain=settings.SESSION_COOKIE_DOMAIN,
-                            path=settings.SESSION_COOKIE_PATH,
-                            secure=settings.SESSION_COOKIE_SECURE or None,
-                            httponly=settings.SESSION_COOKIE_HTTPONLY or None)
+                        response.set_cookie('comps',
+                                comps, max_age=max_age,
+                                expires=expires, domain=settings.SESSION_COOKIE_DOMAIN,
+                                path=settings.SESSION_COOKIE_PATH,
+                                secure=settings.SESSION_COOKIE_SECURE or None,
+                                httponly=settings.SESSION_COOKIE_HTTPONLY or None)
+
+                        response.set_cookie('c'+str(company.id),
+                                request.session.session_key, max_age=max_age,
+                                expires=expires, domain=settings.SESSION_COOKIE_DOMAIN,
+                                path=settings.SESSION_COOKIE_PATH,
+                                secure=settings.SESSION_COOKIE_SECURE or None,
+                                httponly=settings.SESSION_COOKIE_HTTPONLY or None)
+                    else:
+                        for comp in comps:
+                            cookie = request.COOKIES.get(comp, None)
+                            if cookie:
+                                session = AlmanetSessionMiddleware.get_session(request, cookie).load()
+                                if not session:
+                                    response.set_cookie(comp, max_age=0,
+                                            expires='Thu, 01-Jan-1970 00:00:00 GMT',
+                                            domain=settings.SESSION_COOKIE_DOMAIN,
+                                            path=settings.SESSION_COOKIE_PATH,
+                                            secure=settings.SESSION_COOKIE_SECURE or None,
+                                            httponly=settings.SESSION_COOKIE_HTTPONLY or None)
+
         return response
 
 
@@ -104,48 +137,18 @@ class MyAuthenticationMiddleware(object):
     def process_request(self, request):
         # assert hasattr(request, 'session'), "The Django authentication middleware requires session middleware to be installed. Edit your MIDDLEWARE_CLASSES setting to insert 'django.contrib.sessions.middleware.SessionMiddleware'."
 
-        # request.account = SimpleLazyObject(lambda: get_account(request))
-        # request.user = SimpleLazyObject(lambda: get_user(request) if get_user(request).is_anonymous() else get_user(request).user)
-        pass
-
+        request.account = SimpleLazyObject(lambda: get_account(request))
+        request.company = SimpleLazyObject(lambda: get_account(request).company)
+        request.user = SimpleLazyObject(lambda: get_account(request).user)
 
 
 class GetSubdomainMiddleware(object):
 
     def process_request(self, request):
         request.subdomain = tldextract.extract(
-            request.META.get('HTTP_HOST', '')).subdomain
+            request.META.get('HTTP_HOST', '')).subdomain or tldextract.extract(
+            request.META.get('HTTP_REFERER', '')).subdomain
 
-
-def set_user_env(user):
-    subscrs = user.get_subscriptions()
-
-    env = {
-        'user_id': user.pk,
-        'account_ids': [acc.id for acc in user.accounts.all()],
-        'subscriptions': map(lambda s: s.pk, subscrs)
-    }
-    for subscr in subscrs:
-        env['subscription_{}'.format(subscr.pk)] = {
-            'is_active': subscr.is_active,
-            'user_id': user.pk,
-            'slug': subscr.service.slug,
-        }
-    return env
-
-'''
-{% with subscr = request.user_env|get_current_subscription:"id"
-  subscr.
-'''
-
-
-class UserEnvMiddleware(object):
-    def process_request(self, request):
-        # if request.user.is_anonymous() or not request.account.is_authenticated():
-        #     request.user_env = {}
-        #     return
-        # request.user_env = set_user_env(request.user)
-        pass
 
 class ForceDefaultLanguageMiddleware(object):
     """
