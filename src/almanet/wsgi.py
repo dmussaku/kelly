@@ -22,7 +22,7 @@ importer.install()
 
 from . import celery
 
-for i in xrange(100):
+for i in xrange(5):
 	print "PLEASE DONT FORGET PRECACHE"
 
 
