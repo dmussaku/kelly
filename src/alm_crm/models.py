@@ -1785,30 +1785,8 @@ class Activity(SubscriptionObject):
         return self.sales_cycle.contact
 
     @property
-    def feedback_status(self):
-        if hasattr(self, 'feedback'):
-            return self.feedback.status
-        return None
-
-    @property
     def comments_count(self):
         return self.comments.count()
-
-    def set_feedback(self, feedback_obj, save=False):
-        """Set feedback to activity instance. Saves if `save` is set(True)."""
-        feedback_obj.activity = self
-        if save:
-            feedback_obj.save()
-
-    def set_feedback_status(self, status, save_feedback=False):
-        if not hasattr(self, 'feedback'):
-            self.feedback = Feedback(
-                activity=self,
-                owner=self.owner
-                )
-        self.feedback.status = status
-        if save_feedback:
-            self.feedback.save()
 
     def spray(self, subscription_id):
         unfollow_set = {
@@ -1991,39 +1969,6 @@ class ActivityRecipient(SubscriptionObject):
 
     def __unicode__(self):
         return u'Activity: %s' % self.pk or 'Unknown'
-
-
-# class Feedback(SubscriptionObject):
-#     STATUSES_CAPS = (
-#         _('Waiting'),
-#         _('Outcome'),
-#         _('Client is happy'),
-#         _('Client is OK'),
-#         _('Client is angry'))
-#     STATUSES = (WAITING, OUTCOME, POSITIVE, NEUTRAL, NEGATIVE) = ('W', '$', '1', '2', '3')
-#     STATUSES_OPTIONS = zip(STATUSES, STATUSES_CAPS)
-#     STATUSES_DICT = dict(zip(('WAITING', 'OUTCOME', 'POSITIVE', 'NEUTRAL', 'NEGATIVE'),
-#                          STATUSES))
-
-#     feedback = models.CharField(max_length=300, null=True)
-#     status = models.CharField(max_length=1, choices=STATUSES_OPTIONS, default=WAITING)
-#     activity = models.OneToOneField(Activity)
-#     value = models.OneToOneField(Value, blank=True, null=True)
-#     mentions = generic.GenericRelation('Mention')
-#     comments = generic.GenericRelation('Comment')
-#     owner = models.ForeignKey(User, related_name='feedback_owner')
-
-#     def __unicode__(self):
-#         return u"%s: %s" % (self.activity, self.status)
-
-#     def statusHuman(self):
-#         statuses = filter(lambda x: x[0] == self.status, self.STATUSES_OPTIONS)
-#         return len(statuses) > 0 and statuses[0] or None
-
-#     def save(self, **kwargs):
-#         if self.date_created:
-#             self.date_edited = timezone.now()
-#         super(Feedback, self).save(**kwargs)
 
 
 class Mention(SubscriptionObject):

@@ -11,7 +11,6 @@ from models import (
     Contact,
     SalesCycle,
     Activity,
-    Feedback,
     Comment,
     Value,
     CRMUser,
@@ -25,7 +24,6 @@ from forms import (
     MentionForm,
     ActivityForm,
     CommentForm,
-    ActivityFeedbackForm,
     ShareForm,
     ValueForm,
     )
@@ -718,39 +716,3 @@ class ValueDeleteView(DeleteView):
     model = Value
     template_name = "value/value_delete.html"
     success_url = reverse_lazy('value_list')
-
-
-class ActivityFeedbackListView(ListView):
-    model = Feedback
-    queryset = Feedback.objects.all()
-
-    def get_context_data(self, **kwargs):
-        ctx = super(ActivityFeedbackListView, self).get_context_data(**kwargs)
-        ctx['activity_feedbacks'] = Feedback.objects.all()
-        ctx['user'] = self.request.user
-        return ctx
-
-
-class ActivityFeedbackCreateView(CreateView):
-    model = Feedback
-    form_class = ActivityFeedbackForm
-    template_name = "activity_feedback/activity_feedback_create.html"
-    success_url = reverse_lazy('activity_feedback_list')
-
-
-class ActivityFeedbackUpdateView(UpdateView):
-    model = Feedback
-    form_class = ActivityFeedbackForm
-    template_name = "activity_feedback/activity_feedback_update.html"
-    success_url = reverse_lazy('activity_feedback_list')
-
-
-class ActivityFeedbackDetailView(DetailView):
-    model = Feedback
-    template_name = "activity_feedback/activity_feedback_detail.html"
-
-
-class ActivityFeedbackDeleteView(DeleteView):
-    model = Feedback
-    template_name = "activity_feedback/activity_feedback_delete.html"
-    success_url = reverse_lazy('activity_feedback_list')

@@ -1,5 +1,5 @@
 from models import Contact, SalesCycle, Mention, Comment, Activity, Value, \
-    Feedback, Share
+     Share
 from alm_user.models import User
 from django import forms
 from django.forms import ModelForm
@@ -11,7 +11,6 @@ class ActivityForm(ModelForm):
 
     class Meta:
         model = Activity
-        exclude = ['feedback']
 
     def save(self, commit=True):
         activity = super(ActivityForm, self).save(commit=commit)
@@ -27,13 +26,6 @@ class ActivityForm(ModelForm):
                 m = Mention(user_id=user_id, content_object=activity)
                 m.save()
         return activity
-
-
-class ActivityFeedbackForm(ModelForm):
-
-    class Meta:
-        model = Feedback
-        exclude = ['date_created', 'date_edited']
 
 
 class ContactForm(ModelForm):

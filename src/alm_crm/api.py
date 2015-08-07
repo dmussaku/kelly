@@ -11,7 +11,6 @@ from .models import (
     Share,
     CRMUser,
     Value,
-    Feedback,
     Comment,
     Mention,
     SalesCycleProductStat,
@@ -1186,7 +1185,6 @@ class ContactResource(CRMServiceModelResource):
         ...     "date_created": "2014-03-19T00:00:00",
         ...     "date_edited": true,
         ...     "description": "activity #10 of SalesCycle #3",
-        ...     "feedback": null,
         ...     "id": 30,
         ...     "owner": null,
         ...     "resource_uri": "/api/v1/activity/30/",
@@ -2110,7 +2108,6 @@ class ActivityResource(CRMServiceModelResource):
             "date_finished": null,
             "deadline": null,
             "description": "Just trying to show an example of how to create activity",
-            "feedback_status": null,
             "has_read": false,
             "id": 1,
             "need_preparation": false,
@@ -2148,7 +2145,6 @@ class ActivityResource(CRMServiceModelResource):
             date_finished: null
             deadline: null
             description: "Just trying to show an example of how to create activity"
-            feedback_status: null
             has_read: false
             id: 1
             need_preparation: false
@@ -2166,7 +2162,6 @@ class ActivityResource(CRMServiceModelResource):
        "date_finished":null,
        "deadline":null,
        "description":"Just trying to show an example of how to create activity",
-       "feedback_status":null,
        "has_read":false,
        "id":1,
        "need_preparation":false,
@@ -2199,7 +2194,6 @@ class ActivityResource(CRMServiceModelResource):
             date_finished: null
             deadline: "2015-06-01T00:00:00"
             description: "Just trying to show an example of how to plan activity"
-            feedback_status: null
             has_read: false
             id: 1
             need_preparation: false
@@ -2217,7 +2211,6 @@ class ActivityResource(CRMServiceModelResource):
        "date_finished":null,
        "deadline":null,
        "description":"Just trying to show an example of how to create activity",
-       "feedback_status":null,
        "has_read":false,
        "id":1,
        "need_preparation":false,
@@ -2237,11 +2230,10 @@ class ActivityResource(CRMServiceModelResource):
     description = fields.CharField(attribute='description')
     need_preparation = fields.BooleanField(attribute='need_preparation')
     sales_cycle_id = fields.IntegerField(attribute='sales_cycle_id', null=True)
-    feedback_status = fields.CharField(null=True)
     comments_count = fields.IntegerField(attribute='comments_count', readonly=True)
 
     class Meta(CommonMeta):
-        queryset = Activity.objects.all().select_related('owner', 'feedback').prefetch_related('comments', 'recipients')
+        queryset = Activity.objects.all().select_related('owner').prefetch_related('comments', 'recipients')
         resource_name = 'activity'
         excludes = ['subscription_id', 'title']
         always_return_data = True
@@ -2320,9 +2312,6 @@ class ActivityResource(CRMServiceModelResource):
 
     # def hydrate_milestone(self, obj):
     #     return Milestone.objects.get(pk=bundle.data['milestone'])
-
-    def dehydrate_feedback_status(self, bundle):
-        return bundle.obj.feedback_status
 
     def build_filters(self, filters=None):
         if filters is None:
@@ -2440,11 +2429,6 @@ class ActivityResource(CRMServiceModelResource):
         act.save()
         text_parser(base_text=act.description, content_class=act.__class__,
                     object_id=act.id)
-        if bundle.data.get('feedback_status'):
-            act.feedback = Feedback(
-                status=bundle.data.get('feedback_status', None),
-                owner_id=act.author_id)
-            act.feedback.save()
         act.spray(self.get_crmsubscr_id(bundle.request))
         bundle = self.full_hydrate(bundle)
 
@@ -2453,15 +2437,6 @@ class ActivityResource(CRMServiceModelResource):
 
     def save(self, bundle, **kwargs):
         bundle = super(ActivityResource, self).save(bundle, **kwargs)
-        if bundle.data.get('feedback_status', None):
-            if not hasattr(bundle.obj, 'feedback'):
-                bundle.obj.feedback = Feedback(
-                    status=bundle.data['feedback_status'],
-                    owner_id=bundle.obj.author_id)
-                bundle.obj.feedback.save()
-            if bundle.obj.feedback.status != bundle.data['feedback_status']:
-                bundle.obj.feedback.status = bundle.data['feedback_status']
-                bundle.obj.feedback.save()
         if bundle.data.get('sales_cycle_id', None):
             new_sc_id = bundle.data.get('sales_cycle_id')
             if bundle.obj.sales_cycle_id != new_sc_id:
@@ -2871,27 +2846,6 @@ class ShareResource(CRMServiceModelResource):
         return bundle
 
 
-class FeedbackResource(CRMServiceModelResource):
-    '''
-    ALL Method
-    I{URL}:  U{alma.net/api/v1/feedback/}
-
-    B{Description}:
-    API resource to manage Activity's Feedback
-
-    @undocumented: Meta
-    '''
-
-    #activity = fields.OneToOneField(ActivityResource, 'activity', related_name='activity_feedback', null=True, full=False)
-    # value = fields.ToOneField(ValueResource, 'feedback_value', null=True)
-    owner = fields.ToOneField('alm_crm.api.CRMUserResource', 'owner', null=True, full=True)
-    status = fields.CharField(attribute='status')
-
-    class Meta(CommonMeta):
-        queryset = Feedback.objects.all()
-        resource_name = 'feedback'
-
-
 class CommentResource(CRMServiceModelResource):
     '''
     ALL Method
@@ -2899,7 +2853,7 @@ class CommentResource(CRMServiceModelResource):
 
     B{Description}:
     API resource to manage Comments
-    (GenericRelation with Activity, Contact, Share, Feedback)
+    (GenericRelation with Activity, Contact, Share)
 
     @undocumented: Meta
     '''
@@ -2909,7 +2863,6 @@ class CommentResource(CRMServiceModelResource):
         Activity: ActivityResource,
         Contact: ContactResource,
         Share: ShareResource,
-        Feedback: FeedbackResource
     }, 'content_object')
 
     class Meta(CommonMeta):
@@ -2926,7 +2879,7 @@ class CommentResource(CRMServiceModelResource):
         if bundle.data.get('id'):
             return bundle
 
-        generics = ['activity_id', 'contact_id', 'share_id', 'feedback_id']
+        generics = ['activity_id', 'contact_id', 'share_id']
         model_name = filter(lambda k: k in generics, bundle.data.keys())[0]
         obj_class = ContentType.objects.get(app_label='alm_crm', model=model_name[:-3]).model_class()
         obj_id = bundle.data[model_name]
@@ -2950,7 +2903,7 @@ class MentionResource(CRMServiceModelResource):
 
     B{Description}:
     API resource to manage Comments
-    (GenericRelation with Contact, SalesCycle, Activity, Feedback, Comment)
+    (GenericRelation with Contact, SalesCycle, Activity, Comment)
 
     @undocumented: Meta
     '''
@@ -2958,7 +2911,6 @@ class MentionResource(CRMServiceModelResource):
         Contact: ContactResource,
         SalesCycle: SalesCycleResource,
         Activity: ActivityResource,
-        Feedback: FeedbackResource,
         Comment: CommentResource,
     }, 'content_object')
 
@@ -3280,10 +3232,6 @@ class ConstantsObject(object):
             'sales_cycle_log_entry': {
                 'types_hash': SalesCycleLogEntry.TYPES_DICT
             },
-            'activity': {
-                'feedback_options': Feedback.STATUSES_OPTIONS,
-                'feedback_hash': Feedback.STATUSES_DICT
-            },
             'contact': {
                 'statuses': Contact.STATUSES_OPTIONS,
                 'statuses_hash': Contact.STATUSES_DICT,
@@ -3380,10 +3328,6 @@ class AppStateObject(object):
             },
             'sales_cycle_log_entry': {
                 'types_hash': SalesCycleLogEntry.TYPES_DICT
-            },
-            'activity': {
-                'feedback_options': Feedback.STATUSES_OPTIONS,
-                'feedback_hash': Feedback.STATUSES_DICT
             },
             'contact': {
                 'statuses': Contact.STATUSES_OPTIONS,
@@ -3493,7 +3437,6 @@ class AppStateResource(Resource):
         ...         '2014-09-15 00:00',
         ...         'author_id': 1,
         ...         'description': 'd5',
-        ...         'feedback': 'W'
         ...     }],
         ...     'users': [{
         ...         'first_name': 'Bruce',
@@ -3544,12 +3487,6 @@ class AppStateResource(Resource):
         ...         'types': [{'INTL': 'INTL'}, {'POSTAL': 'postal'},
         ...             {'PARCEL': 'parcel'}, {u'WORK': u'work'}, {u'dom': u'dom'},
         ...             {u'home': u'home'}, {u'pref': u'pref'}
-        ...             ]
-        ...         },
-        ...     'feedback': {'statuses': [
-        ...             {'W': 'waiting'}, {'$': '1000'}, {'1': 'Client is happy'},
-        ...             {'2': 'Client is OK'}, {'3': 'Client is neutral'},
-        ...             {'4': 'Client is disappointed'}, {'5': 'Client is angry'}
         ...             ]
         ...         },
         ...     'vcard__phone': {

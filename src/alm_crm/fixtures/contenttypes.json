@@ -252,15 +252,6 @@
     }
 },
 {
-    "pk": 29, 
-    "model": "contenttypes.contenttype", 
-    "fields": {
-        "model": "feedback", 
-        "name": "feedback", 
-        "app_label": "alm_crm"
-    }
-},
-{
     "pk": 30, 
     "model": "contenttypes.contenttype", 
     "fields": {
