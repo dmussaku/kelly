@@ -1,5 +1,10 @@
 from django.conf.urls import patterns, url, include
 from .views import RedirectHomeView
+from almanet.url_resolvers import reverse_lazy
+
+from alm_user.views import logout_view
+
+login_url = reverse_lazy('user_login', subdomain=None)
 
 
 from tastypie.api import Api
@@ -66,5 +71,7 @@ urlpatterns = patterns(
     url(r'^$', RedirectHomeView.as_view()),
     url(r'^(?P<service_slug>[-a-zA-Z0-9_]+)/', include('alm_crm.app_urls')),
     url(r'^api/', include(v1_api.urls)),
+    url(r'^auth/signout/$', logout_view, {'next_page': login_url},
+        name='user_logout'),
 
 )
