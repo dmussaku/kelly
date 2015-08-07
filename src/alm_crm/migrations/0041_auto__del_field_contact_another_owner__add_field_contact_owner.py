@@ -8,23 +8,10 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Deleting field 'Contact.another_owner'
-        db.delete_column('alma_contact', 'another_owner_id')
-
-        # Adding field 'Contact.owner'
-        db.add_column('alma_contact', 'owner',
-                      self.gf('django.db.models.fields.related.ForeignKey')(related_name='another_owned_contacts', null=True, to=orm['alm_user.User']),
-                      keep_default=False)
-
+        db.rename_column('alma_contact', 'another_owner_id', 'owner_id')
 
     def backwards(self, orm):
-        # Adding field 'Contact.another_owner'
-        db.add_column('alma_contact', 'another_owner',
-                      self.gf('django.db.models.fields.related.ForeignKey')(related_name='another_owned_contacts', null=True, to=orm['alm_user.User']),
-                      keep_default=False)
-
-        # Deleting field 'Contact.owner'
-        db.delete_column('alma_contact', 'owner_id')
+        db.rename_column('alma_contact', 'owner_id', 'another_owner_id')
 
 
     models = {

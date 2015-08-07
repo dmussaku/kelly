@@ -57,8 +57,8 @@ class Subscription(models.Model):
             kwargs={'service_slug': self.service.slug.lower()})
 
 class SubscriptionObject(models.Model):
-    subscription_id = models.IntegerField(_('subscription id'),
-                                          null=True, blank=True)
+    # subscription_id = models.IntegerField(_('subscription id'),
+    #                                       null=True, blank=True)
     company_id = models.IntegerField(_('company_id'), null=True, blank=True)
     date_created = models.DateTimeField(auto_now_add=True, blank=True)
     date_edited = models.DateTimeField(auto_now=True, blank=True)

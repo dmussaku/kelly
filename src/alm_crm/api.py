@@ -65,7 +65,7 @@ from alm_vcard.api import (
 from alm_vcard.models import *
 from almanet.settings import DEFAULT_SERVICE
 from almanet.settings import TIME_ZONE
-from almanet.utils.api import RequestContext
+from almanet.utils.api import RequestContext, SessionAuthentication
 from almanet.utils.env import get_subscr_id
 from almanet.utils.ds import StreamList
 from django.conf.urls import url
@@ -79,8 +79,6 @@ from django.utils import translation
 from tastypie import fields, http
 from tastypie.authentication import (
     MultiAuthentication,
-    SessionAuthentication,
-    BasicAuthentication,
     )
 from tastypie.authorization import Authorization
 from tastypie.constants import ALL, ALL_WITH_RELATIONS
@@ -207,8 +205,7 @@ class DummyPaginator(object):
 class CommonMeta:
     list_allowed_methods = ['get', 'post', 'patch']
     detail_allowed_methods = ['get', 'post', 'put', 'delete', 'patch']
-    authentication = MultiAuthentication(SessionAuthentication(),
-                                         BasicAuthentication())
+    authentication = MultiAuthentication(SessionAuthentication())
     authorization = Authorization()
     
     if not settings.RUSTEM_SETTINGS:
@@ -227,13 +224,12 @@ class CRMServiceModelResource(ModelResource):
             additional filters (in one Q object) can be passed
             in applicable_filters as value of 'q'-key
         '''
-        q = Q(subscription_id=self.get_crmsubscr_id(request))
+        q = Q(company_id=request.company.id)
 
         custom_Q = applicable_filters.pop('q', None)  # 'q' - key for Q() object
         objects = super(ModelResource, self).apply_filters(request, applicable_filters)
         if custom_Q:
-            q = q & custom_Q
-
+            q = q & custom_Q    
         return objects.filter(q)
 
     def hydrate(self, bundle):
@@ -243,9 +239,9 @@ class CRMServiceModelResource(ModelResource):
         it happen when tastypie uses BasicAuthentication or another
         which doesn't have session
         """
-        crmuser = self.get_crmuser(bundle.request)
-        if crmuser:
-            bundle.obj.owner = crmuser
+        user = bundle.request.user
+        if user:
+            bundle.obj.owner = user
 
         return bundle
 
@@ -271,25 +267,10 @@ class CRMServiceModelResource(ModelResource):
     def get_resource_id(self, bundle):
         return self.detail_uri_kwargs(bundle)[self._meta.detail_uri_name]
 
-    @classmethod
-    def get_crmsubscr_id(cls, request):
-        return get_subscr_id(request.user_env, DEFAULT_SERVICE)
-
-    def get_crmuser(self, request):
-        if hasattr(self, 'crmuser'):
-            return self.crmuser
-
-        subscription_pk = self.get_crmsubscr_id(request)
-        self.crmuser = None
-        if subscription_pk:
-            self.crmuser = request.user
-        return self.crmuser
-
     class Meta:
         list_allowed_methods = ['get', 'post', 'patch']
         detail_allowed_methods = ['get', 'post', 'put', 'delete', 'patch']
-        authentication = MultiAuthentication(SessionAuthentication(),
-                                             BasicAuthentication())
+        authentication = MultiAuthentication(SessionAuthentication())
         authorization = Authorization()
 
 
@@ -449,7 +430,7 @@ class ContactResource(CRMServiceModelResource):
     '''
     vcard = fields.ToOneField('alm_vcard.api.VCardResource', 'vcard',
         null=True, full=True)
-    owner = fields.ToOneField('alm_crm.api.CRMUserResource', 'owner',
+    owner = fields.ToOneField('alm_user.api.UserResource', 'owner',
         null=True, full=False)
     # followers = fields.ToManyField('alm_crm.api.CRMUserResource', 'followers',
     #                                null=True, full=False)
@@ -1597,7 +1578,6 @@ class ContactResource(CRMServiceModelResource):
             request, {'success':True,'task_id':import_task_id}
             )
 
-    
     def check_import_status(self, request, **kwargs):
         objects = []
         contact_resource = ContactResource()

@@ -8,39 +8,14 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Deleting field 'Value.another_owner'
-        db.delete_column('alma_value', 'another_owner_id')
+        db.rename_column('alma_value', 'another_owner_id', 'owner_id')
 
-        # Adding field 'Value.owner'
-        db.add_column('alma_value', 'owner',
-                      self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='owned_values', null=True, to=orm['alm_user.User']),
-                      keep_default=False)
-
-        # Deleting field 'Product.another_owner'
-        db.delete_column('alma_product', 'another_owner_id')
-
-        # Adding field 'Product.owner'
-        db.add_column('alma_product', 'owner',
-                      self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='crm_products', null=True, to=orm['alm_user.User']),
-                      keep_default=False)
-
+        db.rename_column('alma_product', 'another_owner_id', 'owner_id')
 
     def backwards(self, orm):
-        # Adding field 'Value.another_owner'
-        db.add_column('alma_value', 'another_owner',
-                      self.gf('django.db.models.fields.related.ForeignKey')(related_name='owned_values_ex', null=True, to=orm['alm_user.User'], blank=True),
-                      keep_default=False)
+        db.rename_column('alma_value', 'owner_id', 'another_owner_id')
 
-        # Deleting field 'Value.owner'
-        db.delete_column('alma_value', 'owner_id')
-
-        # Adding field 'Product.another_owner'
-        db.add_column('alma_product', 'another_owner',
-                      self.gf('django.db.models.fields.related.ForeignKey')(related_name='owned_values_exx', null=True, to=orm['alm_user.User'], blank=True),
-                      keep_default=False)
-
-        # Deleting field 'Product.owner'
-        db.delete_column('alma_product', 'owner_id')
+        db.rename_column('alma_product', 'owner_id', 'another_owner_id')
 
 
     models = {

@@ -8,135 +8,38 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Deleting field 'SalesCycleLogEntry.another_owner'
-        db.delete_column(u'alm_crm_salescyclelogentry', 'another_owner_id')
+        db.rename_column('alm_crm_salescyclelogentry', 'another_owner_id', 'owner_id')
 
-        # Adding field 'SalesCycleLogEntry.owner'
-        db.add_column(u'alm_crm_salescyclelogentry', 'owner',
-                      self.gf('django.db.models.fields.related.ForeignKey')(related_name='owned_logentries', null=True, to=orm['alm_user.User']),
-                      keep_default=False)
+        db.rename_column('alm_crm_comment', 'another_owner_id', 'owner_id')
 
-        # Deleting field 'Comment.another_owner'
-        db.delete_column(u'alm_crm_comment', 'another_owner_id')
+        db.rename_column('alma_filter', 'another_owner_id', 'owner_id')
 
-        # Adding field 'Comment.owner'
-        db.add_column(u'alm_crm_comment', 'owner',
-                      self.gf('django.db.models.fields.related.ForeignKey')(related_name='comment_owner', null=True, to=orm['alm_user.User']),
-                      keep_default=False)
+        db.rename_column('alm_crm_mention', 'another_owner_id', 'owner_id')
 
-        # Deleting field 'Filter.another_owner'
-        db.delete_column('alma_filter', 'another_owner_id')
+        db.rename_column('alma_sales_cycle', 'another_owner_id', 'owner_id')
 
-        # Adding field 'Filter.owner'
-        db.add_column('alma_filter', 'owner',
-                      self.gf('django.db.models.fields.related.ForeignKey')(related_name='owned_filter', null=True, to=orm['alm_user.User']),
-                      keep_default=False)
+        db.rename_column('alma_contact_list', 'another_owner_id', 'owner_id')
 
-        # Deleting field 'Mention.another_owner'
-        db.delete_column(u'alm_crm_mention', 'another_owner_id')
+        db.rename_column('alma_activity', 'another_owner_id', 'owner_id')
 
-        # Adding field 'Mention.owner'
-        db.add_column(u'alm_crm_mention', 'owner',
-                      self.gf('django.db.models.fields.related.ForeignKey')(related_name='owned_mentions', null=True, to=orm['alm_user.User']),
-                      keep_default=False)
-
-        # Deleting field 'SalesCycle.another_owner'
-        db.delete_column('alma_sales_cycle', 'another_owner_id')
-
-        # Adding field 'SalesCycle.owner'
-        db.add_column('alma_sales_cycle', 'owner',
-                      self.gf('django.db.models.fields.related.ForeignKey')(related_name='owned_sales_cycles', null=True, to=orm['alm_user.User']),
-                      keep_default=False)
-
-        # Deleting field 'ContactList.another_owner'
-        db.delete_column('alma_contact_list', 'another_owner_id')
-
-        # Adding field 'ContactList.owner'
-        db.add_column('alma_contact_list', 'owner',
-                      self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='owned_list', null=True, to=orm['alm_user.User']),
-                      keep_default=False)
-
-        # Deleting field 'Activity.another_owner'
-        db.delete_column('alma_activity', 'another_owner_id')
-
-        # Adding field 'Activity.owner'
-        db.add_column('alma_activity', 'owner',
-                      self.gf('django.db.models.fields.related.ForeignKey')(related_name='activity_owner', null=True, to=orm['alm_user.User']),
-                      keep_default=False)
-
-        # Deleting field 'ProductGroup.another_owner'
-        db.delete_column('alma_product_group', 'another_owner_id')
-
-        # Adding field 'ProductGroup.owner'
-        db.add_column('alma_product_group', 'owner',
-                      self.gf('django.db.models.fields.related.ForeignKey')(related_name='owned_product_groups', null=True, to=orm['alm_user.User']),
-                      keep_default=False)
-
+        db.rename_column('alma_product_group', 'another_owner_id', 'owner_id')
 
     def backwards(self, orm):
-        # Adding field 'SalesCycleLogEntry.another_owner'
-        db.add_column(u'alm_crm_salescyclelogentry', 'another_owner',
-                      self.gf('django.db.models.fields.related.ForeignKey')(related_name='owned_logentries_x', null=True, to=orm['alm_user.User']),
-                      keep_default=False)
+        db.rename_column('alm_crm_salescyclelogentry', 'owner_id', 'another_owner_id')
 
-        # Deleting field 'SalesCycleLogEntry.owner'
-        db.delete_column(u'alm_crm_salescyclelogentry', 'owner_id')
+        db.rename_column('alm_crm_comment', 'owner_id', 'another_owner_id')
 
-        # Adding field 'Comment.another_owner'
-        db.add_column(u'alm_crm_comment', 'another_owner',
-                      self.gf('django.db.models.fields.related.ForeignKey')(related_name='comment_owner_x', null=True, to=orm['alm_user.User']),
-                      keep_default=False)
+        db.rename_column('alma_filter', 'owner_id', 'another_owner_id')
 
-        # Deleting field 'Comment.owner'
-        db.delete_column(u'alm_crm_comment', 'owner_id')
+        db.rename_column('alm_crm_mention', 'owner_id', 'another_owner_id')
 
-        # Adding field 'Filter.another_owner'
-        db.add_column('alma_filter', 'another_owner',
-                      self.gf('django.db.models.fields.related.ForeignKey')(related_name='owned_filter_x', null=True, to=orm['alm_user.User']),
-                      keep_default=False)
+        db.rename_column('alma_sales_cycle', 'owner_id', 'another_owner_id')
 
-        # Deleting field 'Filter.owner'
-        db.delete_column('alma_filter', 'owner_id')
+        db.rename_column('alma_contact_list', 'owner_id', 'another_owner_id')
 
-        # Adding field 'Mention.another_owner'
-        db.add_column(u'alm_crm_mention', 'another_owner',
-                      self.gf('django.db.models.fields.related.ForeignKey')(related_name='owned_mentions_x', null=True, to=orm['alm_user.User']),
-                      keep_default=False)
+        db.rename_column('alma_activity', 'owner_id', 'another_owner_id')
 
-        # Deleting field 'Mention.owner'
-        db.delete_column(u'alm_crm_mention', 'owner_id')
-
-        # Adding field 'SalesCycle.another_owner'
-        db.add_column('alma_sales_cycle', 'another_owner',
-                      self.gf('django.db.models.fields.related.ForeignKey')(related_name='owned_sales_cycles_x', null=True, to=orm['alm_user.User']),
-                      keep_default=False)
-
-        # Deleting field 'SalesCycle.owner'
-        db.delete_column('alma_sales_cycle', 'owner_id')
-
-        # Adding field 'ContactList.another_owner'
-        db.add_column('alma_contact_list', 'another_owner',
-                      self.gf('django.db.models.fields.related.ForeignKey')(related_name='owned_list_x', null=True, to=orm['alm_user.User'], blank=True),
-                      keep_default=False)
-
-        # Deleting field 'ContactList.owner'
-        db.delete_column('alma_contact_list', 'owner_id')
-
-        # Adding field 'Activity.another_owner'
-        db.add_column('alma_activity', 'another_owner',
-                      self.gf('django.db.models.fields.related.ForeignKey')(related_name='activity_owner_x', null=True, to=orm['alm_user.User']),
-                      keep_default=False)
-
-        # Deleting field 'Activity.owner'
-        db.delete_column('alma_activity', 'owner_id')
-
-        # Adding field 'ProductGroup.another_owner'
-        db.add_column('alma_product_group', 'another_owner',
-                      self.gf('django.db.models.fields.related.ForeignKey')(related_name='owned_product_groups_x', null=True, to=orm['alm_user.User']),
-                      keep_default=False)
-
-        # Deleting field 'ProductGroup.owner'
-        db.delete_column('alma_product_group', 'owner_id')
+        db.rename_column('alma_product_group', 'owner_id', 'another_owner_id')
 
 
     models = {

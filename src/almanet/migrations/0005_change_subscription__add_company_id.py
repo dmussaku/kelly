@@ -44,9 +44,9 @@ class Migration(SchemaMigration):
                       keep_default=False)
 
         # Adding field 'ActivityRecipient.company_id'
-        db.add_column('alma_activity_recipient', 'company_id',
-                      self.gf('django.db.models.fields.IntegerField')(null=True, blank=True),
-                      keep_default=False)
+        # db.add_column('alma_activity_recipient', 'company_id',
+        #               self.gf('django.db.models.fields.IntegerField')(null=True, blank=True),
+        #               keep_default=False)
 
         # Adding field 'Mention.company_id'
         db.add_column(u'alm_crm_mention', 'company_id',

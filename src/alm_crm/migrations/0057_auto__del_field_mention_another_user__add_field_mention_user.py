@@ -8,23 +8,10 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Deleting field 'Mention.another_user'
-        db.delete_column(u'alm_crm_mention', 'another_user_id')
-
-        # Adding field 'Mention.user'
-        db.add_column(u'alm_crm_mention', 'user',
-                      self.gf('django.db.models.fields.related.ForeignKey')(related_name='mentions', null=True, to=orm['alm_user.User']),
-                      keep_default=False)
-
+        db.rename_column('alm_crm_mention', 'another_user_id', 'user_id')
 
     def backwards(self, orm):
-        # Adding field 'Mention.another_user'
-        db.add_column(u'alm_crm_mention', 'another_user',
-                      self.gf('django.db.models.fields.related.ForeignKey')(related_name='mentions_x', null=True, to=orm['alm_user.User']),
-                      keep_default=False)
-
-        # Deleting field 'Mention.user'
-        db.delete_column(u'alm_crm_mention', 'user_id')
+        db.rename_column('alm_crm_mention', 'user_id', 'another_user_id')
 
 
     models = {

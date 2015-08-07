@@ -8,23 +8,10 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Deleting field 'Activity.another_assignee'
-        db.delete_column('alma_activity', 'another_assignee_id')
-
-        # Adding field 'Activity.assignee'
-        db.add_column('alma_activity', 'assignee',
-                      self.gf('django.db.models.fields.related.ForeignKey')(related_name='activity_assignee', null=True, to=orm['alm_user.User']),
-                      keep_default=False)
-
+        db.rename_column('alma_activity', 'another_assignee_id', 'assignee_id')
 
     def backwards(self, orm):
-        # Adding field 'Activity.another_assignee'
-        db.add_column('alma_activity', 'another_assignee',
-                      self.gf('django.db.models.fields.related.ForeignKey')(related_name='activity_assignee_x', null=True, to=orm['alm_user.User']),
-                      keep_default=False)
-
-        # Deleting field 'Activity.assignee'
-        db.delete_column('alma_activity', 'assignee_id')
+        db.rename_column('alma_activity', 'assignee_id', 'another_assignee_id')
 
 
     models = {

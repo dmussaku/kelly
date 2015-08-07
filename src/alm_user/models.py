@@ -176,6 +176,9 @@ class User(AbstractBaseUser):
     def is_service_connected(self, service):
         return service in self.connected_services()
 
+    def get_crmuser(self):
+        from alm_crm.models import CRMUser
+        return CRMUser.objects.get(user_id=self.pk)
 '''
     def connect_service(self, service):
         co = self.company.first()
@@ -226,9 +229,6 @@ class User(AbstractBaseUser):
     #     except CRMUser.DoesNotExist:
     #         return None
 
-    # def get_crmuser(self):
-    #     from alm_crm.models import CRMUser
-    #     return CRMUser.objects.get(user_id=self.pk)
 
 
 class Referral(models.Model):

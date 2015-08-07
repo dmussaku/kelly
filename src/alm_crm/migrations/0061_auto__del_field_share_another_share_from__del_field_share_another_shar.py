@@ -8,39 +8,14 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Deleting field 'Share.another_share_from'
-        db.delete_column('alma_share', 'another_share_from_id')
+        db.rename_column('alma_share', 'another_share_from_id', 'share_from_id')
 
-        # Deleting field 'Share.another_share_to'
-        db.delete_column('alma_share', 'another_share_to_id')
-
-        # Adding field 'Share.share_to'
-        db.add_column('alma_share', 'share_to',
-                      self.gf('django.db.models.fields.related.ForeignKey')(related_name='in_shares', null=True, to=orm['alm_user.User']),
-                      keep_default=False)
-
-        # Adding field 'Share.share_from'
-        db.add_column('alma_share', 'share_from',
-                      self.gf('django.db.models.fields.related.ForeignKey')(related_name='owned_shares', null=True, to=orm['alm_user.User']),
-                      keep_default=False)
-
+        db.rename_column('alma_share', 'another_share_to_id', 'share_to_id')
 
     def backwards(self, orm):
-        # Adding field 'Share.another_share_from'
-        db.add_column('alma_share', 'another_share_from',
-                      self.gf('django.db.models.fields.related.ForeignKey')(related_name='owned_shares_x', null=True, to=orm['alm_user.User']),
-                      keep_default=False)
+        db.rename_column('alma_share', 'share_from_id', 'another_share_from_id')
 
-        # Adding field 'Share.another_share_to'
-        db.add_column('alma_share', 'another_share_to',
-                      self.gf('django.db.models.fields.related.ForeignKey')(related_name='in_shares_x', null=True, to=orm['alm_user.User']),
-                      keep_default=False)
-
-        # Deleting field 'Share.share_to'
-        db.delete_column('alma_share', 'share_to_id')
-
-        # Deleting field 'Share.share_from'
-        db.delete_column('alma_share', 'share_from_id')
+        db.rename_column('alma_share', 'share_to_id', 'another_share_to_id')
 
 
     models = {

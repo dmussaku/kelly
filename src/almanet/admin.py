@@ -34,7 +34,7 @@ class ContactAdmin(admin.ModelAdmin):
 
 class MilestoneAdmin(admin.ModelAdmin):
 
-    list_display = ['subscription_id', 'title', 'color_code']
+    list_display = ['title', 'color_code']
 
 admin.site.register(User, UserAdmin)
 admin.site.register(Company)

@@ -13,7 +13,8 @@ class Migration(DataMigration):
         # and orm['appname.ModelName'] for models in other applications.
         for c in orm.Contact.objects.all():
             crm_user = orm.CRMUser.objects.get(pk=c.owner_id)
-            c.another_owner_id = crm_user.user_id
+            user = orm['alm_user.User'].objects.get(id=crm_user.user_id)
+            c.another_owner = user
             c.save()
 
     def backwards(self, orm):

@@ -5,13 +5,16 @@ from south.v2 import SchemaMigration
 from django.db import models
 from almanet.models import SubscriptionObject, Subscription
 from alm_company.models import Company
+from alm_crm.models import ActivityRecipient
 from django.db import transaction
 
 
 class Migration(SchemaMigration):
 
     def forwards(self, orm):        
-        for model in models.get_models():
+        ms = models.get_models()  
+        ms.pop(ms.index(ActivityRecipient)) 
+        for model in ms:
             if (issubclass(model, SubscriptionObject) and 
                 issubclass(model, models.Model) and not model._meta.abstract):
                 print model
@@ -23,8 +26,10 @@ class Migration(SchemaMigration):
                     except Subscription.DoesNotExist:
                         pass
 
-    def backwards(self, orm):        
-        for model in models.get_models():
+    def backwards(self, orm):     
+        ms = models.get_models()  
+        ms.pop(ms.index(ActivityRecipient)) 
+        for model in ms:
             if (issubclass(model, SubscriptionObject) and 
                 issubclass(model, models.Model) and not model._meta.abstract):
                 for obj in model.objects.all():
