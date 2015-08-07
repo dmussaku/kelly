@@ -176,9 +176,11 @@ class User(AbstractBaseUser):
     def is_service_connected(self, service):
         return service in self.connected_services()
 
-    def get_crmuser(self):
-        from alm_crm.models import CRMUser
-        return CRMUser.objects.get(user_id=self.pk)
+    def get_company(self, request):
+        '''
+        Returns a company taken from request
+        '''
+        return
 '''
     def connect_service(self, service):
         co = self.company.first()

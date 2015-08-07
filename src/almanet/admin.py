@@ -5,7 +5,6 @@ from alm_user.models import (
 )
 from alm_company.models import Company
 from almanet.models import Service, Subscription
-from alm_crm.models import CRMUser
 from alm_crm.models import Contact, Milestone
 
 
@@ -40,6 +39,5 @@ admin.site.register(User, UserAdmin)
 admin.site.register(Company)
 admin.site.register(Service)
 admin.site.register(Subscription, SubscriptionAdmin)
-admin.site.register(CRMUser)
 admin.site.register(Contact, ContactAdmin)
 admin.site.register(Milestone, MilestoneAdmin)

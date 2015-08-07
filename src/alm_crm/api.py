@@ -9,7 +9,6 @@ from .models import (
     Contact,
     ContactList,
     Share,
-    CRMUser,
     Value,
     Comment,
     Mention,
@@ -220,7 +219,7 @@ class CRMServiceModelResource(ModelResource):
 
     def apply_filters(self, request, applicable_filters):
         '''
-            first 'q' is filter for limit by subscription_id;
+            first 'q' is filter for limit by company_id;
             additional filters (in one Q object) can be passed
             in applicable_filters as value of 'q'-key
         '''
@@ -298,7 +297,7 @@ class ContactResource(CRMServiceModelResource):
         0: 3
         share: {contact:2, date_created:2015-05-14T12:56:40.930951, id:1, is_read:false, note:Example Note,…}
         status: 0
-        subscription_id: 1
+        company_id: 1
         tp: "user"
         vcard: {additional_name:, adrs:[], agents:[], bday:null, categories:[], classP:null, custom_fields:[],…}
         additional_name: ""
@@ -354,7 +353,7 @@ class ContactResource(CRMServiceModelResource):
      "share_from": 1,
      "share_to": 1},
      "status": 0,
-     "subscription_id": 1,
+     "company_id": 1,
      "tp": "user",
      "vcard": {
          "additional_name": "",
@@ -420,7 +419,7 @@ class ContactResource(CRMServiceModelResource):
     ...         "/api/v1/sales_cycle/3/"
     ...     ],
     ...     "status": 0,
-    ...     "subscription_id": 1,
+    ...     "company_id": 1,
     ...     "tp": "user",
     ...     "vcard": {...}
     ... },
@@ -432,23 +431,13 @@ class ContactResource(CRMServiceModelResource):
         null=True, full=True)
     owner = fields.ToOneField('alm_user.api.UserResource', 'owner',
         null=True, full=False)
-    # followers = fields.ToManyField('alm_crm.api.CRMUserResource', 'followers',
-    #                                null=True, full=False)
-    # assignees = fields.ToManyField('alm_crm.api.CRMUserResource', 'assignees',
-    #                                null=True, full=False)
-    # sales_cycles = fields.ToManyField(
-    #     'alm_crm.api.SalesCycleResource', 'sales_cycles',
-    #     related_name='contact', null=True, full=False)
+
     sales_cycles = CustomToManyField('alm_crm.api.SalesCycleResource', 'sales_cycles',
         null=True, full=False, full_use_ids=True)
     parent = fields.ToOneField(
         'alm_crm.api.ContactResource', 'parent',
         null=True, full=False
         )
-    # shares = fields.ToManyField(
-    #     'alm_crm.api.ShareResource', 'shares',
-    #     null=True, full=True
-    #     )
 
     share = fields.ToOneField('alm_crm.api.ShareResource',
         attribute=lambda bundle: _firstOfQuerySet(bundle.obj.share_set),
@@ -727,14 +716,14 @@ class ContactResource(CRMServiceModelResource):
         if not vcard_instance.get('fn') and not vcard_instance.get('given_name') and not vcard_instance.get('family_name'):
             raise Exception
         contact_id = kwargs.get('pk', None)
-        subscription_id = self.get_crmsubscr_id(bundle.request)
+        company_id = self.get_crmsubscr_id(bundle.request)
         if contact_id:
             bundle.obj = Contact.objects.get(id=int(contact_id))
-            bundle.obj.subscription_id = subscription_id
+            bundle.obj.company_id = company_id
         else:
             bundle.obj = self._meta.object_class()
-            bundle.obj.subscription_id = subscription_id
-            bundle.obj.owner_id = bundle.request.user.get_crmuser().id
+            bundle.obj.company_id = company_id
+            bundle.obj.owner_id = bundle.request.user.get_company(request).id
             bundle.obj.save()
 
         '''
@@ -796,7 +785,7 @@ class ContactResource(CRMServiceModelResource):
             if not kwargs.get('pk'):
                 SalesCycle.create_globalcycle(
                     **{
-                     'subscription_id':subscription_id,
+                     'company_id':company_id,
                      'owner_id':self.get_crmuser(bundle.request).id,
                      'contact_id':bundle.obj.id
                     }
@@ -814,7 +803,7 @@ class ContactResource(CRMServiceModelResource):
                 return self.create_response(
                     request, {'success':False, 'message':'Pass a list as a parameter'}
                     )
-        crmuser = request.user.get_crmuser()
+        crmuser = request.user.get_company(request)
         for contact_id in contact_ids:
             try:
                 crmuser.unfollow_list.remove(
@@ -837,7 +826,7 @@ class ContactResource(CRMServiceModelResource):
                 return self.create_response(
                     request, {'success':False, 'message':'Pass a list as a parameter'}
                     )
-        crmuser = request.user.get_crmuser()
+        crmuser = request.user.get_company(request)
         for contact_id in contact_ids:
             try:
                 crmuser.unfollow_list.add(
@@ -923,7 +912,7 @@ class ContactResource(CRMServiceModelResource):
         ...         "/api/v1/sales_cycle/3/"
         ...     ],
         ...     "status": 0,
-        ...     "subscription_id": 1,
+        ...     "company_id": 1,
         ...     "tp": "user",
         ...     "vcard": {...}
         ... },
@@ -937,7 +926,7 @@ class ContactResource(CRMServiceModelResource):
         assigned = bool(request.GET.get('assigned', False))
         followed = bool(request.GET.get('followed', False))
         contacts = Contact.get_contacts_by_last_activity_date(
-            subscription_id = request.user.get_crmuser().subscription_id,
+            company_id = request.user.get_company(request).id,
             user_id=request.user.id,
             include_activities=include_activities,
             )
@@ -980,7 +969,7 @@ class ContactResource(CRMServiceModelResource):
             #         'parent_id': obj.parent_id,
             #         'status': obj.status,
             #         'tp': obj.tp,
-            #         'subscription_id': obj.subscription_id,
+            #         'company_id': obj.company_id,
             #         'children': list(contact.id for contact in obj.children.all()),
             #         'sales_cycles': list(cycle.id for cycle in obj.sales_cycles.all()),
             #         'vcard_id': obj.vcard_id
@@ -1026,7 +1015,7 @@ class ContactResource(CRMServiceModelResource):
         ...     "/api/v1/sales_cycle/3/"
         ... ],
         ... "status": 0,
-        ... "subscription_id": 1,
+        ... "company_id": 1,
         ... "tp": "user",
         ... "vcard": {...}
         ... },
@@ -1078,7 +1067,7 @@ class ContactResource(CRMServiceModelResource):
         ...         "/api/v1/sales_cycle/3/"
         ...     ],
         ...     "status": 0,
-        ...     "subscription_id": 1,
+        ...     "company_id": 1,
         ...     "tp": "user",
         ...     "vcard": {...}
         ... },
@@ -1128,7 +1117,7 @@ class ContactResource(CRMServiceModelResource):
         ...         "/api/v1/sales_cycle/22/",
         ...         "/api/v1/sales_cycle/23/"
         ...     ],
-        ...     "subscription_id": null
+        ...     "company_id": null
         ...     },
         ... ]
 
@@ -1170,7 +1159,7 @@ class ContactResource(CRMServiceModelResource):
         ...     "owner": null,
         ...     "resource_uri": "/api/v1/activity/30/",
         ...     "sales_cycle": "/api/v1/sales_cycle/3/",
-        ...     "subscription_id": null,
+        ...     "company_id": null,
         ...     "title": "activity #10 of SalesCycle #3"
         ... },
 
@@ -1228,7 +1217,7 @@ class ContactResource(CRMServiceModelResource):
         ...     "resource_uri": "/api/v1/contact/12/",
         ...     "sales_cycles": [],
         ...     "status": 0,
-        ...     "subscription_id": null,
+        ...     "company_id": null,
         ...     "tp": "user",
         ...     "vcard": {}
         ... },
@@ -1241,7 +1230,7 @@ class ContactResource(CRMServiceModelResource):
             request.GET.get('search_params', "[('fn', 'startswith')]"))
         order_by = ast.literal_eval(request.GET.get('order_by', "['fn','asc']"))
         contacts = Contact.filter_contacts_by_vcard(
-            subscription_id=self.get_crmsubscr_id(request),
+            company_id=self.get_crmsubscr_id(request),
             search_text=search_text,
             search_params=search_params,
             order_by=order_by)
@@ -1370,7 +1359,7 @@ class ContactResource(CRMServiceModelResource):
         data = self.deserialize(
             request, request.body,
             format=request.META.get('CONTENT_TYPE', 'application/json'))
-        current_crmuser = request.user.get_crmuser()
+        current_crmuser = request.user.get_company(request)
         decoded_string = base64.b64decode(data['uploaded_file'])
         filename_chunks = data['filename'].split('.')
         filename = filename_chunks[len(filename_chunks)-1]
@@ -1385,7 +1374,7 @@ class ContactResource(CRMServiceModelResource):
                 self.log_throttled_access(request)
                 return self.error_response(request, {'success': False}, response_class=http.HttpBadRequest)
             contact_list = ContactList(
-                owner = request.user.get_crmuser(),
+                owner = request.user.get_company(request),
                 title = data['filename'])
             contact_list.save()
             contact_list.contacts = contacts
@@ -1418,7 +1407,7 @@ class ContactResource(CRMServiceModelResource):
                 # return self.create_response(request, {'success': False})
             if len(contacts)>1:
                 contact_list = ContactList(
-                    owner = request.user.get_crmuser(),
+                    owner = request.user.get_company(request),
                     title = data['filename'])
                 contact_list.save()
                 contact_list.contacts = contacts
@@ -1630,7 +1619,7 @@ class SalesCycleResource(CRMServiceModelResource):
     GET Method
     I{URL}:  U{alma.net/api/v1/sales_cycle}\n
     B{Response}\n
-    C{{"activities": [], "author_id": 1, "contact_id": 1, "date_created": "2015-05-14T11:47:26.545833", "description": "", "id": 2, "is_global": false, "log": [], "milestone_id": null, "projected_value": null, "real_value": null, "resource_uri": "/api/v1/sales_cycle/2/", "stat": [], "status": "P", "subscription_id": 1, "title": "New Cycle"}}\n
+    C{{"activities": [], "author_id": 1, "contact_id": 1, "date_created": "2015-05-14T11:47:26.545833", "description": "", "id": 2, "is_global": false, "log": [], "milestone_id": null, "projected_value": null, "real_value": null, "resource_uri": "/api/v1/sales_cycle/2/", "stat": [], "status": "P", "company_id": 1, "title": "New Cycle"}}\n
     
     B{Description}:
     API resource manage Contact's SalesCycles
@@ -1640,32 +1629,25 @@ class SalesCycleResource(CRMServiceModelResource):
     B{Accepts Example}
     C{{author_id: 1, contact_id: 1, status: "N", title: "New Cycle"}}\n 
     B{Returns Example}
-    C{{"activities": [], "author_id": 1, "contact_id": 1, "date_created": "2015-05-14T11:47:26.545833", "description": "", "id": 2, "is_global": false, "log": [], "milestone_id": null, "obj_created": true, "projected_value": null, "real_value": null, "resource_uri": "/api/v1/sales_cycle/2/", "stat": [], "status": "N", "subscription_id": 1, "title": "New Cycle"}} 
+    C{{"activities": [], "author_id": 1, "contact_id": 1, "date_created": "2015-05-14T11:47:26.545833", "description": "", "id": 2, "is_global": false, "log": [], "milestone_id": null, "obj_created": true, "projected_value": null, "real_value": null, "resource_uri": "/api/v1/sales_cycle/2/", "stat": [], "status": "N", "company_id": 1, "title": "New Cycle"}} 
     
     I{PUT}\n
     B{Accepts Example}
     C{"status":"P"}\n
     B{Returns Example}
-    C{"activities": [], "author_id": 1, "contact_id": 1, "date_created": "2015-05-14T11:47:26.545833", "description": "", "id": 2, "is_global": false, "log": [], "milestone_id": null, "obj_created": true, "projected_value": null, "real_value": null, "resource_uri": "/api/v1/sales_cycle/2/", "stat": [], "status": "N", "subscription_id": 1, "title": "New Cycle"}\n
+    C{"activities": [], "author_id": 1, "contact_id": 1, "date_created": "2015-05-14T11:47:26.545833", "description": "", "id": 2, "is_global": false, "log": [], "milestone_id": null, "obj_created": true, "projected_value": null, "real_value": null, "resource_uri": "/api/v1/sales_cycle/2/", "stat": [], "status": "N", "company_id": 1, "title": "New Cycle"}\n
 
     @undocumented: prepend_urls, Meta
     '''
-    #contact = fields.ToOneField(ContactResource, 'contact')
     contact_id = fields.IntegerField(attribute='contact_id', null=True)
     activities = CustomToManyField('alm_crm.api.ActivityResource', 'rel_activities',
         related_name='sales_cycle', null=True, full=False, full_use_ids=True,
         use_in=skip_in_field('activities'))
     activities_count = fields.IntegerField(attribute='activities_count', readonly=True,
         use_in=use_in_field('activities_count'))
-    # products = fields.ToManyField(
-    #     'alm_crm.api.ProductResource', 'products',
-    #     related_name='sales_cycles', null=True, full=False, readonly=True)
     product_ids = CustomToManyField('alm_crm.api.ProductResource', 'products',
         null=True, full=False, full_use_ids=True, readonly=True)
-    # owner = fields.ToOneField('alm_crm.api.CRMUserResource', 'owner', null=True, full=True)
     author_id = fields.IntegerField(attribute='owner_id')
-    # followers = fields.ToManyField('alm_crm.api.CRMUserResource',
-    #                                'followers', null=True, full=True)
     projected_value = fields.ToOneField('alm_crm.api.ValueResource',
                                         'projected_value', null=True,
                                         full=True)
@@ -1760,11 +1742,11 @@ class SalesCycleResource(CRMServiceModelResource):
             deserialized = self.alter_deserialized_list_data(request, deserialized)
             if kwargs['status'] == 'succeed':
                 sales_cycle, log_entry = bundle.obj.close(products_with_values=deserialized, succeed=True)
-                log_entry.owner = request.user.get_crmuser()
+                log_entry.owner = request.user.get_company(request)
                 log_entry.save()
             elif kwargs['status'] == 'fail':
                 sales_cycle, log_entry = bundle.obj.close(products_with_values=deserialized, succeed=False)
-                log_entry.owner = request.user.get_crmuser()
+                log_entry.owner = request.user.get_company(request)
                 log_entry.save()
             else:
                 return http.HttpBadRequest()
@@ -1833,7 +1815,7 @@ class SalesCycleResource(CRMServiceModelResource):
                     "deleted": deleted,
                     "products": products}
             log_entry = SalesCycleLogEntry(sales_cycle=obj, 
-                                            owner=request.user.get_crmuser(),
+                                            owner=request.user.get_company(request),
                                             entry_type=SalesCycleLogEntry.PC,
                                             meta=json.dumps(meta))
             log_entry.save()
@@ -1875,7 +1857,7 @@ class SalesCycleResource(CRMServiceModelResource):
                 request, request.body,
                 format=request.META.get('CONTENT_TYPE', 'application/json'))
 
-            sales_cycle = obj.change_milestone(crmuser=request.user.get_crmuser(),
+            sales_cycle = obj.change_milestone(crmuser=request.user.get_company(request),
                                                milestone_id=deserialized['milestone_id'])
 
             if not self._meta.always_return_data:
@@ -1975,7 +1957,7 @@ class MilestoneResource(CRMServiceModelResource):
             data = self.deserialize(
                 request, request.body,
                 format=request.META.get('CONTENT_TYPE', 'application/json'))
-            milestones = Milestone.objects.filter(subscription_id=request.user.get_crmuser().subscription_id)
+            milestones = Milestone.objects.filter(company_id=request.user.get_company(request).id)
             new_milestone_set = []
             sales_cycles = []
             for milestone_data in data:
@@ -1994,14 +1976,14 @@ class MilestoneResource(CRMServiceModelResource):
                             meta = {"prev_milestone_color_code": milestone.color_code,
                                     "prev_milestone_title": milestone.title}
                             log_entry = SalesCycleLogEntry(sales_cycle=sales_cycle, 
-                                                            owner=request.user.get_crmuser(),
+                                                            owner=request.user.get_company(request),
                                                             entry_type=SalesCycleLogEntry.ME,
                                                             meta=json.dumps(meta))
                             log_entry.save()
                 finally:
                     milestone.title = milestone_data['title']
                     milestone.color_code = milestone_data['color_code']
-                    milestone.subscription_id = request.user.get_crmuser().subscription_id
+                    milestone.company_id = request.user.get_company(request).id
                     milestone.save()
                     new_milestone_set.append(milestone)
 
@@ -2014,7 +1996,7 @@ class MilestoneResource(CRMServiceModelResource):
                         meta = {"prev_milestone_color_code": milestone.color_code,
                                 "prev_milestone_title": milestone.title}
                         log_entry = SalesCycleLogEntry(sales_cycle=sales_cycle, 
-                                                        owner=request.user.get_crmuser(),
+                                                        owner=request.user.get_company(request),
                                                         entry_type=SalesCycleLogEntry.MD,
                                                         meta=json.dumps(meta))
                         log_entry.save()
@@ -2044,7 +2026,7 @@ class MilestoneResource(CRMServiceModelResource):
                     milestone = Milestone.objects.get(id=data['id'])
                     if milestone.sort != data['sort']:
                         try:
-                            milestone_2 = Milestone.objects.get(subscription_id=data['subscription_id'], 
+                            milestone_2 = Milestone.objects.get(company_id=data['company_id'], 
                                                             sort=data['sort'])
                         except MultipleObjectsReturned:
                             return http.HttpBadRequest()
@@ -2063,7 +2045,7 @@ class MilestoneResource(CRMServiceModelResource):
                 return self.create_response(request,
                     [MilestoneResource().get_bundle_detail(milestone, request) \
                     for milestone in Milestone.objects.filter(
-                                        subscription_id=request.user.get_crmuser().subscription_id
+                                        company_id=request.user.get_company(request).id
                                         )],
                     response_class=http.HttpAccepted)
 
@@ -2118,7 +2100,7 @@ class ActivityResource(CRMServiceModelResource):
             sales_cycles: [1, 2]
             share: null
             status: 0
-            subscription_id: 1
+            company_id: 1
             tp: "user"
             vcard: {}
             date_created: "2015-05-14T12:16:39.363625"
@@ -2167,7 +2149,7 @@ class ActivityResource(CRMServiceModelResource):
             sales_cycles: [1, 2]
             share: null
             status: 0
-            subscription_id: 1
+            company_id: 1
             tp: "user"
             vcard: {}
             date_created: "2015-05-14T12:16:39.363625"
@@ -2215,7 +2197,7 @@ class ActivityResource(CRMServiceModelResource):
     class Meta(CommonMeta):
         queryset = Activity.objects.all().select_related('owner').prefetch_related('comments', 'recipients')
         resource_name = 'activity'
-        excludes = ['subscription_id', 'title']
+        excludes = ['company_id', 'title']
         always_return_data = True
         filtering = {
             'author_id': ('exact', ),
@@ -2247,7 +2229,7 @@ class ActivityResource(CRMServiceModelResource):
             url(
                 r"^(?P<resource_name>%s)/company_activities%s$" %
                 (self._meta.resource_name, trailing_slash()),
-                self.wrap_view('get_company_activities'),
+                self.wrap_view('get_company(request)_activities'),
                 name='api_company_activities'
             ),
             url(
@@ -2325,7 +2307,7 @@ class ActivityResource(CRMServiceModelResource):
         ...         "date_edited": "2014-12-29T09:45:24.166720",
         ...         "id": 1,
         ...         "resource_uri": "",
-        ...         "subscription_id": 1
+        ...         "company_id": 1
         ...         }
         ...     ]
 
@@ -2343,7 +2325,7 @@ class ActivityResource(CRMServiceModelResource):
                 request, request.body,
                 format=request.META.get('CONTENT_TYPE', 'application/json'))
             for act_id in data:
-                Activity.mark_as_read(request.user.get_crmuser().id, act_id)
+                Activity.mark_as_read(request.user.get_company(request).id, act_id)
             rv = len(data)
         return self.create_response(
             request, {'success': rv})
@@ -2594,7 +2576,7 @@ class ValueResource(CRMServiceModelResource):
     ... "currency": "KZT",
     ... "resource_uri": "/api/v1/sales_cycle/value/1/",
     ... "salary": "monthly",
-    ... "subscription_id": null,
+    ... "company_id": null,
     ... }
 
     @undocumented: Meta
@@ -2605,84 +2587,6 @@ class ValueResource(CRMServiceModelResource):
         queryset = Value.objects.all()
         resource_name = 'sales_cycle/value'
         excludes = ['amount']
-
-
-class CRMUserResource(CRMServiceModelResource):
-    '''
-    ALL Method
-    I{URL}:  U{alma.net/api/v1/crmuser/}
-
-    B{Description}:
-    API resource to manage CRMUsers
-
-    @undocumented: Meta
-    '''
-#    user = fields.ToOneField('alm_user.api.UserResource', 'user', null=True, full=True, readonly=True)
-    unfollow_list = CustomToManyField(ContactResource, 'unfollow_list', null=True, full=False, full_use_ids=True)
-    # unfollow_list = fields.ListField(attribute=lambda bundle: bundle.obj.values_list('unfollow_list__id', flat=True))
-    vcard = fields.ToOneField('alm_vcard.api.VCardResource',
-        attribute=lambda bundle: bundle.obj.get_billing_user(cache=True).vcard, null=True, full=True)
-
-    class Meta(CommonMeta):
-        queryset = CRMUser.objects.all().prefetch_related('unfollow_list').select_related('unfollow_list__vcard')
-        resource_name = 'crmuser'
-        filtering = {
-            "id": ALL,
-        }
-        filtering.update(CommonMeta.filtering)
-
-    def prepend_urls(self):
-        return [
-            url(
-                r"^(?P<resource_name>%s)/follow_unfollow%s$" %
-                (self._meta.resource_name, trailing_slash()),
-                self.wrap_view('follow_unfollow'),
-                name='api_follow_unfollow'
-            ),
-        ]
-
-    def full_dehydrate(self, bundle, for_list=False):
-        bundle = super(self.__class__, self).full_dehydrate(bundle, for_list=True)
-        user = bundle.obj.get_billing_user(cache=True)
-
-        # WHY 'user' now 'user_id' ?
-        # bundle.data['user'] = user.id
-        bundle.data['userpic'] = user.userpic.url if user.userpic else ""
-        return bundle
-
-    def follow_unfollow(self, request, **kwargs):
-        data = self.deserialize(request, request.body, format=request.META.get('CONTENT_TYPE', 'application/json'))
-        contact_ids = data.get('contact_ids', None)
-        if contact_ids:
-            if type(contact_ids) != list:
-                return self.create_response(
-                    request,
-                    {'success': False, 'message': 'Pass a list as a parameter'}
-                    )
-        else:
-            return self.create_response(
-                    request,
-                    {'success': False, 'message': 'Must pass a contact_ids parameter'}
-                    )
-        crmuser = request.user.get_crmuser()
-        unfollow_list = [contact.id for contact in crmuser.unfollow_list.all()]
-        for contact_id in contact_ids:
-            if contact_id in unfollow_list:
-                crmuser.unfollow_list.remove(contact_id)
-            else:
-                crmuser.unfollow_list.add(contact_id)
-        crmuser.save()
-        raise ImmediateHttpResponse(
-            HttpResponse(
-                content=Serializer().to_json(
-                    self.full_dehydrate(
-                        self.build_bundle(
-                            obj=crmuser)
-                        )
-                    ),
-                content_type='application/json; charset=utf-8', status=200
-                )
-            )
 
 
 class ShareResource(CRMServiceModelResource):
@@ -2696,15 +2600,15 @@ class ShareResource(CRMServiceModelResource):
     @undocumented: prepend_urls, Meta
     '''
     contact = fields.ToOneField(ContactResource, 'contact', full=False)
-    share_to = fields.ToOneField(CRMUserResource, 'share_to',
+    share_to = fields.ToOneField(UserResource, 'share_to',
                                  full=False, null=True)
-    share_from = fields.ToOneField(CRMUserResource, 'share_from',
+    share_from = fields.ToOneField(UserResource, 'share_from',
                                    full=False, null=True)
 
     class Meta(CommonMeta):
         queryset = Share.objects.all().select_related('contact', 'share_to', 'share_from')
         resource_name = 'share'
-        excludes = ['subscription_id', 'description']
+        excludes = ['company_id', 'description']
 
     def prepend_urls(self):
         return [
@@ -2758,9 +2662,9 @@ class ShareResource(CRMServiceModelResource):
         for json_obj in deserialized['shares']:
             s = Share(
                 note=json_obj.get('note', ""),
-                share_from=CRMUser.objects.get(id=int(json_obj.get('share_from'))),
+                share_from=User.objects.get(id=int(json_obj.get('share_from'))),
                 contact=Contact.objects.get(id=int(json_obj.get('contact'))),
-                share_to=CRMUser.objects.get(id=int(json_obj.get('share_to')))
+                share_to=User.objects.get(id=int(json_obj.get('share_to')))
                 )
             s.save()
             text_parser(base_text=s.note, content_class=s.__class__,
@@ -2810,12 +2714,12 @@ class ShareResource(CRMServiceModelResource):
         return bundle
 
     def hydrate_share_from(self, bundle):
-        share_from = CRMUser.objects.get(id=bundle.data['share_from'])
+        share_from = User.objects.get(id=bundle.data['share_from'])
         bundle.data['share_from'] = share_from
         return bundle
 
     def hydrate_share_to(self, bundle):
-        share_to = CRMUser.objects.get(id=bundle.data['share_to'])
+        share_to = User.objects.get(id=bundle.data['share_to'])
         bundle.data['share_to'] = share_to
         return bundle
 
@@ -3042,7 +2946,7 @@ class ContactListResource(CRMServiceModelResource):
         ...     {
         ...         "id": 1,
         ...         "resource_uri": "/api/v1/contact_list/1/",
-        ...         "subscription_id": null,
+        ...         "company_id": null,
         ...         "title": "ALMA Cloud",
         ...         "contacts": [
         ...         {
@@ -3050,7 +2954,7 @@ class ContactListResource(CRMServiceModelResource):
         ...             "is_supervisor": false,
         ...             "organization_id": 1,
         ...             "resource_uri": "/api/v1/crmuser/1/",
-        ...             "subscription_id": 1,
+        ...             "company_id": 1,
         ...             "user_id": 1
         ...         },
         ...         {
@@ -3058,7 +2962,7 @@ class ContactListResource(CRMServiceModelResource):
         ...             "is_supervisor": false,
         ...             "organization_id": 1,
         ...             "resource_uri": "/api/v1/crmuser/2/",
-        ...             "subscription_id": 1,
+        ...             "company_id": 1,
         ...             "user_id": 2
         ...         }
         ...     ]
@@ -3259,7 +3163,7 @@ class ConstantsResource(Resource):
 
 class AppStateObject(object):
     '''
-    @undocumented: __init__, get_users, get_company, get_contacts,
+    @undocumented: __init__, get_users, get_company(request), get_contacts,
     get_sales_cycles, get_activities, get_shares, get_constants,
     get_session
     '''
@@ -3270,7 +3174,7 @@ class AppStateObject(object):
         self.request = request
         self.service_slug = service_slug
         self.current_user = request.user
-        self.subscription_id = get_subscr_id(request.user_env, service_slug)
+        self.company_id = get_subscr_id(request.user_env, service_slug)
         self.company = request.account.company
         self.user = request.user
 
@@ -3286,19 +3190,19 @@ class AppStateObject(object):
         return obj
 
 
-    def get_company(self):
+    def get_company(request)(self):
         data = {
             'id': self.company.id,
             'name': self.company.name,
             'subdomain': self.company.subdomain}
-        crmuser = CRMUser.objects.get(
+        crmuser = User.objects.get(
             user_id=self.company.owner.first().pk,
-            subscription_id=self.subscription_id)
+            company_id=self.company_id)
         data['owner_id'] = crmuser.pk
         return [data]
 
     def get_categories(self):
-        return [x.data for x in Category.objects.filter(vcard__contact__subscription_id=self.subscription_id)]
+        return [x.data for x in Category.objects.filter(vcard__contact__company_id=self.company_id)]
 
     def get_constants(self):
         return {
@@ -3373,8 +3277,8 @@ class AppStateResource(Resource):
             url(
                 r"^(?P<resource_name>%s)/(?P<slug>\w+)/company%s$" %
                 (self._meta.resource_name, trailing_slash()),
-                self.wrap_view('get_company'),
-                name='api_get_company'
+                self.wrap_view('get_company(request)'),
+                name='api_get_company(request)'
             ),
             url(
                 r"^(?P<resource_name>%s)/(?P<slug>\w+)/constants%s$" %
@@ -3513,10 +3417,10 @@ class AppStateResource(Resource):
             obj = AppStateObject(service_slug=kwargs['slug'], request=request)
             return self.create_response(request, {'objects': obj.get_categories()}, response_class=http.HttpAccepted)
 
-    def get_company(self, request, **kwargs):
+    def get_company(request)(self, request, **kwargs):
         with RequestContext(self, request, allowed_methods=['get']):
             obj = AppStateObject(service_slug=kwargs['slug'], request=request)
-            return self.create_response(request, {'objects': obj.get_company()}, response_class=http.HttpAccepted)
+            return self.create_response(request, {'objects': obj.get_company(request)()}, response_class=http.HttpAccepted)
 
     def get_constants(self, request, **kwargs):
         with RequestContext(self, request, allowed_methods=['get']):
@@ -3531,7 +3435,7 @@ class AppStateResource(Resource):
 
 class MobileStateObject(object):
     '''
-    @undocumented: __init__, get_users, get_company, get_contacts,
+    @undocumented: __init__, get_users, get_company(request), get_contacts,
     get_sales_cycles, get_activities, get_shares, get_constants,
     get_session
     '''
@@ -3542,8 +3446,8 @@ class MobileStateObject(object):
         request = bundle.request
         self.request = request
         self.current_user = request.user
-        self.subscription_id = get_subscr_id(request.user_env, service_slug)
-        self.company = request.user.get_company()
+        self.company_id = get_subscr_id(request.user_env, service_slug)
+        self.company = request.user.get_company(request)()
         self.current_crmuser = request.account
 
         sales_cycles = SalesCycleResource().obj_get_list(bundle, limit_for='mobile')
@@ -3558,7 +3462,7 @@ class MobileStateObject(object):
         cu_ids = set([str(a.owner_id) for a in activities])
         cu_ids = cu_ids.union([str(sc.owner_id) for sc in sales_cycles])
         cu_ids_param = ','.join(cu_ids)
-        users = CRMUserResource().obj_get_list(bundle, id__in=cu_ids_param)
+        users = UserResource().obj_get_list(bundle, id__in=cu_ids_param)
 
         milestones = MilestoneResource().obj_get_list(bundle)
 
@@ -3566,7 +3470,7 @@ class MobileStateObject(object):
             'sales_cycles': SalesCycleResource,
             'activities': ActivityResource,
             'contacts': ContactResource,
-            'users': CRMUserResource,
+            'users': UserResource,
             'milestones': MilestoneResource
         }
 
@@ -3848,11 +3752,11 @@ class CustomFieldResource(CRMServiceModelResource):
                 finally:
                     field.title = object['title']
                     field.content_type = ContentType.objects.get(app_label="alm_crm", model=content_class)
-                    field.subscription_id = request.user.get_crmuser().subscription_id
+                    field.company_id = request.user.get_company(request).id
                     field.save()
                     fields_set.append(field)
 
-            for field in CustomField.objects.filter(subscription_id=request.user.get_crmuser().subscription_id,
+            for field in CustomField.objects.filter(company_id=request.user.get_company(request).id,
                                                     content_type=ContentType.objects.get(app_label="alm_crm", model=content_class)):
                 if field not in fields_set:
                     if field.values.all().count() != 0:
@@ -3890,7 +3794,7 @@ class CustomFieldResource(CRMServiceModelResource):
             except ContentType.DoesNotExist:
                 return http.HttpNotFound()
             else:
-                objects = CustomField.objects.filter(subscription_id=request.user.get_crmuser().subscription_id,
+                objects = CustomField.objects.filter(company_id=request.user.get_company(request).id,
                                                     content_type=content_type)
 
                 return self.create_response(request, 
@@ -3967,7 +3871,7 @@ class ReportResource(Resource):
             data = {}
         return self.create_response(
             request,
-            report_builders.build_funnel(request.user.get_crmuser().subscription_id, data))
+            report_builders.build_funnel(request.user.get_company(request).id, data))
 
     def realtime_funnel(self, request, **kwargs):
         '''
@@ -3982,7 +3886,7 @@ class ReportResource(Resource):
 
         return self.create_response(
             request,
-            report_builders.build_realtime_funnel(request.user.get_crmuser().subscription_id, data))
+            report_builders.build_realtime_funnel(request.user.get_company(request).id, data))
 
 
     def user_report(self, request, **kwargs):
@@ -3996,7 +3900,7 @@ class ReportResource(Resource):
                 data = {}
             return self.create_response(
                 request, report_builders.build_user_report(
-                    subscription_id=request.user.get_crmuser().subscription_id,
+                    company_id=request.user.get_company(request).id,
                     data=data), response_class=http.HttpAccepted
                 )
         
@@ -4011,6 +3915,6 @@ class ReportResource(Resource):
                 data = {}
             return self.create_response(
                 request, report_builders.build_product_report(
-                    subscription_id=request.user.get_crmuser().subscription_id,
+                    company_id=request.user.get_company(request).id,
                     data=data), response_class=http.HttpAccepted
                 )

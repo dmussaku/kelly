@@ -6,7 +6,6 @@ from django.utils import timezone
 from tastypie.test import ResourceTestCase
 from alm_crm.models import (
     Contact,
-    CRMUser,
     Activity,
     SalesCycle,
     SalesCycleLogEntry,
@@ -32,36 +31,6 @@ from alm_crm.models import GLOBAL_CYCLE_TITLE
 from alm_company.models import Company
 import datetime
 
-
-class CRMUserTestCase(TestCase):
-    fixtures = ['crmusers.json', 'users.json']
-
-    def setUp(self):
-        super(CRMUserTestCase, self).setUp()
-        self.crmuser = CRMUser.objects.first()
-
-    def test_unicode(self):
-        self.assertEqual(str(self.crmuser), 'Bruce Wayne')
-
-    def test_get_billing_user(self):
-        self.assertEqual(self.crmuser.get_billing_user(),
-                         User.objects.get(pk=self.crmuser.user_id))
-
-    def test_set_supervisor(self):
-        self.crmuser.set_supervisor()
-        self.assertTrue(self.crmuser.is_supervisor)
-
-    def test_unset_supervisor(self):
-        self.crmuser.unset_supervisor()
-        self.assertFalse(self.crmuser.is_supervisor)
-
-    def test_get_crmusers(self):
-        self.assertEqual(CRMUser.get_crmusers(self.crmuser.subscription_id).last(), 
-                                                            CRMUser.objects.last())
-        user = User.objects.first()
-        get_with_users = CRMUser.get_crmusers(subscription_id = self.crmuser.subscription_id,
-                                                with_users=True)
-        self.assertTrue(user in get_with_users[1])
 
 
 class ContactTestCase(TestCase):

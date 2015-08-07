@@ -4,7 +4,7 @@ import functools
 import os
 from django.db import models, transaction, IntegrityError
 from django.utils.translation import ugettext_lazy as _
-from almanet import settings
+from django.conf import settings
 from almanet.utils.metaprogramming import DirtyFieldsMixin
 from almanet.models import SubscriptionObject, Subscription
 from alm_vcard.models import (
@@ -56,69 +56,6 @@ GLOBAL_CYCLE_DESCRIPTION = 'Автоматически созданный цик
 def type_cast(input):
     return input if type(input) != float else str(input)
 
-class CRMUser(SubscriptionObject):
-
-    user_id = models.IntegerField(_('user id'))
-    organization_id = models.IntegerField(_('organization id'))
-    is_supervisor = models.BooleanField(_('is supervisor'), default=False)
-    unfollow_list = models.ManyToManyField(
-        'Contact', related_name='unfollowers',
-        null=True, blank=True
-        )
-
-
-    def __unicode__(self):
-        u = self.get_billing_user()
-        return u and u.get_username() or None
-
-    def get_billing_user(self, cache=False):
-        """Returns a original user.
-        Raises:
-           User.DoesNotExist exception if no such relation exist"""
-        
-        if cache and hasattr(self, 'user'):
-            return self.user
-
-        user = User.objects.filter(pk=self.user_id).select_related('vcard').prefetch_related(
-            'vcard__tel_set', 'vcard__category_set',
-            'vcard__adr_set', 'vcard__title_set', 'vcard__url_set',
-            'vcard__org_set', 'vcard__email_set').first()
-        if cache:
-            self.user = user
-        return user
-        
-    def set_supervisor(self, save=False):
-        self.is_supervisor = True
-        if save:
-            self.save()
-
-    def unset_supervisor(self, save=False):
-        self.is_supervisor = False
-        if save:
-            self.save()
-
-    @classmethod
-    def get_crmusers(cls, subscription_id, with_users=False):
-        """TEST Returns list of crmusers on with
-            Returns:
-                Queryset<CRMUser>
-                if with_users:
-                    Queryset<User>
-            example: (crmusers, users)
-        """
-        crmusers = cls.objects.filter(subscription_id=subscription_id)
-        if with_users:
-            users = User.objects.filter(
-                id__in=crmusers.values_list('user_id', flat=True))
-            return (crmusers, users)
-        else:
-            return crmusers
-
-    @classmethod
-    def get_subscription_id(cls, user_id):
-        return cls.objects.get(id=user_id).subscription_id
-
-
 class Milestone(SubscriptionObject):
 
     title = models.CharField(_("title"), max_length=1024, null=True, blank=True)
@@ -131,11 +68,11 @@ class Milestone(SubscriptionObject):
         db_table = settings.DB_PREFIX.format('milestone')
 
     @classmethod
-    def get_for_subscr(cls, subscr_id):
-        return cls.objects.filter(subscription_id=subscr_id)
+    def get_for_company(cls, company_id):
+        return cls.objects.filter(company_id=company_id)
 
     @classmethod
-    def create_default_milestones(cls, subscription_id):
+    def create_default_milestones(cls, company_id):
         milestones = []
         default_data = [{'title':'Звонок/Заявка', 'color_code': '#F4B59C', 'is_system':0, 'sort':1},
                         {'title':'Отправка КП', 'color_code': '#F59CC8', 'is_system':0, 'sort':2},
@@ -153,7 +90,7 @@ class Milestone(SubscriptionObject):
             milestone.color_code = data['color_code']
             milestone.is_system = data['is_system']
             milestone.sort = data['sort']
-            milestone.subscription_id = subscription_id
+            milestone.company_id = company_id
             milestone.save()
             milestones.append(milestone)
 
@@ -326,8 +263,8 @@ class Contact(SubscriptionObject):
         if not contact_ids:
             return False
         try:
-            share_from = CRMUser.objects.get(id=share_from)
-            share_to = CRMUser.objects.get(id=share_to)
+            share_from = User.objects.get(id=share_from)
+            share_to = User.objects.get(id=share_to)
             contacts = Contact.objects.filter(id__in=contact_ids)
             share_list = []
             for contact in contacts:
@@ -388,8 +325,8 @@ class Contact(SubscriptionObject):
             c.save()
 
     @classmethod
-    def get_contacts_by_status(cls, subscription_id, status):
-        q = Q(subscription_id=subscription_id)
+    def get_contacts_by_status(cls, company_id, status):
+        q = Q(company_id=company_id)
         q &= Q(status=status)
         return Contact.objects.filter(q).order_by('-date_created')
 
@@ -412,16 +349,16 @@ class Contact(SubscriptionObject):
         -------
         Queryset of Contacts with whom `user_id` get contacted for that period.
         """
-        crm_user = CRMUser.objects.get(id=user_id)
+        user = User.objects.get(id=user_id)
 
-        # there is no need in filter by subscription_id
+        # there is no need in filter by company_id
         q = Q(date_created__range=(from_dt, to_dt))
-        activities = crm_user.activity_owner.filter(q)
+        activities = user.activity_owner.filter(q)
         contact_ids = activities.values_list('sales_cycle__contact_id', flat=True)
         return Contact.objects.filter(id__in=contact_ids)
 
     @classmethod
-    def filter_contacts_by_vcard(cls, subscription_id, search_text,
+    def filter_contacts_by_vcard(cls, company_id, search_text,
                                  search_params=None, order_by=None):
         r"""TODO Make a search query for contacts by their vcard.
         Important! Search params have one of the following formats:
@@ -460,7 +397,7 @@ class Contact(SubscriptionObject):
 
         for key, value in params.viewitems():
             query_dict = {'vcard__'+str(key): str(value)}
-            q = Q(subscription_id=subscription_id)
+            q = Q(company_id=company_id)
             q &= Q(**query_dict)
             contacts = contacts | Contact.objects.filter(q)
 
@@ -514,7 +451,7 @@ class Contact(SubscriptionObject):
         if save:
             contacts.save()
             # SalesCycle.create_globalcycle(
-            #         **{'subscription_id': contacts.subscription_id,
+            #         **{'company_id': contacts.company_id,
             #          'owner_id': contacts.owner.id,
             #          'contact_id': contacts.id
             #         }
@@ -549,7 +486,7 @@ class Contact(SubscriptionObject):
                 c = cls(vcard=vcard, owner=creator)
                 c.save()
                 SalesCycle.create_globalcycle(
-                    **{'subscription_id': c.subscription_id,
+                    **{'company_id': c.company_id,
                      'owner_id': c.owner.id,
                      'contact_id': c.id
                     }
@@ -572,8 +509,8 @@ class Contact(SubscriptionObject):
         for i in range(0, len(data)):
             if len(fields)==len(data[i]):
                 c = cls()
-                c.owner = creator.get_crmuser()
-                c.subscription_id = creator.get_crmuser().subscription_id
+                c.owner = creator
+                c.company_id = creator.company_id
                 v = VCard()
                 v.given_name = data[i][0].decode('utf-8')
                 # print data[i]
@@ -586,8 +523,8 @@ class Contact(SubscriptionObject):
                 c.vcard = v
                 c.save()
                 SalesCycle.create_globalcycle(
-                        **{'subscription_id':c.subscription_id,
-                         'owner_id':creator.get_crmuser().id,
+                        **{'company_id':c.company_id,
+                         'owner_id':creator.id,
                          'contact_id':c.id
                         }
                     )
@@ -767,7 +704,6 @@ class Contact(SubscriptionObject):
                     response['error'] = True
                     response['error_col'] = col_num
                     return response
-        crmuser = creator.get_crmuser()
         try:
             vcard.save()
         except:
@@ -776,248 +712,16 @@ class Contact(SubscriptionObject):
             return response
         contact.vcard = vcard
         contact.import_task = import_task
-        contact.owner = crmuser
-        contact.subscription_id = crmuser.subscription_id
+        contact.owner = creator
+        contact.company_id = creator.get_company().id
         contact.save()
         SalesCycle.create_globalcycle(
-                        **{'subscription_id':contact.subscription_id,
-                         'owner_id':crmuser.id,
+                        **{'company_id':contact.company_id,
+                         'owner_id':creator.id,
                          'contact_id':contact.id
                         }
                     )
         return {'error':False, 'contact_id':contact.id}
-
-    @classmethod
-    @transaction.atomic
-    def import_from_xls(cls, xls_file_data, creator):
-        book = xlrd.open_workbook(file_contents=xls_file_data)
-        sheets_left = True
-        contacts = []
-        sid = transaction.savepoint()
-        for sheet in book.sheets():
-            i = 1
-            while(sheets_left):
-                try:
-                    header_row = sheet.row(0)
-                    data = sheet.row(i)
-                except IndexError:
-                    sheets_left = False
-                    continue
-                c = cls()
-                v = VCard()
-                try:
-                    with transaction.atomic():
-                        v.family_name = data[0].value if type(data[0].value) == unicode else str(data[0].value)
-                except IntegrityError:
-                    transaction.savepoint_rollback(sid)
-                    return (i,1)
-                try:
-                    with transaction.atomic():
-                        v.given_name = data[1].value if type(data[1].value) == unicode else str(data[1].value)
-                except IntegrityError:
-                    transaction.savepoint_rollback(sid)
-                    return (i,2)
-                try:
-                    with transaction.atomic():
-                        v.additional_name = data[2].value if type(data[2].value) == unicode else str(data[2].value)
-                except IntegrityError:
-                    transaction.savepoint_rollback(sid)
-                    return (i,3)
-                v.fn = v.given_name+" "+v.family_name
-                if ((not v.given_name) and (not v.family_name) and data[4].value):
-                    try:
-                        with transaction.atomic():
-                            v = VCard(fn=data[4].value)
-                            v.save()
-                            c = cls(vcard=v, tp='co')
-                    except IntegrityError:
-                        transaction.savepoint_rollback(sid)
-                        return (i,5)
-                    c.owner = creator.get_crmuser()
-                    c.subscription_id = creator.get_crmuser().subscription_id
-                    c.save()
-                if not v.id:
-                    v.save()
-                    c.vcard = v
-                    c.owner = creator.get_crmuser()
-                    c.subscription_id = creator.get_crmuser().subscription_id
-                    c.save()
-                SalesCycle.create_globalcycle(**{
-                    'subscription_id':c.subscription_id,
-                    'owner_id': c.owner_id,
-                    'contact_id': c.id
-                })
-                try:
-                    with transaction.atomic():
-                        if data[3].value:
-                            positions = type_cast(data[3].value).split(';')
-                            for position in positions:
-                                title = Title(
-                                    vcard=v,
-                                    data=position
-                                    )
-                                title.save()
-                except IntegrityError:
-                    transaction.savepoint_rollback(sid)
-                    return (i, 4)
-                except IndexError:
-                    pass
-                try:
-                    with transaction.atomic():
-                        if data[4].value:
-                            org = Org(vcard=v)
-                            org.organization_name = type_cast(data[4].value)
-                            try:
-                                with transaction.atomic():
-                                    if data[5].value:
-                                        org.organization_unit = type_cast(data[5].value)
-                                    org.save()
-                            except IntegrityError:
-                                transaction.savepoint_rollback(sid)
-                                return (i, 6)
-                except IntegrityError:
-                    transaction.savepoint_rollback(sid)
-                    return (i, 5)
-                except IndexError:
-                    pass
-                try:
-                    with transaction.atomic():
-                        if data[6].value:
-                            phones = type_cast(data[6].value).split(';')
-                            for phone in phones:
-                                tel = Tel(vcard=v, type='WORK')
-                                tel.value = phone
-                                tel.save()
-                except IntegrityError:
-                    transaction.savepoint_rollback(sid)
-                    return (i,7)
-                except IndexError:
-                    pass
-                try:
-                    with transaction.atomic():
-                        if data[7].value:
-                            phones = type_cast(data[7].value).split(';')
-                            for phone in phones:
-                                tel = Tel(vcard=v, type='cell')
-                                tel.value = phone
-                                tel.save()
-                except IntegrityError:
-                    transaction.savepoint_rollback(sid)
-                    return (i, 8)
-                except IndexError:
-                    pass
-                try:
-                    with transaction.atomic():
-                        if data[8].value:
-                            phones = type_cast(data[8].value).split(';')
-                            for phone in phones:
-                                tel = Tel(vcard=v, type='xadditional')
-                                tel.value = phone
-                                tel.save()
-                except IntegrityError:
-                    transaction.savepoint_rollback(sid)
-                    return (i, 9)
-                except IndexError:
-                    pass
-                try:
-                    with transaction.atomic():
-                        if data[9].value:
-                            phones = type_cast(data[9].value).split(';')
-                            for phone in phones:
-                                tel = Tel(vcard=v, type='fax')
-                                tel.value = phone
-                                tel.save()
-                except IntegrityError:
-                    transaction.savepoint_rollback(sid)
-                    return (i, 10)
-                except IndexError:
-                    pass
-                try:
-                    with transaction.atomic():
-                        if data[10].value:
-                            emails = type_cast(data[10].value).split(';')
-                            for email_str in emails:
-                                email = Email(vcard=v, type='work')
-                                email.value = email_str
-                                email.save()
-                except IntegrityError:
-                    transaction.savepoint_rollback(sid)
-                    return (i, 11)
-                except IndexError:
-                    pass
-                try:
-                    with transaction.atomic():
-                        if data[11].value:
-                            emails = type_cast(data[11].value).split(';')
-                            for email_str in emails:
-                                email = Email(vcard=v, type='internet')
-                                email.value = email_str
-                                email.save()
-                except IntegrityError:
-                    transaction.savepoint_rollback(sid)
-                    return (i, 12)
-                except IndexError:
-                    pass
-                try:
-                    with transaction.atomic():
-                        if data[12].value:
-                            adresses = type_cast(data[12].value).split(';;')
-                            for address_str in adresses:
-                                addr_objs = address_str.split(';')
-                                addr_objs = [v,'POSTAL'] + addr_objs
-                                address = Adr.create_from_list(addr_objs)
-                except IntegrityError:
-                    transaction.savepoint_rollback(sid)
-                    return (i, 13)
-                except IndexError:
-                    pass
-                try:
-                    with transaction.atomic():
-                        if data[13].value:
-                            adresses = type_cast(data[13].value).split(';;')
-                            for address_str in adresses:
-                                addr_objs = address_str.split(';')
-                                addr_objs = [v,'xlegal'] + addr_objs
-                                address = Adr.create_from_list(addr_objs)
-                except IntegrityError:
-                    transaction.savepoint_rollback(sid)
-                    return (i, 14)
-                except IndexError:
-                    pass
-                try:
-                    with transaction.atomic():
-                        if data[14].value:
-                            adresses = type_cast(data[14].value).split(';;')
-                            for address_str in adresses:
-                                addr_objs = address_str.split(';')
-                                addr_objs = [v,'WORK'] + addr_objs
-                                address = Adr.create_from_list(addr_objs)
-                except IntegrityError:
-                    transaction.savepoint_rollback(sid)
-                    return (i, 15)
-                except IndexError:
-                    pass
-                try:
-                    with transaction.atomic():
-                        if data[15].value:
-                            sites = type_cast(data[15].value).split(';')
-                            for site in sites:
-                                url = Url(
-                                    vcard=v,
-                                    type='website',
-                                        value=site
-                                        )
-                                url.save()
-                except IntegrityError:
-                    transaction.savepoint_rollback(sid)
-                    return (i, 16)
-                except IndexError:
-                    pass
-                contacts.append(c)
-                # print "%s created contact %s" % (c, c.id)
-                i = i+1
-        transaction.savepoint_commit(sid)
-        return contacts
 
     @classmethod
     def get_xls_structure(cls, filename, xls_file_data):
@@ -1046,7 +750,7 @@ class Contact(SubscriptionObject):
 
     @classmethod
     def get_contacts_by_last_activity_date(
-            cls, subscription_id, user_id=None, owned=True, mentioned=False,
+            cls, company_id, user_id=None, owned=True, mentioned=False,
             in_shares=False, all=False, include_activities=False):
         """TEST Returns list of contacts ordered by last activity date.
             Returns:
@@ -1065,7 +769,7 @@ class Contact(SubscriptionObject):
             in this case return value is always instance of dict, so it is easier to process it
             at the same time, list of contacts always available through rv.keys()
         """
-        q0 = Q(subscription_id=subscription_id)
+        q0 = Q(company_id=company_id)
         q = Q()
         if not all:
             if owned:
@@ -1073,8 +777,8 @@ class Contact(SubscriptionObject):
             if mentioned:
                 q |= Q(mentions__user_id=user_id)
             if in_shares:
-                crmuser = CRMUser.objects.get(pk=user_id)
-                shares = crmuser.in_shares
+                user = User.objects.get(pk=user_id)
+                shares = user.in_shares
                 q |= Q(id__in=set(shares.values_list('contact_id', flat=True)))
         if not all and len(q.children) == 0:
             contacts = cls.objects.none()
@@ -1100,12 +804,12 @@ class Contact(SubscriptionObject):
         return (contacts, activities, contact_activity_map)
 
     @classmethod
-    def get_cold_base(cls, subscription_id):
+    def get_cold_base(cls, company_id):
         """Returns list of contacts that are considered cold.
         Cold contacts should satisfy two conditions:
             1. no assignee for contact
             2. status is NEW"""
-        q = Q(subscription_id=subscription_id)
+        q = Q(company_id=company_id)
         q &= Q(status=cls.NEW)
         return cls.objects.filter(q).order_by('-date_created')
 
@@ -1122,7 +826,7 @@ class Contact(SubscriptionObject):
         # original_activities = [obj.id for obj in Activity.objects.filter(
         #             sales_cycle__in=self.sales_cycles.all())] 
         # original_shares = [ obj.id for obj in self.share_set.all() ]
-        global_sales_cycle = SalesCycle.get_global(self.subscription_id, self.id)
+        global_sales_cycle = SalesCycle.get_global(self.company_id, self.id)
         deleted_sales_cycle_ids = [ obj.sales_cycles.get(is_global=True).id for obj in alias_objects ]
         # Merging sales Cycles
         activities = []
@@ -1283,7 +987,7 @@ class Value(SubscriptionObject):
     amount = models.IntegerField()
     currency = models.CharField(max_length=3, choices=CURRENCY_OPTIONS,
                                 default='KZT')
-    # owner = models.ForeignKey(CRMUser, null=True, blank=True,
+    # owner = models.ForeignKey(User, null=True, blank=True,
     #                           related_name='owned_values')
 
     owner = models.ForeignKey(User, null=True, blank=True,
@@ -1297,8 +1001,8 @@ class Value(SubscriptionObject):
         return "%s %s %s" % (self.amount, self.currency, self.salary)
 
     @classmethod
-    def get_values(cls, subscription_id):
-        q = Q(subscription_id=subscription_id)
+    def get_values(cls, company_id):
+        q = Q(company_id=company_id)
         return cls.objects.filter(q)
 
 
@@ -1308,7 +1012,7 @@ class Product(SubscriptionObject):
     price = models.IntegerField()
     currency = models.CharField(max_length=3, choices=CURRENCY_OPTIONS,
                                 default='KZT')
-    # owner = models.ForeignKey(CRMUser, related_name='crm_products',
+    # owner = models.ForeignKey(User, related_name='crm_products',
     #                           null=True, blank=True)
     custom_field_values = generic.GenericRelation('CustomFieldValue')
     owner = models.ForeignKey(User, null=True, blank=True,
@@ -1331,7 +1035,7 @@ class Product(SubscriptionObject):
 
     @author_id.setter
     def author_id(self, author_id):
-        self.owner = CRMUser.objects.get(id=author_id)
+        self.owner = User.objects.get(id=author_id)
 
     def add_sales_cycle(self, sales_cycle_id, **kw):
         """TEST Assigns products to salescycle"""
@@ -1352,8 +1056,8 @@ class Product(SubscriptionObject):
         return True
 
     @classmethod
-    def get_products(cls, subscription_id):
-        q = Q(subscription_id=subscription_id)
+    def get_products(cls, company_id):
+        q = Q(company_id=company_id)
         return cls.objects.filter(q).order_by('-date_created')
 
     @classmethod
@@ -1373,8 +1077,8 @@ class Product(SubscriptionObject):
                 continue
             product = Product(
                 name=row_vals[0],
-                subscription_id=creator.get_crmuser().subscription_id,
-                owner=creator.get_crmuser()
+                company_id=creator.company_id,
+                owner=creator
                 )
             if row_vals[1]:
                 product.description = row_vals[1]
@@ -1415,8 +1119,8 @@ class ProductGroup(SubscriptionObject):
         return self.title
 
     @classmethod
-    def get_for_subscr(cls, subscr_id):
-        return cls.objects.filter(subscription_id=subscr_id)
+    def get_for_subscr(cls, company_id):
+        return cls.objects.filter(company_id=company_id)
 
 
 class SalesCycle(SubscriptionObject):
@@ -1437,7 +1141,7 @@ class SalesCycle(SubscriptionObject):
                                       through='SalesCycleProductStat')
     owner = models.ForeignKey(User, related_name='owned_sales_cycles', null=True)
     followers = models.ManyToManyField(
-        CRMUser, related_name='follow_sales_cycles',
+        User, related_name='follow_sales_cycles',
         null=True, blank=True)
     contact = models.ForeignKey(Contact, related_name='sales_cycles')
     latest_activity = models.OneToOneField('Activity',
@@ -1468,8 +1172,8 @@ class SalesCycle(SubscriptionObject):
         return self.rel_activities.count()
 
     @classmethod
-    def get_global(cls, subscription_id, contact_id):
-        return SalesCycle.objects.get(subscription_id=subscription_id, contact_id=contact_id,
+    def get_global(cls, company_id, contact_id):
+        return SalesCycle.objects.get(company_id=company_id, contact_id=contact_id,
                                       is_global=True)
 
     def find_latest_activity(self):
@@ -1483,7 +1187,7 @@ class SalesCycle(SubscriptionObject):
     def create_globalcycle(cls, **kwargs):
         try:
             global_cycle = SalesCycle.get_global(contact_id=kwargs['contact_id'],
-                                    subscription_id=kwargs['subscription_id'])
+                                    company_id=kwargs['company_id'])
         except SalesCycle.DoesNotExist:
             global_cycle = cls(
                 is_global=True,
@@ -1507,11 +1211,11 @@ class SalesCycle(SubscriptionObject):
     def assign_user(self, user_id, save=False):
         """TEST Assign user to salescycle."""
         try:
-            self.owner = CRMUser.objects.get(id=user_id)
+            self.owner = User.objects.get(id=user_id)
             if save:
                 self.save()
             return True
-        except CRMUser.DoesNotExist:
+        except User.DoesNotExist:
             return False
 
     def get_activities(self):
@@ -1520,7 +1224,7 @@ class SalesCycle(SubscriptionObject):
 
     def get_mentioned_users(self):
         user_ids = self.mentions.values_list('user_id', flat=True)
-        return CRMUser.objects.filter(pk__in=user_ids)
+        return User.objects.filter(pk__in=user_ids)
 
     def get_first_activity_date(self):
         a = self.rel_activities.order_by('date_created').first()
@@ -1597,14 +1301,14 @@ class SalesCycle(SubscriptionObject):
         status = []
         for uid in user_ids:
             try:
-                crm_user = CRMUser.objects.get(id=uid)
-                self.followers.add(crm_user)
+                user = User.objects.get(id=uid)
+                self.followers.add(user)
                 status.append(True)
-            except CRMUser.DoesNotExist:
+            except User.DoesNotExist:
                 status.append(False)
         return status
 
-    def change_milestone(self, crmuser, milestone_id):
+    def change_milestone(self, user, milestone_id):
         milestone = Milestone.objects.get(id=milestone_id)
 
         prev_milestone_title = None
@@ -1634,7 +1338,7 @@ class SalesCycle(SubscriptionObject):
         sc_log_entry = SalesCycleLogEntry(meta=json.dumps(meta),
                                           entry_type=SalesCycleLogEntry.MC,
                                           sales_cycle=self,
-                                          owner=crmuser)
+                                          owner=user)
         sc_log_entry.save()
         return self
 
@@ -1673,7 +1377,7 @@ class SalesCycle(SubscriptionObject):
 
     @classmethod
     def get_salescycles_by_last_activity_date(
-        cls, subscription_id, user_id=None, owned=True, mentioned=False,
+        cls, company_id, user_id=None, owned=True, mentioned=False,
             followed=False, all=False, include_activities=False):
         """Returns sales_cycles where user is owner, mentioned or followed
             ordered by last activity date.
@@ -1689,7 +1393,7 @@ class SalesCycle(SubscriptionObject):
             Raises:
                 User.DoesNotExist
         """
-        q0 = Q(subscription_id=subscription_id)
+        q0 = Q(company_id=company_id)
         q = Q()
         if not all:
             if owned:
@@ -1778,7 +1482,7 @@ class Activity(SubscriptionObject):
 
     @author_id.setter
     def author_id(self, author_id):
-        self.owner = CRMUser.objects.get(id=author_id)
+        self.owner = User.objects.get(id=author_id)
 
     @property
     def contact(self):
@@ -1788,15 +1492,15 @@ class Activity(SubscriptionObject):
     def comments_count(self):
         return self.comments.count()
 
-    def spray(self, subscription_id):
+    def spray(self, company_id):
         unfollow_set = {
             unfollower.id for unfollower
             in self.sales_cycle.contact.unfollowers.all()}
 
-        q = Q(subscription_id=subscription_id)
-        university_set = set(CRMUser.objects.filter(q).values_list(
+        q = Q(company_id=company_id)
+        university_set = set(User.objects.filter(q).values_list(
                              'id', flat=True))
-        followers = CRMUser.objects.filter(
+        followers = User.objects.filter(
             pk__in=(university_set - unfollow_set))
 
         with transaction.atomic():
@@ -1848,8 +1552,8 @@ class Activity(SubscriptionObject):
         return cls.objects.filter(sales_cycle_id=sales_cycle_id).order_by('-date_created')
 
     @classmethod
-    def get_activities_by_subscription(cls, subscription_id):
-        return cls.objects.filter(subscription_id=subscription_id)\
+    def get_activities_by_subscription(cls, company_id):
+        return cls.objects.filter(company_id=company_id)\
             .order_by('date_created')
 
     @classmethod
@@ -1894,8 +1598,8 @@ class Activity(SubscriptionObject):
     def get_number_of_activities_by_day(cls, user_id,
                                         from_dt=None, to_dt=None):
         try:
-            crmuser = CRMUser.objects.get(id=user_id)
-        except CRMUser.DoesNotExist:
+            user = User.objects.get(id=user_id)
+        except User.DoesNotExist:
             return False
         '''
         need to implement the conversion to datetime object
@@ -1904,7 +1608,7 @@ class Activity(SubscriptionObject):
         if (type(from_dt) and type(to_dt) == datetime):
             pass
         activity_queryset = Activity.objects.filter(
-            date_created__gte=from_dt, date_created__lte=to_dt, owner=crmuser)
+            date_created__gte=from_dt, date_created__lte=to_dt, owner=user)
         date_counts = {}
         for act in activity_queryset:
             date = str(act.date_created.date())
@@ -1916,9 +1620,9 @@ class Activity(SubscriptionObject):
 
     @classmethod
     def get_activities_by_date_created(
-        cls, subscription_id, user_id=None, owned=True,
+        cls, company_id, user_id=None, owned=True,
         mentioned=False, all=False, include_sales_cycles=False):
-        """Returns activities where crmuser is owner or mentioned
+        """Returns activities where user is owner or mentioned
             ordered by created date.
 
             Returns
@@ -1932,7 +1636,7 @@ class Activity(SubscriptionObject):
             Raises:
                 User.DoesNotExist
         """
-        q0 = Q(subscription_id=subscription_id)
+        q0 = Q(company_id=company_id)
         q = Q()
         if not all:
             if owned:
@@ -2005,8 +1709,8 @@ class Mention(SubscriptionObject):
         return Mention.objects.filter(user_id=user_id)
 
     def save(self, **kwargs):
-        if not self.subscription_id and self.content_object:
-            self.subscription_id = self.content_object.owner.subscription_id
+        if not self.company_id and self.content_object:
+            self.company_id = self.content_object.owner.company_id
         super(SubscriptionObject, self).save(**kwargs)
 
 
@@ -2087,8 +1791,8 @@ class Share(SubscriptionObject):
         self.share_from = owner_object
 
     @classmethod
-    def get_shares(cls, subscription_id):
-        q = Q(subscription_id=subscription_id)
+    def get_shares(cls, company_id):
+        q = Q(company_id=company_id)
         return cls.objects.filter(q).order_by('-date_created')
 
     @classmethod
@@ -2136,11 +1840,11 @@ def check_is_title_empty(sender, instance=None, **kwargs):
         raise Exception("Requires non empty value")
 
 def create_milestones(sender, instance, **kwargs):
-    if Milestone.objects.filter(subscription_id=instance.id).count() == 0:
+    if Milestone.objects.filter(company_id=instance.id).count() == 0:
         milestones = Milestone.create_default_milestones(instance.id)
 
 def delete_related_milestones(sender, instance, **kwargs):
-    for milestone in Milestone.objects.filter(subscription_id=instance.id):
+    for milestone in Milestone.objects.filter(company_id=instance.id):
         milestone.delete()
 
 signals.post_delete.connect(on_activity_delete, sender=Activity)
@@ -2177,8 +1881,8 @@ class ContactList(SubscriptionObject):
         return self.title
 
     @classmethod
-    def get_for_subscr(cls, subscr_id):
-        return cls.objects.filter(subscription_id=subscr_id)
+    def get_for_subscr(cls, company_id):
+        return cls.objects.filter(company_id=company_id)
 
     def check_contact(self, contact_id):
         try:
@@ -2268,13 +1972,13 @@ class Filter(SubscriptionObject):
         return u'%s: %s' % (self.title, self.base)
 
     def save(self, **kwargs):
-        if not self.subscription_id and self.owner:
-            self.subscription_id = self.owner.subscription_id
+        if not self.company_id and self.owner:
+            self.company_id = self.owner.company_id
         super(self.__class__, self).save(**kwargs)
 
     @classmethod
-    def get_filters_by_crmuser(cls, crmuser_id):
-        return Filter.objects.filter(owner=crmuser_id)
+    def get_filters_by_user(cls, user_id):
+        return Filter.objects.filter(owner=user_id)
 
 
 class HashTag(models.Model):
@@ -2317,8 +2021,8 @@ class HashTagReference(SubscriptionObject):
         return hashtag_reference
 
     def save(self, **kwargs):
-        if not self.subscription_id and self.content_object:
-            self.subscription_id = self.content_object.owner.subscription_id
+        if not self.company_id and self.content_object:
+            self.company_id = self.content_object.owner.company_id
         super(SubscriptionObject, self).save(**kwargs)
 
 
