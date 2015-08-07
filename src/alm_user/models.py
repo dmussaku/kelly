@@ -76,7 +76,7 @@ class Account(AbstractBaseUser):
     Check if the account has unique email inside one company
     '''
     def save(self, **kwargs):
-        if self.id:
+        if not self.id:
             if self.check_email_uniqueness():
                 return super(self.__class__, self).save(**kwargs)
             else:
