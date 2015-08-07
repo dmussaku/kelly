@@ -10,8 +10,8 @@ class Migration(SchemaMigration):
     def forwards(self, orm):
         db.delete_column('alma_cycle_prod_stat', 'subscription_id')
 
-        # Deleting field 'Feedback.subscription_id'
-        db.delete_column(u'alm_crm_feedback', 'subscription_id')
+        # # Deleting field 'Feedback.subscription_id'
+        # db.delete_column(u'alm_crm_feedback', 'subscription_id')
 
         # Deleting field 'SalesCycleLogEntry.subscription_id'
         db.delete_column(u'alm_crm_salescyclelogentry', 'subscription_id')
