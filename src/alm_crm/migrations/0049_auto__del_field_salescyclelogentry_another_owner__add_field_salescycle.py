@@ -3,88 +3,141 @@ from south.utils import datetime_utils as datetime
 from south.db import db
 from south.v2 import SchemaMigration
 from django.db import models
-from alm_user.models import User
-from alm_crm.models import *
-from django.db.models.fields import FieldDoesNotExist
 
 
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
+        # Deleting field 'SalesCycleLogEntry.another_owner'
+        db.delete_column(u'alm_crm_salescyclelogentry', 'another_owner_id')
 
-        # Changing field 'Feedback.owner'
-        db.alter_column(u'alm_crm_feedback', 'owner_id', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['alm_user.User']))
+        # Adding field 'SalesCycleLogEntry.owner'
+        db.add_column(u'alm_crm_salescyclelogentry', 'owner',
+                      self.gf('django.db.models.fields.related.ForeignKey')(related_name='owned_logentries', null=True, to=orm['alm_user.User']),
+                      keep_default=False)
 
-        # Changing field 'SalesCycleLogEntry.owner'
-        db.alter_column(u'alm_crm_salescyclelogentry', 'owner_id', self.gf('django.db.models.fields.related.ForeignKey')(null=True, to=orm['alm_user.User']))
+        # Deleting field 'Comment.another_owner'
+        db.delete_column(u'alm_crm_comment', 'another_owner_id')
 
-        # Changing field 'Comment.owner'
-        db.alter_column(u'alm_crm_comment', 'owner_id', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['alm_user.User']))
+        # Adding field 'Comment.owner'
+        db.add_column(u'alm_crm_comment', 'owner',
+                      self.gf('django.db.models.fields.related.ForeignKey')(related_name='comment_owner', null=True, to=orm['alm_user.User']),
+                      keep_default=False)
 
-        # Changing field 'Filter.owner'
-        db.alter_column('alma_filter', 'owner_id', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['alm_user.User']))
+        # Deleting field 'Filter.another_owner'
+        db.delete_column('alma_filter', 'another_owner_id')
 
-        # Changing field 'Mention.owner'
-        db.alter_column(u'alm_crm_mention', 'owner_id', self.gf('django.db.models.fields.related.ForeignKey')(null=True, to=orm['alm_user.User']))
+        # Adding field 'Filter.owner'
+        db.add_column('alma_filter', 'owner',
+                      self.gf('django.db.models.fields.related.ForeignKey')(related_name='owned_filter', null=True, to=orm['alm_user.User']),
+                      keep_default=False)
 
-        # Changing field 'SalesCycle.owner'
-        db.alter_column('alma_sales_cycle', 'owner_id', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['alm_user.User']))
+        # Deleting field 'Mention.another_owner'
+        db.delete_column(u'alm_crm_mention', 'another_owner_id')
 
-        # Changing field 'ContactList.owner'
-        db.alter_column('alma_contact_list', 'owner_id', self.gf('django.db.models.fields.related.ForeignKey')(null=True, to=orm['alm_user.User']))
+        # Adding field 'Mention.owner'
+        db.add_column(u'alm_crm_mention', 'owner',
+                      self.gf('django.db.models.fields.related.ForeignKey')(related_name='owned_mentions', null=True, to=orm['alm_user.User']),
+                      keep_default=False)
 
-        # Changing field 'Value.owner'
-        db.alter_column('alma_value', 'owner_id', self.gf('django.db.models.fields.related.ForeignKey')(null=True, to=orm['alm_user.User']))
-        
-        # Changing field 'Activity.owner'
-        db.alter_column('alma_activity', 'owner_id', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['alm_user.User']))
+        # Deleting field 'SalesCycle.another_owner'
+        db.delete_column('alma_sales_cycle', 'another_owner_id')
 
-        # Changing field 'Contact.owner'
-        db.alter_column('alma_contact', 'owner_id', self.gf('django.db.models.fields.related.ForeignKey')(null=True, to=orm['alm_user.User']))
+        # Adding field 'SalesCycle.owner'
+        db.add_column('alma_sales_cycle', 'owner',
+                      self.gf('django.db.models.fields.related.ForeignKey')(related_name='owned_sales_cycles', null=True, to=orm['alm_user.User']),
+                      keep_default=False)
 
-        # Changing field 'Product.owner'
-        db.alter_column('alma_product', 'owner_id', self.gf('django.db.models.fields.related.ForeignKey')(null=True, to=orm['alm_user.User']))
+        # Deleting field 'ContactList.another_owner'
+        db.delete_column('alma_contact_list', 'another_owner_id')
 
-        # Changing field 'ProductGroup.owner'
-        db.alter_column('alma_product_group', 'owner_id', self.gf('django.db.models.fields.related.ForeignKey')(null=True, to=orm['alm_user.User']))
+        # Adding field 'ContactList.owner'
+        db.add_column('alma_contact_list', 'owner',
+                      self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='owned_list', null=True, to=orm['alm_user.User']),
+                      keep_default=False)
+
+        # Deleting field 'Activity.another_owner'
+        db.delete_column('alma_activity', 'another_owner_id')
+
+        # Adding field 'Activity.owner'
+        db.add_column('alma_activity', 'owner',
+                      self.gf('django.db.models.fields.related.ForeignKey')(related_name='activity_owner', null=True, to=orm['alm_user.User']),
+                      keep_default=False)
+
+        # Deleting field 'ProductGroup.another_owner'
+        db.delete_column('alma_product_group', 'another_owner_id')
+
+        # Adding field 'ProductGroup.owner'
+        db.add_column('alma_product_group', 'owner',
+                      self.gf('django.db.models.fields.related.ForeignKey')(related_name='owned_product_groups', null=True, to=orm['alm_user.User']),
+                      keep_default=False)
+
 
     def backwards(self, orm):
+        # Adding field 'SalesCycleLogEntry.another_owner'
+        db.add_column(u'alm_crm_salescyclelogentry', 'another_owner',
+                      self.gf('django.db.models.fields.related.ForeignKey')(related_name='owned_logentries_x', null=True, to=orm['alm_user.User']),
+                      keep_default=False)
 
-        # Changing field 'Feedback.owner'
-        db.alter_column(u'alm_crm_feedback', 'owner_id', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['alm_crm.CRMUser']))
+        # Deleting field 'SalesCycleLogEntry.owner'
+        db.delete_column(u'alm_crm_salescyclelogentry', 'owner_id')
 
-        # Changing field 'SalesCycleLogEntry.owner'
-        db.alter_column(u'alm_crm_salescyclelogentry', 'owner_id', self.gf('django.db.models.fields.related.ForeignKey')(null=True, to=orm['alm_crm.CRMUser']))
+        # Adding field 'Comment.another_owner'
+        db.add_column(u'alm_crm_comment', 'another_owner',
+                      self.gf('django.db.models.fields.related.ForeignKey')(related_name='comment_owner_x', null=True, to=orm['alm_user.User']),
+                      keep_default=False)
 
-        # Changing field 'Comment.owner'
-        db.alter_column(u'alm_crm_comment', 'owner_id', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['alm_crm.CRMUser']))
+        # Deleting field 'Comment.owner'
+        db.delete_column(u'alm_crm_comment', 'owner_id')
 
-        # Changing field 'Filter.owner'
-        db.alter_column('alma_filter', 'owner_id', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['alm_crm.CRMUser']))
+        # Adding field 'Filter.another_owner'
+        db.add_column('alma_filter', 'another_owner',
+                      self.gf('django.db.models.fields.related.ForeignKey')(related_name='owned_filter_x', null=True, to=orm['alm_user.User']),
+                      keep_default=False)
 
-        # Changing field 'Mention.owner'
-        db.alter_column(u'alm_crm_mention', 'owner_id', self.gf('django.db.models.fields.related.ForeignKey')(null=True, to=orm['alm_crm.CRMUser']))
+        # Deleting field 'Filter.owner'
+        db.delete_column('alma_filter', 'owner_id')
 
-        # Changing field 'SalesCycle.owner'
-        db.alter_column('alma_sales_cycle', 'owner_id', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['alm_crm.CRMUser']))
+        # Adding field 'Mention.another_owner'
+        db.add_column(u'alm_crm_mention', 'another_owner',
+                      self.gf('django.db.models.fields.related.ForeignKey')(related_name='owned_mentions_x', null=True, to=orm['alm_user.User']),
+                      keep_default=False)
 
-        # Changing field 'ContactList.owner'
-        db.alter_column('alma_contact_list', 'owner_id', self.gf('django.db.models.fields.related.ForeignKey')(null=True, to=orm['alm_crm.CRMUser']))
+        # Deleting field 'Mention.owner'
+        db.delete_column(u'alm_crm_mention', 'owner_id')
 
-        # Changing field 'Value.owner'
-        db.alter_column('alma_value', 'owner_id', self.gf('django.db.models.fields.related.ForeignKey')(null=True, to=orm['alm_crm.CRMUser']))
+        # Adding field 'SalesCycle.another_owner'
+        db.add_column('alma_sales_cycle', 'another_owner',
+                      self.gf('django.db.models.fields.related.ForeignKey')(related_name='owned_sales_cycles_x', null=True, to=orm['alm_user.User']),
+                      keep_default=False)
 
-        # Changing field 'Activity.owner'
-        db.alter_column('alma_activity', 'owner_id', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['alm_crm.CRMUser']))
+        # Deleting field 'SalesCycle.owner'
+        db.delete_column('alma_sales_cycle', 'owner_id')
 
-        # Changing field 'Contact.owner'
-        db.alter_column('alma_contact', 'owner_id', self.gf('django.db.models.fields.related.ForeignKey')(null=True, to=orm['alm_crm.CRMUser']))
+        # Adding field 'ContactList.another_owner'
+        db.add_column('alma_contact_list', 'another_owner',
+                      self.gf('django.db.models.fields.related.ForeignKey')(related_name='owned_list_x', null=True, to=orm['alm_user.User'], blank=True),
+                      keep_default=False)
 
-        # Changing field 'Product.owner'
-        db.alter_column('alma_product', 'owner_id', self.gf('django.db.models.fields.related.ForeignKey')(null=True, to=orm['alm_crm.CRMUser']))
+        # Deleting field 'ContactList.owner'
+        db.delete_column('alma_contact_list', 'owner_id')
 
-        # Changing field 'ProductGroup.owner'
-        db.alter_column('alma_product_group', 'owner_id', self.gf('django.db.models.fields.related.ForeignKey')(null=True, to=orm['alm_crm.CRMUser']))
+        # Adding field 'Activity.another_owner'
+        db.add_column('alma_activity', 'another_owner',
+                      self.gf('django.db.models.fields.related.ForeignKey')(related_name='activity_owner_x', null=True, to=orm['alm_user.User']),
+                      keep_default=False)
+
+        # Deleting field 'Activity.owner'
+        db.delete_column('alma_activity', 'owner_id')
+
+        # Adding field 'ProductGroup.another_owner'
+        db.add_column('alma_product_group', 'another_owner',
+                      self.gf('django.db.models.fields.related.ForeignKey')(related_name='owned_product_groups_x', null=True, to=orm['alm_user.User']),
+                      keep_default=False)
+
+        # Deleting field 'ProductGroup.owner'
+        db.delete_column('alma_product_group', 'owner_id')
+
 
     models = {
         u'alm_crm.activity': {
@@ -98,9 +151,10 @@ class Migration(SchemaMigration):
             'description': ('django.db.models.fields.CharField', [], {'max_length': '500'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'need_preparation': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'owner': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'activity_owner'", 'to': u"orm['alm_user.User']"}),
+            'owner': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'activity_owner'", 'null': 'True', 'to': u"orm['alm_user.User']"}),
             'result': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
             'sales_cycle': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'rel_activities'", 'to': u"orm['alm_crm.SalesCycle']"}),
+            'subscription_id': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'title': ('django.db.models.fields.CharField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'})
         },
         u'alm_crm.activityrecipient': {
@@ -111,6 +165,7 @@ class Migration(SchemaMigration):
             'date_edited': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
             'has_read': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'subscription_id': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'user': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'activities'", 'to': u"orm['alm_user.User']"})
         },
         u'alm_crm.comment': {
@@ -122,7 +177,8 @@ class Migration(SchemaMigration):
             'date_edited': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'object_id': ('django.db.models.fields.IntegerField', [], {'null': 'True'}),
-            'owner': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'comment_owner'", 'to': u"orm['alm_user.User']"})
+            'owner': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'comment_owner'", 'null': 'True', 'to': u"orm['alm_user.User']"}),
+            'subscription_id': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'})
         },
         u'alm_crm.contact': {
             'Meta': {'object_name': 'Contact', 'db_table': "'alma_contact'"},
@@ -132,9 +188,10 @@ class Migration(SchemaMigration):
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'import_task': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'contacts'", 'null': 'True', 'on_delete': 'models.SET_NULL', 'to': u"orm['alm_crm.ImportTask']"}),
             'latest_activity': ('django.db.models.fields.related.OneToOneField', [], {'related_name': "'contact_latest_activity'", 'unique': 'True', 'null': 'True', 'on_delete': 'models.SET_NULL', 'to': u"orm['alm_crm.Activity']"}),
-            'owner': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'owned_contacts'", 'null': 'True', 'to': u"orm['alm_user.User']"}),
+            'owner': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'owned_contacts'", 'null': 'True', 'to': u"orm['alm_user.User']"}),
             'parent': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'children'", 'null': 'True', 'to': u"orm['alm_crm.Contact']"}),
             'status': ('django.db.models.fields.IntegerField', [], {'default': '0', 'max_length': '30'}),
+            'subscription_id': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'tp': ('django.db.models.fields.CharField', [], {'default': "'user'", 'max_length': '30'}),
             'vcard': ('django.db.models.fields.related.OneToOneField', [], {'related_name': "'contact'", 'null': 'True', 'on_delete': 'models.SET_NULL', 'to': u"orm['alm_vcard.VCard']", 'blank': 'True', 'unique': 'True'})
         },
@@ -147,6 +204,7 @@ class Migration(SchemaMigration):
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'import_task': ('django.db.models.fields.related.OneToOneField', [], {'to': u"orm['alm_crm.ImportTask']", 'unique': 'True', 'null': 'True', 'on_delete': 'models.SET_NULL', 'blank': 'True'}),
             'owner': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'owned_list'", 'null': 'True', 'to': u"orm['alm_user.User']"}),
+            'subscription_id': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'title': ('django.db.models.fields.CharField', [], {'max_length': '150'})
         },
         u'alm_crm.crmuser': {
@@ -157,6 +215,7 @@ class Migration(SchemaMigration):
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'is_supervisor': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'organization_id': ('django.db.models.fields.IntegerField', [], {}),
+            'subscription_id': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'unfollow_list': ('django.db.models.fields.related.ManyToManyField', [], {'blank': 'True', 'related_name': "'unfollowers'", 'null': 'True', 'symmetrical': 'False', 'to': u"orm['alm_crm.Contact']"}),
             'user_id': ('django.db.models.fields.IntegerField', [], {})
         },
@@ -167,6 +226,7 @@ class Migration(SchemaMigration):
             'date_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'date_edited': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'subscription_id': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'title': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'})
         },
         u'alm_crm.customfieldvalue': {
@@ -178,6 +238,7 @@ class Migration(SchemaMigration):
             'date_edited': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'object_id': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
+            'subscription_id': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'value': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'})
         },
         u'alm_crm.customsection': {
@@ -188,6 +249,7 @@ class Migration(SchemaMigration):
             'date_edited': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'object_id': ('django.db.models.fields.IntegerField', [], {}),
+            'subscription_id': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'title': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'})
         },
         u'alm_crm.errorcell': {
@@ -198,18 +260,6 @@ class Migration(SchemaMigration):
             'import_task': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['alm_crm.ImportTask']"}),
             'row': ('django.db.models.fields.IntegerField', [], {})
         },
-        u'alm_crm.feedback': {
-            'Meta': {'object_name': 'Feedback'},
-            'activity': ('django.db.models.fields.related.OneToOneField', [], {'to': u"orm['alm_crm.Activity']", 'unique': 'True'}),
-            'company_id': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
-            'date_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            'date_edited': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
-            'feedback': ('django.db.models.fields.CharField', [], {'max_length': '300', 'null': 'True'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'owner': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'feedback_owner'", 'to': u"orm['alm_user.User']"}),
-            'status': ('django.db.models.fields.CharField', [], {'default': "'W'", 'max_length': '1'}),
-            'value': ('django.db.models.fields.related.OneToOneField', [], {'to': u"orm['alm_crm.Value']", 'unique': 'True', 'null': 'True', 'blank': 'True'})
-        },
         u'alm_crm.filter': {
             'Meta': {'object_name': 'Filter', 'db_table': "'alma_filter'"},
             'base': ('django.db.models.fields.CharField', [], {'default': "'all'", 'max_length': '6'}),
@@ -218,7 +268,8 @@ class Migration(SchemaMigration):
             'date_edited': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
             'filter_text': ('django.db.models.fields.CharField', [], {'max_length': '500'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'owner': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'owned_filter'", 'to': u"orm['alm_user.User']"}),
+            'owner': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'owned_filter'", 'null': 'True', 'to': u"orm['alm_user.User']"}),
+            'subscription_id': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'title': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '100'})
         },
         u'alm_crm.hashtag': {
@@ -236,7 +287,8 @@ class Migration(SchemaMigration):
             'date_edited': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
             'hashtag': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'references'", 'to': u"orm['alm_crm.HashTag']"}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'object_id': ('django.db.models.fields.IntegerField', [], {})
+            'object_id': ('django.db.models.fields.IntegerField', [], {}),
+            'subscription_id': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'})
         },
         u'alm_crm.importtask': {
             'Meta': {'object_name': 'ImportTask'},
@@ -256,6 +308,7 @@ class Migration(SchemaMigration):
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'object_id': ('django.db.models.fields.IntegerField', [], {}),
             'owner': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'owned_mentions'", 'null': 'True', 'to': u"orm['alm_user.User']"}),
+            'subscription_id': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'user': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'mentions'", 'null': 'True', 'to': u"orm['alm_crm.CRMUser']"})
         },
         u'alm_crm.milestone': {
@@ -267,6 +320,7 @@ class Migration(SchemaMigration):
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'is_system': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
             'sort': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
+            'subscription_id': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'title': ('django.db.models.fields.CharField', [], {'max_length': '1024', 'null': 'True', 'blank': 'True'})
         },
         u'alm_crm.product': {
@@ -279,7 +333,8 @@ class Migration(SchemaMigration):
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'owner': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'crm_products'", 'null': 'True', 'to': u"orm['alm_user.User']"}),
-            'price': ('django.db.models.fields.IntegerField', [], {})
+            'price': ('django.db.models.fields.IntegerField', [], {}),
+            'subscription_id': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'})
         },
         u'alm_crm.productgroup': {
             'Meta': {'object_name': 'ProductGroup', 'db_table': "'alma_product_group'"},
@@ -287,8 +342,9 @@ class Migration(SchemaMigration):
             'date_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'date_edited': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'owner': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'owned_product_groups'", 'null': 'True', 'to': u"orm['alm_user.User']"}),
+            'owner': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'owned_product_groups'", 'null': 'True', 'to': u"orm['alm_user.User']"}),
             'products': ('django.db.models.fields.related.ManyToManyField', [], {'blank': 'True', 'related_name': "'product_groups'", 'null': 'True', 'symmetrical': 'False', 'to': u"orm['alm_crm.Product']"}),
+            'subscription_id': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'title': ('django.db.models.fields.CharField', [], {'max_length': '150'})
         },
         u'alm_crm.salescycle': {
@@ -304,11 +360,12 @@ class Migration(SchemaMigration):
             'is_global': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'latest_activity': ('django.db.models.fields.related.OneToOneField', [], {'to': u"orm['alm_crm.Activity']", 'unique': 'True', 'null': 'True', 'on_delete': 'models.SET_NULL', 'blank': 'True'}),
             'milestone': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'sales_cycles'", 'null': 'True', 'to': u"orm['alm_crm.Milestone']"}),
-            'owner': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'owned_sales_cycles'", 'to': u"orm['alm_user.User']"}),
+            'owner': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'owned_sales_cycles'", 'null': 'True', 'to': u"orm['alm_user.User']"}),
             'products': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'sales_cycles'", 'to': u"orm['alm_crm.Product']", 'through': u"orm['alm_crm.SalesCycleProductStat']", 'blank': 'True', 'symmetrical': 'False', 'null': 'True'}),
             'projected_value': ('django.db.models.fields.related.OneToOneField', [], {'blank': 'True', 'related_name': "'sales_cycle_as_projected'", 'unique': 'True', 'null': 'True', 'to': u"orm['alm_crm.Value']"}),
             'real_value': ('django.db.models.fields.related.OneToOneField', [], {'blank': 'True', 'related_name': "'sales_cycle_as_real'", 'unique': 'True', 'null': 'True', 'to': u"orm['alm_crm.Value']"}),
             'status': ('django.db.models.fields.CharField', [], {'default': "'N'", 'max_length': '2'}),
+            'subscription_id': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'title': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'to_date': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'})
         },
@@ -321,7 +378,8 @@ class Migration(SchemaMigration):
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'meta': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
             'owner': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'owned_logentries'", 'null': 'True', 'to': u"orm['alm_user.User']"}),
-            'sales_cycle': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'log'", 'to': u"orm['alm_crm.SalesCycle']"})
+            'sales_cycle': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'log'", 'to': u"orm['alm_crm.SalesCycle']"}),
+            'subscription_id': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'})
         },
         u'alm_crm.salescycleproductstat': {
             'Meta': {'object_name': 'SalesCycleProductStat', 'db_table': "'alma_cycle_prod_stat'"},
@@ -332,7 +390,8 @@ class Migration(SchemaMigration):
             'product': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['alm_crm.Product']"}),
             'projected_value': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
             'real_value': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
-            'sales_cycle': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'product_stats'", 'null': 'True', 'on_delete': 'models.SET_NULL', 'to': u"orm['alm_crm.SalesCycle']"})
+            'sales_cycle': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'product_stats'", 'null': 'True', 'on_delete': 'models.SET_NULL', 'to': u"orm['alm_crm.SalesCycle']"}),
+            'subscription_id': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'})
         },
         u'alm_crm.share': {
             'Meta': {'object_name': 'Share', 'db_table': "'alma_share'"},
@@ -344,7 +403,8 @@ class Migration(SchemaMigration):
             'is_read': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'note': ('django.db.models.fields.CharField', [], {'max_length': '500', 'null': 'True'}),
             'share_from': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'owned_shares'", 'to': u"orm['alm_crm.CRMUser']"}),
-            'share_to': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'in_shares'", 'to': u"orm['alm_crm.CRMUser']"})
+            'share_to': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'in_shares'", 'to': u"orm['alm_crm.CRMUser']"}),
+            'subscription_id': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'})
         },
         u'alm_crm.value': {
             'Meta': {'object_name': 'Value', 'db_table': "'alma_value'"},
@@ -355,7 +415,8 @@ class Migration(SchemaMigration):
             'date_edited': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'owner': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'owned_values'", 'null': 'True', 'to': u"orm['alm_user.User']"}),
-            'salary': ('django.db.models.fields.CharField', [], {'default': "'instant'", 'max_length': '7'})
+            'salary': ('django.db.models.fields.CharField', [], {'default': "'instant'", 'max_length': '7'}),
+            'subscription_id': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'})
         },
         u'alm_user.user': {
             'Meta': {'object_name': 'User', 'db_table': "'alma_user'"},
