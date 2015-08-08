@@ -12,6 +12,8 @@ from alm_crm.models import (
 	)
 
 def text_parser(base_text, content_class=None, object_id=None):
+	content_type =  ContentType.objects.get_for_model(content_class)
+
 	hashtag_parser = re.compile(u'\B#\w*[а-яА-ЯёЁa-zA-Z]+\w*', re.U)
 	mention_parser = re.compile('\B@\[[0-9]*\:')
 
@@ -20,8 +22,18 @@ def text_parser(base_text, content_class=None, object_id=None):
 
 	# delete hashtags and mention references in case of editing objects
 	# content_class.objects.get(id=object_id).hashtags.clear()
-	content_class.objects.get(id=object_id).mentions.clear()
-	
+	content_class.objects.get(id=object_id).mentions.clear()	
+
+	# delete hashtags that not included in new text
+	already_added_hastags = HashTagReference.objects.filter(content_type=content_type, object_id=object_id)
+	for hashtagRef in already_added_hastags:
+		if not hashtagRef.hashtag.text in hashtags:
+			_h = hashtagRef.hashtag
+			hashtagRef.delete()
+			if len(_h.references.all()) == 0:
+				_h.delete()
+
+
 	for hashtag_item in hashtags:
 		hashtag, created = HashTag.objects.get_or_create(text=hashtag_item)
 		if created:
@@ -29,7 +41,7 @@ def text_parser(base_text, content_class=None, object_id=None):
 
 		if(hashtag):
 			# check for prevent adding already added reference
-			newRef = ContentType.objects.get_for_model(content_class).__str__()+str(object_id)
+			newRef = content_type.__str__()+str(object_id)
 			refs = [r.content_type.__str__()+str(r.object_id) for r in hashtag.references.all()]
 
 			if not newRef in refs:
@@ -38,6 +50,7 @@ def text_parser(base_text, content_class=None, object_id=None):
 					content_class=content_class,
 					object_id=object_id,
 					save=True)
+
 
 	user_id_parser = re.compile('\d[0-9]*')
 	for mention_item in mentions:
