@@ -33,10 +33,10 @@ def check_task_status(uuid):
 
 class GroupSplitIterator(object):
 
-    def __init__(self, nrows, gsize):
+    def __init__(self, nrows, gsize, ignore_first_row):
         self.nrows = nrows
         self.gsize = gsize
-        self.next_group = 0
+        self.next_group = 0 if not ignore_first_row else 1
         self.__should_stop = False
 
     def __iter__(self):
@@ -58,8 +58,8 @@ class GroupSplitIterator(object):
         return self.next_group - self.gsize
 
 
-def current_next_iter(nrows, gsize):
-    a, b = itertools.tee(GroupSplitIterator(nrows, gsize), 2)
+def current_next_iter(nrows, gsize, ignore_first_row):
+    a, b = itertools.tee(GroupSplitIterator(nrows, gsize, ignore_first_row), 2)
     next(b, None)
     return itertools.izip(a, b)
 
@@ -72,7 +72,7 @@ def grouped_contact_import_task(file_structure, filename, creator, ignore_first_
     import_task.save()
     chord_task = chord([
         add_contacts_by_chunks.s(import_task.id, file_structure, filename, creator.id, curg, nextg)
-        for curg, nextg in current_next_iter(nrows, 100)
+        for curg, nextg in current_next_iter(nrows, 100, ignore_first_row)
     ])(finish_add_contacts.s(filename, import_task.id, creator.id))
     import_task.uuid = chord_task.id
     import_task.filename = filename 

@@ -1567,9 +1567,7 @@ class ContactResource(CRMServiceModelResource):
             format=request.META.get('CONTENT_TYPE', 'application/json'))
         col_structure = data.get('col_structure')
         filename = data.get('filename')
-        ignore_first_row = data.get('ignore_first_row',"")
-        if not ignore_first_row:
-            ignore_first_row = False
+        ignore_first_row = data.get('ignore_first_row', False)
         # col_structure = request.body.get('col_structure')
         # filename = request.body.get('filename')
         # try:
