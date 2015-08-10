@@ -23,6 +23,7 @@ from .models import (
     ImportTask,
     ErrorCell
     )
+from alm_user.api import UserResource
 from alm_vcard.api import (
     VCardResource,
     VCardEmailResource,
@@ -3144,7 +3145,7 @@ class AppStateObject(object):
         return obj
 
 
-    def get_company(request)(self):
+    def get_company(request):
         data = {
             'id': self.company.id,
             'name': self.company.name,
@@ -3371,7 +3372,7 @@ class AppStateResource(Resource):
             obj = AppStateObject(service_slug=kwargs['slug'], request=request)
             return self.create_response(request, {'objects': obj.get_categories()}, response_class=http.HttpAccepted)
 
-    def get_company(request)(self, request, **kwargs):
+    def get_company(self, request, **kwargs):
         with RequestContext(self, request, allowed_methods=['get']):
             obj = AppStateObject(service_slug=kwargs['slug'], request=request)
             return self.create_response(request, {'objects': obj.get_company(request)()}, response_class=http.HttpAccepted)

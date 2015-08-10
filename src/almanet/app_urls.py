@@ -17,7 +17,6 @@ from alm_crm.api import (
     ProductResource,
     ProductGroupResource,
     ShareResource,
-    CRMUserResource,
     ValueResource,
     ContactListResource,
     ConstantsResource,
@@ -50,7 +49,6 @@ v1_api.register(ProductResource())
 v1_api.register(ProductGroupResource())
 v1_api.register(ShareResource())
 v1_api.register(ValueResource())
-v1_api.register(CRMUserResource())
 v1_api.register(UserResource())
 v1_api.register(ContactListResource())
 v1_api.register(AppStateResource())

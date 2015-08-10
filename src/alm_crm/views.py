@@ -13,7 +13,6 @@ from models import (
     Activity,
     Comment,
     Value,
-    CRMUser,
     Product,
     Share
     )

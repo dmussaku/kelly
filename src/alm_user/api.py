@@ -9,7 +9,7 @@ from django.contrib.auth import login, authenticate
 from django.conf.urls import url
 from tastypie.utils import trailing_slash
 from alm_vcard.models import *
-from alm_crm.models import Contact, CRMUser
+from alm_crm.models import Contact
 
 from .models import User
 from tastypie.authentication import (
@@ -26,7 +26,6 @@ from django.http import HttpResponse
 from almanet.settings import DEFAULT_SERVICE
 from almanet.utils.api import RequestContext
 from almanet.utils.env import get_subscr_id
-from alm_crm.api import CRMUserResource
 import json
 import datetime
 import ast

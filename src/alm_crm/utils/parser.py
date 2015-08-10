@@ -5,7 +5,6 @@ from alm_crm.models import (
 	HashTag, 
 	HashTagReference, 
 	Mention,
-	CRMUser,
 	Comment, 
 	Activity,
 	Share,

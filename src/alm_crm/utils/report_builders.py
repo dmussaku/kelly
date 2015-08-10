@@ -3,7 +3,6 @@ from alm_crm.models import (
 	SalesCycle,
 	Milestone,
 	Activity,
-	CRMUser,
 	SalesCycleProductStat,
 	Product,
 	ProductGroup,
