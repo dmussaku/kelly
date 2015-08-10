@@ -723,7 +723,7 @@ class ContactResource(CRMServiceModelResource):
         else:
             bundle.obj = self._meta.object_class()
             bundle.obj.company_id = company_id
-            bundle.obj.owner_id = bundle.request.user.get_company(request).id
+            bundle.obj.owner_id = bundle.request.user.id
             bundle.obj.save()
 
         '''
@@ -786,59 +786,13 @@ class ContactResource(CRMServiceModelResource):
                 SalesCycle.create_globalcycle(
                     **{
                      'company_id':company_id,
-                     'owner_id':self.get_crmuser(bundle.request).id,
+                     'owner_id':bundle.request.user.id,
                      'contact_id':bundle.obj.id
                     }
                 )
         # t4=time.time()-t3
         # print "Time to finish creating share and sales_cycle objects %s" % t4
         return bundle
-
-    def follow_contacts(self, request, **kwargs):
-        if kwargs.get('contact_ids'):
-            try:
-                contact_ids = ast.literal_eval(
-                    kwargs.get('contact_ids'))
-            except:
-                return self.create_response(
-                    request, {'success':False, 'message':'Pass a list as a parameter'}
-                    )
-        crmuser = request.user.get_company(request)
-        for contact_id in contact_ids:
-            try:
-                crmuser.unfollow_list.remove(
-                    Contact.objects.get(id=contact_id))
-            except DoesNotExist:
-                return self.create_response(
-                    request, {'success':False, 'message':'Contact with a given id does not exist'}
-                    )
-        crmuser.save()
-        return self.create_response(
-                    request, {'success':True, 'message':'You successfully followed %s' % contact}
-                    )
-
-    def unfollow_contacts(self, request, **kwargs):
-        if kwargs.get('contact_ids'):
-            try:
-                contact_ids = ast.literal_eval(
-                    kwargs.get('contact_ids'))
-            except:
-                return self.create_response(
-                    request, {'success':False, 'message':'Pass a list as a parameter'}
-                    )
-        crmuser = request.user.get_company(request)
-        for contact_id in contact_ids:
-            try:
-                crmuser.unfollow_list.add(
-                    Contact.objects.get(id=contact_id))
-            except DoesNotExist:
-                return self.create_response(
-                    request, {'success':False, 'message':'Contact with a given id does not exist'}
-                    )
-        crmuser.save()
-        return self.create_response(
-                    request, {'success':True, 'message':'You successfully followed %s' % contact}
-                    )
 
     def assign_company_contact(self, request, **kwargs):
         if kwargs.get('contact_id'):
