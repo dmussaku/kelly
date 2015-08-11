@@ -1,0 +1,2252 @@
+[
+{
+    "pk": 1, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 6, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 32, 
+        "date_created": "2015-08-10T07:25:07.482Z", 
+        "last_login": "2015-08-10T07:25:07.482Z", 
+        "password": "pbkdf2_sha256$12000$fKwkdMCD66iu$ytFsGnoHe3JruE3d3v0oydAj9ftp8JlKSeGHecXAl0Y=", 
+        "email": "director@medonica.uz", 
+        "date_edited": "2015-08-10T07:25:07.482Z"
+    }
+},
+{
+    "pk": 2, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 10, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 139, 
+        "date_created": "2015-08-10T07:25:07.486Z", 
+        "last_login": "2015-08-10T07:25:07.486Z", 
+        "password": "pbkdf2_sha256$12000$5xdSCtwpajgB$FIzpcd2jDEtYce4pJ4jcCVbkaMMRA9rLQAftiRUZkv4=", 
+        "email": "service@ordamed.com", 
+        "date_edited": "2015-08-10T07:25:07.486Z"
+    }
+},
+{
+    "pk": 3, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 3, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 20, 
+        "date_created": "2015-08-10T07:25:07.489Z", 
+        "last_login": "2015-08-10T07:25:07.489Z", 
+        "password": "pbkdf2_sha256$12000$fMxSvOhuc96I$M9/2ogqEv9mNAUjwnS4hInxWqUd4rMzcu4MSiOEaV4I=", 
+        "email": "zarina@medonica.kz", 
+        "date_edited": "2015-08-10T07:25:07.489Z"
+    }
+},
+{
+    "pk": 4, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 10, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 131, 
+        "date_created": "2015-08-10T07:25:07.493Z", 
+        "last_login": "2015-08-10T07:25:07.492Z", 
+        "password": "pbkdf2_sha256$12000$5MrVSAjD5AQm$9rmLA7z/MMLv2GXoycMRVI9g1/nLeo/wQo4dF/EHPmg=", 
+        "email": "aslan.oralbayev@gmail.com", 
+        "date_edited": "2015-08-10T07:25:07.493Z"
+    }
+},
+{
+    "pk": 5, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 9, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 45, 
+        "date_created": "2015-08-10T07:25:07.496Z", 
+        "last_login": "2015-08-10T07:25:07.495Z", 
+        "password": "pbkdf2_sha256$12000$wPPu82lHv9X5$ongNg/kRaJoliRuhIT2/DpfEa7VNvxljwOD9WR45PL0=", 
+        "email": "director@labtronic.kz", 
+        "date_edited": "2015-08-10T07:25:07.496Z"
+    }
+},
+{
+    "pk": 6, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 10, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 140, 
+        "date_created": "2015-08-10T07:25:07.499Z", 
+        "last_login": "2015-08-10T07:25:07.498Z", 
+        "password": "pbkdf2_sha256$12000$n0JDNxlcSc57$UICSPRvi7egbHclryTd+rMymE+x2zane2XEeKe4UX30=", 
+        "email": "s.turazhbekov@ordamed.kz", 
+        "date_edited": "2015-08-10T07:25:07.499Z"
+    }
+},
+{
+    "pk": 7, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 13, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 118, 
+        "date_created": "2015-08-10T07:25:07.501Z", 
+        "last_login": "2015-08-10T07:25:07.501Z", 
+        "password": "pbkdf2_sha256$12000$bXXmGxzdFhYF$gIwT5SwR1crsvzVJeJc0oqflfQbCVlstPGQIp7AfRko=", 
+        "email": "Aigerim.Moldakhmetova@medexpert.kz", 
+        "date_edited": "2015-08-10T07:25:07.501Z"
+    }
+},
+{
+    "pk": 8, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 19, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 151, 
+        "date_created": "2015-08-10T07:25:07.504Z", 
+        "last_login": "2015-08-10T07:25:07.504Z", 
+        "password": "pbkdf2_sha256$12000$GKPQhpK9rEny$qJo3m91cbwNYnVtsdfn4LrhYRr5420diYMNgzrVa40I=", 
+        "email": "dtamilova@test.kz", 
+        "date_edited": "2015-08-10T07:25:07.504Z"
+    }
+},
+{
+    "pk": 9, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 1, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 143, 
+        "date_created": "2015-08-10T07:25:07.507Z", 
+        "last_login": "2015-08-10T07:25:07.507Z", 
+        "password": "pbkdf2_sha256$12000$FAztPVrJGJN3$f67fup68P4RD6vHm+bt00LBm5nAL2k2M1WSnGbWojeE=", 
+        "email": "dinara.iskakova@hotmail.com", 
+        "date_edited": "2015-08-10T07:25:07.507Z"
+    }
+},
+{
+    "pk": 10, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 9, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 63, 
+        "date_created": "2015-08-10T07:25:07.510Z", 
+        "last_login": "2015-08-10T07:25:07.510Z", 
+        "password": "pbkdf2_sha256$12000$oGI7PYRhUNid$Rvb336El6HKjUuIkCBNwehgi4+lpcjcAbZ29pgHIHHA=", 
+        "email": "t.kulanbayeva@labtronic.kz", 
+        "date_edited": "2015-08-10T07:25:07.510Z"
+    }
+},
+{
+    "pk": 11, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 9, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 141, 
+        "date_created": "2015-08-10T07:25:07.513Z", 
+        "last_login": "2015-08-10T07:25:07.513Z", 
+        "password": "pbkdf2_sha256$12000$Q2kgdFda2FT9$5oIPn0y3EBn5YgGekAw+u6p7pDRotYx0IxV293cwS2s=", 
+        "email": "assel.t@labtronic.kz", 
+        "date_edited": "2015-08-10T07:25:07.513Z"
+    }
+},
+{
+    "pk": 12, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 1, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 138, 
+        "date_created": "2015-08-10T07:25:07.516Z", 
+        "last_login": "2015-08-10T07:25:07.516Z", 
+        "password": "pbkdf2_sha256$12000$guFW0PdzQyss$DwS9dAPKtzzLIiv1DrSPxqpZmyiqLlR5enG4i6y6guk=", 
+        "email": "iztiev@gmail.com", 
+        "date_edited": "2015-08-10T07:25:07.516Z"
+    }
+},
+{
+    "pk": 13, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 11, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 105, 
+        "date_created": "2015-08-10T07:25:07.519Z", 
+        "last_login": "2015-08-10T07:25:07.519Z", 
+        "password": "pbkdf2_sha256$12000$rlWfLHHyhUTx$CCvHY87LS0zVXldFfZhhZv1TGiWscC6qufci9bFl6T0=", 
+        "email": "sales@ordamed.com", 
+        "date_edited": "2015-08-10T07:25:07.519Z"
+    }
+},
+{
+    "pk": 14, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 8, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 44, 
+        "date_created": "2015-08-10T07:25:07.522Z", 
+        "last_login": "2015-08-10T07:25:07.522Z", 
+        "password": "pbkdf2_sha256$12000$79BB9vLPhKIp$PDnfuUJBn7pTy7M+5smW5BB3Ksty8CXEUbplBsc1qP8=", 
+        "email": "adimov@medonica.ru", 
+        "date_edited": "2015-08-10T07:25:07.522Z"
+    }
+},
+{
+    "pk": 15, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 1, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 12, 
+        "date_created": "2015-08-10T07:25:07.525Z", 
+        "last_login": "2015-08-10T07:25:07.525Z", 
+        "password": "pbkdf2_sha256$12000$d4ORdXkPvlhm$PJ/tyu8kTCP9m/RzjNKO9qPkJwgCyLqA6abt0KfMXXg=", 
+        "email": "sanzhar@altayev.kz", 
+        "date_edited": "2015-08-10T07:25:07.525Z"
+    }
+},
+{
+    "pk": 16, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 3, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 24, 
+        "date_created": "2015-08-10T07:25:07.528Z", 
+        "last_login": "2015-08-10T07:25:07.528Z", 
+        "password": "pbkdf2_sha256$12000$gHC0wfgX05o1$FByoDQ996WSlf7yKsHh3iSmSMxxho777OgicraCqMO0=", 
+        "email": "aleksandr@medonica.kz", 
+        "date_edited": "2015-08-10T07:25:07.528Z"
+    }
+},
+{
+    "pk": 17, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 9, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 142, 
+        "date_created": "2015-08-10T07:25:07.531Z", 
+        "last_login": "2015-08-10T07:25:07.531Z", 
+        "password": "pbkdf2_sha256$12000$KEnN5aDeuNSA$caHx/uRLsBWpfiz6Lab9IsfH0CRDRfj6TWJLJnIjFAE=", 
+        "email": "aisulu@labtronic.kz", 
+        "date_edited": "2015-08-10T07:25:07.531Z"
+    }
+},
+{
+    "pk": 18, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 3, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 21, 
+        "date_created": "2015-08-10T07:25:07.534Z", 
+        "last_login": "2015-08-10T07:25:07.534Z", 
+        "password": "pbkdf2_sha256$12000$8CS4KYWOI3hv$M1osToNUCI5MSxW8+iGm0l9OtzGYr6Ga/IoxIscDeDE=", 
+        "email": "inna@medonica.kz", 
+        "date_edited": "2015-08-10T07:25:07.534Z"
+    }
+},
+{
+    "pk": 19, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 2, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 14, 
+        "date_created": "2015-08-10T07:25:07.537Z", 
+        "last_login": "2015-08-10T07:25:07.537Z", 
+        "password": "pbkdf2_sha256$12000$vjfxviNPyNDk$LdNiWx4H3LmnN4o0rakZ+siD6u5ac/FF7vZpn1mkWXI=", 
+        "email": "d.dyussupova@gmail.com", 
+        "date_edited": "2015-08-10T07:25:07.537Z"
+    }
+},
+{
+    "pk": 20, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 3, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 23, 
+        "date_created": "2015-08-10T07:25:07.540Z", 
+        "last_login": "2015-08-10T07:25:07.539Z", 
+        "password": "pbkdf2_sha256$12000$GqfZ5CREzPtG$x2e7FByH22YbnauUGGdrcHCjgI4F94UkhfAjlEHRQL8=", 
+        "email": "alinur@medonica.kz", 
+        "date_edited": "2015-08-10T07:25:07.540Z"
+    }
+},
+{
+    "pk": 21, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 11, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 107, 
+        "date_created": "2015-08-10T07:25:07.543Z", 
+        "last_login": "2015-08-10T07:25:07.542Z", 
+        "password": "pbkdf2_sha256$12000$DRVDHVyokfx1$dJEvXRxeT6QIOdInZK23dxuo9QRxzgkSyRZclGUZ8dk=", 
+        "email": "mustafin.radmir@ordamed.com", 
+        "date_edited": "2015-08-10T07:25:07.543Z"
+    }
+},
+{
+    "pk": 22, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 1, 
+        "is_active": true, 
+        "is_admin": true, 
+        "user": 3, 
+        "date_created": "2015-08-10T07:25:07.546Z", 
+        "last_login": "2015-08-10T07:41:42.862Z", 
+        "password": "pbkdf2_sha256$12000$dcNiQ9QChKm8$uVTTDuMI5Fjbm9CKEvYksxDj+F3jETaO7yp1ImxYpSk=", 
+        "email": "r.kamun@gmail.com", 
+        "date_edited": "2015-08-10T07:25:07.546Z"
+    }
+},
+{
+    "pk": 23, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 3, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 15, 
+        "date_created": "2015-08-10T07:25:07.549Z", 
+        "last_login": "2015-08-10T07:25:07.548Z", 
+        "password": "pbkdf2_sha256$12000$JIwDacRe5VYU$QsB3QK/UDG0PocukAvA6dtlczR7ZuG6KxXF0I5cHq9g=", 
+        "email": "director@medonica.kz", 
+        "date_edited": "2015-08-10T07:25:07.549Z"
+    }
+},
+{
+    "pk": 24, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 14, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 152, 
+        "date_created": "2015-08-10T07:25:07.552Z", 
+        "last_login": "2015-08-10T07:25:07.552Z", 
+        "password": "pbkdf2_sha256$12000$hp39pW6jrdZJ$2TLMj9MQBsgpJEGtv8129cIg4pEavsHI85euUOfqA4E=", 
+        "email": "vtahimov@test.kz", 
+        "date_edited": "2015-08-10T07:25:07.552Z"
+    }
+},
+{
+    "pk": 25, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 1, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 144, 
+        "date_created": "2015-08-10T07:25:07.557Z", 
+        "last_login": "2015-08-10T07:25:07.556Z", 
+        "password": "pbkdf2_sha256$12000$n60XPjIFeuMG$NXgX8wkoyb6gkHJW+W6xD3oEguoN2DPqh5O3j6Y3II8=", 
+        "email": "bukmood@mail.ru", 
+        "date_edited": "2015-08-10T07:25:07.557Z"
+    }
+},
+{
+    "pk": 26, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 4, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 28, 
+        "date_created": "2015-08-10T07:25:07.560Z", 
+        "last_login": "2015-08-10T07:25:07.559Z", 
+        "password": "pbkdf2_sha256$12000$HQxHUVXC0ZG4$pdF53o0eN//1Nqsx8jLh4mFtboOAOfiIZpbJxcIhYTQ=", 
+        "email": "maestro@smartstar.kz", 
+        "date_edited": "2015-08-10T07:25:07.560Z"
+    }
+},
+{
+    "pk": 27, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 6, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 33, 
+        "date_created": "2015-08-10T07:25:07.562Z", 
+        "last_login": "2015-08-10T07:25:07.562Z", 
+        "password": "pbkdf2_sha256$12000$ctbzBixGkjbN$H51gB+1LsZrHIqMbdDCi2imj2Uiik/t2uh/6XahRfMI=", 
+        "email": "finance@medonica.uz", 
+        "date_edited": "2015-08-10T07:25:07.562Z"
+    }
+},
+{
+    "pk": 28, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 3, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 18, 
+        "date_created": "2015-08-10T07:25:07.565Z", 
+        "last_login": "2015-08-10T07:25:07.565Z", 
+        "password": "pbkdf2_sha256$12000$8LLTdxL9yQnk$f4WeQn2CCyJM+gmVBnaPZWqv7PHLQA32wPVzJGrrCHM=", 
+        "email": "accountant@medonica.kz", 
+        "date_edited": "2015-08-10T07:25:07.565Z"
+    }
+},
+{
+    "pk": 29, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 1, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 6, 
+        "date_created": "2015-08-10T07:25:07.568Z", 
+        "last_login": "2015-08-10T07:25:07.567Z", 
+        "password": "pbkdf2_sha256$12000$pM1yLqY7LiMM$vaZKSY45BoNvso32TeqtoliIQjIAhsRq8p8wnaGw9nM=", 
+        "email": "alexfixxed@gmail.com", 
+        "date_edited": "2015-08-10T07:25:07.568Z"
+    }
+},
+{
+    "pk": 30, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 3, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 17, 
+        "date_created": "2015-08-10T07:25:07.571Z", 
+        "last_login": "2015-08-10T07:25:07.570Z", 
+        "password": "pbkdf2_sha256$12000$j1wJrjpJLr48$uuCfFx5Mtg6MHM7Pb5U4mfECkeThnrMmMbOn2A4SZV0=", 
+        "email": "finance@medonica.kz", 
+        "date_edited": "2015-08-10T07:25:07.571Z"
+    }
+},
+{
+    "pk": 31, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 1, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 4, 
+        "date_created": "2015-08-10T07:25:07.574Z", 
+        "last_login": "2015-08-10T07:25:07.573Z", 
+        "password": "pbkdf2_sha256$12000$uQEJ43F8rAZU$ODuZN6takJyPkVmeYAEdXerDqYNVmpbfekYHU3vOVWw=", 
+        "email": "almusin@gmail.com", 
+        "date_edited": "2015-08-10T07:25:07.574Z"
+    }
+},
+{
+    "pk": 32, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 1, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 7, 
+        "date_created": "2015-08-10T07:25:07.577Z", 
+        "last_login": "2015-08-10T07:25:07.576Z", 
+        "password": "pbkdf2_sha256$12000$d1xVCFcE2983$fvreFkuI5DYI0Shm1ff9//+H81IpqgaB5Xq09TGneYQ=", 
+        "email": "kaznur-shan@mail.ru", 
+        "date_edited": "2015-08-10T07:25:07.577Z"
+    }
+},
+{
+    "pk": 33, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 4, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 30, 
+        "date_created": "2015-08-10T07:25:07.580Z", 
+        "last_login": "2015-08-10T07:25:07.579Z", 
+        "password": "pbkdf2_sha256$12000$Keo602RNyYD8$09XybLBu2+SWR11OoqJ7jq5ENyIhEDmSbne6nWlfOiM=", 
+        "email": "office@smartstar.kz", 
+        "date_edited": "2015-08-10T07:25:07.580Z"
+    }
+},
+{
+    "pk": 34, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 12, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 114, 
+        "date_created": "2015-08-10T07:25:07.583Z", 
+        "last_login": "2015-08-10T07:25:07.582Z", 
+        "password": "pbkdf2_sha256$12000$Iibut6A5Yeij$woYpcvV9WK+6PkBrq1Pv4aJZLwdmyN6HymG683Q2luo=", 
+        "email": "altayev@gmail.com", 
+        "date_edited": "2015-08-10T07:25:07.583Z"
+    }
+},
+{
+    "pk": 35, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 11, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 153, 
+        "date_created": "2015-08-10T07:25:07.586Z", 
+        "last_login": "2015-08-10T07:25:07.585Z", 
+        "password": "pbkdf2_sha256$12000$GjobNNGLUD4u$Zd6K4l0IdjuXSafYAM2PqZ1ZNkwZ4LnRHENU0fT+fwo=", 
+        "email": "oca_president@ordamed.com", 
+        "date_edited": "2015-08-10T07:25:07.586Z"
+    }
+},
+{
+    "pk": 36, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 13, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 123, 
+        "date_created": "2015-08-10T07:25:07.590Z", 
+        "last_login": "2015-08-10T07:25:07.590Z", 
+        "password": "pbkdf2_sha256$12000$tNRA1pSV8hht$99E4ThzlS70pSjIMyy6EVsTho+FfXozCzRO2yvkByps=", 
+        "email": "sales@medexpert.kz", 
+        "date_edited": "2015-08-10T07:25:07.590Z"
+    }
+},
+{
+    "pk": 37, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 10, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 71, 
+        "date_created": "2015-08-10T07:25:07.594Z", 
+        "last_login": "2015-08-10T07:25:07.593Z", 
+        "password": "pbkdf2_sha256$12000$yOKmcELsjJPL$dy07Wf/0hsB5FbaTe+eHYxaR9S2k9hIpJC5SwezGdBA=", 
+        "email": "a.khan@ordamed.kz", 
+        "date_edited": "2015-08-10T07:25:07.594Z"
+    }
+},
+{
+    "pk": 38, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 6, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 34, 
+        "date_created": "2015-08-10T07:25:07.597Z", 
+        "last_login": "2015-08-10T07:25:07.596Z", 
+        "password": "pbkdf2_sha256$12000$GCNOJmNHBjSE$W8xnlm7M+uGsyI02HRsLl1+7KZWBIp82eVZsF1Me0w4=", 
+        "email": "marsel@medonica.uz", 
+        "date_edited": "2015-08-10T07:25:07.597Z"
+    }
+},
+{
+    "pk": 39, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 6, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 35, 
+        "date_created": "2015-08-10T07:25:07.600Z", 
+        "last_login": "2015-08-10T07:25:07.600Z", 
+        "password": "pbkdf2_sha256$12000$uxU8m4zEORgd$vczb4eFezL5VZ/O1Fn29DN1fNrZGJqO+rQjY0toK2LM=", 
+        "email": "rifkat@medonica.uz", 
+        "date_edited": "2015-08-10T07:25:07.600Z"
+    }
+},
+{
+    "pk": 40, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 5, 
+        "is_active": true, 
+        "is_admin": true, 
+        "user": 31, 
+        "date_created": "2015-08-10T07:25:07.603Z", 
+        "last_login": "2015-08-10T07:25:07.603Z", 
+        "password": "pbkdf2_sha256$12000$q3lgpdLC7029$O3CmMxOL0sxWs5PPp/+lZWSw8s6nitv43wBJ3uM2g9w=", 
+        "email": "dmussaku@gmail.com", 
+        "date_edited": "2015-08-10T07:25:07.603Z"
+    }
+},
+{
+    "pk": 41, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 1, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 136, 
+        "date_created": "2015-08-10T07:25:07.606Z", 
+        "last_login": "2015-08-10T07:25:07.606Z", 
+        "password": "pbkdf2_sha256$12000$SCIrZtEjn6gh$piJdMuG0rX9AK2n3zzbmpNvOQfMzsq4C4M9SJi5qYY8=", 
+        "email": "arthuran@mail.ru", 
+        "date_edited": "2015-08-10T07:25:07.606Z"
+    }
+},
+{
+    "pk": 42, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 3, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 22, 
+        "date_created": "2015-08-10T07:25:07.610Z", 
+        "last_login": "2015-08-10T07:25:07.609Z", 
+        "password": "pbkdf2_sha256$12000$K0sIgql6YnVD$fei/MvZrjZIwyeNLv0UbF9v+R5cIgG+F8rKpOM1qask=", 
+        "email": "dinara@medonica.kz", 
+        "date_edited": "2015-08-10T07:25:07.610Z"
+    }
+},
+{
+    "pk": 43, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 3, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 27, 
+        "date_created": "2015-08-10T07:25:07.613Z", 
+        "last_login": "2015-08-10T07:25:07.613Z", 
+        "password": "pbkdf2_sha256$12000$dEAiReGx4Ukf$EoVj6ZcsOTLn98DGEJTyuaghQPAiOH30UQWrEl/m/2M=", 
+        "email": "sales@medonica.com", 
+        "date_edited": "2015-08-10T07:25:07.613Z"
+    }
+},
+{
+    "pk": 44, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 2, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 10, 
+        "date_created": "2015-08-10T07:25:07.616Z", 
+        "last_login": "2015-08-10T07:25:07.616Z", 
+        "password": "pbkdf2_sha256$12000$koKvttF7ZcCT$alBFGE8zHCqzJy/QWzVSQR+KYem9cwtbz1YB4ktCZ6c=", 
+        "email": "igeeko@gmail.com", 
+        "date_edited": "2015-08-10T07:25:07.616Z"
+    }
+},
+{
+    "pk": 45, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 3, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 26, 
+        "date_created": "2015-08-10T07:25:07.620Z", 
+        "last_login": "2015-08-10T07:25:07.619Z", 
+        "password": "pbkdf2_sha256$12000$lL1P8zA7Ur9I$WX/wxvcFZPSNfRsQLyIthCDhoen0f7JRmcDdkh5AkLk=", 
+        "email": "service@medonica.kz", 
+        "date_edited": "2015-08-10T07:25:07.620Z"
+    }
+},
+{
+    "pk": 46, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 3, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 25, 
+        "date_created": "2015-08-10T07:25:07.623Z", 
+        "last_login": "2015-08-10T07:25:07.622Z", 
+        "password": "pbkdf2_sha256$12000$QD8KnqslXEDM$Z1yjdVjIJn6yViqWgvdVgltRUnHokgBWEu4pUjiQt50=", 
+        "email": "logistics@medonica.kz", 
+        "date_edited": "2015-08-10T07:25:07.623Z"
+    }
+},
+{
+    "pk": 47, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 1, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 9, 
+        "date_created": "2015-08-10T07:25:07.626Z", 
+        "last_login": "2015-08-10T07:25:07.626Z", 
+        "password": "pbkdf2_sha256$12000$pW9L1SLpzKeM$lki3wX3DFXpZqf2sN3iH/F4DWdVs4mFCDJIkVigm3ew=", 
+        "email": "zhanna.arta.alma@gmail.com", 
+        "date_edited": "2015-08-10T07:25:07.626Z"
+    }
+},
+{
+    "pk": 48, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 18, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 146, 
+        "date_created": "2015-08-10T07:25:07.630Z", 
+        "last_login": "2015-08-10T07:25:07.629Z", 
+        "password": "pbkdf2_sha256$12000$wRk4AoZAGm6W$qfOI0YmEBmPbHwUhTs6NztLfzW5XciUjrUMQArjbT8g=", 
+        "email": "tahmetov@test.kz", 
+        "date_edited": "2015-08-10T07:25:07.630Z"
+    }
+},
+{
+    "pk": 49, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 12, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 11, 
+        "date_created": "2015-08-10T07:25:07.633Z", 
+        "last_login": "2015-08-10T07:25:07.633Z", 
+        "password": "pbkdf2_sha256$12000$u1aXPSUUtOgU$VGzY7AbSCk3dlSRWi4BdLfPz9poEnj4o8O1LUFeHlvo=", 
+        "email": "a.myrzakhmetov@gmail.com", 
+        "date_edited": "2015-08-10T07:25:07.633Z"
+    }
+},
+{
+    "pk": 50, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 3, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 16, 
+        "date_created": "2015-08-10T07:25:07.637Z", 
+        "last_login": "2015-08-10T07:25:07.636Z", 
+        "password": "pbkdf2_sha256$12000$bKMaxM3aA43c$GZHAmWIzxLQeiZBk4Pu4b/UNE/KZ888jdtDjLtofllw=", 
+        "email": "info@medonica.kz", 
+        "date_edited": "2015-08-10T07:25:07.637Z"
+    }
+},
+{
+    "pk": 51, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 1, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 5, 
+        "date_created": "2015-08-10T07:25:07.640Z", 
+        "last_login": "2015-08-10T07:25:07.640Z", 
+        "password": "pbkdf2_sha256$12000$W3fa2GroEE7I$ESGdsnG6PPTB6SwlPWqTOkr+9EwJKXdN3C0lveFehXM=", 
+        "email": "abish.abdeldinov@gmail.com", 
+        "date_edited": "2015-08-10T07:25:07.640Z"
+    }
+},
+{
+    "pk": 52, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 1, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 8, 
+        "date_created": "2015-08-10T07:25:07.643Z", 
+        "last_login": "2015-08-10T07:25:07.643Z", 
+        "password": "pbkdf2_sha256$12000$THXTXTJbWU0E$/dS6M5/pPfDyLTbjjxNfTCs1upGk3ZWSYIDocYPewxI=", 
+        "email": "aigerim.sarmanova@list.ru", 
+        "date_edited": "2015-08-10T07:25:07.643Z"
+    }
+},
+{
+    "pk": 53, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 2, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 13, 
+        "date_created": "2015-08-10T07:25:07.646Z", 
+        "last_login": "2015-08-10T07:25:07.646Z", 
+        "password": "pbkdf2_sha256$12000$GdqHsUkvWsOj$QSVPbv7OAsEmnOOFjXWzygLM5FkBm7B89dhkI4DELB8=", 
+        "email": "azakieva@gmail.com", 
+        "date_edited": "2015-08-10T07:25:07.646Z"
+    }
+},
+{
+    "pk": 54, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 4, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 29, 
+        "date_created": "2015-08-10T07:25:07.650Z", 
+        "last_login": "2015-08-10T07:25:07.649Z", 
+        "password": "pbkdf2_sha256$12000$xzZrao9dWZlh$k1OipDn6xzCnOHWxxulELlFcS9twrUKdzPAtwbapmek=", 
+        "email": "a.brimgazina@smartstar.kz", 
+        "date_edited": "2015-08-10T07:25:07.650Z"
+    }
+},
+{
+    "pk": 55, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 9, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 50, 
+        "date_created": "2015-08-10T07:25:07.653Z", 
+        "last_login": "2015-08-10T07:25:07.652Z", 
+        "password": "pbkdf2_sha256$12000$F17gRC9mkPSn$587kgnbK9s6S8bPbGvT8hIPJ6NT86gO/nbt6zWtb4W8=", 
+        "email": "assel@labtronic.kz", 
+        "date_edited": "2015-08-10T07:25:07.653Z"
+    }
+},
+{
+    "pk": 56, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 8, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 41, 
+        "date_created": "2015-08-10T07:25:07.656Z", 
+        "last_login": "2015-08-10T07:25:07.656Z", 
+        "password": "pbkdf2_sha256$12000$EIsHtjDqho2k$2GiVDk0Imzi0Td+KBierUStxHxvgCfvUmZE7/A4u4lk=", 
+        "email": "mustafina@medonica.ru", 
+        "date_edited": "2015-08-10T07:25:07.656Z"
+    }
+},
+{
+    "pk": 57, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 7, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 38, 
+        "date_created": "2015-08-10T07:25:07.659Z", 
+        "last_login": "2015-08-10T07:25:07.659Z", 
+        "password": "pbkdf2_sha256$12000$AumpnEW6gLeX$kinSB7Qh8vumiD+s3rXEqYTGIMKiixxPQKcuYFZ8Ah4=", 
+        "email": "diu@medonica.com", 
+        "date_edited": "2015-08-10T07:25:07.659Z"
+    }
+},
+{
+    "pk": 58, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 7, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 37, 
+        "date_created": "2015-08-10T07:25:07.662Z", 
+        "last_login": "2015-08-10T07:25:07.662Z", 
+        "password": "pbkdf2_sha256$12000$Diyur9Lsl3S9$RLIYR/DMKDrw4ReSpvC8a4jik8o5twgoJyg584k8g/s=", 
+        "email": "elmira@medonica.com", 
+        "date_edited": "2015-08-10T07:25:07.662Z"
+    }
+},
+{
+    "pk": 59, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 7, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 39, 
+        "date_created": "2015-08-10T07:25:07.665Z", 
+        "last_login": "2015-08-10T07:25:07.665Z", 
+        "password": "pbkdf2_sha256$12000$p8w9zky97fua$kNyzhyP7StegIBzDETXUJVgj6Upa5FNFdmZXZhJsuBk=", 
+        "email": "kate@medonica.com", 
+        "date_edited": "2015-08-10T07:25:07.665Z"
+    }
+},
+{
+    "pk": 60, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 8, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 42, 
+        "date_created": "2015-08-10T07:25:07.669Z", 
+        "last_login": "2015-08-10T07:25:07.668Z", 
+        "password": "pbkdf2_sha256$12000$C71WQqoMLjNZ$BZnyHQY99lvj9D4LZaRN5XIXf39xa9XIapMpZOqEKlk=", 
+        "email": "finance@medonica.ru", 
+        "date_edited": "2015-08-10T07:25:07.669Z"
+    }
+},
+{
+    "pk": 61, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 8, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 43, 
+        "date_created": "2015-08-10T07:25:07.672Z", 
+        "last_login": "2015-08-10T07:25:07.672Z", 
+        "password": "pbkdf2_sha256$12000$Fc0vgmntjfOL$YzkdzpQ1Pva7SGMXm9yxMxPvYloF58rPyiD3VqIiVk8=", 
+        "email": "info@medonica.ru", 
+        "date_edited": "2015-08-10T07:25:07.672Z"
+    }
+},
+{
+    "pk": 62, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 9, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 52, 
+        "date_created": "2015-08-10T07:25:07.675Z", 
+        "last_login": "2015-08-10T07:25:07.675Z", 
+        "password": "pbkdf2_sha256$12000$h5462FUU7ddp$UTSAnpvIuUOYkTUKQZjEwj1LaoJsicCKLQTXo7BL4yI=", 
+        "email": "bakyt@labtronic.kz", 
+        "date_edited": "2015-08-10T07:25:07.675Z"
+    }
+},
+{
+    "pk": 63, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 9, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 60, 
+        "date_created": "2015-08-10T07:25:07.679Z", 
+        "last_login": "2015-08-10T07:25:07.678Z", 
+        "password": "pbkdf2_sha256$12000$b77S9qZrk7e5$5laA6xEDnOejz/K/gnuKdhnohufxej256EsreNDm+9Q=", 
+        "email": "olga@labtronic.kz", 
+        "date_edited": "2015-08-10T07:25:07.679Z"
+    }
+},
+{
+    "pk": 64, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 9, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 57, 
+        "date_created": "2015-08-10T07:25:07.682Z", 
+        "last_login": "2015-08-10T07:25:07.681Z", 
+        "password": "pbkdf2_sha256$12000$GeGe4W0AnA3a$pPLWRHRnMNxwhmDRUp9tBUMSoWLJOXdS4iFmLt0znq0=", 
+        "email": "s.nurgul@labtronic.kz", 
+        "date_edited": "2015-08-10T07:25:07.682Z"
+    }
+},
+{
+    "pk": 65, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 9, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 46, 
+        "date_created": "2015-08-10T07:25:07.685Z", 
+        "last_login": "2015-08-10T07:25:07.685Z", 
+        "password": "pbkdf2_sha256$12000$hPBmn1XSo7rP$hGh7KXRsbkuIXpYsjCocmf+Op0OaBQESjkb7gzXseP0=", 
+        "email": "alexandr@labtronic.kz", 
+        "date_edited": "2015-08-10T07:25:07.685Z"
+    }
+},
+{
+    "pk": 66, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 9, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 47, 
+        "date_created": "2015-08-10T07:25:07.688Z", 
+        "last_login": "2015-08-10T07:25:07.688Z", 
+        "password": "pbkdf2_sha256$12000$opmLfT1QdI7z$Z9g3kcFcQDQeJki2A+UZASkIhEtb5pkebgR9lRezbGA=", 
+        "email": "logistics@labtronic.kz", 
+        "date_edited": "2015-08-10T07:25:07.688Z"
+    }
+},
+{
+    "pk": 67, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 9, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 48, 
+        "date_created": "2015-08-10T07:25:07.692Z", 
+        "last_login": "2015-08-10T07:25:07.691Z", 
+        "password": "pbkdf2_sha256$12000$zoFPeHUg45Qg$Yddk6j1EVK5BIciZZi1sq2W7YD4BzsBtMtkC3NnTga4=", 
+        "email": "finance@labtronic.kz", 
+        "date_edited": "2015-08-10T07:25:07.692Z"
+    }
+},
+{
+    "pk": 68, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 8, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 40, 
+        "date_created": "2015-08-10T07:25:07.695Z", 
+        "last_login": "2015-08-10T07:25:07.694Z", 
+        "password": "pbkdf2_sha256$12000$JZAqjKowsK1C$aHJVEt1oGYVGCme2L188Ey1P1EfZDk4Hg4Rlk1Yq674=", 
+        "email": "ivanov@medonica.ru", 
+        "date_edited": "2015-08-10T07:25:07.695Z"
+    }
+},
+{
+    "pk": 69, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 9, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 49, 
+        "date_created": "2015-08-10T07:25:07.698Z", 
+        "last_login": "2015-08-10T07:25:07.698Z", 
+        "password": "pbkdf2_sha256$12000$DWvSHsB8z3WC$E3JNPENnysiMmb+0rr756TZAbkisDiisFrISDeS+NkM=", 
+        "email": "yekaterina@labtronic.kz", 
+        "date_edited": "2015-08-10T07:25:07.698Z"
+    }
+},
+{
+    "pk": 70, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 9, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 62, 
+        "date_created": "2015-08-10T07:25:07.701Z", 
+        "last_login": "2015-08-10T07:25:07.701Z", 
+        "password": "pbkdf2_sha256$12000$h5epytAWK62o$oUpPWzCDGd+p99naTz0nuZV2trIR4YQzM5YviTURNW0=", 
+        "email": "tender@labtronic.kz", 
+        "date_edited": "2015-08-10T07:25:07.701Z"
+    }
+},
+{
+    "pk": 71, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 9, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 68, 
+        "date_created": "2015-08-10T07:25:07.705Z", 
+        "last_login": "2015-08-10T07:25:07.704Z", 
+        "password": "pbkdf2_sha256$12000$6MGKFVfXMeYn$i0+y7WTu8ec5STFGHc5Jb5ny0DTrak4yTGP1kYi1oeg=", 
+        "email": "olga.l@labtronic.kz", 
+        "date_edited": "2015-08-10T07:25:07.705Z"
+    }
+},
+{
+    "pk": 72, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 9, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 51, 
+        "date_created": "2015-08-10T07:25:07.709Z", 
+        "last_login": "2015-08-10T07:25:07.709Z", 
+        "password": "pbkdf2_sha256$12000$blJGgIgcMSVF$B1fRyMRkIFrol5frOcCiqhVqIbcJdFVxlVrsuSmfVfI=", 
+        "email": "aliya@labtronic.kz", 
+        "date_edited": "2015-08-10T07:25:07.710Z"
+    }
+},
+{
+    "pk": 73, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 9, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 53, 
+        "date_created": "2015-08-10T07:25:07.713Z", 
+        "last_login": "2015-08-10T07:25:07.713Z", 
+        "password": "pbkdf2_sha256$12000$9E24wiWmgrEX$CyHJ4xtzsc7SyQv7wXQ4gsbP7KFSJ4no16M0tqCc3Xs=", 
+        "email": "marketing@labtronic.kz", 
+        "date_edited": "2015-08-10T07:25:07.713Z"
+    }
+},
+{
+    "pk": 74, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 9, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 54, 
+        "date_created": "2015-08-10T07:25:07.716Z", 
+        "last_login": "2015-08-10T07:25:07.715Z", 
+        "password": "pbkdf2_sha256$12000$BAeP2wmk4ymC$rnq/cv8Ivk8ZY9ElwVwSw8RM/P2+4c30xtku5xdsGsw=", 
+        "email": "info@labtronic.kz", 
+        "date_edited": "2015-08-10T07:25:07.716Z"
+    }
+},
+{
+    "pk": 75, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 9, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 55, 
+        "date_created": "2015-08-10T07:25:07.719Z", 
+        "last_login": "2015-08-10T07:25:07.718Z", 
+        "password": "pbkdf2_sha256$12000$prQi4WUylXgP$0bvbiSuhCqHVmKS0nXwUrr99pBm3GtoQ6t65xAGvR3U=", 
+        "email": "admin@labtronic.kz", 
+        "date_edited": "2015-08-10T07:25:07.719Z"
+    }
+},
+{
+    "pk": 76, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 9, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 56, 
+        "date_created": "2015-08-10T07:25:07.721Z", 
+        "last_login": "2015-08-10T07:25:07.721Z", 
+        "password": "pbkdf2_sha256$12000$Ont1r7yY8QxK$b32tKBe2lzOFxFpy7trkEGpCu78PUBZlrckL+WPFty4=", 
+        "email": "viktor@labtronic.kz", 
+        "date_edited": "2015-08-10T07:25:07.722Z"
+    }
+},
+{
+    "pk": 77, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 9, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 65, 
+        "date_created": "2015-08-10T07:25:07.724Z", 
+        "last_login": "2015-08-10T07:25:07.724Z", 
+        "password": "pbkdf2_sha256$12000$dmIrbBWhtYIC$x2KVvgwuOO0QcwTTbTb1zswvhp5Bie+oFz7aXt6G+UU=", 
+        "email": "petropavlovsk@labtronic.kz", 
+        "date_edited": "2015-08-10T07:25:07.724Z"
+    }
+},
+{
+    "pk": 78, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 9, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 64, 
+        "date_created": "2015-08-10T07:25:07.728Z", 
+        "last_login": "2015-08-10T07:25:07.727Z", 
+        "password": "pbkdf2_sha256$12000$TZ1WTSn0W2aE$r03DtAhbX/OSIkX0TnPY0LQ1HycKw43EznDEo8u17H0=", 
+        "email": "pavlodar@labtronic.kz", 
+        "date_edited": "2015-08-10T07:25:07.728Z"
+    }
+},
+{
+    "pk": 79, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 9, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 58, 
+        "date_created": "2015-08-10T07:25:07.731Z", 
+        "last_login": "2015-08-10T07:25:07.731Z", 
+        "password": "pbkdf2_sha256$12000$gIeBfOwqq8YT$YwDyHQv/XtpwAeMj7TA9h0koFu9TDzprM7s4pGm0RGk=", 
+        "email": "vitaliy@labtronic.kz", 
+        "date_edited": "2015-08-10T07:25:07.731Z"
+    }
+},
+{
+    "pk": 80, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 9, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 61, 
+        "date_created": "2015-08-10T07:25:07.734Z", 
+        "last_login": "2015-08-10T07:25:07.734Z", 
+        "password": "pbkdf2_sha256$12000$K6aGRHXZrksq$V78BAZ+8mhCvFZO7Ck4vHk9oap3Hbcx+r34Eq5fEsjQ=", 
+        "email": "gulmira@labtronic.kz", 
+        "date_edited": "2015-08-10T07:25:07.734Z"
+    }
+},
+{
+    "pk": 81, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 7, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 36, 
+        "date_created": "2015-08-10T07:25:07.738Z", 
+        "last_login": "2015-08-10T07:25:07.737Z", 
+        "password": "pbkdf2_sha256$12000$S0JX6vUAzGzK$Qp1hcrOj3HWTKWWvRgHm7zSfo7ye8UXkqiQE+bH7u+o=", 
+        "email": "president@medonica.com", 
+        "date_edited": "2015-08-10T07:25:07.738Z"
+    }
+},
+{
+    "pk": 82, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 9, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 66, 
+        "date_created": "2015-08-10T07:25:07.741Z", 
+        "last_login": "2015-08-10T07:25:07.740Z", 
+        "password": "pbkdf2_sha256$12000$edUGGzgESMDf$rvzPQ/PnZtqKZIslqMh6O6Iw22kwMbIPFXyPWexSNh0=", 
+        "email": "ust-kamenogorsk@labtronic.kz", 
+        "date_edited": "2015-08-10T07:25:07.741Z"
+    }
+},
+{
+    "pk": 83, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 9, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 59, 
+        "date_created": "2015-08-10T07:25:07.744Z", 
+        "last_login": "2015-08-10T07:25:07.744Z", 
+        "password": "pbkdf2_sha256$12000$z1CwBACVfaxd$c2R9uHa9tn2L6T0QrXyb+5dKjmCxcBVbGVRNMAeFoOw=", 
+        "email": "assel.zh@labtronic.kz", 
+        "date_edited": "2015-08-10T07:25:07.744Z"
+    }
+},
+{
+    "pk": 84, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 18, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 147, 
+        "date_created": "2015-08-10T07:25:07.747Z", 
+        "last_login": "2015-08-10T07:25:07.747Z", 
+        "password": "pbkdf2_sha256$12000$WY7zwcqqD0Xu$/TsR2q6vr02k8w76MgZwjpGqd+MsYBmjrinJaf1UK6E=", 
+        "email": "msagitov@test.kz", 
+        "date_edited": "2015-08-10T07:25:07.747Z"
+    }
+},
+{
+    "pk": 85, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 8, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 108, 
+        "date_created": "2015-08-10T07:25:07.750Z", 
+        "last_login": "2015-08-10T07:25:07.750Z", 
+        "password": "pbkdf2_sha256$12000$Doe4QxBRhF10$TSJOl5LiGwCq9ay5259Z8wFAMzs0wAAckLJkloJzbsA=", 
+        "email": "marketing@medonica.ru", 
+        "date_edited": "2015-08-10T07:25:07.751Z"
+    }
+},
+{
+    "pk": 86, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 8, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 110, 
+        "date_created": "2015-08-10T07:25:07.754Z", 
+        "last_login": "2015-08-10T07:25:07.753Z", 
+        "password": "pbkdf2_sha256$12000$moSnlBvd1C2G$2NHuSXmIXaw1WDtF9JhlONmXG5wW1R7nXbOUKjm4gPo=", 
+        "email": "x-ray@medonica.ru", 
+        "date_edited": "2015-08-10T07:25:07.754Z"
+    }
+},
+{
+    "pk": 87, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 11, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 100, 
+        "date_created": "2015-08-10T07:25:07.757Z", 
+        "last_login": "2015-08-10T07:25:07.756Z", 
+        "password": "pbkdf2_sha256$12000$hvdOnMY1luUv$KjbMTzjX08GX1JJnYOXGhx1eL9rUUW1zP17xz5gQjmk=", 
+        "email": "alibek.abdrakhmanov@ordamed.com", 
+        "date_edited": "2015-08-10T07:25:07.757Z"
+    }
+},
+{
+    "pk": 88, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 12, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 112, 
+        "date_created": "2015-08-10T07:25:07.760Z", 
+        "last_login": "2015-08-10T07:25:07.760Z", 
+        "password": "pbkdf2_sha256$12000$a1Oc0mpZNTli$Z+roOkuvj8yZuh+N4a28w78rzi7Y7ERBN/J8c9wg7hI=", 
+        "email": "ruslan@mobiliuz.com", 
+        "date_edited": "2015-08-10T07:25:07.760Z"
+    }
+},
+{
+    "pk": 89, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 10, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 129, 
+        "date_created": "2015-08-10T07:25:07.763Z", 
+        "last_login": "2015-08-10T07:25:07.763Z", 
+        "password": "pbkdf2_sha256$12000$tYO4wM8NYnRr$4z1XKpAb3jElezI9Vu33emDYWTfWvugF5RZBMN6Kn/Y=", 
+        "email": "di.adilbekova@gmail.com", 
+        "date_edited": "2015-08-10T07:25:07.763Z"
+    }
+},
+{
+    "pk": 90, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 10, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 127, 
+        "date_created": "2015-08-10T07:25:07.766Z", 
+        "last_login": "2015-08-10T07:25:07.766Z", 
+        "password": "pbkdf2_sha256$12000$OEkhYhAY2Kg0$Ock/JjP0ImOOwacBVdHpfiGkQYH9LyQ5d5PpbastARk=", 
+        "email": "n.umralinov@ordamed.kz", 
+        "date_edited": "2015-08-10T07:25:07.766Z"
+    }
+},
+{
+    "pk": 91, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 15, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 135, 
+        "date_created": "2015-08-10T07:25:07.770Z", 
+        "last_login": "2015-08-10T07:25:07.769Z", 
+        "password": "pbkdf2_sha256$12000$V3D55BQqoQdz$a8r96fKdCC0RdDEOVxZwm+IlSj68y6NbZo8KU7anN7E=", 
+        "email": "ysagiyev@gmail.com", 
+        "date_edited": "2015-08-10T07:25:07.770Z"
+    }
+},
+{
+    "pk": 92, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 13, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 124, 
+        "date_created": "2015-08-10T07:25:07.773Z", 
+        "last_login": "2015-08-10T07:25:07.773Z", 
+        "password": "pbkdf2_sha256$12000$zkBnljfmP4aO$R8s3J2svT+C95MKO1znPtQjOMnkEnWKqGZDletXOqRc=", 
+        "email": "akmaral@medexpert.kz", 
+        "date_edited": "2015-08-10T07:25:07.773Z"
+    }
+},
+{
+    "pk": 93, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 13, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 116, 
+        "date_created": "2015-08-10T07:25:07.776Z", 
+        "last_login": "2015-08-10T07:25:07.776Z", 
+        "password": "pbkdf2_sha256$12000$Wa1ltu9oszxE$flFxyJjaAAXxzGmI1aHs65Ec5jyJQgBv6ldLN1D7juc=", 
+        "email": "info@medexpert.kz", 
+        "date_edited": "2015-08-10T07:25:07.776Z"
+    }
+},
+{
+    "pk": 94, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 10, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 77, 
+        "date_created": "2015-08-10T07:25:07.780Z", 
+        "last_login": "2015-08-10T07:25:07.779Z", 
+        "password": "pbkdf2_sha256$12000$hZPrUVMjNojQ$1ENYCLURt9l9B8s7nDyIzpeoX0arjQ0PqO68mnYk/uQ=", 
+        "email": "s.pasko@ordamed.kz", 
+        "date_edited": "2015-08-10T07:25:07.780Z"
+    }
+},
+{
+    "pk": 95, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 10, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 87, 
+        "date_created": "2015-08-10T07:25:07.783Z", 
+        "last_login": "2015-08-10T07:25:07.782Z", 
+        "password": "pbkdf2_sha256$12000$8xqO7eiVBCxW$CLA6p28/uwFWP3TrHPRSRuLh+6xyHRWWQq0NmPHbPPI=", 
+        "email": "a.kurbanova@ordamed.kz", 
+        "date_edited": "2015-08-10T07:25:07.783Z"
+    }
+},
+{
+    "pk": 96, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 1, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 125, 
+        "date_created": "2015-08-10T07:25:07.786Z", 
+        "last_login": "2015-08-10T07:25:07.786Z", 
+        "password": "pbkdf2_sha256$12000$Izv5KS7HEr5q$DbOfaZMsxo/wfVd3lRPhkkJh32SpHkalqrzZqovLJe0=", 
+        "email": "mukayevag@gmail.com", 
+        "date_edited": "2015-08-10T07:25:07.786Z"
+    }
+},
+{
+    "pk": 97, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 10, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 82, 
+        "date_created": "2015-08-10T07:25:07.789Z", 
+        "last_login": "2015-08-10T07:25:07.789Z", 
+        "password": "pbkdf2_sha256$12000$ZqxPNgdarwUb$XCX/5zMK7KYWwJNSYvVDvBJPYTcwdua5Q4dx5KhFY2U=", 
+        "email": "g.tazetdinova@ordamed.kz", 
+        "date_edited": "2015-08-10T07:25:07.789Z"
+    }
+},
+{
+    "pk": 98, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 10, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 70, 
+        "date_created": "2015-08-10T07:25:07.793Z", 
+        "last_login": "2015-08-10T07:25:07.792Z", 
+        "password": "pbkdf2_sha256$12000$6RXmvjDc2XaD$NB2TdTIWaQgi7D1Oh4UvFSqOPzhR42z/UBUuu2SDVeQ=", 
+        "email": "m.kamerdinova@ordamed.kz", 
+        "date_edited": "2015-08-10T07:25:07.793Z"
+    }
+},
+{
+    "pk": 99, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 10, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 79, 
+        "date_created": "2015-08-10T07:25:07.796Z", 
+        "last_login": "2015-08-10T07:25:07.796Z", 
+        "password": "pbkdf2_sha256$12000$daU0YKFaTJqd$Z4l99u5HpELODY29RQ9CNACaU7bO1s8Xvy9pYDT86tQ=", 
+        "email": "a.stamgaziyeva@ordamed.kz", 
+        "date_edited": "2015-08-10T07:25:07.796Z"
+    }
+},
+{
+    "pk": 100, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 10, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 72, 
+        "date_created": "2015-08-10T07:25:07.800Z", 
+        "last_login": "2015-08-10T07:25:07.799Z", 
+        "password": "pbkdf2_sha256$12000$slpr13pEHyLs$tE1ZMYWZ1IVwvAma7Xck8JjSB0bXQxbYE2dqAmnJ9bo=", 
+        "email": "marketing@ordamed.kz", 
+        "date_edited": "2015-08-10T07:25:07.800Z"
+    }
+},
+{
+    "pk": 101, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 10, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 78, 
+        "date_created": "2015-08-10T07:25:07.803Z", 
+        "last_login": "2015-08-10T07:25:07.803Z", 
+        "password": "pbkdf2_sha256$12000$w1cqb0wCtjys$/jhZcqVq2fLh+kVIENg+NNX/6/9pNyB//xFtlDu7l5M=", 
+        "email": "s.umbeshova@ordamed.kz", 
+        "date_edited": "2015-08-10T07:25:07.803Z"
+    }
+},
+{
+    "pk": 102, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 9, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 67, 
+        "date_created": "2015-08-10T07:25:07.806Z", 
+        "last_login": "2015-08-10T07:25:07.806Z", 
+        "password": "pbkdf2_sha256$12000$oDElVbiGw4WD$NkXvKjF9//R9Cavz2AlTlgMe2e5aze3lnE0GhV1LJso=", 
+        "email": "astana@labtronic.kz", 
+        "date_edited": "2015-08-10T07:25:07.806Z"
+    }
+},
+{
+    "pk": 103, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 10, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 69, 
+        "date_created": "2015-08-10T07:25:07.810Z", 
+        "last_login": "2015-08-10T07:25:07.809Z", 
+        "password": "pbkdf2_sha256$12000$N0cRgKXyk94m$uEc2hj0VuiQd1abMMIDOxM02t+HnnJnh5a2dGChjyco=", 
+        "email": "president@ordamed.com", 
+        "date_edited": "2015-08-10T07:25:07.810Z"
+    }
+},
+{
+    "pk": 104, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 11, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 102, 
+        "date_created": "2015-08-10T07:25:07.813Z", 
+        "last_login": "2015-08-10T07:25:07.813Z", 
+        "password": "pbkdf2_sha256$12000$KuM2Ev10dCSK$wGP4feJlBSRr3xN7agfw7R006HERCzXDqEEZlMwf9I0=", 
+        "email": "mariyam.baimaganova@ordamed.com", 
+        "date_edited": "2015-08-10T07:25:07.813Z"
+    }
+},
+{
+    "pk": 105, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 10, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 74, 
+        "date_created": "2015-08-10T07:25:07.816Z", 
+        "last_login": "2015-08-10T07:25:07.816Z", 
+        "password": "pbkdf2_sha256$12000$ThkzM8awyGZl$upCi2XEr0hewI6In7L+kE6nP18PZxca9R2uI/DfW194=", 
+        "email": "n.mukhamejanov@ordamed.kz", 
+        "date_edited": "2015-08-10T07:25:07.816Z"
+    }
+},
+{
+    "pk": 106, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 10, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 83, 
+        "date_created": "2015-08-10T07:25:07.820Z", 
+        "last_login": "2015-08-10T07:25:07.819Z", 
+        "password": "pbkdf2_sha256$12000$gLxotnQWlOyu$+VHV/b5X6ihTkn9Ja585TxABX+EDic5HVlnOOeKJx/Q=", 
+        "email": "r.yakupov@ordamed.kz", 
+        "date_edited": "2015-08-10T07:25:07.820Z"
+    }
+},
+{
+    "pk": 107, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 11, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 92, 
+        "date_created": "2015-08-10T07:25:07.823Z", 
+        "last_login": "2015-08-10T07:25:07.823Z", 
+        "password": "pbkdf2_sha256$12000$GJJnFYFaOMzC$WvfVbmxnL+fuvMbiSuHU5IeglNl1Akz8O8sSTPzQdAI=", 
+        "email": "dinara.adilbekova@ordamed.com", 
+        "date_edited": "2015-08-10T07:25:07.823Z"
+    }
+},
+{
+    "pk": 108, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 13, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 120, 
+        "date_created": "2015-08-10T07:25:07.826Z", 
+        "last_login": "2015-08-10T07:25:07.826Z", 
+        "password": "pbkdf2_sha256$12000$Q202YBkRXkHX$jfMyJcOZ5J0MMp9pRiwXwkHDSuda1gdsIxSX1hRoHsE=", 
+        "email": "aigerim.smagulova@medexpert.kz", 
+        "date_edited": "2015-08-10T07:25:07.826Z"
+    }
+},
+{
+    "pk": 109, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 11, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 97, 
+        "date_created": "2015-08-10T07:25:07.830Z", 
+        "last_login": "2015-08-10T07:25:07.829Z", 
+        "password": "pbkdf2_sha256$12000$wSvP8clJBeFm$l9zZAiQixltz7TvvGFGK4OGCrYNHOX0MFeL7FYjoVEc=", 
+        "email": "alibek.saparbayev@ordamed.com", 
+        "date_edited": "2015-08-10T07:25:07.830Z"
+    }
+},
+{
+    "pk": 110, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 11, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 133, 
+        "date_created": "2015-08-10T07:25:07.833Z", 
+        "last_login": "2015-08-10T07:25:07.833Z", 
+        "password": "pbkdf2_sha256$12000$sys6ak8R3m3F$dIy80MdaLhMKU8p8sEMJwrNqfKOWry7rsXqG1+AM9xI=", 
+        "email": "aslan.oralbayev@ordamed.com", 
+        "date_edited": "2015-08-10T07:25:07.833Z"
+    }
+},
+{
+    "pk": 111, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 10, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 76, 
+        "date_created": "2015-08-10T07:25:07.836Z", 
+        "last_login": "2015-08-10T07:25:07.836Z", 
+        "password": "pbkdf2_sha256$12000$rL2BWjevrlQD$lh9wJew4h1bprFKcQXmdCfDF9thLdrynBT6X5/TUD1U=", 
+        "email": "s.mukhatay@ordamed.kz", 
+        "date_edited": "2015-08-10T07:25:07.836Z"
+    }
+},
+{
+    "pk": 112, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 10, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 81, 
+        "date_created": "2015-08-10T07:25:07.840Z", 
+        "last_login": "2015-08-10T07:25:07.839Z", 
+        "password": "pbkdf2_sha256$12000$ote2a1am021G$qVQ0MVpDITgoWXzfRQD2kIkpD3Asy+emv5J2xitzyKg=", 
+        "email": "kokshetau@ordamed.kz", 
+        "date_edited": "2015-08-10T07:25:07.840Z"
+    }
+},
+{
+    "pk": 113, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 13, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 122, 
+        "date_created": "2015-08-10T07:25:07.843Z", 
+        "last_login": "2015-08-10T07:25:07.842Z", 
+        "password": "pbkdf2_sha256$12000$aRnwwujx4SiP$TBJhqQ8kxoVjth+EnGvJJelZCSZvmu5gUW25SGVn5GY=", 
+        "email": "info@medtranslate.kz", 
+        "date_edited": "2015-08-10T07:25:07.843Z"
+    }
+},
+{
+    "pk": 114, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 18, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 148, 
+        "date_created": "2015-08-10T07:25:07.846Z", 
+        "last_login": "2015-08-10T07:25:07.846Z", 
+        "password": "pbkdf2_sha256$12000$PehaUAfRjn90$cnFvaQl2+zQ7s4FZA8UlFleeX5weuIjjRNmbwjmsAas=", 
+        "email": "ysarmatova@test.kz", 
+        "date_edited": "2015-08-10T07:25:07.846Z"
+    }
+},
+{
+    "pk": 115, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 10, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 75, 
+        "date_created": "2015-08-10T07:25:07.849Z", 
+        "last_login": "2015-08-10T07:25:07.849Z", 
+        "password": "pbkdf2_sha256$12000$70uzRmvRMi7C$mt+fnI/dwR/il4d/WzTbL2aLFJQ5iT7ORx0arbMz5GU=", 
+        "email": "y.tukhtiyev@ordamed.kz", 
+        "date_edited": "2015-08-10T07:25:07.849Z"
+    }
+},
+{
+    "pk": 116, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 11, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 95, 
+        "date_created": "2015-08-10T07:25:07.852Z", 
+        "last_login": "2015-08-10T07:25:07.852Z", 
+        "password": "pbkdf2_sha256$12000$17xk1ldTlBeV$qCzS7CJDk1BXRRxmpZLuOy5Ldk1uPkzt/AG/1Uva4MA=", 
+        "email": "hr@ordamed.com", 
+        "date_edited": "2015-08-10T07:25:07.852Z"
+    }
+},
+{
+    "pk": 117, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 11, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 91, 
+        "date_created": "2015-08-10T07:25:07.856Z", 
+        "last_login": "2015-08-10T07:25:07.855Z", 
+        "password": "pbkdf2_sha256$12000$bSIyunPpUusl$+MU03+qtHempy6Qtm2YYB+T/5RNUo8w/eEmvSYX+U48=", 
+        "email": "finance@ordamed.com", 
+        "date_edited": "2015-08-10T07:25:07.856Z"
+    }
+},
+{
+    "pk": 118, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 11, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 93, 
+        "date_created": "2015-08-10T07:25:07.859Z", 
+        "last_login": "2015-08-10T07:25:07.858Z", 
+        "password": "pbkdf2_sha256$12000$tgrWG1hutmWH$Qkj5rXKhZWCp0+2yXLZYKTqxV5ooV7i4rIWuzSEpuro=", 
+        "email": "finance@ordamed.kz", 
+        "date_edited": "2015-08-10T07:25:07.859Z"
+    }
+},
+{
+    "pk": 119, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 11, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 94, 
+        "date_created": "2015-08-10T07:25:07.862Z", 
+        "last_login": "2015-08-10T07:25:07.862Z", 
+        "password": "pbkdf2_sha256$12000$J6C8VsKuElxG$wQPvhQbCVm6HcIFQLfTQj73g12fYuUeiEGBdgUavNgc=", 
+        "email": "m.abdullayeva@ordamed.kz", 
+        "date_edited": "2015-08-10T07:25:07.862Z"
+    }
+},
+{
+    "pk": 120, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 11, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 96, 
+        "date_created": "2015-08-10T07:25:07.865Z", 
+        "last_login": "2015-08-10T07:25:07.865Z", 
+        "password": "pbkdf2_sha256$12000$gMdojzFCIQtg$ImhzEOjAU5l9Ib1HJIuimmZ5VuwtiH9pFvlaVujqseY=", 
+        "email": "info@ordamed.kz", 
+        "date_edited": "2015-08-10T07:25:07.865Z"
+    }
+},
+{
+    "pk": 121, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 10, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 89, 
+        "date_created": "2015-08-10T07:25:07.868Z", 
+        "last_login": "2015-08-10T07:25:07.868Z", 
+        "password": "pbkdf2_sha256$12000$zX1rwQJTIQ8H$xrGLEzevdjohUqQ0hZPTmkxnL/s9q/BozYAPBhnRZGE=", 
+        "email": "taraz@ordamed.kz", 
+        "date_edited": "2015-08-10T07:25:07.868Z"
+    }
+},
+{
+    "pk": 122, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 11, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 103, 
+        "date_created": "2015-08-10T07:25:07.872Z", 
+        "last_login": "2015-08-10T07:25:07.871Z", 
+        "password": "pbkdf2_sha256$12000$RtKzg4597kfg$7IN4gQbSEx9NjaCwTYP9X2gxvzWZ16KFc2kabfqKp7w=", 
+        "email": "mariya.korneva@ordamed.com", 
+        "date_edited": "2015-08-10T07:25:07.872Z"
+    }
+},
+{
+    "pk": 123, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 8, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 109, 
+        "date_created": "2015-08-10T07:25:07.875Z", 
+        "last_login": "2015-08-10T07:25:07.874Z", 
+        "password": "pbkdf2_sha256$12000$eCzMRtKfquds$JvQ5poPU2qub/mx93nIbo4Uxu5LI+SK0gtz06o7OTvU=", 
+        "email": "service@medonica.ru", 
+        "date_edited": "2015-08-10T07:25:07.875Z"
+    }
+},
+{
+    "pk": 124, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 1, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 132, 
+        "date_created": "2015-08-10T07:25:07.878Z", 
+        "last_login": "2015-08-10T07:25:07.877Z", 
+        "password": "pbkdf2_sha256$12000$E3res1nA0tSv$0akxY5VYgALnJB8c/7MxBrxRfaDvIVCnRYgvMhezY6M=", 
+        "email": "gp_kalek@mail.ru", 
+        "date_edited": "2015-08-10T07:25:07.878Z"
+    }
+},
+{
+    "pk": 125, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 12, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 113, 
+        "date_created": "2015-08-10T07:25:07.881Z", 
+        "last_login": "2015-08-10T07:25:07.880Z", 
+        "password": "pbkdf2_sha256$12000$O6nyZ6fFDDjW$vakt0FWyqP1WInsgQi2turaAmI3I8IoThOGY+7TJ4dk=", 
+        "email": "eduard@mobiliuz.com", 
+        "date_edited": "2015-08-10T07:25:07.881Z"
+    }
+},
+{
+    "pk": 126, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 1, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 111, 
+        "date_created": "2015-08-10T07:25:07.884Z", 
+        "last_login": "2015-08-10T07:25:07.884Z", 
+        "password": "pbkdf2_sha256$12000$KtfWZzg86Rxu$ohLNNWi8DwM9+mLqvoLEC/4j98I2eS5g6ppaKZlCf4c=", 
+        "email": "danela17@mail.ru", 
+        "date_edited": "2015-08-10T07:25:07.884Z"
+    }
+},
+{
+    "pk": 127, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 10, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 80, 
+        "date_created": "2015-08-10T07:25:07.887Z", 
+        "last_login": "2015-08-10T07:25:07.887Z", 
+        "password": "pbkdf2_sha256$12000$NnU62FGaGzcB$zqcDF3pOpN/G0sMoqTtK+MlUA/qhJDBtGdJAUbSayUw=", 
+        "email": "t.nurtazin@ordamed.kz", 
+        "date_edited": "2015-08-10T07:25:07.887Z"
+    }
+},
+{
+    "pk": 128, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 1, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 130, 
+        "date_created": "2015-08-10T07:25:07.890Z", 
+        "last_login": "2015-08-10T07:25:07.890Z", 
+        "password": "pbkdf2_sha256$12000$vrXANgb4pQdw$axJlVkT/xStQSf1H3Mq/cY0lakCvU550UsJ22AyllrU=", 
+        "email": "t.a19@mail.ru", 
+        "date_edited": "2015-08-10T07:25:07.890Z"
+    }
+},
+{
+    "pk": 129, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 11, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 101, 
+        "date_created": "2015-08-10T07:25:07.894Z", 
+        "last_login": "2015-08-10T07:25:07.893Z", 
+        "password": "pbkdf2_sha256$12000$sZk50QLDidUW$4A1MNv81kRyKJfU9KCtRwx2PA3C0vSROMOMwWfHZtoc=", 
+        "email": "dias.temirov@ordamed.com", 
+        "date_edited": "2015-08-10T07:25:07.894Z"
+    }
+},
+{
+    "pk": 130, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 13, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 126, 
+        "date_created": "2015-08-10T07:25:07.897Z", 
+        "last_login": "2015-08-10T07:25:07.896Z", 
+        "password": "pbkdf2_sha256$12000$X1rFBpkLyHPw$rJaZ5+ty46PjEouj9rosKCS/IOQdcmoxkV/k1GMUEPY=", 
+        "email": "ulya.akhmetova@medexpert.kz", 
+        "date_edited": "2015-08-10T07:25:07.897Z"
+    }
+},
+{
+    "pk": 131, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 11, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 98, 
+        "date_created": "2015-08-10T07:25:07.900Z", 
+        "last_login": "2015-08-10T07:25:07.900Z", 
+        "password": "pbkdf2_sha256$12000$0eIGMhL1lpgj$VGBJr72tvI0BllUSVHYwX7CoG8nSZkI0BG1NQVOQ7js=", 
+        "email": "v.vakhrislamov@ordamed.kz", 
+        "date_edited": "2015-08-10T07:25:07.900Z"
+    }
+},
+{
+    "pk": 132, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 9, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 128, 
+        "date_created": "2015-08-10T07:25:07.903Z", 
+        "last_login": "2015-08-10T07:25:07.903Z", 
+        "password": "pbkdf2_sha256$12000$vh5qOXS8fwYl$jByerA0krcbBkkkeJobsP0D6xXcD9qM7GMtFOUnv/vM=", 
+        "email": "anna@labtronic.kz", 
+        "date_edited": "2015-08-10T07:25:07.903Z"
+    }
+},
+{
+    "pk": 133, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 13, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 119, 
+        "date_created": "2015-08-10T07:25:07.906Z", 
+        "last_login": "2015-08-10T07:25:07.906Z", 
+        "password": "pbkdf2_sha256$12000$5CDDMRktQf5z$+5nGxFBcxI74Nvw5sbzT3cUS6W4mVl0u/63OqqrQ3Co=", 
+        "email": "alina.balenko@medexpert.kz", 
+        "date_edited": "2015-08-10T07:25:07.906Z"
+    }
+},
+{
+    "pk": 134, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 10, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 88, 
+        "date_created": "2015-08-10T07:25:07.909Z", 
+        "last_login": "2015-08-10T07:25:07.909Z", 
+        "password": "pbkdf2_sha256$12000$E8Euzh4OkqjS$LRCPFW/AZJ5GA3857JstzTrpz/SLSpIkdlt/x9TAhcc=", 
+        "email": "r.sattarova@ordamed.kz", 
+        "date_edited": "2015-08-10T07:25:07.909Z"
+    }
+},
+{
+    "pk": 135, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 3, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 19, 
+        "date_created": "2015-08-10T07:25:07.912Z", 
+        "last_login": "2015-08-10T07:25:07.912Z", 
+        "password": "pbkdf2_sha256$12000$R6E9DA58XEbg$h89S++/mWyrMum62OXbhDjh0wxG/r0C/FiWMMosRrRw=", 
+        "email": "marketing@medonica.kz", 
+        "date_edited": "2015-08-10T07:25:07.912Z"
+    }
+},
+{
+    "pk": 136, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 10, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 86, 
+        "date_created": "2015-08-10T07:25:07.915Z", 
+        "last_login": "2015-08-10T07:25:07.915Z", 
+        "password": "pbkdf2_sha256$12000$Cr6zHO9TdzaQ$7HR/k/HJFRG/P+Yiq+L2Zhcn4nRuwHdAZf2lubkvjeE=", 
+        "email": "uralsk@xn--ordamd-7of.kz", 
+        "date_edited": "2015-08-10T07:25:07.915Z"
+    }
+},
+{
+    "pk": 137, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 10, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 84, 
+        "date_created": "2015-08-10T07:25:07.918Z", 
+        "last_login": "2015-08-10T07:25:07.917Z", 
+        "password": "pbkdf2_sha256$12000$5WgqTrcPwHJN$FHF+n+rFRMqDlgv6cTw9cUXIdGKrLV5hLMgVQYgRhuI=", 
+        "email": "pavlodar@ordamed.kz", 
+        "date_edited": "2015-08-10T07:25:07.918Z"
+    }
+},
+{
+    "pk": 138, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 13, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 115, 
+        "date_created": "2015-08-10T07:25:07.921Z", 
+        "last_login": "2015-08-10T07:25:07.920Z", 
+        "password": "pbkdf2_sha256$12000$zkIQUkhexxCe$qp17wTzKhAVm4iBcLLN/LtCKFQE54oebaIzk9WTssok=", 
+        "email": "aidyn.dzhankurazova@medexpert.kz", 
+        "date_edited": "2015-08-10T07:25:07.921Z"
+    }
+},
+{
+    "pk": 139, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 10, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 85, 
+        "date_created": "2015-08-10T07:25:07.924Z", 
+        "last_login": "2015-08-10T07:25:07.923Z", 
+        "password": "pbkdf2_sha256$12000$gXmdnx4mxtDD$a0aF/ex77bIo0UlXW0iBJYXjFq6zjMoeTJS/j7jWDLY=", 
+        "email": "s.myrzagaliyeva@ordamed.kz", 
+        "date_edited": "2015-08-10T07:25:07.924Z"
+    }
+},
+{
+    "pk": 140, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 11, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 99, 
+        "date_created": "2015-08-10T07:25:07.927Z", 
+        "last_login": "2015-08-10T07:25:07.926Z", 
+        "password": "pbkdf2_sha256$12000$kKzdVbvMHKqN$rCBdEnTVEmNwA9ttXQhEMMFflerMBU3laGzX4V0kCUQ=", 
+        "email": "ainash.imangaliyeva@ordamed.com", 
+        "date_edited": "2015-08-10T07:25:07.927Z"
+    }
+},
+{
+    "pk": 141, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 10, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 90, 
+        "date_created": "2015-08-10T07:25:07.930Z", 
+        "last_login": "2015-08-10T07:25:07.930Z", 
+        "password": "pbkdf2_sha256$12000$b7UhRHAGwgGf$Ta0WTalEDmtAkwe24qfpQQIX/ka/5a9SxXf6Fpg08U8=", 
+        "email": "kyzylorda@ordamed.kz", 
+        "date_edited": "2015-08-10T07:25:07.930Z"
+    }
+},
+{
+    "pk": 142, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 11, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 106, 
+        "date_created": "2015-08-10T07:25:07.933Z", 
+        "last_login": "2015-08-10T07:25:07.933Z", 
+        "password": "pbkdf2_sha256$12000$eUUL34IJGoHP$jyiuI1AaAYFwTlKMhLL1VMR/2ciW42QQj05iLPsWWIM=", 
+        "email": "denis.pyanov@ordamed.com", 
+        "date_edited": "2015-08-10T07:25:07.933Z"
+    }
+},
+{
+    "pk": 143, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 10, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 73, 
+        "date_created": "2015-08-10T07:25:07.936Z", 
+        "last_login": "2015-08-10T07:25:07.936Z", 
+        "password": "pbkdf2_sha256$12000$2V6IEyQVsiIF$0RaYVxONKww/R2tBA9zyXC8SqYMKZMLJJKjJvei/kLo=", 
+        "email": "m.omyrzakova@ordamed.kz", 
+        "date_edited": "2015-08-10T07:25:07.936Z"
+    }
+},
+{
+    "pk": 144, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 19, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 149, 
+        "date_created": "2015-08-10T07:25:07.939Z", 
+        "last_login": "2015-08-10T07:25:07.939Z", 
+        "password": "pbkdf2_sha256$12000$q9xpAVHAMn7g$6mDbeAwE0QgoMeL5rUwEmwfoE8BGInGxQXTsjcRaxl8=", 
+        "email": "uivanov@test.kz", 
+        "date_edited": "2015-08-10T07:25:07.939Z"
+    }
+},
+{
+    "pk": 145, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 11, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 104, 
+        "date_created": "2015-08-10T07:25:07.942Z", 
+        "last_login": "2015-08-10T07:25:07.942Z", 
+        "password": "pbkdf2_sha256$12000$leGHEpaYw42Y$qWxtDudezrXCpUhGB0YdU9QXFZ7TEGdf7LbBtVCTB2s=", 
+        "email": "marketing@ordamed.com", 
+        "date_edited": "2015-08-10T07:25:07.942Z"
+    }
+},
+{
+    "pk": 146, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 1, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 137, 
+        "date_created": "2015-08-10T07:25:07.945Z", 
+        "last_login": "2015-08-10T07:25:07.945Z", 
+        "password": "pbkdf2_sha256$12000$ELaXJtqEqQPL$uTfwEd9bR2kB7L16tLkCrnAXUQJBAMhnVYYXDM/P87w=", 
+        "email": "mail@salesexpert.kz", 
+        "date_edited": "2015-08-10T07:25:07.945Z"
+    }
+},
+{
+    "pk": 147, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 19, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 150, 
+        "date_created": "2015-08-10T07:25:07.948Z", 
+        "last_login": "2015-08-10T07:25:07.948Z", 
+        "password": "pbkdf2_sha256$12000$yUXifsGLB3Nt$8trwMfzsTD+eA1+2ZDWtIZg7CBPfx3XOsAYeYgh+Jao=", 
+        "email": "damirov@test.kz", 
+        "date_edited": "2015-08-10T07:25:07.948Z"
+    }
+},
+{
+    "pk": 148, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 13, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 121, 
+        "date_created": "2015-08-10T07:25:07.951Z", 
+        "last_login": "2015-08-10T07:25:07.951Z", 
+        "password": "pbkdf2_sha256$12000$zfSr1AcMWIdI$OC6cUTmNK7E66XqzSkqrxFsPCN3swdIHXiWGgxfPt4s=", 
+        "email": "issabayev@medexpert.kz", 
+        "date_edited": "2015-08-10T07:25:07.951Z"
+    }
+},
+{
+    "pk": 149, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 14, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 134, 
+        "date_created": "2015-08-10T07:25:07.954Z", 
+        "last_login": "2015-08-10T07:25:07.953Z", 
+        "password": "pbkdf2_sha256$12000$LqFZIsaV7xfO$08uzQ0zQwMTRWiq9SD7pHx3VvGlzQFSz+slK1Fq/VVA=", 
+        "email": "demo@almasales.kz", 
+        "date_edited": "2015-08-10T07:25:07.954Z"
+    }
+},
+{
+    "pk": 150, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 13, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 117, 
+        "date_created": "2015-08-10T07:25:07.957Z", 
+        "last_login": "2015-08-10T07:25:07.956Z", 
+        "password": "pbkdf2_sha256$12000$5RxBNxoHVQVh$c1IsSssJ7zu0Pgqjhr2naju0D7ZA+8VTHgoRh6WzE/Y=", 
+        "email": "merei.altynbekova@medexpert.kz", 
+        "date_edited": "2015-08-10T07:25:07.957Z"
+    }
+}
+]

@@ -3,72 +3,1859 @@
     "pk": 1, 
     "model": "alm_crm.milestone", 
     "fields": {
-        "subscription_id": 1, 
+        "sort": 1, 
         "color_code": "#CCB2FF", 
-        "title": "\u041f\u043e\u0434\u0433\u043e\u0442\u043e\u0432\u043a\u0430 \u043a \u0442\u0443\u0440\u0443",
-        "date_created": "2014-11-24T07:49:32.991Z",
-        "date_edited": "2014-11-24T07:49:32.991Z",
-        "sort": 1
+        "title": "\u041f\u043e\u0434\u0433\u043e\u0442\u043e\u0432\u043a\u0430 \u043a \u0442\u0443\u0440\u0443", 
+        "is_system": 0, 
+        "company_id": 2, 
+        "date_created": "2015-06-11T18:00:00Z", 
+        "date_edited": "2015-06-11T18:00:00Z"
     }
 },
 {
     "pk": 2, 
     "model": "alm_crm.milestone", 
     "fields": {
-        "subscription_id": 1, 
+        "sort": 2, 
         "color_code": "#FFFF99", 
-        "title": "\u041e\u0444\u043e\u0440\u043c\u043b\u0435\u043d\u0438\u0435 \u0434\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u043e\u0432",
-        "date_created": "2014-11-24T07:49:32.991Z",
-        "date_edited": "2014-11-24T07:49:32.991Z", 
-        "sort": 2
+        "title": "\u041e\u0444\u043e\u0440\u043c\u043b\u0435\u043d\u0438\u0435 \u0434\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u043e\u0432", 
+        "is_system": 0, 
+        "company_id": 2, 
+        "date_created": "2015-06-11T18:00:00Z", 
+        "date_edited": "2015-06-11T18:00:00Z"
     }
 },
 {
     "pk": 3, 
     "model": "alm_crm.milestone", 
     "fields": {
-        "subscription_id": 1, 
+        "sort": 3, 
         "color_code": "#CCEBF5", 
-        "title": "\u0422\u0443\u0440",
-        "date_created": "2014-11-24T07:49:32.991Z",
-        "date_edited": "2014-11-24T07:49:32.991Z", 
-        "sort": 3
+        "title": "\u0422\u0443\u0440", 
+        "is_system": 0, 
+        "company_id": 2, 
+        "date_created": "2015-06-11T18:00:00Z", 
+        "date_edited": "2015-06-11T18:00:00Z"
     }
 },
 {
-    "pk": 4, 
+    "pk": 7, 
     "model": "alm_crm.milestone", 
     "fields": {
-        "subscription_id": 2, 
+        "sort": 1, 
         "color_code": "#CCB2FF", 
-        "title": "\u041f\u043e\u0434\u0433\u043e\u0442\u043e\u0432\u043a\u0430 \u043a \u0442\u0443\u0440\u0443",
-        "date_created": "2014-11-24T07:49:32.991Z",
-        "date_edited": "2014-11-24T07:49:32.991Z",
-        "sort":  1
+        "title": "\u041f\u043e\u0434\u0433\u043e\u0442\u043e\u0432\u043a\u0430 \u043a \u0442\u0443\u0440\u0443", 
+        "is_system": 0, 
+        "company_id": 4, 
+        "date_created": "2015-06-11T18:00:00Z", 
+        "date_edited": "2015-06-11T18:00:00Z"
     }
 },
 {
-    "pk": 5, 
+    "pk": 8, 
     "model": "alm_crm.milestone", 
     "fields": {
-        "subscription_id": 2, 
+        "sort": 2, 
         "color_code": "#FFFF99", 
-        "title": "\u041e\u0444\u043e\u0440\u043c\u043b\u0435\u043d\u0438\u0435 \u0434\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u043e\u0432",
-        "date_created": "2014-11-24T07:49:32.991Z",
-        "date_edited": "2014-11-24T07:49:32.991Z", 
-        "sort": 2
+        "title": "\u041e\u0444\u043e\u0440\u043c\u043b\u0435\u043d\u0438\u0435 \u0434\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u043e\u0432", 
+        "is_system": 0, 
+        "company_id": 4, 
+        "date_created": "2015-06-11T18:00:00Z", 
+        "date_edited": "2015-06-11T18:00:00Z"
     }
 },
 {
-    "pk": 6, 
+    "pk": 9, 
     "model": "alm_crm.milestone", 
     "fields": {
-        "subscription_id": 2, 
+        "sort": 3, 
         "color_code": "#CCEBF5", 
-        "title": "\u0422\u0443\u0440",
-        "date_created": "2014-11-24T07:49:32.991Z",
-        "date_edited": "2014-11-24T07:49:32.991Z", 
-        "sort": 3  
+        "title": "\u0422\u0443\u0440", 
+        "is_system": 0, 
+        "company_id": 4, 
+        "date_created": "2015-06-11T18:00:00Z", 
+        "date_edited": "2015-06-11T18:00:00Z"
+    }
+},
+{
+    "pk": 10, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": 1, 
+        "color_code": "#CCB2FF", 
+        "title": "\u041f\u043e\u0434\u0433\u043e\u0442\u043e\u0432\u043a\u0430 \u043a \u0442\u0443\u0440\u0443", 
+        "is_system": 0, 
+        "company_id": 5, 
+        "date_created": "2015-06-11T18:00:00Z", 
+        "date_edited": "2015-06-11T18:00:00Z"
+    }
+},
+{
+    "pk": 11, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": 2, 
+        "color_code": "#FFFF99", 
+        "title": "\u041e\u0444\u043e\u0440\u043c\u043b\u0435\u043d\u0438\u0435 \u0434\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u043e\u0432", 
+        "is_system": 0, 
+        "company_id": 5, 
+        "date_created": "2015-06-11T18:00:00Z", 
+        "date_edited": "2015-06-11T18:00:00Z"
+    }
+},
+{
+    "pk": 12, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": 3, 
+        "color_code": "#CCEBF5", 
+        "title": "\u0422\u0443\u0440", 
+        "is_system": 0, 
+        "company_id": 5, 
+        "date_created": "2015-06-11T18:00:00Z", 
+        "date_edited": "2015-06-11T18:00:00Z"
+    }
+},
+{
+    "pk": 16, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": 1, 
+        "color_code": "#F4B59C", 
+        "title": "\u0420\u0435\u043a\u043b\u0430\u043c\u0430 \u0438 \u043f\u0440\u043e\u043c\u043e", 
+        "is_system": 0, 
+        "company_id": 3, 
+        "date_created": "2015-06-11T18:00:00Z", 
+        "date_edited": "2015-06-11T18:00:00Z"
+    }
+},
+{
+    "pk": 17, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": 2, 
+        "color_code": "#F59CC8", 
+        "title": "\u0412\u0445\u043e\u0434\u044f\u0449\u0438\u0435 \u0438 \u0438\u0441\u0445\u043e\u0434\u044f\u0449\u0438\u0435 \u0437\u0432\u043e\u043d\u043a\u0438", 
+        "is_system": 0, 
+        "company_id": 3, 
+        "date_created": "2015-06-11T18:00:00Z", 
+        "date_edited": "2015-06-11T18:00:00Z"
+    }
+},
+{
+    "pk": 18, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": 3, 
+        "color_code": "#A39CF4", 
+        "title": "\u041f\u0435\u0440\u0432\u0430\u044f \u0432\u0441\u0442\u0440\u0435\u0447\u0430 \u0441 \u043f\u043e\u0442\u0435\u043d\u0446\u0438\u0430\u043b\u044c\u043d\u044b\u043c \u043a\u043b\u0438\u0435\u043d\u0442\u043e\u043c", 
+        "is_system": 0, 
+        "company_id": 3, 
+        "date_created": "2015-06-11T18:00:00Z", 
+        "date_edited": "2015-06-11T18:00:00Z"
+    }
+},
+{
+    "pk": 19, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": 4, 
+        "color_code": "#9CE5F4", 
+        "title": "\u041a\u043e\u043b\u0438\u0447\u0435\u0441\u0442\u0432\u043e \u043a\u043b\u0438\u0435\u043d\u0442\u043e\u0432, \u043a\u043e\u0442\u043e\u0440\u044b\u043c \u0432\u044b\u0441\u043b\u0430\u043d\u043e \u041a\u041f", 
+        "is_system": 0, 
+        "company_id": 3, 
+        "date_created": "2015-06-11T18:00:00Z", 
+        "date_edited": "2015-06-11T18:00:00Z"
+    }
+},
+{
+    "pk": 20, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": 5, 
+        "color_code": "#9CF4A7", 
+        "title": "\u041f\u043e\u0432\u0442\u043e\u0440\u043d\u044b\u0439 \u043a\u043e\u043d\u0442\u0430\u043a\u0442 \u0441 \u041b\u041f\u0420", 
+        "is_system": 0, 
+        "company_id": 3, 
+        "date_created": "2015-06-11T18:00:00Z", 
+        "date_edited": "2015-06-11T18:00:00Z"
+    }
+},
+{
+    "pk": 21, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": 6, 
+        "color_code": "#F4DC9C", 
+        "title": "\u0414\u043e\u0433\u043e\u0432\u043e\u0440 \u043f\u043e\u0434\u043f\u0438\u0441\u0430\u043d\u043d\u044b\u0439", 
+        "is_system": 0, 
+        "company_id": 3, 
+        "date_created": "2015-06-11T18:00:00Z", 
+        "date_edited": "2015-06-11T18:00:00Z"
+    }
+},
+{
+    "pk": 22, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": 1, 
+        "color_code": "#F4B59C", 
+        "title": "\u041f\u043e\u0438\u0441\u043a \u043a\u043e\u043d\u0442\u0440\u0430\u0433\u0435\u043d\u0442\u043e\u0432", 
+        "is_system": 0, 
+        "company_id": 6, 
+        "date_created": "2015-06-11T18:00:00Z", 
+        "date_edited": "2015-06-11T18:00:00Z"
+    }
+},
+{
+    "pk": 23, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": 2, 
+        "color_code": "#F59CC8", 
+        "title": "\u0424\u0438\u043b\u044c\u0442\u0440\u0430\u0446\u0438\u044f, \u0432\u044b\u0445\u043e\u0434 \u043d\u0430 \u041b\u041f\u0420-\u043e\u0432", 
+        "is_system": 0, 
+        "company_id": 6, 
+        "date_created": "2015-06-11T18:00:00Z", 
+        "date_edited": "2015-06-11T18:00:00Z"
+    }
+},
+{
+    "pk": 24, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": 3, 
+        "color_code": "#A39CF4", 
+        "title": "\u0417\u0432\u043e\u043d\u043e\u043a, \u043e\u0431\u0440\u0430\u0449\u0435\u043d\u0438\u0435", 
+        "is_system": 0, 
+        "company_id": 6, 
+        "date_created": "2015-06-11T18:00:00Z", 
+        "date_edited": "2015-06-11T18:00:00Z"
+    }
+},
+{
+    "pk": 25, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": 4, 
+        "color_code": "#9CE5F4", 
+        "title": "\u041b\u0438\u0447\u043d\u0430\u044f \u0432\u0441\u0442\u0440\u0435\u0447\u0430, \u043f\u0440\u0435\u0437\u0435\u043d\u0442\u0430\u0446\u0438\u044f", 
+        "is_system": 0, 
+        "company_id": 6, 
+        "date_created": "2015-06-11T18:00:00Z", 
+        "date_edited": "2015-06-11T18:00:00Z"
+    }
+},
+{
+    "pk": 26, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": 5, 
+        "color_code": "#9CF4A7", 
+        "title": "\u041f\u0440\u0435\u0434\u043b\u043e\u0436\u0435\u043d\u0438\u0435. \u041f\u0435\u0440\u0435\u0433\u043e\u0432\u043e\u0440\u044b", 
+        "is_system": 0, 
+        "company_id": 6, 
+        "date_created": "2015-06-11T18:00:00Z", 
+        "date_edited": "2015-06-11T18:00:00Z"
+    }
+},
+{
+    "pk": 27, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": 6, 
+        "color_code": "#F4DC9C", 
+        "title": "\u041a\u043e\u043d\u0442\u0440\u0430\u043a\u0442", 
+        "is_system": 0, 
+        "company_id": 6, 
+        "date_created": "2015-06-11T18:00:00Z", 
+        "date_edited": "2015-06-11T18:00:00Z"
+    }
+},
+{
+    "pk": 28, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": 1, 
+        "color_code": "#F4B59C", 
+        "title": "\u041f\u043e\u0438\u0441\u043a \u043a\u043e\u043d\u0442\u0440\u0430\u0433\u0435\u043d\u0442\u043e\u0432", 
+        "is_system": 0, 
+        "company_id": 7, 
+        "date_created": "2015-06-11T18:00:00Z", 
+        "date_edited": "2015-06-11T18:00:00Z"
+    }
+},
+{
+    "pk": 29, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": 2, 
+        "color_code": "#F59CC8", 
+        "title": "\u0424\u0438\u043b\u044c\u0442\u0440\u0430\u0446\u0438\u044f, \u0432\u044b\u0445\u043e\u0434 \u043d\u0430 \u041b\u041f\u0420-\u043e\u0432", 
+        "is_system": 0, 
+        "company_id": 7, 
+        "date_created": "2015-06-11T18:00:00Z", 
+        "date_edited": "2015-06-11T18:00:00Z"
+    }
+},
+{
+    "pk": 30, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": 3, 
+        "color_code": "#A39CF4", 
+        "title": "\u0417\u0432\u043e\u043d\u043e\u043a, \u043e\u0431\u0440\u0430\u0449\u0435\u043d\u0438\u0435", 
+        "is_system": 0, 
+        "company_id": 7, 
+        "date_created": "2015-06-11T18:00:00Z", 
+        "date_edited": "2015-06-11T18:00:00Z"
+    }
+},
+{
+    "pk": 32, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": 4, 
+        "color_code": "#9CE5F4", 
+        "title": "\u041b\u0438\u0447\u043d\u0430\u044f \u0432\u0441\u0442\u0440\u0435\u0447\u0430, \u043f\u0440\u0435\u0437\u0435\u043d\u0442\u0430\u0446\u0438\u044f", 
+        "is_system": 0, 
+        "company_id": 7, 
+        "date_created": "2015-06-11T18:00:00Z", 
+        "date_edited": "2015-06-11T18:00:00Z"
+    }
+},
+{
+    "pk": 33, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": 6, 
+        "color_code": "#9CF4A7", 
+        "title": "\u041f\u0440\u0435\u043b\u043e\u0436\u0435\u043d\u0438\u0435. \u041f\u0435\u0440\u0435\u0433\u043e\u0432\u043e\u0440\u044b", 
+        "is_system": 0, 
+        "company_id": 7, 
+        "date_created": "2015-06-11T18:00:00Z", 
+        "date_edited": "2015-06-11T18:00:00Z"
+    }
+},
+{
+    "pk": 34, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": 5, 
+        "color_code": "#F4DC9C", 
+        "title": "\u041a\u043e\u043d\u0442\u0440\u0430\u043a\u0442", 
+        "is_system": 0, 
+        "company_id": 7, 
+        "date_created": "2015-06-11T18:00:00Z", 
+        "date_edited": "2015-06-11T18:00:00Z"
+    }
+},
+{
+    "pk": 35, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": 1, 
+        "color_code": "#F4B59C", 
+        "title": "\u041f\u043e\u0438\u0441\u043a \u043a\u043e\u043d\u0442\u0440\u0430\u0433\u0435\u043d\u0442\u043e\u0432", 
+        "is_system": 0, 
+        "company_id": 8, 
+        "date_created": "2015-06-11T18:00:00Z", 
+        "date_edited": "2015-06-11T18:00:00Z"
+    }
+},
+{
+    "pk": 36, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": 2, 
+        "color_code": "#F59CC8", 
+        "title": "\u0424\u0438\u043b\u044c\u0442\u0440\u0430\u0446\u0438\u044f, \u0432\u044b\u0445\u043e\u0434 \u043d\u0430 \u041b\u041f\u0420-\u043e\u0432", 
+        "is_system": 0, 
+        "company_id": 8, 
+        "date_created": "2015-06-11T18:00:00Z", 
+        "date_edited": "2015-06-11T18:00:00Z"
+    }
+},
+{
+    "pk": 37, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": 3, 
+        "color_code": "#A39CF4", 
+        "title": "\u0417\u0432\u043e\u043d\u043e\u043a, \u043e\u0431\u0440\u0430\u0449\u0435\u043d\u0438\u0435", 
+        "is_system": 0, 
+        "company_id": 8, 
+        "date_created": "2015-06-11T18:00:00Z", 
+        "date_edited": "2015-06-11T18:00:00Z"
+    }
+},
+{
+    "pk": 38, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": 4, 
+        "color_code": "#9CE5F4", 
+        "title": "\u041b\u0438\u0447\u043d\u0430\u044f \u0432\u0441\u0442\u0440\u0435\u0447\u0430, \u043f\u0440\u0435\u0437\u0435\u043d\u0442\u0430\u0446\u0438\u044f", 
+        "is_system": 0, 
+        "company_id": 8, 
+        "date_created": "2015-06-11T18:00:00Z", 
+        "date_edited": "2015-06-11T18:00:00Z"
+    }
+},
+{
+    "pk": 39, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": 5, 
+        "color_code": "#9CF4A7", 
+        "title": "\u041f\u0440\u0435\u0434\u043b\u043e\u0436\u0435\u043d\u0438\u0435. \u041f\u0435\u0440\u0435\u0433\u043e\u0432\u043e\u0440\u044b", 
+        "is_system": 0, 
+        "company_id": 8, 
+        "date_created": "2015-06-11T18:00:00Z", 
+        "date_edited": "2015-06-11T18:00:00Z"
+    }
+},
+{
+    "pk": 40, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": 6, 
+        "color_code": "#F4DC9C", 
+        "title": "\u041a\u043e\u043d\u0442\u0440\u0430\u043a\u0442", 
+        "is_system": 0, 
+        "company_id": 8, 
+        "date_created": "2015-06-11T18:00:00Z", 
+        "date_edited": "2015-06-11T18:00:00Z"
+    }
+},
+{
+    "pk": 48, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": 8, 
+        "color_code": "#F4B59C", 
+        "title": "\u0417\u0432\u043e\u043d\u043e\u043a / \u0437\u0430\u044f\u0432\u043a\u0430", 
+        "is_system": 0, 
+        "company_id": 1, 
+        "date_created": "2015-06-11T18:00:00Z", 
+        "date_edited": "2015-07-30T17:00:44.339Z"
+    }
+},
+{
+    "pk": 49, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": 9, 
+        "color_code": "#F59CC8", 
+        "title": "\u041e\u0442\u043f\u0440\u0430\u0432\u043a\u0430 \u041a\u041f", 
+        "is_system": 0, 
+        "company_id": 1, 
+        "date_created": "2015-06-11T18:00:00Z", 
+        "date_edited": "2015-07-30T17:00:44.358Z"
+    }
+},
+{
+    "pk": 50, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": 10, 
+        "color_code": "#A39CF4", 
+        "title": "\u0421\u043e\u0433\u043b\u0430\u0441\u043e\u0432\u0430\u043d\u0438\u0435 \u0434\u043e\u0433\u043e\u0432\u043e\u0440\u0430", 
+        "is_system": 0, 
+        "company_id": 1, 
+        "date_created": "2015-06-11T18:00:00Z", 
+        "date_edited": "2015-07-30T17:00:44.373Z"
+    }
+},
+{
+    "pk": 51, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": 11, 
+        "color_code": "#9CE5F4", 
+        "title": "\u0412\u044b\u0441\u0442\u0430\u0432\u043b\u0435\u043d\u0438\u0435 \u0441\u0447\u0435\u0442\u0430", 
+        "is_system": 0, 
+        "company_id": 1, 
+        "date_created": "2015-06-11T18:00:00Z", 
+        "date_edited": "2015-07-30T17:00:44.383Z"
+    }
+},
+{
+    "pk": 52, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": 12, 
+        "color_code": "#9CF4A7", 
+        "title": "\u041a\u043e\u043d\u0442\u0440\u043e\u043b\u044c \u043e\u043f\u043b\u0430\u0442\u044b", 
+        "is_system": 0, 
+        "company_id": 1, 
+        "date_created": "2015-06-11T18:00:00Z", 
+        "date_edited": "2015-07-30T17:00:44.406Z"
+    }
+},
+{
+    "pk": 53, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": 13, 
+        "color_code": "#D4F49B", 
+        "title": "\u041f\u0440\u0435\u0434\u043e\u0441\u0442\u0430\u0432\u043b\u0435\u043d\u0438\u0435 \u0443\u0441\u043b\u0443\u0433\u0438", 
+        "is_system": 0, 
+        "company_id": 1, 
+        "date_created": "2015-06-11T18:00:00Z", 
+        "date_edited": "2015-07-30T17:00:44.420Z"
+    }
+},
+{
+    "pk": 54, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": 14, 
+        "color_code": "#F4DC9C", 
+        "title": "Upsales", 
+        "is_system": 0, 
+        "company_id": 1, 
+        "date_created": "2015-06-11T18:00:00Z", 
+        "date_edited": "2015-07-30T17:00:44.438Z"
+    }
+},
+{
+    "pk": 55, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": 5, 
+        "color_code": "#F4B59C", 
+        "title": "\u0417\u0432\u043e\u043d\u043e\u043a / \u0437\u0430\u044f\u0432\u043a\u0430", 
+        "is_system": 0, 
+        "company_id": 9, 
+        "date_created": "2015-06-11T18:00:00Z", 
+        "date_edited": "2015-06-11T18:00:00Z"
+    }
+},
+{
+    "pk": 56, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": 6, 
+        "color_code": "#F59CC8", 
+        "title": "\u041e\u0442\u043f\u0440\u0430\u0432\u043a\u0430 \u041a\u041f", 
+        "is_system": 0, 
+        "company_id": 9, 
+        "date_created": "2015-06-11T18:00:00Z", 
+        "date_edited": "2015-06-11T18:00:00Z"
+    }
+},
+{
+    "pk": 57, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": 7, 
+        "color_code": "#A39CF4", 
+        "title": "\u041f\u043e\u0434\u0433\u043e\u0442\u043e\u0432\u043a\u0430 \u0434\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u043e\u0432", 
+        "is_system": 0, 
+        "company_id": 9, 
+        "date_created": "2015-06-11T18:00:00Z", 
+        "date_edited": "2015-06-11T18:00:00Z"
+    }
+},
+{
+    "pk": 58, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": 4, 
+        "color_code": "#9CE5F4", 
+        "title": "\u0422\u0435\u043d\u0434\u0435\u0440 / \u043a\u043e\u043d\u043a\u0443\u0440\u0441 / \u0446\u0435\u043d\u043e\u0432\u043e\u0435", 
+        "is_system": 0, 
+        "company_id": 9, 
+        "date_created": "2015-06-11T18:00:00Z", 
+        "date_edited": "2015-06-11T18:00:00Z"
+    }
+},
+{
+    "pk": 59, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": 11, 
+        "color_code": "#9CF4A7", 
+        "title": "\u0412\u0441\u0442\u0440\u0435\u0447\u0430", 
+        "is_system": 0, 
+        "company_id": 9, 
+        "date_created": "2015-06-11T18:00:00Z", 
+        "date_edited": "2015-07-24T05:12:16.330Z"
+    }
+},
+{
+    "pk": 60, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": 10, 
+        "color_code": "#D4F49B", 
+        "title": "\u041f\u043e\u0432\u0442\u043e\u0440\u043d\u0430\u044f \u0432\u0441\u0442\u0440\u0435\u0447\u0430", 
+        "is_system": 0, 
+        "company_id": 9, 
+        "date_created": "2015-06-11T18:00:00Z", 
+        "date_edited": "2015-07-24T05:12:04.159Z"
+    }
+},
+{
+    "pk": 61, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": 12, 
+        "color_code": "#F4DC9C", 
+        "title": "\u0421\u043e\u0433\u043b\u0430\u0441\u043e\u0432\u0430\u043d\u0438\u0435 \u0434\u043e\u0433\u043e\u0432\u043e\u0440\u0430", 
+        "is_system": 0, 
+        "company_id": 9, 
+        "date_created": "2015-06-11T18:00:00Z", 
+        "date_edited": "2015-07-24T05:36:18.211Z"
+    }
+},
+{
+    "pk": 62, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": 1, 
+        "color_code": "#F4B59C", 
+        "title": "\u0420\u0435\u043a\u043b\u0430\u043c\u0430 \u0438 \u043f\u0440\u043e\u043c\u043e", 
+        "is_system": 0, 
+        "company_id": 10, 
+        "date_created": "2015-06-11T18:00:00Z", 
+        "date_edited": "2015-06-11T18:00:00Z"
+    }
+},
+{
+    "pk": 63, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": 2, 
+        "color_code": "#F59CC8", 
+        "title": "\u0412\u0445\u043e\u0434\u044f\u0449\u0438\u0435 \u0438 \u0438\u0441\u0445\u043e\u0434\u044f\u0449\u0438\u0435 \u0437\u0432\u043e\u043d\u043a\u0438", 
+        "is_system": 0, 
+        "company_id": 10, 
+        "date_created": "2015-06-11T18:00:00Z", 
+        "date_edited": "2015-06-11T18:00:00Z"
+    }
+},
+{
+    "pk": 64, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": 3, 
+        "color_code": "#A39CF4", 
+        "title": "\u041f\u0435\u0440\u0432\u0430\u044f \u0432\u0441\u0442\u0440\u0435\u0447\u0430 \u0441 \u043f\u043e\u0442\u0435\u043d\u0446\u0438\u0430\u043b\u044c\u043d\u044b\u043c \u043a\u043b\u0438\u0435\u043d\u0442\u043e\u043c", 
+        "is_system": 0, 
+        "company_id": 10, 
+        "date_created": "2015-06-11T18:00:00Z", 
+        "date_edited": "2015-06-11T18:00:00Z"
+    }
+},
+{
+    "pk": 65, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": 4, 
+        "color_code": "#9CE5F4", 
+        "title": "\u041a\u043e\u043b\u0438\u0447\u0435\u0441\u0442\u0432\u043e \u043a\u043b\u0438\u0435\u043d\u0442\u043e\u0432, \u043a\u043e\u0442\u043e\u0440\u044b\u043c \u0432\u044b\u0441\u043b\u0430\u043d\u043e \u041a\u041f", 
+        "is_system": 0, 
+        "company_id": 10, 
+        "date_created": "2015-06-11T18:00:00Z", 
+        "date_edited": "2015-06-11T18:00:00Z"
+    }
+},
+{
+    "pk": 66, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": 5, 
+        "color_code": "#9CF4A7", 
+        "title": "\u041f\u043e\u0432\u0442\u043e\u0440\u043d\u044b\u0439 \u043a\u043e\u043d\u0442\u0430\u043a\u0442 \u0441 \u041b\u041f\u0420", 
+        "is_system": 0, 
+        "company_id": 10, 
+        "date_created": "2015-06-11T18:00:00Z", 
+        "date_edited": "2015-06-11T18:00:00Z"
+    }
+},
+{
+    "pk": 67, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": 6, 
+        "color_code": "#D4F49B", 
+        "title": "\u0414\u043e\u0433\u043e\u0432\u043e\u0440 \u043f\u043e\u0434\u043f\u0438\u0441\u0430\u043d\u043d\u044b\u0439", 
+        "is_system": 0, 
+        "company_id": 10, 
+        "date_created": "2015-06-11T18:00:00Z", 
+        "date_edited": "2015-06-11T18:00:00Z"
+    }
+},
+{
+    "pk": 69, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": 1, 
+        "color_code": "#F4B59C", 
+        "title": "\u0420\u0435\u043a\u043b\u0430\u043c\u0430 \u0438 \u043f\u0440\u043e\u043c\u043e", 
+        "is_system": 0, 
+        "company_id": 11, 
+        "date_created": "2015-06-11T18:00:00Z", 
+        "date_edited": "2015-06-11T18:00:00Z"
+    }
+},
+{
+    "pk": 70, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": 2, 
+        "color_code": "#F59CC8", 
+        "title": "\u0412\u0445\u043e\u0434\u044f\u0449\u0438\u0435 \u0438 \u0438\u0441\u0445\u043e\u0434\u044f\u0449\u0438\u0435 \u0437\u0432\u043e\u043d\u043a\u0438", 
+        "is_system": 0, 
+        "company_id": 11, 
+        "date_created": "2015-06-11T18:00:00Z", 
+        "date_edited": "2015-06-11T18:00:00Z"
+    }
+},
+{
+    "pk": 71, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": 3, 
+        "color_code": "#A39CF4", 
+        "title": "\u041f\u0435\u0440\u0432\u0430\u044f \u0432\u0441\u0442\u0440\u0435\u0447\u0430 \u0441 \u043f\u043e\u0442\u0435\u043d\u0446\u0438\u0430\u043b\u044c\u043d\u044b\u043c \u043a\u043b\u0438\u0435\u043d\u0442\u043e\u043c", 
+        "is_system": 0, 
+        "company_id": 11, 
+        "date_created": "2015-06-11T18:00:00Z", 
+        "date_edited": "2015-06-11T18:00:00Z"
+    }
+},
+{
+    "pk": 72, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": 4, 
+        "color_code": "#9CE5F4", 
+        "title": "\u041a\u043e\u043b\u0438\u0447\u0435\u0441\u0442\u0432\u043e \u043a\u043b\u0438\u0435\u043d\u0442\u043e\u0432, \u043a\u043e\u0442\u043e\u0440\u044b\u043c \u0432\u044b\u0441\u043b\u0430\u043d\u043e \u041a\u041f", 
+        "is_system": 0, 
+        "company_id": 11, 
+        "date_created": "2015-06-11T18:00:00Z", 
+        "date_edited": "2015-06-11T18:00:00Z"
+    }
+},
+{
+    "pk": 73, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": 5, 
+        "color_code": "#9CF4A7", 
+        "title": "\u041f\u043e\u0432\u0442\u043e\u0440\u043d\u044b\u0439 \u043a\u043e\u043d\u0442\u0430\u043a\u0442 \u0441 \u041b\u041f\u0420", 
+        "is_system": 0, 
+        "company_id": 11, 
+        "date_created": "2015-06-11T18:00:00Z", 
+        "date_edited": "2015-06-11T18:00:00Z"
+    }
+},
+{
+    "pk": 74, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": 6, 
+        "color_code": "#D4F49B", 
+        "title": "\u0414\u043e\u0433\u043e\u0432\u043e\u0440 \u043f\u043e\u0434\u043f\u0438\u0441\u0430\u043d\u043d\u044b\u0439", 
+        "is_system": 0, 
+        "company_id": 11, 
+        "date_created": "2015-06-11T18:00:00Z", 
+        "date_edited": "2015-06-11T18:00:00Z"
+    }
+},
+{
+    "pk": 76, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": 1, 
+        "color_code": "#F4B59C", 
+        "title": "\u0417\u0432\u043e\u043d\u043e\u043a/\u0417\u0430\u044f\u0432\u043a\u0430", 
+        "is_system": 0, 
+        "company_id": 12, 
+        "date_created": "2015-06-11T18:00:00Z", 
+        "date_edited": "2015-06-11T18:00:00Z"
+    }
+},
+{
+    "pk": 77, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": 2, 
+        "color_code": "#F59CC8", 
+        "title": "\u041e\u0442\u043f\u0440\u0430\u0432\u043a\u0430 \u041a\u041f", 
+        "is_system": 0, 
+        "company_id": 12, 
+        "date_created": "2015-06-11T18:00:00Z", 
+        "date_edited": "2015-06-11T18:00:00Z"
+    }
+},
+{
+    "pk": 78, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": 3, 
+        "color_code": "#A39CF4", 
+        "title": "\u0421\u043e\u0433\u043b\u0430\u0441\u043e\u0432\u0430\u043d\u0438\u0435 \u0434\u043e\u0433\u043e\u0432\u043e\u0440\u0430", 
+        "is_system": 0, 
+        "company_id": 12, 
+        "date_created": "2015-06-11T18:00:00Z", 
+        "date_edited": "2015-06-11T18:00:00Z"
+    }
+},
+{
+    "pk": 79, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": 4, 
+        "color_code": "#9CE5F4", 
+        "title": "\u0412\u044b\u0441\u0442\u0430\u0432\u043b\u0435\u043d\u0438\u0435 \u0441\u0447\u0435\u0442\u0430", 
+        "is_system": 0, 
+        "company_id": 12, 
+        "date_created": "2015-06-11T18:00:00Z", 
+        "date_edited": "2015-06-11T18:00:00Z"
+    }
+},
+{
+    "pk": 80, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": 5, 
+        "color_code": "#9CF4A7", 
+        "title": "\u041a\u043e\u043d\u0442\u0440\u043e\u043b\u044c \u043e\u043f\u043b\u0430\u0442\u044b", 
+        "is_system": 0, 
+        "company_id": 12, 
+        "date_created": "2015-06-11T18:00:00Z", 
+        "date_edited": "2015-06-11T18:00:00Z"
+    }
+},
+{
+    "pk": 81, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": 6, 
+        "color_code": "#D4F49B", 
+        "title": "\u041f\u0440\u0435\u0434\u043e\u0441\u0442\u0430\u0432\u043b\u0435\u043d\u0438\u0435 \u0443\u0441\u043b\u0443\u0433\u0438", 
+        "is_system": 0, 
+        "company_id": 12, 
+        "date_created": "2015-06-11T18:00:00Z", 
+        "date_edited": "2015-06-11T18:00:00Z"
+    }
+},
+{
+    "pk": 82, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": 7, 
+        "color_code": "#F4DC9C", 
+        "title": "Upsales", 
+        "is_system": 0, 
+        "company_id": 12, 
+        "date_created": "2015-06-11T18:00:00Z", 
+        "date_edited": "2015-06-11T18:00:00Z"
+    }
+},
+{
+    "pk": 90, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": 9, 
+        "color_code": "#C69CF4", 
+        "title": "\u0417\u0430\u043a\u043b\u044e\u0447\u0435\u043d\u0438\u0435 \u0434\u043e\u0433\u043e\u0432\u043e\u0440\u0430", 
+        "is_system": 0, 
+        "company_id": 9, 
+        "date_created": "2015-06-11T18:00:00Z", 
+        "date_edited": "2015-07-24T05:11:27.050Z"
+    }
+},
+{
+    "pk": 91, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": 3, 
+        "color_code": "#E3C0AB", 
+        "title": "\u0412\u044b\u0441\u0442\u0430\u0432\u043b\u0435\u043d\u0438\u0435 \u0441\u0447\u0435\u0442\u0430", 
+        "is_system": 0, 
+        "company_id": 9, 
+        "date_created": "2015-06-11T18:00:00Z", 
+        "date_edited": "2015-07-24T05:11:06.120Z"
+    }
+},
+{
+    "pk": 92, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": 1, 
+        "color_code": "#F4B59C", 
+        "title": "\u0417\u0432\u043e\u043d\u043e\u043a/\u0417\u0430\u044f\u0432\u043a\u0430", 
+        "is_system": 0, 
+        "company_id": 13, 
+        "date_created": "2015-06-11T18:00:00Z", 
+        "date_edited": "2015-06-11T18:00:00Z"
+    }
+},
+{
+    "pk": 93, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": 2, 
+        "color_code": "#F59CC8", 
+        "title": "\u041e\u0442\u043f\u0440\u0430\u0432\u043a\u0430 \u041a\u041f", 
+        "is_system": 0, 
+        "company_id": 13, 
+        "date_created": "2015-06-11T18:00:00Z", 
+        "date_edited": "2015-06-11T18:00:00Z"
+    }
+},
+{
+    "pk": 94, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": 3, 
+        "color_code": "#A39CF4", 
+        "title": "\u041f\u0435\u0440\u0435\u0433\u043e\u0432\u043e\u0440\u044b", 
+        "is_system": 0, 
+        "company_id": 13, 
+        "date_created": "2015-06-11T18:00:00Z", 
+        "date_edited": "2015-06-11T18:00:00Z"
+    }
+},
+{
+    "pk": 95, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": 4, 
+        "color_code": "#9CE5F4", 
+        "title": "\u0421\u043e\u0433\u043b\u0430\u0441\u043e\u0432\u0430\u043d\u0438\u0435 \u0434\u043e\u0433\u043e\u0432\u043e\u0440\u0430", 
+        "is_system": 0, 
+        "company_id": 13, 
+        "date_created": "2015-06-11T18:00:00Z", 
+        "date_edited": "2015-06-11T18:00:00Z"
+    }
+},
+{
+    "pk": 96, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": 5, 
+        "color_code": "#9CF4A7", 
+        "title": "\u0421\u0431\u043e\u0440 \u0434\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u043e\u0432", 
+        "is_system": 0, 
+        "company_id": 13, 
+        "date_created": "2015-06-11T18:00:00Z", 
+        "date_edited": "2015-06-11T18:00:00Z"
+    }
+},
+{
+    "pk": 97, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": 6, 
+        "color_code": "#D4F49B", 
+        "title": "\u0412\u044b\u0441\u0442\u0430\u0432\u043b\u0435\u043d\u0438\u0435 \u0441\u0447\u0435\u0442\u0430", 
+        "is_system": 0, 
+        "company_id": 13, 
+        "date_created": "2015-06-11T18:00:00Z", 
+        "date_edited": "2015-06-11T18:00:00Z"
+    }
+},
+{
+    "pk": 98, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": 7, 
+        "color_code": "#C69CF4", 
+        "title": "\u041a\u043e\u043d\u0442\u0440\u043e\u043b\u044c \u043e\u043f\u043b\u0430\u0442\u044b", 
+        "is_system": 0, 
+        "company_id": 13, 
+        "date_created": "2015-06-11T18:00:00Z", 
+        "date_edited": "2015-06-11T18:00:00Z"
+    }
+},
+{
+    "pk": 106, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": 8, 
+        "color_code": "#9CC2F4", 
+        "title": "\u041a\u043e\u043d\u0442\u0440\u043e\u043b\u044c \u0434\u043e\u0433\u043e\u0432\u043e\u0440\u0430", 
+        "is_system": 0, 
+        "company_id": 9, 
+        "date_created": "2015-06-11T18:00:00Z", 
+        "date_edited": "2015-07-24T05:10:49.272Z"
+    }
+},
+{
+    "pk": 107, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": 8, 
+        "color_code": "#9CC2F4", 
+        "title": "\u041f\u0440\u0435\u0434\u043e\u0441\u0442\u0430\u0432\u043b\u0435\u043d\u0438\u0435 \u0443\u0441\u043b\u0443\u0433\u0438", 
+        "is_system": 0, 
+        "company_id": 13, 
+        "date_created": "2015-06-11T18:00:00Z", 
+        "date_edited": "2015-06-11T18:00:00Z"
+    }
+},
+{
+    "pk": 108, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": 9, 
+        "color_code": "#F4DC9C", 
+        "title": "Upsales", 
+        "is_system": 0, 
+        "company_id": 13, 
+        "date_created": "2015-06-11T18:00:00Z", 
+        "date_edited": "2015-06-11T18:00:00Z"
+    }
+},
+{
+    "pk": 109, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": 1, 
+        "color_code": "#F4B59C", 
+        "title": "\u0417\u0432\u043e\u043d\u043e\u043a/\u0417\u0430\u044f\u0432\u043a\u0430", 
+        "is_system": 0, 
+        "company_id": 14, 
+        "date_created": "2015-06-11T18:00:00Z", 
+        "date_edited": "2015-07-31T09:58:18.177Z"
+    }
+},
+{
+    "pk": 110, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": 2, 
+        "color_code": "#F59CC8", 
+        "title": "\u041e\u0442\u043f\u0440\u0430\u0432\u043a\u0430 \u041a\u041f", 
+        "is_system": 0, 
+        "company_id": 14, 
+        "date_created": "2015-06-11T18:00:00Z", 
+        "date_edited": "2015-07-31T09:58:18.192Z"
+    }
+},
+{
+    "pk": 111, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": 3, 
+        "color_code": "#A39CF4", 
+        "title": "\u0421\u043e\u0433\u043b\u0430\u0441\u043e\u0432\u0430\u043d\u0438\u0435 \u0434\u043e\u0433\u043e\u0432\u043e\u0440\u0430", 
+        "is_system": 0, 
+        "company_id": 14, 
+        "date_created": "2015-06-11T18:00:00Z", 
+        "date_edited": "2015-07-31T09:58:18.208Z"
+    }
+},
+{
+    "pk": 112, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": 4, 
+        "color_code": "#9CE5F4", 
+        "title": "\u0412\u044b\u0441\u0442\u0430\u0432\u043b\u0435\u043d\u0438\u0435 \u0441\u0447\u0435\u0442\u0430", 
+        "is_system": 0, 
+        "company_id": 14, 
+        "date_created": "2015-06-11T18:00:00Z", 
+        "date_edited": "2015-07-31T09:58:18.223Z"
+    }
+},
+{
+    "pk": 113, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": 5, 
+        "color_code": "#9CF4A7", 
+        "title": "\u041a\u043e\u043d\u0442\u0440\u043e\u043b\u044c \u043e\u043f\u043b\u0430\u0442\u044b", 
+        "is_system": 0, 
+        "company_id": 14, 
+        "date_created": "2015-06-11T18:00:00Z", 
+        "date_edited": "2015-07-31T09:58:18.239Z"
+    }
+},
+{
+    "pk": 114, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": 6, 
+        "color_code": "#D4F49B", 
+        "title": "\u041f\u0440\u0435\u0434\u043e\u0441\u0442\u0430\u0432\u043b\u0435\u043d\u0438\u0435 \u0443\u0441\u043b\u0443\u0433\u0438", 
+        "is_system": 0, 
+        "company_id": 14, 
+        "date_created": "2015-06-11T18:00:00Z", 
+        "date_edited": "2015-07-31T09:58:18.259Z"
+    }
+},
+{
+    "pk": 115, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": 7, 
+        "color_code": "#F4DC9C", 
+        "title": "Upsales", 
+        "is_system": 0, 
+        "company_id": 14, 
+        "date_created": "2015-06-11T18:00:00Z", 
+        "date_edited": "2015-07-31T09:58:18.277Z"
+    }
+},
+{
+    "pk": 123, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": 1, 
+        "color_code": "#F4B59C", 
+        "title": "\u0417\u0432\u043e\u043d\u043e\u043a/\u0417\u0430\u044f\u0432\u043a\u0430", 
+        "is_system": 0, 
+        "company_id": 15, 
+        "date_created": "2015-06-11T18:00:00Z", 
+        "date_edited": "2015-06-11T18:00:00Z"
+    }
+},
+{
+    "pk": 124, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": 2, 
+        "color_code": "#F59CC8", 
+        "title": "\u041e\u0442\u043f\u0440\u0430\u0432\u043a\u0430 \u041a\u041f", 
+        "is_system": 0, 
+        "company_id": 15, 
+        "date_created": "2015-06-11T18:00:00Z", 
+        "date_edited": "2015-06-11T18:00:00Z"
+    }
+},
+{
+    "pk": 125, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": 3, 
+        "color_code": "#A39CF4", 
+        "title": "\u0421\u043e\u0433\u043b\u0430\u0441\u043e\u0432\u0430\u043d\u0438\u0435 \u0434\u043e\u0433\u043e\u0432\u043e\u0440\u0430", 
+        "is_system": 0, 
+        "company_id": 15, 
+        "date_created": "2015-06-11T18:00:00Z", 
+        "date_edited": "2015-06-11T18:00:00Z"
+    }
+},
+{
+    "pk": 126, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": 4, 
+        "color_code": "#9CE5F4", 
+        "title": "\u0412\u044b\u0441\u0442\u0430\u0432\u043b\u0435\u043d\u0438\u0435 \u0441\u0447\u0435\u0442\u0430", 
+        "is_system": 0, 
+        "company_id": 15, 
+        "date_created": "2015-06-11T18:00:00Z", 
+        "date_edited": "2015-06-11T18:00:00Z"
+    }
+},
+{
+    "pk": 127, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": 5, 
+        "color_code": "#9CF4A7", 
+        "title": "\u041a\u043e\u043d\u0442\u0440\u043e\u043b\u044c \u043e\u043f\u043b\u0430\u0442\u044b", 
+        "is_system": 0, 
+        "company_id": 15, 
+        "date_created": "2015-06-11T18:00:00Z", 
+        "date_edited": "2015-06-11T18:00:00Z"
+    }
+},
+{
+    "pk": 128, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": 6, 
+        "color_code": "#D4F49B", 
+        "title": "\u041f\u0440\u0435\u0434\u043e\u0441\u0442\u0430\u0432\u043b\u0435\u043d\u0438\u0435 \u0443\u0441\u043b\u0443\u0433\u0438", 
+        "is_system": 0, 
+        "company_id": 15, 
+        "date_created": "2015-06-11T18:00:00Z", 
+        "date_edited": "2015-06-11T18:00:00Z"
+    }
+},
+{
+    "pk": 129, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": 7, 
+        "color_code": "#F4DC9C", 
+        "title": "Upsales", 
+        "is_system": 0, 
+        "company_id": 15, 
+        "date_created": "2015-06-11T18:00:00Z", 
+        "date_edited": "2015-06-11T18:00:00Z"
+    }
+},
+{
+    "pk": 137, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": 2, 
+        "color_code": "#9CF4A7", 
+        "title": "\u041e\u0442\u0433\u0440\u0443\u0437\u043a\u0430", 
+        "is_system": 0, 
+        "company_id": 9, 
+        "date_created": "2015-07-24T05:03:25.349Z", 
+        "date_edited": "2015-07-24T05:10:37.548Z"
+    }
+},
+{
+    "pk": 138, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": 1, 
+        "color_code": "#D4F49B", 
+        "title": "\u0417\u0430\u043a\u0440\u044b\u0442\u0438\u0435 \u0434\u043e\u0433\u043e\u0432\u043e\u0440\u0430", 
+        "is_system": 0, 
+        "company_id": 9, 
+        "date_created": "2015-07-24T05:03:25.464Z", 
+        "date_edited": "2015-07-24T05:10:28.169Z"
+    }
+},
+{
+    "pk": 174, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": 8, 
+        "color_code": "#F4B59C", 
+        "title": "\u0417\u0432\u043e\u043d\u043e\u043a/\u0417\u0430\u044f\u0432\u043a\u0430", 
+        "is_system": 0, 
+        "company_id": 18, 
+        "date_created": "2015-07-30T09:01:33.926Z", 
+        "date_edited": "2015-07-31T04:46:00.102Z"
+    }
+},
+{
+    "pk": 175, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": 9, 
+        "color_code": "#F59CC8", 
+        "title": "\u041e\u0442\u043f\u0440\u0430\u0432\u043a\u0430 \u041a\u041f", 
+        "is_system": 0, 
+        "company_id": 18, 
+        "date_created": "2015-07-30T09:01:33.929Z", 
+        "date_edited": "2015-07-31T04:46:00.115Z"
+    }
+},
+{
+    "pk": 176, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": 10, 
+        "color_code": "#A39CF4", 
+        "title": "\u0421\u043e\u0433\u043b\u0430\u0441\u043e\u0432\u0430\u043d\u0438\u0435 \u0434\u043e\u0433\u043e\u0432\u043e\u0440\u0430", 
+        "is_system": 0, 
+        "company_id": 18, 
+        "date_created": "2015-07-30T09:01:33.931Z", 
+        "date_edited": "2015-07-31T04:46:00.128Z"
+    }
+},
+{
+    "pk": 177, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": 11, 
+        "color_code": "#9CE5F4", 
+        "title": "\u0412\u044b\u0441\u0442\u0430\u0432\u043b\u0435\u043d\u0438\u0435 \u0441\u0447\u0435\u0442\u0430", 
+        "is_system": 0, 
+        "company_id": 18, 
+        "date_created": "2015-07-30T09:01:33.933Z", 
+        "date_edited": "2015-07-31T04:46:00.147Z"
+    }
+},
+{
+    "pk": 178, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": 12, 
+        "color_code": "#9CF4A7", 
+        "title": "\u041a\u043e\u043d\u0442\u0440\u043e\u043b\u044c \u043e\u043f\u043b\u0430\u0442\u044b", 
+        "is_system": 0, 
+        "company_id": 18, 
+        "date_created": "2015-07-30T09:01:33.935Z", 
+        "date_edited": "2015-07-31T04:46:00.160Z"
+    }
+},
+{
+    "pk": 179, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": 13, 
+        "color_code": "#D4F49B", 
+        "title": "\u041f\u0440\u0435\u0434\u043e\u0441\u0442\u0430\u0432\u043b\u0435\u043d\u0438\u0435 \u0443\u0441\u043b\u0443\u0433\u0438", 
+        "is_system": 0, 
+        "company_id": 18, 
+        "date_created": "2015-07-30T09:01:33.937Z", 
+        "date_edited": "2015-07-31T04:46:00.174Z"
+    }
+},
+{
+    "pk": 180, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": 14, 
+        "color_code": "#F4DC9C", 
+        "title": "Upsales", 
+        "is_system": 0, 
+        "company_id": 18, 
+        "date_created": "2015-07-30T09:01:33.939Z", 
+        "date_edited": "2015-07-31T04:46:00.188Z"
+    }
+},
+{
+    "pk": 181, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": 1, 
+        "color_code": "#F4B59C", 
+        "title": "\u0417\u0432\u043e\u043d\u043e\u043a/\u0417\u0430\u044f\u0432\u043a\u0430", 
+        "is_system": 0, 
+        "company_id": 19, 
+        "date_created": "2015-07-30T09:18:17.029Z", 
+        "date_edited": "2015-08-03T04:13:21.357Z"
+    }
+},
+{
+    "pk": 182, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": 2, 
+        "color_code": "#F59CC8", 
+        "title": "\u041e\u0442\u043f\u0440\u0430\u0432\u043a\u0430 \u041a\u041f", 
+        "is_system": 0, 
+        "company_id": 19, 
+        "date_created": "2015-07-30T09:18:17.032Z", 
+        "date_edited": "2015-08-03T04:13:21.371Z"
+    }
+},
+{
+    "pk": 183, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": 3, 
+        "color_code": "#A39CF4", 
+        "title": "\u0421\u043e\u0433\u043b\u0430\u0441\u043e\u0432\u0430\u043d\u0438\u0435 \u0434\u043e\u0433\u043e\u0432\u043e\u0440\u0430", 
+        "is_system": 0, 
+        "company_id": 19, 
+        "date_created": "2015-07-30T09:18:17.034Z", 
+        "date_edited": "2015-08-03T04:13:21.382Z"
+    }
+},
+{
+    "pk": 184, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": 4, 
+        "color_code": "#9CE5F4", 
+        "title": "\u0412\u044b\u0441\u0442\u0430\u0432\u043b\u0435\u043d\u0438\u0435 \u0441\u0447\u0435\u0442\u0430", 
+        "is_system": 0, 
+        "company_id": 19, 
+        "date_created": "2015-07-30T09:18:17.036Z", 
+        "date_edited": "2015-08-03T04:13:21.410Z"
+    }
+},
+{
+    "pk": 185, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": 5, 
+        "color_code": "#9CF4A7", 
+        "title": "\u041a\u043e\u043d\u0442\u0440\u043e\u043b\u044c \u043e\u043f\u043b\u0430\u0442\u044b", 
+        "is_system": 0, 
+        "company_id": 19, 
+        "date_created": "2015-07-30T09:18:17.038Z", 
+        "date_edited": "2015-08-03T04:13:21.423Z"
+    }
+},
+{
+    "pk": 186, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": 6, 
+        "color_code": "#D4F49B", 
+        "title": "\u041f\u0440\u0435\u0434\u043e\u0441\u0442\u0430\u0432\u043b\u0435\u043d\u0438\u0435 \u0443\u0441\u043b\u0443\u0433\u0438", 
+        "is_system": 0, 
+        "company_id": 19, 
+        "date_created": "2015-07-30T09:18:17.040Z", 
+        "date_edited": "2015-08-03T04:13:21.437Z"
+    }
+},
+{
+    "pk": 187, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": 7, 
+        "color_code": "#F4DC9C", 
+        "title": "Upsales", 
+        "is_system": 0, 
+        "company_id": 19, 
+        "date_created": "2015-07-30T09:18:17.042Z", 
+        "date_edited": "2015-08-03T04:13:21.451Z"
+    }
+},
+{
+    "pk": 195, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": null, 
+        "color_code": "#9CF4A7", 
+        "title": "\u0423\u0441\u043f\u0435\u0448\u043d\u043e \u0437\u0430\u0432\u0435\u0440\u0448\u0435\u043d\u043e", 
+        "is_system": 1, 
+        "company_id": 2, 
+        "date_created": "2015-07-30T14:43:32.465Z", 
+        "date_edited": "2015-07-30T14:43:32.465Z"
+    }
+},
+{
+    "pk": 196, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": null, 
+        "color_code": "#F4A09C", 
+        "title": "\u041d\u0435 \u0440\u0435\u0430\u043b\u0438\u0437\u043e\u0432\u0430\u043d\u043e", 
+        "is_system": 2, 
+        "company_id": 2, 
+        "date_created": "2015-07-30T14:43:32.467Z", 
+        "date_edited": "2015-07-30T14:43:32.467Z"
+    }
+},
+{
+    "pk": 197, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": null, 
+        "color_code": "#9CF4A7", 
+        "title": "\u0423\u0441\u043f\u0435\u0448\u043d\u043e \u0437\u0430\u0432\u0435\u0440\u0448\u0435\u043d\u043e", 
+        "is_system": 1, 
+        "company_id": 3, 
+        "date_created": "2015-07-30T14:43:32.468Z", 
+        "date_edited": "2015-07-30T14:43:32.468Z"
+    }
+},
+{
+    "pk": 198, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": null, 
+        "color_code": "#F4A09C", 
+        "title": "\u041d\u0435 \u0440\u0435\u0430\u043b\u0438\u0437\u043e\u0432\u0430\u043d\u043e", 
+        "is_system": 2, 
+        "company_id": 3, 
+        "date_created": "2015-07-30T14:43:32.470Z", 
+        "date_edited": "2015-07-30T14:43:32.470Z"
+    }
+},
+{
+    "pk": 199, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": null, 
+        "color_code": "#9CF4A7", 
+        "title": "\u0423\u0441\u043f\u0435\u0448\u043d\u043e \u0437\u0430\u0432\u0435\u0440\u0448\u0435\u043d\u043e", 
+        "is_system": 1, 
+        "company_id": 4, 
+        "date_created": "2015-07-30T14:43:32.478Z", 
+        "date_edited": "2015-07-30T14:43:32.478Z"
+    }
+},
+{
+    "pk": 200, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": null, 
+        "color_code": "#F4A09C", 
+        "title": "\u041d\u0435 \u0440\u0435\u0430\u043b\u0438\u0437\u043e\u0432\u0430\u043d\u043e", 
+        "is_system": 2, 
+        "company_id": 4, 
+        "date_created": "2015-07-30T14:43:32.480Z", 
+        "date_edited": "2015-07-30T14:43:32.480Z"
+    }
+},
+{
+    "pk": 201, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": null, 
+        "color_code": "#9CF4A7", 
+        "title": "\u0423\u0441\u043f\u0435\u0448\u043d\u043e \u0437\u0430\u0432\u0435\u0440\u0448\u0435\u043d\u043e", 
+        "is_system": 1, 
+        "company_id": 5, 
+        "date_created": "2015-07-30T14:43:32.488Z", 
+        "date_edited": "2015-07-30T14:43:32.488Z"
+    }
+},
+{
+    "pk": 202, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": null, 
+        "color_code": "#F4A09C", 
+        "title": "\u041d\u0435 \u0440\u0435\u0430\u043b\u0438\u0437\u043e\u0432\u0430\u043d\u043e", 
+        "is_system": 2, 
+        "company_id": 5, 
+        "date_created": "2015-07-30T14:43:32.490Z", 
+        "date_edited": "2015-07-30T14:43:32.491Z"
+    }
+},
+{
+    "pk": 203, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": null, 
+        "color_code": "#9CF4A7", 
+        "title": "\u0423\u0441\u043f\u0435\u0448\u043d\u043e \u0437\u0430\u0432\u0435\u0440\u0448\u0435\u043d\u043e", 
+        "is_system": 1, 
+        "company_id": 6, 
+        "date_created": "2015-07-30T14:43:32.492Z", 
+        "date_edited": "2015-07-30T14:43:32.492Z"
+    }
+},
+{
+    "pk": 204, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": null, 
+        "color_code": "#F4A09C", 
+        "title": "\u041d\u0435 \u0440\u0435\u0430\u043b\u0438\u0437\u043e\u0432\u0430\u043d\u043e", 
+        "is_system": 2, 
+        "company_id": 6, 
+        "date_created": "2015-07-30T14:43:32.495Z", 
+        "date_edited": "2015-07-30T14:43:32.495Z"
+    }
+},
+{
+    "pk": 205, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": null, 
+        "color_code": "#9CF4A7", 
+        "title": "\u0423\u0441\u043f\u0435\u0448\u043d\u043e \u0437\u0430\u0432\u0435\u0440\u0448\u0435\u043d\u043e", 
+        "is_system": 1, 
+        "company_id": 7, 
+        "date_created": "2015-07-30T14:43:32.497Z", 
+        "date_edited": "2015-07-30T14:43:32.497Z"
+    }
+},
+{
+    "pk": 206, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": null, 
+        "color_code": "#F4A09C", 
+        "title": "\u041d\u0435 \u0440\u0435\u0430\u043b\u0438\u0437\u043e\u0432\u0430\u043d\u043e", 
+        "is_system": 2, 
+        "company_id": 7, 
+        "date_created": "2015-07-30T14:43:32.500Z", 
+        "date_edited": "2015-07-30T14:43:32.500Z"
+    }
+},
+{
+    "pk": 207, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": null, 
+        "color_code": "#9CF4A7", 
+        "title": "\u0423\u0441\u043f\u0435\u0448\u043d\u043e \u0437\u0430\u0432\u0435\u0440\u0448\u0435\u043d\u043e", 
+        "is_system": 1, 
+        "company_id": 8, 
+        "date_created": "2015-07-30T14:43:32.501Z", 
+        "date_edited": "2015-07-30T14:43:32.502Z"
+    }
+},
+{
+    "pk": 208, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": null, 
+        "color_code": "#F4A09C", 
+        "title": "\u041d\u0435 \u0440\u0435\u0430\u043b\u0438\u0437\u043e\u0432\u0430\u043d\u043e", 
+        "is_system": 2, 
+        "company_id": 8, 
+        "date_created": "2015-07-30T14:43:32.503Z", 
+        "date_edited": "2015-07-30T14:43:32.504Z"
+    }
+},
+{
+    "pk": 209, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": null, 
+        "color_code": "#9CF4A7", 
+        "title": "\u0423\u0441\u043f\u0435\u0448\u043d\u043e \u0437\u0430\u0432\u0435\u0440\u0448\u0435\u043d\u043e", 
+        "is_system": 1, 
+        "company_id": 9, 
+        "date_created": "2015-07-30T14:43:32.506Z", 
+        "date_edited": "2015-07-30T14:43:32.506Z"
+    }
+},
+{
+    "pk": 210, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": null, 
+        "color_code": "#F4A09C", 
+        "title": "\u041d\u0435 \u0440\u0435\u0430\u043b\u0438\u0437\u043e\u0432\u0430\u043d\u043e", 
+        "is_system": 2, 
+        "company_id": 9, 
+        "date_created": "2015-07-30T14:43:32.507Z", 
+        "date_edited": "2015-07-30T14:43:32.507Z"
+    }
+},
+{
+    "pk": 211, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": null, 
+        "color_code": "#9CF4A7", 
+        "title": "\u0423\u0441\u043f\u0435\u0448\u043d\u043e \u0437\u0430\u0432\u0435\u0440\u0448\u0435\u043d\u043e", 
+        "is_system": 1, 
+        "company_id": 10, 
+        "date_created": "2015-07-30T14:43:32.510Z", 
+        "date_edited": "2015-07-30T14:43:32.510Z"
+    }
+},
+{
+    "pk": 212, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": null, 
+        "color_code": "#F4A09C", 
+        "title": "\u041d\u0435 \u0440\u0435\u0430\u043b\u0438\u0437\u043e\u0432\u0430\u043d\u043e", 
+        "is_system": 2, 
+        "company_id": 10, 
+        "date_created": "2015-07-30T14:43:32.511Z", 
+        "date_edited": "2015-07-30T14:43:32.511Z"
+    }
+},
+{
+    "pk": 213, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": null, 
+        "color_code": "#9CF4A7", 
+        "title": "\u0423\u0441\u043f\u0435\u0448\u043d\u043e \u0437\u0430\u0432\u0435\u0440\u0448\u0435\u043d\u043e", 
+        "is_system": 1, 
+        "company_id": 11, 
+        "date_created": "2015-07-30T14:43:32.514Z", 
+        "date_edited": "2015-07-30T14:43:32.514Z"
+    }
+},
+{
+    "pk": 214, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": null, 
+        "color_code": "#F4A09C", 
+        "title": "\u041d\u0435 \u0440\u0435\u0430\u043b\u0438\u0437\u043e\u0432\u0430\u043d\u043e", 
+        "is_system": 2, 
+        "company_id": 11, 
+        "date_created": "2015-07-30T14:43:32.516Z", 
+        "date_edited": "2015-07-30T14:43:32.516Z"
+    }
+},
+{
+    "pk": 215, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": null, 
+        "color_code": "#9CF4A7", 
+        "title": "\u0423\u0441\u043f\u0435\u0448\u043d\u043e \u0437\u0430\u0432\u0435\u0440\u0448\u0435\u043d\u043e", 
+        "is_system": 1, 
+        "company_id": 12, 
+        "date_created": "2015-07-30T14:43:32.518Z", 
+        "date_edited": "2015-07-30T14:43:32.518Z"
+    }
+},
+{
+    "pk": 216, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": null, 
+        "color_code": "#F4A09C", 
+        "title": "\u041d\u0435 \u0440\u0435\u0430\u043b\u0438\u0437\u043e\u0432\u0430\u043d\u043e", 
+        "is_system": 2, 
+        "company_id": 12, 
+        "date_created": "2015-07-30T14:43:32.520Z", 
+        "date_edited": "2015-07-30T14:43:32.520Z"
+    }
+},
+{
+    "pk": 217, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": null, 
+        "color_code": "#9CF4A7", 
+        "title": "\u0423\u0441\u043f\u0435\u0448\u043d\u043e \u0437\u0430\u0432\u0435\u0440\u0448\u0435\u043d\u043e", 
+        "is_system": 1, 
+        "company_id": 13, 
+        "date_created": "2015-07-30T14:43:32.521Z", 
+        "date_edited": "2015-07-30T14:43:32.521Z"
+    }
+},
+{
+    "pk": 218, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": null, 
+        "color_code": "#F4A09C", 
+        "title": "\u041d\u0435 \u0440\u0435\u0430\u043b\u0438\u0437\u043e\u0432\u0430\u043d\u043e", 
+        "is_system": 2, 
+        "company_id": 13, 
+        "date_created": "2015-07-30T14:43:32.523Z", 
+        "date_edited": "2015-07-30T14:43:32.523Z"
+    }
+},
+{
+    "pk": 219, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": null, 
+        "color_code": "#9CF4A7", 
+        "title": "\u0423\u0441\u043f\u0435\u0448\u043d\u043e \u0437\u0430\u0432\u0435\u0440\u0448\u0435\u043d\u043e", 
+        "is_system": 1, 
+        "company_id": 14, 
+        "date_created": "2015-07-30T14:43:32.524Z", 
+        "date_edited": "2015-07-31T09:58:18.292Z"
+    }
+},
+{
+    "pk": 220, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": null, 
+        "color_code": "#F4A09C", 
+        "title": "\u041d\u0435 \u0440\u0435\u0430\u043b\u0438\u0437\u043e\u0432\u0430\u043d\u043e", 
+        "is_system": 2, 
+        "company_id": 14, 
+        "date_created": "2015-07-30T14:43:32.527Z", 
+        "date_edited": "2015-07-31T09:58:18.307Z"
+    }
+},
+{
+    "pk": 221, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": null, 
+        "color_code": "#9CF4A7", 
+        "title": "\u0423\u0441\u043f\u0435\u0448\u043d\u043e \u0437\u0430\u0432\u0435\u0440\u0448\u0435\u043d\u043e", 
+        "is_system": 1, 
+        "company_id": 15, 
+        "date_created": "2015-07-30T14:43:32.529Z", 
+        "date_edited": "2015-07-30T14:43:32.529Z"
+    }
+},
+{
+    "pk": 222, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": null, 
+        "color_code": "#F4A09C", 
+        "title": "\u041d\u0435 \u0440\u0435\u0430\u043b\u0438\u0437\u043e\u0432\u0430\u043d\u043e", 
+        "is_system": 2, 
+        "company_id": 15, 
+        "date_created": "2015-07-30T14:43:32.531Z", 
+        "date_edited": "2015-07-30T14:43:32.531Z"
+    }
+},
+{
+    "pk": 223, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": null, 
+        "color_code": "#9CF4A7", 
+        "title": "\u0423\u0441\u043f\u0435\u0448\u043d\u043e \u0437\u0430\u0432\u0435\u0440\u0448\u0435\u043d\u043e", 
+        "is_system": 1, 
+        "company_id": 1, 
+        "date_created": "2015-07-30T14:43:32.533Z", 
+        "date_edited": "2015-07-30T17:00:44.453Z"
+    }
+},
+{
+    "pk": 224, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": null, 
+        "color_code": "#F4A09C", 
+        "title": "\u041d\u0435 \u0440\u0435\u0430\u043b\u0438\u0437\u043e\u0432\u0430\u043d\u043e", 
+        "is_system": 2, 
+        "company_id": 1, 
+        "date_created": "2015-07-30T14:43:32.534Z", 
+        "date_edited": "2015-07-30T17:00:44.466Z"
+    }
+},
+{
+    "pk": 225, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": null, 
+        "color_code": "#9CF4A7", 
+        "title": "\u0423\u0441\u043f\u0435\u0448\u043d\u043e \u0437\u0430\u0432\u0435\u0440\u0448\u0435\u043d\u043e", 
+        "is_system": 1, 
+        "company_id": 18, 
+        "date_created": "2015-07-30T14:43:32.536Z", 
+        "date_edited": "2015-07-31T04:46:00.203Z"
+    }
+},
+{
+    "pk": 226, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": null, 
+        "color_code": "#F4A09C", 
+        "title": "\u041d\u0435 \u0440\u0435\u0430\u043b\u0438\u0437\u043e\u0432\u0430\u043d\u043e", 
+        "is_system": 2, 
+        "company_id": 18, 
+        "date_created": "2015-07-30T14:43:32.538Z", 
+        "date_edited": "2015-07-31T04:46:00.216Z"
+    }
+},
+{
+    "pk": 227, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": null, 
+        "color_code": "#9CF4A7", 
+        "title": "\u0423\u0441\u043f\u0435\u0448\u043d\u043e \u0437\u0430\u0432\u0435\u0440\u0448\u0435\u043d\u043e", 
+        "is_system": 1, 
+        "company_id": 19, 
+        "date_created": "2015-07-30T14:43:32.540Z", 
+        "date_edited": "2015-08-03T04:13:21.463Z"
+    }
+},
+{
+    "pk": 228, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": null, 
+        "color_code": "#F4A09C", 
+        "title": "\u041d\u0435 \u0440\u0435\u0430\u043b\u0438\u0437\u043e\u0432\u0430\u043d\u043e", 
+        "is_system": 2, 
+        "company_id": 19, 
+        "date_created": "2015-07-30T14:43:32.541Z", 
+        "date_edited": "2015-08-03T04:13:21.484Z"
+    }
+},
+{
+    "pk": 230, 
+    "model": "alm_crm.milestone", 
+    "fields": {
+        "sort": null, 
+        "color_code": "#F4B59C", 
+        "title": "\u041d\u043e\u0432\u044b\u0439", 
+        "is_system": 0, 
+        "company_id": 14, 
+        "date_created": "2015-07-31T09:58:18.321Z", 
+        "date_edited": "2015-07-31T09:58:18.321Z"
     }
 }
 ]

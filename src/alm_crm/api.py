@@ -2208,8 +2208,8 @@ class ActivityResource(CRMServiceModelResource):
         ]
 
     def dehydrate(self, bundle):
-        crmuser = self.get_crmuser(bundle.request)
-        bundle.data['has_read'] = self._has_read(bundle, crmuser.id)
+        # crmuser = self.get_crmuser(bundle.request)
+        bundle.data['has_read'] = self._has_read(bundle, bundle.request.user.id)
 
         # send updated contact (status was changed to LEAD)
         if bundle.data.get('obj_created'):
@@ -3129,7 +3129,7 @@ class AppStateObject(object):
         self.request = request
         self.service_slug = service_slug
         self.current_user = request.user
-        self.company_id = get_subscr_id(request.user_env, service_slug)
+        self.company_id = request.account.company.id
         self.company = request.account.company
         self.user = request.user
 
@@ -3749,7 +3749,7 @@ class CustomFieldResource(CRMServiceModelResource):
             except ContentType.DoesNotExist:
                 return http.HttpNotFound()
             else:
-                objects = CustomField.objects.filter(company_id=request.user.get_company(request).id,
+                objects = CustomField.objects.filter(company_id=request.account.company.id,
                                                     content_type=content_type)
 
                 return self.create_response(request, 

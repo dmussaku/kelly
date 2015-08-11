@@ -25,7 +25,7 @@ from alm_crm.models import (
     CustomFieldValue
     )
 from alm_vcard.models import VCard, Tel, Email, Org
-from alm_user.models import User
+from alm_user.models import User, Account
 from almanet.models import Subscription, Service
 from alm_crm.models import GLOBAL_CYCLE_TITLE
 from alm_company.models import Company
@@ -42,15 +42,13 @@ class ContactTestCase(TestCase):
     def setUp(self):
         super(ContactTestCase, self).setUp()
         self.contact1 = Contact.objects.get(pk=1)
-        self.crmuser = self.contact1.owner
-        self.crm_subscr_id = CRMUser.get_subscription_id(self.crmuser.id)
 
     def test_get_contacts_by_status(self):
-        contacts = Contact.get_contacts_by_status(self.crm_subscr_id, status=1)
+        contacts = Contact.get_contacts_by_status(self.company_id, status=1)
         self.assertEqual(len(contacts), 2)
 
     def test_get_cold_base(self):
-        cold_contacts = Contact.get_cold_base(self.crm_subscr_id)
+        cold_contacts = Contact.get_cold_base(self.company_id)
         self.assertEqual(len(cold_contacts), 1)
 
     def test_change_status_without_save(self):

@@ -193,12 +193,6 @@ class UserResource(ModelResource):
                     }
                 )
 
-    def dehydrate(self, bundle):
-        subscription_id = get_subscr_id(bundle.request.user_env, DEFAULT_SERVICE)
-        bundle.data['crm_user_id'] = bundle.obj.get_subscr_user(subscription_id=subscription_id).pk
-        bundle.data['is_supervisor'] = bundle.obj.get_subscr_user(subscription_id=subscription_id).is_supervisor
-        return bundle
-
     def get_current_user(self, request, **kwargs):
         with RequestContext(self, request, allowed_methods=['get']):
             bundle = self.build_bundle(obj=request.user, request=request)
@@ -259,7 +253,8 @@ class UserResource(ModelResource):
 
     def full_dehydrate(self, bundle, for_list=False):
         bundle = super(self.__class__, self).full_dehydrate(bundle, for_list=True)
-        bundle.data['unfollow_list'] = [contact.id for contact in bundle.obj.get_crmuser().unfollow_list.all()]
+        bundle.data['crm_user_id'] = bundle.obj.id # needs to be deleted
+        bundle.data['unfollow_list'] = [contact.id for contact in bundle.obj.unfollow_list.all()]
         return bundle
 
     def vcard_full_hydrate(self, bundle):
