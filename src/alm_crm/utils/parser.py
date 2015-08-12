@@ -12,6 +12,9 @@ from alm_crm.models import (
 	)
 
 def text_parser(base_text, content_class=None, object_id=None):
+	if base_text == None:
+		return
+		
 	content_type =  ContentType.objects.get_for_model(content_class)
 
 	hashtag_parser = re.compile(u'\B#\w*[а-яА-ЯёЁa-zA-Z]+\w*', re.U)
