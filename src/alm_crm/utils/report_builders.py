@@ -77,6 +77,10 @@ def build_activity_feed(subscription_id, data=None):
 
 	if 'users' in data:
 		q &= Q(owner_id__in=data.get('users', []))
+	if 'date_from' in data:
+		q &= Q(date_created__gte=data.get('date_from', datetime.now()))
+	if 'date_to' in data:
+		q &= Q(date_created__lte=data.get('date_to', datetime.now()))
 
 	activities = [a.id for a in Activity.objects.filter(q)]
 
