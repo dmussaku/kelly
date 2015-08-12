@@ -67,6 +67,21 @@ def build_realtime_funnel(subscription_id, data={}):
 	for m in milestones:
 		rv['funnel'][m.id] = [sc.id for sc in sc_in_funnel if sc.milestone.id == m.id]
 	return rv
+
+def build_activity_feed(subscription_id, data=None):
+	data = {} if data is None else data
+	rv = {
+		'report_name': 'activity_feed'
+	}
+	q = Q(subscription_id=subscription_id)
+
+	activities = [a.id for a in Activity.objects.filter(q)]
+
+	rv['activities'] = activities
+
+	return rv
+
+
 		
 def build_user_report(subscription_id, data):
 	user_ids=data.get('user_ids', [-1])

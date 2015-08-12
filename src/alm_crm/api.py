@@ -4035,6 +4035,12 @@ class ReportResource(Resource):
                 name='api_realtime_funnel'
             ),
             url(
+                r"^(?P<resource_name>%s)/activity_feed%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('activity_feed'),
+                name='api_activity_feed'
+            ),
+            url(
                 r"^(?P<resource_name>%s)/user_report%s$" %
                 (self._meta.resource_name, trailing_slash()),
                 self.wrap_view('user_report'),
@@ -4075,6 +4081,18 @@ class ReportResource(Resource):
         return self.create_response(
             request,
             report_builders.build_realtime_funnel(request.user.get_crmuser().subscription_id, data))
+
+    def activity_feed(self, request, **kwargs):
+        if request.body:
+            data = self.deserialize(
+                request, request.body,
+                format=request.META.get('CONTENT_TYPE', 'application/json'))
+        else:
+            data = {}
+
+        return self.create_response(
+            request,
+            report_builders.build_activity_feed(request.user.get_crmuser().subscription_id, data))
 
 
     def user_report(self, request, **kwargs):
