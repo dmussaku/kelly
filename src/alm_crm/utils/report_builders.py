@@ -75,6 +75,9 @@ def build_activity_feed(subscription_id, data=None):
 	}
 	q = Q(subscription_id=subscription_id)
 
+	if 'users' in data:
+		q &= Q(owner_id__in=data.get('users', []))
+
 	activities = [a.id for a in Activity.objects.filter(q)]
 
 	rv['activities'] = activities
