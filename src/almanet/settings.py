@@ -412,7 +412,6 @@ class StagingConfiguration(FileSettings('~/.almanet/almanet.conf.py'), BaseConfi
     SITE_NAME = 'almasales.qa:3082'
     SITE_DOMAIN = 'http://almasales.qa:3082'
     CSRF_COOKIE_DOMAIN = '.almasales.qa'
-    SESSION_COOKIE_DOMAIN = '.almasales.qa'
     # CORS_ORIGIN_WHITELIST = (
     #     'almasales.kz',
     #     'almacloud.almasales.kz',

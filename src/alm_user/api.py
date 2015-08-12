@@ -33,18 +33,18 @@ import ast
 
 
 
-class OpenAuthEndpoint(Authentication):
+# class OpenAuthEndpoint(Authentication):
 
-    def is_authenticated(self, request, **kwargs):
-        """
-        Identifies if the user is authenticated to continue or not.
-        Should return either ``True`` if allowed, ``False`` if not or an
-        ``HttpResponse`` if you need something custom.
-        """
+#     def is_authenticated(self, request, **kwargs):
+#         """
+#         Identifies if the user is authenticated to continue or not.
+#         Should return either ``True`` if allowed, ``False`` if not or an
+#         ``HttpResponse`` if you need something custom.
+#         """
 
-        auth_endpoint = '/api/v1/%s/auth%s' % (UserResource._meta.resource_name, trailing_slash())
+#         auth_endpoint = '/api/v1/%s/auth%s' % (UserResource._meta.resource_name, trailing_slash())
 
-        return request.path == auth_endpoint
+#         # return request.path == auth_endpoint
 
 
 class UserSession(object):
@@ -107,7 +107,7 @@ class UserResource(ModelResource):
         detail_allowed_methods = ['get', 'patch']
         resource_name = 'user'
         authentication = MultiAuthentication(
-            OpenAuthEndpoint(),
+            # OpenAuthEndpoint(),
             BasicAuthentication(),
             SessionAuthentication()
             )
@@ -195,9 +195,8 @@ class UserResource(ModelResource):
                 )
 
     def dehydrate(self, bundle):
-        subscription_id = get_subscr_id(bundle.request.user_env, DEFAULT_SERVICE)
-        bundle.data['crm_user_id'] = bundle.obj.get_subscr_user(subscription_id=subscription_id).pk
-        bundle.data['is_supervisor'] = bundle.obj.get_subscr_user(subscription_id=subscription_id).is_supervisor
+        bundle.data['crm_user_id'] = bundle.obj.get_crmuser().pk
+        bundle.data['is_supervisor'] = bundle.obj.get_crmuser().is_supervisor
         return bundle
 
     def get_current_user(self, request, **kwargs):
@@ -371,7 +370,7 @@ class UserResource(ModelResource):
 
 
     def authorization(self, request, **kwargs):
-        with RequestContext(self, request, allowed_methods=['post']):
+        with RequestContext(self, request, auth=False, allowed_methods=['post']):
             data = self.deserialize(request, request.body, format=request.META.get('CONTENT_TYPE', 'application/json'))
 
             user = authenticate(username=data.get('email'), password=data.get('password'))
@@ -389,6 +388,7 @@ class UserResource(ModelResource):
                 data = {'message': "Invalid login"}
                 return self.error_response(request, data, response_class=http.HttpUnauthorized)
 
+            # request.user = user
             bundle = self.build_bundle(obj=None, data={
                 'user': self.full_dehydrate(self.build_bundle(obj=request.user, request=request)),
                 'session_key': session_key,
