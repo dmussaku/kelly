@@ -4109,7 +4109,7 @@ class ReportResource(Resource):
             else:
                 data = {}
 
-            xls_file = report_builders.get_activity_feed_xls(request.get_crmuser().subscription_id, data)
+            xls_file = report_builders.get_activity_feed_xls(request.user.get_crmuser().subscription_id, data)
 
             if not xlsx:
                 http.HttpNotFound('Empty data received or not found')
