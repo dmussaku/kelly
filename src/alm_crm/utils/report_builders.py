@@ -95,9 +95,6 @@ def build_activity_feed(subscription_id, data=None):
 def get_activity_feed_xls(subscription_id, data=None):
 	activities = build_activity_feed(subscription_id, data)['activities']
 
-	if len(activities) == 0:
-		return False
-
 	from  tempfile import NamedTemporaryFile
 
 	f = NamedTemporaryFile(delete=True)

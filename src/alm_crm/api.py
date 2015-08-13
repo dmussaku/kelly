@@ -4107,16 +4107,13 @@ class ReportResource(Resource):
                 data = {
                     'users': [int(u_id) for u_id in request.GET.get('users', '').split(',')],
                     'date_from': dateutil.parser.parse(request.GET.get('date_from', "")),
-                    'date_to': dateutil.parser.parse(request.GET.get('date_from', ""))
+                    'date_to': dateutil.parser.parse(request.GET.get('date_to', ""))
                 }
             else:
                 data = {}
 
             xls_file = report_builders.get_activity_feed_xls(request.user.get_crmuser().subscription_id, data)
 
-            if not xls_file:
-                http.HttpNotFound('Empty data received or not found')
-            
             response = HttpResponse(xls_file.read(), content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
             response['Content-Disposition'] = 'attachment; filename='+'Отчет.xlsx'
             try:
