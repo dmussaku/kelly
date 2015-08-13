@@ -93,6 +93,7 @@ from tastypie.utils import trailing_slash
 from django.db.models.loading import get_model
 import ast
 from datetime import datetime, timedelta
+import dateutil.parser
 import pytz
 
 from .utils.parser import text_parser
@@ -4104,15 +4105,9 @@ class ReportResource(Resource):
         with RequestContext(self, request, allowed_methods=['get']):
             if request.GET:
                 data = {
-                    'users': eval(request.GET.get('users', [])),
-                    'date_from': datetime.datetime.strptime(
-                                    request.GET.get('date_from', str(datetime.now().\
-                                    strptime('%Y-%m-%dT%H:%M:%S.%f'))), \
-                                    "%Y-%m-%dT%H:%M:%S.%f")),
-                    'date_to': datetime.datetime.strptime(
-                                    request.GET.get('date_to', str(datetime.now().\
-                                    strptime('%Y-%m-%dT%H:%M:%S.%f'))), \
-                                    "%Y-%m-%dT%H:%M:%S.%f"))
+                    'users': [int(u_id) for u_id in request.GET.get('users', '').split(',')],
+                    'date_from': dateutil.parser.parse(request.GET.get('date_from', "")),
+                    'date_to': dateutil.parser.parse(request.GET.get('date_from', ""))
                 }
             else:
                 data = {}
