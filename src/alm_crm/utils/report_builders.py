@@ -129,7 +129,7 @@ def get_activity_feed_xls(subscription_id, data=None):
 
 	f = NamedTemporaryFile(delete=True)
 
-	workbook = xlsxwriter.Workbook('report.xlsx')
+	workbook = xlsxwriter.Workbook(f.name)
 	worksheet = workbook.add_worksheet()
 
 	header_format = workbook.add_format({'bold': True})
@@ -172,6 +172,8 @@ def get_activity_feed_xls(subscription_id, data=None):
 	worksheet.set_column(3, 3, 30)
 	worksheet.set_column(4, 4, 25)
 	worksheet.set_column(5, 5, 25)
+
+	workbook.close()
 
 	return f
 
