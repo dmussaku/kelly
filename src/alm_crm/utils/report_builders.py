@@ -85,43 +85,7 @@ def build_activity_feed(subscription_id, data=None):
 	if 'date_to' in data:
 		q &= Q(date_created__lte=data.get('date_to', datetime.now()))
 
-	activities = [a.id for a in Activity.objects.filter(q)]
-
-	rv['activities'] = activities
-
-	return rv
-
-
-def get_activity_feed_xls(subscription_id, data=None):
-	activities = build_activity_feed(subscription_id, data)['activities']
-
-	if len(activities) == 0:
-		return False
-
-	from  tempfile import NamedTemporaryFile
-
-	f = NamedTemporaryFile(delete=True)
-
-	workbook = xlsxwriter.Workbook(f.name)
-	worksheet = workbook.add_worksheet()
-
-	header_format = workbook.add_format({'bold': True})
-	header_format.set_border(style=1)
-	header_format.set_text_wrap()
-
-	cell_format = workbook.add_format()
-	cell_format.set_border(style=1)
-	cell_format.set_text_wrap()
-
-	report_data = (
-		[],
-		[],
-		[],
-		[],
-		[]
-	)
-	cnt = 1
-
+	report_data = []
 	months = [
 		u'Янв', 
 		u'Фев',
@@ -136,41 +100,81 @@ def get_activity_feed_xls(subscription_id, data=None):
 		u'Ноя',
 		u'Дек'
 	]
-
-	for activity in Activity.objects.filter(id__in=activities):
-		report_data[0].append(cnt)
+	cnt = 1
+	for activity in Activity.objects.filter(q):
 		date = activity.date_created.strftime("%H:%M, %d {%m} %y")
 		month = date.split('{')[1].split('}')[0]
 		date = date.split('{')[0]+months[int(month)-1]+date.split('}')[1]
-		report_data[1].append(date)
-		report_data[2].append(activity.description)
-		report_data[3].append(activity.sales_cycle.contact.vcard.fn)
-		report_data[4].append(activity.owner.get_billing_user().get_full_name())
+
+		row = {
+			'number': cnt,
+			'date': date,
+			'hashtags': [hr.hashtag.text for hr in activity.hashtags.all()],
+			'description': activity.description,
+			'contact': activity.sales_cycle.contact.vcard.fn,
+			'user': activity.owner.get_billing_user().get_full_name()
+		}
+		report_data.append(row)
 		cnt += 1
+
+	rv['report_data'] = report_data
+
+	return rv
+
+
+def get_activity_feed_xls(subscription_id, data=None):
+	report_data = build_activity_feed(subscription_id, data)['report_data']
+
+	from  tempfile import NamedTemporaryFile
+
+	f = NamedTemporaryFile(delete=True)
+
+	workbook = xlsxwriter.Workbook('report.xlsx')
+	worksheet = workbook.add_worksheet()
+
+	header_format = workbook.add_format({'bold': True})
+	header_format.set_border(style=1)
+	header_format.set_text_wrap()
+
+	cell_format = workbook.add_format()
+	cell_format.set_border(style=1)
+	cell_format.set_text_wrap()
 
 	worksheet.write(0, 0, u'№', header_format) 
 	worksheet.write(0, 1, u'Дата', header_format) 
-	worksheet.write(0, 2, u'Описание', header_format) 
-	worksheet.write(0, 3, u'Контакт', header_format) 
-	worksheet.write(0, 4, u'Пользователь', header_format) 
+	worksheet.write(0, 2, u'Хэштеги', header_format) 
+	worksheet.write(0, 3, u'Описание', header_format) 
+	worksheet.write(0, 4, u'Наименование контакта', header_format) 
+	worksheet.write(0, 5, u'Пользователь', header_format) 
 
-	col = 0
 	row = 1
 
-	for _list in report_data:
-		row = 1
-		for item in _list:
-			worksheet.write(row, col, item, cell_format) 
-			row += 1
-		col+=1
+	for item in report_data:
+		hashtags = ''
+		hstg_len = len(item['hashtags']) - 1
+		for cnt, hashtag in enumerate(item['hashtags']):
+			if cnt < hstg_len:
+				hashtag = hashtag + ','
+
+			hashtags += hashtag
+
+		worksheet.write(row, 0, item['number'], cell_format) 
+		worksheet.write(row, 1, item['date'], cell_format)
+		worksheet.write(row, 2, hashtags, cell_format)
+		worksheet.write(row, 3, item['description'], cell_format)
+		worksheet.write(row, 4, item['contact'], cell_format)
+		worksheet.write(row, 5, item['user'], cell_format)
+		row+=1
 
 	worksheet.set_column(0, 0, 5)
 	worksheet.set_column(1, 1, 15)
-	worksheet.set_column(2, 2, 30)
-	worksheet.set_column(3, 3, 25)
+	worksheet.set_column(2, 2, 25)
+	worksheet.set_column(3, 3, 30)
 	worksheet.set_column(4, 4, 25)
+	worksheet.set_column(5, 5, 25)
 
-	return f
+	workbook.close()
+	# return f
 
 		
 def build_user_report(subscription_id, data):

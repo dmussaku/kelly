@@ -4114,11 +4114,8 @@ class ReportResource(Resource):
 
             xls_file = report_builders.get_activity_feed_xls(request.user.get_crmuser().subscription_id, data)
 
-            if not xls_file:
-                http.HttpNotFound('Empty data received or not found')
-            
             response = HttpResponse(xls_file.read(), content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-            response['Content-Disposition'] = 'attachment; filename='+'Отчет.xlsx'
+            response['Content-Disposition'] = 'attachment; filename='+'Лента событий %s.xlsx'%datetime.now().strftime("%d.%m.%y")
             try:
                 return response
             finally:
