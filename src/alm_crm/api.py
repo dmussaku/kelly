@@ -4111,7 +4111,7 @@ class ReportResource(Resource):
 
             xls_file = report_builders.get_activity_feed_xls(request.user.get_crmuser().subscription_id, data)
 
-            if not xlsx:
+            if not xls_file:
                 http.HttpNotFound('Empty data received or not found')
             
             response = HttpResponse(xls_file, content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
