@@ -12,7 +12,6 @@ from alm_crm.models import (
     Milestone,
     Product,
     Mention,
-    Feedback,
     Value,
     Comment,
     Share,
@@ -34,22 +33,22 @@ import datetime
 
 
 class ContactTestCase(TestCase):
-    fixtures = ['crmusers.json', 'vcards.json', 'contacts.json',
-                'salescycles.json', 'activities.json', 'feedbacks.json',
-                'emails.json', 'organizations.json', 'users.json',
-                'vcards.json']
+    fixtures = ['vcards.json', 'accounts.json', 'contacts.json', 
+                'companies.json', 'users.json', 'tels.json', 'emails.json']
+                # 'salescycles.json', 'activities.json',
+                # 'emails.json', 'organizations.json', 
 
     def setUp(self):
         super(ContactTestCase, self).setUp()
         self.contact1 = Contact.objects.get(pk=1)
 
     def test_get_contacts_by_status(self):
-        contacts = Contact.get_contacts_by_status(self.company_id, status=1)
-        self.assertEqual(len(contacts), 2)
+        contacts = Contact.get_contacts_by_status(self.contact1.company_id, status=1)
+        self.assertEqual(len(contacts), 3)
 
     def test_get_cold_base(self):
-        cold_contacts = Contact.get_cold_base(self.company_id)
-        self.assertEqual(len(cold_contacts), 1)
+        cold_contacts = Contact.get_cold_base(self.contact1.company_id)
+        self.assertEqual(len(cold_contacts), 3)
 
     def test_change_status_without_save(self):
         self.assertEqual(self.contact1.status, 1)
@@ -92,35 +91,25 @@ class ContactTestCase(TestCase):
         self.assertNotEqual(contact.name, "Unknown")
 
     def test_filter_contacts_by_vcard(self):
-        cs = Contact.filter_contacts_by_vcard(self.crm_subscr_id,
-                                              search_text='Akerke Akerke',
+        cs = Contact.filter_contacts_by_vcard(self.contact1.company_id,
+                                              search_text='Karim Masimov',
                                               search_params=[('fn')],
                                               order_by=[])
         self.assertEqual(len(cs), 1)
-        cs = Contact.filter_contacts_by_vcard(self.crm_subscr_id,
-                                              search_text='Akerke',
+        cs = Contact.filter_contacts_by_vcard(self.contact1.company_id,
+                                              search_text='Karim',
                                               search_params=[('fn', 'icontains')],
                                               order_by=[])
         self.assertEqual(len(cs), 1)
-        cs = Contact.filter_contacts_by_vcard(self.crm_subscr_id,
-                                              search_text='359',
-                                              search_params=[('tel__value', 'icontains')],
-                                              order_by=[])
-        self.assertEqual(len(cs), 1)
-        cs = Contact.filter_contacts_by_vcard(self.crm_subscr_id,
-                                              search_text='359',
-                                              search_params=[('fn', 'icontains')],
-                                              order_by=[])
-        self.assertEqual(len(cs), 0)
 
     def test_get_contacts_by_last_activity_date_without_activities(self):
-        contacts = Contact.get_contacts_by_last_activity_date(subscription_id=1)
+        contacts = Contact.get_contacts_by_last_activity_date(company_id=1)
         self.assertEqual(len(contacts), 0)
 
     def test_get_contacts_by_last_activity_date(self):
-        contacts = Contact.get_contacts_by_last_activity_date(self.crm_subscr_id,
+        contacts = Contact.get_contacts_by_last_activity_date(self.contact1.company_id,
                                                               all=True)
-        subscr_contacts = Contact.objects.filter(subscription_id=self.crm_subscr_id)
+        subscr_contacts = Contact.objects.filter(company_id=self.contact1.company_id)
         self.assertEqual(contacts.count(), subscr_contacts.count())
 
     def test_export_to(self):
@@ -133,9 +122,6 @@ class ContactTestCase(TestCase):
         contact2 = Contact.objects.get(pk=2)
         contact2.vcard = None
         self.assertEqual(self.contact1.tel(), Tel.objects.get(vcard=self.contact1.vcard).value)
-        self.assertEqual(self.contact1.mobile(), Tel.objects.get(vcard=self.contact1.vcard).value)
-        self.assertEqual(self.contact1.email(), Email.objects.get(vcard=self.contact1.vcard).value)
-        self.assertEqual(self.contact1.company(), Org.objects.get(vcard=self.contact1.vcard).name)
         self.assertTrue(contact2.is_new())
         self.assertTrue(self.contact1.is_lead())
         self.assertTrue(Contact.objects.get(pk=3).is_opportunity())
@@ -146,16 +132,9 @@ class ContactTestCase(TestCase):
         email = '%s<br />' % self.contact1.email()
         self.assertTrue(email in html)
 
-    def test_add_mentions(self):
-        count = Mention.objects.all().count()
-        self.contact1.add_mention(user_ids=1)
-        self.assertEqual(Mention.objects.all().count(), count+1)
-        self.assertEqual(self.contact1.mentions.get(pk=1),
-                         Mention.objects.last())
-
     def test_share_contacts(self):
-        share_to = CRMUser.objects.get(id=1)
-        share_from = CRMUser.objects.get(id=2)
+        share_to = User.objects.get(id=1)
+        share_from = User.objects.get(id=2)
         shares = Contact.share_contacts(share_from=share_from,
                                         share_to=share_to,
                                         contact_ids=[])
@@ -171,22 +150,24 @@ class ContactTestCase(TestCase):
                                  'alm_crm/fixtures/nurlan.vcf')
         amount_before_import = SalesCycle.objects.all().count()
         contacts = Contact.import_from_vcard(raw_vcard=open(file_path, "r"),
-                                                creator=CRMUser.objects.first())
+                                                creator=User.objects.first(),
+                                                company_id=self.contact1.company_id)
+
         amount_after_import = SalesCycle.objects.all().count()
 
-        contact1 = Contact.filter_contacts_by_vcard(self.crm_subscr_id,
+        contact1 = Contact.filter_contacts_by_vcard(self.contact1.company_id,
                                                     search_text='Aslan',
                                                     search_params=[('fn', 'icontains')],
                                                     order_by=[])
-        contact2 = Contact.filter_contacts_by_vcard(self.crm_subscr_id,
+        contact2 = Contact.filter_contacts_by_vcard(self.contact1.company_id,
                                                     search_text='Serik',
                                                     search_params=[('fn', 'icontains')],
                                                     order_by=[])
-        contact3 = Contact.filter_contacts_by_vcard(self.crm_subscr_id,
+        contact3 = Contact.filter_contacts_by_vcard(self.contact1.company_id,
                                                     search_text='Almat',
                                                     search_params=[('fn', 'icontains')],
                                                     order_by=[])
-        contact4 = Contact.filter_contacts_by_vcard(self.crm_subscr_id,
+        contact4 = Contact.filter_contacts_by_vcard(self.contact1.company_id,
                                                     search_text='Mukatayev',
                                                     search_params=[('fn', 'icontains')],
                                                     order_by=[])
@@ -217,19 +198,19 @@ class ValueTestCase(TestCase):
 
 
 class ProductTestCase(TestCase):
-    fixtures = ['products.json', 'crmusers.json']
+    fixtures = ['products.json']
 
     def setUp(self):
         super(ProductTestCase, self).setUp()
         self.product = Product.objects.get(pk=1)
-        self.crm_subscr_id = 1
+        self.company_id = 1
 
     def test_unicode(self):
-        self.assertEqual(self.product.__unicode__(), 'p1')
+        self.assertEqual(self.product.__unicode__(), 'RFM525HF')
 
     def test_get_products(self):
         self.assertEqual(len(Product.objects.all()),
-                         len(Product.get_products(self.crm_subscr_id)))
+                         len(Product.get_products(self.company_id)))
 
 class CustomFieldValueTestCase(TestCase):
     fixtures = ['custom_field.json', 'custom_field_value.json, products.json, contacts.json']
@@ -238,9 +219,8 @@ class CustomFieldValueTestCase(TestCase):
         super(self.__class__, self).setUp()
 
 class ActivityTestCase(TestCase):
-    fixtures = ['crmusers.json', 'vcards.json', 'contacts.json',
-                'salescycles.json', 'activities.json', 'feedbacks.json', 'emails.json',
-                 'organizations.json', 'users.json', 'vcards.json', 'comments.json', 'mentions.json']
+    fixtures = ['vcards.json', 'contacts.json', 'salescycles.json', 'activities.json',
+                'emails.json', 'organizations.json', 'users.json', 'comments.json', 'mentions.json']
 
     def setUp(self):
         super(ActivityTestCase, self).setUp()
@@ -253,27 +233,6 @@ class ActivityTestCase(TestCase):
         self.assertEqual(len(Activity.objects.filter(
                          sales_cycle__contact_id=c.id)),
                          len(a.get_activities_by_contact(c.id)))
-
-    def test_set_feedback(self):
-        self.assertNotEqual(0, len(Activity.objects.filter(sales_cycle_id=1)))
-        self.assertNotEqual(0, len(Feedback.objects.all()))
-        a = Activity(title='t6', description='d6', date_created=timezone.now(),
-                     sales_cycle_id=1, owner_id=1)
-        a.save()
-        self.assertEqual(a, Activity.objects.get(id=a.id))
-        self.assertEqual(0, len(Feedback.objects.filter(id=a.id)))
-        f = Feedback(feedback='feedback8', status=Feedback.WAITING,
-                     date_created=timezone.now(), date_edited=timezone.now(),
-                     activity=a, owner_id=1)
-        f.save()
-        self.assertEqual(f, Feedback.objects.get(id=f.id))
-
-        a.set_feedback(f, False)
-        b = Activity.objects.last()
-        self.assertEqual(b.feedback, f)
-        a.set_feedback(f, True)
-        a = Activity.objects.get(pk=a.pk)
-        self.assertEqual(a.feedback, f)
 
     def test_get_activities_by_salescycle(self):
         all_activities = self.salescycle1.rel_activities.all()
@@ -337,7 +296,7 @@ class ActivityTestCase(TestCase):
                                                               from_dt,
                                                               to_dt)
         self.assertEqual(sum(owned_data.values()), user_activities.count())
-        self.assertEqual(owned_data, {'2014-12-30': 3, '2014-11-24': 3})
+        self.assertEqual(owned_data, {'2015-02-12': 2, '2015-03-03': 1})
         
 
 
@@ -373,7 +332,7 @@ class MentionTestCase(TestCase):
 
 
 class CommentTestCase(TestCase):
-    fixtures = ['crmusers.json', 'vcards.json', 'contacts.json',
+    fixtures = [ 'vcards.json', 'contacts.json', 'users.json',
                 'salescycles.json', 'activities.json', 'mentions.json',
                 'comments.json']
 
@@ -406,7 +365,7 @@ class CommentTestCase(TestCase):
         self.assertEqual(Comment.get_comments_by_context(1, Activity)
                          .count(), activity1.comments.count())
         self.assertEqual(Comment.get_comments_by_context(1, Activity)
-                         .count(), 30)
+                         .count(), 2)
 
     def test_add_mention(self):
         count = self.comment.mentions.count()
@@ -415,7 +374,7 @@ class CommentTestCase(TestCase):
 
 
 class SalesCycleTestCase(TestCase):
-    fixtures = ['crmusers.json', 'vcards.json', 'contacts.json',
+    fixtures = [ 'vcards.json', 'contacts.json', 'users.json',
                 'salescycles.json', 'activities.json', 'mentions.json',
                 'products.json', 'values.json', 'salescycle_product_stat.json', 
                 'milestones.json', 'comments.json', 'sc_log_entry.json']
@@ -432,9 +391,9 @@ class SalesCycleTestCase(TestCase):
     def test_try_to_create_another_global_cycle(self):
         contact = Contact.objects.first()
         owner = contact.owner
-        subscription_id = owner.subscription_id
+        company_id = 1
         count = SalesCycle.objects.all().count()
-        self.assertEqual(SalesCycle.create_globalcycle(**{'subscription_id': subscription_id,
+        self.assertEqual(SalesCycle.create_globalcycle(**{'company_id': company_id,
                                                          'owner_id': owner.id,
                                                          'contact_id': contact.id}),
                         contact.sales_cycles.get(is_global=True))
@@ -478,7 +437,7 @@ class SalesCycleTestCase(TestCase):
     def test_get_activities(self):
         self.assertEqual(
             list(self.sc1.get_activities().values_list('id', flat=True)),
-            [2, 4, 6, 1, 3])
+            [16, 1])
 
     def test_add_product(self):
         count = len(self.sc1.products.all())
@@ -513,11 +472,8 @@ class SalesCycleTestCase(TestCase):
         ret = SalesCycle.get_salescycles_by_last_activity_date(self.crm_subscr_id,
                                                                user_id,
                                                                include_activities=True)
-        self.assertEqual(sorted(list(ret[0].values_list('pk', flat=True))), [1, 2, 3, 4, 5])
-        self.assertEqual(sorted(list(ret[1].values_list('pk', flat=True))), range(1, 7))
-        self.assertItemsEqual(ret[2], {1: [1, 2, 3, 4, 5, 6], 2: [], 3: [], 4: [], 5: []})
-
-
+        self.assertEqual(sorted(list(ret[0].values_list('pk', flat=True))), [1, 11])
+        self.assertEqual(sorted(list(ret[1].values_list('pk', flat=True))), [1, 11, 16])
 
     def test_get_salescycles_by_last_activity_date_with_mentioned(self):
         user_id = 1
@@ -525,9 +481,8 @@ class SalesCycleTestCase(TestCase):
                                                                user_id,
                                                                mentioned=True,
                                                                include_activities=True)
-        self.assertEqual(sorted(list(ret[0].values_list('pk', flat=True))), [1, 2, 3, 4, 5])
-        self.assertEqual(sorted(list(ret[1].values_list('pk', flat=True))), range(1, 7))
-        self.assertItemsEqual(ret[2], {1: [1, 2, 3, 4, 5, 6], 2: [], 3: [], 4: [], 5: []})
+        self.assertEqual(sorted(list(ret[0].values_list('pk', flat=True))), [1, 4, 11])
+        self.assertEqual(sorted(list(ret[1].values_list('pk', flat=True))), [1, 4, 11, 16, 19])
 
     def test_get_salescycles_by_last_activity_date_only_mentioned(self):
         user_id = 1
@@ -537,13 +492,13 @@ class SalesCycleTestCase(TestCase):
                                                                mentioned=True,
                                                                include_activities=True)
         self.assertEqual(list(ret[0].values_list('pk', flat=True)), [4])
-        self.assertEqual(list(ret[1].values_list('pk', flat=True)), [])
+        self.assertEqual(list(ret[1].values_list('pk', flat=True)), [4, 19])
         self.assertItemsEqual(ret[2], {4: []})
 
     def test_get_salescycles_by_last_activity_date_only_followed(self):
         user_id = 1
         ret = SalesCycle.get_salescycles_by_last_activity_date(self.crm_subscr_id,
-                                                               user_id,
+                                                               user_id=user_id,
                                                                owned=False,
                                                                mentioned=False,
                                                                followed=True,
@@ -552,10 +507,10 @@ class SalesCycleTestCase(TestCase):
 
 
     def test_get_salescycles_by_last_activity_date_without_user_id(self):
-        user_id = 10
+        user_id = 11
         try:
-            CRMUser.objects.get(pk=user_id)
-        except CRMUser.DoesNotExist:
+            User.objects.get(pk=user_id)
+        except User.DoesNotExist:
             raised = True
         else:
             raised = False
@@ -564,7 +519,7 @@ class SalesCycleTestCase(TestCase):
 
     def test_get_salescycles_by_contact(self):
         ret = SalesCycle.get_salescycles_by_contact(1)
-        self.assertEqual(list(ret.values_list('pk', flat=True)), [1])
+        self.assertEqual(list(ret.values_list('pk', flat=True)), [1, 11])
 
     def test_close_salescycle(self):
         self.assertNotEqual(self.sc1.status, 'C')
@@ -573,22 +528,22 @@ class SalesCycleTestCase(TestCase):
             "2": 13500
         }
 
-        ret = self.sc1.close(products_with_values)
+        ret = self.sc1.close(products_with_values, True)
         self.assertIsInstance(ret[0], SalesCycle)
-        self.assertIsInstance(ret[1], Activity)
+        self.assertIsInstance(ret[1], SalesCycleLogEntry)
         self.assertEqual(self.sc1.status, 'C')
         self.assertEqual(self.sc1.real_value.amount,
                          sum(products_with_values.values()))
         stat1 = SalesCycleProductStat.objects.get(sales_cycle=self.sc1,
-                                                  product=Product.objects.get(id=1)).value
+                                                  product=Product.objects.get(id=1)).real_value
         stat2 = SalesCycleProductStat.objects.get(sales_cycle=self.sc1,
-                                                  product=Product.objects.get(id=2)).value
+                                                  product=Product.objects.get(id=2)).real_value
         self.assertEqual(stat1, 15000)
         self.assertEqual(stat2, 13500)
 
     def test_set_result_by_amount(self):
         amount = 5000
-        self.sc1.set_result_by_amount(amount)
+        self.sc1.set_result_by_amount(amount, True)
         self.assertEqual(self.get_sc(pk=1).real_value.amount, amount)
 
     def test_delete_sales_cycle(self):
@@ -622,7 +577,7 @@ class SalesCycleTestCase(TestCase):
         self.assertEqual(Milestone.objects.all().count(), milestones_count)
 
 class ContactListTestCase(TestCase):
-    fixtures = ['crmusers.json', 'contactlist.json', 'users.json', 'contacts.json']
+    fixtures = [ 'contactlist.json', 'vcards.json', 'users.json', 'contacts.json']
 
     def setUp(self):
         super(self.__class__, self).setUp()
@@ -687,14 +642,14 @@ class ContactListTestCase(TestCase):
         self.assertEqual(contact_list2.count(), 3)
 
 class FilterTestCase(TestCase):
-    fixtures = ['filters.json', 'crmusers.json', 'users.json']
+    fixtures = ['filters.json', 'vcards.json', 'users.json']
 
     def setUp(self):
         super(self.__class__, self).setUp()
         self.filter = Filter.objects.first()
 
     def test_create_filter(self):
-        crmuser = CRMUser.objects.first()
+        crmuser = User.objects.first()
         new_filter = Filter(title='New filter', filter_text='Test Filter', owner=crmuser)
         self.assertEqual(new_filter.title, 'New filter')
         self.assertEqual(new_filter.base, 'all')
@@ -707,7 +662,7 @@ class FilterTestCase(TestCase):
         self.assertEqual(count_before-1, count_after)
 
     def test_create_filter_with_base(self):
-        crmuser = CRMUser.objects.first()
+        crmuser = User.objects.first()
         new_filter = Filter(title='New filter', filter_text='Test Filter', owner=crmuser, base='cold')
         self.assertEqual(new_filter.title, 'New filter')
         self.assertEqual(new_filter.base, 'cold')
@@ -727,47 +682,51 @@ class MilestoneTestCase(TestCase):
         s.save()
         after = Milestone.objects.all().count()
         actual = after
-        expected = before+7
+        expected = before+9
         expected_titles = ['Звонок/Заявка',
                             'Отправка КП',
                             'Согласование договора',
                             'Выставление счета',
                             'Контроль оплаты',
                             'Предоставление услуги',
-                            'Upsales']
+                            'Upsales',
+                            'Успешно завершено',
+                            'Не реализовано'
+                            ]
         expected_colors = ['#F4B59C',
                             '#F59CC8',
                             '#A39CF4',
                             '#9CE5F4',
                             '#9CF4A7',
                             '#D4F49B',
-                            '#F4DC9C'
+                            '#F4DC9C',
+                            '#9CF4A7',
+                            '#F4A09C'
                             ]
         self.assertEqual(actual, expected)
-        for milestone in Milestone.objects.filter(subscription_id = s.pk):
+        for milestone in Milestone.objects.filter(company_id = s.pk):
             self.assertTrue(milestone.title.encode('utf-8') in expected_titles)
             self.assertTrue(milestone.color_code in expected_colors)
-            self.assertEqual(expected_titles.index(milestone.title.encode('utf-8')), expected_colors.index(milestone.color_code))
 
 
 class ResourceTestMixin(object):
-    fixtures = ['companies.json', 'services.json', 'users.json',
+    fixtures = ['companies.json', 'services.json', 'users.json', 'accounts.json',
                 'subscriptions.json', 'comments.json',
-                'crmusers.json', 'vcards.json', 'contacts.json',
+                 'vcards.json', 'contacts.json',
                 'salescycles.json', 'activities.json', 'products.json',
                 'mentions.json', 'values.json', 'emails.json', 'contactlist.json', 'share.json',
-                'hashtag.json', 'hashtag_ref.json', 'feedbacks.json', 'salescycle_product_stat.json', 
+                'hashtag.json', 'hashtag_ref.json', 'salescycle_product_stat.json', 
                 'filters.json', 'milestones.json', 'sc_log_entry.json', 'custom_fields.json', 'custom_field_values.json']
 
     def get_user(self):
         from alm_user.models import User
-        self.user = User.objects.get(pk=1)
-        self.user_password = '123'
+        self.account = Account.objects.get(pk=1)
+        self.account_password = '123'
 
     def get_credentials(self):
         self.get_user()
-        self.api_client.client.login(username=self.user.email, password=self.user_password)
-        return self.create_basic(self.user.email, self.user_password)
+        self.api_client.client.login(subdomain=self.account.company.subdomain, username=self.account.email, password=self.account_password)
+        return self.create_basic(self.account.email, self.account_password)
 
 
 class SalesCycleResourceTest(ResourceTestMixin, ResourceTestCase):
@@ -783,7 +742,7 @@ class SalesCycleResourceTest(ResourceTestMixin, ResourceTestCase):
         self.get_des_res = lambda path: self.deserialize(self.get_resp(path))
         self.sales_cycle = SalesCycle.objects.first()
 
-        self.QUERYSET_OPEN_CYCLES = SalesCycle.objects.filter(subscription_id=1, is_global=False, status__in=[SalesCycle.NEW, SalesCycle.PENDING])
+        self.QUERYSET_OPEN_CYCLES = SalesCycle.objects.filter(company_id=1, is_global=False, status__in=[SalesCycle.NEW, SalesCycle.PENDING])
 
     def test_get_list_valid_json(self):
         self.assertValidJSONResponse(self.get_resp(''))

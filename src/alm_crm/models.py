@@ -467,7 +467,7 @@ class Contact(SubscriptionObject):
         return contact
 
     @classmethod
-    def import_from_vcard(cls, raw_vcard, creator):
+    def import_from_vcard(cls, raw_vcard, creator, company_id):
         """
         Parameters
         ----------
@@ -484,6 +484,7 @@ class Contact(SubscriptionObject):
                     print e
                     continue
                 c = cls(vcard=vcard, owner=creator)
+                c.company_id = company_id
                 c.save()
                 SalesCycle.create_globalcycle(
                     **{'company_id': c.company_id,
@@ -1405,8 +1406,7 @@ class SalesCycle(SubscriptionObject):
         if not all and len(q.children) == 0:
             sales_cycles = SalesCycle.objects.none()
         else:
-            sales_cycles = SalesCycle.objects.filter(q0 & q).order_by(
-                '-latest_activity__date_created')
+            sales_cycles = SalesCycle.objects.filter(q0 & q).order_by('-latest_activity__date_created')
 
         if not include_activities:
             return sales_cycles
@@ -1707,12 +1707,6 @@ class Mention(SubscriptionObject):
             Queryset<Mention>
         """
         return Mention.objects.filter(user_id=user_id)
-
-    def save(self, **kwargs):
-        if not self.company_id and self.content_object:
-            self.company_id = self.content_object.owner.company_id
-        super(SubscriptionObject, self).save(**kwargs)
-
 
 
 class Comment(SubscriptionObject):

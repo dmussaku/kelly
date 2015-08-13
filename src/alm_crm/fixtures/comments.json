@@ -1,1185 +1,522 @@
 [
 {
-    "pk": 5, 
+    "pk": 1, 
     "model": "alm_crm.comment", 
     "fields": {
         "comment": "\u0410\u043f\u043f\u0430\u0440\u0430\u0442 \u0443\u0441\u0442\u0430\u043d\u043e\u0432\u043b\u0435\u043d \u0441 22 \u043f\u043e 26 \u0444\u0435\u0432\u0440\u0430\u043b\u044f. 25 \u0444\u0435\u0432\u0440\u0430\u043b\u044f \u043f\u0440\u043e\u0432\u0435\u0434\u0435\u043d\u043e \u043e\u0431\u0443\u0447\u0435\u043d\u0438\u0435 \u043f\u0435\u0440\u0441\u043e\u043d\u0430\u043b\u0430. 26 \u0444\u0435\u0432\u0440\u0430\u043b\u044f \u0441\u0434\u0430\u043b\u0438 \u041a\u0430\u0437\u041c\u0435\u0434\u0422\u0435\u0445\u0443.\u00a0", 
-        "company_id": 3, 
-        "object_id": 57, 
-        "content_type": 39, 
-        "owner": 25, 
+        "company_id": 1, 
+        "object_id": 1, 
+        "content_type": ["alm_crm", "activity"], 
+        "owner": 1, 
         "date_created": "2015-03-02T03:51:03.103Z", 
         "date_edited": "2015-08-10T07:31:12.250Z"
+    }
+},
+{
+    "pk": 2, 
+    "model": "alm_crm.comment", 
+    "fields": {
+        "comment": "", 
+        "company_id": 1, 
+        "object_id": 2, 
+        "content_type": ["alm_crm", "activity"], 
+        "owner": 2, 
+        "date_created": "2015-03-20T04:28:58.964Z", 
+        "date_edited": "2015-08-10T07:31:12.252Z"
+    }
+},
+{
+    "pk": 3, 
+    "model": "alm_crm.comment", 
+    "fields": {
+        "comment": "M1010 \u043e\u0431\u043e\u0440\u0443\u0434\u043e\u0432\u0430\u043d\u0438\u0435 \u0437\u0430\u043a\u0430\u0437\u0430\u043d\u043e \u0438 \u043e\u043f\u043b\u0430\u0447\u0435\u043d\u043e, \u0432\u043e\u0437\u043c\u043e\u0436\u043d\u044b\u0439 \u0441\u0440\u043e\u043a \u043e\u0442\u043f\u0440\u0430\u0432\u043a\u0438 02.04.2015", 
+        "company_id": 1, 
+        "object_id": 3, 
+        "content_type": ["alm_crm", "activity"], 
+        "owner": 3, 
+        "date_created": "2015-03-20T04:30:21.660Z", 
+        "date_edited": "2015-08-10T07:31:12.255Z"
+    }
+},
+{
+    "pk": 4, 
+    "model": "alm_crm.comment", 
+    "fields": {
+        "comment": "\u041f\u0440\u043e\u0432\u0435\u043b\u0438 \u0438\u043d\u0441\u0442\u0430\u043b\u043b\u044f\u0446\u0438\u044e \u0430\u043f\u043f\u0430\u0440\u0430\u0442\u0430 \u0421ardipia 200 \u0432 \u0413\u041a\u041f \u043d\u0430 \u041f\u0425\u0412 \u0432 \u0413\u041f \u2116 22  \u0433.\u0410\u043b\u043c\u0430\u0442\u044b.,  \u043e\u0431\u0443\u0447\u0438\u043b\u0438 \u043f\u0435\u0440\u0441\u043e\u043d\u0430\u043b. \u043f\u0440\u043e\u0435\u043a\u0442 \u0437\u0430\u043a\u0440\u044b\u0442   11 \u043c\u0430\u0440\u0442\u0430 2015 \u0433.", 
+        "company_id": 1, 
+        "object_id": 4, 
+        "content_type": ["alm_crm", "activity"], 
+        "owner": 4, 
+        "date_created": "2015-03-20T04:44:14.841Z", 
+        "date_edited": "2015-08-10T07:31:12.257Z"
+    }
+},
+{
+    "pk": 5, 
+    "model": "alm_crm.comment", 
+    "fields": {
+        "comment": "", 
+        "company_id": 1, 
+        "object_id": 5, 
+        "content_type": ["alm_crm", "activity"], 
+        "owner": 5, 
+        "date_created": "2015-03-20T04:52:54.923Z", 
+        "date_edited": "2015-08-10T07:31:12.259Z"
+    }
+},
+{
+    "pk": 6, 
+    "model": "alm_crm.comment", 
+    "fields": {
+        "comment": "@\u0410\u043b\u0435\u043a\u0441\u0430\u043d\u0434\u0440 \u0426\u043e\u0439 ", 
+        "company_id": 1, 
+        "object_id": 6, 
+        "content_type": ["alm_crm", "activity"], 
+        "owner": 6, 
+        "date_created": "2015-03-20T04:53:25.601Z", 
+        "date_edited": "2015-08-10T07:31:12.262Z"
     }
 },
 {
     "pk": 7, 
     "model": "alm_crm.comment", 
     "fields": {
-        "comment": "", 
-        "company_id": 3, 
-        "object_id": 89, 
-        "content_type": 39, 
-        "owner": 25, 
-        "date_created": "2015-03-20T04:28:58.964Z", 
-        "date_edited": "2015-08-10T07:31:12.252Z"
+        "comment": "\u0426\u0435\u043d\u043e\u0432\u043a\u0438 \u043f\u0440\u043e\u0448\u043b\u0438, \u0436\u0434\u0435\u043c \u043f\u0440\u043e\u0442\u043e\u043a\u043e\u043b \u0438\u0442\u043e\u0433\u043e\u0432 \u043e\u0442 \u0420\u0414\u0426.", 
+        "company_id": 1, 
+        "object_id": 7, 
+        "content_type": ["alm_crm", "activity"], 
+        "owner": 7, 
+        "date_created": "2015-03-20T04:54:21.645Z", 
+        "date_edited": "2015-08-10T07:31:12.264Z"
     }
 },
 {
     "pk": 8, 
     "model": "alm_crm.comment", 
     "fields": {
-        "comment": "M1010 \u043e\u0431\u043e\u0440\u0443\u0434\u043e\u0432\u0430\u043d\u0438\u0435 \u0437\u0430\u043a\u0430\u0437\u0430\u043d\u043e \u0438 \u043e\u043f\u043b\u0430\u0447\u0435\u043d\u043e, \u0432\u043e\u0437\u043c\u043e\u0436\u043d\u044b\u0439 \u0441\u0440\u043e\u043a \u043e\u0442\u043f\u0440\u0430\u0432\u043a\u0438 02.04.2015", 
-        "company_id": 3, 
-        "object_id": 89, 
-        "content_type": 39, 
-        "owner": 25, 
-        "date_created": "2015-03-20T04:30:21.660Z", 
-        "date_edited": "2015-08-10T07:31:12.255Z"
+        "comment": "", 
+        "company_id": 1, 
+        "object_id": 8, 
+        "content_type": ["alm_crm", "activity"], 
+        "owner": 8, 
+        "date_created": "2015-03-20T05:03:06.882Z", 
+        "date_edited": "2015-08-10T07:31:12.267Z"
     }
 },
 {
     "pk": 9, 
     "model": "alm_crm.comment", 
     "fields": {
-        "comment": "\u041f\u0440\u043e\u0432\u0435\u043b\u0438 \u0438\u043d\u0441\u0442\u0430\u043b\u043b\u044f\u0446\u0438\u044e \u0430\u043f\u043f\u0430\u0440\u0430\u0442\u0430 \u0421ardipia 200 \u0432 \u0413\u041a\u041f \u043d\u0430 \u041f\u0425\u0412 \u0432 \u0413\u041f \u2116 22  \u0433.\u0410\u043b\u043c\u0430\u0442\u044b.,  \u043e\u0431\u0443\u0447\u0438\u043b\u0438 \u043f\u0435\u0440\u0441\u043e\u043d\u0430\u043b. \u043f\u0440\u043e\u0435\u043a\u0442 \u0437\u0430\u043a\u0440\u044b\u0442   11 \u043c\u0430\u0440\u0442\u0430 2015 \u0433.", 
-        "company_id": 3, 
-        "object_id": 71, 
-        "content_type": 39, 
-        "owner": 26, 
-        "date_created": "2015-03-20T04:44:14.841Z", 
-        "date_edited": "2015-08-10T07:31:12.257Z"
+        "comment": "\u042e\u043b\u044c, \u043d\u043e\u043c\u0435\u0440 PO/PI/CI \u0442\u043e\u0436\u0435 \u043d\u0430\u043f\u0438\u0448\u0438\u0442\u0435 ", 
+        "company_id": 1, 
+        "object_id": 9, 
+        "content_type": ["alm_crm", "activity"], 
+        "owner": 9, 
+        "date_created": "2015-03-26T09:03:32.014Z", 
+        "date_edited": "2015-08-10T07:31:12.269Z"
     }
 },
 {
     "pk": 10, 
     "model": "alm_crm.comment", 
     "fields": {
-        "comment": "", 
-        "company_id": 3, 
-        "object_id": 92, 
-        "content_type": 39, 
-        "owner": 24, 
-        "date_created": "2015-03-20T04:52:54.923Z", 
-        "date_edited": "2015-08-10T07:31:12.259Z"
+        "comment": "\u042e\u043b\u044f, \u043a\u043e\u0433\u0434\u0430 \u0434\u043e\u0441\u0442\u0430\u0432\u043a\u0430?", 
+        "company_id": 1, 
+        "object_id": 10, 
+        "content_type": ["alm_crm", "activity"], 
+        "owner": 10, 
+        "date_created": "2015-03-27T05:39:21.101Z", 
+        "date_edited": "2015-08-10T07:31:12.271Z"
     }
 },
 {
     "pk": 11, 
     "model": "alm_crm.comment", 
     "fields": {
-        "comment": "@\u0410\u043b\u0435\u043a\u0441\u0430\u043d\u0434\u0440 \u0426\u043e\u0439 ", 
-        "company_id": 3, 
-        "object_id": 92, 
-        "content_type": 39, 
-        "owner": 24, 
-        "date_created": "2015-03-20T04:53:25.601Z", 
-        "date_edited": "2015-08-10T07:31:12.262Z"
+        "comment": "\u0412\u044b\u0437\u0432\u0430\u043b\u0438 \u043a\u0443\u0440\u044c\u0435\u0440\u0430 \u0432 \u043f\u044f\u0442\u043d\u0438\u0446\u0443, \u0441\u0435\u0433\u043e\u0434\u043d\u044f 30.03.2015 \u0434\u043e\u043b\u0436\u043d\u044b \u043f\u043e\u043b\u0443\u0447\u0438\u0442\u044c \u0434\u043e\u0433\u043e\u0432\u043e\u0440.", 
+        "company_id": 1, 
+        "object_id": 1, 
+        "content_type": ["alm_crm", "contact"], 
+        "owner": 1, 
+        "date_created": "2015-03-30T03:12:43.972Z", 
+        "date_edited": "2015-08-10T07:31:12.273Z"
     }
 },
 {
     "pk": 12, 
     "model": "alm_crm.comment", 
     "fields": {
-        "comment": "\u0426\u0435\u043d\u043e\u0432\u043a\u0438 \u043f\u0440\u043e\u0448\u043b\u0438, \u0436\u0434\u0435\u043c \u043f\u0440\u043e\u0442\u043e\u043a\u043e\u043b \u0438\u0442\u043e\u0433\u043e\u0432 \u043e\u0442 \u0420\u0414\u0426.", 
-        "company_id": 3, 
-        "object_id": 92, 
-        "content_type": 39, 
-        "owner": 24, 
-        "date_created": "2015-03-20T04:54:21.645Z", 
-        "date_edited": "2015-08-10T07:31:12.264Z"
+        "comment": "\u041f\u043e\u043b\u0443\u0447\u0438\u043b\u0438 \u0434\u043e\u0433\u043e\u0432\u043e\u0440, \u043f\u043e\u0434\u043f\u0438\u0441\u0430\u043b\u0438.", 
+        "company_id": 1, 
+        "object_id": 2, 
+        "content_type": ["alm_crm", "contact"], 
+        "owner": 2, 
+        "date_created": "2015-03-31T05:04:40.803Z", 
+        "date_edited": "2015-08-10T07:31:12.276Z"
     }
 },
 {
     "pk": 13, 
     "model": "alm_crm.comment", 
     "fields": {
-        "comment": "", 
-        "company_id": 3, 
-        "object_id": 93, 
-        "content_type": 39, 
-        "owner": 24, 
-        "date_created": "2015-03-20T05:03:06.882Z", 
-        "date_edited": "2015-08-10T07:31:12.267Z"
+        "comment": "\u041f\u043e\u043b\u0443\u0447\u0438\u043b\u0438 \u0434\u043e\u0433\u043e\u0432\u043e\u0440, \u043f\u043e\u0434\u043f\u0438\u0441\u0430\u043b\u0438.", 
+        "company_id": 1, 
+        "object_id": 3, 
+        "content_type": ["alm_crm", "contact"], 
+        "owner": 3, 
+        "date_created": "2015-03-31T05:05:35.764Z", 
+        "date_edited": "2015-08-10T07:31:12.278Z"
     }
 },
 {
     "pk": 14, 
     "model": "alm_crm.comment", 
     "fields": {
-        "comment": "\u042e\u043b\u044c, \u043d\u043e\u043c\u0435\u0440 PO/PI/CI \u0442\u043e\u0436\u0435 \u043d\u0430\u043f\u0438\u0448\u0438\u0442\u0435 ", 
-        "company_id": 3, 
-        "object_id": 106, 
-        "content_type": 39, 
-        "owner": 15, 
-        "date_created": "2015-03-26T09:03:32.014Z", 
-        "date_edited": "2015-08-10T07:31:12.269Z"
+        "comment": "\u0422\u0435\u043d\u0434\u0435\u0440 \u0432\u044b\u0445\u043e\u0434\u0438\u0442 26 \u0430\u043f\u0440\u0435\u043b\u044f, \u0436\u0434\u0435\u043c \u0442\u0435\u043d\u0434\u0435\u0440\u043d\u0443\u044e \u0434\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u0430\u0446\u0438\u044e, \u0421\u0430\u0448\u0430 \u043f\u043e\u0442\u0438\u0445\u043e\u043d\u044c\u043a\u0443 \u0441\u043e\u0431\u0438\u0440\u0430\u0435\u0442 \u0430\u0432\u0442\u043e\u0440\u0438\u0437\u0430\u0446\u0438\u043e\u043d\u043d\u044b\u0439 \u043f\u0430\u043a\u0435\u0442.", 
+        "company_id": 1, 
+        "object_id": 4, 
+        "content_type": ["alm_crm", "contact"], 
+        "owner": 4, 
+        "date_created": "2015-04-07T07:25:12.288Z", 
+        "date_edited": "2015-08-10T07:31:12.280Z"
     }
 },
 {
     "pk": 15, 
     "model": "alm_crm.comment", 
     "fields": {
-        "comment": "\u042e\u043b\u044f, \u043a\u043e\u0433\u0434\u0430 \u0434\u043e\u0441\u0442\u0430\u0432\u043a\u0430?", 
-        "company_id": 3, 
-        "object_id": 123, 
-        "content_type": 39, 
-        "owner": 15, 
-        "date_created": "2015-03-27T05:39:21.101Z", 
-        "date_edited": "2015-08-10T07:31:12.271Z"
+        "comment": "\u0416\u0434\u0443 \u0414\u043e\u0433\u043e\u0432\u043e\u0440 \u043e\u0442 \u043a\u043b\u0438\u0435\u043d\u0442\u0430 \u043d\u0430 \u0434\u0435\u043d\u0442\u0430\u043b\u044c\u043d\u0438\u043a \u0446\u0435\u043d\u0430-747 000.", 
+        "company_id": 1, 
+        "object_id": 5, 
+        "content_type": ["alm_crm", "contact"], 
+        "owner": 5, 
+        "date_created": "2015-04-13T04:02:43.711Z", 
+        "date_edited": "2015-08-10T07:31:12.285Z"
     }
 },
 {
     "pk": 16, 
     "model": "alm_crm.comment", 
     "fields": {
-        "comment": "\u0412\u044b\u0437\u0432\u0430\u043b\u0438 \u043a\u0443\u0440\u044c\u0435\u0440\u0430 \u0432 \u043f\u044f\u0442\u043d\u0438\u0446\u0443, \u0441\u0435\u0433\u043e\u0434\u043d\u044f 30.03.2015 \u0434\u043e\u043b\u0436\u043d\u044b \u043f\u043e\u043b\u0443\u0447\u0438\u0442\u044c \u0434\u043e\u0433\u043e\u0432\u043e\u0440.", 
-        "company_id": 3, 
-        "object_id": 124, 
-        "content_type": 39, 
-        "owner": 24, 
-        "date_created": "2015-03-30T03:12:43.972Z", 
-        "date_edited": "2015-08-10T07:31:12.273Z"
+        "comment": "\u041f\u043e\u043b\u0443\u0447\u0438\u043b\u0438 \u0434\u043e\u0433\u043e\u0432\u0440, \u043e\u0442\u043f\u0440\u0430\u0432\u0438\u043b\u0430 \u0441\u0447\u0435\u0442 \u043d\u0430 \u043e\u043f\u043b\u0430\u0442\u0443, \u0436\u0434\u0435\u043c \u043e\u043f\u043b\u0430\u0442\u0443", 
+        "company_id": 1, 
+        "object_id": 6, 
+        "content_type": ["alm_crm", "contact"], 
+        "owner": 6, 
+        "date_created": "2015-04-13T10:10:54.840Z", 
+        "date_edited": "2015-08-10T07:31:12.288Z"
     }
 },
 {
     "pk": 17, 
     "model": "alm_crm.comment", 
     "fields": {
-        "comment": "\u041f\u043e\u043b\u0443\u0447\u0438\u043b\u0438 \u0434\u043e\u0433\u043e\u0432\u043e\u0440, \u043f\u043e\u0434\u043f\u0438\u0441\u0430\u043b\u0438.", 
-        "company_id": 3, 
-        "object_id": 124, 
-        "content_type": 39, 
-        "owner": 24, 
-        "date_created": "2015-03-31T05:04:40.803Z", 
-        "date_edited": "2015-08-10T07:31:12.276Z"
+        "comment": "\u041f\u043e\u043b\u0443\u0447\u0438\u043b\u0438 \u0434\u043e\u0433\u043e\u0432\u0440, \u043e\u0442\u043f\u0440\u0430\u0432\u0438\u043b\u0430 \u0441\u0447\u0435\u0442 \u043d\u0430 \u043e\u043f\u043b\u0430\u0442\u0443, \u0436\u0434\u0435\u043c \u043e\u043f\u043b\u0430\u0442\u0443", 
+        "company_id": 1, 
+        "object_id": 7, 
+        "content_type": ["alm_crm", "contact"], 
+        "owner": 7, 
+        "date_created": "2015-04-13T10:12:44.892Z", 
+        "date_edited": "2015-08-10T07:31:12.290Z"
     }
 },
 {
     "pk": 18, 
     "model": "alm_crm.comment", 
     "fields": {
-        "comment": "\u041f\u043e\u043b\u0443\u0447\u0438\u043b\u0438 \u0434\u043e\u0433\u043e\u0432\u043e\u0440, \u043f\u043e\u0434\u043f\u0438\u0441\u0430\u043b\u0438.", 
-        "company_id": 3, 
-        "object_id": 124, 
-        "content_type": 39, 
-        "owner": 24, 
-        "date_created": "2015-03-31T05:05:35.764Z", 
-        "date_edited": "2015-08-10T07:31:12.278Z"
+        "comment": "\u0421 \u043d\u0435\u0434\u0430\u0432\u043d\u0435\u0433\u043e \u0432\u0440\u0435\u043c\u0435\u043d\u0438 \u0432\u044b\u0448\u043b\u043e \u0443\u0432\u0435\u0434\u043e\u043c\u043b\u0435\u043d\u0438\u0435 \u043e \u0437\u0430\u043a\u0443\u043f\u0435 \u0440\u0430\u0434\u0438\u043e\u043b\u043e\u0433\u0438\u0438 \u043d\u0430 \u0417\u0430\u043f\u0430\u0434\u043d\u043e\u043c \u041a\u0417 \u0442\u043e\u043b\u044c\u043a\u043e \u041e\u0442\u0435\u0447\u0435\u0441\u0442\u0432\u0435\u043d\u043d\u043e\u0433\u043e \u043f\u0440\u043e\u0438\u0437\u0432\u043e\u043b\u0438\u0442\u0435\u043b\u044f, \u043f\u043e\u0441\u043c\u043e\u0442\u0440\u0438\u043c \u0447\u0442\u043e \u043f\u043e\u043b\u0443\u0447\u0438\u0442\u0441\u044f", 
+        "company_id": 1, 
+        "object_id": 8, 
+        "content_type": ["alm_crm", "contact"], 
+        "owner": 8, 
+        "date_created": "2015-04-14T07:17:29.541Z", 
+        "date_edited": "2015-08-10T07:31:12.292Z"
+    }
+},
+{
+    "pk": 19, 
+    "model": "alm_crm.comment", 
+    "fields": {
+        "comment": "\u041c\u0425-300 \u0441 \u043e\u0446\u0438\u0444\u0440\u043e\u0432\u0449\u0438\u043a\u043e\u043c \u0438 \u043f\u0440\u0438\u043d\u0442\u0435\u0440\u043e\u043c Carestream \u043f\u043e \u0446\u0435\u043d\u0435 23 800 000, \u0431\u044e\u0434\u0436\u0435\u0442 \u043d\u0430 2 \u0448\u0442( 35 000 000), \u043f\u043e \u0442\u0435\u0445\u043d\u0438\u0447\u043a\u0435 \u043f\u0440\u043e\u0445\u043e\u0434\u0438\u043c.", 
+        "company_id": 1, 
+        "object_id": 9, 
+        "content_type": ["alm_crm", "contact"], 
+        "owner": 9, 
+        "date_created": "2015-04-14T07:18:13.555Z", 
+        "date_edited": "2015-08-10T07:31:12.295Z"
+    }
+},
+{
+    "pk": 20, 
+    "model": "alm_crm.comment", 
+    "fields": {
+        "comment": "\u0414\u0430\u043b\u0438 \u043a\u0440\u0430\u0439\u043d\u0435\u0435 \u043f\u0440\u0435\u0434\u043b\u043e\u0436\u0435\u043d\u0438\u0435 \u043d\u0430 \u041c\u0420\u0422 \u0441 \u0446\u0435\u043d\u043e\u0439 895 000$ \u0441 \u0443\u0441\u043b\u043e\u0432\u0438\u044f\u043c\u0438 \u043e\u043f\u043b\u0430\u0442\u044b-50%\u044550%.", 
+        "company_id": 1, 
+        "object_id": 10, 
+        "content_type": ["alm_crm", "contact"], 
+        "owner": 10, 
+        "date_created": "2015-04-15T03:26:31.573Z", 
+        "date_edited": "2015-08-10T07:31:12.297Z"
+    }
+},
+{
+    "pk": 21, 
+    "model": "alm_crm.comment", 
+    "fields": {
+        "comment": "\u0420\u0430\u0437\u043c\u0435\u0441\u0442\u0438\u043b\u0438 \u0437\u0430\u043a\u0430\u0437 \u0432 \u041a\u043e\u0440\u0435\u044e", 
+        "company_id": 1, 
+        "object_id": 1, 
+        "content_type": ["alm_crm", "share"], 
+        "owner": 1, 
+        "date_created": "2015-04-22T05:45:44.045Z", 
+        "date_edited": "2015-08-10T07:31:12.299Z"
+    }
+},
+{
+    "pk": 22, 
+    "model": "alm_crm.comment", 
+    "fields": {
+        "comment": "\u0442\u0435\u0441\u0442", 
+        "company_id": 1, 
+        "object_id": 2, 
+        "content_type": ["alm_crm", "share"], 
+        "owner": 2, 
+        "date_created": "2015-05-05T11:47:46.443Z", 
+        "date_edited": "2015-08-10T07:31:12.302Z"
+    }
+},
+{
+    "pk": 23, 
+    "model": "alm_crm.comment", 
+    "fields": {
+        "comment": "\u0414\u043e\u0431\u0440\u044b\u0439 \u0434\u0435\u043d\u044c \u0410\u043d\u0430\u0442\u043e\u043b\u0438\u0439! \u041a\u0430\u043a\u043e\u0432\u044b \u0440\u0435\u0437\u0443\u043b\u044c\u0442\u0430\u0442\u044b \u043f\u0435\u0440\u0435\u0433\u043e\u0432\u043e\u0440\u043e\u0432 \u0441 \u041e\u0441\u0442 \u0424\u0430\u0440\u043c?", 
+        "company_id": 1, 
+        "object_id": 3, 
+        "content_type": ["alm_crm", "share"], 
+        "owner": 3, 
+        "date_created": "2015-05-06T10:50:31.288Z", 
+        "date_edited": "2015-08-10T07:31:12.304Z"
+    }
+},
+{
+    "pk": 24, 
+    "model": "alm_crm.comment", 
+    "fields": {
+        "comment": "", 
+        "company_id": 1, 
+        "object_id": 4, 
+        "content_type": ["alm_crm", "share"], 
+        "owner": 4, 
+        "date_created": "2015-05-13T08:32:06.868Z", 
+        "date_edited": "2015-08-10T07:31:12.306Z"
     }
 },
 {
     "pk": 25, 
     "model": "alm_crm.comment", 
     "fields": {
-        "comment": "\u0422\u0435\u043d\u0434\u0435\u0440 \u0432\u044b\u0445\u043e\u0434\u0438\u0442 26 \u0430\u043f\u0440\u0435\u043b\u044f, \u0436\u0434\u0435\u043c \u0442\u0435\u043d\u0434\u0435\u0440\u043d\u0443\u044e \u0434\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u0430\u0446\u0438\u044e, \u0421\u0430\u0448\u0430 \u043f\u043e\u0442\u0438\u0445\u043e\u043d\u044c\u043a\u0443 \u0441\u043e\u0431\u0438\u0440\u0430\u0435\u0442 \u0430\u0432\u0442\u043e\u0440\u0438\u0437\u0430\u0446\u0438\u043e\u043d\u043d\u044b\u0439 \u043f\u0430\u043a\u0435\u0442.", 
-        "company_id": 3, 
-        "object_id": 131, 
-        "content_type": 39, 
-        "owner": 20, 
-        "date_created": "2015-04-07T07:25:12.288Z", 
-        "date_edited": "2015-08-10T07:31:12.280Z"
+        "comment": "\u0417\u0434\u0440\u0430\u0441\u0442\u0432\u0443\u0439\u0442\u0435 , \u0412\u0438\u0442\u0430\u043b\u0438\u0439! \u044f \u0443\u0442\u043e\u0447\u043d\u044e", 
+        "company_id": 1, 
+        "object_id": 5, 
+        "content_type": ["alm_crm", "share"], 
+        "owner": 5, 
+        "date_created": "2015-05-14T04:56:16.489Z", 
+        "date_edited": "2015-08-10T07:31:12.309Z"
+    }
+},
+{
+    "pk": 26, 
+    "model": "alm_crm.comment", 
+    "fields": {
+        "comment": "\u0421\u041a\u0414\u0426 \u043f\u043e\u0434\u0433\u043e\u0442\u0430\u0432\u043b\u0438\u0432\u0430\u0435\u0442 \u0434\u0430\u043d\u043d\u044b\u0435 \u043f\u043e \u0437\u0430\u043f\u0440\u043e\u0441\u0443 \u0417\u0410\u041e \"\u041b\u0430\u043c\u0438\u043d\u0430\u0440\u043d\u044b\u0435 \u0441\u0438\u0441\u0442\u0435\u043c\u044b\"", 
+        "company_id": 1, 
+        "object_id": 6, 
+        "content_type": ["alm_crm", "share"], 
+        "owner": 6, 
+        "date_created": "2015-05-19T01:34:37.036Z", 
+        "date_edited": "2015-08-10T07:31:12.312Z"
+    }
+},
+{
+    "pk": 27, 
+    "model": "alm_crm.comment", 
+    "fields": {
+        "comment": "\u041e\u043f\u043b\u0430\u0442\u0443 \u043f\u043e\u043b\u0443\u0447\u0438\u043b\u0438.", 
+        "company_id": 1, 
+        "object_id": 7, 
+        "content_type": ["alm_crm", "share"], 
+        "owner": 7, 
+        "date_created": "2015-05-19T08:14:31.568Z", 
+        "date_edited": "2015-08-10T07:31:12.314Z"
     }
 },
 {
     "pk": 28, 
     "model": "alm_crm.comment", 
     "fields": {
-        "comment": "\u0416\u0434\u0443 \u0414\u043e\u0433\u043e\u0432\u043e\u0440 \u043e\u0442 \u043a\u043b\u0438\u0435\u043d\u0442\u0430 \u043d\u0430 \u0434\u0435\u043d\u0442\u0430\u043b\u044c\u043d\u0438\u043a \u0446\u0435\u043d\u0430-747 000.", 
-        "company_id": 3, 
-        "object_id": 167, 
-        "content_type": 39, 
-        "owner": 20, 
-        "date_created": "2015-04-13T04:02:43.711Z", 
-        "date_edited": "2015-08-10T07:31:12.285Z"
+        "comment": "\u0413\u0443\u043b\u044c\u043d\u0430\u0440\u0430, \u0412\u044b \u0437\u0430\u043f\u0440\u043e\u0441 \u043e\u0442 \u043d\u0438\u0445 \u043f\u043e\u043b\u0443\u0447\u0438\u043b\u0438? \u0438\u043b\u0438 \u043e\u0442\u043f\u0440\u0430\u0432\u0438\u043b\u0438? \u044f \u043f\u0440\u0430\u0432\u0438\u043b\u044c\u043d\u043e \u043f\u043e\u043d\u044f\u043b\u0430, \u044d\u0442\u043e \u0446\u0438\u043a\u043b \"\u0432\u0445\u043e\u0434\u044f\u0449\u0438\u0435, \u0438\u0441\u0445\u043e\u0434\u044f\u0449\u0438\u0435 \u0437\u0432\u043e\u043d\u043a\u0438\", \u043d\u0435 \u043e\u0441\u043d\u043e\u0432\u043d\u043e\u0439 \u043f\u043e\u0442\u043e\u043a?", 
+        "company_id": 1, 
+        "object_id": 8, 
+        "content_type": ["alm_crm", "share"], 
+        "owner": 8, 
+        "date_created": "2015-05-20T03:35:49.446Z", 
+        "date_edited": "2015-08-10T07:31:12.317Z"
     }
 },
 {
     "pk": 29, 
     "model": "alm_crm.comment", 
     "fields": {
-        "comment": "\u041f\u043e\u043b\u0443\u0447\u0438\u043b\u0438 \u0434\u043e\u0433\u043e\u0432\u0440, \u043e\u0442\u043f\u0440\u0430\u0432\u0438\u043b\u0430 \u0441\u0447\u0435\u0442 \u043d\u0430 \u043e\u043f\u043b\u0430\u0442\u0443, \u0436\u0434\u0435\u043c \u043e\u043f\u043b\u0430\u0442\u0443", 
-        "company_id": 3, 
-        "object_id": 167, 
-        "content_type": 39, 
-        "owner": 20, 
-        "date_created": "2015-04-13T10:10:54.840Z", 
-        "date_edited": "2015-08-10T07:31:12.288Z"
+        "comment": "\u0435\u0441\u043b\u0438 \u043e\u043d\u0438 \u0437\u0430\u043f\u0440\u043e\u0441\u0438\u043b\u0438, \u0437\u043d\u0430\u0447\u0438\u0442 \u044d\u0442\u043e \u0446\u0438\u043a\u043b - \u0432\u0445\u043e\u0434\u044f\u0449\u0438\u0435, \u0438\u0441\u0445\u043e\u0434\u044f\u0449\u0438\u0435 \u0437\u0432\u043e\u043d\u043a\u0438 \u0438\u043b\u0438 \u0446\u0438\u043a\u043b - \u0412\u044b\u0441\u043b\u0430\u043d\u043e \u041a\u041f?", 
+        "company_id": 1, 
+        "object_id": 9, 
+        "content_type": ["alm_crm", "share"], 
+        "owner": 9, 
+        "date_created": "2015-05-20T03:37:01.479Z", 
+        "date_edited": "2015-08-10T07:31:12.319Z"
     }
 },
 {
     "pk": 30, 
     "model": "alm_crm.comment", 
     "fields": {
-        "comment": "\u041f\u043e\u043b\u0443\u0447\u0438\u043b\u0438 \u0434\u043e\u0433\u043e\u0432\u0440, \u043e\u0442\u043f\u0440\u0430\u0432\u0438\u043b\u0430 \u0441\u0447\u0435\u0442 \u043d\u0430 \u043e\u043f\u043b\u0430\u0442\u0443, \u0436\u0434\u0435\u043c \u043e\u043f\u043b\u0430\u0442\u0443", 
-        "company_id": 3, 
-        "object_id": 167, 
-        "content_type": 39, 
-        "owner": 20, 
-        "date_created": "2015-04-13T10:12:44.892Z", 
-        "date_edited": "2015-08-10T07:31:12.290Z"
+        "comment": "", 
+        "company_id": 1, 
+        "object_id": 10, 
+        "content_type": ["alm_crm", "share"], 
+        "owner": 10, 
+        "date_created": "2015-05-20T04:02:01.363Z", 
+        "date_edited": "2015-08-10T07:31:12.322Z"
     }
 },
 {
     "pk": 31, 
     "model": "alm_crm.comment", 
     "fields": {
-        "comment": "\u0421 \u043d\u0435\u0434\u0430\u0432\u043d\u0435\u0433\u043e \u0432\u0440\u0435\u043c\u0435\u043d\u0438 \u0432\u044b\u0448\u043b\u043e \u0443\u0432\u0435\u0434\u043e\u043c\u043b\u0435\u043d\u0438\u0435 \u043e \u0437\u0430\u043a\u0443\u043f\u0435 \u0440\u0430\u0434\u0438\u043e\u043b\u043e\u0433\u0438\u0438 \u043d\u0430 \u0417\u0430\u043f\u0430\u0434\u043d\u043e\u043c \u041a\u0417 \u0442\u043e\u043b\u044c\u043a\u043e \u041e\u0442\u0435\u0447\u0435\u0441\u0442\u0432\u0435\u043d\u043d\u043e\u0433\u043e \u043f\u0440\u043e\u0438\u0437\u0432\u043e\u043b\u0438\u0442\u0435\u043b\u044f, \u043f\u043e\u0441\u043c\u043e\u0442\u0440\u0438\u043c \u0447\u0442\u043e \u043f\u043e\u043b\u0443\u0447\u0438\u0442\u0441\u044f", 
-        "company_id": 3, 
-        "object_id": 177, 
-        "content_type": 39, 
-        "owner": 20, 
-        "date_created": "2015-04-14T07:17:29.541Z", 
-        "date_edited": "2015-08-10T07:31:12.292Z"
+        "comment": "", 
+        "company_id": 1, 
+        "object_id": 1, 
+        "content_type": ["alm_crm", "activity"], 
+        "owner": 1, 
+        "date_created": "2015-05-20T04:59:38.775Z", 
+        "date_edited": "2015-08-10T07:31:12.325Z"
     }
 },
 {
     "pk": 32, 
     "model": "alm_crm.comment", 
     "fields": {
-        "comment": "\u041c\u0425-300 \u0441 \u043e\u0446\u0438\u0444\u0440\u043e\u0432\u0449\u0438\u043a\u043e\u043c \u0438 \u043f\u0440\u0438\u043d\u0442\u0435\u0440\u043e\u043c Carestream \u043f\u043e \u0446\u0435\u043d\u0435 23 800 000, \u0431\u044e\u0434\u0436\u0435\u0442 \u043d\u0430 2 \u0448\u0442( 35 000 000), \u043f\u043e \u0442\u0435\u0445\u043d\u0438\u0447\u043a\u0435 \u043f\u0440\u043e\u0445\u043e\u0434\u0438\u043c.", 
-        "company_id": 3, 
-        "object_id": 177, 
-        "content_type": 39, 
-        "owner": 20, 
-        "date_created": "2015-04-14T07:18:13.555Z", 
-        "date_edited": "2015-08-10T07:31:12.295Z"
+        "comment": "\u0420\u043e\u0437\u0430, \u043f\u0435\u0440\u0435\u043d\u0435\u0441\u0438\u0442\u0435 \u0438\u0437 \u043e\u0441\u043d\u043e\u0432\u043d\u043e\u0433\u043e \u043f\u043e\u0442\u043e\u043a\u0430 \u0432 \u043f\u0435\u0440\u0432\u0438\u0447\u043d\u0443\u044e \u0432\u0441\u0442\u0440\u0435\u0447\u0443. \u043a\u0430\u043a\u043e\u0439-\u043d\u0438\u0431\u0443\u0434\u044c \u0430\u043f\u043f\u0430\u0440\u0430\u0442 \u0437\u0430\u0438\u043d\u0442\u0435\u0440\u0435\u0441\u043e\u0432\u0430\u043b \u043a\u043b\u0438\u0435\u043d\u0442\u0430?", 
+        "company_id": 1, 
+        "object_id": 2, 
+        "content_type": ["alm_crm", "activity"], 
+        "owner": 2, 
+        "date_created": "2015-05-20T05:00:58.572Z", 
+        "date_edited": "2015-08-10T07:31:12.328Z"
     }
 },
 {
     "pk": 33, 
     "model": "alm_crm.comment", 
     "fields": {
-        "comment": "\u0414\u0430\u043b\u0438 \u043a\u0440\u0430\u0439\u043d\u0435\u0435 \u043f\u0440\u0435\u0434\u043b\u043e\u0436\u0435\u043d\u0438\u0435 \u043d\u0430 \u041c\u0420\u0422 \u0441 \u0446\u0435\u043d\u043e\u0439 895 000$ \u0441 \u0443\u0441\u043b\u043e\u0432\u0438\u044f\u043c\u0438 \u043e\u043f\u043b\u0430\u0442\u044b-50%\u044550%.", 
-        "company_id": 3, 
-        "object_id": 163, 
-        "content_type": 39, 
-        "owner": 20, 
-        "date_created": "2015-04-15T03:26:31.573Z", 
-        "date_edited": "2015-08-10T07:31:12.297Z"
+        "comment": "", 
+        "company_id": 1, 
+        "object_id": 3, 
+        "content_type": ["alm_crm", "activity"], 
+        "owner": 3, 
+        "date_created": "2015-05-20T05:01:16.758Z", 
+        "date_edited": "2015-08-10T07:31:12.331Z"
     }
 },
 {
     "pk": 34, 
     "model": "alm_crm.comment", 
     "fields": {
-        "comment": "\u0420\u0430\u0437\u043c\u0435\u0441\u0442\u0438\u043b\u0438 \u0437\u0430\u043a\u0430\u0437 \u0432 \u041a\u043e\u0440\u0435\u044e", 
-        "company_id": 3, 
-        "object_id": 199, 
-        "content_type": 39, 
-        "owner": 25, 
-        "date_created": "2015-04-22T05:45:44.045Z", 
-        "date_edited": "2015-08-10T07:31:12.299Z"
-    }
-},
-{
-    "pk": 44, 
-    "model": "alm_crm.comment", 
-    "fields": {
-        "comment": "\u0442\u0435\u0441\u0442", 
-        "company_id": 10, 
-        "object_id": 543, 
-        "content_type": 39, 
-        "owner": 70, 
-        "date_created": "2015-05-05T11:47:46.443Z", 
-        "date_edited": "2015-08-10T07:31:12.302Z"
-    }
-},
-{
-    "pk": 45, 
-    "model": "alm_crm.comment", 
-    "fields": {
-        "comment": "\u0414\u043e\u0431\u0440\u044b\u0439 \u0434\u0435\u043d\u044c \u0410\u043d\u0430\u0442\u043e\u043b\u0438\u0439! \u041a\u0430\u043a\u043e\u0432\u044b \u0440\u0435\u0437\u0443\u043b\u044c\u0442\u0430\u0442\u044b \u043f\u0435\u0440\u0435\u0433\u043e\u0432\u043e\u0440\u043e\u0432 \u0441 \u041e\u0441\u0442 \u0424\u0430\u0440\u043c?", 
-        "company_id": 9, 
-        "object_id": 583, 
-        "content_type": 39, 
-        "owner": 45, 
-        "date_created": "2015-05-06T10:50:31.288Z", 
-        "date_edited": "2015-08-10T07:31:12.304Z"
-    }
-},
-{
-    "pk": 46, 
-    "model": "alm_crm.comment", 
-    "fields": {
-        "comment": "", 
-        "company_id": 9, 
-        "object_id": 762, 
-        "content_type": 39, 
-        "owner": 58, 
-        "date_created": "2015-05-13T08:32:06.868Z", 
-        "date_edited": "2015-08-10T07:31:12.306Z"
-    }
-},
-{
-    "pk": 47, 
-    "model": "alm_crm.comment", 
-    "fields": {
-        "comment": "\u0417\u0434\u0440\u0430\u0441\u0442\u0432\u0443\u0439\u0442\u0435 , \u0412\u0438\u0442\u0430\u043b\u0438\u0439! \u044f \u0443\u0442\u043e\u0447\u043d\u044e", 
-        "company_id": 9, 
-        "object_id": 768, 
-        "content_type": 39, 
-        "owner": 67, 
-        "date_created": "2015-05-14T04:56:16.489Z", 
-        "date_edited": "2015-08-10T07:31:12.309Z"
-    }
-},
-{
-    "pk": 48, 
-    "model": "alm_crm.comment", 
-    "fields": {
-        "comment": "\u0421\u041a\u0414\u0426 \u043f\u043e\u0434\u0433\u043e\u0442\u0430\u0432\u043b\u0438\u0432\u0430\u0435\u0442 \u0434\u0430\u043d\u043d\u044b\u0435 \u043f\u043e \u0437\u0430\u043f\u0440\u043e\u0441\u0443 \u0417\u0410\u041e \"\u041b\u0430\u043c\u0438\u043d\u0430\u0440\u043d\u044b\u0435 \u0441\u0438\u0441\u0442\u0435\u043c\u044b\"", 
-        "company_id": 9, 
-        "object_id": 761, 
-        "content_type": 39, 
-        "owner": 66, 
-        "date_created": "2015-05-19T01:34:37.036Z", 
-        "date_edited": "2015-08-10T07:31:12.312Z"
-    }
-},
-{
-    "pk": 49, 
-    "model": "alm_crm.comment", 
-    "fields": {
-        "comment": "\u041e\u043f\u043b\u0430\u0442\u0443 \u043f\u043e\u043b\u0443\u0447\u0438\u043b\u0438.", 
-        "company_id": 3, 
-        "object_id": 193, 
-        "content_type": 39, 
-        "owner": 21, 
-        "date_created": "2015-05-19T08:14:31.568Z", 
-        "date_edited": "2015-08-10T07:31:12.314Z"
-    }
-},
-{
-    "pk": 50, 
-    "model": "alm_crm.comment", 
-    "fields": {
-        "comment": "\u0413\u0443\u043b\u044c\u043d\u0430\u0440\u0430, \u0412\u044b \u0437\u0430\u043f\u0440\u043e\u0441 \u043e\u0442 \u043d\u0438\u0445 \u043f\u043e\u043b\u0443\u0447\u0438\u043b\u0438? \u0438\u043b\u0438 \u043e\u0442\u043f\u0440\u0430\u0432\u0438\u043b\u0438? \u044f \u043f\u0440\u0430\u0432\u0438\u043b\u044c\u043d\u043e \u043f\u043e\u043d\u044f\u043b\u0430, \u044d\u0442\u043e \u0446\u0438\u043a\u043b \"\u0432\u0445\u043e\u0434\u044f\u0449\u0438\u0435, \u0438\u0441\u0445\u043e\u0434\u044f\u0449\u0438\u0435 \u0437\u0432\u043e\u043d\u043a\u0438\", \u043d\u0435 \u043e\u0441\u043d\u043e\u0432\u043d\u043e\u0439 \u043f\u043e\u0442\u043e\u043a?", 
-        "company_id": 10, 
-        "object_id": 966, 
-        "content_type": 39, 
-        "owner": 70, 
-        "date_created": "2015-05-20T03:35:49.446Z", 
-        "date_edited": "2015-08-10T07:31:12.317Z"
-    }
-},
-{
-    "pk": 51, 
-    "model": "alm_crm.comment", 
-    "fields": {
-        "comment": "\u0435\u0441\u043b\u0438 \u043e\u043d\u0438 \u0437\u0430\u043f\u0440\u043e\u0441\u0438\u043b\u0438, \u0437\u043d\u0430\u0447\u0438\u0442 \u044d\u0442\u043e \u0446\u0438\u043a\u043b - \u0432\u0445\u043e\u0434\u044f\u0449\u0438\u0435, \u0438\u0441\u0445\u043e\u0434\u044f\u0449\u0438\u0435 \u0437\u0432\u043e\u043d\u043a\u0438 \u0438\u043b\u0438 \u0446\u0438\u043a\u043b - \u0412\u044b\u0441\u043b\u0430\u043d\u043e \u041a\u041f?", 
-        "company_id": 10, 
-        "object_id": 967, 
-        "content_type": 39, 
-        "owner": 70, 
-        "date_created": "2015-05-20T03:37:01.479Z", 
-        "date_edited": "2015-08-10T07:31:12.319Z"
-    }
-},
-{
-    "pk": 52, 
-    "model": "alm_crm.comment", 
-    "fields": {
-        "comment": "", 
-        "company_id": 10, 
-        "object_id": 990, 
-        "content_type": 39, 
-        "owner": 70, 
-        "date_created": "2015-05-20T04:02:01.363Z", 
-        "date_edited": "2015-08-10T07:31:12.322Z"
-    }
-},
-{
-    "pk": 53, 
-    "model": "alm_crm.comment", 
-    "fields": {
-        "comment": "", 
-        "company_id": 10, 
-        "object_id": 989, 
-        "content_type": 39, 
-        "owner": 70, 
-        "date_created": "2015-05-20T04:59:38.775Z", 
-        "date_edited": "2015-08-10T07:31:12.325Z"
-    }
-},
-{
-    "pk": 54, 
-    "model": "alm_crm.comment", 
-    "fields": {
         "comment": "\u0420\u043e\u0437\u0430, \u043f\u0435\u0440\u0435\u043d\u0435\u0441\u0438\u0442\u0435 \u0438\u0437 \u043e\u0441\u043d\u043e\u0432\u043d\u043e\u0433\u043e \u043f\u043e\u0442\u043e\u043a\u0430 \u0432 \u043f\u0435\u0440\u0432\u0438\u0447\u043d\u0443\u044e \u0432\u0441\u0442\u0440\u0435\u0447\u0443. \u043a\u0430\u043a\u043e\u0439-\u043d\u0438\u0431\u0443\u0434\u044c \u0430\u043f\u043f\u0430\u0440\u0430\u0442 \u0437\u0430\u0438\u043d\u0442\u0435\u0440\u0435\u0441\u043e\u0432\u0430\u043b \u043a\u043b\u0438\u0435\u043d\u0442\u0430?", 
-        "company_id": 10, 
-        "object_id": 987, 
-        "content_type": 39, 
-        "owner": 70, 
-        "date_created": "2015-05-20T05:00:58.572Z", 
-        "date_edited": "2015-08-10T07:31:12.328Z"
-    }
-},
-{
-    "pk": 55, 
-    "model": "alm_crm.comment", 
-    "fields": {
-        "comment": "", 
-        "company_id": 10, 
-        "object_id": 989, 
-        "content_type": 39, 
-        "owner": 70, 
-        "date_created": "2015-05-20T05:01:16.758Z", 
-        "date_edited": "2015-08-10T07:31:12.331Z"
-    }
-},
-{
-    "pk": 56, 
-    "model": "alm_crm.comment", 
-    "fields": {
-        "comment": "\u0420\u043e\u0437\u0430, \u043f\u0435\u0440\u0435\u043d\u0435\u0441\u0438\u0442\u0435 \u0438\u0437 \u043e\u0441\u043d\u043e\u0432\u043d\u043e\u0433\u043e \u043f\u043e\u0442\u043e\u043a\u0430 \u0432 \u043f\u0435\u0440\u0432\u0438\u0447\u043d\u0443\u044e \u0432\u0441\u0442\u0440\u0435\u0447\u0443. \u043a\u0430\u043a\u043e\u0439-\u043d\u0438\u0431\u0443\u0434\u044c \u0430\u043f\u043f\u0430\u0440\u0430\u0442 \u0437\u0430\u0438\u043d\u0442\u0435\u0440\u0435\u0441\u043e\u0432\u0430\u043b \u043a\u043b\u0438\u0435\u043d\u0442\u0430?", 
-        "company_id": 10, 
-        "object_id": 987, 
-        "content_type": 39, 
-        "owner": 70, 
+        "company_id": 1, 
+        "object_id": 4, 
+        "content_type": ["alm_crm", "activity"], 
+        "owner": 4, 
         "date_created": "2015-05-20T05:01:27.125Z", 
         "date_edited": "2015-08-10T07:31:12.334Z"
     }
 },
 {
-    "pk": 57, 
+    "pk": 35, 
     "model": "alm_crm.comment", 
     "fields": {
         "comment": "\u0422\u0438\u043c\u0443\u0440, \u0432\u044b \u0437\u043d\u0430\u0435\u0442\u0435 \u043f\u0440\u0430\u0439\u0441 \u0438 \u0443\u0442\u0432\u0435\u0440\u0436\u0434\u0435\u043d\u043d\u044b\u0435 \u0441\u043a\u0438\u0434\u043a\u0438. \u043f\u043e \u044d\u0442\u043e\u043c\u0443 \u0432\u043e\u043f\u0440\u043e\u0441\u0443 \u043c\u044b \u043f\u0435\u0440\u0435\u0433\u043e\u0432\u043e\u0440\u0438\u043c \u0441 \u0432\u0430\u043c\u0438 \u0438\u043d\u0434\u0438\u0432\u0438\u0434\u0443\u0430\u043b\u044c\u043d\u043e, \u043d\u043e \u0446\u0435\u043d\u043e\u0432\u0443\u044e \u043f\u043e\u043b\u0438\u0442\u0438\u043a\u0443 \u043d\u0443\u0436\u043d\u043e \u0441\u043e\u0431\u043b\u044e\u0434\u0430\u0442\u044c", 
-        "company_id": 10, 
-        "object_id": 964, 
-        "content_type": 39, 
-        "owner": 70, 
+        "company_id": 1, 
+        "object_id": 5, 
+        "content_type": ["alm_crm", "activity"], 
+        "owner": 5, 
         "date_created": "2015-05-20T05:18:55.434Z", 
         "date_edited": "2015-08-10T07:31:12.336Z"
     }
 },
 {
-    "pk": 59, 
+    "pk": 36, 
     "model": "alm_crm.comment", 
     "fields": {
         "comment": "\u0421\u0430\u043d\u0438\u044f, \u043f\u0435\u0440\u0435\u0432\u0435\u0434\u0438\u0442\u0435 \u0434\u0435\u0439\u0441\u0442\u0432\u0438\u0435 \u0438\u0437 \u043e\u0441\u043d\u043e\u0432\u043d\u043e\u0433\u043e \u043f\u043e\u0442\u043e\u043a\u0430 \u0432 \u0441\u043e\u043e\u0442\u0432\u0435\u0442\u0441\u0442\u0432\u0443\u044e\u0449\u0438\u0439 \u0446\u0438\u043a\u043b - \u0437\u0432\u043e\u043d\u043e\u043a \u0432\u0445\u043e\u0434\u044f\u0449\u0438\u0439/\u0438\u0441\u0445\u043e\u0434\u044f\u0449\u0438\u0439", 
-        "company_id": 10, 
-        "object_id": 1043, 
-        "content_type": 39, 
-        "owner": 70, 
+        "company_id": 1, 
+        "object_id": 6, 
+        "content_type": ["alm_crm", "activity"], 
+        "owner": 6, 
         "date_created": "2015-05-21T05:04:16.331Z", 
         "date_edited": "2015-08-10T07:31:12.339Z"
     }
 },
 {
-    "pk": 60, 
+    "pk": 37, 
     "model": "alm_crm.comment", 
     "fields": {
         "comment": "\u041e\u043d\u0438 \u0432\u044b\u043f\u043e\u043b\u043d\u044f\u044e\u0442 2-5 \u0438\u0441\u0441\u043b\u0435\u0434\u043e\u0432\u0430\u043d\u0438\u0439 \u0421\u041e\u042d \u0432 \u0434\u0435\u043d\u044c.\u0418\u043c \u043d\u0443\u0436\u0435\u043d \u0441\u0430\u043c\u044b\u0439 \u043f\u0440\u043e\u0441\u0442\u043e\u0439 \u0421\u041e\u042d- \u043c\u0435\u0442\u0440.", 
-        "company_id": 9, 
-        "object_id": 762, 
-        "content_type": 39, 
-        "owner": 67, 
+        "company_id": 1, 
+        "object_id": 7, 
+        "content_type": ["alm_crm", "activity"], 
+        "owner": 7, 
         "date_created": "2015-05-21T05:41:28.726Z", 
         "date_edited": "2015-08-10T07:31:12.342Z"
     }
 },
 {
-    "pk": 61, 
+    "pk": 38, 
     "model": "alm_crm.comment", 
     "fields": {
         "comment": "\u0437\u0430\u043f\u043b\u0430\u043d\u0438\u0440\u043e\u0432\u0430\u043d\u043d\u043e\u0435 \u0441\u043e\u0431\u044b\u0442\u0438\u0435 \u0432\u043d\u0435\u0441\u0438\u0442\u0435 \u0432 \u043a\u0430\u043b\u0435\u043d\u0434\u0430\u0440\u044c", 
-        "company_id": 10, 
-        "object_id": 1048, 
-        "content_type": 39, 
-        "owner": 70, 
+        "company_id": 1, 
+        "object_id": 8, 
+        "content_type": ["alm_crm", "activity"], 
+        "owner": 8, 
         "date_created": "2015-05-21T06:23:47.688Z", 
         "date_edited": "2015-08-10T07:31:12.345Z"
     }
 },
 {
-    "pk": 62, 
+    "pk": 39, 
     "model": "alm_crm.comment", 
     "fields": {
         "comment": "", 
-        "company_id": 10, 
-        "object_id": 927, 
-        "content_type": 39, 
-        "owner": 70, 
+        "company_id": 1, 
+        "object_id": 9, 
+        "content_type": ["alm_crm", "activity"], 
+        "owner": 9, 
         "date_created": "2015-05-21T08:33:20.886Z", 
         "date_edited": "2015-08-10T07:31:12.348Z"
     }
 },
 {
-    "pk": 63, 
+    "pk": 40, 
     "model": "alm_crm.comment", 
     "fields": {
         "comment": "\u0432\u0438\u0437\u0438\u0442 \u0441\u043e\u0441\u0442\u043e\u044f\u043b\u0441\u044f \u0438\u043b\u0438 \u0437\u0430\u043f\u043b\u0430\u043d\u0438\u0440\u043e\u0432\u0430\u043d?", 
-        "company_id": 10, 
-        "object_id": 962, 
-        "content_type": 39, 
-        "owner": 70, 
+        "company_id": 1, 
+        "object_id": 10, 
+        "content_type": ["alm_crm", "activity"], 
+        "owner": 10, 
         "date_created": "2015-05-21T08:33:37.329Z", 
         "date_edited": "2015-08-10T07:31:12.350Z"
-    }
-},
-{
-    "pk": 64, 
-    "model": "alm_crm.comment", 
-    "fields": {
-        "comment": "", 
-        "company_id": 10, 
-        "object_id": 1066, 
-        "content_type": 39, 
-        "owner": 70, 
-        "date_created": "2015-05-21T09:10:05.174Z", 
-        "date_edited": "2015-08-10T07:31:12.353Z"
-    }
-},
-{
-    "pk": 65, 
-    "model": "alm_crm.comment", 
-    "fields": {
-        "comment": "\u041a\u041f \u0432\u044b\u0441\u043b\u0430\u043b\u0438 \u0438\u043b\u0438 \u043f\u043b\u0430\u043d\u0438\u0440\u0443\u0435\u0442\u0435? \u043a\u043e\u0433\u0434\u0430?", 
-        "company_id": 10, 
-        "object_id": 1069, 
-        "content_type": 39, 
-        "owner": 70, 
-        "date_created": "2015-05-21T11:21:49.063Z", 
-        "date_edited": "2015-08-10T07:31:12.356Z"
-    }
-},
-{
-    "pk": 66, 
-    "model": "alm_crm.comment", 
-    "fields": {
-        "comment": "\u044d\u0442\u043e \u0431\u044b\u043b \u0437\u0432\u043e\u043d\u043e\u043a \u0438\u043b\u0438 \u0432\u0441\u0442\u0440\u0435\u0447\u0430? \u043e\u0442\u043c\u0435\u0442\u044c\u0442\u0435 \u0432 \u0441\u043e\u043e\u0442\u0432\u0435\u0442\u0441\u0442\u0432\u0443\u044e\u0449\u0435\u043c \u0446\u0438\u043a\u043b\u0435", 
-        "company_id": 10, 
-        "object_id": 1069, 
-        "content_type": 39, 
-        "owner": 70, 
-        "date_created": "2015-05-21T11:22:12.312Z", 
-        "date_edited": "2015-08-10T07:31:12.359Z"
-    }
-},
-{
-    "pk": 67, 
-    "model": "alm_crm.comment", 
-    "fields": {
-        "comment": "\u0441 \u0447\u0435\u043c \u0441\u043e\u0433\u043b\u0430\u0441\u0438\u043b\u0441\u044f \u043a\u043b\u0438\u043f\u0435\u043d\u0442?", 
-        "company_id": 10, 
-        "object_id": 743, 
-        "content_type": 39, 
-        "owner": 70, 
-        "date_created": "2015-05-22T05:40:54.907Z", 
-        "date_edited": "2015-08-10T07:31:12.362Z"
-    }
-},
-{
-    "pk": 68, 
-    "model": "alm_crm.comment", 
-    "fields": {
-        "comment": "\u043a\u0430\u043a\u043e\u0439 \u0440\u0435\u0437\u0443\u043b\u044c\u0442\u0430\u0442 \u0432\u0441\u0442\u0440\u0435\u0447\u0438?", 
-        "company_id": 10, 
-        "object_id": 1117, 
-        "content_type": 39, 
-        "owner": 70, 
-        "date_created": "2015-05-22T05:41:40.763Z", 
-        "date_edited": "2015-08-10T07:31:12.364Z"
-    }
-},
-{
-    "pk": 69, 
-    "model": "alm_crm.comment", 
-    "fields": {
-        "comment": "\u043a\u0430\u043a\u0438\u0435 \u0440\u0435\u0437\u0443\u043b\u044c\u0442\u0430\u0442\u044b \u0432\u0441\u0442\u0440\u0435\u0447\u0438? \u043a\u0430\u043a\u043e\u0435 \u043e\u0431\u043e\u0440\u0443\u0434\u043e\u0432\u0430\u043d\u0438\u0435 \u043e\u0431\u0441\u0443\u0436\u0434\u0430\u043b\u043e\u0441\u044c?", 
-        "company_id": 10, 
-        "object_id": 1107, 
-        "content_type": 39, 
-        "owner": 70, 
-        "date_created": "2015-05-22T06:35:42.535Z", 
-        "date_edited": "2015-08-10T07:31:12.367Z"
-    }
-},
-{
-    "pk": 70, 
-    "model": "alm_crm.comment", 
-    "fields": {
-        "comment": "\u0437\u0430\u043f\u043b\u0430\u043d\u0438\u0440\u043e\u0432\u0430\u043d\u0430 \u043f\u043e\u0432\u0442\u043e\u0440\u043d\u0430\u044f \u0432\u0441\u0442\u0440\u0435\u0447\u0430 \u0438\u043b\u0438 \u0437\u0432\u043e\u043d\u043e\u043a, \u0438\u043b\u0438 \u043f\u0440\u0435\u0434\u043e\u0441\u0442\u0430\u0432\u043b\u0435\u043d\u0438\u0435 \u043a\u043f?", 
-        "company_id": 10, 
-        "object_id": 1107, 
-        "content_type": 39, 
-        "owner": 70, 
-        "date_created": "2015-05-22T06:36:01.806Z", 
-        "date_edited": "2015-08-10T07:31:12.370Z"
-    }
-},
-{
-    "pk": 71, 
-    "model": "alm_crm.comment", 
-    "fields": {
-        "comment": " \u0437\u0430\u043f\u043b\u0430\u043d\u0438\u0440\u043e\u0432\u0430\u043d\u0430 \u043f\u043e\u0432\u0442\u043e\u0440\u043d\u0430\u044f \u0432\u0441\u0442\u0440\u0435\u0447\u0430? \u0438\u043b\u0438 \u0435\u0441\u0442\u044c \u0434\u0440 \u0438\u0442\u043e\u0433?", 
-        "company_id": 10, 
-        "object_id": 1147, 
-        "content_type": 39, 
-        "owner": 70, 
-        "date_created": "2015-05-22T10:00:26.789Z", 
-        "date_edited": "2015-08-10T07:31:12.372Z"
-    }
-},
-{
-    "pk": 72, 
-    "model": "alm_crm.comment", 
-    "fields": {
-        "comment": "\u0421\u0430\u043d\u0438\u044f, \u0437\u0434\u0435\u0441\u044c \u043e\u0442\u0440\u0430\u0436\u0430\u044e\u0442\u0441\u044f \u0432\u0437\u0430\u0438\u043c\u043e\u0434\u0435\u0439\u0442\u0441\u0442\u0432\u0438\u0435 \u0441 \u043a\u043b\u0438\u0435\u043d\u0442\u043e\u043c - \u0441\u0442\u0430\u0434\u0438\u044f \u043f\u043e\u0434\u0433\u043e\u0442\u043e\u0432\u043a\u0438 \u043c\u043e\u0436\u0435\u0442 \u043d\u0430\u0439\u0442\u0438 \u043e\u0442\u0440\u0430\u0436\u0435\u043d\u0438\u0435 \u0432 \u043a\u0430\u043b\u0435\u043d\u0434\u0430\u0440\u0435. ", 
-        "company_id": 10, 
-        "object_id": 1151, 
-        "content_type": 39, 
-        "owner": 70, 
-        "date_created": "2015-05-22T11:19:47.745Z", 
-        "date_edited": "2015-08-10T07:31:12.375Z"
-    }
-},
-{
-    "pk": 73, 
-    "model": "alm_crm.comment", 
-    "fields": {
-        "comment": "\u0414\u043e\u0433\u043e\u0432\u043e\u0440 \u0437\u0430\u043a\u043b\u044e\u0447\u0435\u043d? \u0438\u043b\u0438 \u0431\u044b\u043b\u0430 \u0432\u0441\u0442\u0440\u0435\u0447\u0430 \u0441 \u041b\u041f\u0420?", 
-        "company_id": 10, 
-        "object_id": 1151, 
-        "content_type": 39, 
-        "owner": 70, 
-        "date_created": "2015-05-22T11:20:02.654Z", 
-        "date_edited": "2015-08-10T07:31:12.378Z"
-    }
-},
-{
-    "pk": 74, 
-    "model": "alm_crm.comment", 
-    "fields": {
-        "comment": "", 
-        "company_id": 10, 
-        "object_id": 1151, 
-        "content_type": 39, 
-        "owner": 70, 
-        "date_created": "2015-05-22T11:20:05.357Z", 
-        "date_edited": "2015-08-10T07:31:12.283Z"
-    }
-},
-{
-    "pk": 75, 
-    "model": "alm_crm.comment", 
-    "fields": {
-        "comment": "\u0430 \u0432 \u0420\u043e\u0441\u0441\u0438\u0438 \u0443 \u041c\u0435\u0434\u043e\u043d\u0438\u043a\u0438 \u044d\u043a\u0441\u043a\u043b\u044e\u0437\u0438\u0432?", 
-        "company_id": 10, 
-        "object_id": 1183, 
-        "content_type": 39, 
-        "owner": 70, 
-        "date_created": "2015-05-25T04:41:20.467Z", 
-        "date_edited": "2015-08-10T07:31:12.381Z"
-    }
-},
-{
-    "pk": 76, 
-    "model": "alm_crm.comment", 
-    "fields": {
-        "comment": "\u0421\u0442\u0430\u0442\u0443\u0441 \u043c\u0435\u043d\u044f\u0439, \u0432\u0441\u0442\u0440\u0435\u0447\u0430 \u0441\u043e\u0441\u0442\u043e\u044f\u043b\u0430\u0441\u044c", 
-        "company_id": 13, 
-        "object_id": 993, 
-        "content_type": 39, 
-        "owner": 115, 
-        "date_created": "2015-05-25T04:44:42.726Z", 
-        "date_edited": "2015-08-10T07:31:12.384Z"
-    }
-},
-{
-    "pk": 80, 
-    "model": "alm_crm.comment", 
-    "fields": {
-        "comment": "\u041a\u041f \u043d\u0430 \u0430\u0442\u043c\u043e\u0441 \u0438\u043b \u043c\u0435\u0434\u0441\u0442\u0430\u0440?", 
-        "company_id": 10, 
-        "object_id": 1435, 
-        "content_type": 39, 
-        "owner": 70, 
-        "date_created": "2015-05-27T07:33:25.348Z", 
-        "date_edited": "2015-08-10T07:31:12.386Z"
-    }
-},
-{
-    "pk": 81, 
-    "model": "alm_crm.comment", 
-    "fields": {
-        "comment": "\u043f\u043e\u0441\u0442\u0443\u043f\u0438\u043b\u0430 \u043e\u043f\u043b\u0430\u0442\u0430 50%, \u043e\u0444\u043e\u0440\u043c\u0438\u043b\u0438 \u0437\u0430\u043a\u0430\u0437", 
-        "company_id": 3, 
-        "object_id": 937, 
-        "content_type": 39, 
-        "owner": 20, 
-        "date_created": "2015-05-28T05:21:44.398Z", 
-        "date_edited": "2015-08-10T07:31:12.389Z"
-    }
-},
-{
-    "pk": 82, 
-    "model": "alm_crm.comment", 
-    "fields": {
-        "comment": "\u0410\u043f\u043f\u0430\u0440\u0430\u0442 \u0443\u0441\u0442\u0430\u043d\u043e\u0432\u043b\u0435\u043d 22 \u0430\u043f\u0440\u0435\u043b\u044f 2015 \u0433. \u043f\u0440\u043e\u0432\u0435\u0434\u0435\u043d\u043e \u043e\u0431\u0443\u0447\u0435\u043d\u0438\u0435 \u043f\u0435\u0440\u0441\u043e\u043d\u0430\u043b\u0430. ", 
-        "company_id": 3, 
-        "object_id": 123, 
-        "content_type": 39, 
-        "owner": 26, 
-        "date_created": "2015-05-28T10:49:54.110Z", 
-        "date_edited": "2015-08-10T07:31:12.392Z"
-    }
-},
-{
-    "pk": 83, 
-    "model": "alm_crm.comment", 
-    "fields": {
-        "comment": "\u041e\u0442\u043a\u0430\u0437 - \u0434\u043e\u0440\u043e\u0433\u043e", 
-        "company_id": 13, 
-        "object_id": 1714, 
-        "content_type": 39, 
-        "owner": 123, 
-        "date_created": "2015-06-01T05:22:10.007Z", 
-        "date_edited": "2015-08-10T07:31:12.395Z"
-    }
-},
-{
-    "pk": 86, 
-    "model": "alm_crm.comment", 
-    "fields": {
-        "comment": "\u043a\u0430\u043a\u0438\u0435 \u0440\u0435\u0437\u0443\u043b\u044c\u0442\u0430\u0442\u044b \u0432\u0441\u0442\u0440\u0435\u0447\u0438", 
-        "company_id": 10, 
-        "object_id": 1774, 
-        "content_type": 39, 
-        "owner": 70, 
-        "date_created": "2015-06-03T06:23:59.656Z", 
-        "date_edited": "2015-08-10T07:31:12.398Z"
-    }
-},
-{
-    "pk": 88, 
-    "model": "alm_crm.comment", 
-    "fields": {
-        "comment": "\u0421\u0434\u0435\u043b\u0430\u0439 \u0441\u043a\u0438\u0434\u043a\u0443", 
-        "company_id": 13, 
-        "object_id": 1722, 
-        "content_type": 39, 
-        "owner": 115, 
-        "date_created": "2015-06-03T11:02:47.003Z", 
-        "date_edited": "2015-08-10T07:31:12.400Z"
-    }
-},
-{
-    "pk": 89, 
-    "model": "alm_crm.comment", 
-    "fields": {
-        "comment": "\u041a\u041f \u043f\u0435\u0440\u0435\u0434\u0435\u043b\u0430\u043b\u0430 \u0432 \u0442\u0435\u043d\u0433\u0435", 
-        "company_id": 13, 
-        "object_id": 1974, 
-        "content_type": 39, 
-        "owner": 117, 
-        "date_created": "2015-06-04T10:12:02.518Z", 
-        "date_edited": "2015-08-10T07:31:12.403Z"
-    }
-},
-{
-    "pk": 90, 
-    "model": "alm_crm.comment", 
-    "fields": {
-        "comment": "\u0410\u0439\u0448\u0438\u0433\u0443\u043b\u044c, \u043a\u043e\u043c\u0443 \u043e\u0442\u0434\u0430\u043b\u0430 \u043d\u0430 \u043f\u0435\u0440\u0435\u0432\u043e\u0434?", 
-        "company_id": 13, 
-        "object_id": 1910, 
-        "content_type": 39, 
-        "owner": 115, 
-        "date_created": "2015-06-05T05:21:44.200Z", 
-        "date_edited": "2015-08-10T07:31:12.406Z"
-    }
-},
-{
-    "pk": 91, 
-    "model": "alm_crm.comment", 
-    "fields": {
-        "comment": "\u041f\u0435\u0440\u0435\u0433\u043e\u0432\u043e\u0440\u0438\u0442 \u0441 \u043a\u043e\u043b\u043b\u0435\u0433\u0430\u043c\u0438 \u043d\u0430\u0441\u0447\u0435\u0442 \u041a\u0430\u0437\u0430\u0445\u0441\u0442\u0430\u043d\u0430 \u0438 \u0441\u0432\u044f\u0436\u0435\u0442\u0441\u044f ", 
-        "company_id": 13, 
-        "object_id": 1886, 
-        "content_type": 39, 
-        "owner": 123, 
-        "date_created": "2015-06-08T05:39:46.583Z", 
-        "date_edited": "2015-08-10T07:31:12.408Z"
-    }
-},
-{
-    "pk": 92, 
-    "model": "alm_crm.comment", 
-    "fields": {
-        "comment": "\u0414\u043e\u0431\u0440\u044b\u0439 \u0434\u0435\u043d\u044c!  \u041f\u0440\u0435\u0434\u043b\u043e\u0436\u0435\u043d\u0438\u0435 \u0412\u0430\u0448\u0435 \u043d\u0430 \u0440\u0430\u0441\u0441\u043c\u043e\u0442\u0440\u0435\u043d\u0438\u0438 \u0433\u0435\u043d\u0435\u0440\u0430\u043b\u044c\u043d\u043e\u0433\u043e \u0434\u0438\u0440\u0435\u043a\u0442\u043e\u0440\u0430. \u0415\u0441\u043b\u0438 \u0431\u0443\u0434\u0443\u0442 \u0432\u043e\u043f\u0440\u043e\u0441\u044b , \u044f \u043e\u0431\u044f\u0437\u0430\u0442\u0435\u043b\u044c\u043d\u043e \u0441 \u0412\u0430\u043c\u0438 \u0441\u0432\u044f\u0436\u0443\u0441\u044c.", 
-        "company_id": 13, 
-        "object_id": 2248, 
-        "content_type": 39, 
-        "owner": 123, 
-        "date_created": "2015-06-09T07:28:46.192Z", 
-        "date_edited": "2015-08-10T07:31:12.411Z"
-    }
-},
-{
-    "pk": 93, 
-    "model": "alm_crm.comment", 
-    "fields": {
-        "comment": "\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b \u043e\u0442\u043f\u0440\u0430\u0432\u0438\u043b\u0438 ", 
-        "company_id": 13, 
-        "object_id": 1637, 
-        "content_type": 39, 
-        "owner": 117, 
-        "date_created": "2015-06-09T10:04:21.629Z", 
-        "date_edited": "2015-08-10T07:31:12.414Z"
-    }
-},
-{
-    "pk": 94, 
-    "model": "alm_crm.comment", 
-    "fields": {
-        "comment": "InBody", 
-        "company_id": 10, 
-        "object_id": 2288, 
-        "content_type": 39, 
-        "owner": 71, 
-        "date_created": "2015-06-10T03:22:27.793Z", 
-        "date_edited": "2015-08-10T07:31:12.417Z"
-    }
-},
-{
-    "pk": 95, 
-    "model": "alm_crm.comment", 
-    "fields": {
-        "comment": "\u041a\u0430\u043a\u043e\u0439 \u0432\u0438\u0434 \u0437\u0430\u043a\u0443\u043f\u0430 \u043f\u043b\u0430\u043d\u0438\u0440\u0443\u044e\u0442? \u041a\u0430\u043a\u0430\u044f \u0441\u0443\u043c\u043c\u0430 \u043f\u043e \u041a\u041f \u0438 \u0447\u0442\u043e \u043d\u0435\u043e\u0431\u0445\u043e\u0434\u0438\u043c\u043e \u0434\u043e\u043f\u043e\u043b\u043d\u0438\u0442\u0435\u043b\u044c\u043d\u043e?", 
-        "company_id": 11, 
-        "object_id": 2305, 
-        "content_type": 39, 
-        "owner": 92, 
-        "date_created": "2015-06-10T07:12:10.655Z", 
-        "date_edited": "2015-08-10T07:31:12.419Z"
-    }
-},
-{
-    "pk": 96, 
-    "model": "alm_crm.comment", 
-    "fields": {
-        "comment": "\u0417\u0430\u043a\u0443\u043f \u0431\u0443\u0434\u0435\u0442 \u043e\u043f\u043b\u0430\u0447\u0438\u0432\u0430\u0442\u044c \u0414\u0412\u0414 \u0441\u0432\u043e\u043c\u0438\u043c \u0441\u0440\u0435\u0434\u0441\u0442\u0432\u0430\u043c\u0438. \u0426\u0435\u043d\u0430 \u043f\u0440\u0430\u0439\u0441\u043e\u0432\u0430\u044f. \u0414\u043e\u043f\u043e\u043b\u043d\u0438\u0442\u0435\u043b\u044c\u043d\u043e \u0445\u043e\u0442\u044f\u0442 \u043f\u043e\u0441\u0442\u0430\u0432\u0438\u0442\u044c  \u0440\u0430\u0431\u043e\u0447\u0443\u044e \u0441\u0442\u0430\u043d\u0446\u0438\u044e \u0438 \u043f\u0440\u043e\u044f\u0432\u043e\u0447\u043d\u044b\u0439 \u043f\u0440\u043e\u0446\u0435\u0441\u0441\u043e\u0440", 
-        "company_id": 11, 
-        "object_id": 2305, 
-        "content_type": 39, 
-        "owner": 100, 
-        "date_created": "2015-06-10T09:12:01.052Z", 
-        "date_edited": "2015-08-10T07:31:12.422Z"
-    }
-},
-{
-    "pk": 97, 
-    "model": "alm_crm.comment", 
-    "fields": {
-        "comment": "\u041e\u043f\u043b\u0430\u0442\u0430 \u0431\u044b\u043b\u0430?", 
-        "company_id": 13, 
-        "object_id": 2236, 
-        "content_type": 39, 
-        "owner": 115, 
-        "date_created": "2015-06-10T10:24:39.191Z", 
-        "date_edited": "2015-08-10T07:31:12.425Z"
-    }
-},
-{
-    "pk": 98, 
-    "model": "alm_crm.comment", 
-    "fields": {
-        "comment": "\u041a\u043e\u0433\u0434\u0430 \u043e\u043f\u043b\u0430\u0442\u0438\u043b\u0438?", 
-        "company_id": 13, 
-        "object_id": 2281, 
-        "content_type": 39, 
-        "owner": 115, 
-        "date_created": "2015-06-10T11:06:33.414Z", 
-        "date_edited": "2015-08-10T07:31:12.428Z"
-    }
-},
-{
-    "pk": 99, 
-    "model": "alm_crm.comment", 
-    "fields": {
-        "comment": "\u0417\u0430\u043f\u043b\u0430\u043d\u0438\u0440\u0443\u0439 \u0434\u0430\u0442\u0443 \u043a\u043e\u043d\u0442\u0430\u043a\u0442\u0430", 
-        "company_id": 13, 
-        "object_id": 2247, 
-        "content_type": 39, 
-        "owner": 115, 
-        "date_created": "2015-06-10T11:08:13.211Z", 
-        "date_edited": "2015-08-10T07:31:12.430Z"
-    }
-},
-{
-    "pk": 100, 
-    "model": "alm_crm.comment", 
-    "fields": {
-        "comment": "\u0412 \u043c\u0430\u0435 \u043e\u043f\u043b\u0430\u0442\u0438\u043b\u0438 ", 
-        "company_id": 13, 
-        "object_id": 2281, 
-        "content_type": 39, 
-        "owner": 117, 
-        "date_created": "2015-06-11T04:29:05.993Z", 
-        "date_edited": "2015-08-10T07:31:12.431Z"
-    }
-},
-{
-    "pk": 103, 
-    "model": "alm_crm.comment", 
-    "fields": {
-        "comment": "\u041d\u0430\u0434\u043e \u0432\u044b\u0445\u043e\u0434\u0438\u0442\u044c \u043d\u0430 \u043f\u0440\u043e\u0438\u0437\u0432\u043e\u0434\u0438\u0442\u0435\u043b\u044f", 
-        "company_id": 13, 
-        "object_id": 2359, 
-        "content_type": 39, 
-        "owner": 115, 
-        "date_created": "2015-06-11T08:11:35.792Z", 
-        "date_edited": "2015-08-10T07:31:12.433Z"
-    }
-},
-{
-    "pk": 104, 
-    "model": "alm_crm.comment", 
-    "fields": {
-        "comment": "\u0412\u044b\u0441\u0442\u0430\u0432\u0438\u043b\u0438 \u0437\u0430\u043c\u0435\u0447\u0430\u043d\u0438\u044f, \u0437\u0430\u043f\u0440\u043e\u0441\u0438\u043b\u0430 \u0434\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b.", 
-        "company_id": 13, 
-        "object_id": 1521, 
-        "content_type": 39, 
-        "owner": 117, 
-        "date_created": "2015-06-11T11:53:19.216Z", 
-        "date_edited": "2015-08-10T07:31:12.434Z"
-    }
-},
-{
-    "pk": 105, 
-    "model": "alm_crm.comment", 
-    "fields": {
-        "comment": "", 
-        "company_id": 10, 
-        "object_id": 2568, 
-        "content_type": 39, 
-        "owner": 131, 
-        "date_created": "2015-06-16T11:40:18.576Z", 
-        "date_edited": "2015-08-10T07:31:12.436Z"
-    }
-},
-{
-    "pk": 106, 
-    "model": "alm_crm.comment", 
-    "fields": {
-        "comment": "\u0412\u043d\u0435\u0441\u0435\u043d\u0438\u0435 \u043e\u043f\u043b\u0430\u0442\u0438\u043b\u0438", 
-        "company_id": 13, 
-        "object_id": 2730, 
-        "content_type": 39, 
-        "owner": 115, 
-        "date_created": "2015-06-19T05:06:54.817Z", 
-        "date_edited": "2015-08-10T07:31:12.438Z"
-    }
-},
-{
-    "pk": 107, 
-    "model": "alm_crm.comment", 
-    "fields": {
-        "comment": "\u041e\u0441\u0442\u0430\u0442\u043e\u043a \u0443\u0441\u043b\u0443\u0433 960 \u0435\u0432\u0440\u043e. \u041e\u0442\u043f\u0440\u0430\u0432\u0438\u043b\u0430 \u0441\u0447\u0435\u0442 8.07.15. \u0436\u0434\u0443 \u043e\u0442\u0432\u0435\u0442\u0430 \u0438 \u043f\u043e\u0441\u0442\u0443\u043f\u043b\u0435\u043d\u0438\u044f", 
-        "company_id": 13, 
-        "object_id": 3743, 
-        "content_type": 39, 
-        "owner": 117, 
-        "date_created": "2015-07-09T03:29:36.370Z", 
-        "date_edited": "2015-08-10T07:31:12.441Z"
-    }
-},
-{
-    "pk": 108, 
-    "model": "alm_crm.comment", 
-    "fields": {
-        "comment": "\u041e\u0441\u0442\u0430\u0442\u043e\u043a \u0443\u0441\u043b\u0443\u0433 \u043e\u043f\u043b\u0430\u0442\u0438\u043b\u0438 24.06.15. \u0432\u044b\u0441\u043b\u0430\u043b\u0438 \u043f\u043b\u0430\u0442\u0435\u0436\u043a\u0443.\u041e\u043f\u043b\u0430\u0442\u0430 \u043f\u043e\u0441\u0442\u0443\u043f\u0438\u043b\u0430. \u041f\u043e\u043b\u0443\u0447\u0438\u043b\u0430 \u0420\u0423. \u0410\u043a\u0442\u044b \u0437\u0430\u043a\u0440\u044b\u043b\u0430.", 
-        "company_id": 13, 
-        "object_id": 2271, 
-        "content_type": 39, 
-        "owner": 117, 
-        "date_created": "2015-07-09T03:48:24.096Z", 
-        "date_edited": "2015-08-10T07:31:12.444Z"
-    }
-},
-{
-    "pk": 109, 
-    "model": "alm_crm.comment", 
-    "fields": {
-        "comment": "\u043d\u0435 \u043f\u043e\u043b\u0443\u0447\u0430\u0435\u0442 \u044e\u0437\u0435\u0440\u0430 \u0438\u0437 \u0430\u043f\u0438", 
-        "company_id": 1, 
-        "object_id": 3957, 
-        "content_type": 39, 
-        "owner": 3, 
-        "date_created": "2015-07-14T08:14:20.431Z", 
-        "date_edited": "2015-08-10T07:31:12.455Z"
-    }
-},
-{
-    "pk": 110, 
-    "model": "alm_crm.comment", 
-    "fields": {
-        "comment": "\u041e\u0442\u043f\u0440\u0430\u0432\u0438\u043b \u043f\u0438\u0441\u044c\u043c\u043e", 
-        "company_id": 13, 
-        "object_id": 3847, 
-        "content_type": 39, 
-        "owner": 123, 
-        "date_created": "2015-07-14T08:30:10.273Z", 
-        "date_edited": "2015-08-10T07:31:12.458Z"
-    }
-},
-{
-    "pk": 111, 
-    "model": "alm_crm.comment", 
-    "fields": {
-        "comment": "\u043f\u0435\u0440\u0435\u043f\u0443\u0442\u0430\u043b \u0441 \u0442\u0435\u0441\u0442\u043e\u043c \u0438 \u043d\u0430\u0436\u0430\u043b\u0430 \u0433\u043e\u0442\u043e\u0432\u043e", 
-        "company_id": 1, 
-        "object_id": 3957, 
-        "content_type": 39, 
-        "owner": 136, 
-        "date_created": "2015-07-14T11:27:26.519Z", 
-        "date_edited": "2015-08-10T07:31:12.461Z"
-    }
-},
-{
-    "pk": 112, 
-    "model": "alm_crm.comment", 
-    "fields": {
-        "comment": "\u0416\u0434\u0435\u043c \u0437\u0432\u043e\u043d\u043a\u0430", 
-        "company_id": 14, 
-        "object_id": 3270, 
-        "content_type": 39, 
-        "owner": 134, 
-        "date_created": "2015-07-18T12:29:27.467Z", 
-        "date_edited": "2015-08-10T07:31:12.464Z"
-    }
-},
-{
-    "pk": 113, 
-    "model": "alm_crm.comment", 
-    "fields": {
-        "comment": "asdfasdf", 
-        "company_id": 2, 
-        "object_id": 4253, 
-        "content_type": 39, 
-        "owner": 10, 
-        "date_created": "2015-07-20T04:08:09.252Z", 
-        "date_edited": "2015-08-10T07:31:12.467Z"
-    }
-},
-{
-    "pk": 114, 
-    "model": "alm_crm.comment", 
-    "fields": {
-        "comment": "asdfalsd fkjasf lkjsal dkjfs ldkjf sald kjfsla dkfjsald kjfals dkjflsak jdfl kasjd flkasjdf laskjdf lsakdfj asld fkjasldfk j", 
-        "company_id": 2, 
-        "object_id": 4253, 
-        "content_type": 39, 
-        "owner": 10, 
-        "date_created": "2015-07-20T04:09:39.956Z", 
-        "date_edited": "2015-08-10T07:31:12.469Z"
-    }
-},
-{
-    "pk": 115, 
-    "model": "alm_crm.comment", 
-    "fields": {
-        "comment": "\u041e\u043f\u043b\u0430\u0442\u0438\u043b\u0438 30% \u043f\u043e \u0434\u043e\u0433\u043e\u0432\u043e\u0440\u0443. \u0421\u0434\u0435\u043b\u0430\u043b\u0430 \u0437\u0430\u044f\u0432\u043a\u0443 \u043d\u0430 \u0437\u0430\u043a\u0430\u0437 \u043d\u0430 \u0432\u0441\u0435 \u043f\u043e\u0437\u0438\u0446\u0438\u0438 \u043f\u043e \u0434\u043e\u0433\u043e\u0432\u043e\u0440\u0443.", 
-        "company_id": 10, 
-        "object_id": 4178, 
-        "content_type": 39, 
-        "owner": 78, 
-        "date_created": "2015-07-24T09:23:14.361Z", 
-        "date_edited": "2015-08-10T07:31:12.472Z"
-    }
-},
-{
-    "pk": 116, 
-    "model": "alm_crm.comment", 
-    "fields": {
-        "comment": "\u043e\u043a", 
-        "company_id": 1, 
-        "object_id": 4368, 
-        "content_type": 39, 
-        "owner": 12, 
-        "date_created": "2015-07-25T11:42:01.141Z", 
-        "date_edited": "2015-08-10T07:31:12.447Z"
-    }
-},
-{
-    "pk": 117, 
-    "model": "alm_crm.comment", 
-    "fields": {
-        "comment": "\u043f\u0440\u0438\u0432\u0435\u0442", 
-        "company_id": 1, 
-        "object_id": 4370, 
-        "content_type": 39, 
-        "owner": 3, 
-        "date_created": "2015-07-25T16:38:18.460Z", 
-        "date_edited": "2015-08-10T07:31:12.450Z"
-    }
-},
-{
-    "pk": 118, 
-    "model": "alm_crm.comment", 
-    "fields": {
-        "comment": "\u0422\u041e\u041e \"ZETA TRADE\" \u0432\u044b\u0441\u0442\u0430\u0432\u0438\u043b\u0430 \u0441\u0447\u0435\u0442 \u043d\u0430 \u0441\u0442\u0443\u043b \u043c\u0435\u0434\u0438\u0446\u0438\u043d\u0441\u043a\u0438\u0439 \u0432 \u043a\u043e\u043b\u0438\u0447\u0435\u0441\u0442\u0432\u0435 7 \u0448\u0442,\u043d\u0430 \u043e\u0431\u0449\u0443\u044e \u0441\u0443\u043c\u043c\u0443 66 150 \u0442\u0433.\u0421\u0434\u0435\u043b\u0430\u043b\u0430 \u0437\u0430\u044f\u0432\u043a\u0443 \u0432 \u0431\u0443\u0445\u0433\u0430\u043b\u0442\u0435\u0440\u0438\u044e", 
-        "company_id": 10, 
-        "object_id": 4178, 
-        "content_type": 39, 
-        "owner": 78, 
-        "date_created": "2015-07-27T09:07:45.555Z", 
-        "date_edited": "2015-08-10T07:31:12.453Z"
-    }
-},
-{
-    "pk": 119, 
-    "model": "alm_crm.comment", 
-    "fields": {
-        "comment": "\u041f\u043e\u0441\u0442\u0443\u043f\u0438\u043b\u0430 \u043e\u043f\u043b\u0430\u0442\u0430 24.07.15, 2120 \u0435\u0432\u0440\u043e. \u0414\u043e\u0441\u044c\u0435 \u0441\u0434\u0430\u043b\u0430 \u0436\u0434\u0443 \u0441\u0447\u0435\u0442 \u044d\u043a\u0441\u043f\u0435\u0440\u0442\u0438\u0437\u044b.", 
-        "company_id": 13, 
-        "object_id": 2793, 
-        "content_type": 39, 
-        "owner": 117, 
-        "date_created": "2015-07-27T10:35:29.174Z", 
-        "date_edited": "2015-08-10T07:31:12.475Z"
-    }
-},
-{
-    "pk": 120, 
-    "model": "alm_crm.comment", 
-    "fields": {
-        "comment": "\u041e\u0446\u0435\u043d\u043a\u0430 \u043f\u0440\u043e\u0438\u0437\u0432\u043e\u0434\u0441\u0442\u0432\u0430 \u0432 \u0430\u0432\u0433\u0443\u0441\u0442\u0435. ", 
-        "company_id": 13, 
-        "object_id": 4749, 
-        "content_type": 39, 
-        "owner": 117, 
-        "date_created": "2015-07-28T03:22:37.620Z", 
-        "date_edited": "2015-08-10T07:31:12.478Z"
-    }
-},
-{
-    "pk": 121, 
-    "model": "alm_crm.comment", 
-    "fields": {
-        "comment": "\u041e\u043f\u043b\u0430\u0442\u0438\u043b\u0438 \u0441\u0447\u0435\u0442 \u043d\u0430 \u0441\u0443\u043c\u043c\u0443 66 150 \u0442\u0433 \u0437\u0430 \u0441\u0442\u0443\u043b\u044c\u044f \u043c\u0435\u0434\u0438\u0446\u0438\u043d\u0441\u043a\u0438\u0435 7 \u0448\u0442. \u041e\u0442\u043f\u0440\u0430\u0432\u0438\u043b\u0430 \u043f\u043b\u0430\u0442\u0435\u0436\u043d\u043e\u0435 \u043f\u043e\u0440\u0443\u0447\u0435\u043d\u0438\u0435, \u043d\u0430 \u0441\u043b\u0435\u0434\u0443\u044e\u0449\u0435\u0439 \u043d\u0435\u0434\u0435\u043b\u0435 \u043e\u0442\u0433\u0440\u0443\u0437\u044f\u0442.", 
-        "company_id": 10, 
-        "object_id": 4178, 
-        "content_type": 39, 
-        "owner": 78, 
-        "date_created": "2015-07-30T11:29:45.314Z", 
-        "date_edited": "2015-08-10T07:31:12.481Z"
-    }
-},
-{
-    "pk": 122, 
-    "model": "alm_crm.comment", 
-    "fields": {
-        "comment": "\u0417\u0430\u043f\u043b\u0430\u043d\u0438\u0440\u043e\u0432\u0430\u043d\u043e \u043f\u0440\u043e\u0434\u0430\u0436\u0430 \u043d\u0430 500000\u0442\u0433", 
-        "company_id": 19, 
-        "object_id": 5214, 
-        "content_type": 39, 
-        "owner": 150, 
-        "date_created": "2015-07-31T09:04:14.973Z", 
-        "date_edited": "2015-08-10T07:31:12.483Z"
     }
 }
 ]

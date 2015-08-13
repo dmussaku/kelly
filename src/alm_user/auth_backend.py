@@ -6,7 +6,6 @@ from django.contrib.auth.signals import user_logged_in, user_logged_out
 from django.middleware.csrf import rotate_token
 
 def login(request, account):
-
     request.session = AlmanetSessionMiddleware.create_session(request, account)
 
     request.account = account

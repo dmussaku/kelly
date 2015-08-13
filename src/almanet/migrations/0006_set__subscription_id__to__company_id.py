@@ -13,7 +13,7 @@ class Migration(SchemaMigration):
 
     def forwards(self, orm):        
         ms = models.get_models()  
-        ms.pop(ms.index(ActivityRecipient)) 
+        # ms.pop(ms.index(ActivityRecipient)) 
         for model in ms:
             if (issubclass(model, SubscriptionObject) and 
                 issubclass(model, models.Model) and not model._meta.abstract):
@@ -28,7 +28,7 @@ class Migration(SchemaMigration):
 
     def backwards(self, orm):     
         ms = models.get_models()  
-        ms.pop(ms.index(ActivityRecipient)) 
+        # ms.pop(ms.index(ActivityRecipient)) 
         for model in ms:
             if (issubclass(model, SubscriptionObject) and 
                 issubclass(model, models.Model) and not model._meta.abstract):
