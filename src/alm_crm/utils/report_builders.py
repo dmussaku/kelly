@@ -143,9 +143,9 @@ def get_activity_feed_xls(subscription_id, data=None):
 		month = date.split('{')[1].split('}')[0]
 		date = date.split('{')[0]+months[int(month)-1]+date.split('}')[1]
 		report_data[1].append(date)
-		report_data[2].append(activity.description.decode('utf-8'))
-		report_data[3].append(activity.sales_cycle.contact.vcard.fn.decode('utf-8'))
-		report_data[4].append(activity.owner.get_billing_user().get_full_name().decode('utf-8'))
+		report_data[2].append(activity.description)
+		report_data[3].append(activity.sales_cycle.contact.vcard.fn)
+		report_data[4].append(activity.owner.get_billing_user().get_full_name())
 		cnt += 1
 
 	worksheet.write(0, 0, u'№', header_format) 
