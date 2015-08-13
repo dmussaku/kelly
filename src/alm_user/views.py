@@ -55,11 +55,10 @@ def login_view(request, template_name='registration/login.html',
             # Okay, security check complete. Log the user in.
             login(request, form.get_user())
 
-                # TODO: check if subscription is active
-                # subscr = request.user.get_active_subscriptions().first()
-                # if not subscr is None:
-                #     return HttpResponseRedirect(subscr.get_home_url())
-            return HttpResponseRedirect('/auth/signin')
+            return HttpResponseRedirect(
+                reverse_lazy('crm_home', 
+                        subdomain=request.company.subdomain,
+                        kwargs={'service_slug': settings.DEFAULT_SERVICE}))
     else:
         form = authentication_form(request)
 
