@@ -4101,11 +4101,9 @@ class ReportResource(Resource):
             report_builders.build_activity_feed(request.user.get_crmuser().subscription_id, data))
 
     def export_activity_feed(self, request, **kwargs):
-        with RequestContext(self, request, allowed_methods=['post']):
-            if request.body:
-                data = self.deserialize(
-                    request, request.body,
-                    format=request.META.get('CONTENT_TYPE', 'application/json'))
+        with RequestContext(self, request, allowed_methods=['get']):
+            if request.GET:
+                data = request.GET
             else:
                 data = {}
 
@@ -4114,7 +4112,7 @@ class ReportResource(Resource):
             if not xls_file:
                 http.HttpNotFound('Empty data received or not found')
             
-            response = HttpResponse(xls_file, content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+            response = HttpResponse(xls_file.read(), content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
             response['Content-Disposition'] = 'attachment; filename='+'Отчет.xlsx'
             try:
                 return response
