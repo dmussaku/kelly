@@ -4103,7 +4103,17 @@ class ReportResource(Resource):
     def export_activity_feed(self, request, **kwargs):
         with RequestContext(self, request, allowed_methods=['get']):
             if request.GET:
-                data = request.GET
+                data = {
+                    'users': eval(request.GET.get('users', [])),
+                    'date_from': datetime.datetime.strptime(
+                                    request.GET.get('date_from', str(datetime.now().\
+                                    strptime('%Y-%m-%dT%H:%M:%S.%f'))), \
+                                    "%Y-%m-%dT%H:%M:%S.%f")),
+                    'date_to': datetime.datetime.strptime(
+                                    request.GET.get('date_to', str(datetime.now().\
+                                    strptime('%Y-%m-%dT%H:%M:%S.%f'))), \
+                                    "%Y-%m-%dT%H:%M:%S.%f"))
+                }
             else:
                 data = {}
 
