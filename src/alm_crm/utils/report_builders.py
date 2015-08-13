@@ -95,10 +95,14 @@ def build_activity_feed(subscription_id, data=None):
 def get_activity_feed_xls(subscription_id, data=None):
 	activities = build_activity_feed(subscription_id, data)['activities']
 
-	# if len(activities) == 0:
-	# 	return False
+	if len(activities) == 0:
+		return False
 
-	workbook = xlsxwriter.Workbook('activity_feed_report.xlsx')
+	from  tempfile import NamedTemporaryFile
+
+	f = NamedTemporaryFile(delete=True)
+
+	workbook = xlsxwriter.Workbook(f.name)
 	worksheet = workbook.add_worksheet()
 
 	header_format = workbook.add_format({'bold': True})
@@ -118,12 +122,30 @@ def get_activity_feed_xls(subscription_id, data=None):
 	)
 	cnt = 1
 
+	months = [
+		u'Янв', 
+		u'Фев',
+		u'Мар',
+		u'Апр',
+		u'Май',
+		u'Июн',
+		u'Июл',
+		u'Авг',
+		u'Сен',
+		u'Окт',
+		u'Ноя',
+		u'Дек'
+	]
+
 	for activity in Activity.objects.filter(id__in=activities):
 		report_data[0].append(cnt)
-		report_data[1].append(activity.date_created.strftime("%H:%M, %d %b %y"))
-		report_data[2].append(activity.description)
-		report_data[3].append(activity.sales_cycle.contact.vcard.fn)
-		report_data[4].append(activity.owner.get_billing_user().get_full_name())
+		date = activity.date_created.strftime("%H:%M, %d {%m} %y")
+		month = date.split('{')[1].split('}')[0]
+		date = date.split('{')[0]+months[int(month)-1]+date.split('}')[1]
+		report_data[1].append(date)
+		report_data[2].append(activity.description.decode('utf-8'))
+		report_data[3].append(activity.sales_cycle.contact.vcard.fn.decode('utf-8'))
+		report_data[4].append(activity.owner.get_billing_user().get_full_name().decode('utf-8'))
 		cnt += 1
 
 	worksheet.write(0, 0, u'№', header_format) 
@@ -143,15 +165,13 @@ def get_activity_feed_xls(subscription_id, data=None):
 		col+=1
 
 	worksheet.set_column(0, 0, 5)
-	worksheet.set_column(1, 1, 10)
+	worksheet.set_column(1, 1, 15)
 	worksheet.set_column(2, 2, 30)
 	worksheet.set_column(3, 3, 25)
 	worksheet.set_column(4, 4, 25)
 
-	# workbook.close()
+	workbook.close()
 	return workbook
-
-
 
 		
 def build_user_report(subscription_id, data):

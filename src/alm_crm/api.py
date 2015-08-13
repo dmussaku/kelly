@@ -4114,9 +4114,12 @@ class ReportResource(Resource):
             if not xlsx:
                 http.HttpNotFound('Empty data received or not found')
             
-            response = HttpResponse(xls_file, content_type='application/vnd.ms-excel')
-            response['Content-Disposition'] = 'attachment; filename='+base_file.filename
-            return response
+            response = HttpResponse(xls_file, content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+            response['Content-Disposition'] = 'attachment; filename='+'Отчет.xlsx'
+            try:
+                return response
+            finally:
+                xls_file.close()
 
     def user_report(self, request, **kwargs):
         with RequestContext(self, request, allowed_methods=['post']):
