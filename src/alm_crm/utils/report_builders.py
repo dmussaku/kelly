@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 import re
 from alm_crm.models import (
 	SalesCycle,
@@ -14,6 +16,7 @@ from datetime import datetime
 from django.utils import timezone
 from django.db.models import Q
 import pytz
+import xlsxwriter
 
 def build_funnel(subscription_id, data=None):
 	data = {} if data is None else data
@@ -87,6 +90,67 @@ def build_activity_feed(subscription_id, data=None):
 	rv['activities'] = activities
 
 	return rv
+
+
+def get_activity_feed_xls(subscription_id, data=None):
+	activities = build_activity_feed(subscription_id, data)['activities']
+
+	# if len(activities) == 0:
+	# 	return False
+
+	workbook = xlsxwriter.Workbook('activity_feed_report.xlsx')
+	worksheet = workbook.add_worksheet()
+
+	header_format = workbook.add_format({'bold': True})
+	header_format.set_border(style=1)
+	header_format.set_text_wrap()
+
+	cell_format = workbook.add_format()
+	cell_format.set_border(style=1)
+	cell_format.set_text_wrap()
+
+	report_data = (
+		[],
+		[],
+		[],
+		[],
+		[]
+	)
+	cnt = 1
+
+	for activity in Activity.objects.filter(id__in=activities):
+		report_data[0].append(cnt)
+		report_data[1].append(activity.date_created.strftime("%H:%M, %d %b %y"))
+		report_data[2].append(activity.description)
+		report_data[3].append(activity.sales_cycle.contact.vcard.fn)
+		report_data[4].append(activity.owner.get_billing_user().get_full_name())
+		cnt += 1
+
+	worksheet.write(0, 0, u'№', header_format) 
+	worksheet.write(0, 1, u'Дата', header_format) 
+	worksheet.write(0, 2, u'Описание', header_format) 
+	worksheet.write(0, 3, u'Контакт', header_format) 
+	worksheet.write(0, 4, u'Пользователь', header_format) 
+
+	col = 0
+	row = 1
+
+	for _list in report_data:
+		row = 1
+		for item in _list:
+			worksheet.write(row, col, item, cell_format) 
+			row += 1
+		col+=1
+
+	worksheet.set_column(0, 0, 5)
+	worksheet.set_column(1, 1, 10)
+	worksheet.set_column(2, 2, 30)
+	worksheet.set_column(3, 3, 25)
+	worksheet.set_column(4, 4, 25)
+
+	# workbook.close()
+	return workbook
+
 
 
 		
