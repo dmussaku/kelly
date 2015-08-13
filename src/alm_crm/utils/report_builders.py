@@ -173,8 +173,7 @@ def get_activity_feed_xls(subscription_id, data=None):
 	worksheet.set_column(4, 4, 25)
 	worksheet.set_column(5, 5, 25)
 
-	workbook.close()
-	# return f
+	return f
 
 		
 def build_user_report(subscription_id, data):
