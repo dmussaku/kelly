@@ -17,6 +17,7 @@ from django.utils import timezone
 from django.db.models import Q
 import pytz
 import xlsxwriter
+from dateutil import tz
 
 def build_funnel(subscription_id, data=None):
 	data = {} if data is None else data
@@ -71,7 +72,7 @@ def build_realtime_funnel(subscription_id, data={}):
 		rv['funnel'][m.id] = [sc.id for sc in sc_in_funnel if sc.milestone.id == m.id]
 	return rv
 
-def build_activity_feed(subscription_id, data=None):
+def build_activity_feed(subscription_id, data=None, timezone='UTC'):
 	data = {} if data is None else data
 	rv = {
 		'report_name': 'activity_feed'
@@ -101,8 +102,15 @@ def build_activity_feed(subscription_id, data=None):
 		u'Дек'
 	]
 	cnt = 1
+
+	from_zone = tz.gettz('UTC')
+	to_zone = tz.gettz(timezone)
+
 	for activity in Activity.objects.filter(q):
-		date = activity.date_created.strftime("%H:%M, %d {%m} %y")
+		date_created_utc = activity.date_created
+		date_created_utc = date_created_utc.replace(tzinfo=from_zone)
+		date_local = date_created_utc.astimezone(to_zone)
+		date = date_local.strftime("%H:%M, %d {%m} %y")
 		month = date.split('{')[1].split('}')[0]
 		date = date.split('{')[0]+months[int(month)-1]+date.split('}')[1]
 
@@ -122,8 +130,8 @@ def build_activity_feed(subscription_id, data=None):
 	return rv
 
 
-def get_activity_feed_xls(subscription_id, data=None):
-	report_data = build_activity_feed(subscription_id, data)['report_data']
+def get_activity_feed_xls(subscription_id, data=None, timezone='UTC'):
+	report_data = build_activity_feed(subscription_id, data, timezone)['report_data']
 
 	from  tempfile import NamedTemporaryFile
 

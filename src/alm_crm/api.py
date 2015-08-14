@@ -4098,7 +4098,7 @@ class ReportResource(Resource):
 
         return self.create_response(
             request,
-            report_builders.build_activity_feed(request.user.get_crmuser().subscription_id, data))
+            report_builders.build_activity_feed(request.user.get_crmuser().subscription_id, data, request.user.timezone.zone))
 
     def export_activity_feed(self, request, **kwargs):
         with RequestContext(self, request, allowed_methods=['get']):
@@ -4111,7 +4111,7 @@ class ReportResource(Resource):
             else:
                 data = {}
 
-            xls_file = report_builders.get_activity_feed_xls(request.user.get_crmuser().subscription_id, data)
+            xls_file = report_builders.get_activity_feed_xls(request.user.get_crmuser().subscription_id, data, request.user.timezone.zone)
 
             response = HttpResponse(xls_file.read(), content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
             response['Content-Disposition'] = 'attachment; filename='+'Лента событий %s.xlsx'%datetime.now().strftime("%d.%m.%y")
