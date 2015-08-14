@@ -44,7 +44,7 @@ def build_funnel(subscription_id, data=None):
 		rv['funnel'][m.id] = [sc.id for sc in sc_in_funnel]
 		sc_in_funnel = [sc for sc in sc_in_funnel if sc.milestone.id != m.id]
 	for m in system_milestones:
-		rv['funnel'][m.id] = [sc.id for sc in sales_cycles if sc.milestone.id == m.id]
+		rv['funnel'][m.id] = [sc.id for sc in sales_cycles if sc.milestone_id == m.id]
 	return rv
 
 def build_realtime_funnel(subscription_id, data={}):
