@@ -4096,8 +4096,8 @@ class ReportResource(Resource):
             if request.GET:
                 data = {
                     'users': [int(u_id) for u_id in request.GET.get('users', '').split(',')],
-                    'date_from': dateutil.parser.parse(request.GET.get('date_from', "")),
-                    'date_to': dateutil.parser.parse(request.GET.get('date_to', ""))
+                    'date_from': request.GET.get('date_from', ""),
+                    'date_to': request.GET.get('date_to', "")
                 }
             else:
                 data = {}
