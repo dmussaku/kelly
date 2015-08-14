@@ -1,16 +1,27 @@
+import re
 from os import *
 import datetime
+import json
 from datetime import *
 from time import *
-import re
 from django.db import models, transaction as tx
-import vobject
-from vobject.vcard import *
 from django.utils.translation import ugettext as _
 from django.conf import settings
 from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
+from django.db import transaction
+from django.db.models import get_models, Model
+from django.db.models.signals import post_save
+from django.contrib.contenttypes.generic import GenericForeignKey
+from django.core.cache import cache
+from django.contrib.contenttypes.generic import GenericForeignKey
 
+import vobject
+from vobject.vcard import *
+from almanet.utils.metaprogramming import SerializableModel
+from almanet.utils.cache import build_key, extract_id
+from almanet.utils.json import date_handler
+from .serializer import serialize_objs, vcard_rel_fields
 
 class VObjectImportException(Exception):
     message = _("The vCard could not be converted into a vObject")
@@ -85,8 +96,6 @@ class VCard(models.Model):
     # a common CharField was used
     uid = models.CharField(max_length=256, blank=True,
                            null=True, verbose_name=_("unique identifier"))
-    custom_sections = generic.GenericRelation('alm_crm.CustomSection')
-    custom_fields = generic.GenericRelation('alm_crm.CustomField')
 
     class Meta:
         verbose_name = _("vcard")
@@ -97,7 +106,7 @@ class VCard(models.Model):
         return self.fn
 
     def save(self, **kwargs):
-        if not self.fn:
+        if not self.fn or self.fn == '':
             self.fill_fn()
         super(self.__class__, self).save(**kwargs)
 
@@ -165,6 +174,7 @@ class VCard(models.Model):
             return self.toVObject()
 
     @classmethod
+    @transaction.atomic
     def fromVObject(cls, vObject, autocommit=False):
         """
         Contact sets its properties as specified by the supplied
@@ -705,7 +715,7 @@ class VCard(models.Model):
 
         for j in self.url_set.all():
             i = v.add('x-url')
-            i.value = j.data
+            i.value = j.dataf
 
         return v
 
@@ -715,8 +725,136 @@ class VCard(models.Model):
         """
         return self.toVObject().serialize()
 
+    def serialize(self):
+        return serialize_objs(self)
 
-class Tel(models.Model):
+    @classmethod
+    @transaction.atomic
+    def merge_model_objects(cls, primary_object, alias_objects=[], keep_old=True):
+        """
+
+        """
+        if not isinstance(alias_objects, list):
+            alias_objects = [alias_objects]
+        
+        # check that all aliases are the same class as primary one and that
+        # they are subclass of model
+        primary_class = primary_object.__class__
+        
+        if not issubclass(primary_class, Model):
+            raise TypeError('Only django.db.models.Model subclasses can be merged')
+        
+        for alias_object in alias_objects:
+            if not isinstance(alias_object, primary_class):
+                raise TypeError('Only models of same class can be merged')
+        
+        # Get a list of all GenericForeignKeys in all models
+        # TODO: this is a bit of a hack, since the generics framework should provide a similar
+        # method to the ForeignKey field for accessing the generic related fields.
+        generic_fields = []
+        for model in get_models():
+            for field_name, field in filter(lambda x: isinstance(x[1], GenericForeignKey), model.__dict__.iteritems()):
+                generic_fields.append(field)
+                
+        blank_local_fields = set([field.attname for field in primary_object._meta.local_fields if getattr(primary_object, field.attname) in [None, '']])
+        
+        # Loop through all alias objects and migrate their data to the primary object.
+        for alias_object in alias_objects:
+            # Migrate all foreign key references from alias object to primary object.
+            for related_object in alias_object._meta.get_all_related_objects():
+                try:
+                    # The variable name on the alias_object model.
+                    alias_varname = related_object.get_accessor_name()
+                    # The variable name on the related model.
+                    obj_varname = related_object.field.name
+                    related_objects = getattr(alias_object, alias_varname)
+                    for obj in related_objects.all():
+                        setattr(obj, obj_varname, primary_object)
+                        obj.save()
+                except:
+                    pass
+    
+            # Migrate all many to many references from alias object to primary object.
+            for related_many_object in alias_object._meta.get_all_related_many_to_many_objects():
+                alias_varname = related_many_object.get_accessor_name()
+                obj_varname = related_many_object.field.name
+                
+                if alias_varname is not None:
+                    # standard case
+                    related_many_objects = getattr(alias_object, alias_varname).all()
+                else:
+                    # special case, symmetrical relation, no reverse accessor
+                    related_many_objects = getattr(alias_object, obj_varname).all()
+                for obj in related_many_objects.all():
+                    getattr(obj, obj_varname).remove(alias_object)
+                    getattr(obj, obj_varname).add(primary_object)
+    
+            # Migrate all generic foreign key references from alias object to primary object.
+            for field in generic_fields:
+                filter_kwargs = {}
+                filter_kwargs[field.fk_field] = alias_object._get_pk_val()
+                filter_kwargs[field.ct_field] = field.get_content_type(alias_object)
+                for generic_related_object in field.model.objects.filter(**filter_kwargs):
+                    setattr(generic_related_object, field.name, primary_object)
+                    generic_related_object.save()
+                    
+            # Try to fill all missing values in primary object by values of duplicates
+            filled_up = set()
+            for field_name in blank_local_fields:
+                val = getattr(alias_object, field_name) 
+                if val not in [None, '']:
+                    setattr(primary_object, field_name, val)
+                    filled_up.add(field_name)
+            blank_local_fields -= filled_up
+                
+            if not keep_old:
+                alias_object.delete()
+        primary_object.save()
+        return primary_object
+
+
+    @classmethod
+    def after_save(cls, sender, instance, **kwargs):
+        cache.set(build_key(cls._meta.model_name, instance.pk), json.dumps(serialize_objs(instance), default=date_handler))
+        # TODO: each time when contact is updated vcard is recreated. So if it is the case then reinvalidate cache
+        if hasattr(instance, 'contact'):
+            contact = instance.contact
+            contact_id = contact.id
+            cached_contact = cache.get(build_key(contact.__class__._meta.model_name, contact_id))
+            if cached_contact is None:
+                return
+            cached_contact = json.loads(cached_contact)
+            old_id = cached_contact['vcard_id']
+            cached_contact['vcard_id'] = instance.pk
+            cache.set(build_key(contact.__class__._meta.model_name, contact_id), json.dumps(cached_contact, default=date_handler))
+            cache.delete(build_key(cls._meta.model_name, old_id))
+
+    @classmethod
+    def get_by_ids(cls, *ids):
+        """Get vcard by ids from cache with fallback to postgres."""
+        rv = cache.get_many([build_key(cls._meta.model_name, vcard_id) for vcard_id in ids])
+        rv = {extract_id(k, coerce=int): json.loads(v) for k, v in rv.iteritems()}
+
+        not_found_ids = [vcard_id for vcard_id in ids if not vcard_id in rv]
+        if not not_found_ids:
+            return rv.values()
+        vcards_qs = cls.objects.filter(pk__in=not_found_ids).prefetch_related(*vcard_rel_fields())
+        more_rv = serialize_objs(vcards_qs)
+        cache.set_many({build_key(cls._meta.model_name, vcard_raw['id']): json.dumps(vcard_raw, default=date_handler) for vcard_raw in more_rv})
+        return rv.values() + more_rv
+
+    @classmethod
+    def cache_all(cls):
+        vcard_qs = VCard.objects.all().prefetch_related(*vcard_rel_fields())
+        vcards_raw = serialize_objs(vcard_qs)
+        cache.set_many({build_key(cls._meta.model_name, vcard_raw['id']): json.dumps(vcard_raw, default=date_handler) for vcard_raw in vcards_raw})
+
+
+post_save.connect(VCard.after_save, sender=VCard)
+
+
+
+class Tel(SerializableModel):
     """
     A telephone number of a contact
     """
@@ -748,8 +886,12 @@ class Tel(models.Model):
         verbose_name = _("telephone number")
         verbose_name_plural = _("telephone numbers")
 
+    class SerializerMeta:
+        exclude = ['vcard']
+        alias = 'tels'
 
-class Email(models.Model):
+
+class Email(SerializableModel):
     """
     An email of a contact
     """
@@ -771,6 +913,10 @@ class Email(models.Model):
     def __unicode__(self):
         return '%s' % self.value
 
+    class SerializerMeta:
+        exclude = ['vcard']
+        alias = 'emails'
+
 
 class Geo(models.Model):
     """
@@ -787,7 +933,7 @@ class Geo(models.Model):
         verbose_name_plural = _("geographic uri's")
 
 
-class Org(models.Model):
+class Org(SerializableModel):
     """
     An organization and unit the contact is affiliated with.
     """
@@ -809,8 +955,12 @@ class Org(models.Model):
     def name(self):
         return self.organization_name
 
+    class SerializerMeta:
+        exclude = ['vcard']
+        alias = 'orgs'
 
-class Adr(models.Model):
+
+class Adr(SerializableModel):
     """
     An address
     """
@@ -865,6 +1015,10 @@ class Adr(models.Model):
         adr.save()
         return adr
 
+    class SerializerMeta:
+        exclude = ['vcard']
+        alias = 'adrs'
+
 
 class Agent(models.Model):
     """
@@ -878,7 +1032,7 @@ class Agent(models.Model):
         verbose_name_plural = _("agents")
 
 
-class Category(models.Model):
+class Category(SerializableModel):
     """
     Specifies application category information about the
     contact.  Also known as "tags".
@@ -892,6 +1046,10 @@ class Category(models.Model):
 
     def __unicode__(self):
         return self.data
+
+    class SerializerMeta:
+        exclude = ['vcard']
+        alias = 'categories'
 
 
 class Key(models.Model):
@@ -966,7 +1124,7 @@ class Nickname(models.Model):
         verbose_name_plural = _("nicknames")
 
 
-class Note(models.Model):
+class Note(SerializableModel):
     """
     Supplemental information or a comment that is
     associated with the vCard.
@@ -974,9 +1132,16 @@ class Note(models.Model):
     vcard = models.ForeignKey(VCard)
     data = models.TextField()
 
+    def __unicode__(self):
+        return self.data
+
     class Meta:
         verbose_name = _("note")
         verbose_name_plural = _("notes")
+
+    class SerializerMeta:
+        exclude = ['vcard']
+        alias = 'notes'
 
 
 # class Photo(models.Model):
@@ -1034,7 +1199,7 @@ class Role(models.Model):
 #    data = models.TextField()
 
 
-class Title(models.Model):
+class Title(SerializableModel):
     """
     The position or job of the contact
     """
@@ -1048,6 +1213,10 @@ class Title(models.Model):
     def __eq__(self, r):
         l = self
         return l.data == r.data
+
+    class SerializerMeta:
+        exclude = ['vcard']
+        alias = 'titles'
 
 
 class Tz(models.Model):
@@ -1065,7 +1234,7 @@ class Tz(models.Model):
         verbose_name_plural = _("time zones")
 
 
-class Url(models.Model):
+class Url(SerializableModel):
     """
     A Url associted with a contact.
     """
@@ -1080,3 +1249,7 @@ class Url(models.Model):
     class Meta:
         verbose_name = _("url")
         verbose_name_plural = _("url's")
+
+    class SerializerMeta:
+        exclude = ['vcard']
+        alias = 'urls'

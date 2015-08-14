@@ -11,7 +11,8 @@ from almanet.views import (
     ServiceUpdateView,
     ServiceDeleteView,
     ServiceDetailView,
-    RedirectHomeView
+    RedirectHomeView,
+    landing_form
     )
 from tastypie.api import Api
 from alm_vcard import api as vcard_api
@@ -27,17 +28,22 @@ from alm_crm.api import (
     CRMUserResource,
     ValueResource,
     ContactListResource,
+    ConstantsResource,
     AppStateResource,
+    MobileStateResource,
     SalesCycleProductStatResource,
     FilterResource,
     CommentResource,
     CustomSectionResource,
     CustomFieldResource,
+    AttachedFileResource,
+    CustomFieldValueResource,
     ReportResource,
-    AttachedFileResource
+    HashTagReferenceResource,
     )
 from alm_user.api import UserResource
 from tastypie.resources import ModelResource
+from django.views.generic import TemplateView
 from almastorage.api import SwiftContainerResource, SwiftFileResource
 
 admin.autodiscover()
@@ -61,16 +67,21 @@ v1_api.register(CRMUserResource())
 v1_api.register(UserResource())
 v1_api.register(ContactListResource())
 v1_api.register(AppStateResource())
+v1_api.register(MobileStateResource())
+v1_api.register(ConstantsResource())
 v1_api.register(SalesCycleProductStatResource())
 v1_api.register(FilterResource())
 v1_api.register(CommentResource())
 v1_api.register(CustomSectionResource())
 v1_api.register(CustomFieldResource())
+v1_api.register(CustomFieldValueResource())
 v1_api.register(MilestoneResource())
 v1_api.register(ReportResource())
 v1_api.register(SwiftContainerResource())
 v1_api.register(SwiftFileResource())
 v1_api.register(AttachedFileResource())
+v1_api.register(HashTagReferenceResource())
+
 
 urlpatterns = patterns(
     '',
@@ -96,6 +107,8 @@ urlpatterns = patterns(
     url(r'^services/service_delete/(?P<pk>\d+)/$', ServiceDeleteView.as_view(), name='service_delete'),
     url(r'^api/', include(v1_api.urls)),
     url(r'api/doc/', include('tastypie_swagger.urls', namespace='tastypie_swagger')),
+    url(r'agreement/$', TemplateView.as_view(template_name='almanet/agreement.crm.html'), name='agreement'),
+    url(r'landing_form/$', landing_form, name='landing_form'),
 
 )
 

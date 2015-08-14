@@ -1,13 +1,16 @@
-Django==1.6.5
-Fabric==1.9.0
-Pillow==2.7.0
-South==1.0
-Werkzeug==0.9.6
-argparse==1.2.1
+amqp==1.4.6
+anyjson==0.3.3
+billiard==3.3.0.20
+celery==3.1.18
 cov-core==1.13.0
 coverage==3.7.1
 data-importer==2.2.0
+<<<<<<< HEAD
 django-almastorage==0.2
+=======
+Django==1.6.5
+django-celery==3.1.16
+>>>>>>> develop
 django-configurations==0.8
 django-cors-headers==1.0.0
 django-debug-panel==0.8.0
@@ -16,27 +19,29 @@ django-extensions==1.4.9
 django-hosts==0.6
 django-mailviews==0.6.3
 django-model-utils==2.2
-# django-nose2==0.1.1
+django-nose2==0.1.1
 django-tastypie==0.12.1
+-e git+git@github.com:Rustem/django-tastypie.git@v0.12.5#egg=tastypie
 django-tastypie-swagger==0.1.2
 django-timezone-field==1.1
--e git+git@github.com:Rustem/django-vcard.git@1402d6c89378c026f2fd45f1ac8ccbfeebc0305f#egg=django_vcard-master
+git+https://github.com/Rustem/django-vcard.git@1402d6c89378c026f2fd45f1ac8ccbfeebc0305f#egg=django_vcard-master
 djrill==1.1.1
 ecdsa==0.11
 epydoc==3.0.1
+Fabric==1.9.0
 google-api-python-client==1.4.0
 httplib2==0.9
 ipython==2.3.0
 jdcal==1.0
+kombu==3.0.26
 mock==1.0.1
-# nose2==0.4.7
-# nose2-cov==1.0a4
-# -e git+git@github.com:Rustem/nose2django.git@faabed3a92b1a38f3fb96970a7eb82b4b8ab3d59#egg=nose2django-origin/hotfix/djver-incompat
+nose2==0.4.7
+nose2-cov==1.0a4
 oauth2client==1.4.6
 openpyxl==2.1.4
 paramiko==1.14.0
+Pillow==2.7.0
 pip-autoremove==0.6.0
-psycopg2==2.5.4
 pyasn1==0.1.7
 pyasn1-modules==0.0.5
 pycrypto==2.6.1
@@ -50,10 +55,16 @@ rsa==3.1.4
 selenium==2.42.1
 simplejson==3.6.5
 six==1.9.0
+South==1.0
 sqlparse==0.1.14
 tldextract==1.5.1
 uritemplate==0.6
-vobject==0.8.1c
-wsgiref==0.1.2
+vobject==0.8.1rc0
+Werkzeug==0.9.6
 xlrd==0.9.3
+<<<<<<< HEAD
 django-almastorage
+=======
+XlsxWriter==0.7.3
+django-preserialize==1.1.0
+>>>>>>> develop

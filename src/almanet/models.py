@@ -3,7 +3,10 @@ from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from django.utils.text import slugify
 from almanet.url_resolvers import reverse as almanet_reverse
+from almanet.utils.metaprogramming import SerializableModel
 from django.db.models import signals
+from django.utils import timezone
+from datetime import datetime
 
 
 class Service(models.Model):
@@ -33,6 +36,8 @@ class Subscription(models.Model):
     organization = models.ForeignKey(
         'alm_company.Company', related_name='subscriptions')
     is_active = models.BooleanField(default=True)
+    date_created = models.DateTimeField(auto_now_add=True, blank=True)
+    date_edited = models.DateTimeField(auto_now=True, blank=True)
 
     def __init__(self, *args, **kwargs):
         super(Subscription, self).__init__(*args, **kwargs)
@@ -60,6 +65,8 @@ class Subscription(models.Model):
 class SubscriptionObject(models.Model):
     subscription_id = models.IntegerField(_('subscription id'),
                                           null=True, blank=True)
+    date_created = models.DateTimeField(auto_now_add=True, blank=True)
+    date_edited = models.DateTimeField(auto_now=True, blank=True)
 
     class Meta:
         abstract = True
@@ -68,3 +75,9 @@ class SubscriptionObject(models.Model):
         if not self.subscription_id and self.owner:
             self.subscription_id = self.owner.subscription_id
         super(SubscriptionObject, self).save(**kwargs)
+
+
+class SerializableSubscriptionObject(SubscriptionObject, SerializableModel):
+
+    class Meta:
+        abstract = True

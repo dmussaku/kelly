@@ -6,7 +6,8 @@
             "user":1,
             "content_type":["alm_crm", "activity"],
             "object_id":1,
-            "date_created": "2014-09-10T00:00:00Z"
+            "date_created": "2014-09-10T00:00:00Z",
+            "date_edited": "2014-11-24T07:49:32.991Z"
         }
     },
     {
@@ -16,7 +17,8 @@
         	"user":1,
             "content_type":["alm_crm", "activity"],
         	"object_id":2,
-            "date_created": "2014-09-10T00:00:00Z"
+            "date_created": "2014-09-10T00:00:00Z",
+            "date_edited": "2014-11-24T07:49:32.991Z"
         }
     },
     {
@@ -26,7 +28,8 @@
         	"user":1,
             "content_type":["alm_crm", "activity"],
         	"object_id":3,
-            "date_created": "2014-09-10T00:00:00Z"
+            "date_created": "2014-09-10T00:00:00Z",
+            "date_edited": "2014-11-24T07:49:32.991Z"
         }
     },
     {
@@ -36,7 +39,8 @@
         	"user":1,
             "content_type":["alm_crm", "activity"],
         	"object_id":4,
-            "date_created": "2014-09-10T00:00:00Z"
+            "date_created": "2014-09-10T00:00:00Z",
+            "date_edited": "2014-11-24T07:49:32.991Z"
         }
     },
     {
@@ -46,7 +50,8 @@
             "user":1,
             "content_type":["alm_crm", "activity"],
             "object_id":5,
-            "date_created": "2014-09-10T00:00:00Z"
+            "date_created": "2014-09-10T00:00:00Z",
+            "date_edited": "2014-11-24T07:49:32.991Z"
         }
     },
 
@@ -58,7 +63,8 @@
             "user":1,
             "content_type":["alm_crm", "salescycle"],
             "object_id":1,
-            "date_created": "2014-09-10T00:00:00Z"
+            "date_created": "2014-09-10T00:00:00Z",
+            "date_edited": "2014-11-24T07:49:32.991Z"
         }
     }
 ]

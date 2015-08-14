@@ -17,7 +17,8 @@
         "owner": 1,
         "date_created": "2014-11-10T09:36:58.880Z",
         "subscription_id": 1,
-        "milestone": 1
+        "milestone": 1,
+        "date_edited": "2014-11-24T07:49:32.991Z" 
     }
 },
 {
@@ -38,7 +39,8 @@
         "owner": 1,
         "date_created": "2015-01-08T08:28:32.171Z",
         "subscription_id": 1,
-        "milestone": 2
+        "milestone": 2,
+        "date_edited": "2014-11-24T07:49:32.991Z" 
     }
 },
 {
@@ -58,7 +60,8 @@
         "date_created": "2014-11-10T09:36:58.880Z",
         "subscription_id": 1,
         "is_global": true,
-        "milestone": 3
+        "milestone": 3,
+        "date_edited": "2014-11-24T07:49:32.991Z" 
     }
 },
 {
@@ -79,7 +82,8 @@
         "date_created": "2014-11-10T09:36:58.880Z",
         "subscription_id": 1,
         "is_global": true,
-        "milestone": 4
+        "milestone": 4,
+        "date_edited": "2014-11-24T07:49:32.991Z" 
     }
 },
 {
@@ -100,7 +104,8 @@
         "date_created": "2014-11-10T09:36:58.880Z",
         "subscription_id": 1,
         "is_global": true,
-        "milestone": 5
+        "milestone": 5,
+        "date_edited": "2014-11-24T07:49:32.991Z" 
     }
 }
 ]

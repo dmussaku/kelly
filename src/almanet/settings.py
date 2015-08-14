@@ -16,7 +16,6 @@ from configurations import Configuration, pristinemethod
 from configurations.utils import uppercase_attributes
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
-
 def rel(*x):
     return os.path.join(BASE_DIR, *x)
 
@@ -86,6 +85,16 @@ def FileSettings(path):
 
 class BaseConfiguration(SubdomainConfiguration, Configuration):
 
+    # Celery settings
+
+    BROKER_URL = 'amqp://guest:guest@localhost//'
+
+    #: Only add pickle to this list if your broker is secured
+    #: from unwanted access (see userguide/security.html)
+    CELERY_ACCEPT_CONTENT = ['json']
+    CELERY_TASK_SERIALIZER = 'json'
+    CELERY_RESULT_SERIALIZER = 'json'
+
     @pristinemethod
     def reverse_lazy(viewname, **kw):
         def __inner():
@@ -97,6 +106,8 @@ class BaseConfiguration(SubdomainConfiguration, Configuration):
     TEST_RUNNER = "djnose2.TestRunner"
 
     BASE_DIR = BASE_DIR
+    TEMP_DIR = rel(BASE_DIR, 'temp_dir')
+
     # Quick-start development settings - unsuitable for production
     # See https://docs.djangoproject.com/en/1.6/howto/deployment/checklist/
 
@@ -133,6 +144,7 @@ class BaseConfiguration(SubdomainConfiguration, Configuration):
         'tastypie_swagger',
         'django_extensions',
         'almastorage',
+        'djcelery',
     )
 
     MIDDLEWARE_CLASSES = (
@@ -169,7 +181,6 @@ class BaseConfiguration(SubdomainConfiguration, Configuration):
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
             'NAME': rel('../..', 'db.sqlite3'),
-            'ATOMIC_REQUEST': True,
         },
         'test': {
             'ENGINE': 'django.db.backends.sqlite3',
@@ -333,6 +344,9 @@ class BaseConfiguration(SubdomainConfiguration, Configuration):
     SW_KEY = 'nurlan'
     SW_AUTH_URL = 'http://45.55.141.109/auth/v1.0'
     
+    RUSTEM_SETTINGS = False
+
+
 class DevConfiguration(
         FileSettings('~/.almanet/almanet.conf.py'), BaseConfiguration):
     DEBUG = True
@@ -345,10 +359,15 @@ class DevConfiguration(
     SITE_NAME = 'alma.net:8000'
     CSRF_COOKIE_DOMAIN = '.alma.net'
     CORS_ALLOW_CREDENTIALS = True
+    BROKER_URL = 'amqp://dev:dev@almasales.kz:5672//almasales/dev'
+    CELERY_RESULT_BACKEND = 'djcelery.backends.database:DatabaseBackend'
+
+    RUSTEM_SETTINGS = True
 
 
 class QAConfiguration(DevConfiguration):
     USE_PROFILER = True
+    # DEBUG_TOOLBAR_PATCH_SETTINGS = False
 
     @classmethod
     def pre_setup(cls):
@@ -387,19 +406,17 @@ class TestConfiguration(
         #     'NAME': rel('../..', 'test_db.sqlite3'),
         # },
     }
-
     DEBUG = True
 
 
 class StagingConfiguration(FileSettings('~/.almanet/almanet.conf.py'), BaseConfiguration):
     DEBUG = False
-    PARENT_HOST = 'almasales.kz:3082'
-    HOSTCONF_REGEX = r'almasales\.kz:3082'
+    PARENT_HOST = 'almasales.qa:3082'
+    HOSTCONF_REGEX = r'almasales\.qa:3082'
 
-    SITE_NAME = 'almasales.kz:3082'
-    SITE_DOMAIN = 'http://almasales.kz:3082'
-    CSRF_COOKIE_DOMAIN = '.almasales.kz'
-    SESSION_COOKIE_DOMAIN = '.almasales.kz'
+    SITE_NAME = 'almasales.qa:3082'
+    SITE_DOMAIN = 'http://almasales.qa:3082'
+    CSRF_COOKIE_DOMAIN = '.almasales.qa'
     # CORS_ORIGIN_WHITELIST = (
     #     'almasales.kz',
     #     'almacloud.almasales.kz',
@@ -422,12 +439,15 @@ class StagingConfiguration(FileSettings('~/.almanet/almanet.conf.py'), BaseConfi
     CACHES = {
         'default': {
             'BACKEND': 'django.core.cache.backends.memcached.PyLibMCCache',
-            'LOCATION': 'db.alma.net:11211'
+            'LOCATION': '127.0.0.1:11211'
         }
     }
 
-    MEDIA_ROOT = os.path.expanduser('~/.almanet/media/')
-    STATIC_ROOT = os.path.expanduser('~/.almanet/static/')
+    MEDIA_ROOT = os.path.expanduser('~/.almanet/stagemedia/')
+    STATIC_ROOT = os.path.expanduser('~/.almanet/stagestatic/')
+    BROKER_URL = 'amqp://stage:n0easyway1n@10.10.10.245:5672//almasales/stage'
+    CELERY_RESULT_BACKEND = 'djcelery.backends.database:DatabaseBackend'
+
 
 
 class DemoConfiguration(FileSettings('~/.almanet/almanet.conf.py'), BaseConfiguration):

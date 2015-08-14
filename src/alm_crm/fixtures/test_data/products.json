@@ -1,4 +1,5 @@
 [
+<<<<<<< HEAD
 {
     "pk": 1,
     "model": "alm_crm.product",
@@ -13260,3 +13261,82 @@
     }
 }
 ]
+=======
+    {
+        "pk":1,
+        "model":"alm_crm.Product",
+        "fields": {
+            "name":"p1: Microsoft Office 360",
+            "description":"Microsoft Office 360 is your new Office in everyplace where you are.",
+            "price":8900,
+            "currency":"KZT",
+            "date_created": "2014-09-10T00:00:00Z",
+            "owner": 1,
+            "subscription_id": 1,
+        "date_created": "2014-09-10T00:00:00Z",
+        "date_edited": "2014-11-24T07:49:32.991Z"
+        }
+    },
+    {
+        "pk":2,
+        "model":"alm_crm.Product",
+        "fields": {
+            "name":"p2: 1C Online (monthly)",
+            "description":"1C Online - monthly subscription",
+            "price":3000,
+            "currency":"KZT",
+            "date_created": "2014-09-10T00:00:00Z",
+            "owner": 1,
+            "subscription_id": 1,
+        "date_created": "2014-09-10T00:00:00Z",
+        "date_edited": "2014-11-24T07:49:32.991Z"
+        }
+    },
+    {
+        "pk":3,
+        "model":"alm_crm.Product",
+        "fields": {
+            "name":"p2: 1C Online (year)",
+            "description":"1C Online - year subscription",
+            "price":25000,
+            "currency":"KZT",
+            "date_created": "2014-09-10T00:00:00Z",
+            "owner": 1,
+            "subscription_id": 1,
+        "date_created": "2014-09-10T00:00:00Z",
+        "date_edited": "2014-11-24T07:49:32.991Z"
+        }
+    },
+    {
+        "pk":4,
+        "model":"alm_crm.Product",
+        "fields": {
+            "name":"p2: Paragraph Online",
+            "description":"Paragraph Online is product for lawyers",
+            "price":59000,
+            "currency":"KZT",
+            "date_created": "2014-09-10T00:00:00Z",
+            "owner": 1,
+            "subscription_id": 1,
+        "date_created": "2014-09-10T00:00:00Z",
+        "date_edited": "2014-11-24T07:49:32.991Z"
+        }
+    },
+
+    {
+        "pk":5,
+        "model":"alm_crm.Product",
+        "fields": {
+            "name":"Facebook's OculusRift",
+            "description":"Technology of Virtual 3D",
+            "price":159000,
+            "currency":"KZT",
+            "date_created": "2015-01-01T00:00:00Z",
+            "owner": 5,
+            "subscription_id": 2,
+        "date_created": "2014-09-10T00:00:00Z",
+        "date_edited": "2014-11-24T07:49:32.991Z"
+        }
+    }
+]
+>>>>>>> develop

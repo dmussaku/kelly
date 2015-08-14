@@ -10,7 +10,13 @@
         "owner": 9,
         "date_created": "2014-09-10T00:00:00Z",
         "subscription_id": 1,
+<<<<<<< HEAD
         "vcard": 21
+=======
+        "vcard": 6,
+        "date_created": "2014-09-10T00:00:00Z",
+        "date_edited": "2014-11-24T07:49:32.991Z"
+>>>>>>> develop
     }
 },
 {
@@ -24,7 +30,13 @@
         "owner": 11,
         "date_created": "2014-09-10T00:00:00Z",
         "subscription_id": 1,
+<<<<<<< HEAD
         "vcard": 22
+=======
+        "vcard": 7,
+        "date_created": "2014-09-10T00:00:00Z",
+        "date_edited": "2014-11-24T07:49:32.991Z"
+>>>>>>> develop
     }
 },
 {
@@ -38,7 +50,13 @@
         "owner": 4,
         "date_created": "2014-09-10T00:00:00Z",
         "subscription_id": 1,
+<<<<<<< HEAD
         "vcard": 23
+=======
+        "vcard": 8,
+        "date_created": "2014-09-10T00:00:00Z",
+        "date_edited": "2014-11-24T07:49:32.991Z"
+>>>>>>> develop
     }
 },
 {
@@ -52,7 +70,13 @@
         "owner": 3,
         "date_created": "2014-09-10T00:00:00Z",
         "subscription_id": 1,
+<<<<<<< HEAD
         "vcard": 24
+=======
+        "vcard": 9,
+        "date_created": "2014-09-10T00:00:00Z",
+        "date_edited": "2014-11-24T07:49:32.991Z"
+>>>>>>> develop
     }
 },
 {
@@ -66,7 +90,13 @@
         "owner": 12,
         "date_created": "2014-09-10T00:00:00Z",
         "subscription_id": 1,
+<<<<<<< HEAD
         "vcard": 25
+=======
+        "vcard": 10,
+        "date_created": "2014-09-10T00:00:00Z",
+        "date_edited": "2014-11-24T07:49:32.991Z"
+>>>>>>> develop
     }
 },
 {
@@ -80,7 +110,13 @@
         "owner": 7,
         "date_created": "2014-09-10T00:00:00Z",
         "subscription_id": 1,
+<<<<<<< HEAD
         "vcard": 26
+=======
+        "vcard": 11,
+        "date_created": "2014-09-10T00:00:00Z",
+        "date_edited": "2014-11-24T07:49:32.991Z"
+>>>>>>> develop
     }
 },
 {
@@ -94,7 +130,13 @@
         "owner": 16,
         "date_created": "2014-09-10T00:00:00Z",
         "subscription_id": 1,
+<<<<<<< HEAD
         "vcard": 27
+=======
+        "vcard": 12,
+        "date_created": "2014-09-10T00:00:00Z",
+        "date_edited": "2014-11-24T07:49:32.991Z"
+>>>>>>> develop
     }
 },
 {
@@ -108,7 +150,13 @@
         "owner": 3,
         "date_created": "2014-09-10T00:00:00Z",
         "subscription_id": 1,
+<<<<<<< HEAD
         "vcard": 28
+=======
+        "vcard": 13,
+        "date_created": "2014-09-10T00:00:00Z",
+        "date_edited": "2014-11-24T07:49:32.991Z"
+>>>>>>> develop
     }
 },
 {
@@ -122,7 +170,13 @@
         "owner": 13,
         "date_created": "2014-09-10T00:00:00Z",
         "subscription_id": 1,
+<<<<<<< HEAD
         "vcard": 29
+=======
+        "vcard": 14,
+        "date_created": "2014-09-10T00:00:00Z",
+        "date_edited": "2014-11-24T07:49:32.991Z"
+>>>>>>> develop
     }
 },
 {
@@ -136,7 +190,13 @@
         "owner": 2,
         "date_created": "2014-09-10T00:00:00Z",
         "subscription_id": 1,
+<<<<<<< HEAD
         "vcard": 30
+=======
+        "vcard": 15,
+        "date_created": "2014-09-10T00:00:00Z",
+        "date_edited": "2014-11-24T07:49:32.991Z"
+>>>>>>> develop
     }
 },
 {
@@ -150,7 +210,13 @@
         "owner": 7,
         "date_created": "2014-09-10T00:00:00Z",
         "subscription_id": 1,
+<<<<<<< HEAD
         "vcard": 31
+=======
+        "vcard": 16,
+        "date_created": "2014-09-10T00:00:00Z",
+        "date_edited": "2014-11-24T07:49:32.991Z"
+>>>>>>> develop
     }
 },
 {
@@ -163,8 +229,15 @@
         "parent": null,
         "owner": 18,
         "date_created": "2014-09-10T00:00:00Z",
+<<<<<<< HEAD
         "subscription_id": 1,
         "vcard": 32
+=======
+        "subscription_id": 2,
+        "vcard": 19,
+        "date_created": "2014-09-10T00:00:00Z",
+        "date_edited": "2014-11-24T07:49:32.991Z"
+>>>>>>> develop
     }
 },
 {
@@ -177,8 +250,15 @@
         "parent": null,
         "owner": 3,
         "date_created": "2014-09-10T00:00:00Z",
+<<<<<<< HEAD
         "subscription_id": 1,
         "vcard": 33
+=======
+        "subscription_id": 2,
+        "vcard": 20,
+        "date_created": "2014-09-10T00:00:00Z",
+        "date_edited": "2014-11-24T07:49:32.991Z"
+>>>>>>> develop
     }
 },
 {
@@ -443,6 +523,7 @@
         "parent": null,
         "owner": 6,
         "date_created": "2014-09-10T00:00:00Z",
+<<<<<<< HEAD
         "subscription_id": 1,
         "vcard": 52
     }
@@ -42753,6 +42834,12 @@
         "date_created": "2014-09-10T00:00:00Z",
         "subscription_id": 2,
         "vcard": 3084
+=======
+        "subscription_id": 2,
+        "vcard": 21,
+        "date_created": "2014-09-10T00:00:00Z",
+        "date_edited": "2014-11-24T07:49:32.991Z"
+>>>>>>> develop
     }
 }
 ]

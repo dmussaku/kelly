@@ -12,6 +12,54 @@
 
   <figure>
   <svg xmlns='http://www.w3.org/2000/svg' style='display: none;' xmlns:xlink='http://www.w3.org/1999/xlink'>
+    <symbol id='report-preloader' viewbox='0 0 40 40'>
+      <path opacity="0.2" fill="#000" d="M20.201,5.169c-8.254,0-14.946,6.692-14.946,14.946c0,8.255,6.692,14.946,14.946,14.946 s14.946-6.691,14.946-14.946C35.146,11.861,28.455,5.169,20.201,5.169z M20.201,31.749c-6.425,0-11.634-5.208-11.634-11.634 c0-6.425,5.209-11.634,11.634-11.634c6.425,0,11.633,5.209,11.633,11.634C31.834,26.541,26.626,31.749,20.201,31.749z"/>
+      <path fill="#000" d="M26.013,10.047l1.654-2.866c-2.198-1.272-4.743-2.012-7.466-2.012h0v3.312h0 C22.32,8.481,24.301,9.057,26.013,10.047z">
+        <animateTransform attributeType="xml" attributeName="transform" type="rotate" from="0 20 20" to="360 20 20" dur="0.5s"  repeatCount="indefinite"/>
+      </path>
+    </symbol>
+    <symbol id='icon-alert' viewbox='0 0 24 24'>
+      <path class='svg-currentColor' d='M12 4L4 20h16L12 4zm-1 6h2l-.5 6h-1l-.5-6zm.5 7h1v1h-1v-1z' />
+    </symbol>
+    <symbol id='icon-remove' viewbox='0 0 24 24'>
+      <path class='svg-currentColor' d='M3 5h18v2H3V5zm6-2h6l1 2H8l1-2zM5 8h14l-.5 13h-13L5 8zm1 0h12l-.5 11h-11L6 8zm3 0h1v11H9V8zm5 0h1v11h-1V8z' fill-rule='evenodd' />
+    </symbol>
+    <symbol id='icon-close' viewbox='0 0 24 24'>
+      <path class='svg-outline-currentColor' stroke-width='2' d='M4.5 4.5l15 15M19.5 4.5l-15 15' />
+    </symbol>
+    <symbol id='icon-share' viewbox='0 0 24 24'>
+      <path class='svg-outline-currentColor' stroke-width='2' d='M16 10h4v11H4V10h4' />
+      <path class='svg-outline-currentColor' stroke-width='2' d='M12 16V5' />
+      <path class='svg-outline-currentColor' stroke-width='2' d='M7.5 8L12 3.5 16.5 8' />
+    </symbol>
+    <symbol id='icon-organization' viewbox='0 0 24 24'>
+      <path class='svg-currentColor' d='M21 21H3V6l5 4V6l5 4V6l5 4V3h3v18z' />
+    </symbol>
+    <symbol id='icon-person' viewbox='0 0 24 24'>
+      <path class='svg-currentColor' d='M12 13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm0 0l9 8H3l9-8z' />
+    </symbol>
+    <symbol id='icon-file' viewbox='0 0 24 24'>
+      <path class='svg-outline-currentColor' d='M12.165 6.074l-6 6c-1 1-3.072 4.06-1.155 5.877 1.916 1.82 4.655.624 5.655-.376l8.5-8.5c1.274-1.407 1.54-3 .5-4s-2.636-.763-4 .5l-8 8c-.824 1.057-1.74 1.683-.74 2.683 1 1 1.71.127 2.74-.683l6.5-6.5' />
+    </symbol>
+    <symbol id='icon-people' viewbox='0 0 24 24'>
+      <path class='svg-currentColor' d='M13.004 12.72c-.116-.11-.23-.22-.34-.348-.744-.893-1.275-2.263-1.275-3.387C11.39 7.533 12.53 6 14.237 6c1.332 0 2.764 1.244 2.764 3.082 0 1.184-.654 2.636-1.547 3.49-.058.07-.124.113-.182.166l-.108.096.033.134c.23.85 1.275 1.14 3.37 1.69l.43.126c1.084.305 1.597.797 1.82 1.332h.008c.208.528.183 1.11.157 1.645-.008.076-.008.166-.015.24H7.49c-.007-.126-.016-.246-.032-.4-.04-.493-.083-1.006.066-1.482.182-.544.654-1.027 1.748-1.332l.42-.127c1.92-.514 2.947-.805 3.288-1.482l.108-.162-.008-.217c-.027-.026-.043-.034-.076-.08zM6.92 11.435c-.68-.566-1.226-1.66-1.226-2.583 0-1.293 1.01-2.218 2.012-2.218 1.01 0 2.07.857 2.07 2.15 0 .918-.497 2.056-1.143 2.637-.015.02-.04.044-.057.06h.075c.157.46.82.64 2.128.997.414.058.33.268.373.417-.164.357-.82.535-2.035.87l-.29.083c-.927.246-1.308.692-1.465 1.176H3.02c0-.797-.305-1.973 1.433-2.456 1.565-.425 2.327-.605 2.468-1.133z' />
+    </symbol>
+    <symbol id='icon-left-chevron' viewbox='0 0 24 24'>
+      <path class='svg-currentColor' d='M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z' />
+    </symbol>
+    <symbol id='icon-right-chevron' viewbox='0 0 24 24'>
+      <path class='svg-currentColor' d='M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z' />
+    </symbol>
+    <symbol id='icon-edit' viewBox='0 0 24 24'>
+      <path class='svg-currentColor' d='M5.648 13.913L16.564 3 21 7.44 10.09 18.35l-4.442-4.44zm-1.087 1.09L3 21l5.998-1.557-4.437-4.44z'></path>
+    </symbol>
+    <symbol id='icon-move' viewBox='0 0 24 24'>
+      <path class='svg-currentColor' d='M16.207 4.685c-1.068.973-1.17 2.658-.273 3.873l-5.29.996 1.076 1.21-5.077 4.623c-.936-.342-2.006-.164-2.766.528-1.13 1.03-1.174 2.862-.097 4.072s2.883 1.357 4.013.328c.76-.692 1.027-1.732.808-2.728l5.098-4.642 1.077 1.21 1.51-5.2c1.103 1.028 2.77 1.102 3.838.13 1.13-1.03 1.174-2.862.097-4.072s-2.883-1.357-4.013-.328zM7.01 19.435c-.68.618-1.76.53-2.408-.197-.647-.726-.62-1.825.058-2.443.68-.618 1.76-.53 2.408.197.647.727.62 1.825-.058 2.443zm12.33-11.23c-.68.618-1.76.53-2.408-.197-.647-.727-.62-1.825.058-2.443.68-.618 1.76-.53 2.408.197.647.726.62 1.825-.058 2.443z'></path>
+    </symbol>
+    <symbol id='icon-calendar' viewBox='0 0 24 24'>
+      <path class='svg-currentColor' d='M18 6V4h-2v3h-1V6H9V4H7v3H6V6H4v2h17V6h-3zM9 9h3v3H9V9zm4 0h3v3h-3V9zm4 0h3v3h-3V9zM5 13h3v3H5v-3zm4 0h3v3H9v-3zm4 0h3v3h-3v-3zm4 0h3v3h-3v-3zM5 17h3v3H5v-3zm4 0h3v3H9v-3zm4 0h3v3h-3v-3z'></path>
+    </symbol>
+
     <symbol id='move' viewbox='0 0 24 24'>
       <path class='svg-currentColor' d='M6 13v3l-4-4 4-4v3h3v2H6zm5-7H8l4-4 4 4h-3v3h-2V6zm7 5V8l4 4-4 4v-3h-3v-2h3zm-5 7h3l-4 4-4-4h3v-3h2v3z' />
     </symbol>
@@ -130,6 +178,7 @@
     <symbol id='comment' viewbox='0 0 24 24'>
       <path class='svg-currentColor' d='M20 2h-16c-1.1 0-1.99.9-1.99 2l-.01 18 4-4h14c1.1 0 2-.9 2-2v-12c0-1.1-.9-2-2-2zm-14 7h12v2h-12v-2zm8 5h-8v-2h8v2zm4-6h-12v-2h12v2z'/>
     </symbol>
+
   </svg>
 </figure>
     <div id="js-crm-app" class="body-container">
@@ -137,15 +186,19 @@
     </div>
     <script src="{% static 'js/webfont.min.js' %}"></script>
     <script>
-     WebFont.load({
-      custom: {
-        families: ['Roboto', 'Roboto Condensed'],
-        urls: ["{% static 'css/fonts.css' %}"]
-      },
-      // google: { families: [ 'Roboto:400,700:latin,cyrillic', 'Roboto+Condensed::latin,cyrillic' ] },
-      active: function(familyName, fvd) {
-      }
-    });
+    var WebFontConfig = ({
+        google: { families: [ 'Open+Sans:400,700:latin,cyrillic' ] }
+      });
+      (function() {
+        'use strict';
+        var wf = document.createElement('script');
+        wf.src = ('https:' === document.location.protocol ? 'https' : 'http') +
+                  '://ajax.googleapis.com/ajax/libs/webfont/1.5.6/webfont.js';
+        wf.type = 'text/javascript';
+        wf.async = 'true';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(wf, s);
+      })();
     </script>
 
     {% settings_value 'DEBUG' as debug_mode_on %}
@@ -155,11 +208,6 @@
     <script type="text/javascript" src="{% static 'js/bundle.min.js' %}"></script>
     {% endif %}
 
-    <!-- BEGIN JIVOSITE CODE {literal} -->
-    <script type='text/javascript'>
-    (function(){ var widget_id = 'XSu2Q2bgXq';
-    var s = document.createElement('script'); s.type = 'text/javascript'; s.async = true; s.src = '//code.jivosite.com/script/widget/'+widget_id; var ss = document.getElementsByTagName('script')[0]; ss.parentNode.insertBefore(s, ss);})();</script>
-    <!-- {/literal} END JIVOSITE CODE —>
-
+  
   </body>
 </html>

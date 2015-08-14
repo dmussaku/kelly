@@ -7,6 +7,7 @@ from timezone_field import TimeZoneField
 from almanet.models import Subscription
 from alm_vcard.models import VCard, Email
 from almastorage.utils import default_file
+from datetime import datetime
 
 class UserManager(contrib_user_manager):
     """
@@ -39,6 +40,9 @@ class User(AbstractBaseUser):
 
     userpic = models.ForeignKey('almastorage.SwiftFile', related_name='users', null=True, blank=True, 
                                 default=lambda: default_file.set_file('default_userpic.png', 'image').id)
+    userpic = models.ImageField(upload_to='userpics')
+    date_created = models.DateTimeField(auto_now_add=True, blank=True)
+    date_edited = models.DateTimeField(auto_now=True, blank=True)
 
     class Meta:
         verbose_name = _('user')
@@ -55,6 +59,10 @@ class User(AbstractBaseUser):
     @property
     def is_superuser(self):
         return self.is_admin
+
+    @property
+    def is_supervisor(self):
+        return self.get_crmuser().is_supervisor
 
     def save(self, *a, **kw):
         is_created = not hasattr(self, 'pk') or not self.pk
@@ -163,11 +171,11 @@ class User(AbstractBaseUser):
         self.save()
         return crmuser  # self.crmuser
 
-    def get_subscr_user(self, subscr_id):
+    def get_subscr_user(self, subscription_id):
         from alm_crm.models import CRMUser
         try:
             return CRMUser.objects.get(user_id=self.pk,
-                                       subscription_id=subscr_id)
+                                       subscription_id=subscription_id)
         except CRMUser.DoesNotExist:
             return None
 
