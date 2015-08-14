@@ -1,5 +1,6 @@
 {% extends "user/base.html" %}
 {% load i18n %}
+{% load static from staticfiles %}
 {% block head_title %} Login page {% endblock %}
 {% block content %}
     {{ message }}
@@ -55,7 +56,11 @@
       </div>
     </form>
             </div>
-
+    <p class="p1 text-center">
+        <a href='https://appsto.re/kz/pvzn8.i' target="_blank">
+            <img style='display:inline-block' src="{% static 'img/app_store_badge.svg' %}" />
+        </a>
+    </p>
   </div>
 
   </div>

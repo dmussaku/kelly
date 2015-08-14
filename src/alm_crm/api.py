@@ -93,6 +93,7 @@ from tastypie.utils import trailing_slash
 from django.db.models.loading import get_model
 import ast
 from datetime import datetime, timedelta
+import dateutil.parser
 import pytz
 
 from .utils.parser import text_parser
@@ -1558,9 +1559,7 @@ class ContactResource(CRMServiceModelResource):
             format=request.META.get('CONTENT_TYPE', 'application/json'))
         col_structure = data.get('col_structure')
         filename = data.get('filename')
-        ignore_first_row = data.get('ignore_first_row',"")
-        if not ignore_first_row:
-            ignore_first_row = False
+        ignore_first_row = data.get('ignore_first_row', False)
         # col_structure = request.body.get('col_structure')
         # filename = request.body.get('filename')
         # try:
@@ -1804,8 +1803,7 @@ class SalesCycleResource(CRMServiceModelResource):
         with RequestContext(self, request, allowed_methods=['post', 'get', 'put']):
             basic_bundle = self.build_bundle(request=request)
             try:
-                obj = self.cached_obj_get(bundle=basic_bundle,
-                                          **self.remove_api_resource_names(kwargs))
+                obj = SalesCycle.objects.get(id=kwargs.get('id', -1))
             except ObjectDoesNotExist:
                 return http.HttpNotFound()
             except MultipleObjectsReturned:
@@ -4028,6 +4026,18 @@ class ReportResource(Resource):
                 name='api_realtime_funnel'
             ),
             url(
+                r"^(?P<resource_name>%s)/activity_feed%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('activity_feed'),
+                name='api_activity_feed'
+            ),
+            url(
+                r"^(?P<resource_name>%s)/activity_feed/export%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('export_activity_feed'),
+                name='api_export_activity_feed'
+            ),
+            url(
                 r"^(?P<resource_name>%s)/user_report%s$" %
                 (self._meta.resource_name, trailing_slash()),
                 self.wrap_view('user_report'),
@@ -4069,6 +4079,37 @@ class ReportResource(Resource):
             request,
             report_builders.build_realtime_funnel(request.user.get_crmuser().subscription_id, data))
 
+    def activity_feed(self, request, **kwargs):
+        if request.body:
+            data = self.deserialize(
+                request, request.body,
+                format=request.META.get('CONTENT_TYPE', 'application/json'))
+        else:
+            data = {}
+
+        return self.create_response(
+            request,
+            report_builders.build_activity_feed(request.user.get_crmuser().subscription_id, data, request.user.timezone.zone))
+
+    def export_activity_feed(self, request, **kwargs):
+        with RequestContext(self, request, allowed_methods=['get']):
+            if request.GET:
+                data = {
+                    'users': [int(u_id) for u_id in request.GET.get('users', '').split(',')],
+                    'date_from': dateutil.parser.parse(request.GET.get('date_from', "")),
+                    'date_to': dateutil.parser.parse(request.GET.get('date_to', ""))
+                }
+            else:
+                data = {}
+
+            xls_file = report_builders.get_activity_feed_xls(request.user.get_crmuser().subscription_id, data, request.user.timezone.zone)
+
+            response = HttpResponse(xls_file.read(), content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+            response['Content-Disposition'] = 'attachment; filename='+'Лента событий %s.xlsx'%datetime.now().strftime("%d.%m.%y")
+            try:
+                return response
+            finally:
+                xls_file.close()
 
     def user_report(self, request, **kwargs):
         with RequestContext(self, request, allowed_methods=['post']):

@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 import re
 from alm_crm.models import (
 	SalesCycle,
@@ -14,6 +16,8 @@ from datetime import datetime
 from django.utils import timezone
 from django.db.models import Q
 import pytz
+import xlsxwriter
+from dateutil import tz
 
 def build_funnel(subscription_id, data=None):
 	data = {} if data is None else data
@@ -67,6 +71,120 @@ def build_realtime_funnel(subscription_id, data={}):
 	for m in milestones:
 		rv['funnel'][m.id] = [sc.id for sc in sc_in_funnel if sc.milestone.id == m.id]
 	return rv
+
+def build_activity_feed(subscription_id, data=None, timezone='UTC'):
+	data = {} if data is None else data
+	rv = {
+		'report_name': 'activity_feed'
+	}
+	q = Q(subscription_id=subscription_id)
+
+	if 'users' in data:
+		q &= Q(owner_id__in=data.get('users', []))
+	if 'date_from' in data:
+		q &= Q(date_created__gte=data.get('date_from', datetime.now()))
+	if 'date_to' in data:
+		q &= Q(date_created__lte=data.get('date_to', datetime.now()))
+
+	report_data = []
+	months = [
+		u'Янв', 
+		u'Фев',
+		u'Мар',
+		u'Апр',
+		u'Май',
+		u'Июн',
+		u'Июл',
+		u'Авг',
+		u'Сен',
+		u'Окт',
+		u'Ноя',
+		u'Дек'
+	]
+	cnt = 1
+
+	from_zone = tz.gettz('UTC')
+	to_zone = tz.gettz(timezone)
+
+	for activity in Activity.objects.filter(q):
+		date_created_utc = activity.date_created
+		date_created_utc = date_created_utc.replace(tzinfo=from_zone)
+		date_local = date_created_utc.astimezone(to_zone)
+		date = date_local.strftime("%H:%M, %d {%m} %y")
+		month = date.split('{')[1].split('}')[0]
+		date = date.split('{')[0]+months[int(month)-1]+date.split('}')[1]
+
+		row = {
+			'number': cnt,
+			'date': date,
+			'hashtags': [hr.hashtag.text for hr in activity.hashtags.all()],
+			'description': activity.description,
+			'contact': activity.sales_cycle.contact.vcard.fn,
+			'user': activity.owner.get_billing_user().get_full_name()
+		}
+		report_data.append(row)
+		cnt += 1
+
+	rv['report_data'] = report_data
+
+	return rv
+
+
+def get_activity_feed_xls(subscription_id, data=None, timezone='UTC'):
+	report_data = build_activity_feed(subscription_id, data, timezone)['report_data']
+
+	from  tempfile import NamedTemporaryFile
+
+	f = NamedTemporaryFile(delete=True)
+
+	workbook = xlsxwriter.Workbook(f.name)
+	worksheet = workbook.add_worksheet()
+
+	header_format = workbook.add_format({'bold': True})
+	header_format.set_border(style=1)
+	header_format.set_text_wrap()
+
+	cell_format = workbook.add_format()
+	cell_format.set_border(style=1)
+	cell_format.set_text_wrap()
+
+	worksheet.write(0, 0, u'№', header_format) 
+	worksheet.write(0, 1, u'Дата', header_format) 
+	worksheet.write(0, 2, u'Хэштеги', header_format) 
+	worksheet.write(0, 3, u'Описание', header_format) 
+	worksheet.write(0, 4, u'Наименование контакта', header_format) 
+	worksheet.write(0, 5, u'Пользователь', header_format) 
+
+	row = 1
+
+	for item in report_data:
+		hashtags = ''
+		hstg_len = len(item['hashtags']) - 1
+		for cnt, hashtag in enumerate(item['hashtags']):
+			if cnt < hstg_len:
+				hashtag = hashtag + ','
+
+			hashtags += hashtag
+
+		worksheet.write(row, 0, item['number'], cell_format) 
+		worksheet.write(row, 1, item['date'], cell_format)
+		worksheet.write(row, 2, hashtags, cell_format)
+		worksheet.write(row, 3, item['description'], cell_format)
+		worksheet.write(row, 4, item['contact'], cell_format)
+		worksheet.write(row, 5, item['user'], cell_format)
+		row+=1
+
+	worksheet.set_column(0, 0, 5)
+	worksheet.set_column(1, 1, 15)
+	worksheet.set_column(2, 2, 25)
+	worksheet.set_column(3, 3, 30)
+	worksheet.set_column(4, 4, 25)
+	worksheet.set_column(5, 5, 25)
+
+	workbook.close()
+
+	return f
+
 		
 def build_user_report(subscription_id, data):
 	user_ids=data.get('user_ids', [-1])
