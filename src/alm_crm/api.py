@@ -21,13 +21,10 @@ from .models import (
     HashTagReference,
     CustomSection,
     CustomField,
-<<<<<<< HEAD
     AttachedFile,
-=======
     CustomFieldValue,
     ImportTask,
     ErrorCell
->>>>>>> develop
     )
 from alm_vcard.api import (
     VCardResource,
@@ -2305,7 +2302,6 @@ class ActivityResource(CRMServiceModelResource):
 
     def dehydrate(self, bundle):
         crmuser = self.get_crmuser(bundle.request)
-<<<<<<< HEAD
         bundle.data['has_read'] = bundle.obj.has_read(crmuser.id)
         files = []
         for attached_file in bundle.obj.attached_files.all():
@@ -2314,9 +2310,6 @@ class ActivityResource(CRMServiceModelResource):
                             'url':attached_file.file_object.url
                         })
         bundle.data['attached_files'] = files
-=======
-        bundle.data['has_read'] = self._has_read(bundle, crmuser.id)
->>>>>>> develop
 
         # send updated contact (status was changed to LEAD)
         if bundle.data.get('obj_created'):
