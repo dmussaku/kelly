@@ -248,7 +248,6 @@ class CRMServiceModelResource(ModelResource):
         crmuser = self.get_crmuser(bundle.request)
         if crmuser:
             bundle.obj.owner = crmuser
-
         return bundle
 
     def get_bundle_list(self, obj_list, request):
@@ -278,14 +277,10 @@ class CRMServiceModelResource(ModelResource):
         return get_subscr_id(request.user_env, DEFAULT_SERVICE)
 
     def get_crmuser(self, request):
-        if hasattr(self, 'crmuser'):
-            return self.crmuser
-
         subscription_pk = self.get_crmsubscr_id(request)
-        self.crmuser = None
         if subscription_pk:
-            self.crmuser = request.user.get_subscr_user(subscription_pk)
-        return self.crmuser
+            return request.user.get_subscr_user(subscription_pk)
+        return None
 
     class Meta:
         list_allowed_methods = ['get', 'post', 'patch']
@@ -1925,11 +1920,6 @@ class SalesCycleResource(CRMServiceModelResource):
 
     def obj_create(self, bundle, **kwargs):
         bundle = super(self.__class__, self).obj_create(bundle, **kwargs)
-        if 'milestone_id' in bundle.data:
-            milestone = Milestone.objects.get(pk=bundle.data.get('milestone_id'))
-            bundle.obj.milestone = milestone
-        bundle.obj.save()
-        bundle = self.full_hydrate(bundle)
         bundle.data['obj_created'] = True
         return bundle
 
