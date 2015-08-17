@@ -435,8 +435,8 @@ class SessionObject(object):
 class SessionResource(Resource):
 
     session = fields.DictField(attribute='session', readonly=True)
-    user = fields.DictField(attribute='user', readonly=True)
-    company = fields.DictField(attribute='company', readonly=True)
+    user = fields.DictField(readonly=True)
+    company = fields.DictField(readonly=True)
 
     class Meta:
         resource_name = 'session_state'

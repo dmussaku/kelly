@@ -2208,8 +2208,7 @@ class ActivityResource(CRMServiceModelResource):
         ]
 
     def dehydrate(self, bundle):
-        crmuser = self.get_crmuser(bundle.request)
-        bundle.data['has_read'] = self._has_read(bundle, crmuser.id)
+        bundle.data['has_read'] = self._has_read(bundle, bundle.request.user.id)
 
         # send updated contact (status was changed to LEAD)
         if bundle.data.get('obj_created'):
@@ -3130,8 +3129,8 @@ class AppStateObject(object):
         self.service_slug = service_slug
         self.company = request.company
 
-        obj.constants = obj.get_constants()
-        obj.categories = obj.get_categories()
+        self.constants = self.get_constants()
+        self.categories = self.get_categories()
 
     def get_categories(self):
         return [x.data for x in Category.objects.filter(vcard__contact__company_id=self.company.id)]
@@ -3174,9 +3173,8 @@ class AppStateResource(Resource):
 
     @undocumented: Meta
     '''
-    objects = fields.DictField(attribute='objects', readonly=True)
+    categories = fields.ListField(attribute='categories', readonly=True)
     constants = fields.DictField(attribute='constants', readonly=True)
-    session = fields.DictField(attribute='session', readonly=True)
 
     class Meta:
         resource_name = 'app_state'
@@ -3316,6 +3314,7 @@ class AppStateResource(Resource):
         ... }
 
         '''
+
         return AppStateObject(service_slug=kwargs['pk'], request=bundle.request)
 
     def my_feed(self, request, **kwargs):
