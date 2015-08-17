@@ -3128,36 +3128,13 @@ class AppStateObject(object):
             return
         self.request = request
         self.service_slug = service_slug
-        self.current_user = request.user
-        self.company_id = get_subscr_id(request.user_env, service_slug)
-        self.company = request.account.company
-        self.user = request.user
+        self.company = request.company
 
-    @classmethod
-    def create_object(cls, service_slug=None, request=None):
-        obj = AppStateObject(service_slug=service_slug, request=request)
-        obj.objects = {
-            'categories': obj.get_categories(),
-            'company': obj.company,
-        }
         obj.constants = obj.get_constants()
-        obj.session = obj.get_session()
-        return obj
-
-
-    def get_company(request):
-        data = {
-            'id': self.company.id,
-            'name': self.company.name,
-            'subdomain': self.company.subdomain}
-        crmuser = User.objects.get(
-            user_id=self.company.owner.first().pk,
-            company_id=self.company_id)
-        data['owner_id'] = crmuser.pk
-        return [data]
+        obj.categories = obj.get_categories()
 
     def get_categories(self):
-        return [x.data for x in Category.objects.filter(vcard__contact__company_id=self.company_id)]
+        return [x.data for x in Category.objects.filter(vcard__contact__company_id=self.company.id)]
 
     def get_constants(self):
         return {
@@ -3180,15 +3157,6 @@ class AppStateObject(object):
                 'tel': {'types': Tel.TYPE_CHOICES},
                 'url': {'types': Url.TYPE_CHOICES}
             }
-        }
-
-    def get_session(self):
-        return {
-            'user_id': self.user.pk,
-            'session_key': self.request.session.session_key,
-            'logged_in': self.current_user.is_authenticated(),
-            'language': translation.get_language(),
-            'timezone': TIME_ZONE
         }
 
     def to_dict(self):
@@ -3348,8 +3316,7 @@ class AppStateResource(Resource):
         ... }
 
         '''
-        return AppStateObject.create_object(service_slug=kwargs['pk'],
-                              request=bundle.request)
+        return AppStateObject(service_slug=kwargs['pk'], request=bundle.request)
 
     def my_feed(self, request, **kwargs):
         '''
