@@ -248,7 +248,6 @@ class CRMServiceModelResource(ModelResource):
         crmuser = self.get_crmuser(bundle.request)
         if crmuser:
             bundle.obj.owner = crmuser
-
         return bundle
 
     def get_bundle_list(self, obj_list, request):
@@ -278,14 +277,10 @@ class CRMServiceModelResource(ModelResource):
         return get_subscr_id(request.user_env, DEFAULT_SERVICE)
 
     def get_crmuser(self, request):
-        if hasattr(self, 'crmuser'):
-            return self.crmuser
-
         subscription_pk = self.get_crmsubscr_id(request)
-        self.crmuser = None
         if subscription_pk:
-            self.crmuser = request.user.get_subscr_user(subscription_pk)
-        return self.crmuser
+            return request.user.get_subscr_user(subscription_pk)
+        return None
 
     class Meta:
         list_allowed_methods = ['get', 'post', 'patch']
@@ -803,11 +798,7 @@ class ContactResource(CRMServiceModelResource):
                             bundle=vcard_bundle,
                             **kwargs
                             )
-        # t2=time.time()-t1
-        # print "Time to finish contact hydration %s" % t2
         bundle.obj.vcard = vcard_bundle.obj
-        # t3=time.time()-t2
-        # print "Time to finish vcard hydration %s" % t3
         bundle.obj.save()
         with transaction.atomic():
             if bundle.data.get('note') and not kwargs.get('pk'):
@@ -822,8 +813,6 @@ class ContactResource(CRMServiceModelResource):
                      'contact_id':bundle.obj.id
                     }
                 )
-        # t4=time.time()-t3
-        # print "Time to finish creating share and sales_cycle objects %s" % t4
         return bundle
 
     def follow_contacts(self, request, **kwargs):
@@ -1497,8 +1486,6 @@ class ContactResource(CRMServiceModelResource):
         data = self.deserialize(
             request, request.body,
             format=request.META.get('CONTENT_TYPE', 'application/json'))
-        # print request.body
-        # data = eval(request.body)
         merged_contacts_ids = data.get("merged_contacts", [])
         merge_into_contact_id = data.get("merge_into_contact", "")
         delete_merged = data.get("merged_contacts", [])
@@ -1548,7 +1535,6 @@ class ContactResource(CRMServiceModelResource):
                     ), for_list=True
                 )  for share in response['shares']
         ]
-        # print "Time to dehydrate resources %s " % str(time.time()-t)
         return self.create_response(
                 request,
                 {
@@ -1934,11 +1920,6 @@ class SalesCycleResource(CRMServiceModelResource):
 
     def obj_create(self, bundle, **kwargs):
         bundle = super(self.__class__, self).obj_create(bundle, **kwargs)
-        if 'milestone_id' in bundle.data:
-            milestone = Milestone.objects.get(pk=bundle.data.get('milestone_id'))
-            bundle.obj.milestone = milestone
-        bundle.obj.save()
-        bundle = self.full_hydrate(bundle)
         bundle.data['obj_created'] = True
         return bundle
 

@@ -88,12 +88,13 @@ class BaseConfiguration(SubdomainConfiguration, Configuration):
     # Celery settings
 
     BROKER_URL = 'amqp://guest:guest@localhost//'
-
+    
     #: Only add pickle to this list if your broker is secured
     #: from unwanted access (see userguide/security.html)
     CELERY_ACCEPT_CONTENT = ['json']
     CELERY_TASK_SERIALIZER = 'json'
     CELERY_RESULT_SERIALIZER = 'json'
+    CELERY_RESULT_BACKEND = 'djcelery.backends.database:DatabaseBackend'
 
     @pristinemethod
     def reverse_lazy(viewname, **kw):
@@ -355,7 +356,6 @@ class DevConfiguration(
     CSRF_COOKIE_DOMAIN = '.alma.net'
     CORS_ALLOW_CREDENTIALS = True
     BROKER_URL = 'amqp://dev:dev@almasales.kz:5672//almasales/dev'
-    CELERY_RESULT_BACKEND = 'djcelery.backends.database:DatabaseBackend'
 
     RUSTEM_SETTINGS = True
 
