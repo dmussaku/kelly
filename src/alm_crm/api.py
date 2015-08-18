@@ -2691,6 +2691,7 @@ class CRMUserResource(CRMServiceModelResource):
         # WHY 'user' now 'user_id' ?
         # bundle.data['user'] = user.id
         bundle.data['userpic'] = user.userpic.url if user.userpic else ""
+        bundle.data['is_active'] = user.is_active
         return bundle
 
     def follow_unfollow(self, request, **kwargs):
