@@ -156,8 +156,8 @@ class UserResource(ModelResource):
             # file_contents = SimpleUploadedFile("%s" %(data['name']), base64.b64decode(data['pic']), content_type='image')
             # request.user.userpic.save(data['name'], file_contents, True)
             swiftfile = SwiftFile.upload_file(file_contents=base64.b64decode(data['pic']), filename=data['name'], 
-                                                content_type='image', author=request.user)
-            request.user.userpic = swiftfile
+                                                content_type='image', author=request.user, container_title='userpics')
+            request.user.userpic_obj = swiftfile
             request.user.save()
             raise ImmediateHttpResponse(
                 HttpResponse(
@@ -204,8 +204,6 @@ class UserResource(ModelResource):
 
     def dehydrate(self, bundle):
         bundle.data['crm_user_id'] = bundle.obj.get_crmuser().pk
-        if bundle.obj.userpic != None:
-            bundle.data['userpic'] = bundle.obj.userpic.url
         bundle.data['is_supervisor'] = bundle.obj.get_crmuser().is_supervisor
         return bundle
 
@@ -270,6 +268,8 @@ class UserResource(ModelResource):
     def full_dehydrate(self, bundle, for_list=False):
         bundle = super(self.__class__, self).full_dehydrate(bundle, for_list=True)
         bundle.data['unfollow_list'] = [contact.id for contact in bundle.obj.get_crmuser().unfollow_list.all()]
+        if bundle.obj.userpic_obj != None:
+            bundle.data['userpic'] = bundle.obj.userpic_obj.url
         return bundle
 
     def vcard_full_hydrate(self, bundle):

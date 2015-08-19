@@ -8,40 +8,22 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Deleting field 'User.userpic_file'
-        db.delete_column('alma_user', 'userpic_file_id')
-
-
-        # Renaming column for 'User.userpic' to match new field type.
-        db.rename_column('alma_user', 'userpic', 'userpic_id')
-        # Changing field 'User.userpic'
-        db.alter_column('alma_user', 'userpic_id', self.gf('django.db.models.fields.related.ForeignKey')(null=True, to=orm['almastorage.SwiftFile']))
-        # Adding index on 'User', fields ['userpic']
-        db.create_index('alma_user', ['userpic_id'])
+        # Deleting field 'User.userpic'
+        db.delete_column('alma_user', 'userpic')
 
 
     def backwards(self, orm):
-        # Removing index on 'User', fields ['userpic']
-        db.delete_index('alma_user', ['userpic_id'])
-
-        # Adding field 'User.userpic_file'
-        db.add_column('alma_user', 'userpic_file',
-                      self.gf('django.db.models.fields.related.ForeignKey')(related_name='users', null=True, to=orm['almastorage.SwiftFile'], blank=True),
+        # Adding field 'User.userpic'
+        db.add_column('alma_user', 'userpic',
+                      self.gf('django.db.models.fields.files.ImageField')(default='userpics/defaul_userpic.png', max_length=100),
                       keep_default=False)
 
-
-        # User chose to not deal with backwards NULL issues for 'User.userpic'
-        raise RuntimeError("Cannot reverse this migration. 'User.userpic' and its values cannot be restored.")
-        
-        # The following code is provided here to aid in writing a correct migration
-        # Renaming column for 'User.userpic' to match new field type.
-        db.rename_column('alma_user', 'userpic_id', 'userpic')
-        # Changing field 'User.userpic'
-        db.alter_column('alma_user', 'userpic', self.gf('django.db.models.fields.files.ImageField')(max_length=100))
 
     models = {
         u'alm_company.company': {
             'Meta': {'object_name': 'Company', 'db_table': "'alma_company'"},
+            'date_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'null': 'True', 'blank': 'True'}),
+            'date_edited': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'null': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'owner': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'owned_company'", 'symmetrical': 'False', 'to': u"orm['alm_user.User']"}),
@@ -57,6 +39,8 @@ class Migration(SchemaMigration):
         u'alm_user.user': {
             'Meta': {'object_name': 'User', 'db_table': "'alma_user'"},
             'company': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'users'", 'symmetrical': 'False', 'to': u"orm['alm_company.Company']"}),
+            'date_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
+            'date_edited': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
             'email': ('django.db.models.fields.EmailField', [], {'unique': 'True', 'max_length': '75'}),
             'first_name': ('django.db.models.fields.CharField', [], {'max_length': '31'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
@@ -66,7 +50,7 @@ class Migration(SchemaMigration):
             'last_name': ('django.db.models.fields.CharField', [], {'max_length': '30'}),
             'password': ('django.db.models.fields.CharField', [], {'max_length': '128'}),
             'timezone': ('timezone_field.fields.TimeZoneField', [], {'default': "'Asia/Almaty'"}),
-            'userpic': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'users'", 'null': 'True', 'to': u"orm['almastorage.SwiftFile']"}),
+            'userpic_obj': ('django.db.models.fields.related.ForeignKey', [], {'default': '10', 'related_name': "'users'", 'null': 'True', 'blank': 'True', 'to': u"orm['almastorage.SwiftFile']"}),
             'vcard': ('django.db.models.fields.related.OneToOneField', [], {'to': u"orm['alm_vcard.VCard']", 'unique': 'True', 'null': 'True', 'blank': 'True'})
         },
         u'alm_vcard.vcard': {
@@ -88,7 +72,7 @@ class Migration(SchemaMigration):
             'Meta': {'ordering': "['-date_created']", 'object_name': 'SwiftContainer', 'db_table': "'sw_container'"},
             'date_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'service_slug': ('django.db.models.fields.CharField', [], {'default': "'nurlan'", 'unique': 'True', 'max_length': '30'}),
+            'service_slug': ('django.db.models.fields.CharField', [], {'default': "'ALMASALES'", 'unique': 'True', 'max_length': '30'}),
             'title': ('django.db.models.fields.CharField', [], {'default': "'Main_container'", 'max_length': '255'})
         },
         u'almastorage.swiftfile': {
@@ -97,7 +81,7 @@ class Migration(SchemaMigration):
             'container': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'files'", 'to': u"orm['almastorage.SwiftContainer']"}),
             'content_type': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'date_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            'date_modified': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2015, 5, 6, 0, 0)', 'auto_now': 'True', 'blank': 'True'}),
+            'date_modified': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2015, 8, 19, 0, 0)', 'auto_now': 'True', 'blank': 'True'}),
             'filename': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
             'filesize': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),

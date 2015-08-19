@@ -1,27 +1,39 @@
 # -*- coding: utf-8 -*-
 from south.utils import datetime_utils as datetime
 from south.db import db
-from south.v2 import SchemaMigration
+from south.v2 import DataMigration
 from django.db import models
+from almastorage.utils.default_file import set_file
+from almastorage.models import SwiftFile
 
-
-class Migration(SchemaMigration):
+class Migration(DataMigration):
 
     def forwards(self, orm):
-        # Adding field 'User.userpic_file'
-        db.add_column('alma_user', 'userpic_file',
-                      self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='users', null=True, to=orm['almastorage.SwiftFile']),
-                      keep_default=False)
-
+        "Write your forwards methods here."
+        # Note: Don't use "from appname.models import ModelName". 
+        # Use orm.ModelName to refer to models in this application,
+        # and orm['appname.ModelName'] for models in other applications.
+        for user in orm.User.objects.all():
+            if user.userpic != None:
+                swiftfile = SwiftFile.upload_file( file_contents=user.userpic.file.read(), 
+                                                                        filename=user.userpic.name.split('/')[1], 
+                                                                        content_type='image', 
+                                                                        container_title='userpics')
+                user.userpic_obj = orm['almastorage.SwiftFile'].objects.get(id=swiftfile.id)
+                user.save()
 
     def backwards(self, orm):
-        # Deleting field 'User.userpic_file'
-        db.delete_column('alma_user', 'userpic_file_id')
-
+        "Write your backwards methods here."
+        for user in orm.User.objects.all():
+            from django.core.files.uploadedfile import SimpleUploadedFile
+            file_contents = SimpleUploadedFile(user.userpic_obj.filename, SwiftFile.objects.get(id=user.userpic_obj.id).download()[1], content_type='image')
+            user.userpic.save(user.userpic_obj.filename, file_contents, True)
 
     models = {
         u'alm_company.company': {
             'Meta': {'object_name': 'Company', 'db_table': "'alma_company'"},
+            'date_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'null': 'True', 'blank': 'True'}),
+            'date_edited': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'null': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'owner': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'owned_company'", 'symmetrical': 'False', 'to': u"orm['alm_user.User']"}),
@@ -37,6 +49,8 @@ class Migration(SchemaMigration):
         u'alm_user.user': {
             'Meta': {'object_name': 'User', 'db_table': "'alma_user'"},
             'company': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'users'", 'symmetrical': 'False', 'to': u"orm['alm_company.Company']"}),
+            'date_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
+            'date_edited': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
             'email': ('django.db.models.fields.EmailField', [], {'unique': 'True', 'max_length': '75'}),
             'first_name': ('django.db.models.fields.CharField', [], {'max_length': '31'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
@@ -47,7 +61,7 @@ class Migration(SchemaMigration):
             'password': ('django.db.models.fields.CharField', [], {'max_length': '128'}),
             'timezone': ('timezone_field.fields.TimeZoneField', [], {'default': "'Asia/Almaty'"}),
             'userpic': ('django.db.models.fields.files.ImageField', [], {'max_length': '100'}),
-            'userpic_file': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'users'", 'null': 'True', 'to': u"orm['almastorage.SwiftFile']"}),
+            'userpic_obj': ('django.db.models.fields.related.ForeignKey', [], {'default': '10', 'related_name': "'users'", 'null': 'True', 'blank': 'True', 'to': u"orm['almastorage.SwiftFile']"}),
             'vcard': ('django.db.models.fields.related.OneToOneField', [], {'to': u"orm['alm_vcard.VCard']", 'unique': 'True', 'null': 'True', 'blank': 'True'})
         },
         u'alm_vcard.vcard': {
@@ -69,7 +83,7 @@ class Migration(SchemaMigration):
             'Meta': {'ordering': "['-date_created']", 'object_name': 'SwiftContainer', 'db_table': "'sw_container'"},
             'date_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'service_slug': ('django.db.models.fields.CharField', [], {'default': "'nurlan'", 'unique': 'True', 'max_length': '30'}),
+            'service_slug': ('django.db.models.fields.CharField', [], {'default': "'ALMASALES'", 'unique': 'True', 'max_length': '30'}),
             'title': ('django.db.models.fields.CharField', [], {'default': "'Main_container'", 'max_length': '255'})
         },
         u'almastorage.swiftfile': {
@@ -77,13 +91,15 @@ class Migration(SchemaMigration):
             'author': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'files_set'", 'null': 'True', 'to': u"orm['alm_user.User']"}),
             'container': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'files'", 'to': u"orm['almastorage.SwiftContainer']"}),
             'content_type': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'date_created': ('django.db.models.fields.DateTimeField', [], {}),
-            'date_modified': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2015, 5, 6, 0, 0)', 'auto_now': 'True', 'blank': 'True'}),
+            'date_created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
+            'date_modified': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2015, 8, 19, 0, 0)', 'auto_now': 'True', 'blank': 'True'}),
             'filename': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
             'filesize': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'key': ('django.db.models.fields.CharField', [], {'max_length': '40'}),
             'temp_url': ('django.db.models.fields.CharField', [], {'max_length': '255'})
         }
     }
 
-    complete_apps = ['alm_user']
+    complete_apps = ['almastorage', 'alm_user']
+    symmetrical = True

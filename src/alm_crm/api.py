@@ -2307,7 +2307,7 @@ class ActivityResource(CRMServiceModelResource):
         for attached_file in bundle.obj.attached_files.all():
             files.append({
                             'filename':attached_file.file_object.filename,
-                            'url':attached_file.file_object.url
+                            'swiftfile_id':attached_file.file_object.id
                         })
         bundle.data['attached_files'] = files
 
@@ -2447,6 +2447,13 @@ class ActivityResource(CRMServiceModelResource):
         if 'need_preparation' in bundle.data:
             act.need_preparation = bundle.data.get('need_preparation')
         act.save()
+
+        if 'files' in bundle.data:
+            for file_data in bundle.data['files']:
+                att_file = AttachedFile.objects.get(id=file_data['file_id'])
+                att_file.object_id = act.id
+                att_file.save()
+
         text_parser(base_text=act.description, content_class=act.__class__,
                     object_id=act.id)
         if bundle.data.get('feedback_status'):
@@ -2478,6 +2485,11 @@ class ActivityResource(CRMServiceModelResource):
                 bundle.obj.sales_cycle = sales_cycle
                 bundle.obj.save()
         bundle.obj.save()
+        if 'files' in bundle.data:
+            for file_data in bundle.data['files']:
+                att_file = AttachedFile.objects.get(id=file_data['file_id'])
+                att_file.object_id = bundle.obj.id
+                att_file.save()
         text_parser(base_text=bundle.obj.description, content_class=bundle.obj.__class__,
                     object_id=bundle.obj.id)
         return bundle
@@ -2701,7 +2713,7 @@ class CRMUserResource(CRMServiceModelResource):
 
         # WHY 'user' now 'user_id' ?
         # bundle.data['user'] = user.id
-        bundle.data['userpic'] = user.userpic.url if user.userpic else ""
+        bundle.data['userpic'] = user.userpic_obj.url if user.userpic_obj else ""
         return bundle
 
     def follow_unfollow(self, request, **kwargs):
@@ -2991,47 +3003,56 @@ class AttachedFileResource(CRMServiceModelResource):
         Activity: ActivityResource
     }, 'content_object')
 
+    swiftfile_id = fields.IntegerField(attribute='file_object_id', readonly=True)
+
     class Meta(CommonMeta):
         queryset = AttachedFile.objects.all()
-        resource_name = 'attached_file'
+        resource_name = 'files'
 
     def prepend_urls(self):
         return [
             url(
-                r"^(?P<resource_name>%s)/attach_files%s$" %
+                r"^(?P<resource_name>%s)/attach%s$" %
                 (self._meta.resource_name, trailing_slash()),
-                self.wrap_view('attach_files'),
-                name='api_attach_files'
+                self.wrap_view('attach_file'),
+                name='api_attach_file'
             )
         ]
 
-    def attach_files(self, request, **kwargs):
+    def deserialize(self, request, data, format=None):
+        if not format:
+            format = request.META.get('CONTENT_TYPE', 'application/json')
+
+        if format.startswith('multipart'):
+            data = request.POST.copy()
+            return data
+
+        return super(self.__class__, self).deserialize(request, data, format)
+
+    def attach_file(self, request, **kwargs):
         with RequestContext(self, request, allowed_methods=['post']):
-            request_data = self.deserialize(
-            request, request.body,
-            format=request.META.get('CONTENT_TYPE', 'application/json'))
+            data = self.deserialize(request, request.body, format=request.META.get('CONTENT_TYPE', 'application/json'))
+            try:
+                swiftfile = SwiftFile.upload_file(file_contents=request.FILES['file'],
+                                                    filename=data['name'], 
+                                                    content_type=data['type'], 
+                                                    author=request.user)
+            except Exception as e:
+                return http.HttpApplicationError(e.message)
 
-            files = []
-            
-            for data in request_data['files']:
-                swiftfile = SwiftFile.upload_file(file_contents=base64.b64decode(data['file_content']),
-                                    filename=data['filename'], 
-                                    content_type=data['content_type'], author=request.user)
-                attached_file = AttachedFile.build_new( file_object=swiftfile, 
-                                        content_class=ContentType.objects.get(app_label='alm_crm', 
-                                                    model=request_data['content_class'].lower()).model_class(),
-                                        object_id=request_data['object_id'], 
-                                        save=True)
-                file_dict = {
-                                'filename': swiftfile.filename,
-                                'url': swiftfile.url
-                            }
-                files.append(file_dict)
+            attached_file = AttachedFile.build_new( file_object=swiftfile, 
+                                                content_class=ContentType.objects.get(app_label='alm_crm', 
+                                                model=data['content_class'].lower()).model_class(),
+                                                object_id=None,
+                                                save=True)
 
-            return self.create_response(request, {
-                            'object_id': request_data['object_id'],
-                            'content_class': request_data['content_class'],
-                            'files': files}, response_class=http.HttpCreated)
+            return self.create_response(request,
+                                        {
+                                            'file_id': attached_file.id, 
+                                            'swiftfile_id': swiftfile.id,
+                                            'filename': data['name']
+                                        }, 
+                                        response_class=http.HttpCreated)
 
 
 class ContactListResource(CRMServiceModelResource):

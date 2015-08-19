@@ -38,9 +38,8 @@ class User(AbstractBaseUser):
 
     vcard = models.OneToOneField(VCard, blank=True, null=True)
 
-    # userpic = models.ForeignKey('almastorage.SwiftFile', related_name='users', null=True, blank=True, 
-    #                             default=lambda: default_file.set_file('default_userpic.png', 'image').id)
-    userpic = models.ImageField(upload_to='userpics')
+    userpic_obj = models.ForeignKey('almastorage.SwiftFile', related_name='users', 
+                                default=lambda: default_file.set_file('default_userpic.png', 'image', container_title='userpics').id)
     date_created = models.DateTimeField(auto_now_add=True, blank=True)
     date_edited = models.DateTimeField(auto_now=True, blank=True)
 

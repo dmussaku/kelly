@@ -2123,8 +2123,8 @@ class Comment(SubscriptionObject):
 class AttachedFile(SubscriptionObject):
     file_object = models.ForeignKey('almastorage.SwiftFile', related_name='attachments')
     owner = models.ForeignKey(CRMUser, related_name='owned_attachments', null=True)
-    content_type = models.ForeignKey(ContentType)
-    object_id = models.IntegerField()
+    content_type = models.ForeignKey(ContentType, null=True, blank=True)
+    object_id = models.IntegerField(null=True, blank=True)
     content_object = generic.GenericForeignKey('content_type', 'object_id')
 
     def __unicode__(self):
@@ -2133,6 +2133,13 @@ class AttachedFile(SubscriptionObject):
     @property
     def author(self):
         return self.owner
+
+    @property
+    def is_active(self):
+        if self.content_object == None:
+            return False
+        
+        return True
 
     @classmethod
     def build_new(cls, file_object, content_class=None,
@@ -2148,6 +2155,12 @@ class AttachedFile(SubscriptionObject):
         if not self.subscription_id and self.content_object:
             self.subscription_id = self.content_object.owner.subscription_id
         super(SubscriptionObject, self).save(**kwargs)
+
+def delete_related_file_objs(sender, instance, **kwargs):
+    file_obj = instance.file_object
+    file_obj.delete()
+
+signals.post_delete.connect(delete_related_file_objs, sender=AttachedFile)
 
 
 class Share(SubscriptionObject):
