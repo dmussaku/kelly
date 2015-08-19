@@ -2391,7 +2391,7 @@ class ActivityResource(CRMServiceModelResource):
                         owner_id=new_activity.author_id)
                     new_activity.feedback.save()
 
-                new_activity.spray(self.get_crmsubscr_id(request))
+                new_activity.spray(request.user.get_crmuser().subscription_id)
 
                 text_parser(base_text=new_activity.description, 
                             content_class=new_activity.__class__,
