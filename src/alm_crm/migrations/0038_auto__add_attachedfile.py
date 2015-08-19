@@ -7,6 +7,11 @@ from django.db import models
 
 class Migration(SchemaMigration):
 
+    depends_on = (
+        ("almastorage", "0002_auto__del_unique_swiftcontainer_service_slug"),
+        ("alm_crm", "0021_auto__add_attachedfile"),
+    )
+
     def forwards(self, orm):
         # Changing field 'AttachedFile.object_id'
         db.alter_column(u'alm_crm_attachedfile', 'object_id', self.gf('django.db.models.fields.IntegerField')(null=True, blank=True))

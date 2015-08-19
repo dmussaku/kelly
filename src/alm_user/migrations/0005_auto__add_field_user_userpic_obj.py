@@ -7,6 +7,10 @@ from django.db import models
 
 class Migration(SchemaMigration):
 
+    depends_on = (
+        ("almastorage", "0002_auto__del_unique_swiftcontainer_service_slug"),
+    )
+
     def forwards(self, orm):
         # Adding field 'User.userpic_obj'
         db.add_column('alma_user', 'userpic_obj',
