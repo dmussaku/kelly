@@ -2365,7 +2365,7 @@ class ActivityResource(CRMServiceModelResource):
             request, {'success': rv})
 
     def create_multiple(self, request, **kwargs):
-        with RequestContext(self, request, allowed_methods['post']):
+        with RequestContext(self, request, allowed_methods=['post']):
             data = self.deserialize(request, request.body,
                                     format = request.META.get('CONTENT_TYPE', 'application/json'))
 
