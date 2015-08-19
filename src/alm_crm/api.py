@@ -2370,6 +2370,7 @@ class ActivityResource(CRMServiceModelResource):
                                     format = request.META.get('CONTENT_TYPE', 'application/json'))
 
             new_activities_list = []
+            subscription_id = self.get_crmsubscr_id(request)
 
             for new_activity_data in data:
                 new_activity = Activity()
@@ -2391,13 +2392,14 @@ class ActivityResource(CRMServiceModelResource):
                         owner_id=new_activity.author_id)
                     new_activity.feedback.save()
 
-                new_activity.spray(request.user.get_crmuser().subscription_id)
+
+                new_activity.spray(subscription_id)
 
                 text_parser(base_text=new_activity.description, 
                             content_class=new_activity.__class__,
                             object_id=new_activity.id)
                 
-                new_activities_list.append(self.full_dehydrate(self.build_bundle(obj=new_activity)))
+                new_activities_list.append(self.full_dehydrate(self.build_bundle(obj=new_activity, request=request)))
 
             return self.create_response(request, new_activities_list, response_class=http.HttpCreated)
 
