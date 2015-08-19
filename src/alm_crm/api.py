@@ -2252,6 +2252,12 @@ class ActivityResource(CRMServiceModelResource):
                 name='api_my_activities'
             ),
             url(
+                r"^(?P<resource_name>%s)/create_multiple%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('create_multiple'),
+                name='api_create_multiple'
+            ),
+            url(
                 r"^(?P<resource_name>%s)/company_activities%s$" %
                 (self._meta.resource_name, trailing_slash()),
                 self.wrap_view('get_company_activities'),
@@ -2357,6 +2363,43 @@ class ActivityResource(CRMServiceModelResource):
             rv = len(data)
         return self.create_response(
             request, {'success': rv})
+
+    def create_multiple(self, request, **kwargs):
+        with RequestContext(self, request, allowed_methods['post']):
+            data = self.deserialize(request, request.body,
+                                    format = request.META.get('CONTENT_TYPE', 'application/json'))
+
+            new_activities_list = []
+
+            for new_activity_data in data:
+                new_activity = Activity()
+                new_activity.author_id = new_activity_data.get('author_id')
+                new_activity.description = new_activity_data.get('description')
+                new_activity.sales_cycle_id = new_activity_data.get('sales_cycle_id')
+                new_activity.assignee_id = new_activity_data.get('assignee_id')
+
+                if 'deadline' in new_activity_data:
+                    new_activity.deadline = new_activity_data.get('deadline')
+
+                if 'need_preparation' in new_activity_data:
+                    new_activity.need_preparation = new_activity_data.get('need_preparation')
+                new_activity.save()
+                
+                if new_activity_data.get('feedback_status'):
+                    new_activity.feedback = Feedback(
+                        status=new_activity_data.get('feedback_status', None),
+                        owner_id=new_activity.author_id)
+                    new_activity.feedback.save()
+
+                new_activity.spray(self.get_crmsubscr_id(bundle.request))
+
+                text_parser(base_text=new_activity.description, 
+                            content_class=new_activity.__class__,
+                            object_id=new_activity.id)
+                
+                new_activities_list.append(self.full_dehydrate(self.build_bundle(obj=new_activity)))
+
+            return self.create_response(request, new_activities_list, response_class=http.HttpCreated)
 
     def finish_activity(self, request, **kwargs):
         with RequestContext(self, request, allowed_methods=['post']):
