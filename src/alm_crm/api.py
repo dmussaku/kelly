@@ -98,6 +98,7 @@ from .utils.data_processing import (
     processing_custom_field_data,
     )
 from alm_vcard.serializer import serialize_objs
+from almanet.utils.api import CommonMeta
 
 import base64
 import simplejson as json
@@ -189,31 +190,6 @@ class CustomToManyField(fields.ToManyField):
     def build_related_resource(self, value, request=None, related_obj=None, related_name=None):
         return super(self.__class__, self).build_related_resource(value, request=request,
             related_obj=related_obj, related_name=related_name)
-
-
-class DummyPaginator(object):
-    def __init__(self, request_data, objects, resource_uri=None,
-                 limit=None, offset=0, max_limit=1000,
-                 collection_name='objects'):
-        self.objects = objects
-        self.collection_name = collection_name
-
-    def page(self):
-        return {self.collection_name: self.objects}
-
-
-class CommonMeta:
-    list_allowed_methods = ['get', 'post', 'patch']
-    detail_allowed_methods = ['get', 'post', 'put', 'delete', 'patch']
-    authentication = MultiAuthentication(SessionAuthentication())
-    authorization = Authorization()
-    
-    if not settings.RUSTEM_SETTINGS:
-        paginator_class = DummyPaginator
-    
-    filtering = {
-        'date_edited': ALL_WITH_RELATIONS
-    }
 
 
 class CRMServiceModelResource(ModelResource):

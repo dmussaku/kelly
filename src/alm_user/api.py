@@ -17,6 +17,7 @@ from django.core.exceptions import PermissionDenied
 from django.conf.urls import url
 from django.utils import translation
 from django.http import HttpResponse
+from django.db.models import Q
 
 from .models import User
 from alm_vcard.models import *
@@ -28,7 +29,7 @@ from tastypie.authentication import (
     )
 
 from almanet.settings import DEFAULT_SERVICE, TIME_ZONE
-from almanet.utils.api import RequestContext
+from almanet.utils.api import RequestContext, CommonMeta
 from almanet.utils.env import get_subscr_id
 import json
 import datetime
@@ -102,18 +103,18 @@ class UserResource(ModelResource):
     '''
     vcard = fields.ToOneField('alm_vcard.api.VCardResource', 'vcard', null=True, full=True)
 
-    class Meta:
+    class Meta(CommonMeta):
         queryset = User.objects.all()
         excludes = ['password', 'is_admin']
         list_allowed_methods = ['get', 'patch']
         detail_allowed_methods = ['get', 'patch']
         resource_name = 'user'
-        authentication = MultiAuthentication(
-            OpenAuthEndpoint(),
-            BasicAuthentication(),
-            SessionAuthentication()
-            )
-        authorization = Authorization()
+
+    def apply_filters(self, request, applicable_filters):
+        user_ids = [acc.user_id for acc in request.company.accounts.all()]
+        q = Q(id__in=user_ids)
+        objects = super(ModelResource, self).apply_filters(request, applicable_filters)
+        return objects.filter(q)
 
     def prepend_urls(self):
         return [
