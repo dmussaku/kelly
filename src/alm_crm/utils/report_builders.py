@@ -14,13 +14,13 @@ from django.utils import timezone
 from django.db.models import Q
 import pytz
 
-def build_funnel(subscription_id, data=None):
+def build_funnel(company_id, data=None):
 	data = {} if data is None else data
 	rv = {
 		'report_name': 'funnel'
 	}
 	q = Q(products__isnull=False,
-			subscription_id=subscription_id,
+			company_id=company_id,
 			is_global=False)
 	
 	if 'products' in data:
@@ -31,7 +31,7 @@ def build_funnel(subscription_id, data=None):
 	rv['total'] = len(sales_cycles)
 	rv['undefined'] = len(filter(lambda sc: sc.milestone == None, sales_cycles))
 	rv['funnel'] = {}
-	milestones = Milestone.objects.filter(subscription_id=subscription_id)
+	milestones = Milestone.objects.filter(company_id=company_id)
 	system_milestones = milestones.filter(is_system__in=[1,2]).order_by('is_system')
 	milestones = milestones.exclude(is_system__in=[1,2]).order_by('sort')
 	sc_in_funnel = [sc for sc in sales_cycles if sc.milestone != None]
@@ -42,12 +42,12 @@ def build_funnel(subscription_id, data=None):
 		rv['funnel'][m.id] = [sc.id for sc in sales_cycles if sc.milestone.id == m.id]
 	return rv
 
-def build_realtime_funnel(subscription_id, data={}):
+def build_realtime_funnel(company_id, data={}):
 	rv = {
 		'report_name': 'realtime_funnel'
 	}
 	q = Q(products__isnull=False,
-			subscription_id=subscription_id,
+			company_id=company_id,
 			is_global=False)
 	
 	if 'products' in data:
@@ -60,7 +60,7 @@ def build_realtime_funnel(subscription_id, data={}):
 	rv['undefined'] = len(filter(lambda sc: sc.milestone == None, sales_cycles))
 	
 	rv['funnel'] = {}
-	milestones = Milestone.objects.filter(subscription_id=subscription_id)
+	milestones = Milestone.objects.filter(company_id=company_id)
 	
 	sc_in_funnel = [sc for sc in sales_cycles if sc.milestone != None]
 	for m in milestones:
@@ -119,7 +119,7 @@ def build_user_report(subscription_id, data):
 		'to_date': to_date}
 	return user_report
 
-def build_product_report(subscription_id, data):
+def build_product_report(company_id, data):
 	product_ids=data.get('products', [-1])
 	print product_ids
 	from_date=data.get('from_date', None)
@@ -130,16 +130,16 @@ def build_product_report(subscription_id, data):
 	if to_date == None:
 		to_date = datetime.now().replace(tzinfo=pytz.UTC)
 
-	products_amount = len(product_ids) if len(product_ids) > 1 else Product.objects.filter(subscription_id=subscription_id).count()
+	products_amount = len(product_ids) if len(product_ids) > 1 else Product.objects.filter(company_id=company_id).count()
 	open_sales_cycles = SalesCycle.objects.filter(
 							products__in = product_ids if product_ids[0] != -1 
-							else Product.objects.filter(subscription_id=subscription_id).values_list('id', flat=True),
+							else Product.objects.filter(company_id=company_id).values_list('id', flat=True),
 							milestone__is_system=0, is_global=False, date_created__range=(from_date, to_date)
 						)
 
 	closed_sales_cycles = SalesCycle.objects.filter(
 								products__in = product_ids if product_ids[0] != -1 
-								else Product.objects.filter(subscription_id=subscription_id).values_list('id', flat=True),
+								else Product.objects.filter(company_id=company_id).values_list('id', flat=True),
 								milestone__is_system__in=[1,2],
 								is_global=False, date_created__range=(from_date, to_date)
 							)
@@ -150,9 +150,9 @@ def build_product_report(subscription_id, data):
 	
 
 	if product_ids == [-1]:
-		products = Product.objects.filter(subscription_id=subscription_id, date_created__range=(from_date, to_date))
+		products = Product.objects.filter(company_id=company_id, date_created__range=(from_date, to_date))
 	else:
-		products = Product.objects.filter(subscription_id=subscription_id, id__in=product_ids, date_created__range=(from_date, to_date))
+		products = Product.objects.filter(company_id=company_id, id__in=product_ids, date_created__range=(from_date, to_date))
 
 	product_stat_array = []
 

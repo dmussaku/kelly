@@ -1,4 +1,5 @@
 from contextlib import contextmanager
+from django.middleware.csrf import _sanitize_token, constant_time_compare
 from tastypie.authentication import Authentication, MultiAuthentication
 from tastypie.authorization import Authorization
 from tastypie.constants import ALL, ALL_WITH_RELATIONS
