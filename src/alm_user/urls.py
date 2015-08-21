@@ -13,12 +13,6 @@ login_url = reverse_lazy('user_login')
 
 urlpatterns = patterns(
     '',
-    # url(r'^list/$', UserListView.as_view(
-    #     model=User,
-    #     template_name='user/user_list.html',
-    #     queryset=User.objects.all()), name='user_list'),
-    # url(r'^signup/$', UserRegistrationView.as_view(),
-    #     name='user_registration'),
     url(r'^signin/$',
         login_view, {'template_name': 'user/user_login.html'},
         name='user_login'),

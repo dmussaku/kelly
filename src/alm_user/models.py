@@ -180,7 +180,7 @@ class User(AbstractBaseUser):
         '''
         Returns a company taken from request
         '''
-        return
+        return request.company
 '''
     def connect_service(self, service):
         co = self.company.first()

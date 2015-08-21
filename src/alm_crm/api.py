@@ -98,6 +98,7 @@ from .utils.data_processing import (
     processing_custom_field_data,
     )
 from alm_vcard.serializer import serialize_objs
+from almanet.utils.api import CommonMeta
 
 import base64
 import simplejson as json
@@ -189,31 +190,6 @@ class CustomToManyField(fields.ToManyField):
     def build_related_resource(self, value, request=None, related_obj=None, related_name=None):
         return super(self.__class__, self).build_related_resource(value, request=request,
             related_obj=related_obj, related_name=related_name)
-
-
-class DummyPaginator(object):
-    def __init__(self, request_data, objects, resource_uri=None,
-                 limit=None, offset=0, max_limit=1000,
-                 collection_name='objects'):
-        self.objects = objects
-        self.collection_name = collection_name
-
-    def page(self):
-        return {self.collection_name: self.objects}
-
-
-class CommonMeta:
-    list_allowed_methods = ['get', 'post', 'patch']
-    detail_allowed_methods = ['get', 'post', 'put', 'delete', 'patch']
-    authentication = MultiAuthentication(SessionAuthentication())
-    authorization = Authorization()
-    
-    if not settings.RUSTEM_SETTINGS:
-        paginator_class = DummyPaginator
-    
-    filtering = {
-        'date_edited': ALL_WITH_RELATIONS
-    }
 
 
 class CRMServiceModelResource(ModelResource):
@@ -2208,7 +2184,6 @@ class ActivityResource(CRMServiceModelResource):
         ]
 
     def dehydrate(self, bundle):
-        # crmuser = self.get_crmuser(bundle.request)
         bundle.data['has_read'] = self._has_read(bundle, bundle.request.user.id)
 
         # send updated contact (status was changed to LEAD)
@@ -3128,36 +3103,13 @@ class AppStateObject(object):
             return
         self.request = request
         self.service_slug = service_slug
-        self.current_user = request.user
-        self.company_id = request.account.company.id
-        self.company = request.account.company
-        self.user = request.user
+        self.company = request.company
 
-    @classmethod
-    def create_object(cls, service_slug=None, request=None):
-        obj = AppStateObject(service_slug=service_slug, request=request)
-        obj.objects = {
-            'categories': obj.get_categories(),
-            'company': obj.company,
-        }
-        obj.constants = obj.get_constants()
-        obj.session = obj.get_session()
-        return obj
-
-
-    def get_company(request):
-        data = {
-            'id': self.company.id,
-            'name': self.company.name,
-            'subdomain': self.company.subdomain}
-        crmuser = User.objects.get(
-            user_id=self.company.owner.first().pk,
-            company_id=self.company_id)
-        data['owner_id'] = crmuser.pk
-        return [data]
+        self.constants = self.get_constants()
+        self.categories = self.get_categories()
 
     def get_categories(self):
-        return [x.data for x in Category.objects.filter(vcard__contact__company_id=self.company_id)]
+        return [x.data for x in Category.objects.filter(vcard__contact__company_id=self.company.id)]
 
     def get_constants(self):
         return {
@@ -3182,15 +3134,6 @@ class AppStateObject(object):
             }
         }
 
-    def get_session(self):
-        return {
-            'user_id': self.user.pk,
-            'session_key': self.request.session.session_key,
-            'logged_in': self.current_user.is_authenticated(),
-            'language': translation.get_language(),
-            'timezone': TIME_ZONE
-        }
-
     def to_dict(self):
         return self._data
 
@@ -3206,9 +3149,8 @@ class AppStateResource(Resource):
 
     @undocumented: Meta
     '''
-    objects = fields.DictField(attribute='objects', readonly=True)
+    categories = fields.ListField(attribute='categories', readonly=True)
     constants = fields.DictField(attribute='constants', readonly=True)
-    session = fields.DictField(attribute='session', readonly=True)
 
     class Meta:
         resource_name = 'app_state'
@@ -3348,8 +3290,8 @@ class AppStateResource(Resource):
         ... }
 
         '''
-        return AppStateObject.create_object(service_slug=kwargs['pk'],
-                              request=bundle.request)
+
+        return AppStateObject(service_slug=kwargs['pk'], request=bundle.request)
 
     def my_feed(self, request, **kwargs):
         '''

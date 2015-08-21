@@ -50,8 +50,8 @@ CURRENCY_OPTIONS = (
     ('KZT', 'Tenge'),
 )
 
-GLOBAL_CYCLE_TITLE = 'Основной поток'
-GLOBAL_CYCLE_DESCRIPTION = 'Автоматически созданный цикл'
+GLOBAL_CYCLE_TITLE = u'Основной поток'
+GLOBAL_CYCLE_DESCRIPTION = u'Автоматически созданный цикл'
 
 def type_cast(input):
     return input if type(input) != float else str(input)
@@ -74,15 +74,15 @@ class Milestone(SubscriptionObject):
     @classmethod
     def create_default_milestones(cls, company_id):
         milestones = []
-        default_data = [{'title':'Звонок/Заявка', 'color_code': '#F4B59C', 'is_system':0, 'sort':1},
-                        {'title':'Отправка КП', 'color_code': '#F59CC8', 'is_system':0, 'sort':2},
-                        {'title':'Согласование договора', 'color_code': '#A39CF4', 'is_system':0, 'sort':3},
-                        {'title':'Выставление счета', 'color_code': '#9CE5F4', 'is_system':0, 'sort':4},
-                        {'title':'Контроль оплаты', 'color_code': '#9CF4A7', 'is_system':0, 'sort':5},
-                        {'title':'Предоставление услуги', 'color_code': '#D4F49B', 'is_system':0, 'sort':6},
-                        {'title':'Upsales', 'color_code': '#F4DC9C', 'is_system':0, 'sort':7},
-                        {'title':'Успешно завершено', 'color_code':'#9CF4A7', 'is_system':1, 'sort':8},
-                        {'title':'Не реализовано', 'color_code':'#F4A09C', 'is_system':2, 'sort':9}]
+        default_data = [{'title':u'Звонок/Заявка', 'color_code': '#F4B59C', 'is_system':0, 'sort':1},
+                        {'title':u'Отправка КП', 'color_code': '#F59CC8', 'is_system':0, 'sort':2},
+                        {'title':u'Согласование договора', 'color_code': '#A39CF4', 'is_system':0, 'sort':3},
+                        {'title':u'Выставление счета', 'color_code': '#9CE5F4', 'is_system':0, 'sort':4},
+                        {'title':u'Контроль оплаты', 'color_code': '#9CF4A7', 'is_system':0, 'sort':5},
+                        {'title':u'Предоставление услуги', 'color_code': '#D4F49B', 'is_system':0, 'sort':6},
+                        {'title':u'Upsales', 'color_code': '#F4DC9C', 'is_system':0, 'sort':7},
+                        {'title':u'Успешно завершено', 'color_code':'#9CF4A7', 'is_system':1, 'sort':8},
+                        {'title':u'Не реализовано', 'color_code':'#F4A09C', 'is_system':2, 'sort':9}]
 
         for data in default_data:
             milestone = Milestone()
@@ -1943,7 +1943,7 @@ class SalesCycleProductStat(SubscriptionObject):
         db_table = settings.DB_PREFIX.format('cycle_prod_stat')
 
     def __unicode__(self):
-        return u'%s | %s | %s' % (self.sales_cycle, self.product, self.value)
+        return u'%s | %s | %s' % (self.sales_cycle, self.product, self.real_value)
 
 
 class Filter(SubscriptionObject):

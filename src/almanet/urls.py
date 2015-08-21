@@ -24,6 +24,9 @@ urlpatterns = patterns(
     url(r'^$', RedirectHomeView.as_view()),
     url(r'^admin/', include(admin.site.urls)),
     url(r'^auth/', include('alm_user.urls')),
+    url(r'^api/', include('almanet.api_urls')),
+
+    
     # TODO: temp, needs to be deleted
     url(r'^crm/', include('alm_crm.urls')),
     url(r'^vcard/', include('alm_vcard.urls')),

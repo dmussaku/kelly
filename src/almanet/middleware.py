@@ -139,8 +139,7 @@ class MyAuthenticationMiddleware(object):
 
         request.account = SimpleLazyObject(lambda: get_account(request))
         request.company = SimpleLazyObject(lambda: get_account(request).company)
-        request.user = SimpleLazyObject(lambda: get_account(request).user)
-
+        request.user = SimpleLazyObject(lambda: get_account(request).user or get_account(request)) # set Anonymous if None
 
 class GetSubdomainMiddleware(object):
 

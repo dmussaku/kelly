@@ -859,8 +859,8 @@ class Tel(SerializableModel):
     A telephone number of a contact
     """
     TYPE_CHOICES = (
-        ('VOICE', _(u"INTL")),
         ('HOME', _(u"home")),
+        ('VOICE', _(u"INTL")),
         ('MSG',  _(u"message")),
         ('WORK',  _(u"work")),
         ('pref',  _(u"prefered")),
@@ -965,10 +965,10 @@ class Adr(SerializableModel):
     An address
     """
     TYPE_CHOICES = (
+        ('WORK',  _(u"work")),
         ('INTL', _(u"INTL")),
         ('POSTAL', _(u"postal")),
         ('PARCEL',  _(u"parcel")),
-        ('WORK',  _(u"work")),
         ('dom',  _(u"dom")),
         ('home',  _(u"home")),
         ('pref',  _(u"pref")),
