@@ -1746,7 +1746,7 @@ class SalesCycleResource(CRMServiceModelResource):
                     "deleted": deleted,
                     "products": products}
             log_entry = SalesCycleLogEntry(sales_cycle=obj, 
-                                            owner=request.user.get_company(request),
+                                            owner=request.user,
                                             entry_type=SalesCycleLogEntry.PC,
                                             meta=json.dumps(meta))
             log_entry.save()
@@ -1788,7 +1788,7 @@ class SalesCycleResource(CRMServiceModelResource):
                 request, request.body,
                 format=request.META.get('CONTENT_TYPE', 'application/json'))
 
-            sales_cycle = obj.change_milestone(crmuser=request.user.get_company(request),
+            sales_cycle = obj.change_milestone(user=request.user,
                                                milestone_id=deserialized['milestone_id'])
 
             if not self._meta.always_return_data:
@@ -3768,7 +3768,7 @@ class ReportResource(Resource):
             data = {}
         return self.create_response(
             request,
-            report_builders.build_funnel(request.user.get_company(request).id, data))
+            report_builders.build_funnel(request.company.id, data))
 
     def realtime_funnel(self, request, **kwargs):
         '''

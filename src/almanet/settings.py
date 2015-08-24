@@ -352,7 +352,7 @@ class DevConfiguration(
     BROKER_URL = 'amqp://dev:dev@almasales.kz:5672//almasales/dev'
     CELERY_RESULT_BACKEND = 'djcelery.backends.database:DatabaseBackend'
 
-    RUSTEM_SETTINGS = True
+    RUSTEM_SETTINGS = False
 
 
 class QAConfiguration(DevConfiguration):
