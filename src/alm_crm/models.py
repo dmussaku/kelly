@@ -19,7 +19,7 @@ from alm_vcard.models import (
     Url,
     Note,
     )
-from alm_user.models import User
+from alm_user.models import User, Account
 from django.template.loader import render_to_string
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.cache import cache
@@ -1501,10 +1501,11 @@ class Activity(SubscriptionObject):
     def spray(self, company_id):
         unfollow_set = {
             unfollower.id for unfollower
-            in self.sales_cycle.contact.unfollowers.all()}
+            in self.sales_cycle.contact.owner.unfollow_list.all()}
 
-        q = Q(company_id=company_id)
-        university_set = set(User.objects.filter(q).values_list(
+        # q = Q(company_id=company_id)
+        accounts = Account.objects.filter(company_id=company_id)
+        university_set = set(User.objects.filter(accounts__in=accounts).values_list(
                              'id', flat=True))
         followers = User.objects.filter(
             pk__in=(university_set - unfollow_set))
