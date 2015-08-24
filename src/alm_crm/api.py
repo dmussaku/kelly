@@ -218,7 +218,7 @@ class CRMServiceModelResource(ModelResource):
         user = bundle.request.user
         if user:
             bundle.obj.owner = user
-
+            bundle.obj.company_id = user.get_company(bundle.request).id
         return bundle
 
     def get_bundle_list(self, obj_list, request):
