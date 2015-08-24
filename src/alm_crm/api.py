@@ -693,7 +693,7 @@ class ContactResource(CRMServiceModelResource):
         if not vcard_instance.get('fn') and not vcard_instance.get('given_name') and not vcard_instance.get('family_name'):
             raise Exception
         contact_id = kwargs.get('pk', None)
-        company_id = self.get_crmsubscr_id(bundle.request)
+        company_id = bundle.request.user.get_company(bundle.request).id
         if contact_id:
             bundle.obj = Contact.objects.get(id=int(contact_id))
             bundle.obj.company_id = company_id
@@ -757,7 +757,7 @@ class ContactResource(CRMServiceModelResource):
         with transaction.atomic():
             if bundle.data.get('note') and not kwargs.get('pk'):
                 bundle.obj.create_share_to(
-                    self.get_crmuser(bundle.request).id,
+                    bundle.request.user.id,
                     bundle.data.get('note'))
             if not kwargs.get('pk'):
                 SalesCycle.create_globalcycle(
@@ -767,8 +767,6 @@ class ContactResource(CRMServiceModelResource):
                      'contact_id':bundle.obj.id
                     }
                 )
-        # t4=time.time()-t3
-        # print "Time to finish creating share and sales_cycle objects %s" % t4
         return bundle
 
     def assign_company_contact(self, request, **kwargs):
@@ -956,7 +954,7 @@ class ContactResource(CRMServiceModelResource):
         limit = int(request.GET.get('limit', 20))
         offset = int(request.GET.get('offset', 0))
 
-        contacts = Contact.get_cold_base(self.get_crmsubscr_id(request))
+        contacts = Contact.get_cold_base(request.user.id)
         return self.create_response(
             request,
             {
@@ -1008,7 +1006,7 @@ class ContactResource(CRMServiceModelResource):
         limit = int(request.GET.get('limit', 20))
         offset = int(request.GET.get('offset', 0))
 
-        contacts = Contact.get_contacts_by_status(self.get_crmsubscr_id(request),
+        contacts = Contact.get_contacts_by_status(request.user.id,
                                                   Contact.LEAD)
         return self.create_response(
             request, {
@@ -1161,7 +1159,7 @@ class ContactResource(CRMServiceModelResource):
             request.GET.get('search_params', "[('fn', 'startswith')]"))
         order_by = ast.literal_eval(request.GET.get('order_by', "['fn','asc']"))
         contacts = Contact.filter_contacts_by_vcard(
-            company_id=self.get_crmsubscr_id(request),
+            company_id=bundle.request.user.get_company(bundle.request).id,
             search_text=search_text,
             search_params=search_params,
             order_by=order_by)
@@ -1290,7 +1288,7 @@ class ContactResource(CRMServiceModelResource):
         data = self.deserialize(
             request, request.body,
             format=request.META.get('CONTENT_TYPE', 'application/json'))
-        current_crmuser = request.user.get_company(request)
+        current_user = request.user.get_company(request)
         decoded_string = base64.b64decode(data['uploaded_file'])
         filename_chunks = data['filename'].split('.')
         filename = filename_chunks[len(filename_chunks)-1]
@@ -1331,7 +1329,7 @@ class ContactResource(CRMServiceModelResource):
                 request, xls_meta)
         elif filename=='vcf':
             contacts = Contact.import_from_vcard(
-                    decoded_string, current_crmuser)
+                    decoded_string, current_user)
             if not contacts:
                 self.log_throttled_access(request)
                 return self.error_response(request, {'success': False}, response_class=http.HttpBadRequest)
@@ -1345,7 +1343,7 @@ class ContactResource(CRMServiceModelResource):
             else:
                 contact_list = False
             for contact in contacts:
-                contact.create_share_to(current_crmuser.pk)
+                contact.create_share_to(current_user.pk)
                 _bundle = contact_resource.build_bundle(
                     obj=contact, request=request)
                 _bundle.data['global_sales_cycle'] = SalesCycleResource().full_dehydrate(
@@ -2321,7 +2319,7 @@ class ActivityResource(CRMServiceModelResource):
         act.save()
         text_parser(base_text=act.description, content_class=act.__class__,
                     object_id=act.id)
-        act.spray(self.get_crmsubscr_id(bundle.request))
+        act.spray(bundle.request.user.get_company(bundle.request).id)
         bundle = self.full_hydrate(bundle)
 
         bundle.data['obj_created'] = True
@@ -2393,7 +2391,7 @@ class ProductResource(CRMServiceModelResource):
         data = self.deserialize(
             request, request.body,
             format=request.META.get('CONTENT_TYPE', 'application/json'))
-        current_crmuser = request.user
+        current_user = request.user
         decoded_string = base64.b64decode(data['uploaded_file'])
         file_extension = data['filename'].split('.')[1]
         if file_extension=='xls' or file_extension=='xlsx':
@@ -2569,7 +2567,7 @@ class ShareResource(CRMServiceModelResource):
         limit = int(request.GET.get('limit', 20))
         offset = int(request.GET.get('offset', 0))
 
-        shares = Share.get_shares(self.get_crmsubscr_id(request))
+        shares = Share.get_shares(self.request.user.id)
         return self.create_response(
             request,
             {'objects': self.get_bundle_list(shares, request)}
@@ -3298,7 +3296,7 @@ class AppStateResource(Resource):
         pass limit and offset with GET request
         '''
         activities, sales_cycles, s2a_map = \
-            Activity.get_activities_by_date_created(self.get_crmsubscr_id(request),
+            Activity.get_activities_by_date_created(request.user.id,
                                                     owned=True, mentioned=True,
                                                     include_sales_cycles=True)
 
@@ -3345,7 +3343,7 @@ class MobileStateObject(object):
         self.current_user = request.user
         self.company_id = get_subscr_id(request.user_env, service_slug)
         self.company = request.user.get_company(request)()
-        self.current_crmuser = request.account
+        self.current_user = request.account
 
         sales_cycles = SalesCycleResource().obj_get_list(bundle, limit_for='mobile')
 
