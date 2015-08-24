@@ -10,7 +10,7 @@ from alm_crm.models import (
 	Share,
 	)
 
-def text_parser(base_text, content_class=None, object_id=None):
+def text_parser(base_text, content_class=None, object_id=None, company_id=None):
 	hashtag_parser = re.compile(u'\B#\w*[а-яА-ЯёЁa-zA-Z]+\w*', re.U)
 	mention_parser = re.compile('\B@\[[0-9]*\:')
 
@@ -36,6 +36,7 @@ def text_parser(base_text, content_class=None, object_id=None):
 					hashtag_id=hashtag.id, 
 					content_class=content_class,
 					object_id=object_id,
+					company_id = company_id,
 					save=True)
 
 	user_id_parser = re.compile('\d[0-9]*')
@@ -44,5 +45,6 @@ def text_parser(base_text, content_class=None, object_id=None):
 		mention = Mention.build_new(user_id=user_id,
 									content_class=content_class,
 									object_id=object_id,
+									company_id = company_id,
 									save=True)
 		

@@ -23,6 +23,7 @@ from .models import (
     ImportTask,
     ErrorCell
     )
+from alm_user.models import User
 from alm_user.api import UserResource
 from alm_vcard.api import (
     VCardResource,
@@ -420,7 +421,7 @@ class ContactResource(CRMServiceModelResource):
         attribute=lambda bundle: _firstOfQuerySet(bundle.obj.share_set),
         null=True, blank=True, readonly=True, full=False)
 
-    author_id = fields.IntegerField(attribute='owner_id', null=True)
+    owner_id = fields.IntegerField(attribute='owner_id', null=True)
     parent_id = fields.IntegerField(attribute='parent_id', null=True)
 
     class Meta(CommonMeta):
@@ -756,9 +757,12 @@ class ContactResource(CRMServiceModelResource):
         bundle.obj.save()
         with transaction.atomic():
             if bundle.data.get('note') and not kwargs.get('pk'):
-                bundle.obj.create_share_to(
+                share = bundle.obj.create_share_to(
                     bundle.request.user.id,
+                    company_id,
                     bundle.data.get('note'))
+                text_parser(base_text=share.note, content_class=share.__class__,
+                    object_id=share.id, company_id = bundle.request.user.get_company(bundle.request).id)
             if not kwargs.get('pk'):
                 SalesCycle.create_globalcycle(
                     **{
@@ -1208,10 +1212,12 @@ class ContactResource(CRMServiceModelResource):
                 }
                 )
         contact_id = int(request.GET.get('contact_id', 0))
+        text_parser(base_text=share.note, content_class=share.__class__,
+                    object_id=share.id, company_id = bundle.request.user.get_company(bundle.request).id)
         return self.create_response(
             request,
             {'success':
-                Contact.share_contact(share_from, share_to, contact_id)}
+                Contact.share_contact(share_from, share_to, contact_id, company_id=request.user.get_company(request).id)}
             )
 
     def share_contacts(self, request, **kwargs):
@@ -1343,7 +1349,9 @@ class ContactResource(CRMServiceModelResource):
             else:
                 contact_list = False
             for contact in contacts:
-                contact.create_share_to(current_user.pk)
+                share = contact.create_share_to(current_user.pk, company_id=current_user.get_company(request).id)
+                text_parser(base_text=share.note, content_class=share.__class__,
+                    object_id=share.id, company_id = request.user.get_company(request).id)
                 _bundle = contact_resource.build_bundle(
                     obj=contact, request=request)
                 _bundle.data['global_sales_cycle'] = SalesCycleResource().full_dehydrate(
@@ -1576,7 +1584,7 @@ class SalesCycleResource(CRMServiceModelResource):
         use_in=use_in_field('activities_count'))
     product_ids = CustomToManyField('alm_crm.api.ProductResource', 'products',
         null=True, full=False, full_use_ids=True, readonly=True)
-    author_id = fields.IntegerField(attribute='owner_id')
+    owner_id = fields.IntegerField(attribute='owner_id')
     projected_value = fields.ToOneField('alm_crm.api.ValueResource',
                                         'projected_value', null=True,
                                         full=True)
@@ -1670,12 +1678,18 @@ class SalesCycleResource(CRMServiceModelResource):
                 format=request.META.get('CONTENT_TYPE', 'application/json'))
             deserialized = self.alter_deserialized_list_data(request, deserialized)
             if kwargs['status'] == 'succeed':
-                sales_cycle, log_entry = bundle.obj.close(products_with_values=deserialized, succeed=True)
-                log_entry.owner = request.user.get_company(request)
+                sales_cycle, log_entry = bundle.obj.close(products_with_values=deserialized, 
+                                                            company_id=request.user.get_company(request).id,
+                                                            succeed=True)
+                log_entry.owner = request.user
+                log_entry.company_id = request.user.get_company(request).id
                 log_entry.save()
             elif kwargs['status'] == 'fail':
-                sales_cycle, log_entry = bundle.obj.close(products_with_values=deserialized, succeed=False)
-                log_entry.owner = request.user.get_company(request)
+                sales_cycle, log_entry = bundle.obj.close(products_with_values=deserialized, 
+                                                            company_id=request.user.get_company(request).id,
+                                                            succeed=False)
+                log_entry.owner = request.user
+                log_entry.company_id = request.user.get_company(request).id
                 log_entry.save()
             else:
                 return http.HttpBadRequest()
@@ -1730,7 +1744,7 @@ class SalesCycleResource(CRMServiceModelResource):
             products = []
 
             obj.products.clear()
-            obj.add_products(deserialized['object_ids'])
+            obj.add_products(deserialized['object_ids'], company_id=request.user.get_company(request).id)
 
             for product in obj.products.all():
                 products.append(
@@ -1745,6 +1759,7 @@ class SalesCycleResource(CRMServiceModelResource):
                     "products": products}
             log_entry = SalesCycleLogEntry(sales_cycle=obj, 
                                             owner=request.user,
+                                            company_id=request.user.get_company(request).id,
                                             entry_type=SalesCycleLogEntry.PC,
                                             meta=json.dumps(meta))
             log_entry.save()
@@ -1787,7 +1802,8 @@ class SalesCycleResource(CRMServiceModelResource):
                 format=request.META.get('CONTENT_TYPE', 'application/json'))
 
             sales_cycle = obj.change_milestone(user=request.user,
-                                               milestone_id=deserialized['milestone_id'])
+                                               milestone_id=deserialized['milestone_id'],
+                                               company_id=request.user.get_company(request).id)
 
             if not self._meta.always_return_data:
                 return http.HttpAccepted()
@@ -2312,13 +2328,14 @@ class ActivityResource(CRMServiceModelResource):
         act.description = bundle.data.get('description')
         act.sales_cycle_id = bundle.data.get('sales_cycle_id')
         act.assignee_id = bundle.data.get('assignee_id')
+        act.company_id = bundle.request.user.get_company(bundle.request).id
         if 'deadline' in bundle.data:
             act.deadline = bundle.data.get('deadline')
         if 'need_preparation' in bundle.data:
             act.need_preparation = bundle.data.get('need_preparation')
         act.save()
         text_parser(base_text=act.description, content_class=act.__class__,
-                    object_id=act.id)
+                    object_id=act.id, company_id = bundle.request.user.get_company(bundle.request).id)
         act.spray(bundle.request.user.get_company(bundle.request).id)
         bundle = self.full_hydrate(bundle)
 
@@ -2333,9 +2350,11 @@ class ActivityResource(CRMServiceModelResource):
                 sales_cycle = SalesCycle.objects.get(pk=new_sc_id)
                 bundle.obj.sales_cycle = sales_cycle
                 bundle.obj.save()
+            if bundle.obj.company_id == None:
+                bundle.obj.company_id = bundle.request.user.get_company(bundle.request).id
         bundle.obj.save()
         text_parser(base_text=bundle.obj.description, content_class=bundle.obj.__class__,
-                    object_id=bundle.obj.id)
+                    object_id=bundle.obj.id, company_id = bundle.request.user.get_company(bundle.request).id)
         return bundle
 
 
@@ -2350,7 +2369,7 @@ class ProductResource(CRMServiceModelResource):
 
     @undocumented: Meta
     '''
-    author_id = fields.IntegerField(attribute='author_id', null=True)
+    owner_id = fields.IntegerField(attribute='author_id', null=True)
 #    sales_cycles = fields.ToManyField(SalesCycleResource, 'sales_cycles', readonly=True)
 
     class Meta(CommonMeta):
@@ -2590,14 +2609,15 @@ class ShareResource(CRMServiceModelResource):
         for json_obj in deserialized['shares']:
             s = Share(
                 note=json_obj.get('note', ""),
-                share_from=User.objects.get(id=int(json_obj.get('share_from'))),
+                share_from=request.user,
                 contact=Contact.objects.get(id=int(json_obj.get('contact'))),
+                company_id=request.user.get_company(request).id,
                 share_to=User.objects.get(id=int(json_obj.get('share_to')))
                 )
             s.save()
             text_parser(base_text=s.note, content_class=s.__class__,
-                    object_id=s.id)
-            if s.share_to.get_billing_user() == request.user:
+                    object_id=s.id, company_id = request.user.get_company(request).id)
+            if s.share_to == request.user:
                 share_list.append(s)
 
         return self.create_response(
@@ -2654,7 +2674,7 @@ class ShareResource(CRMServiceModelResource):
     def save(self, bundle, skip_errors=False):
         bundle = super(ShareResource, self).save(bundle)
         text_parser(base_text=bundle.obj.note, content_class=bundle.obj.__class__,
-                    object_id=bundle.obj.id)
+                    object_id=bundle.obj.id, company_id = bundle.request.user.get_company(bundle.request).id)
         return bundle
 
 
@@ -2704,7 +2724,7 @@ class CommentResource(CRMServiceModelResource):
     def save(self, bundle, skip_errors=False):
         bundle = super(CommentResource, self).save(bundle)
         text_parser(base_text=bundle.obj.comment, content_class=bundle.obj.__class__,
-                    object_id=bundle.obj.id)
+                    object_id=bundle.obj.id, company_id = bundle.request.user.get_company(bundle.request).id)
         return bundle
 
 
@@ -3296,7 +3316,7 @@ class AppStateResource(Resource):
         pass limit and offset with GET request
         '''
         activities, sales_cycles, s2a_map = \
-            Activity.get_activities_by_date_created(request.user.id,
+            Activity.get_activities_by_date_created(request.user.get_company(request).id,
                                                     owned=True, mentioned=True,
                                                     include_sales_cycles=True)
 
@@ -3341,7 +3361,7 @@ class MobileStateObject(object):
         request = bundle.request
         self.request = request
         self.current_user = request.user
-        self.company_id = get_subscr_id(request.user_env, service_slug)
+        self.company_id = request.user.get_company(request).id
         self.company = request.user.get_company(request)()
         self.current_user = request.account
 
@@ -3549,7 +3569,7 @@ class HashTagReferenceResource(CRMServiceModelResource):
                 share_resource = ShareResource()
                 shares_list = []
                 for share in shares:
-                    if share.share_to.get_billing_user() == request.user:
+                    if share.share_to == request.user:
                         shares_list.append(share)
 
                 obj_dict['objects']['shares'] = \
