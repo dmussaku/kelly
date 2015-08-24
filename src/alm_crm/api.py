@@ -93,6 +93,7 @@ from tastypie.utils import trailing_slash
 from django.db.models.loading import get_model
 import ast
 from datetime import datetime, timedelta
+import dateutil.parser
 import pytz
 
 from .utils.parser import text_parser
@@ -247,7 +248,6 @@ class CRMServiceModelResource(ModelResource):
         crmuser = self.get_crmuser(bundle.request)
         if crmuser:
             bundle.obj.owner = crmuser
-
         return bundle
 
     def get_bundle_list(self, obj_list, request):
@@ -277,14 +277,10 @@ class CRMServiceModelResource(ModelResource):
         return get_subscr_id(request.user_env, DEFAULT_SERVICE)
 
     def get_crmuser(self, request):
-        if hasattr(self, 'crmuser'):
-            return self.crmuser
-
         subscription_pk = self.get_crmsubscr_id(request)
-        self.crmuser = None
         if subscription_pk:
-            self.crmuser = request.user.get_subscr_user(subscription_pk)
-        return self.crmuser
+            return request.user.get_subscr_user(subscription_pk)
+        return None
 
     class Meta:
         list_allowed_methods = ['get', 'post', 'patch']
@@ -802,11 +798,7 @@ class ContactResource(CRMServiceModelResource):
                             bundle=vcard_bundle,
                             **kwargs
                             )
-        # t2=time.time()-t1
-        # print "Time to finish contact hydration %s" % t2
         bundle.obj.vcard = vcard_bundle.obj
-        # t3=time.time()-t2
-        # print "Time to finish vcard hydration %s" % t3
         bundle.obj.save()
         with transaction.atomic():
             if bundle.data.get('note') and not kwargs.get('pk'):
@@ -821,8 +813,6 @@ class ContactResource(CRMServiceModelResource):
                      'contact_id':bundle.obj.id
                     }
                 )
-        # t4=time.time()-t3
-        # print "Time to finish creating share and sales_cycle objects %s" % t4
         return bundle
 
     def follow_contacts(self, request, **kwargs):
@@ -1496,8 +1486,6 @@ class ContactResource(CRMServiceModelResource):
         data = self.deserialize(
             request, request.body,
             format=request.META.get('CONTENT_TYPE', 'application/json'))
-        # print request.body
-        # data = eval(request.body)
         merged_contacts_ids = data.get("merged_contacts", [])
         merge_into_contact_id = data.get("merge_into_contact", "")
         delete_merged = data.get("merged_contacts", [])
@@ -1547,7 +1535,6 @@ class ContactResource(CRMServiceModelResource):
                     ), for_list=True
                 )  for share in response['shares']
         ]
-        # print "Time to dehydrate resources %s " % str(time.time()-t)
         return self.create_response(
                 request,
                 {
@@ -1567,9 +1554,7 @@ class ContactResource(CRMServiceModelResource):
             format=request.META.get('CONTENT_TYPE', 'application/json'))
         col_structure = data.get('col_structure')
         filename = data.get('filename')
-        ignore_first_row = data.get('ignore_first_row',"")
-        if not ignore_first_row:
-            ignore_first_row = False
+        ignore_first_row = data.get('ignore_first_row', False)
         # col_structure = request.body.get('col_structure')
         # filename = request.body.get('filename')
         # try:
@@ -1851,8 +1836,7 @@ def get_contact_state(self, request, **kwargs):
         with RequestContext(self, request, allowed_methods=['post', 'get', 'put']):
             basic_bundle = self.build_bundle(request=request)
             try:
-                obj = self.cached_obj_get(bundle=basic_bundle,
-                                          **self.remove_api_resource_names(kwargs))
+                obj = SalesCycle.objects.get(id=kwargs.get('id', -1))
             except ObjectDoesNotExist:
                 return http.HttpNotFound()
             except MultipleObjectsReturned:
@@ -1974,11 +1958,6 @@ def get_contact_state(self, request, **kwargs):
 
     def obj_create(self, bundle, **kwargs):
         bundle = super(self.__class__, self).obj_create(bundle, **kwargs)
-        if 'milestone_id' in bundle.data:
-            milestone = Milestone.objects.get(pk=bundle.data.get('milestone_id'))
-            bundle.obj.milestone = milestone
-        bundle.obj.save()
-        bundle = self.full_hydrate(bundle)
         bundle.data['obj_created'] = True
         return bundle
 
@@ -2311,6 +2290,12 @@ class ActivityResource(CRMServiceModelResource):
                 name='api_my_activities'
             ),
             url(
+                r"^(?P<resource_name>%s)/create_multiple%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('create_multiple'),
+                name='api_create_multiple'
+            ),
+            url(
                 r"^(?P<resource_name>%s)/company_activities%s$" %
                 (self._meta.resource_name, trailing_slash()),
                 self.wrap_view('get_company_activities'),
@@ -2430,6 +2415,45 @@ class ActivityResource(CRMServiceModelResource):
             rv = len(data)
         return self.create_response(
             request, {'success': rv})
+
+    def create_multiple(self, request, **kwargs):
+        with RequestContext(self, request, allowed_methods=['post']):
+            data = self.deserialize(request, request.body,
+                                    format = request.META.get('CONTENT_TYPE', 'application/json'))
+
+            new_activities_list = []
+            subscription_id = self.get_crmsubscr_id(request)
+
+            for new_activity_data in data:
+                new_activity = Activity()
+                new_activity.author_id = new_activity_data.get('author_id')
+                new_activity.description = new_activity_data.get('description')
+                new_activity.sales_cycle_id = new_activity_data.get('sales_cycle_id')
+                new_activity.assignee_id = new_activity_data.get('assignee_id')
+
+                if 'deadline' in new_activity_data:
+                    new_activity.deadline = new_activity_data.get('deadline')
+
+                if 'need_preparation' in new_activity_data:
+                    new_activity.need_preparation = new_activity_data.get('need_preparation')
+                new_activity.save()
+                
+                if new_activity_data.get('feedback_status'):
+                    new_activity.feedback = Feedback(
+                        status=new_activity_data.get('feedback_status', None),
+                        owner_id=new_activity.author_id)
+                    new_activity.feedback.save()
+
+
+                new_activity.spray(subscription_id)
+
+                text_parser(base_text=new_activity.description, 
+                            content_class=new_activity.__class__,
+                            object_id=new_activity.id)
+                
+                new_activities_list.append(self.full_dehydrate(self.build_bundle(obj=new_activity, request=request)))
+
+            return self.create_response(request, new_activities_list, response_class=http.HttpCreated)
 
     def finish_activity(self, request, **kwargs):
         with RequestContext(self, request, allowed_methods=['post']):
@@ -2745,6 +2769,7 @@ class CRMUserResource(CRMServiceModelResource):
         # WHY 'user' now 'user_id' ?
         # bundle.data['user'] = user.id
         bundle.data['userpic'] = user.userpic.url if user.userpic else ""
+        bundle.data['is_active'] = user.is_active
         return bundle
 
     def follow_unfollow(self, request, **kwargs):
@@ -4089,6 +4114,18 @@ class ReportResource(Resource):
                 name='api_realtime_funnel'
             ),
             url(
+                r"^(?P<resource_name>%s)/activity_feed%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('activity_feed'),
+                name='api_activity_feed'
+            ),
+            url(
+                r"^(?P<resource_name>%s)/activity_feed/export%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('export_activity_feed'),
+                name='api_export_activity_feed'
+            ),
+            url(
                 r"^(?P<resource_name>%s)/user_report%s$" %
                 (self._meta.resource_name, trailing_slash()),
                 self.wrap_view('user_report'),
@@ -4130,6 +4167,37 @@ class ReportResource(Resource):
             request,
             report_builders.build_realtime_funnel(request.user.get_crmuser().subscription_id, data))
 
+    def activity_feed(self, request, **kwargs):
+        if request.body:
+            data = self.deserialize(
+                request, request.body,
+                format=request.META.get('CONTENT_TYPE', 'application/json'))
+        else:
+            data = {}
+
+        return self.create_response(
+            request,
+            report_builders.build_activity_feed(request.user.get_crmuser().subscription_id, data, request.user.timezone.zone))
+
+    def export_activity_feed(self, request, **kwargs):
+        with RequestContext(self, request, allowed_methods=['get']):
+            if request.GET:
+                data = {
+                    'users': [int(u_id) for u_id in request.GET.get('users', '').split(',')],
+                    'date_from': request.GET.get('date_from', ""),
+                    'date_to': request.GET.get('date_to', "")
+                }
+            else:
+                data = {}
+
+            xls_file = report_builders.get_activity_feed_xls(request.user.get_crmuser().subscription_id, data, request.user.timezone.zone)
+
+            response = HttpResponse(xls_file.read(), content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+            response['Content-Disposition'] = 'attachment; filename='+'Лента событий %s.xlsx'%datetime.now().strftime("%d.%m.%y")
+            try:
+                return response
+            finally:
+                xls_file.close()
 
     def user_report(self, request, **kwargs):
         with RequestContext(self, request, allowed_methods=['post']):
