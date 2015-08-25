@@ -1924,7 +1924,10 @@ class SalesCycleResource(CRMServiceModelResource):
         return bundle
 
     def obj_update(self, bundle, **kwargs):
-        del(bundle.data['activities'])
+        try:
+            del(bundle.data['activities'])
+        except:
+            pass
         return super(self.__class__, self).obj_update(bundle, **kwargs)
 
     def save(self, bundle, **kwargs):
