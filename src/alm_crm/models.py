@@ -1032,7 +1032,7 @@ class Product(SubscriptionObject):
 
     @classmethod
     @transaction.atomic()
-    def import_from_xls(cls, xls_file_data, creator):
+    def import_from_xls(cls, xls_file_data, creator, company_id):
         '''
         first column is name, second is description and third is price
         '''
@@ -1047,7 +1047,7 @@ class Product(SubscriptionObject):
                 continue
             product = Product(
                 name=row_vals[0],
-                company_id=creator.company_id,
+                company_id=company_id,
                 owner=creator
                 )
             if row_vals[1]:

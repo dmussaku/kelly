@@ -2415,7 +2415,7 @@ class ProductResource(CRMServiceModelResource):
         file_extension = data['filename'].split('.')[1]
         if file_extension=='xls' or file_extension=='xlsx':
             for product in Product.import_from_xls(
-                decoded_string, request.user):
+                decoded_string, request.user, request.user.get_company(request).id):
                 _bundle = product_resource.build_bundle(
                     obj=product, request=request)
                 objects.append(product_resource.full_dehydrate(
