@@ -2312,6 +2312,7 @@ class ActivityResource(CRMServiceModelResource):
         act.description = bundle.data.get('description')
         act.sales_cycle_id = bundle.data.get('sales_cycle_id')
         act.assignee_id = bundle.data.get('assignee_id')
+        act.company_id = bundle.request.user.get_company(bundle.request).id
         if 'deadline' in bundle.data:
             act.deadline = bundle.data.get('deadline')
         if 'need_preparation' in bundle.data:
