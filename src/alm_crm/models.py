@@ -68,10 +68,6 @@ class Milestone(SubscriptionObject):
         db_table = settings.DB_PREFIX.format('milestone')
 
     @classmethod
-    def get_for_company(cls, company_id):
-        return cls.objects.filter(company_id=company_id)
-
-    @classmethod
     def create_default_milestones(cls, company_id):
         milestones = []
         default_data = [{'title':u'Звонок/Заявка', 'color_code': '#F4B59C', 'is_system':0, 'sort':1},
@@ -222,9 +218,6 @@ class Contact(SubscriptionObject):
         exporter = getattr(self, 'to_{}'.format(tp))
         return exporter(**options)
 
-    def to_vcard(self, locale='ru_RU'):
-        return self.vcard.exportTo('vcard')
-
     def to_html(self, locale='ru_RU'):
         tpl_name = 'vcard/_detail.%s.html' % locale
         context = {'object': self.vcard}
@@ -332,33 +325,6 @@ class Contact(SubscriptionObject):
         q = Q(company_id=company_id)
         q &= Q(status=status)
         return Contact.objects.filter(q).order_by('-date_created')
-
-    @classmethod
-    def get_contacts_for_last_activity_period(
-            cls, user_id, from_dt=None, to_dt=None):
-        r"""
-        Retrieves all contacts according to the following criteria:
-            - user contacted for that time period (`from_dt`, `to_dt`)
-        user contacted means user have activities with at least one
-        contact for that period.
-
-        Parameters
-        ----------
-           user_id - who is contacted
-           from_dt - date from
-           to_dt - date to
-
-        Returns
-        -------
-        Queryset of Contacts with whom `user_id` get contacted for that period.
-        """
-        user = User.objects.get(id=user_id)
-
-        # there is no need in filter by company_id
-        q = Q(date_created__range=(from_dt, to_dt))
-        activities = user.activity_owner.filter(q)
-        contact_ids = activities.values_list('sales_cycle__contact_id', flat=True)
-        return Contact.objects.filter(id__in=contact_ids)
 
     @classmethod
     def filter_contacts_by_vcard(cls, company_id, search_text,
@@ -1122,10 +1088,6 @@ class ProductGroup(SubscriptionObject):
     def __unicode__(self):
         return self.title
 
-    @classmethod
-    def get_for_subscr(cls, company_id):
-        return cls.objects.filter(company_id=company_id)
-
 
 class SalesCycle(SubscriptionObject):
     STATUSES_CAPS = (
@@ -1225,18 +1187,6 @@ class SalesCycle(SubscriptionObject):
     def get_activities(self):
         """TEST Returns list of activities ordered by date."""
         return self.rel_activities.order_by('-date_created')
-
-    def get_mentioned_users(self):
-        user_ids = self.mentions.values_list('user_id', flat=True)
-        return User.objects.filter(pk__in=user_ids)
-
-    def get_first_activity_date(self):
-        a = self.rel_activities.order_by('date_created').first()
-        return a and a.date_created
-
-    def get_last_activity_date(self):
-        a = self.rel_activities.order_by('-date_created').first()
-        return a and a.date_created
 
     def add_product(self, product_id, **kw):
         """TEST Assigns products to salescycle"""
@@ -1551,17 +1501,8 @@ class Activity(SubscriptionObject):
         return Activity.objects.filter(sales_cycle__contact_id=contact_id)
 
     @classmethod
-    def get_user_activities(cls, user):
-        return cls.objects.filter(owner=user).order_by('-date_created')
-
-    @classmethod
     def get_activities_by_salescycle(cls, sales_cycle_id):
         return cls.objects.filter(sales_cycle_id=sales_cycle_id).order_by('-date_created')
-
-    @classmethod
-    def get_activities_by_subscription(cls, company_id):
-        return cls.objects.filter(company_id=company_id)\
-            .order_by('date_created')
 
     @classmethod
     def get_mentioned_activities_of(cls, user_ids):
@@ -1802,11 +1743,6 @@ class Share(SubscriptionObject):
         return cls.objects.filter(share_to__pk=user_id)\
             .order_by('-date_created')
 
-    @classmethod
-    def get_shares_owned_for(cls, user_id):
-        return cls.objects.filter(share_from__pk=user_id)\
-            .order_by('-date_created')
-
     def __unicode__(self):
         return u'%s : %s -> %s' % (self.contact, self.share_from, self.share_to)
 
@@ -1977,10 +1913,6 @@ class Filter(SubscriptionObject):
         if not self.company_id and self.owner:
             self.company_id = self.owner.company_id
         super(self.__class__, self).save(**kwargs)
-
-    @classmethod
-    def get_filters_by_user(cls, user_id):
-        return Filter.objects.filter(owner=user_id)
 
 
 class HashTag(models.Model):
