@@ -181,6 +181,12 @@ class User(AbstractBaseUser):
         Returns a company taken from request
         '''
         return request.company
+
+    def get_account(self, request):
+        '''
+        Returns a account taken from request
+        '''
+        return request.account
 '''
     def connect_service(self, service):
         co = self.company.first()

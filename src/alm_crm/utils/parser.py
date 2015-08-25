@@ -11,6 +11,9 @@ from alm_crm.models import (
 	)
 
 def text_parser(base_text, content_class=None, object_id=None, company_id=None):
+	if base_text == None or base_text == "":
+		return
+		
 	hashtag_parser = re.compile(u'\B#\w*[а-яА-ЯёЁa-zA-Z]+\w*', re.U)
 	mention_parser = re.compile('\B@\[[0-9]*\:')
 

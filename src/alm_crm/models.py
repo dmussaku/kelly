@@ -567,7 +567,7 @@ class Contact(SubscriptionObject):
     '''
 
     @classmethod
-    def create_from_structure(cls, data, file_structure, creator, import_task):
+    def create_from_structure(cls, data, file_structure, creator, import_task, company_id):
         contact = cls()
         vcard = VCard()
         response = {}
@@ -683,7 +683,7 @@ class Contact(SubscriptionObject):
         contact.vcard = vcard
         contact.import_task = import_task
         contact.owner = creator
-        contact.company_id = creator.get_company().id
+        contact.company_id = company_id
         contact.save()
         SalesCycle.create_globalcycle(
                         **{'company_id':contact.company_id,

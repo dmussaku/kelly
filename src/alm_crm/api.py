@@ -1499,7 +1499,7 @@ class ContactResource(CRMServiceModelResource):
                 obj_dict['attr'] = value.split('__')[1]
             col_hash.append(obj_dict)
         import_task_id = grouped_contact_import_task(
-            col_hash, filename, request.user, ignore_first_row)
+            col_hash, filename, request.user, request.user.get_company(request).id, request.user.get_account(request).email, ignore_first_row)
         return self.create_response(
             request, {'success':True,'task_id':import_task_id}
             )
@@ -2716,6 +2716,7 @@ class CommentResource(CRMServiceModelResource):
         obj_class = ContentType.objects.get(app_label='alm_crm', model=model_name[:-3]).model_class()
         obj_id = bundle.data[model_name]
         bundle.data['object_id'] = obj_id
+        bundle.data['company_id'] = bundle.request.user.get_company(bundle.request).id
         bundle.data['content_object'] = obj_class.objects.get(id=obj_id)
         bundle.data.pop(model_name)
         return bundle

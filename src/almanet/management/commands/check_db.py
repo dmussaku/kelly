@@ -25,8 +25,13 @@ def check_app_models_for_equality_company_id_with_owner():
             continue
         for object in model.objects.all():
             if hasattr(object, 'owner'):
-                if object.company_id != object.owner.accounts.first().company_id:
+                if object.owner == None:
+                    logging.warning('NO_OWNER {%s} ID {%s}'%(object.__class__.__name__, object.id))
+                elif object.company_id != object.owner.accounts.first().company_id:
                     logging.warning('DIFFERENT_COMPANY_IDS {%s} ID {%s} {User} ID {%s}'%(object.__class__.__name__, object.id, object.owner.id))
+            elif hasattr(object, 'company_id'):
+                if object.company_id == None:
+                    logging.warning('NO_COMPANY_ID {%s} ID {%s}'%(object.__class__.__name__, object.id))
 
     logging.info("FINISHED\n")
     print "******** Checking finished ********\n"
