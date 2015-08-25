@@ -1,9 +1,0 @@
-{% extends "user/base.html" %}
-{% load i18n %}
-{% block head_title %} {{ _("User List Page") }} {% endblock %}
-{% block content %}
-    <form action="" method="post">{% csrf_token %}
-        <p>Are you sure you want to delete "{{ object }}"?</p>
-        <input type="submit" value="Confirm" />
-    </form>
-{% endblock %}

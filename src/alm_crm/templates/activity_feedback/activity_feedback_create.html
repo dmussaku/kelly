@@ -1,9 +1,0 @@
-{% extends "user/base.html" %}
-{% load i18n %}
-{% block head_title %} {{ _("Activity Feedback List Page") }} {% endblock %}
-{% block content %}
-<form action="{% url 'activity_feedback_create' %}" method="post">{% csrf_token %}
-	{{ form.as_p }}
-	<input type="submit" value="Create" />
-</form>
-{% endblock %}
