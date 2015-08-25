@@ -160,9 +160,9 @@ class UserResource(ModelResource):
             raise ImmediateHttpResponse(
                 HttpResponse(
                     content=Serializer().to_json(
-                        CRMUserResource().full_dehydrate(
-                            CRMUserResource().build_bundle(
-                                obj=CRMUser.objects.get(id=request.user.get_crmuser().id))
+                        UserResource().full_dehydrate(
+                            UserResource().build_bundle(
+                                obj=User.objects.get(id=request.user.id))
                             )
                         ),
                     content_type='application/json; charset=utf-8', status=200)
