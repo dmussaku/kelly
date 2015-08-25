@@ -2306,6 +2306,7 @@ class ActivityResource(CRMServiceModelResource):
         files = []
         for attached_file in bundle.obj.attached_files.all():
             files.append({
+                            'file_id':attached_file.id,
                             'filename':attached_file.file_object.filename,
                             'swiftfile_id':attached_file.file_object.id
                         })
@@ -3008,6 +3009,7 @@ class AttachedFileResource(CRMServiceModelResource):
     class Meta(CommonMeta):
         queryset = AttachedFile.objects.all()
         resource_name = 'files'
+        always_return_data = True
 
     def prepend_urls(self):
         return [
