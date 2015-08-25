@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from alm_crm.models import Contact, SalesCycle, Milestone, ContactList, Filter, Product, SalesCycleLogEntry
+from alm_crm.models import Contact, SalesCycle, Milestone, ContactList, Filter, Product, SalesCycleLogEntry, Share
 from almanet.models import Subscription
 from alm_vcard.models import Tel, Email, Adr, Url
 from alm_crm.models import GLOBAL_CYCLE_TITLE
 from alm_user.models import User, Account
+from django.db.models.loading import get_model
 import datetime
 
 def set_global_cycle_owner(sales_cycle):
@@ -169,6 +170,14 @@ def main():
 				_filter.save()
 				warning_fixed = True
 
+			if not warning_fixed:
+				model = get_model('alm_crm', model_name)
+				obj = model.objects.get(id=model_id)
+				if obj.company_id == None:
+					obj.company_id = obj.owner.accounts.first().company_id
+					obj.save()
+					warning_fixed = True
+
 
 		elif u'ILLEGAL_AMOUNT_OF_MILESTONES' in line:
 			model_id = line.split('{')[2].split('}')[0]
@@ -191,7 +200,7 @@ def main():
 		if not warning_fixed:
 			with open("check_db.log", "a") as _file:
 				if u"CHECK DATABASE STARTED" in line:
-					_file.write(u"=================================================================\n")
+					_file.write(u"\n=================================================================\n")
 					_file.write(u"INFO:root:%s CORRECTING DATABASE STARTED"%datetime.datetime.now())
 				elif u"CHECK DATABASE FINISHED" in line:
 					_file.write(u"INFO:root:%s CHECK DATABASE FINISHED"%datetime.datetime.now())

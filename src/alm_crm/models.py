@@ -251,11 +251,11 @@ class Contact(SubscriptionObject):
         self.save()
 
     @classmethod
-    def share_contact(cls, share_from, share_to, contact_id, comment=None):
-        return cls.share_contacts(share_from, share_to, [contact_id], comment)
+    def share_contact(cls, share_from, share_to, contact_id, company_id, comment=None):
+        return cls.share_contacts(share_from, share_to, [contact_id], company_id, comment)
 
     @classmethod
-    def share_contacts(cls, share_from, share_to, contact_ids, comment=None):
+    def share_contacts(cls, share_from, share_to, contact_ids, company_id, comment=None):
         '''
         Share multiple contacts to a single user
         '''
@@ -273,6 +273,7 @@ class Contact(SubscriptionObject):
                         share_to=share_to,
                         contact=contact
                     )
+                share.company_id = company_id
                 share.save()
                 share_list.append(share)
             '''
@@ -285,14 +286,15 @@ class Contact(SubscriptionObject):
                         comment=comment,
                         object_id=share.id,
                         owner_id=share_from.id,
-                        content_type_id=ContentType.objects.get_for_model(Share).id
+                        content_type_id=ContentType.objects.get_for_model(Share).id,
+                        company_id = company_id
                         )
                     comment.save()
             return True
         except:
             return False
 
-    def create_share_to(self, user_id, note=None):
+    def create_share_to(self, user_id, company_id, note=None):
         default_note = self.SHARE_IMPORTED_TEXT + \
             self.date_created.strftime(settings.DATETIME_FORMAT_NORMAL)
 
@@ -300,7 +302,8 @@ class Contact(SubscriptionObject):
             note=note or default_note,
             share_to_id=user_id,
             share_from_id=user_id,
-            contact_id=self.id
+            contact_id=self.id,
+            company_id=company_id
         )
         share.save()
         return share
@@ -1239,7 +1242,7 @@ class SalesCycle(SubscriptionObject):
         """TEST Assigns products to salescycle"""
         return self.add_products([product_id], **kw)
 
-    def add_products(self, product_ids):
+    def add_products(self, product_ids, company_id):
         """TEST Assigns products to salescycle"""
         if isinstance(product_ids, int):
             product_ids = [product_ids]
@@ -1251,7 +1254,7 @@ class SalesCycle(SubscriptionObject):
             try:
                 SalesCycleProductStat.objects.get(sales_cycle=self, product=product)
             except SalesCycleProductStat.DoesNotExist:
-                s = SalesCycleProductStat(sales_cycle=self, product=product)
+                s = SalesCycleProductStat(sales_cycle=self, product=product, company_id=company_id)
                 s.save()
 
         return True
@@ -1282,8 +1285,9 @@ class SalesCycle(SubscriptionObject):
         if save:
             self.save()
 
-    def set_result_by_amount(self, amount, succeed):
+    def set_result_by_amount(self, amount, company_id, succeed):
         v = Value(amount=amount, owner=self.owner)
+        v.company_id = company_id
         v.save()
 
         if succeed:
@@ -1309,7 +1313,7 @@ class SalesCycle(SubscriptionObject):
                 status.append(False)
         return status
 
-    def change_milestone(self, user, milestone_id):
+    def change_milestone(self, user, milestone_id, company_id):
         milestone = Milestone.objects.get(id=milestone_id)
 
         prev_milestone_title = None
@@ -1339,11 +1343,12 @@ class SalesCycle(SubscriptionObject):
         sc_log_entry = SalesCycleLogEntry(meta=json.dumps(meta),
                                           entry_type=SalesCycleLogEntry.MC,
                                           sales_cycle=self,
-                                          owner=user)
+                                          owner=user, 
+                                          company_id=company_id)
         sc_log_entry.save()
         return self
 
-    def close(self, products_with_values, succeed):
+    def close(self, products_with_values, company_id, succeed):
         amount = 0
         for product, value in products_with_values.iteritems():
             amount += value
@@ -1356,7 +1361,7 @@ class SalesCycle(SubscriptionObject):
             s.save()
 
         self.status = self.COMPLETED
-        self.set_result_by_amount(amount, succeed)
+        self.set_result_by_amount(amount, company_id, succeed)
         self.save()
 
         log_entry = SalesCycleLogEntry(sales_cycle=self, meta=json.dumps({"amount": amount}))
@@ -1364,6 +1369,7 @@ class SalesCycle(SubscriptionObject):
             log_entry.entry_type = SalesCycleLogEntry.SC
         else:
             log_entry.entry_type = SalesCycleLogEntry.FC
+        log_entry.company_id = company_id
 
         return [self, log_entry]
 
@@ -1692,10 +1698,11 @@ class Mention(SubscriptionObject):
 
     @classmethod
     def build_new(cls, user_id, content_class=None,
-                  object_id=None, save=False):
+                  object_id=None, company_id = None, save=False):
         mention = cls(user_id=user_id)
         mention.content_type = ContentType.objects.get_for_model(content_class)
         mention.object_id = object_id
+        mention.company_id = company_id
         if save:
             mention.save()
         return mention
@@ -2007,18 +2014,14 @@ class HashTagReference(SubscriptionObject):
 
     @classmethod
     def build_new(cls, hashtag_id, content_class=None,
-                  object_id=None, save=False):
+                  object_id=None, company_id=None, save=False):
         hashtag_reference = cls(hashtag_id=hashtag_id)
         hashtag_reference.content_type = ContentType.objects.get_for_model(content_class)
         hashtag_reference.object_id = object_id
+        hashtag_reference.company_id = company_id
         if save:
             hashtag_reference.save()
         return hashtag_reference
-
-    def save(self, **kwargs):
-        if not self.company_id and self.content_object:
-            self.company_id = self.content_object.owner.company_id
-        super(SubscriptionObject, self).save(**kwargs)
 
 
 class CustomSection(SubscriptionObject):
