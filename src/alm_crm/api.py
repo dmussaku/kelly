@@ -2269,7 +2269,7 @@ class ActivityResource(CRMServiceModelResource):
                 request, request.body,
                 format=request.META.get('CONTENT_TYPE', 'application/json'))
             for act_id in data:
-                Activity.mark_as_read(request.user.get_company(request).id, act_id)
+                Activity.mark_as_read(request.user.id, act_id)
             rv = len(data)
         return self.create_response(
             request, {'success': rv})
