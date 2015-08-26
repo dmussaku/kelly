@@ -892,6 +892,7 @@ class ContactResource(CRMServiceModelResource):
             contact_ids = self.obj_get_list(bundle=base_bundle, **self.remove_api_resource_names(kwargs)
                 ).values_list('id', flat=True)
             contacts = Contact.get_by_ids(*contact_ids)
+            print contacts
             # bundles = (
             #     {
             #         'id': obj.id,

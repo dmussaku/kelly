@@ -887,8 +887,10 @@ class Contact(SubscriptionObject):
             return objects
 
     def serialize(self):
+
         return {
             'author_id': self.owner_id,
+            'custom_fields':{cf.custom_field_id:cf.value for cf in self.custom_field_values.all()},
             'date_created': self.date_created,
             'date_edited': self.date_edited,
             'id': self.pk,
