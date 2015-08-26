@@ -26,7 +26,7 @@ from django.core.cache import cache
 from django.db.models import signals, Q
 from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, post_delete
 from django.utils import timezone
 from datetime import datetime, timedelta
 import xlrd
@@ -923,6 +923,10 @@ class Contact(SubscriptionObject):
         # cache.delete(build_key(cls._meta.model_name, old_id))
 
     @classmethod
+    def after_delete(cls, sender, instance, **kwargs):
+        cache.delete(build_key(cls._meta.model_name, instance.pk))
+
+    @classmethod
     def get_by_ids(cls, *ids):
         """Get vcard by ids from cache with fallback to postgres."""
         rv = cache.get_many([build_key(cls._meta.model_name, cid) for cid in ids])
@@ -938,6 +942,14 @@ class Contact(SubscriptionObject):
         return rv.values() + more_rv
 
     @classmethod
+    def recache(cls, ids):
+        if not isinstance(ids, list):
+            ids=[ids]
+        contact_qs = cls.objects.filter(id__in=ids).prefetch_related('sales_cycles', 'children')
+        contact_raws = [c.serialize() for c in contact_qs]
+        cache.set_many({build_key(cls._meta.model_name, contact_raw['id']): json.dumps(contact_raw, default=date_handler) for contact_raw in contact_raws})
+
+    @classmethod
     def cache_all(cls):
         contact_qs = cls.objects.all().prefetch_related('sales_cycles', 'children')
         contact_raws = [c.serialize() for c in contact_qs]
@@ -945,6 +957,7 @@ class Contact(SubscriptionObject):
 
 
 post_save.connect(Contact.after_save, sender=Contact)
+post_delete.connect(Contact.after_delete, sender=Contact)
 
 
 class Value(SubscriptionObject):
@@ -2000,6 +2013,13 @@ class CustomField(SubscriptionObject):
         return u'%s' % (self.title)
 
     @classmethod
+    def after_save_delete(cls, sender, instance, **kwargs):
+        if instance.content_type.model_class()==Contact:
+            custom_field_values = CustomFieldValue.objects.filter(custom_field=instance)
+            contact_ids = [c.content_object.id for c in custom_field_values]
+            Contact.recache(contact_ids)
+
+    @classmethod
     def build_new(cls, title=None, content_class=None, save=False):
         custom_field = cls(title=title)
         if content_class:
@@ -2007,6 +2027,9 @@ class CustomField(SubscriptionObject):
         if save:
             custom_field.save()
         return custom_field
+
+signals.post_save.connect(CustomField.after_save_delete, sender=CustomField)
+signals.post_delete.connect(CustomField.after_save_delete, sender=CustomField)
 
 class CustomFieldValue(SubscriptionObject):
     custom_field = models.ForeignKey('CustomField', related_name="values")
@@ -2027,6 +2050,12 @@ class CustomFieldValue(SubscriptionObject):
         return u'%s: %s' % (self.custom_field.title, self.value)
 
     @classmethod
+    def after_save_delete(cls, sender, instance, **kwargs):
+        if isinstance(instance.content_object, Contact):
+            Contact.recache([instance.content_object.id])
+
+
+    @classmethod
     def build_new(cls, field, value=None, object_id=None, save=False):
         custom_field_val = cls(custom_field=field, value=value)
         if object_id:
@@ -2035,6 +2064,9 @@ class CustomFieldValue(SubscriptionObject):
         if save:
             custom_field_val.save()
         return custom_field_val
+
+signals.post_save.connect(CustomFieldValue.after_save_delete, sender=CustomFieldValue)
+signals.post_delete.connect(CustomFieldValue.after_save_delete, sender=CustomFieldValue)
 
 class ImportTask(models.Model):
     uuid = models.CharField(blank=True, null=True, max_length=100)
