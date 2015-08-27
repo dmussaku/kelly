@@ -9,11 +9,13 @@ https://docs.djangoproject.com/en/1.6/ref/settings/
 """
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+from __future__ import absolute_import
 import os
 import imp
 from django.utils.functional import lazy
 from configurations import Configuration, pristinemethod
 from configurations.utils import uppercase_attributes
+from celery.schedules import crontab
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 def rel(*x):
@@ -91,9 +93,18 @@ class BaseConfiguration(SubdomainConfiguration, Configuration):
 
     #: Only add pickle to this list if your broker is secured
     #: from unwanted access (see userguide/security.html)
+    CELERYBEAT_SCHEDULER = 'djcelery.schedulers.DatabaseScheduler'
     CELERY_ACCEPT_CONTENT = ['json']
     CELERY_TASK_SERIALIZER = 'json'
     CELERY_RESULT_SERIALIZER = 'json'
+
+    CELERYBEAT_SCHEDULE = {
+        'cleanup-inactive-files': {
+            'task': 'alm_crm.tasks.cleanup_inactive_files',
+            'schedule': crontab(minute=0, hour=0) # execute every midnight
+        },
+    }
+
 
     @pristinemethod
     def reverse_lazy(viewname, **kw):
