@@ -12,7 +12,8 @@ from tastypie.exceptions import ImmediateHttpResponse, NotFound
 from tastypie.http import HttpNotFound
 from tastypie.serializers import Serializer
 
-from django.contrib.auth import login, authenticate
+from django.contrib.auth import login
+from alm_user.auth_backend import MyAuthBackend
 from django.core.exceptions import PermissionDenied
 from django.conf.urls import url
 from django.utils import translation
@@ -385,12 +386,16 @@ class UserResource(ModelResource):
         with RequestContext(self, request, allowed_methods=['post']):
             data = self.deserialize(request, request.body, format=request.META.get('CONTENT_TYPE', 'application/json'))
 
-            user = authenticate(username=data.get('email'), password=data.get('password'))
+            account = MyAuthBackend().authenticate(
+                subdomain=data.get('subdomain'), 
+                username=data.get('email'), 
+                password=data.get('password')
+                )
             session_key = None
             session_expire_date = None
-            if user is not None:
-                if user.is_active:
-                    login(request, user)  # will add session to request
+            if account is not None:
+                if account.is_active:
+                    login(request, account)  # will add session to request
                     session_key = request.session.session_key
                     session_expire_date = request.session.get_expiry_date()
                 else:
@@ -401,9 +406,10 @@ class UserResource(ModelResource):
                 return self.error_response(request, data, response_class=http.HttpUnauthorized)
 
             bundle = self.build_bundle(obj=None, data={
-                'user': self.full_dehydrate(self.build_bundle(obj=request.user, request=request)),
+                'user': self.full_dehydrate(self.build_bundle(obj=request.account, request=request)),
                 'session_key': session_key,
-                'session_expire_date': session_expire_date
+                'session_expire_date': session_expire_date,
+                'api_token': account.key
                 }, request=request)
             return self.create_response(request, bundle)
 
