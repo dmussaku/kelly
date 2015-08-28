@@ -1,6 +1,6 @@
 from contextlib import contextmanager
 from django.middleware.csrf import _sanitize_token, constant_time_compare
-from tastypie.authentication import Authentication, MultiAuthentication
+from tastypie.authentication import Authentication, MultiAuthentication, ApiKeyAuthentication
 from tastypie.authorization import Authorization
 from tastypie.constants import ALL, ALL_WITH_RELATIONS
 
@@ -17,6 +17,22 @@ def RequestContext(resource, request, allowed_methods=None):
     resource.throttle_check(request)
     yield
     resource.log_throttled_access(request)
+
+
+class ApiKeyAuthentication(ApiKeyAuthentication):
+
+    def get_key(self, user, api_key):
+        """
+        Attempts to find the API key for the user. Uses ``ApiKey`` by default
+        but can be overridden.
+        """
+
+        try:
+            Account.objects.get(user=user, key=api_key)
+        except Account.DoesNotExist:
+            return self._unauthorized()
+
+        return True
 
 
 class SessionAuthentication(Authentication):
@@ -73,7 +89,7 @@ class DummyPaginator(object):
 class CommonMeta:
     list_allowed_methods = ['get', 'post', 'patch']
     detail_allowed_methods = ['get', 'post', 'put', 'delete', 'patch']
-    authentication = MultiAuthentication(SessionAuthentication())
+    authentication = MultiAuthentication(SessionAuthentication(), ApiKeyAuthentication())
     authorization = Authorization()
 
     if not settings.RUSTEM_SETTINGS:

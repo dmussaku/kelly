@@ -22,6 +22,7 @@ from django.db.models import Q
 from .models import User
 from alm_vcard.models import *
 from alm_crm.models import SalesCycle, SalesCycleLogEntry, Contact, Category
+from alm_user.models import Account
 from tastypie.authentication import (
     MultiAuthentication,
     SessionAuthentication,
@@ -474,3 +475,6 @@ class SessionResource(Resource):
             bundle = self.build_bundle(obj=SessionObject(request=request), request=request)
             data = self.full_dehydrate(bundle)
             return self.create_response(request, data)
+
+
+
