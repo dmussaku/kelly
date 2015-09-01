@@ -58,6 +58,10 @@ class AlmanetSessionMiddleware(object):
         return engine.SessionStore(session_key)
 
     def process_request(self, request):
+        if request.META['HTTP_USER_AGENT'] and not request.COOKIES.get('sessionid') and request.META.get('API_TOKEN'):
+            api_token = request.META.get('API_TOKEN')
+            account = Account.objects.get(key=api_token)
+            self.__class__.create_session(request, account)
         engine = import_module(settings.SESSION_ENGINE)
         subdomain = request.subdomain
         session_tokens = request.COOKIES.get('comps', None)

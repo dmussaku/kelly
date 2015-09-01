@@ -8,6 +8,13 @@ from timezone_field import TimeZoneField
 from almanet.models import Subscription
 from alm_vcard.models import VCard, Email
 from datetime import datetime
+import hmac
+import uuid
+try:
+    from hashlib import sha1
+except ImportError:
+    import sha
+    sha1 = sha.sha
 
 
 
@@ -34,6 +41,7 @@ class Account(AbstractBaseUser):
 
     company = models.ForeignKey('alm_company.Company', related_name='accounts')
     user = models.ForeignKey('User', related_name='accounts')
+    key = models.CharField(max_length=128, blank=True, default='', db_index=True)
 
     class Meta:
         verbose_name = 'account'
@@ -76,11 +84,14 @@ class Account(AbstractBaseUser):
     Check if the account has unique email inside one company
     '''
     def save(self, **kwargs):
+
         if not self.id:
             if self.check_email_uniqueness():
                 return super(self.__class__, self).save(**kwargs)
             else:
                 raise Exception
+        if not self.key:
+                self.key = self.generate_key()
         return super(self.__class__, self).save(**kwargs)
 
     def check_email_uniqueness(self):
@@ -89,6 +100,12 @@ class Account(AbstractBaseUser):
             return False
         else:
             return True
+
+    def generate_key(self):
+        # Get a random UUID.
+        new_uuid = uuid.uuid4()
+        # Hmac that beast.
+        return hmac.new(new_uuid.bytes, digestmod=sha1).hexdigest()
 
 
 class UserManager(contrib_user_manager):
