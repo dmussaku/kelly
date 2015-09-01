@@ -216,10 +216,22 @@ class CRMServiceModelResource(ModelResource):
         it happen when tastypie uses BasicAuthentication or another
         which doesn't have session
         """
+<<<<<<< Updated upstream
         user = bundle.request.user
         if user:
             bundle.obj.owner = user
             bundle.obj.company_id = user.get_company(bundle.request).id
+=======
+        crmuser = self.get_crmuser(bundle.request)
+        if crmuser:
+            bundle.obj.owner = crmuser
+            
+            with open('./in', 'a') as f:
+                f.write('API::{}-{}::{}\n'.format(
+                    crmuser.get_billing_user().vcard.fn,
+                    crmuser.get_billing_user().pk, crmuser.subsription_id))
+
+>>>>>>> Stashed changes
         return bundle
 
     def get_bundle_list(self, obj_list, request):
@@ -244,6 +256,19 @@ class CRMServiceModelResource(ModelResource):
     def get_resource_id(self, bundle):
         return self.detail_uri_kwargs(bundle)[self._meta.detail_uri_name]
 
+<<<<<<< Updated upstream
+=======
+    @classmethod
+    def get_crmsubscr_id(cls, request):
+        return get_subscr_id(request.user_env, DEFAULT_SERVICE)
+
+    def get_crmuser(self, request):
+        subscription_pk = self.get_crmsubscr_id(request)
+        if subscription_pk:
+            return request.user.get_subscr_user(subscription_pk)
+        return None
+
+>>>>>>> Stashed changes
     class Meta:
         list_allowed_methods = ['get', 'post', 'patch']
         detail_allowed_methods = ['get', 'post', 'put', 'delete', 'patch']
@@ -1842,11 +1867,14 @@ class SalesCycleResource(CRMServiceModelResource):
 
     def obj_create(self, bundle, **kwargs):
         bundle = super(self.__class__, self).obj_create(bundle, **kwargs)
-        if 'milestone_id' in bundle.data:
-            milestone = Milestone.objects.get(pk=bundle.data.get('milestone_id'))
-            bundle.obj.milestone = milestone
-        bundle.obj.save()
-        bundle = self.full_hydrate(bundle)
+        # if 'milestone_id' in bundle.data:
+        #     milestone = Milestone.objects.get(pk=bundle.data.get('milestone_id'))
+        #     bundle.obj.milestone = milestone
+
+        # bundle.obj.save()
+        # bundle = self.full_hydrate(bundle)
+        # bundle = 
+        bundle = self.save(bundle)
         bundle.data['obj_created'] = True
         return bundle
 
