@@ -67,15 +67,6 @@ class SubscriptionObject(models.Model):
         abstract = True
 
     def save(self, **kwargs):
-<<<<<<< Updated upstream
-=======
-        if not self.subscription_id and self.owner:
-            self.subscription_id = self.owner.subscription_id
-            with open('./in', 'a') as f:
-                f.write('SubscriptionObject::save {}-{}::{}\n'.format(
-                    self.owner.get_billing_user().vcard.fn,
-                    self.owner.get_billing_user().pk, self.owner.subsription_id))
->>>>>>> Stashed changes
         super(SubscriptionObject, self).save(**kwargs)
 
 
