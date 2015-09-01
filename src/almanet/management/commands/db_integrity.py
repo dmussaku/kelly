@@ -63,6 +63,7 @@ def check_object_count(model_list):
             sql_query + ' {}'.format(model_name._meta.db_table)).using('old')
         if count(new_query) != count(old_query):
             logging.warning('Integrity fault at {}'.format(model_name))
+    print 'Overall object count finished'
     
 def check_objects_by_subscription(model_list):
     sql_query = 'SELECT * FROM'
@@ -102,6 +103,11 @@ def check_objects_by_owner(model_list):
             if new_query.count() != count(old_query):
                 logging.warning('Integrity fault at {} at user {} crmuser {}'.format(model, user, crmuser))
 
+def check_global_cycle():
+    for contact in Contact.objects.all():
+        sales_cycles_global = [sales_cycle.is_global for sales_cycle in contact.sales_cycles.all()]
+        if not True in sales_cycles_global:
+            logging.warning('no global cycle found in contact {}'.format(contact))
 
 class Command(BaseCommand):
     help = ''
