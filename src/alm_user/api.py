@@ -383,6 +383,9 @@ class UserResource(ModelResource):
 
 
     def authorization(self, request, **kwargs):
+        '''
+        X-User-Agent: net.alma.app.mobile
+        '''
         with RequestContext(self, request, allowed_methods=['post']):
             data = self.deserialize(request, request.body, format=request.META.get('CONTENT_TYPE', 'application/json'))
 
@@ -404,13 +407,14 @@ class UserResource(ModelResource):
             else:
                 data = {'message': "Invalid login"}
                 return self.error_response(request, data, response_class=http.HttpUnauthorized)
-
-            bundle = self.build_bundle(obj=None, data={
+            data = {
                 'user': self.full_dehydrate(self.build_bundle(obj=request.account, request=request)),
                 'session_key': session_key,
-                'session_expire_date': session_expire_date,
-                'api_token': account.key
-                }, request=request)
+                'session_expire_date': session_expire_date
+                }
+            if request.META.get('X-User-Agent',"") == 'net.alma.app.mobile':
+                data['api_token'] = account.key
+            bundle = self.build_bundle(obj=None, data=data, request=request)
             return self.create_response(request, bundle)
 
 

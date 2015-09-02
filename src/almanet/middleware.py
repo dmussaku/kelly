@@ -58,8 +58,8 @@ class AlmanetSessionMiddleware(object):
         return engine.SessionStore(session_key)
 
     def process_request(self, request):
-        if request.META['HTTP_USER_AGENT'] and not request.COOKIES.get('sessionid') and request.META.get('API_TOKEN'):
-            api_token = request.META.get('API_TOKEN')
+        if request.META.get('X-User-Agent',"") == 'net.alma.app.mobile' and not request.COOKIES.get('sessionid') and request.META.get('X-Api-Token'):
+            api_token = request.META.get('X-Api-Token')
             account = Account.objects.get(key=api_token)
             self.__class__.create_session(request, account)
         engine = import_module(settings.SESSION_ENGINE)

@@ -106,14 +106,14 @@ class VCard(models.Model):
         return self.fn
 
     def save(self, **kwargs):
-        if not self.fn or self.fn == '':
-            self.fill_fn()
+        # if not self.fn or self.fn == '':
+        self.fill_fn()
         super(self.__class__, self).save(**kwargs)
 
     def fill_fn(self):
-        if self.fn:
+        if self.fn and (not self.given_name) and (not self.family_name):
             return
-        self.fn = ''
+        self.fn = '' 
         if self.given_name:
             self.fn += self.given_name
         if self.family_name:

@@ -245,19 +245,6 @@ class CRMServiceModelResource(ModelResource):
     def get_resource_id(self, bundle):
         return self.detail_uri_kwargs(bundle)[self._meta.detail_uri_name]
 
-<<<<<<< Updated upstream
-=======
-    @classmethod
-    def get_crmsubscr_id(cls, request):
-        return get_subscr_id(request.user_env, DEFAULT_SERVICE)
-
-    def get_crmuser(self, request):
-        subscription_pk = self.get_crmsubscr_id(request)
-        if subscription_pk:
-            return request.user.get_subscr_user(subscription_pk)
-        return None
-
->>>>>>> Stashed changes
     class Meta:
         list_allowed_methods = ['get', 'post', 'patch']
         detail_allowed_methods = ['get', 'post', 'put', 'delete', 'patch']
