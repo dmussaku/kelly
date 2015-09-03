@@ -53,13 +53,11 @@ class GroupSplitIterator(object):
             self.__should_stop = True
             self.next_group -= self.gsize
             self.next_group += (self.nrows - self.next_group)
-            return self.next_group
+            return self.next_group+1
 
         self.next_group += self.gsize
         num = self.next_group - self.gsize
         if num == 0 and self.ignore_first_row:
-            return num+1
-        if num == self.nrows:
             return num+1
         return self.next_group - self.gsize
 
