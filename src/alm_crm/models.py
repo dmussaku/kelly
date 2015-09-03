@@ -586,15 +586,12 @@ class Contact(SubscriptionObject):
                     try:
                         vcard.save()
                     except:
-                        print 'exception at vcard.save()'
                         pass
                 except:
                     # transaction.savepoint_rollback(sid)
-                    print 'exception at trying to save vcard'
                     try:
                         vcard.delete()
                     except:
-                        print 'at exception vcard.delete()'
                         pass
                     response['error'] = True
                     response['error_col'] = col_num
@@ -611,11 +608,9 @@ class Contact(SubscriptionObject):
                             obj.save()
                 except:
                     # transaction.savepoint_rollback(sid)
-                    print 'exception at trying to craete TEL or EMAIL or URL'
                     try:
                         vcard.delete()
                     except:
-                        print 'exception at vcard.delete()'
                         pass
                     response['error'] = True
                     response['error_col'] = col_num
