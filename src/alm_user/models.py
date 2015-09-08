@@ -110,8 +110,8 @@ class Account(AbstractBaseUser):
 
 class UserManager(contrib_user_manager):
     @classmethod
-    def create_user(self, first_name, last_name):
-        user = User(first_name=first_name, last_name=last_name)
+    def create_user(self, first_name, last_name, is_supervisor=False):
+        user = User(first_name=first_name, last_name=last_name, is_supervisor=is_supervisor)
         user.save()
         return user
 
@@ -290,11 +290,11 @@ class AnonymousAccount(object):
     def __hash__(self):
         return 1  # instances always return the same hash value
 
-    @property 
+    @property
     def user(self): # needed to return something when SimpleLazyObject executed in MyAuthenticationMiddleware for request.user
         return None
 
-    @property 
+    @property
     def company(self): # needed to return something when SimpleLazyObject executed in MyAuthenticationMiddleware for request.company
         return None
 
