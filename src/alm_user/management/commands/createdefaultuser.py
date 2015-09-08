@@ -6,7 +6,7 @@ from django.utils.translation import ugettext as _
 from alm_user.models import User, UserManager, Account
 from alm_company.models import Company
 from almanet.models import Service, Subscription
-from alm_crm.models import CRMUser
+
 
 class Command(BaseCommand):
     help = 'Create user with email b.wayne@batman.bat and password 123, also creates \
@@ -19,6 +19,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         is_admin = options.get('is_admin', False)
+        is_supervisor = True
         first_name = 'Bruce'
         last_name = 'Wayne'
         email = 'b.wayne@batman.bat'
@@ -44,10 +45,10 @@ class Command(BaseCommand):
             u = acc.user
             sys.stderr.write("Error: bwayne@batman.bat email is already taken.\n")
         except (Account.DoesNotExist, KeyError):
-            u = UserManager.create_user(first_name=first_name, last_name=last_name)
+            u = UserManager.create_user(first_name=first_name, last_name=last_name, is_supervisor=is_supervisor)
             acc = Account.objects.create_user(
                 email=email, password=password, user=u, company=c, is_admin=True)
-            sys.stderr.write("Account and User created successfully.\n")        
+            sys.stderr.write("Account and User created successfully.\n")
         subscription.user = u
         subscription.organization = c
         subscription.is_active = True

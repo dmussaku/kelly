@@ -33,7 +33,7 @@ class MyAuthBackend(object):
             try:
                 company = Company.objects.get(subdomain=subdomain)
             except Company.DoesNotExist:
-                return -1 # to say that there is no company with provided subdomain
+                return None
             acc = Account.objects.get(**{Account.USERNAME_FIELD: username, 'company_id': company.id})
             if acc.check_password(password):
                 return acc
