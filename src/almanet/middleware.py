@@ -58,10 +58,10 @@ class AlmanetSessionMiddleware(object):
         return engine.SessionStore(session_key)
 
     def process_request(self, request):
-        if request.META.get('X-User-Agent',"") == 'net.alma.app.mobile' and not request.COOKIES.get('sessionid') and request.META.get('X-Api-Token'):
-            api_token = request.META.get('X-Api-Token')
-            account = Account.objects.get(key=api_token)
-            self.__class__.create_session(request, account)
+        # if request.META.get('X-User-Agent',"") == 'net.alma.app.mobile' and request.META.get('X-Api-Token'):
+        #     api_token = request.META.get('X-Api-Token')
+        #     account = Account.objects.get(key=api_token)
+        #     self.__class__.create_session(request, account)
         engine = import_module(settings.SESSION_ENGINE)
         subdomain = request.subdomain
         session_tokens = request.COOKIES.get('comps', None)
@@ -90,7 +90,10 @@ class AlmanetSessionMiddleware(object):
                     expires = None
                 else:
                     max_age = request.session.get_expiry_age()
-                    expires_time = time.time() + max_age
+                    if request.META.get('X-User-Agent',"") == 'net.alma.app.mobile':
+                        expires_time = time.time() + 10000000
+                    else:
+                        expires_time = time.time() + max_age
                     expires = cookie_date(expires_time)
                 # Save the session data and refresh the client cookie.
                 # Skip session save for 500 responses, refs #3881.

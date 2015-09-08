@@ -569,7 +569,8 @@ class Contact(SubscriptionObject):
     @classmethod
     def create_from_structure(cls, data, file_structure, creator, import_task, company_id):
         contact = cls()
-        vcard = VCard()
+        vcard = VCard(fn='Без Имени')
+        vcard.save()
         response = {}
         for structure_dict in file_structure:
             col_num = int(structure_dict.get('num'))
@@ -585,13 +586,16 @@ class Contact(SubscriptionObject):
                         setattr(vcard, attr, str(data[col_num].value))
                     try:
                         vcard.save()
-                    except:
+                    except Exception as e:
+                        print str(e) + 'at col {} at 589'.format(col_num)
                         pass
-                except:
+                except Exception as e:
+                    print str(e) + 'at col {} at 592'.format(col_num)
                     # transaction.savepoint_rollback(sid)
                     try:
                         vcard.delete()
-                    except:
+                    except Exception as e:
+                        print str(e) + 'at col {} 597'.format(col_num)
                         pass
                     response['error'] = True
                     response['error_col'] = col_num
@@ -606,11 +610,13 @@ class Contact(SubscriptionObject):
                             obj = model(type=v_type, value = object)
                             obj.vcard = vcard
                             obj.save()
-                except:
+                except Exception as e:
+                    print str(e) + 'at col {} at 613'.format(col_num)
                     # transaction.savepoint_rollback(sid)
                     try:
                         vcard.delete()
-                    except:
+                    except Exception as e:
+                        print str(e) + 'at col {} 618'.format(col_num)
                         pass
                     response['error'] = True
                     response['error_col'] = col_num
@@ -624,11 +630,13 @@ class Contact(SubscriptionObject):
                             obj = model(organization_name = object)
                             obj.vcard = vcard
                             obj.save()
-                except:
+                except Exception as e:
+                    print str(e) + 'at col {} at 633'.format(col_num)
                     # transaction.savepoint_rollback(sid)
                     try:
                         vcard.delete()
-                    except:
+                    except Exception as e:
+                        print str(e) + 'at col {} at 638'.format(col_num)
                         pass
                     response['error'] = True
                     response['error_col'] = col_num
@@ -642,11 +650,13 @@ class Contact(SubscriptionObject):
                             addr_objs = address_str.split(';')
                             addr_objs = [vcard, adr_type] + addr_objs
                             address = Adr.create_from_list(addr_objs)
-                except:
+                except Exception as e:
+                    print str(e) + 'at col {} at 653'.format(col_num)
                     # transaction.savepoint_rollback(sid)
                     try:
                         vcard.delete()
-                    except:
+                    except Exception as e:
+                        print str(e) + 'at col {} 658'.format(col_num)
                         pass
                     response['error'] = True
                     response['error_col'] = col_num
@@ -665,21 +675,30 @@ class Contact(SubscriptionObject):
                             obj = model(data = object)
                             obj.vcard = vcard
                             obj.save()
-                except:
+                except Exception as e:
+                    print str(e) + 'at col {} at 678'.format(col_num)
                     # transaction.savepoint_rollback(sid)
                     try:
                         vcard.delete()
-                    except:
+                    except Exception as e:
+                        print str(e) + 'at col {} at 683'.format(col_num)
                         pass
                     response['error'] = True
                     response['error_col'] = col_num
                     return response
         try:
             vcard.save()
-        except:
+        except Exception as e:
+            print str(e) + 'at col {} at 691'.format(col_num)
             response['error'] = True
             response['error_col'] = 0
             return response
+        if vcard.fn == 'Без Имени' and vcard.org_set.first():
+            vcard.fn = vcard.org_set.first().organization_name
+            vcard.save()
+        elif vcard.fn == 'Без Имени' and vcard.email_set.first():
+            vcard.fn = vcard.email_set.first().value
+            vcard.save()
         contact.vcard = vcard
         contact.import_task = import_task
         contact.owner = creator
