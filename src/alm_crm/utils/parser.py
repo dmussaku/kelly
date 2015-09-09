@@ -11,7 +11,7 @@ from alm_crm.models import (
 	)
 
 
-def text_parser(base_text, content_class=None, object_id=None):
+def text_parser(base_text, company_id, content_class=None, object_id=None):
 	if base_text == None or base_text == "":
 		return
 		
