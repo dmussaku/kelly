@@ -112,12 +112,19 @@ class UserResource(ModelResource):
         detail_allowed_methods = ['get', 'patch']
         resource_name = 'user'
 
+        # authentication = MultiAuthentication(
+        #     # OpenAuthEndpoint(),
+        #     BasicAuthentication(),
+        #     SessionAuthentication()
+        #     )
+        # authorization = Authorization()
+
     def apply_filters(self, request, applicable_filters):
         user_ids = [acc.user_id for acc in request.company.accounts.all()]
         q = Q(id__in=user_ids)
         objects = super(ModelResource, self).apply_filters(request, applicable_filters)
         return objects.filter(q)
-
+        
     def prepend_urls(self):
         return [
             url(
@@ -272,6 +279,7 @@ class UserResource(ModelResource):
     def full_dehydrate(self, bundle, for_list=False):
         bundle = super(self.__class__, self).full_dehydrate(bundle, for_list=True)
         bundle.data['unfollow_list'] = [contact.id for contact in bundle.obj.unfollow_list.all()]
+        bundle.data['is_active'] = bundle.request.account.is_active if hasattr(bundle.request, 'account') else None
         # TODO: use CustomFields with use_in_ids
         return bundle
 
