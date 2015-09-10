@@ -206,7 +206,7 @@ class CRMServiceModelResource(ModelResource):
         custom_Q = applicable_filters.pop('q', None)  # 'q' - key for Q() object
         objects = super(ModelResource, self).apply_filters(request, applicable_filters)
         if custom_Q:
-            q = q & custom_Q    
+            q = q & custom_Q
         return objects.filter(q)
 
     def hydrate(self, bundle):
@@ -256,7 +256,7 @@ class ContactResource(CRMServiceModelResource):
     '''
     GET Method \n
     I{URL}:  U{alma.net/api/v1/contact}\n
-    
+
     Description:
     Api for Contact model\n
 
@@ -360,10 +360,10 @@ class ContactResource(CRMServiceModelResource):
          "rev": null,
          "roles": [],
          "sort_string": null,
-         "tels": [{"type": "work", "value": "7777777777"}], 
-         "titles": [{"data": "SEO"}], 
-         "tzs": [], 
-         "uid": null, 
+         "tels": [{"type": "work", "value": "7777777777"}],
+         "titles": [{"data": "SEO"}],
+         "tzs": [],
+         "uid": null,
          "urls": []
         }
      }
@@ -372,9 +372,9 @@ class ContactResource(CRMServiceModelResource):
     So basically if you want to edit the contact you must send all the attributes
     (except for the empty ones) If you want to say change fn (full name) and leave
     emails and telephone number untouched you have to send them via PUT as well. And
-    if you want to add an email to a contact you have to attach the previous ones (they 
+    if you want to add an email to a contact you have to attach the previous ones (they
     may be edited as well, just keep ids of those objects) plus the new email object.
-    The Accept and response json are similar to the ones used in Create example 
+    The Accept and response json are similar to the ones used in Create example
 
     @type  limit: number
     @param limit: The limit of results, 20 by default.
@@ -549,7 +549,7 @@ class ContactResource(CRMServiceModelResource):
                 (self._meta.resource_name, trailing_slash()),
                 self.wrap_view('get_vcard_state'),
                 name='api_get_vcard_state'
-            )   
+            )
         ]
 
     def get_meta_dict(self, limit, offset, count, url):
@@ -1416,13 +1416,13 @@ class ContactResource(CRMServiceModelResource):
         except ObjectDoesNotExist:
             return self.create_response(
                     request, {
-                        'success':False, 
+                        'success':False,
                         'message':'Contact with %s id doesnt exist' % merge_into_contact_id
                         }
                     )
         alias_objects = Contact.objects.filter(id__in=merged_contacts_ids)
         response = primary_object.merge_contacts(alias_objects, delete_merged)
-        if not response['success']:  
+        if not response['success']:
             return self.create_response(
                 request, response
                 )
@@ -1489,7 +1489,7 @@ class ContactResource(CRMServiceModelResource):
                 request, {'success':False, 'message':'Invalid parameters'}
                 )
         """
-        col structure: 
+        col structure:
         {0:'Adr__postal', 1:'VCard__fn', 2:'Adr__home', 3:'Org', 4:'Nickname'}
         """
         col_hash = []
@@ -1548,7 +1548,7 @@ class ContactResource(CRMServiceModelResource):
         email_sent = True if not_imported_num != 0 else False
         import_task.delete()
         return self.create_response(
-            request, {'success':True, 'status':'FINISHED', 'objects': objects, 'contact_list': contact_list, 
+            request, {'success':True, 'status':'FINISHED', 'objects': objects, 'contact_list': contact_list,
             'imported_num':imported_num, 'not_imported_num':not_imported_num, 'email_sent':email_sent})
 
 
@@ -1558,17 +1558,17 @@ class SalesCycleResource(CRMServiceModelResource):
     I{URL}:  U{alma.net/api/v1/sales_cycle}\n
     B{Response}\n
     C{{"activities": [], "author_id": 1, "contact_id": 1, "date_created": "2015-05-14T11:47:26.545833", "description": "", "id": 2, "is_global": false, "log": [], "milestone_id": null, "projected_value": null, "real_value": null, "resource_uri": "/api/v1/sales_cycle/2/", "stat": [], "status": "P", "company_id": 1, "title": "New Cycle"}}\n
-    
+
     B{Description}:
     API resource manage Contact's SalesCycles
-    
+
 
     I{POST}\n
     B{Accepts Example}
-    C{{author_id: 1, contact_id: 1, status: "N", title: "New Cycle"}}\n 
+    C{{author_id: 1, contact_id: 1, status: "N", title: "New Cycle"}}\n
     B{Returns Example}
-    C{{"activities": [], "author_id": 1, "contact_id": 1, "date_created": "2015-05-14T11:47:26.545833", "description": "", "id": 2, "is_global": false, "log": [], "milestone_id": null, "obj_created": true, "projected_value": null, "real_value": null, "resource_uri": "/api/v1/sales_cycle/2/", "stat": [], "status": "N", "company_id": 1, "title": "New Cycle"}} 
-    
+    C{{"activities": [], "author_id": 1, "contact_id": 1, "date_created": "2015-05-14T11:47:26.545833", "description": "", "id": 2, "is_global": false, "log": [], "milestone_id": null, "obj_created": true, "projected_value": null, "real_value": null, "resource_uri": "/api/v1/sales_cycle/2/", "stat": [], "status": "N", "company_id": 1, "title": "New Cycle"}}
+
     I{PUT}\n
     B{Accepts Example}
     C{"status":"P"}\n
@@ -1679,14 +1679,14 @@ class SalesCycleResource(CRMServiceModelResource):
                 format=request.META.get('CONTENT_TYPE', 'application/json'))
             deserialized = self.alter_deserialized_list_data(request, deserialized)
             if kwargs['status'] == 'succeed':
-                sales_cycle, log_entry = bundle.obj.close(products_with_values=deserialized, 
+                sales_cycle, log_entry = bundle.obj.close(products_with_values=deserialized,
                                                             company_id=request.company.id,
                                                             succeed=True)
                 log_entry.owner = request.user
                 log_entry.company_id = request.company.id
                 log_entry.save()
             elif kwargs['status'] == 'fail':
-                sales_cycle, log_entry = bundle.obj.close(products_with_values=deserialized, 
+                sales_cycle, log_entry = bundle.obj.close(products_with_values=deserialized,
                                                             company_id=request.company.id,
                                                             succeed=False)
                 log_entry.owner = request.user
@@ -1739,7 +1739,7 @@ class SalesCycleResource(CRMServiceModelResource):
 
             new_objects_list = deserialized['object_ids']
             last_objects_list = obj.products.all().values_list('id', flat=True)
-            
+
             added = [Product.objects.get(id=item).name for item in new_objects_list if item not in last_objects_list]
             deleted = [Product.objects.get(id=item).name for item in last_objects_list if item not in new_objects_list]
             products = []
@@ -1758,7 +1758,7 @@ class SalesCycleResource(CRMServiceModelResource):
             meta = {"added": added,
                     "deleted": deleted,
                     "products": products}
-            log_entry = SalesCycleLogEntry(sales_cycle=obj, 
+            log_entry = SalesCycleLogEntry(sales_cycle=obj,
                                             owner=request.user,
                                             company_id=request.company.id,
                                             entry_type=SalesCycleLogEntry.PC,
@@ -1848,7 +1848,7 @@ class SalesCycleResource(CRMServiceModelResource):
 
         # bundle.obj.save()
         # bundle = self.full_hydrate(bundle)
-        # bundle = 
+        # bundle =
         bundle = self.save(bundle)
         bundle.data['obj_created'] = True
         return bundle
@@ -1916,7 +1916,8 @@ class MilestoneResource(CRMServiceModelResource):
                     milestone = Milestone()
                 else:
                     if milestone.title != milestone_data['title'] or \
-                       milestone.color_code != milestone_data['color_code']:
+                       milestone.color_code != milestone_data['color_code'] or \
+                       milestone.sort != milestone_data['sort']:
 
                         for sales_cycle in milestone.sales_cycles.all():
                             sales_cycle.milestone = None
@@ -1924,14 +1925,15 @@ class MilestoneResource(CRMServiceModelResource):
                             sales_cycles.append(sales_cycle)
                             meta = {"prev_milestone_color_code": milestone.color_code,
                                     "prev_milestone_title": milestone.title}
-                            log_entry = SalesCycleLogEntry(sales_cycle=sales_cycle, 
-                                                            owner=request.user.get_account(request).company,
+                            log_entry = SalesCycleLogEntry(sales_cycle=sales_cycle,
+                                                            owner=request.user,
                                                             entry_type=SalesCycleLogEntry.ME,
                                                             meta=json.dumps(meta))
                             log_entry.save()
                 finally:
                     milestone.title = milestone_data['title']
                     milestone.color_code = milestone_data['color_code']
+                    milestone.sort = milestone_data['sort']
                     milestone.company_id = request.company.id
                     milestone.save()
                     new_milestone_set.append(milestone)
@@ -1944,16 +1946,16 @@ class MilestoneResource(CRMServiceModelResource):
                         sales_cycles.append(sales_cycle)
                         meta = {"prev_milestone_color_code": milestone.color_code,
                                 "prev_milestone_title": milestone.title}
-                        log_entry = SalesCycleLogEntry(sales_cycle=sales_cycle, 
+                        log_entry = SalesCycleLogEntry(sales_cycle=sales_cycle,
                                                         owner=request.user,
                                                         entry_type=SalesCycleLogEntry.MD,
                                                         meta=json.dumps(meta))
                         log_entry.save()
                     milestone.delete()
             bundle = {
-                "milestones": [self.full_dehydrate(self.build_bundle(obj=milestone)) 
+                "milestones": [self.full_dehydrate(self.build_bundle(obj=milestone))
                                                             for milestone in new_milestone_set],
-                "sales_cycles": [SalesCycleResource().full_dehydrate(SalesCycleResource().build_bundle(obj=sc)) 
+                "sales_cycles": [SalesCycleResource().full_dehydrate(SalesCycleResource().build_bundle(obj=sc))
                                                             for sc in sales_cycles]
             }
 
@@ -1975,7 +1977,7 @@ class MilestoneResource(CRMServiceModelResource):
                     milestone = Milestone.objects.get(id=data['id'])
                     if milestone.sort != data['sort']:
                         try:
-                            milestone_2 = Milestone.objects.get(company_id=data['company_id'], 
+                            milestone_2 = Milestone.objects.get(company_id=data['company_id'],
                                                             sort=data['sort'])
                         except MultipleObjectsReturned:
                             return http.HttpBadRequest()
@@ -2031,9 +2033,9 @@ class ActivityResource(CRMServiceModelResource):
 
     B{Description}:
     API resource to manage SalesCycle's Activities
-    
+
     I{Create activity POST}\n
-        B{accepts example} 
+        B{accepts example}
         C{
             author_id: 1
             comments_count: 0
@@ -2064,8 +2066,8 @@ class ActivityResource(CRMServiceModelResource):
             status: true
         }
 
-    Response 
-    {  
+    Response
+    {
        "author_id":1,
        "comments_count":0,
        "contact":{},
@@ -2082,14 +2084,14 @@ class ActivityResource(CRMServiceModelResource):
     }
 
     I{Plan activity POST}\n
-        B{accepts example} 
+        B{accepts example}
         C{
             author_id: 1
             comments_count: 0
             contact:{}
             author_id: 1
             children: []
-            
+
             id: 1
             owner: 1
             parent: null
@@ -2113,8 +2115,8 @@ class ActivityResource(CRMServiceModelResource):
             status: true
         }
 
-    Response 
-    {  
+    Response
+    {
        "author_id":1,
        "comments_count":0,
        "contact":{},
@@ -2133,7 +2135,7 @@ class ActivityResource(CRMServiceModelResource):
 
     @undocumented: Meta
 
-    
+
     '''
 
     author_id = fields.IntegerField(attribute='owner_id', null=True)
@@ -3661,7 +3663,7 @@ class CustomFieldResource(CRMServiceModelResource):
                 request, request.body,
                 format=request.META.get('CONTENT_TYPE', 'application/json'))
 
-            fields_set = []       
+            fields_set = []
             content_class = data['content_class']
             changed_objects = []
 
@@ -3704,8 +3706,8 @@ class CustomFieldResource(CRMServiceModelResource):
                         'custom_fields': [self.full_dehydrate(self.build_bundle(obj=field)) for field in fields_set],
                         'changed_objects': changed_objects_bundle}
 
-            return self.create_response(request, 
-                        bundle, 
+            return self.create_response(request,
+                        bundle,
                         response_class=http.HttpAccepted)
 
     def get_for_model(self, request, **kwargs):
@@ -3718,10 +3720,10 @@ class CustomFieldResource(CRMServiceModelResource):
                 objects = CustomField.objects.filter(company_id=request.account.company.id,
                                                     content_type=content_type)
 
-                return self.create_response(request, 
-                        [self.full_dehydrate(self.build_bundle(obj=obj)) for obj in objects], 
+                return self.create_response(request,
+                        [self.full_dehydrate(self.build_bundle(obj=obj)) for obj in objects],
                         response_class=http.HttpAccepted)
-           
+
 
 class CustomFieldValueResource(CRMServiceModelResource):
 
@@ -3824,7 +3826,7 @@ class ReportResource(Resource):
                     company_id=request.company.id,
                     data=data), response_class=http.HttpAccepted
                 )
-        
+
 
     def product_report(self, request, **kwargs):
         with RequestContext(self, request, allowed_methods=['post']):
