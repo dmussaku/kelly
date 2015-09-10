@@ -88,12 +88,13 @@ class BaseConfiguration(SubdomainConfiguration, Configuration):
     # Celery settings
 
     BROKER_URL = 'amqp://guest:guest@localhost//'
-
+    
     #: Only add pickle to this list if your broker is secured
     #: from unwanted access (see userguide/security.html)
     CELERY_ACCEPT_CONTENT = ['json']
     CELERY_TASK_SERIALIZER = 'json'
     CELERY_RESULT_SERIALIZER = 'json'
+    CELERY_RESULT_BACKEND = 'djcelery.backends.database:DatabaseBackend'
 
     @pristinemethod
     def reverse_lazy(viewname, **kw):
@@ -350,7 +351,6 @@ class DevConfiguration(
     CSRF_COOKIE_DOMAIN = '.alma.net'
     CORS_ALLOW_CREDENTIALS = True
     BROKER_URL = 'amqp://dev:dev@almasales.kz:5672//almasales/dev'
-    CELERY_RESULT_BACKEND = 'djcelery.backends.database:DatabaseBackend'
 
     RUSTEM_SETTINGS = False
 
@@ -419,6 +419,47 @@ class StagingConfiguration(FileSettings('~/.almanet/almanet.conf.py'), BaseConfi
         'default': {
             'ENGINE': 'django.db.backends.postgresql_psycopg2',
             'NAME': 'qa_almanet',
+            'TEST_NAME': 'test_almanet',
+            'USER': 'xepa4ep',
+            'PASSWORD': 'f1b0nacc1',
+            'HOST': 'db.alma.net',
+            'PORT': '5432'
+        }
+    }
+
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.memcached.PyLibMCCache',
+            'LOCATION': '127.0.0.1:11211'
+        }
+    }
+
+    MEDIA_ROOT = os.path.expanduser('~/.almanet/stagemedia/')
+    STATIC_ROOT = os.path.expanduser('~/.almanet/stagestatic/')
+    BROKER_URL = 'amqp://stage:n0easyway1n@10.10.10.245:5672//almasales/stage'
+    CELERY_RESULT_BACKEND = 'djcelery.backends.database:DatabaseBackend'
+
+
+class StagingConfiguration2(FileSettings('~/.almanet/almanet.conf.py'), BaseConfiguration):
+    DEBUG = False
+    PARENT_HOST = 'almasales.qa2:4369'
+    HOSTCONF_REGEX = r'almasales\.qa2:4369'
+
+    SITE_NAME = 'almasales.qa2:4369'
+    SITE_DOMAIN = 'http://almasales.qa2:4369'
+    CSRF_COOKIE_DOMAIN = '.almasales.qa2'
+    SESSION_COOKIE_DOMAIN = '.almasales.qa2'
+    # CORS_ORIGIN_WHITELIST = (
+    #     'almasales.kz',
+    #     'almacloud.almasales.kz',
+    #     'arta.almasales.kz'
+    # )
+    CORS_ALLOW_CREDENTIALS = True
+
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'NAME': 'qa2_almanet',
             'TEST_NAME': 'test_almanet',
             'USER': 'xepa4ep',
             'PASSWORD': 'f1b0nacc1',
