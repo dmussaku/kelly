@@ -1504,6 +1504,8 @@ class Activity(SubscriptionObject):
         with transaction.atomic():
             for follower in followers:
                 act_recip = ActivityRecipient(user=follower, activity=self)
+                if follower==self.owner:
+                    act_recip.has_read = True
                 act_recip.save()
 
     def has_read(self, user_id):
@@ -1730,6 +1732,8 @@ class Comment(SubscriptionObject):
         with transaction.atomic():
             for follower in followers:
                 comment_recipient = CommentRecipient(user=follower, comment=self)
+                if follower==self.owner:
+                    comment_recipient.has_read = True
                 comment_recipient.save()
 
     def has_read(self, user_id):
