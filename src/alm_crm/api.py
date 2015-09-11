@@ -1903,6 +1903,7 @@ class MilestoneResource(CRMServiceModelResource):
             milestones = Milestone.objects.filter(company_id=request.company.id)
             new_milestone_set = []
             sales_cycles = []
+            max_sort_value = (sorted(map(lambda m: m.get('sort',0), data))[-1:] or [0])[0]
             for milestone_data in data:
                 try:
                     milestone = milestones.get(id=milestone_data.get('id', -1))
@@ -1927,7 +1928,11 @@ class MilestoneResource(CRMServiceModelResource):
                 finally:
                     milestone.title = milestone_data['title']
                     milestone.color_code = milestone_data['color_code']
-                    milestone.sort = milestone_data['sort']
+                    try:
+                        milestone.sort = milestone_data['sort']
+                    except Exception as e:
+                        max_sort_value += 1;
+                        milestone.sort = max_sort_value;
                     milestone.company_id = request.company.id
                     milestone.save()
                     new_milestone_set.append(milestone)
@@ -2301,7 +2306,7 @@ class ActivityResource(CRMServiceModelResource):
                 if 'need_preparation' in new_activity_data:
                     new_activity.need_preparation = new_activity_data.get('need_preparation')
                 new_activity.save()
-                
+
                 if new_activity_data.get('feedback_status'):
                     new_activity.feedback = Feedback(
                         status=new_activity_data.get('feedback_status', None),
@@ -2311,10 +2316,10 @@ class ActivityResource(CRMServiceModelResource):
 
                 new_activity.spray(subscription_id)
 
-                text_parser(base_text=new_activity.description, 
+                text_parser(base_text=new_activity.description,
                             content_class=new_activity.__class__,
                             object_id=new_activity.id)
-                
+
                 new_activities_list.append(self.full_dehydrate(self.build_bundle(obj=new_activity, request=request)))
 
             return self.create_response(request, new_activities_list, response_class=http.HttpCreated)
