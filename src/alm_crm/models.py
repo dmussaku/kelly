@@ -1482,6 +1482,13 @@ class Activity(SubscriptionObject):
     def comments_count(self):
         return self.comments.count()
 
+    @property
+    def new_comments_count(self):
+        return len(
+            filter(lambda(comment): not comment.has_read(self.author_id),
+                   self.comments.all())
+            )
+
     def spray(self, company_id):
         unfollow_set = {
             unfollower.id for unfollower
@@ -1497,6 +1504,8 @@ class Activity(SubscriptionObject):
         with transaction.atomic():
             for follower in followers:
                 act_recip = ActivityRecipient(user=follower, activity=self)
+                if follower==self.owner:
+                    act_recip.has_read = True
                 act_recip.save()
 
     def has_read(self, user_id):
@@ -1708,6 +1717,47 @@ class Comment(SubscriptionObject):
     def author(self):
         return self.owner
 
+    def spray(self, company_id):
+        unfollow_set = {
+            unfollower.id for unfollower
+            in self.content_object.sales_cycle.contact.owner.unfollow_list.all()}
+
+        # q = Q(company_id=company_id)
+        accounts = Account.objects.filter(company_id=company_id)
+        university_set = set(User.objects.filter(accounts__in=accounts).values_list(
+                             'id', flat=True))
+        followers = User.objects.filter(
+            pk__in=(university_set - unfollow_set))
+
+        with transaction.atomic():
+            for follower in followers:
+                comment_recipient = CommentRecipient(user=follower, comment=self)
+                if follower==self.owner:
+                    comment_recipient.has_read = True
+                comment_recipient.save()
+
+    def has_read(self, user_id):
+        recip = self.recipients.filter(user_id=user_id).first()
+        # # OPTIMIZE VERSION =D
+        # recip = None
+        # for r in self.recipients.all():
+        #     if r.user_id == user_id:
+        #         recip = r
+        #         break
+        return not recip or recip.has_read
+
+    @classmethod
+    def mark_as_read(cls, user_id, comment_id):
+        try:
+            comment = CommentRecipient.objects.get(
+                user__id=user_id, comment__id=comment_id)
+        except CommentRecipient.DoesNotExist:
+            pass
+        else:
+            comment.has_read = True
+            comment.save()
+        return True
+
     def save(self, **kwargs):
         if self.date_created:
             self.date_edited = timezone.now()
@@ -1743,6 +1793,23 @@ class Comment(SubscriptionObject):
         return cls.objects.filter(
             object_id=context_object_id,
             content_type=cttype)
+
+
+
+class CommentRecipient(SubscriptionObject):
+    comment = models.ForeignKey(Comment, related_name='recipients')
+    user = models.ForeignKey(User, related_name='comments')
+    has_read = models.BooleanField(default=False)
+
+    @property
+    def owner(self):
+        return self.comment.owner
+
+    class Meta:
+        db_table = settings.DB_PREFIX.format('comment_recipient')
+
+    def __unicode__(self):
+        return u'Comment: %s' % self.pk or 'Unknown'
 
 
 class Share(SubscriptionObject):

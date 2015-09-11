@@ -1292,7 +1292,7 @@ class ContactResource(CRMServiceModelResource):
         data = self.deserialize(
             request, request.body,
             format=request.META.get('CONTENT_TYPE', 'application/json'))
-        current_user = request.user.get_account(request).company
+        current_user = request.user
         decoded_string = base64.b64decode(data['uploaded_file'])
         filename_chunks = data['filename'].split('.')
         filename = filename_chunks[len(filename_chunks)-1]
@@ -1307,7 +1307,7 @@ class ContactResource(CRMServiceModelResource):
                 self.log_throttled_access(request)
                 return self.error_response(request, {'success': False}, response_class=http.HttpBadRequest)
             contact_list = ContactList(
-                owner = request.user.get_account(request).company,
+                owner = request.user,
                 title = data['filename'])
             contact_list.save()
             contact_list.contacts = contacts
@@ -1340,7 +1340,7 @@ class ContactResource(CRMServiceModelResource):
                 # return self.create_response(request, {'success': False})
             if len(contacts)>1:
                 contact_list = ContactList(
-                    owner = request.user.get_account(request).company,
+                    owner = request.user,
                     title = data['filename'])
                 contact_list.save()
                 contact_list.contacts = contacts
@@ -1492,7 +1492,7 @@ class ContactResource(CRMServiceModelResource):
                 obj_dict['attr'] = value.split('__')[1]
             col_hash.append(obj_dict)
         import_task_id = grouped_contact_import_task(
-            col_hash, filename, request.user, request.company.id, request.user.get_account(request).email, ignore_first_row)
+            col_hash, filename, request.user, request.company.id, request.account.email, ignore_first_row)
         return self.create_response(
             request, {'success':True,'task_id':import_task_id}
             )
@@ -2138,6 +2138,7 @@ class ActivityResource(CRMServiceModelResource):
     need_preparation = fields.BooleanField(attribute='need_preparation')
     sales_cycle_id = fields.IntegerField(attribute='sales_cycle_id', null=True)
     comments_count = fields.IntegerField(attribute='comments_count', readonly=True)
+    new_comments_count = fields.IntegerField(attribute='new_comments_count', readonly=True)
 
     class Meta(CommonMeta):
         queryset = Activity.objects.all().select_related('owner').prefetch_related('comments', 'recipients')
@@ -2264,9 +2265,19 @@ class ActivityResource(CRMServiceModelResource):
         '''
         with RequestContext(self, request, allowed_methods=['post', 'get']):
             activity = Activity.objects.get(pk=kwargs.get('id'))
-            comments = CommentResource().get_bundle_list(activity.comments.all(), request)
+            unread_comments = filter(
+                lambda(comment):not comment.has_read(request.user.id), 
+                activity.comments.all()
+                )
+            for unread in unread_comments:
+                Comment.mark_as_read(request.user.id, unread.id)
+            comments = CommentResource().get_bundle_list(
+                activity.comments.all(), request)
+            activity = ActivityResource().full_dehydrate(
+                ActivityResource().build_bundle(obj=activity, request=request) 
+                )
         return self.create_response(
-            request, {'objects': comments})
+            request, {'objects': comments, 'activity':activity})
 
     def mark_as_read(self, request, **kwargs):
         rv = 0
@@ -2747,9 +2758,53 @@ class CommentResource(CRMServiceModelResource):
         resource_name = 'comment'
         always_return_data = True
 
+    def prepend_urls(self):
+        return [
+            url(
+                r"^(?P<resource_name>%s)/read%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('mark_as_read'),
+                name='api_mark_as_ready'
+            ),
+            ]
+
+    def mark_as_read(self, request, **kwargs):
+        rv = 0
+        with RequestContext(self, request, allowed_methods=['post']):
+            data = self.deserialize(
+                request, request.body,
+                format=request.META.get('CONTENT_TYPE', 'application/json'))
+            for comment_id in data:
+                Comment.mark_as_read(request.user.id, comment_id)
+            rv = len(data)
+            activity = Activity.objects.get(comments__id=data[0])
+            activity_res = ActivityResource().full_dehydrate(
+                    ActivityResource().build_bundle(
+                        obj=activity, request=request
+                    )
+                )
+        return self.create_response(
+            request, {'success': rv, 'activity':activity_res})
+
+    def _has_read(self, bundle, user_id):
+        recip = None
+        for r in bundle.obj.recipients.all():
+            if r.user_id == user_id:
+                recip = r
+                break
+        return not recip or recip.has_read
+
     def dehydrate(self, bundle):
         class_name = bundle.obj.content_object.__class__.__name__.lower()
         bundle.data[class_name+'_id'] = bundle.obj.content_object.id
+        bundle.data['has_read'] = self._has_read(bundle, bundle.request.user.id)
+        return bundle
+
+    def obj_create(self, bundle):
+        bundle = super(self.__class__, self).obj_create(bundle)
+        comment = bundle.obj
+        comment.save()
+        comment.spray(comment.company_id)
         return bundle
 
     def hydrate(self, bundle):
