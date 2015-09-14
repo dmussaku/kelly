@@ -696,6 +696,7 @@ class Contact(SubscriptionObject):
         if vcard.fn == 'Без Имени' and vcard.org_set.first():
             vcard.fn = vcard.org_set.first().organization_name
             vcard.save()
+            contact.tp = 'co'
         elif vcard.fn == 'Без Имени' and vcard.email_set.first():
             vcard.fn = vcard.email_set.first().value
             vcard.save()

@@ -33,10 +33,11 @@ def check_task_status(uuid):
 
 class GroupSplitIterator(object):
 
-    def __init__(self, nrows, gsize, ignore_first_row):
+    def __init__(self, nrows, gsize, ignore_first_row=False):
         self.nrows = nrows
         self.gsize = gsize
-        self.next_group = 0 if not ignore_first_row else 1
+        self.next_group = 0
+        self.ignore_first_row = ignore_first_row
         self.__should_stop = False
 
     def __iter__(self):
@@ -55,10 +56,13 @@ class GroupSplitIterator(object):
             return self.next_group+1
 
         self.next_group += self.gsize
+        num = self.next_group - self.gsize
+        if num == 0 and self.ignore_first_row:
+            return num+1
         return self.next_group - self.gsize
 
 
-def current_next_iter(nrows, gsize, ignore_first_row):
+def current_next_iter(nrows, gsize, ignore_first_row=False):
     a, b = itertools.tee(GroupSplitIterator(nrows, gsize, ignore_first_row), 2)
     next(b, None)
     return itertools.izip(a, b)
@@ -69,10 +73,11 @@ def grouped_contact_import_task(file_structure, filename, creator, company_id, c
     nrows = sheet.nrows
     import_task = ImportTask()
     import_task.save()
-    chord_task = chord([
-        add_contacts_by_chunks.s(import_task.id, file_structure, filename, creator.id, curg, nextg)
+    task_list = [
+        add_contacts_by_chunks.s(import_task.id, file_structure, filename, creator.id, company_id, curg, nextg)
         for curg, nextg in current_next_iter(nrows, 100, ignore_first_row)
-    ])(finish_add_contacts.s(filename, import_task.id, creator.id))
+    ]
+    chord_task = chord(task_list)(finish_add_contacts.s(filename, import_task.id, creator.id, company_id, creator_email))
     import_task.uuid = chord_task.id
     import_task.filename = filename 
     import_task.save()
