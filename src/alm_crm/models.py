@@ -26,7 +26,7 @@ from django.core.cache import cache
 from django.db.models import signals, Q
 from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
-from django.db.models.signals import post_save, post_delete
+from django.db.models.signals import post_save, post_delete, pre_delete
 from django.utils import timezone
 from datetime import datetime, timedelta
 import xlrd
@@ -910,6 +910,7 @@ class Contact(SubscriptionObject):
 
         return {
             'author_id': self.owner_id,
+            'company_id': self.company_id,
             'custom_fields':{cf.custom_field_id:cf.value for cf in self.custom_field_values.all()},
             'date_created': self.date_created,
             'date_edited': self.date_edited,
@@ -1168,6 +1169,10 @@ class SalesCycle(SubscriptionObject):
     def __unicode__(self):
         return '%s [%s %s]' % (self.title, self.contact, self.status)
 
+    def delete(self):
+        print 'at salescycle delete'
+        super(self.__class__, self).delete()
+
     @property
     def activities_count(self):
         return self.rel_activities.count()
@@ -1421,6 +1426,66 @@ class SalesCycle(SubscriptionObject):
             .order_by('-latest_activity__date_created')
         return sales_cycles
 
+    def serialize(self):
+        projected_value_id = None
+        real_value_id = None
+        if self.projected_value:
+            projected_value_id = self.projected_value.id
+        if self.real_value:
+            real_value_id = self.real_value.id
+
+        return {
+            'activities': [activity.id for activity in self.rel_activities.all()],
+            'author_id': self.owner_id,
+            'company_id': self.company_id,
+            'contact_id': self.contact_id,
+            'date_created': self.date_created,
+            'date_edited': self.date_edited,
+            'description': self.description,
+            'id': self.pk,
+            'is_global': self.is_global,
+            'log': [l.id for l in self.log.all()],
+            'milestone_id': self.milestone_id,
+            'pk': self.pk,
+            'product_ids': [p.id for p in self.products.all()],
+            "projected_value": projected_value_id,
+            "real_value": real_value_id,
+            "stat": [stat.id for stat in self.product_stats.all()],
+            "status": self.status,
+            "title": self.title
+        }
+
+    @classmethod
+    def get_by_ids(cls, *ids):
+        """Get sales cycles by ids from cache with fallback to postgres."""
+        rv = cache.get_many([build_key(cls._meta.model_name, sid) for sid in ids])
+        rv = {extract_id(k, coerce=int): json.loads(v) for k, v in rv.iteritems()}
+
+        not_found_ids = [cid for cid in ids if not cid in rv]
+        if not not_found_ids:
+            return rv.values()
+        sales_cycles = cls.objects.filter(pk__in=not_found_ids).prefetch_related('rel_activities')
+        more_rv = list(s.serialize() for s in sales_cycles)
+        cache.set_many({build_key(cls._meta.model_name, salescycle_raw['id']): json.dumps(salescycle_raw, default=date_handler)
+                        for salescycle_raw in more_rv})
+        return rv.values() + more_rv
+
+    @classmethod
+    def after_save(cls, sender, instance, **kwargs):
+        cache.set(build_key(cls._meta.model_name, instance.pk), json.dumps(instance.serialize(), default=date_handler))
+    
+    @classmethod
+    def after_delete(cls, sender, instance, **kwargs):
+        cache.delete(build_key(cls._meta.model_name, instance.pk))
+
+    @classmethod
+    def cache_all(cls):
+        sales_cycles_qs = cls.objects.all().prefetch_related('rel_activities')
+        sales_cycle_raws = [c.serialize() for c in sales_cycles_qs]
+        cache.set_many({build_key(cls._meta.model_name, sales_cycle_raw['id']): json.dumps(sales_cycle_raw, default=date_handler) for sales_cycle_raw in sales_cycle_raws})
+
+post_save.connect(SalesCycle.after_save, sender=SalesCycle)
+post_delete.connect(SalesCycle.after_delete, sender=SalesCycle)
 
 class SalesCycleLogEntry(SubscriptionObject):
     TYPES_CAPS = (
@@ -1649,6 +1714,57 @@ class Activity(SubscriptionObject):
             for sc in sales_cycles:
                 s2a_map[sc.id] = sc.rel_activities.values_list('pk', flat=True)
             return (activities, sales_cycles, s2a_map)
+
+    def serialize(self):
+        return {
+            'assignee_id': self.assignee_id,            
+            'author_id': self.owner_id,
+            'company_id': self.company_id,
+            'comments_count': self.comments_count,
+            'date_created': self.date_created,
+            'date_edited': self.date_edited,
+            'date_finished': self.date_finished,
+            'deadline': self.deadline,
+            'description': self.description,
+            'id': self.pk,
+            'need_preparation': self.need_preparation,
+            'pk': self.pk,
+            'result': self.result,
+            'sales_cycle_id': self.sales_cycle_id
+        }
+
+    @classmethod
+    def get_by_ids(cls, *ids):
+        """Get sales cycles by ids from cache with fallback to postgres."""
+        rv = cache.get_many([build_key(cls._meta.model_name, aid) for aid in ids])
+        rv = {extract_id(k, coerce=int): json.loads(v) for k, v in rv.iteritems()}
+
+        not_found_ids = [aid for aid in ids if not aid in rv]
+        if not not_found_ids:
+            return rv.values()
+        activities = cls.objects.filter(pk__in=not_found_ids)
+        more_rv = list(a.serialize() for a in activities)
+        cache.set_many({build_key(cls._meta.model_name, activity_raw['id']): json.dumps(activity_raw, default=date_handler)
+                        for activity_raw in more_rv})
+        return rv.values() + more_rv
+
+    @classmethod
+    def after_save(cls, sender, instance, **kwargs):
+        cache.set(build_key(cls._meta.model_name, instance.pk), json.dumps(instance.serialize(), default=date_handler))
+    
+    @classmethod
+    def after_delete(cls, sender, instance, **kwargs):
+        cache.delete(build_key(cls._meta.model_name, instance.pk))
+
+
+    @classmethod
+    def cache_all(cls):
+        activities = cls.objects.all()
+        activity_raws = [activity.serialize() for activity in activities]
+        cache.set_many({build_key(cls._meta.model_name, activity_raw['id']): json.dumps(activity_raw, default=date_handler) for activity_raw in activity_raws})
+
+# post_save.connect(Activity.after_save, sender=Activity)
+# post_delete.connect(Activity.after_delete, sender=Activity)
 
 
 class ActivityRecipient(SubscriptionObject):

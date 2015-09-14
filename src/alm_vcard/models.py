@@ -11,7 +11,7 @@ from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
 from django.db import transaction
 from django.db.models import get_models, Model
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, post_delete
 from django.contrib.contenttypes.generic import GenericForeignKey
 from django.core.cache import cache
 from django.contrib.contenttypes.generic import GenericForeignKey
@@ -109,6 +109,10 @@ class VCard(models.Model):
         # if not self.fn or self.fn == '':
         self.fill_fn()
         super(self.__class__, self).save(**kwargs)
+
+    @classmethod
+    def after_delete(cls, sender, instance, **kwargs):
+        cache.delete(build_key(cls._meta.model_name, instance.pk))
 
     def fill_fn(self):
         if self.fn and (not self.given_name) and (not self.family_name):
@@ -851,7 +855,7 @@ class VCard(models.Model):
 
 
 post_save.connect(VCard.after_save, sender=VCard)
-
+post_delete.connect(VCard.after_delete, sender=VCard)
 
 
 class Tel(SerializableModel):
