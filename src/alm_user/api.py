@@ -12,9 +12,9 @@ from tastypie.exceptions import ImmediateHttpResponse, NotFound
 from tastypie.http import HttpNotFound
 from tastypie.serializers import Serializer
 
-from django.contrib.auth import login
-from alm_user.auth_backend import MyAuthBackend
+from alm_user.auth_backend import login
 from django.core.exceptions import PermissionDenied
+from django.contrib.auth import authenticate
 from django.conf.urls import url
 from django.utils import translation
 from django.http import HttpResponse
@@ -112,11 +112,11 @@ class UserResource(ModelResource):
         detail_allowed_methods = ['get', 'patch']
         resource_name = 'user'
 
-        # authentication = MultiAuthentication(
-        #     # OpenAuthEndpoint(),
-        #     BasicAuthentication(),
-        #     SessionAuthentication()
-        #     )
+        authentication = MultiAuthentication(
+            OpenAuthEndpoint(),
+            # BasicAuthentication(),
+            SessionAuthentication()
+            )
         # authorization = Authorization()
 
     def apply_filters(self, request, applicable_filters):
@@ -187,7 +187,6 @@ class UserResource(ModelResource):
             if old_password is None or new_password is None:
                 self.error_response(request, {}, response_class=http.HttpBadRequest)
 
-            print old_password, new_password
             if user.check_password(old_password):
                 user.set_password(new_password)
                 user.save()
@@ -397,7 +396,7 @@ class UserResource(ModelResource):
         with RequestContext(self, request, allowed_methods=['post']):
             data = self.deserialize(request, request.body, format=request.META.get('CONTENT_TYPE', 'application/json'))
 
-            account = MyAuthBackend().authenticate(
+            account = authenticate(
                 subdomain=data.get('subdomain'), 
                 username=data.get('email'), 
                 password=data.get('password')
@@ -416,7 +415,7 @@ class UserResource(ModelResource):
                 data = {'message': "Invalid login"}
                 return self.error_response(request, data, response_class=http.HttpUnauthorized)
             data = {
-                'user': self.full_dehydrate(self.build_bundle(obj=request.account, request=request)),
+                'user': self.full_dehydrate(self.build_bundle(obj=request.user, request=request)),
                 'session_key': session_key,
                 'session_expire_date': session_expire_date
                 }
