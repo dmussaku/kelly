@@ -11,6 +11,7 @@ from tastypie.authentication import Authentication
 from tastypie.exceptions import ImmediateHttpResponse, NotFound
 from tastypie.http import HttpNotFound
 from tastypie.serializers import Serializer
+from tastypie.constants import ALL
 
 from alm_user.auth_backend import login
 from django.core.exceptions import PermissionDenied
@@ -111,6 +112,9 @@ class UserResource(ModelResource):
         list_allowed_methods = ['get', 'patch']
         detail_allowed_methods = ['get', 'patch']
         resource_name = 'user'
+        filtering = {
+            'id': ALL
+        }
 
         authentication = MultiAuthentication(
             OpenAuthEndpoint(),
