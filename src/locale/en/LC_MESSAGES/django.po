@@ -500,13 +500,21 @@ msgstr ""
 msgid "User Profile Password Settings Page"
 msgstr ""
 
-#: alm_user/templates/user/user_login.html:47
+#: alm_user/templates/user/user_login.html:59
 msgid "Forgot your password?"
-msgstr ""
+msgstr "Забыли пароль?"
+
+#: alm_user/templates/user/user_login.html:47
+msgid "Forgot your subdomain?"
+msgstr "Забыли ваш поддомен?"
 
 #: alm_user/templates/user/user_login.html:50
 msgid "Login"
-msgstr ""
+msgstr "Войти"
+
+#: alm_user/templates/user/user_login.html:62
+msgid "Legal details"
+msgstr "Соглашение о порядке предоставления услуг"
 
 #: alm_vcard/admin.py:170
 msgid "Select VCF"

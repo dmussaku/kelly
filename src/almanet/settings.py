@@ -298,7 +298,7 @@ class BaseConfiguration(SubdomainConfiguration, Configuration):
 
 
     SITE_NAME = 'alma.net'
-    SITE_DOMAIN = 'http://localhost:8000'
+    SITE_DOMAIN = 'http://alma.net:8000'
 
     DEFAULT_URL_SCHEME = 'http'
 

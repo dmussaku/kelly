@@ -11,13 +11,14 @@ from django.conf import settings
 from almanet.settings import MY_SD
 
 from alm_company.models import Company
-from alm_user.models import User, Referral
+from alm_user.models import User, Referral, Account
 from alm_user.forms import(
     # RegistrationForm, 
     UserBaseSettingsForm, 
     UserPasswordSettingsForm, 
     ReferralForm, 
     PasswordResetForm,
+    SubdomainForgotForm,
     AuthenticationForm,
 ) 
 from alm_user.auth_backend import login, logout
@@ -110,6 +111,82 @@ def logout_view(request, next_page=None,
 
     return HttpResponseRedirect('/auth/signin')
 
+@csrf_protect
+def password_reset(request, is_admin_site=False,
+                   template_name='registration/password_reset_form.html',
+                   email_template_name='registration/password_reset_email.html',
+                   subject_template_name='registration/password_reset_subject.txt',
+                   password_reset_form=PasswordResetForm,
+                   token_generator=default_token_generator,
+                   post_reset_redirect=None,
+                   from_email=None,
+                   current_app=None,
+                   extra_context=None):
+    if post_reset_redirect is None:
+        post_reset_redirect = reverse('password_reset_done')
+    else:
+        post_reset_redirect = resolve_url(post_reset_redirect)
+    if request.method == "POST":
+        form = password_reset_form(request.POST)
+        if form.is_valid():
+            opts = {
+                'use_https': request.is_secure(),
+                'token_generator': token_generator,
+                'from_email': from_email,
+                'email_template_name': email_template_name,
+                'subject_template_name': subject_template_name,
+                'request': request,
+            }
+            if is_admin_site:
+                opts = dict(opts, domain_override=request.get_host())
+            form.save(**opts)
+            return HttpResponseRedirect(post_reset_redirect)
+    else:
+        form = password_reset_form()
+    context = {
+        'form': form,
+    }
+    if extra_context is not None:
+        context.update(extra_context)
+    return TemplateResponse(request, template_name, context,
+                            current_app=current_app)
+
+@csrf_protect
+def subdomain_forgot(request,
+                    is_admin_site=False, 
+                    template_name='user/subdomain_forgot.html',
+                    from_email=None,
+                    post_reset_redirect=None,
+                    extra_context=None,
+                    email_template_name='registration/password_reset_email.html',
+                    subject_template_name='registration/password_reset_subject.txt',):
+    if post_reset_redirect is None:
+        post_reset_redirect = almanet_reverse('subdomain_forgot_done')
+    else:
+        post_reset_redirect = resolve_url(post_reset_redirect)
+    if request.method == 'POST':
+        form = SubdomainForgotForm(request.POST)
+        if form.is_valid():
+            opts = {
+                'use_https': request.is_secure(),
+                'from_email': from_email,
+                'email_template_name': email_template_name,
+                'subject_template_name': subject_template_name,
+                'request': request,
+            }
+            if is_admin_site:
+                opts = dict(opts, domain_override=request.get_host())
+            form.save(**opts)
+            return HttpResponseRedirect(post_reset_redirect)
+    else:
+        form = SubdomainForgotForm()
+    context = {
+        'form': form,
+    }
+    if extra_context is not None:
+        context.update(extra_context)
+    return TemplateResponse(request, template_name, context)
+
 
 class UserListView(ListView):
 
@@ -142,7 +219,8 @@ def password_reset_confirm(request, user_pk=None, token=None,
         post_reset_redirect = reverse_lazy('password_reset_success')
 
     try:
-        user = User._default_manager.get(pk=user_pk)
+        user = Account.objects.get(pk=user_pk)
+        print user
     except User.DoesNotExist:
         user = None
 

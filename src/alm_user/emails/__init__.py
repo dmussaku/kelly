@@ -1,1 +1,5 @@
-from .messages import UserResetPasswordEmail, UserRegistrationEmail
+from .messages import (
+	UserResetPasswordEmail, 
+	UserRegistrationEmail, 
+	SubdomainForgotEmail
+	)

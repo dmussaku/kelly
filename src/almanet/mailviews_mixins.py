@@ -1,6 +1,7 @@
 from django import forms
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from alm_user.models import Account
 
 
 class PreviewForm(forms.Form):
@@ -44,7 +45,7 @@ class UserMixin(object):
                 result[dest] = User.objects.filter(
                     **{search_field: value}).first()
                 '''
-                result[dest] = User.objects.filter(
+                result[dest] = Account.objects.filter(
                     **{search_field: value})[0]
         kwargs.update(result)
         return super(UserMixin, self).get_context_data(**kwargs)

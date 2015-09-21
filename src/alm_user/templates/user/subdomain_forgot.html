@@ -1,26 +1,16 @@
 {% extends "user/base.html" %}
 {% load i18n %}
-{% block head_title %} _("Reset password") {% endblock %}
+{% block head_title %} _("Forgot subdomain") {% endblock %}
 {% block content %}
     {{ message }}
     <div class="login">
         <div class="login-body">
             <div class="login-form">
-            	<h1>{{ _("Password reset") }}</h1>
+            	<h1>{{ _("Forgot subdomain") }}</h1>
 
-				<p>{{ _("Forgotten your password? Enter your email address below, and we'll email instructions for setting a new one.") }}</p>
+				<p>{{ _("Forgotten your subdomain? Enter an email below and we will send you all the companies that you are involved in via email") }}</p>
             <form name="login-form" action="" method="post">
                 {% csrf_token %}
-                <div class="login-fieldset">
-                    <label class="login-fieldset-icon" for="login-subdomain">
-                        <figure class="icon icon--organization">
-                          <svg version="1.1">
-                            <use xlink:href="#icon-organization"></use>
-                          </svg>
-                        </figure>
-                    </label>
-                    <input class="login-input" id="subdomain" name="subdomain" type="text" placeholder="Subdomain">
-                </div>
                 <div class="login-fieldset {% if form.email.errors or form.non_field_errors %}has-error{% endif %}">
                     <label class="login-fieldset-icon" for="email">
                         <figure class="icon icon--mail">
@@ -31,19 +21,16 @@
                     </label>
                     <input class="login-input" id="email" name="email" type="email" placeholder="E-mail">
                     {% if form.email.errors %}
-                    <div class="login-error">{{ form.error_messages }}</div>
+                        <div class="login-error">{{ form.error_messages }}</div>
                     {% endif %}
                     {% if form.non_field_errors %}
                         {% for error in form.non_field_errors %}
                         <div class="login-error">{{ error }}</div>
                         {% endfor %}
                     {% endif %}
-                    <div>
-                        <a href="{% url 'subdomain_forgot' %}">{{ _("Forgot your subdomain?") }}</a>
-                    </div>
                 </div>
         <div class="login-fieldset" style="margin-top: 0;">
-          <button class="login-submit" type="submit">{{ _("Reset my password") }}</button>
+          <button class="login-submit" type="submit">{{ _("Send subdomains") }}</button>
         </div>
       </div>
     </form>

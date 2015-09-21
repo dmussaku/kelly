@@ -6,15 +6,13 @@
     <div class="login">
         <div class="login-body">
             <div class="login-form">
-				<h1>{% trans 'Password reset' %}</h1>
+				<h1>{% trans 'Subdomains sent' %}</h1>
 
-				<p>{% trans "We've emailed you instructions for setting your password. You should be receiving them shortly." %}</p>
+				<p>{% trans "We've emailed you the list of companies you are currently registered with. You should be receiving them shortly." %}</p>
 
 				<p>{% trans "If you don't receive an email, please make sure you've entered the address you registered with, and check your spam folder." %}</p>
-
 				<a href="{% url 'user_login' %}">{% trans "Return to main page" %}</a>
             </div>
-  		</div>
-
-    </div>
+		</div>
+	</div>
 {% endblock %}

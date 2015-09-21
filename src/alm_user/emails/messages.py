@@ -41,3 +41,11 @@ class UserRegistrationEmail(
 
     subject_template_name = 'emails/registration_greeting_subject.txt'
     body_template_name = 'emails/registration_greeting_email.txt'
+
+
+class SubdomainForgotEmail(
+    ContextMixin, UserMixin, DomainMixin, TemplatedEmailMessageView):
+    
+    subject_template_name = 'emails/subdomain_forgot_subject.txt'
+    body_template_name = 'emails/subdomain_forgot_email.txt'
+
