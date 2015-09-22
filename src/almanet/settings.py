@@ -401,13 +401,13 @@ class TestConfiguration(
 
 class StagingConfiguration(FileSettings('~/.almanet/almanet.conf.py'), BaseConfiguration):
     DEBUG = False
-    PARENT_HOST = 'almasales.qa:3082'
-    HOSTCONF_REGEX = r'almasales\.qa:3082'
+    PARENT_HOST = 'origamibar.kz:3082'
+    HOSTCONF_REGEX = r'origamibar\.kz:3082'
 
-    SITE_NAME = 'almasales.qa:3082'
-    SITE_DOMAIN = 'http://almasales.qa:3082'
-    CSRF_COOKIE_DOMAIN = '.almasales.qa'
-    SESSION_COOKIE_DOMAIN = '.almasales.qa'
+    SITE_NAME = 'origamibar.kz:3082'
+    SITE_DOMAIN = 'http://origamibar.kz:3082'
+    CSRF_COOKIE_DOMAIN = '.origamibar.kz'
+    SESSION_COOKIE_DOMAIN = '.origamibar.kz'
     # CORS_ORIGIN_WHITELIST = (
     #     'almasales.kz',
     #     'almacloud.almasales.kz',
