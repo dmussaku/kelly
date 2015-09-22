@@ -1492,7 +1492,7 @@ class ContactResource(CRMServiceModelResource):
                 obj_dict['attr'] = value.split('__')[1]
             col_hash.append(obj_dict)
         import_task_id = grouped_contact_import_task(
-            col_hash, filename, request.user, request.company.id, request.account.email, ignore_first_row)
+            col_hash, filename, request.user, request.company.id, request.user.email, ignore_first_row)
         return self.create_response(
             request, {'success':True,'task_id':import_task_id}
             )
@@ -3522,7 +3522,7 @@ class MobileStateObject(object):
         self.current_user = request.user
         self.company_id = request.company.id
         self.company = request.company
-        self.account = request.account
+        self.account = request.user
 
         sales_cycles = SalesCycleResource().obj_get_list(bundle, limit_for='mobile')
 
@@ -3868,7 +3868,7 @@ class CustomFieldResource(CRMServiceModelResource):
             except ContentType.DoesNotExist:
                 return http.HttpNotFound()
             else:
-                objects = CustomField.objects.filter(company_id=request.account.company.id,
+                objects = CustomField.objects.filter(company_id=request.user.company.id,
                                                     content_type=content_type)
 
                 return self.create_response(request,

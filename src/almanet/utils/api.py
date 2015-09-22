@@ -4,7 +4,7 @@ from tastypie.authentication import Authentication, MultiAuthentication, ApiKeyA
 from tastypie.authorization import Authorization
 from tastypie.constants import ALL, ALL_WITH_RELATIONS
 
-from alm_user.models import Account
+from alm_user.models import Account, User
 from almanet import settings
 
 
@@ -40,10 +40,10 @@ class SessionAuthentication(Authentication):
     def is_authenticated(self, request, **kwargs):
         
         if request.method in ('GET', 'HEAD', 'OPTIONS', 'TRACE'):
-            return request.account.is_authenticated()
+            return request.user.is_authenticated()
 
         if getattr(request, '_dont_enforce_csrf_checks', False):
-            return request.account.is_authenticated()
+            return request.user.is_authenticated()
 
         csrf_token = _sanitize_token(request.COOKIES.get(settings.CSRF_COOKIE_NAME, ''))
 
@@ -63,7 +63,7 @@ class SessionAuthentication(Authentication):
         if not constant_time_compare(request_csrf_token, csrf_token):
             return False
 
-        return request.account.is_authenticated()
+        return request.user.is_authenticated()
 
     def get_identifier(self, request):
         """
@@ -72,7 +72,7 @@ class SessionAuthentication(Authentication):
         This implementation returns the user's username.
         """
 
-        return getattr(request.account, Account.USERNAME_FIELD)
+        return getattr(request.user, User.USERNAME_FIELD)
 
 
 

@@ -26,12 +26,7 @@ class AccountManager(contrib_user_manager):
         return acc
 
 
-class Account(AbstractBaseUser):
-
-    REQUIRED_FIELDS = ['email']
-    USERNAME_FIELD = 'email'
-
-    email = models.EmailField(blank=False)
+class Account(models.Model):
 
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
@@ -80,26 +75,10 @@ class Account(AbstractBaseUser):
     def has_perm(self, perm, obj=None):
         return self.is_admin
 
-    '''
-    Check if the account has unique email inside one company
-    '''
     def save(self, **kwargs):
-
-        if not self.id:
-            if self.check_email_uniqueness():
-                return super(self.__class__, self).save(**kwargs)
-            else:
-                raise Exception
         if not self.key:
                 self.key = self.generate_key()
         return super(self.__class__, self).save(**kwargs)
-
-    def check_email_uniqueness(self):
-        qs = Account.objects.filter(company=self.company)
-        if (self.email,) in qs.values_list('email'):
-            return False
-        else:
-            return True
 
     def generate_key(self):
         # Get a random UUID.
@@ -118,12 +97,12 @@ class UserManager(contrib_user_manager):
 
 class User(AbstractBaseUser):
 
-    #REQUIRED_FIELDS = ['email']
-    USERNAME_FIELD = 'id'
+    # REQUIRED_FIELDS = ['email']
+    USERNAME_FIELD = 'email'
     first_name = models.CharField(_('first name'), max_length=31,
                                   null=False, blank=False)
     last_name = models.CharField(_('last name'), max_length=30, blank=False)
-    # email = models.EmailField(_('email address'), unique=True, blank=False)
+    email = models.EmailField(_('email address'), unique=True, blank=True)
     # is_active = models.BooleanField(_('active'), default=True)
 
     timezone = TimeZoneField(default='Asia/Almaty')

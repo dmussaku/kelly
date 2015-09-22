@@ -13,7 +13,6 @@ from tastypie.http import HttpNotFound
 from tastypie.serializers import Serializer
 from tastypie.constants import ALL
 
-from alm_user.auth_backend import login
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth import authenticate
 from django.conf.urls import url

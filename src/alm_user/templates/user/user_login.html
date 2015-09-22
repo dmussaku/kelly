@@ -13,7 +13,7 @@
             <div class="login-form">
             <form name="login-form" action="" method="post">
                 {% csrf_token %}
-                <div class="login-fieldset">
+                <!-- <div class="login-fieldset">
                     <label class="login-fieldset-icon" for="login-subdomain">
                         <figure class="icon icon--organization">
                           <svg version="1.1">
@@ -23,7 +23,7 @@
                     </label>
 
                     <input class="login-input" id="login-subdomain" name="subdomain" type="text" placeholder="Subdomain">
-                </div>
+                </div> -->
                 <div class="login-fieldset {% if form.username.errors or form.non_field_errors %}has-error{% endif %}">
                     <label class="login-fieldset-icon" for="login-email">
                         <figure class="icon icon--mail">
