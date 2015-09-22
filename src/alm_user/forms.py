@@ -7,7 +7,11 @@ from django.contrib.auth import authenticate
 from django.contrib.auth.hashers import check_password
 from django.contrib.auth.tokens import default_token_generator
 from alm_user.models import Account, User, Referral
-from alm_user.emails import UserResetPasswordEmail, UserRegistrationEmail
+from alm_user.emails import (
+    UserResetPasswordEmail, 
+    UserRegistrationEmail,
+    SubdomainForgotEmail,
+    )
 from alm_company.models import Company
 
 # need to finish validation errors for the passwords form
@@ -140,14 +144,16 @@ class AuthenticationForm(forms.Form):
 
 
 class PasswordResetForm(forms.Form):
-
+    subdomain = forms.CharField(label=_("Subdomain"), max_length=254)
     email = forms.EmailField(label=_("Email"), max_length=254)
     error_messages = (_("Account with such email is not registered."))
 
     def clean_email(self):
         email = self.cleaned_data['email']
+        subdomain = self.cleaned_data['subdomain']
         try:
-            self.cached_user = Account.objects.get(email=email)
+            self.cached_user = Account.objects.get(
+                email=email, company__subdomain=subdomain)
         except Account.DoesNotExist:
             raise forms.ValidationError(self.error_messages[0])
         else:
@@ -173,6 +179,35 @@ class PasswordResetForm(forms.Form):
             to=(self.cached_user.email,),
             bcc=settings.BCC_EMAILS)
 
+
+class SubdomainForgotForm(forms.Form):
+    email = forms.EmailField(label=_("Email"), max_length=254)
+    error_messages = (_("Account with such email is not registered."))
+
+    def clean_email(self):
+        email = self.cleaned_data['email']
+        accounts = Account.objects.filter(
+                email=email)
+        self.email = email
+        self.accounts = accounts
+        if not accounts:
+            raise forms.ValidationError(self.error_messages[0])
+        else:
+            return accounts
+
+    def save(self, domain_override=None,
+             subject_template_name=None,
+             email_template_name=None,
+             use_https=False, token_generator=default_token_generator,
+             from_email=None, request=None):
+        mail_context = {
+            'site_name': settings.SITE_NAME,
+            'accounts': self.accounts,
+            'protocol': 'https' if use_https else 'http',
+        }
+        SubdomainForgotEmail(**mail_context).send(
+            to=(self.email,),
+            bcc=settings.BCC_EMAILS)
 
 class UserBaseSettingsForm(ModelForm):
 

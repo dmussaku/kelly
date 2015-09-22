@@ -183,17 +183,20 @@ class UserResource(ModelResource):
 
     def change_password(self, request, **kwargs):
         with RequestContext(self, request, allowed_methods=['post']):
-            data = self.deserialize(request, request.body, format=request.META.get('CONTENT_TYPE', 'application/json'))
+            data = self.deserialize(
+                request, request.body, 
+                format=request.META.get('CONTENT_TYPE', 'application/json')
+                )
             old_password = data.get('old_password', None)
             new_password = data.get('new_password', None)
-            user = request.user
+            account = request.account
 
             if old_password is None or new_password is None:
                 self.error_response(request, {}, response_class=http.HttpBadRequest)
 
-            if user.check_password(old_password):
-                user.set_password(new_password)
-                user.save()
+            if account.check_password(old_password):
+                account.set_password(new_password)
+                account.save()
                 return self.create_response(
                     request,
                     {

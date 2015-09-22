@@ -1,4 +1,5 @@
-{% block header %}Hi, {{ user.get_username }}!{% endblock %}
+{% load i18n %}
+{% block header %} {% trans "Hi" %}, {{ user.get_username }}!{% endblock %}
 {% block body %}{% endblock %}
 {% block footer %}
 
