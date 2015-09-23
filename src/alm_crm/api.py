@@ -2323,7 +2323,7 @@ class ActivityResource(CRMServiceModelResource):
         with RequestContext(self, request, allowed_methods=['post', 'get']):
             activity = Activity.objects.get(pk=kwargs.get('id'))
             unread_comments = filter(
-                lambda(comment):not comment.has_read(request.user.id), 
+                lambda(comment):not comment.has_read(request.user.id),
                 activity.comments.all()
                 )
             for unread in unread_comments:
@@ -2331,7 +2331,7 @@ class ActivityResource(CRMServiceModelResource):
             comments = CommentResource().get_bundle_list(
                 activity.comments.all(), request)
             activity = ActivityResource().full_dehydrate(
-                ActivityResource().build_bundle(obj=activity, request=request) 
+                ActivityResource().build_bundle(obj=activity, request=request)
                 )
         return self.create_response(
             request, {'objects': comments, 'activity':activity})
@@ -3992,7 +3992,9 @@ class ReportResource(Resource):
                 data = {
                     'users': [int(u_id) for u_id in request.GET.get('users', '').split(',')],
                     'date_from': request.GET.get('date_from', ""),
-                    'date_to': request.GET.get('date_to', "")
+                    'date_to': request.GET.get('date_to', ""),
+                    'order': request.GET.get('order', "asc"),
+                    'sort': request.GET.get('sort', "date")
                 }
             else:
                 data = {}
