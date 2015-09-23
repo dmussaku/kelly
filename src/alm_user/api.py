@@ -23,7 +23,8 @@ from django.db.models import Q
 from .models import User
 from alm_vcard.models import *
 from alm_crm.models import SalesCycle, SalesCycleLogEntry, Contact, Category
-from alm_user.models import Account
+from alm_user.models import Account, User
+from alm_company.models import Company
 from tastypie.authentication import (
     MultiAuthentication,
     SessionAuthentication,
@@ -37,6 +38,7 @@ import json
 import datetime
 import ast
 from django.contrib.auth import login
+from almanet.middleware import GetSubdomainMiddleware
 
 
 
@@ -125,7 +127,9 @@ class UserResource(ModelResource):
         # authorization = Authorization()
 
     def apply_filters(self, request, applicable_filters):
-        user_ids = [acc.user_id for acc in request.user.accounts.all()]
+        subdomain = GetSubdomainMiddleware.get_subdomain(request)
+        company = Company.objects.get(subdomain=subdomain)
+        user_ids = [acc.user_id for acc in company.accounts.all()]
         q = Q(id__in=user_ids)
         objects = super(ModelResource, self).apply_filters(request, applicable_filters)
         return objects.filter(q)
@@ -286,13 +290,20 @@ class UserResource(ModelResource):
     def full_dehydrate(self, bundle, for_list=False):
         bundle = super(self.__class__, self).full_dehydrate(bundle, for_list=True)
         company_list = []
+        is_supervisor = False
+        subdomain = GetSubdomainMiddleware.get_subdomain(bundle.request)
+        print subdomain
         for account in bundle.obj.accounts.all():
+            if subdomain == account.company.subdomain:
+                is_supervisor = account.is_supervisor
             company_list.append(
-                {'id':account.company.id, 
+                {
+                 'id':account.company.id, 
                  'name':account.company.name, 
                  'subdomain':account.company.subdomain
                 }
             )
+        bundle.data['is_supervisor'] = is_supervisor
         bundle.data['companies'] = company_list
         bundle.data['is_active'] = bundle.request.account.is_active if hasattr(bundle.request, 'account') else None
         # TODO: use CustomFields with use_in_ids
@@ -437,11 +448,9 @@ class UserResource(ModelResource):
                 }
             # if request.META.get('X-User-Agent',"") == 'net.alma.app.mobile':
             #     data['api_token'] = account.key
+
             bundle = self.build_bundle(obj=None, data=data, request=request)
             return self.create_response(request, bundle)
-
-
-
 
 
 class SessionObject(object):
@@ -496,6 +505,7 @@ class SessionResource(Resource):
         return UserResource().full_dehydrate(user_bundle)
 
     def dehydrate_company(self, bundle):
+        print bundle.obj
         company = bundle.obj.company
         return {
             'id': company.id,
@@ -505,7 +515,8 @@ class SessionResource(Resource):
 
     def get_current_state(self, request, **kwargs):
         with RequestContext(self, request, allowed_methods=['get']):
-            bundle = self.build_bundle(obj=SessionObject(request=request), request=request)
+            bundle = self.build_bundle(
+                obj=SessionObject(request=request), request=request)
             data = self.full_dehydrate(bundle)
             return self.create_response(request, data)
 

@@ -5,14 +5,39 @@ from south.v2 import SchemaMigration
 from django.db import models
 from almanet.models import SubscriptionObject, Subscription
 from alm_company.models import Company
-from alm_crm.models import ActivityRecipient
+from alm_crm.models import (
+    Milestone,
+    Contact,
+    Value,
+    Product,
+    ProductGroup,
+    SalesCycle,
+    SalesCycleLogEntry,
+    Activity,
+    ActivityRecipient,
+    Mention,
+    Comment,
+    )
 from django.db import transaction
 
 
 class Migration(SchemaMigration):
 
     def forwards(self, orm):        
-        ms = models.get_models()  
+        ms = models.get_models()
+        ms = [
+            Milestone,
+            Contact,
+            Value,
+            Product,
+            ProductGroup,
+            SalesCycle,
+            SalesCycleLogEntry,
+            Activity,
+            ActivityRecipient,
+            Mention,
+            Comment
+        ]          
         # ms.pop(ms.index(ActivityRecipient)) 
         for model in ms:
             if (issubclass(model, SubscriptionObject) and 

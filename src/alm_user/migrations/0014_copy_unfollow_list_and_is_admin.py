@@ -3,57 +3,24 @@ from south.utils import datetime_utils as datetime
 from south.db import db
 from south.v2 import SchemaMigration
 from django.db import models
+from alm_user.models import Account, User
 
 
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Deleting field 'User.is_supervisor'
-        db.delete_column('alma_user', 'is_supervisor')
-
-        # Adding field 'User.is_admin'
-        db.add_column('alma_user', 'is_admin',
-                      self.gf('django.db.models.fields.BooleanField')(default=False),
-                      keep_default=False)
-
-        # Deleting field 'Account.is_admin'
-        db.delete_column('alma_account', 'is_admin')
-
-        # Adding field 'Account.is_supervisor'
-        db.add_column('alma_account', 'is_supervisor',
-                      self.gf('django.db.models.fields.BooleanField')(default=False),
-                      keep_default=False)
-
-        # Adding M2M table for field unfollow_list on 'Account'
-        m2m_table_name = db.shorten_name('alma_account_unfollow_list')
-        db.create_table(m2m_table_name, (
-            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
-            ('account', models.ForeignKey(orm[u'alm_user.account'], null=False)),
-            ('contact', models.ForeignKey(orm[u'alm_crm.contact'], null=False))
-        ))
-        db.create_unique(m2m_table_name, ['account_id', 'contact_id'])
-
+        for account in Account.objects.all():
+            account.is_supervisor = account.user.is_supervisor
+            account.save()
+        for user in User.objects.all():
+            if user.unfollow_list.all():
+                account = user.accounts.first()
+                for contact in user.unfollow_list.all():
+                    account.unfollow_list.add(contact)
+                account.save()
 
     def backwards(self, orm):
-        # Adding field 'User.is_supervisor'
-        db.add_column('alma_user', 'is_supervisor',
-                      self.gf('django.db.models.fields.BooleanField')(default=False),
-                      keep_default=False)
-
-        # Deleting field 'User.is_admin'
-        db.delete_column('alma_user', 'is_admin')
-
-        # Adding field 'Account.is_admin'
-        db.add_column('alma_account', 'is_admin',
-                      self.gf('django.db.models.fields.BooleanField')(default=False),
-                      keep_default=False)
-
-        # Deleting field 'Account.is_supervisor'
-        db.delete_column('alma_account', 'is_supervisor')
-
-        # Removing M2M table for field unfollow_list on 'Account'
-        db.delete_table(db.shorten_name('alma_account_unfollow_list'))
-
+        pass
 
     models = {
         u'alm_company.company': {
@@ -78,6 +45,7 @@ class Migration(SchemaMigration):
             'owner': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'activity_owner'", 'null': 'True', 'to': u"orm['alm_user.User']"}),
             'result': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
             'sales_cycle': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'rel_activities'", 'to': u"orm['alm_crm.SalesCycle']"}),
+            'subscription_id': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'title': ('django.db.models.fields.CharField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'})
         },
         u'alm_crm.contact': {
@@ -91,6 +59,7 @@ class Migration(SchemaMigration):
             'owner': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'owned_contacts'", 'null': 'True', 'to': u"orm['alm_user.User']"}),
             'parent': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'children'", 'null': 'True', 'to': u"orm['alm_crm.Contact']"}),
             'status': ('django.db.models.fields.IntegerField', [], {'default': '0', 'max_length': '30'}),
+            'subscription_id': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'tp': ('django.db.models.fields.CharField', [], {'default': "'user'", 'max_length': '30'}),
             'vcard': ('django.db.models.fields.related.OneToOneField', [], {'related_name': "'contact'", 'null': 'True', 'on_delete': 'models.SET_NULL', 'to': u"orm['alm_vcard.VCard']", 'blank': 'True', 'unique': 'True'})
         },
@@ -112,6 +81,7 @@ class Migration(SchemaMigration):
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'is_system': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
             'sort': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
+            'subscription_id': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'title': ('django.db.models.fields.CharField', [], {'max_length': '1024', 'null': 'True', 'blank': 'True'})
         },
         u'alm_crm.product': {
@@ -124,7 +94,8 @@ class Migration(SchemaMigration):
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'owner': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'crm_products'", 'null': 'True', 'to': u"orm['alm_user.User']"}),
-            'price': ('django.db.models.fields.IntegerField', [], {})
+            'price': ('django.db.models.fields.IntegerField', [], {}),
+            'subscription_id': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'})
         },
         u'alm_crm.salescycle': {
             'Meta': {'object_name': 'SalesCycle', 'db_table': "'alma_sales_cycle'"},
@@ -144,6 +115,7 @@ class Migration(SchemaMigration):
             'projected_value': ('django.db.models.fields.related.OneToOneField', [], {'blank': 'True', 'related_name': "'sales_cycle_as_projected'", 'unique': 'True', 'null': 'True', 'to': u"orm['alm_crm.Value']"}),
             'real_value': ('django.db.models.fields.related.OneToOneField', [], {'blank': 'True', 'related_name': "'sales_cycle_as_real'", 'unique': 'True', 'null': 'True', 'to': u"orm['alm_crm.Value']"}),
             'status': ('django.db.models.fields.CharField', [], {'default': "'N'", 'max_length': '2'}),
+            'subscription_id': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'title': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'to_date': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'})
         },
@@ -156,7 +128,8 @@ class Migration(SchemaMigration):
             'product': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['alm_crm.Product']"}),
             'projected_value': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
             'real_value': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
-            'sales_cycle': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'product_stats'", 'null': 'True', 'on_delete': 'models.SET_NULL', 'to': u"orm['alm_crm.SalesCycle']"})
+            'sales_cycle': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'product_stats'", 'null': 'True', 'on_delete': 'models.SET_NULL', 'to': u"orm['alm_crm.SalesCycle']"}),
+            'subscription_id': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'})
         },
         u'alm_crm.value': {
             'Meta': {'object_name': 'Value', 'db_table': "'alma_value'"},
@@ -167,7 +140,8 @@ class Migration(SchemaMigration):
             'date_edited': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'owner': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'owned_values'", 'null': 'True', 'to': u"orm['alm_user.User']"}),
-            'salary': ('django.db.models.fields.CharField', [], {'default': "'instant'", 'max_length': '7'})
+            'salary': ('django.db.models.fields.CharField', [], {'default': "'instant'", 'max_length': '7'}),
+            'subscription_id': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'})
         },
         u'alm_user.account': {
             'Meta': {'object_name': 'Account', 'db_table': "'alma_account'"},
@@ -176,6 +150,7 @@ class Migration(SchemaMigration):
             'date_edited': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'is_active': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
+            'is_admin': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'is_supervisor': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'key': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '128', 'db_index': 'True', 'blank': 'True'}),
             'unfollow_list': ('django.db.models.fields.related.ManyToManyField', [], {'symmetrical': 'False', 'to': u"orm['alm_crm.Contact']", 'null': 'True', 'blank': 'True'}),
@@ -195,7 +170,7 @@ class Migration(SchemaMigration):
             'email': ('django.db.models.fields.EmailField', [], {'unique': 'True', 'max_length': '75', 'blank': 'True'}),
             'first_name': ('django.db.models.fields.CharField', [], {'max_length': '31'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'is_admin': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'is_supervisor': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'last_login': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
             'last_name': ('django.db.models.fields.CharField', [], {'max_length': '30'}),
             'password': ('django.db.models.fields.CharField', [], {'max_length': '128'}),

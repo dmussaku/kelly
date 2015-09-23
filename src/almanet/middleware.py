@@ -21,6 +21,12 @@ class GetSubdomainMiddleware(object):
             request.subdomain = subdomain
             request.company = Company.objects.get(subdomain=subdomain)
 
+    @classmethod
+    def get_subdomain(self, request):
+        return tldextract.extract(
+            request.META.get('HTTP_HOST', '')).subdomain or tldextract.extract(
+            request.META.get('HTTP_REFERER', '')).subdomain
+
 
 class ForceDefaultLanguageMiddleware(object):
     """

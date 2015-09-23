@@ -101,11 +101,13 @@ from .utils.data_processing import (
     )
 from alm_vcard.serializer import serialize_objs
 from almanet.utils.api import CommonMeta
+from alm_user.models import Account
 
 import base64
 import simplejson as json
 from collections import OrderedDict
 from .tasks import grouped_contact_import_task, check_task_status
+from almanet.middleware import GetSubdomainMiddleware
 import time
 
 
@@ -2449,7 +2451,10 @@ class ActivityResource(CRMServiceModelResource):
         act.save()
         text_parser(base_text=act.description, content_class=act.__class__,
                     object_id=act.id, company_id = bundle.request.company.id)
-        act.spray(bundle.request.company.id)
+        subdomain = GetSubdomainMiddleware.get_subdomain(bundle.request)
+        account=Account.objects.get(
+            company__subdomain=subdomain, user=bundle.request.user)
+        act.spray(bundle.request.company.id, account)
         bundle = self.full_hydrate(bundle)
 
         bundle.data['obj_created'] = True
@@ -2861,7 +2866,10 @@ class CommentResource(CRMServiceModelResource):
         bundle = super(self.__class__, self).obj_create(bundle)
         comment = bundle.obj
         comment.save()
-        comment.spray(comment.company_id)
+        subdomain = GetSubdomainMiddleware.get_subdomain(bundle.request)
+        account=Account.objects.get(
+            company__subdomain=subdomain, user=bundle.request.user)
+        comment.spray(comment.company_id, account)
         return bundle
 
     def hydrate(self, bundle):

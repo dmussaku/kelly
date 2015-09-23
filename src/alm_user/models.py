@@ -7,6 +7,7 @@ from django.conf import settings
 from timezone_field import TimeZoneField
 from almanet.models import Subscription
 from alm_vcard.models import VCard, Email
+
 from datetime import datetime
 import hmac
 import uuid
@@ -19,8 +20,9 @@ except ImportError:
 
 
 class AccountManager(contrib_user_manager):
-    def create_user(self, email, password, user, company, is_admin=False):
-        acc = Account(email=email, is_admin=is_admin, user=user, company=company)
+    def create_user(self, email, password, user, company, is_supervisor=False):
+        acc = Account(email=email, 
+            is_supervisor=is_supervisor, user=user, company=company)
         acc.set_password(password)
         acc.save()
         return acc
@@ -29,7 +31,7 @@ class AccountManager(contrib_user_manager):
 class Account(models.Model):
 
     is_active = models.BooleanField(default=True)
-    is_supervisor = models.BooleanField(_('is supervisor'), default=False)
+    is_supervisor = models.BooleanField(default=False)
 
     date_created = models.DateTimeField(auto_now_add=True, blank=True)
     date_edited = models.DateTimeField(auto_now=True, blank=True)
@@ -38,10 +40,9 @@ class Account(models.Model):
     user = models.ForeignKey('User', related_name='accounts')
     key = models.CharField(max_length=128, blank=True, default='', db_index=True)
     unfollow_list = models.ManyToManyField(
-        'alm_crm.Contact', 
+        'alm_crm.Contact', #related_name='followers',
         null=True, blank=True
         )
-
     class Meta:
         verbose_name = 'account'
         db_table = settings.DB_PREFIX.format('account')
@@ -52,11 +53,11 @@ class Account(models.Model):
     def is_staff(self):
         "Is the user a member of staff?"
         # Simplest possible answer: All admins are staff
-        return self.is_supervisor
+        return self.is_admin
 
-    # @property
-    # def is_superuser(self):
-    #     return self.is_admin
+    @property
+    def is_superuser(self):
+        return self.is_admin
 
     def get_short_name(self):
         return self.user.get_short_name()
@@ -77,7 +78,7 @@ class Account(models.Model):
         return False
 
     def has_perm(self, perm, obj=None):
-        return self.is_supervisor
+        return self.is_admin
 
     def save(self, **kwargs):
         if not self.key:
@@ -91,10 +92,11 @@ class Account(models.Model):
         return hmac.new(new_uuid.bytes, digestmod=sha1).hexdigest()
 
 
+
 class UserManager(contrib_user_manager):
     @classmethod
-    def create_user(self, first_name, last_name, is_supervisor=False):
-        user = User(first_name=first_name, last_name=last_name, is_supervisor=is_supervisor)
+    def create_user(self, first_name, last_name, is_admin=False):
+        user = User(first_name=first_name, last_name=last_name, is_admin=is_admin)
         user.save()
         return user
 
@@ -110,10 +112,10 @@ class User(AbstractBaseUser):
     # is_active = models.BooleanField(_('active'), default=True)
 
     timezone = TimeZoneField(default='Asia/Almaty')
-
+    is_admin = models.BooleanField(default=False)
     # company = models.ManyToManyField('alm_company.Company',
     #                                  related_name='users')
-    is_admin = models.BooleanField(default=False)
+    # is_admin = models.BooleanField(default=False)
 
     vcard = models.OneToOneField(VCard, blank=True, null=True)
     userpic = models.ImageField(upload_to='userpics')
@@ -181,6 +183,14 @@ class User(AbstractBaseUser):
         Returns a account taken from request
         '''
         return request.account
+
+    @classmethod
+    def is_superuser(self, subdomain):
+        print subdomain
+        account = Account.objects.get(
+            user=self, company__subdomain=subdomain)
+        return account.is_supervisor
+
 '''
     def connect_service(self, service):
         co = self.company.first()

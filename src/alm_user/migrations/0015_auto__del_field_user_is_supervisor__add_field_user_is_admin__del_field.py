@@ -8,11 +8,30 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
+        # Deleting field 'User.is_supervisor'
+        db.delete_column('alma_user', 'is_supervisor')
+
+        # Adding field 'User.is_admin'
+        db.add_column('alma_user', 'is_admin',
+                      self.gf('django.db.models.fields.BooleanField')(default=False),
+                      keep_default=False)
+
         # Removing M2M table for field unfollow_list on 'User'
         db.delete_table(db.shorten_name('alma_user_unfollow_list'))
 
+        # Deleting field 'Account.is_admin'
+        db.delete_column('alma_account', 'is_admin')
+
 
     def backwards(self, orm):
+        # Adding field 'User.is_supervisor'
+        db.add_column('alma_user', 'is_supervisor',
+                      self.gf('django.db.models.fields.BooleanField')(default=False),
+                      keep_default=False)
+
+        # Deleting field 'User.is_admin'
+        db.delete_column('alma_user', 'is_admin')
+
         # Adding M2M table for field unfollow_list on 'User'
         m2m_table_name = db.shorten_name('alma_user_unfollow_list')
         db.create_table(m2m_table_name, (
@@ -21,6 +40,11 @@ class Migration(SchemaMigration):
             ('contact', models.ForeignKey(orm[u'alm_crm.contact'], null=False))
         ))
         db.create_unique(m2m_table_name, ['user_id', 'contact_id'])
+
+        # Adding field 'Account.is_admin'
+        db.add_column('alma_account', 'is_admin',
+                      self.gf('django.db.models.fields.BooleanField')(default=False),
+                      keep_default=False)
 
 
     models = {
