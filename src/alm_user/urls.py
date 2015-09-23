@@ -13,8 +13,10 @@ from alm_user.views import (
     referral_complete, 
     password_reset_success,
     subdomain_forgot,
+    ChooseSubdomain
     )
 from alm_user.models import User
+from django.views.generic import TemplateView
 
 login_url = reverse_lazy('user_login')
 
@@ -23,6 +25,10 @@ urlpatterns = patterns(
     url(r'^signin/$',
         login_view, {'template_name': 'user/user_login.html'},
         name='user_login'),
+
+    url(r'^signin/company/$',
+        ChooseSubdomain.as_view(template_name='user/choose_subdomain.html'),
+        name='choose_subdomain'),
 
     url(r'^referral/$',
         referral, {'template_name': 'user/login-register.html'},

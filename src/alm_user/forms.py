@@ -78,12 +78,10 @@ class AuthenticationForm(forms.Form):
     Base class for authenticating users. Extend this to get a form that accepts
     username/password logins.
     """
-    subdomain = forms.CharField(max_length=300)
     username = forms.CharField(max_length=254)
     password = forms.CharField(label=_("Password"), widget=forms.PasswordInput)
 
     error_messages = {
-        'invalid_subdomain': _("Please enter a correct subdomain."),
         'invalid_login': _("Please enter a correct %(username)s and password. "
                            "Note that both fields may be case-sensitive."),
         'inactive': _("This account is inactive."),
@@ -99,35 +97,31 @@ class AuthenticationForm(forms.Form):
         super(AuthenticationForm, self).__init__(*args, **kwargs)
 
         # Set the label for the "username" field.
-        self.username_field = Account._meta.get_field(Account.USERNAME_FIELD)
+        self.username_field = User._meta.get_field(User.USERNAME_FIELD)
         if self.fields['username'].label is None:
             self.fields['username'].label = capfirst(self.username_field.verbose_name)
 
     def clean(self):
-        subdomain = self.cleaned_data.get('subdomain')
         username = self.cleaned_data.get('username')
         password = self.cleaned_data.get('password')
 
         if username and password:
-            self.user_cache = authenticate(subdomain=subdomain,
-                                           username=username,
+            self.user_cache = authenticate(username=username,
                                            password=password)
-            if self.user_cache == -1:
-                raise forms.ValidationError(
-                    self.error_messages['invalid_subdomain'],
-                    code='invalid_subdomain',
-                )
+            print self.user_cache
             if self.user_cache is None:
                 raise forms.ValidationError(
                     self.error_messages['invalid_login'],
                     code='invalid_login',
                     params={'username': self.username_field.verbose_name},
                 )
-            elif not self.user_cache.is_active:
-                raise forms.ValidationError(
-                    self.error_messages['inactive'],
-                    code='inactive',
-                )
+            else:
+                accounts = self.user_cache.accounts.all()
+                if len(accounts) == 1 and not accounts[0].is_active:
+                    raise forms.ValidationError(
+                        self.error_messages['inactive'],
+                        code='inactive',
+                    )
         return self.cleaned_data
 
     def check_for_test_cookie(self):

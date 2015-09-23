@@ -13,7 +13,6 @@ from tastypie.http import HttpNotFound
 from tastypie.serializers import Serializer
 from tastypie.constants import ALL
 
-from alm_user.auth_backend import login
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth import authenticate
 from django.conf.urls import url
@@ -24,7 +23,8 @@ from django.db.models import Q
 from .models import User
 from alm_vcard.models import *
 from alm_crm.models import SalesCycle, SalesCycleLogEntry, Contact, Category
-from alm_user.models import Account
+from alm_user.models import Account, User
+from alm_company.models import Company
 from tastypie.authentication import (
     MultiAuthentication,
     SessionAuthentication,
@@ -37,6 +37,8 @@ from almanet.utils.env import get_subscr_id
 import json
 import datetime
 import ast
+from django.contrib.auth import login
+from almanet.middleware import GetSubdomainMiddleware
 
 
 
@@ -104,7 +106,8 @@ class UserResource(ModelResource):
 
     @undocumented: Meta
     '''
-    vcard = fields.ToOneField('alm_vcard.api.VCardResource', 'vcard', null=True, full=True)
+    vcard = fields.ToOneField(
+        'alm_vcard.api.VCardResource', 'vcard', null=True, full=True)
 
     class Meta(CommonMeta):
         queryset = User.objects.all()
@@ -124,7 +127,9 @@ class UserResource(ModelResource):
         # authorization = Authorization()
 
     def apply_filters(self, request, applicable_filters):
-        user_ids = [acc.user_id for acc in request.company.accounts.all()]
+        subdomain = GetSubdomainMiddleware.get_subdomain(request)
+        company = Company.objects.get(subdomain=subdomain)
+        user_ids = [acc.user_id for acc in company.accounts.all()]
         q = Q(id__in=user_ids)
         objects = super(ModelResource, self).apply_filters(request, applicable_filters)
         return objects.filter(q)
@@ -189,14 +194,14 @@ class UserResource(ModelResource):
                 )
             old_password = data.get('old_password', None)
             new_password = data.get('new_password', None)
-            account = request.account
+            user = request.user
 
             if old_password is None or new_password is None:
                 self.error_response(request, {}, response_class=http.HttpBadRequest)
 
-            if account.check_password(old_password):
-                account.set_password(new_password)
-                account.save()
+            if user.check_password(old_password):
+                user.set_password(new_password)
+                user.save()
                 return self.create_response(
                     request,
                     {
@@ -284,8 +289,27 @@ class UserResource(ModelResource):
 
     def full_dehydrate(self, bundle, for_list=False):
         bundle = super(self.__class__, self).full_dehydrate(bundle, for_list=True)
-        bundle.data['unfollow_list'] = [contact.id for contact in bundle.obj.unfollow_list.all()]
-        bundle.data['is_active'] = bundle.request.account.is_active if hasattr(bundle.request, 'account') else None
+        company_list = []
+        is_supervisor = False
+        subdomain = GetSubdomainMiddleware.get_subdomain(bundle.request)
+        current_account = None
+        for account in bundle.obj.accounts.all():
+            if subdomain == account.company.subdomain:
+                current_account = account
+                is_supervisor = account.is_supervisor
+            company_list.append(
+                {
+                 'id':account.company.id, 
+                 'name':account.company.name, 
+                 'subdomain':account.company.subdomain
+                }
+            )
+        bundle.data['is_supervisor'] = is_supervisor
+        bundle.data['companies'] = company_list
+        if current_account:
+            bundle.data['is_active'] = current_account.is_active
+        else:
+            bundle.data['is_active'] = False
         # TODO: use CustomFields with use_in_ids
         return bundle
 
@@ -403,16 +427,15 @@ class UserResource(ModelResource):
         with RequestContext(self, request, allowed_methods=['post']):
             data = self.deserialize(request, request.body, format=request.META.get('CONTENT_TYPE', 'application/json'))
 
-            account = authenticate(
-                subdomain=data.get('subdomain'), 
+            user = authenticate(
                 username=data.get('email'), 
                 password=data.get('password')
                 )
             session_key = None
             session_expire_date = None
-            if account is not None:
-                if account.is_active:
-                    login(request, account)  # will add session to request
+            if user is not None:
+                if user.is_active:
+                    login(request, user)  # will add session to request
                     session_key = request.session.session_key
                     session_expire_date = request.session.get_expiry_date()
                 else:
@@ -422,17 +445,16 @@ class UserResource(ModelResource):
                 data = {'message': "Invalid login"}
                 return self.error_response(request, data, response_class=http.HttpUnauthorized)
             data = {
-                'user': self.full_dehydrate(self.build_bundle(obj=request.user, request=request)),
+                'user': self.full_dehydrate(self.build_bundle(
+                    obj=request.user, request=request)),
                 'session_key': session_key,
                 'session_expire_date': session_expire_date
                 }
-            if request.META.get('X-User-Agent',"") == 'net.alma.app.mobile':
-                data['api_token'] = account.key
+            # if request.META.get('X-User-Agent',"") == 'net.alma.app.mobile':
+            #     data['api_token'] = account.key
+
             bundle = self.build_bundle(obj=None, data=data, request=request)
             return self.create_response(request, bundle)
-
-
-
 
 
 class SessionObject(object):
@@ -496,7 +518,8 @@ class SessionResource(Resource):
 
     def get_current_state(self, request, **kwargs):
         with RequestContext(self, request, allowed_methods=['get']):
-            bundle = self.build_bundle(obj=SessionObject(request=request), request=request)
+            bundle = self.build_bundle(
+                obj=SessionObject(request=request), request=request)
             data = self.full_dehydrate(bundle)
             return self.create_response(request, data)
 

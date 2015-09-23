@@ -7,6 +7,7 @@ from django.conf import settings
 from timezone_field import TimeZoneField
 from almanet.models import Subscription
 from alm_vcard.models import VCard, Email
+
 from datetime import datetime
 import hmac
 import uuid
@@ -19,22 +20,18 @@ except ImportError:
 
 
 class AccountManager(contrib_user_manager):
-    def create_user(self, email, password, user, company, is_admin=False):
-        acc = Account(email=email, is_admin=is_admin, user=user, company=company)
+    def create_user(self, email, password, user, company, is_supervisor=False):
+        acc = Account(email=email, 
+            is_supervisor=is_supervisor, user=user, company=company)
         acc.set_password(password)
         acc.save()
         return acc
 
 
-class Account(AbstractBaseUser):
-
-    REQUIRED_FIELDS = ['email']
-    USERNAME_FIELD = 'email'
-
-    email = models.EmailField(blank=False)
+class Account(models.Model):
 
     is_active = models.BooleanField(default=True)
-    is_admin = models.BooleanField(default=False)
+    is_supervisor = models.BooleanField(default=False)
 
     date_created = models.DateTimeField(auto_now_add=True, blank=True)
     date_edited = models.DateTimeField(auto_now=True, blank=True)
@@ -42,7 +39,10 @@ class Account(AbstractBaseUser):
     company = models.ForeignKey('alm_company.Company', related_name='accounts')
     user = models.ForeignKey('User', related_name='accounts')
     key = models.CharField(max_length=128, blank=True, default='', db_index=True)
-
+    unfollow_list = models.ManyToManyField(
+        'alm_crm.Contact', #related_name='followers',
+        null=True, blank=True
+        )
     class Meta:
         verbose_name = 'account'
         db_table = settings.DB_PREFIX.format('account')
@@ -80,26 +80,10 @@ class Account(AbstractBaseUser):
     def has_perm(self, perm, obj=None):
         return self.is_admin
 
-    '''
-    Check if the account has unique email inside one company
-    '''
     def save(self, **kwargs):
-
-        if not self.id:
-            if self.check_email_uniqueness():
-                return super(self.__class__, self).save(**kwargs)
-            else:
-                raise Exception
         if not self.key:
                 self.key = self.generate_key()
         return super(self.__class__, self).save(**kwargs)
-
-    def check_email_uniqueness(self):
-        qs = Account.objects.filter(company=self.company)
-        if (self.email,) in qs.values_list('email'):
-            return False
-        else:
-            return True
 
     def generate_key(self):
         # Get a random UUID.
@@ -108,26 +92,27 @@ class Account(AbstractBaseUser):
         return hmac.new(new_uuid.bytes, digestmod=sha1).hexdigest()
 
 
+
 class UserManager(contrib_user_manager):
     @classmethod
-    def create_user(self, first_name, last_name, is_supervisor=False):
-        user = User(first_name=first_name, last_name=last_name, is_supervisor=is_supervisor)
+    def create_user(self, first_name, last_name, is_admin=False):
+        user = User(first_name=first_name, last_name=last_name, is_admin=is_admin)
         user.save()
         return user
 
 
 class User(AbstractBaseUser):
 
-    #REQUIRED_FIELDS = ['email']
-    USERNAME_FIELD = 'id'
+    # REQUIRED_FIELDS = ['email']
+    USERNAME_FIELD = 'email'
     first_name = models.CharField(_('first name'), max_length=31,
                                   null=False, blank=False)
     last_name = models.CharField(_('last name'), max_length=30, blank=False)
-    # email = models.EmailField(_('email address'), unique=True, blank=False)
+    email = models.EmailField(_('email address'), unique=True, blank=True)
     # is_active = models.BooleanField(_('active'), default=True)
 
     timezone = TimeZoneField(default='Asia/Almaty')
-
+    is_admin = models.BooleanField(default=False)
     # company = models.ManyToManyField('alm_company.Company',
     #                                  related_name='users')
     # is_admin = models.BooleanField(default=False)
@@ -137,12 +122,6 @@ class User(AbstractBaseUser):
 
     date_created = models.DateTimeField(auto_now_add=True, blank=True)
     date_edited = models.DateTimeField(auto_now=True, blank=True)
-
-    is_supervisor = models.BooleanField(_('is supervisor'), default=False)
-    unfollow_list = models.ManyToManyField(
-        'alm_crm.Contact', #related_name='followers',
-        null=True, blank=True
-        )
 
     class Meta:
         verbose_name = _('user')
@@ -204,6 +183,14 @@ class User(AbstractBaseUser):
         Returns a account taken from request
         '''
         return request.account
+
+    @classmethod
+    def is_superuser(self, subdomain):
+        print subdomain
+        account = Account.objects.get(
+            user=self, company__subdomain=subdomain)
+        return account.is_supervisor
+
 '''
     def connect_service(self, service):
         co = self.company.first()

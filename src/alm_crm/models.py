@@ -1551,14 +1551,14 @@ class Activity(SubscriptionObject):
     @property
     def new_comments_count(self):
         return len(
-            filter(lambda(comment): not comment.has_read(self.author_id),
+            filter(lambda(comment): not comment.has_read(comment.owner_id),
                    self.comments.all())
             )
 
-    def spray(self, company_id):
+    def spray(self, company_id, account):
         unfollow_set = {
             unfollower.id for unfollower
-            in self.sales_cycle.contact.owner.unfollow_list.all()}
+            in account.unfollow_list.all()}
 
         # q = Q(company_id=company_id)
         accounts = Account.objects.filter(company_id=company_id)
@@ -1834,10 +1834,10 @@ class Comment(SubscriptionObject):
     def author(self):
         return self.owner
 
-    def spray(self, company_id):
+    def spray(self, company_id, account):
         unfollow_set = {
             unfollower.id for unfollower
-            in self.content_object.sales_cycle.contact.owner.unfollow_list.all()}
+            in account.unfollow_list.all()}
 
         # q = Q(company_id=company_id)
         accounts = Account.objects.filter(company_id=company_id)

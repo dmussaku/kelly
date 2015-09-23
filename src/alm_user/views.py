@@ -21,7 +21,7 @@ from alm_user.forms import(
     SubdomainForgotForm,
     AuthenticationForm,
 ) 
-from alm_user.auth_backend import login, logout
+# from alm_user.auth_backend import login, logout
 from almanet.models import Service
 from almanet.url_resolvers import reverse_lazy
 
@@ -32,9 +32,9 @@ from django.views.decorators.csrf import csrf_protect
 from django.contrib.sites.models import get_current_site
 from django.utils.http import is_safe_url
 from django.shortcuts import resolve_url
-from django.contrib.auth import REDIRECT_FIELD_NAME
+from django.contrib.auth import login, logout, REDIRECT_FIELD_NAME
 from almanet.url_resolvers import reverse as almanet_reverse
-from almanet.middleware import AlmanetSessionMiddleware
+
 
 @sensitive_post_parameters()
 @csrf_protect
@@ -56,26 +56,21 @@ def login_view(request, template_name='registration/login.html',
             # Okay, security check complete. Log the user in.
             login(request, form.get_user())
 
+            accounts = request.user.accounts.all()
+            if len(accounts) > 1:
+                return HttpResponseRedirect(
+                    reverse_lazy('choose_subdomain')
+                )
             return HttpResponseRedirect(
                 reverse_lazy('crm_home', 
-                        subdomain=request.company.subdomain,
+                        subdomain=accounts[0].company.subdomain,
                         kwargs={'service_slug': settings.DEFAULT_SERVICE}))
     else:
         form = authentication_form(request)
-
     comps = request.COOKIES.get('comps', None)
-
     logged_in_companies = []
-
-    if comps is not None:
-        cookie_comps = comps.split(',')
-        for cookie_comp in cookie_comps:
-            session = AlmanetSessionMiddleware.get_session(request, cookie_comp).load()
-            if session:
-                company = Company.objects.get(id=session['company_id'])
-                logged_in_companies.append(company)
-
-
+    if request.user and not request.user.is_anonymous():
+        logged_in_companies = [account.company for account in request.user.accounts.all()]
     context = {
         'form': form,
         redirect_field_name: redirect_to,
@@ -319,3 +314,12 @@ def referral(request, template_name='user/login-registration.html',
 
 def referral_complete(request, template_name='user/referral-complete.html'):
     return TemplateResponse(request, template_name)
+
+
+class ChooseSubdomain(TemplateView):
+
+    def get_context_data(self, **kwargs):
+        ctx = super(ChooseSubdomain, self).get_context_data(**kwargs)
+        accounts = self.request.user.accounts.all()
+        ctx['companies'] = [account.company for account in accounts]
+        return ctx

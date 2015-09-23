@@ -101,11 +101,13 @@ from .utils.data_processing import (
     )
 from alm_vcard.serializer import serialize_objs
 from almanet.utils.api import CommonMeta
+from alm_user.models import Account
 
 import base64
 import simplejson as json
 from collections import OrderedDict
 from .tasks import grouped_contact_import_task, check_task_status
+from almanet.middleware import GetSubdomainMiddleware
 import time
 
 
@@ -1492,7 +1494,7 @@ class ContactResource(CRMServiceModelResource):
                 obj_dict['attr'] = value.split('__')[1]
             col_hash.append(obj_dict)
         import_task_id = grouped_contact_import_task(
-            col_hash, filename, request.user, request.company.id, request.account.email, ignore_first_row)
+            col_hash, filename, request.user, request.company.id, request.user.email, ignore_first_row)
         return self.create_response(
             request, {'success':True,'task_id':import_task_id}
             )
@@ -2449,7 +2451,10 @@ class ActivityResource(CRMServiceModelResource):
         act.save()
         text_parser(base_text=act.description, content_class=act.__class__,
                     object_id=act.id, company_id = bundle.request.company.id)
-        act.spray(bundle.request.company.id)
+        subdomain = GetSubdomainMiddleware.get_subdomain(bundle.request)
+        account=Account.objects.get(
+            company__subdomain=subdomain, user=bundle.request.user)
+        act.spray(bundle.request.company.id, account)
         bundle = self.full_hydrate(bundle)
 
         bundle.data['obj_created'] = True
@@ -2861,7 +2866,10 @@ class CommentResource(CRMServiceModelResource):
         bundle = super(self.__class__, self).obj_create(bundle)
         comment = bundle.obj
         comment.save()
-        comment.spray(comment.company_id)
+        subdomain = GetSubdomainMiddleware.get_subdomain(bundle.request)
+        account=Account.objects.get(
+            company__subdomain=subdomain, user=bundle.request.user)
+        comment.spray(comment.company_id, account)
         return bundle
 
     def hydrate(self, bundle):
@@ -3522,7 +3530,7 @@ class MobileStateObject(object):
         self.current_user = request.user
         self.company_id = request.company.id
         self.company = request.company
-        self.account = request.account
+        self.account = request.user
 
         sales_cycles = SalesCycleResource().obj_get_list(bundle, limit_for='mobile')
 
@@ -3868,7 +3876,7 @@ class CustomFieldResource(CRMServiceModelResource):
             except ContentType.DoesNotExist:
                 return http.HttpNotFound()
             else:
-                objects = CustomField.objects.filter(company_id=request.account.company.id,
+                objects = CustomField.objects.filter(company_id=request.company.id,
                                                     content_type=content_type)
 
                 return self.create_response(request,

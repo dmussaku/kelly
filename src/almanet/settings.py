@@ -155,8 +155,10 @@ class BaseConfiguration(SubdomainConfiguration, Configuration):
         'almanet.middleware.ForceDefaultLanguageMiddleware',
         'django.middleware.locale.LocaleMiddleware',
         'django_hosts.middleware.HostsMiddleware',
-        'almanet.middleware.AlmanetSessionMiddleware',
-        'almanet.middleware.MyAuthenticationMiddleware',
+        'django.contrib.sessions.middleware.SessionMiddleware',
+        'django.contrib.auth.middleware.AuthenticationMiddleware',
+        # 'almanet.middleware.AlmanetSessionMiddleware',
+        # 'almanet.middleware.MyAuthenticationMiddleware',
     )
 
     SESSION_COOKIE_DOMAIN = '.alma.net'
@@ -289,12 +291,11 @@ class BaseConfiguration(SubdomainConfiguration, Configuration):
     PASSWORD_RESET_TIMEOUT_DAYS = 15
 
     DB_PREFIX = 'alma_{}'
-    # AUTHENTICATION_BACKENDS = (
-    #     'django.contrib.auth.backends.ModelBackend',
-    #     'alm_user.authbackend.MyAuthBackend',)  # for admin
-
     AUTHENTICATION_BACKENDS = (
-        'alm_user.auth_backend.MyAuthBackend',)
+        'django.contrib.auth.backends.ModelBackend',)  # for admin
+
+    # AUTHENTICATION_BACKENDS = (
+    #     'alm_user.auth_backend.MyAuthBackend',)
 
 
     SITE_NAME = 'alma.net'
