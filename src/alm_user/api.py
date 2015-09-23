@@ -292,9 +292,10 @@ class UserResource(ModelResource):
         company_list = []
         is_supervisor = False
         subdomain = GetSubdomainMiddleware.get_subdomain(bundle.request)
-        print subdomain
+        current_account = None
         for account in bundle.obj.accounts.all():
             if subdomain == account.company.subdomain:
+                current_account = account
                 is_supervisor = account.is_supervisor
             company_list.append(
                 {
@@ -305,7 +306,10 @@ class UserResource(ModelResource):
             )
         bundle.data['is_supervisor'] = is_supervisor
         bundle.data['companies'] = company_list
-        bundle.data['is_active'] = bundle.request.account.is_active if hasattr(bundle.request, 'account') else None
+        if current_account:
+            bundle.data['is_active'] = current_account.is_active
+        else:
+            bundle.data['is_active'] = False
         # TODO: use CustomFields with use_in_ids
         return bundle
 
@@ -505,7 +509,6 @@ class SessionResource(Resource):
         return UserResource().full_dehydrate(user_bundle)
 
     def dehydrate_company(self, bundle):
-        print bundle.obj
         company = bundle.obj.company
         return {
             'id': company.id,
