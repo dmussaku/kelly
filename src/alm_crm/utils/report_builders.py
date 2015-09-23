@@ -78,6 +78,7 @@ def build_activity_feed(company_id, data=None, timezone='UTC'):
     }
     q = Q(company_id=company_id)
 
+    order_q = 'date_created' # order by default
     if 'users' in data:
         q &= Q(owner_id__in=data.get('users', []))
     if 'date_from' in data:
