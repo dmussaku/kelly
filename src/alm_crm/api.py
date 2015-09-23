@@ -3868,7 +3868,7 @@ class CustomFieldResource(CRMServiceModelResource):
             except ContentType.DoesNotExist:
                 return http.HttpNotFound()
             else:
-                objects = CustomField.objects.filter(company_id=request.user.company.id,
+                objects = CustomField.objects.filter(company_id=request.company.id,
                                                     content_type=content_type)
 
                 return self.create_response(request,

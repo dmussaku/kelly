@@ -67,20 +67,10 @@ def login_view(request, template_name='registration/login.html',
                         kwargs={'service_slug': settings.DEFAULT_SERVICE}))
     else:
         form = authentication_form(request)
-
     comps = request.COOKIES.get('comps', None)
-
     logged_in_companies = []
-
-    if comps is not None:
-        cookie_comps = comps.split(',')
-        for cookie_comp in cookie_comps:
-            session = AlmanetSessionMiddleware.get_session(request, cookie_comp).load()
-            if session:
-                company = Company.objects.get(id=session['company_id'])
-                logged_in_companies.append(company)
-
-
+    if request.user and not request.user.is_anonymous():
+        logged_in_companies = [account.company for account in request.user.accounts.all()]
     context = {
         'form': form,
         redirect_field_name: redirect_to,

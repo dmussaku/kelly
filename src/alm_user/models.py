@@ -29,7 +29,7 @@ class AccountManager(contrib_user_manager):
 class Account(models.Model):
 
     is_active = models.BooleanField(default=True)
-    is_admin = models.BooleanField(default=False)
+    is_supervisor = models.BooleanField(_('is supervisor'), default=False)
 
     date_created = models.DateTimeField(auto_now_add=True, blank=True)
     date_edited = models.DateTimeField(auto_now=True, blank=True)
@@ -37,6 +37,10 @@ class Account(models.Model):
     company = models.ForeignKey('alm_company.Company', related_name='accounts')
     user = models.ForeignKey('User', related_name='accounts')
     key = models.CharField(max_length=128, blank=True, default='', db_index=True)
+    unfollow_list = models.ManyToManyField(
+        'alm_crm.Contact', 
+        null=True, blank=True
+        )
 
     class Meta:
         verbose_name = 'account'
@@ -48,11 +52,11 @@ class Account(models.Model):
     def is_staff(self):
         "Is the user a member of staff?"
         # Simplest possible answer: All admins are staff
-        return self.is_admin
+        return self.is_supervisor
 
-    @property
-    def is_superuser(self):
-        return self.is_admin
+    # @property
+    # def is_superuser(self):
+    #     return self.is_admin
 
     def get_short_name(self):
         return self.user.get_short_name()
@@ -73,7 +77,7 @@ class Account(models.Model):
         return False
 
     def has_perm(self, perm, obj=None):
-        return self.is_admin
+        return self.is_supervisor
 
     def save(self, **kwargs):
         if not self.key:
@@ -109,19 +113,13 @@ class User(AbstractBaseUser):
 
     # company = models.ManyToManyField('alm_company.Company',
     #                                  related_name='users')
-    # is_admin = models.BooleanField(default=False)
+    is_admin = models.BooleanField(default=False)
 
     vcard = models.OneToOneField(VCard, blank=True, null=True)
     userpic = models.ImageField(upload_to='userpics')
 
     date_created = models.DateTimeField(auto_now_add=True, blank=True)
     date_edited = models.DateTimeField(auto_now=True, blank=True)
-
-    is_supervisor = models.BooleanField(_('is supervisor'), default=False)
-    unfollow_list = models.ManyToManyField(
-        'alm_crm.Contact', #related_name='followers',
-        null=True, blank=True
-        )
 
     class Meta:
         verbose_name = _('user')

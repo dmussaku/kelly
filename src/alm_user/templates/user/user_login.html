@@ -73,6 +73,7 @@
             <p>Компании, в которые вы залогинены</p>
             {% for company in logged_in_companies %}
                 <a href="{% subdomain_url 'crm_home' subdomain=company.subdomain service_slug='crm'  %}" class="login-submit">{{ company.name }}</a>
+                <br/>
             {% endfor %}
         {% endif %}
     </div>

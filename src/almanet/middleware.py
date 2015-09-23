@@ -17,8 +17,9 @@ class GetSubdomainMiddleware(object):
         subdomain = tldextract.extract(
             request.META.get('HTTP_HOST', '')).subdomain or tldextract.extract(
             request.META.get('HTTP_REFERER', '')).subdomain
-        request.subdomain = subdomain
-        request.company = Company.objects.get(subdomain=subdomain)
+        if subdomain:
+            request.subdomain = subdomain
+            request.company = Company.objects.get(subdomain=subdomain)
 
 
 class ForceDefaultLanguageMiddleware(object):
