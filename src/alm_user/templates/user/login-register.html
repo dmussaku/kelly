@@ -7,10 +7,11 @@
     <div class="login-body">
       <div class="login-switcher">
         <a href="{% url 'user_login' %}" class="login-switcher-button">{{ _("Sign in") }}</a>
-        <a href="{% url 'user_referral' %}" class="login-switcher-button active">{{ _("Register") }}</a>
+        <a href="{% url 'user_registration' %}" class="login-switcher-button active">{{ _("Register") }}</a>
       </div>
       <div class="login-form">
-      <form name="login-form" action="" method="post">{% csrf_token %}
+      <form name="login-form" action="" method="post">
+      {% csrf_token %}
         <p class="login-form-p">{{ _("The registration is now closed. To learn more or participate in beta, leave your email below.") }}</p>
         <div class="login-fieldset">
           <label class="login-fieldset-icon" for="login-email">

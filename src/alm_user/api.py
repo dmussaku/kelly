@@ -263,18 +263,17 @@ class UserResource(ModelResource):
 
         bundle = self.full_hydrate(bundle, **kwargs)
         #return self.save(bundle, skip_errors=skip_errors)
+        user = User.objects.get(id=bundle.request.user.id)
+        bundle = self.build_bundle(obj=user, request=bundle.request)
+        bundle = self.full_dehydrate(bundle)
         raise ImmediateHttpResponse(
             HttpResponse(
                 content=Serializer().to_json(
-                    self.full_dehydrate(
-                        self.build_bundle(
-                            obj=User.objects.get(id=bundle.obj.id))
-                        )
+                    bundle
                     ),
                 content_type='application/json; charset=utf-8', status=200
                 )
             )
-        return bundle
 
     def full_hydrate(self, bundle, **kwargs):
         user_id = kwargs.get('pk', None)
@@ -288,7 +287,7 @@ class UserResource(ModelResource):
     def full_dehydrate(self, bundle, for_list=False):
         bundle = super(self.__class__, self).full_dehydrate(bundle, for_list=True)
         company_list = []
-        subdomain = bundle.request.subdomain 
+        subdomain = bundle.request.subdomain
         is_supervisor = False
         current_account = None
         for account in bundle.obj.accounts.all():
@@ -309,7 +308,6 @@ class UserResource(ModelResource):
 
     def vcard_full_hydrate(self, bundle):
         field_object = bundle.data.get('vcard',{})
-        subscription_id = self.get_crm_subscription(bundle.request)
         if bundle.obj.vcard:
             vcard = bundle.obj.vcard
         else:
@@ -375,7 +373,6 @@ class UserResource(ModelResource):
                             vcard_obj.vcard = VCard.objects.get(id=value)
                         else:
                             vcard_obj.__setattr__(key, value)
-                    vcard_obj.subscription_id = subscription_id
                     vcard_obj.save()
                     id_list.append(vcard_obj.id)
                 for obj in queryset:
@@ -384,7 +381,6 @@ class UserResource(ModelResource):
             else:
                 for obj in model.objects.filter(vcard=vcard):
                     obj.delete()
-        vcard.subscription_id = subscription_id
         vcard.save()
 
     def subscriptions(self, request, **kwargs):

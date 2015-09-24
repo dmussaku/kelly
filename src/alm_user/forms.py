@@ -13,65 +13,75 @@ from alm_user.emails import (
     SubdomainForgotEmail,
     )
 from alm_company.models import Company
+import re
 
 # need to finish validation errors for the passwords form
 
 
-# class RegistrationForm(forms.ModelForm):
+class RegistrationForm(forms.Form):
+    email = forms.EmailField(label=_("Email"), max_length=254)
+    company_name = forms.CharField(max_length=200)
+    company_subdomain = forms.CharField(max_length=20)
+    password = forms.CharField(widget=forms.PasswordInput(),
+                               max_length=100)
 
-#     password = forms.CharField(widget=forms.PasswordInput(),
-#                                max_length=100)
-#     confirm_password = forms.CharField(widget=forms.PasswordInput(),
-#                                        max_length=100)
-#     company_name = forms.CharField(max_length=100)
+    def clean_email(self):
+        email = self.cleaned_data['email']
+        if email in [user.email for user in User.objects.all()]:
+            raise forms.ValidationError( _("Email %s is already registered") % email)
+        return email
 
-#     class Meta:
+    def clean_company_subdomain(self):
+        company_subdomain = self.cleaned_data['company_subdomain']
+        if company_subdomain in settings.BUSY_SUBDOMAINS:
+            busy_subdomains = ', '.join(settings.BUSY_SUBDOMAINS)
+            raise forms.ValidationError(_(
+                "The following company names are busy: %(names)s") % {
+                'names': busy_subdomains})
+        if company_subdomain in [company.subdomain for company in Company.objects.all()]:
+            raise forms.ValidationError( _("Subdomain is already taken") )
+        if not re.match('\w', company_subdomain):
+            raise forms.ValidationError( 
+                _("Subdomain must be written in latin alphabet letters") 
+                )
+        return company_subdomain
 
-#         model = Account
-#         fields = ['first_name', 'last_name', 'email', 'timezone']
+    def clean_password(self):
+        password = self.cleaned_data.get('password', None)
+        if not password:
+            raise forms.ValidationError( 
+                _("Enter valid password") 
+                )
+        return password
 
-#     def clean_company_name(self):
-#         company_name = self.cleaned_data['company_name']
-#         if company_name in settings.BUSY_SUBDOMAINS:
-#             busy_subdomains = ', '.join(settings.BUSY_SUBDOMAINS)
-#             raise forms.ValidationError(_(
-#                 "The following company names are busy: %(names)s") % {
-#                 'names': busy_subdomains})
-#         return company_name
-
-#     def clean(self):
-#         password = self.cleaned_data.get('password', None)
-#         confirm_password = self.cleaned_data.get('confirm_password', None)
-#         if (not password):
-#             return super(RegistrationForm, self).clean()
-#         if (not confirm_password):
-#             return super(RegistrationForm, self).clean()
-#         if (password != confirm_password):
-#             raise forms.ValidationError('Password Mismatch')
-#         else:
-#             return super(RegistrationForm, self).clean()
-
-#     def save(self, commit=True):
-#         user = super(RegistrationForm, self).save(commit=commit)
-#         user.set_password(self.cleaned_data['password'])
-#         if commit:
-#             gened_subdomain = Company.generate_subdomain(
-#                 self.cleaned_data['company_name'])
-#             company = Company(
-#                 name=self.cleaned_data['company_name'],
-#                 subdomain=gened_subdomain)
-#             company.save()
-#             user.save()
-#             company.users.add(user)
-#             user.owned_company.add(company)
-#             mail_context = {
-#                 'site_name': settings.SITE_NAME,
-#                 'gu__user__email': user.email,
-#             }
-#             UserRegistrationEmail(**mail_context).send(
-#                 to=(user.email,),
-#                 bcc=settings.BCC_EMAILS)
-#         return user
+    def save(self, commit=True):
+        user = User(email=self.cleaned_data['email'])
+        user.set_password(self.cleaned_data['password'])
+        username = self.cleaned_data['email']
+        password = self.cleaned_data['password']
+        if commit:
+            gened_subdomain = Company.generate_subdomain(
+                self.cleaned_data['company_subdomain'])
+            company = Company(
+                name=self.cleaned_data['company_name'],
+                subdomain=gened_subdomain)
+            company.save()
+            user.save()
+            account = Account(
+                company=company,
+                user=user,
+                is_supervisor=True
+                )
+            account.save()
+            mail_context = {
+                'site_name': settings.SITE_NAME,
+                'gu__user__email': user.email,
+            }
+            UserRegistrationEmail(**mail_context).send(
+                to=(user.email,),
+                bcc=settings.BCC_EMAILS)
+        user = authenticate(username=username, password=password)
+        return user
 
 class AuthenticationForm(forms.Form):
     """
@@ -138,17 +148,16 @@ class AuthenticationForm(forms.Form):
 
 
 class PasswordResetForm(forms.Form):
-    subdomain = forms.CharField(label=_("Subdomain"), max_length=254)
+    # subdomain = forms.CharField(label=_("Subdomain"), max_length=254)
     email = forms.EmailField(label=_("Email"), max_length=254)
     error_messages = (_("Account with such email is not registered."))
 
     def clean_email(self):
         email = self.cleaned_data['email']
-        subdomain = self.cleaned_data['subdomain']
+        # subdomain = self.cleaned_data['subdomain']
         try:
-            self.cached_user = Account.objects.get(
-                email=email, company__subdomain=subdomain)
-        except Account.DoesNotExist:
+            self.cached_user = User.objects.get(email=email)
+        except User.DoesNotExist:
             raise forms.ValidationError(self.error_messages[0])
         else:
             return email
@@ -173,35 +182,6 @@ class PasswordResetForm(forms.Form):
             to=(self.cached_user.email,),
             bcc=settings.BCC_EMAILS)
 
-
-class SubdomainForgotForm(forms.Form):
-    email = forms.EmailField(label=_("Email"), max_length=254)
-    error_messages = (_("Account with such email is not registered."))
-
-    def clean_email(self):
-        email = self.cleaned_data['email']
-        accounts = Account.objects.filter(
-                email=email)
-        self.email = email
-        self.accounts = accounts
-        if not accounts:
-            raise forms.ValidationError(self.error_messages[0])
-        else:
-            return accounts
-
-    def save(self, domain_override=None,
-             subject_template_name=None,
-             email_template_name=None,
-             use_https=False, token_generator=default_token_generator,
-             from_email=None, request=None):
-        mail_context = {
-            'site_name': settings.SITE_NAME,
-            'accounts': self.accounts,
-            'protocol': 'https' if use_https else 'http',
-        }
-        SubdomainForgotEmail(**mail_context).send(
-            to=(self.email,),
-            bcc=settings.BCC_EMAILS)
 
 class UserBaseSettingsForm(ModelForm):
 

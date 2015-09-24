@@ -13,6 +13,7 @@ from almanet.views import (
     ServiceDetailView,
     RedirectHomeView,
     landing_form,
+    landing
     )
 from django.views.generic import TemplateView
 
@@ -21,7 +22,7 @@ admin.autodiscover()
 
 urlpatterns = patterns(
     '',
-    url(r'^$', RedirectHomeView.as_view()),
+    url(r'^$', landing, name='landing_page'),
     url(r'^admin/', include(admin.site.urls)),
     url(r'^auth/', include('alm_user.urls')),
     url(r'^api/', include('almanet.api_urls')),
@@ -46,8 +47,8 @@ urlpatterns = patterns(
     url(r'^services/service_delete/(?P<pk>\d+)/$', ServiceDeleteView.as_view(), name='service_delete'),
     url(r'api/doc/', include('tastypie_swagger.urls', namespace='tastypie_swagger')),
     url(r'agreement/$', TemplateView.as_view(template_name='almanet/agreement.crm.html'), name='agreement'),
-    url(r'landing_form/$', landing_form, name='landing_form'),
-    url(r'landing/$', TemplateView.as_view(template_name='index.html'), name='landing_page'),
+    # url(r'landing_form/$', landing_form, name='landing_form'),
+    url(r'landing/$', landing, name='landing_page'),
 
 )
 

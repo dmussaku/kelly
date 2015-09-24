@@ -18,8 +18,8 @@ from alm_user.forms import(
     UserPasswordSettingsForm, 
     ReferralForm, 
     PasswordResetForm,
-    SubdomainForgotForm,
     AuthenticationForm,
+    RegistrationForm,
 ) 
 # from alm_user.auth_backend import login, logout
 from almanet.models import Service
@@ -146,42 +146,6 @@ def password_reset(request, is_admin_site=False,
     return TemplateResponse(request, template_name, context,
                             current_app=current_app)
 
-@csrf_protect
-def subdomain_forgot(request,
-                    is_admin_site=False, 
-                    template_name='user/subdomain_forgot.html',
-                    from_email=None,
-                    post_reset_redirect=None,
-                    extra_context=None,
-                    email_template_name='registration/password_reset_email.html',
-                    subject_template_name='registration/password_reset_subject.txt',):
-    if post_reset_redirect is None:
-        post_reset_redirect = almanet_reverse('subdomain_forgot_done')
-    else:
-        post_reset_redirect = resolve_url(post_reset_redirect)
-    if request.method == 'POST':
-        form = SubdomainForgotForm(request.POST)
-        if form.is_valid():
-            opts = {
-                'use_https': request.is_secure(),
-                'from_email': from_email,
-                'email_template_name': email_template_name,
-                'subject_template_name': subject_template_name,
-                'request': request,
-            }
-            if is_admin_site:
-                opts = dict(opts, domain_override=request.get_host())
-            form.save(**opts)
-            return HttpResponseRedirect(post_reset_redirect)
-    else:
-        form = SubdomainForgotForm()
-    context = {
-        'form': form,
-    }
-    if extra_context is not None:
-        context.update(extra_context)
-    return TemplateResponse(request, template_name, context)
-
 
 class UserListView(ListView):
 
@@ -214,7 +178,7 @@ def password_reset_confirm(request, user_pk=None, token=None,
         post_reset_redirect = reverse_lazy('password_reset_success')
 
     try:
-        user = Account.objects.get(pk=user_pk)
+        user = User.objects.get(pk=user_pk)
         print user
     except User.DoesNotExist:
         user = None
@@ -306,6 +270,31 @@ def referral(request, template_name='user/login-registration.html',
     else:
         form = referral_form(request)
 
+    context = {
+        'form': form
+    }
+    return TemplateResponse(request, template_name, context)
+
+def registration(request, template_name='user/registration.html',
+    registration_form=RegistrationForm):
+    if request.method == "POST":
+        form = registration_form(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            accounts = request.user.accounts.all()
+            if len(accounts) > 1:
+                return HttpResponseRedirect(
+                    reverse_lazy('choose_subdomain')
+                )
+            return HttpResponseRedirect(
+                reverse_lazy('crm_home', 
+                        subdomain=accounts[0].company.subdomain,
+                        kwargs={'service_slug': settings.DEFAULT_SERVICE}))
+            # return HttpResponseRedirect(reverse_lazy('user_registration_success'))
+    else:
+        email = request.GET.get('email','')
+        form = registration_form(initial={"email":email})
     context = {
         'form': form
     }

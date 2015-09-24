@@ -7,6 +7,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from almanet.utils.metaprogramming import DirtyFieldsMixin
 from almanet.models import SubscriptionObject, Subscription
+from alm_company.models import Company
 from alm_vcard.models import (
     VCard,
     BadVCardError,
@@ -1142,9 +1143,7 @@ class SalesCycle(SubscriptionObject):
                                       null=True, blank=True,
                                       through='SalesCycleProductStat')
     owner = models.ForeignKey(User, related_name='owned_sales_cycles', null=True)
-    followers = models.ManyToManyField(
-        User, related_name='follow_sales_cycles',
-        null=True, blank=True)
+
     contact = models.ForeignKey(Contact, related_name='sales_cycles')
     latest_activity = models.OneToOneField('Activity',
                                            blank=True, null=True,
@@ -1285,23 +1284,6 @@ class SalesCycle(SubscriptionObject):
         else:
             self.projected_value = v
         self.save()
-
-    def add_follower(self, user_id, **kw):
-        """TEST Set follower to salescycle"""
-        return self.add_followers([user_id], **kw)[0]
-
-    def add_followers(self, user_ids, save=False):
-        """TEST Set followers to salescycle"""
-        assert isinstance(user_ids, (tuple, list)), 'must be a list'
-        status = []
-        for uid in user_ids:
-            try:
-                user = User.objects.get(id=uid)
-                self.followers.add(user)
-                status.append(True)
-            except User.DoesNotExist:
-                status.append(False)
-        return status
 
     def change_milestone(self, user, milestone_id, company_id):
         milestone = Milestone.objects.get(id=milestone_id)
@@ -2005,8 +1987,8 @@ def delete_related_milestones(sender, instance, **kwargs):
 
 signals.post_delete.connect(on_activity_delete, sender=Activity)
 signals.pre_save.connect(check_is_title_empty, sender=SalesCycle)
-signals.post_save.connect(create_milestones, sender=Subscription)
-signals.pre_delete.connect(delete_related_milestones, sender=Subscription)
+signals.post_save.connect(create_milestones, sender=Company)
+signals.pre_delete.connect(delete_related_milestones, sender=Company)
 
 '''
 Function to get mentions by 3 of optional parameters:

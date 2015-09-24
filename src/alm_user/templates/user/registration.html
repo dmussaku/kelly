@@ -1,0 +1,87 @@
+{% extends "user/base.html" %}
+{% load i18n %}
+{% block head_title %} Register &mdash; Almanet {% endblock %}
+{% block content %}
+  {{message}}
+  <div class="login">
+    <div class="login-body">
+      <div class="login-switcher">
+        <a href="{% url 'user_login' %}" class="login-switcher-button">{{ _("Sign in") }}</a>
+        <a href="{% url 'user_registration' %}" class="login-switcher-button active">{{ _("Register") }}</a>
+      </div>
+      <div class="login-form">
+
+      <form name="login-form" action="" method="post">
+      {% csrf_token %}
+        <div class="login-fieldset {% if form.email.errors or form.non_field_errors %}has-error{% endif %}">
+          <label class="login-fieldset-icon" for="login-email">
+            <figure class="icon icon--mail">
+              <svg version="1.1">
+                <use xlink:href="#mail"></use>
+              </svg>
+            </figure>
+          </label>
+          <input class="login-input" id="login-email" name="email" type="email" placeholder="E-mail" required value={{form.initial.email}}>
+          {% if form.email.errors %}
+              <div class="login-error">{{ form.email.errors }}</div>
+          {% endif %}
+          {% if form.non_field_errors %}
+              {% for error in form.non_field_errors %}
+              <div class="login-error">{{ error }}</div>
+              {% endfor %}
+          {% endif %}
+        </div>
+
+        <div class="login-fieldset">
+          <label class="login-fieldset-icon" for="login-company-name">
+            <figure class="icon icon--organization">
+              <svg>
+                <use xlink:href="#icon-organization"></use>
+              </svg>
+            </figure>
+          </label>
+          <input class="login-input" id="login-company-name" name="company_name" type="text" placeholder={{ _("Company") }} required>
+        </div>
+
+        <div class="login-fieldset {% if form.company_subdomain.errors or form.non_field_errors %}has-error{% endif %}">
+          <label class="login-fieldset-icon" for="login-company-name">
+            <figure class="icon icon--organization">
+              <svg>
+                <use xlink:href="#icon-organization"></use>
+              </svg>
+            </figure>
+          </label>
+          <input class="login-input" id="login-company-subdomain" name="company_subdomain" type="text" placeholder={{ _("Subdomain") }} required>
+          {% if form.company_subdomain.errors %}
+              <div class="login-error">{{ form.company_subdomain.errors }}</div>
+          {% endif %}
+          {% if form.non_field_errors %}
+              {% for error in form.non_field_errors %}
+              <div class="login-error">{{ error }}</div>
+              {% endfor %}
+          {% endif %}
+        </div>
+
+        <div class="login-fieldset {% if form.password.errors %}has-error{% endif %}">
+          <label class="login-fieldset-icon" for="password">
+              <figure class="icon icon--lock">
+                  <svg version="1.1">
+                      <use xlink:href="#lock"></use>
+                  </svg>
+              </figure>
+          </label>
+          <input type="password" class="login-input" id="password" name="password" placeholder={{ _("Password") }}>
+          {% if form.password.errors %}
+            <div class="login-error">Error message here!</div>
+          {% endif %}
+        </div>
+
+        <div class="login-fieldset">
+          <button class="login-submit" type="submit">{{ _("Register") }}</button>
+        </div>
+      </form>
+      </div>
+    </div>
+
+  </div>
+  {% endblock %}
