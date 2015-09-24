@@ -2451,7 +2451,7 @@ class ActivityResource(CRMServiceModelResource):
         act.save()
         text_parser(base_text=act.description, content_class=act.__class__,
                     object_id=act.id, company_id = bundle.request.company.id)
-        subdomain = GetSubdomainMiddleware.get_subdomain(bundle.request)
+        subdomain = bundle.request.subdomain
         account=Account.objects.get(
             company__subdomain=subdomain, user=bundle.request.user)
         act.spray(bundle.request.company.id, account)
@@ -2866,7 +2866,7 @@ class CommentResource(CRMServiceModelResource):
         bundle = super(self.__class__, self).obj_create(bundle)
         comment = bundle.obj
         comment.save()
-        subdomain = GetSubdomainMiddleware.get_subdomain(bundle.request)
+        subdomain = bundle.request.subdomain
         account=Account.objects.get(
             company__subdomain=subdomain, user=bundle.request.user)
         comment.spray(comment.company_id, account)
