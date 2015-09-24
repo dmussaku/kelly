@@ -31,7 +31,7 @@ from alm_crm.api import (
     ReportResource,
     HashTagReferenceResource,
     )
-from alm_user.api import UserResource
+from alm_user.api import UserResource, SessionResource
 from tastypie.resources import ModelResource
 
 
@@ -63,6 +63,7 @@ v1_api.register(CustomFieldValueResource())
 v1_api.register(MilestoneResource())
 v1_api.register(ReportResource())
 v1_api.register(HashTagReferenceResource())
+v1_api.register(SessionResource())
 
 urlpatterns = patterns(
     '',

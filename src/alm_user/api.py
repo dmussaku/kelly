@@ -127,7 +127,7 @@ class UserResource(ModelResource):
         # authorization = Authorization()
 
     def apply_filters(self, request, applicable_filters):
-        subdomain = GetSubdomainMiddleware.get_subdomain(request)
+        subdomain = request.subdomain
         company = Company.objects.get(subdomain=subdomain)
         user_ids = [acc.user_id for acc in company.accounts.all()]
         q = Q(id__in=user_ids)
@@ -290,13 +290,12 @@ class UserResource(ModelResource):
     def full_dehydrate(self, bundle, for_list=False):
         bundle = super(self.__class__, self).full_dehydrate(bundle, for_list=True)
         company_list = []
+        subdomain = bundle.request.subdomain 
         is_supervisor = False
-        subdomain = GetSubdomainMiddleware.get_subdomain(bundle.request)
         current_account = None
         for account in bundle.obj.accounts.all():
             if subdomain == account.company.subdomain:
                 current_account = account
-                is_supervisor = account.is_supervisor
             company_list.append(
                 {
                  'id':account.company.id, 
@@ -304,12 +303,9 @@ class UserResource(ModelResource):
                  'subdomain':account.company.subdomain
                 }
             )
-        bundle.data['is_supervisor'] = is_supervisor
+        bundle.data['is_supervisor'] = current_account.is_supervisor
+        bundle.data['is_active'] = current_account.is_active
         bundle.data['companies'] = company_list
-        if current_account:
-            bundle.data['is_active'] = current_account.is_active
-        else:
-            bundle.data['is_active'] = False
         # TODO: use CustomFields with use_in_ids
         return bundle
 
@@ -469,7 +465,7 @@ class SessionObject(object):
     def get_session(self, request):
         return {
             'user_id': self.user.pk,
-            'session_key': request.session.session_key,
+            # 'session_key': request.session.session_key,
             # 'logged_in': request.account.is_authenticated(),
             'language': translation.get_language(),
             'timezone': TIME_ZONE
@@ -479,7 +475,6 @@ class SessionObject(object):
 class SessionResource(Resource):
 
     session = fields.DictField(attribute='session', readonly=True)
-    user = fields.DictField(readonly=True)
     company = fields.DictField(readonly=True)
 
     class Meta:
@@ -500,10 +495,6 @@ class SessionResource(Resource):
                 self.wrap_view('get_current_state'),
                 name='api_current_state'
             )]
-
-    def dehydrate_user(self, bundle):
-        user_bundle = UserResource().build_bundle(obj=bundle.obj.user)
-        return UserResource().full_dehydrate(user_bundle)
 
     def dehydrate_company(self, bundle):
         company = bundle.obj.company
