@@ -50,7 +50,7 @@
               </svg>
             </figure>
           </label>
-          <input class="login-input" id="login-company-subdomain" name="company_subdomain" type="text" placeholder={{ _("Company subdomain") }} required>
+          <input class="login-input" id="login-company-subdomain" name="company_subdomain" type="text" placeholder={{ _("Subdomain") }} required>
           {% if form.company_subdomain.errors %}
               <div class="login-error">{{ form.company_subdomain.errors }}</div>
           {% endif %}
@@ -69,22 +69,8 @@
                   </svg>
               </figure>
           </label>
-          <input type="password" class="login-input" id="password" name="password" placeholder="Password">
+          <input type="password" class="login-input" id="password" name="password" placeholder={{ _("Password") }}>
           {% if form.password.errors %}
-          <div class="login-error">Error message here!</div>
-          {% endif %}
-        </div>
-
-        <div class="login-fieldset {% if form.password.errors %}has-error{% endif %}">
-          <label class="login-fieldset-icon" for="confirm_password">
-              <figure class="icon icon--lock">
-                  <svg version="1.1">
-                      <use xlink:href="#lock"></use>
-                  </svg>
-              </figure>
-          </label>
-          <input type="password" class="login-input" id="confirm_password" name="confirm_password" placeholder="Confirm password">
-          {% if form.confirm_password.errors %}
           <div class="login-error">Error message here!</div>
           {% endif %}
         </div>

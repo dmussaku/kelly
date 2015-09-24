@@ -290,7 +290,7 @@ class UserResource(ModelResource):
     def full_dehydrate(self, bundle, for_list=False):
         bundle = super(self.__class__, self).full_dehydrate(bundle, for_list=True)
         company_list = []
-        subdomain = bundle.request.subdomain 
+        subdomain = bundle.request.subdomain
         is_supervisor = False
         current_account = None
         for account in bundle.obj.accounts.all():

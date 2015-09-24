@@ -24,8 +24,6 @@ class RegistrationForm(forms.Form):
     company_subdomain = forms.CharField(max_length=20)
     password = forms.CharField(widget=forms.PasswordInput(),
                                max_length=100)
-    confirm_password = forms.CharField(widget=forms.PasswordInput(),
-                                       max_length=100)
 
     def clean_email(self):
         email = self.cleaned_data['email']
@@ -48,17 +46,13 @@ class RegistrationForm(forms.Form):
                 )
         return company_subdomain
 
-    def clean(self):
+    def clean_password(self):
         password = self.cleaned_data.get('password', None)
-        confirm_password = self.cleaned_data.get('confirm_password', None)
-        if (not password):
-            return super(RegistrationForm, self).clean()
-        if (not confirm_password):
-            return super(RegistrationForm, self).clean()
-        if (password != confirm_password):
-            raise forms.ValidationError('Password Mismatch')
-        else:
-            return super(RegistrationForm, self).clean()
+        if not password:
+            raise forms.ValidationError( 
+                _("Enter valid password") 
+                )
+        return password
 
     def save(self, commit=True):
         user = User(email=self.cleaned_data['email'])
