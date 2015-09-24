@@ -5,67 +5,75 @@ from tastypie import fields, http
 from tastypie.bundle import Bundle
 from tastypie.resources import Resource, ModelResource
 from tastypie.exceptions import NotFound, BadRequest
-from django.contrib.auth import login, logout, authenticate
-from django.conf.urls import url
 from tastypie.utils import trailing_slash
-from alm_vcard.models import *
-from alm_crm.models import Contact, CRMUser
-
-from .models import User
-from tastypie.authentication import (
-    MultiAuthentication,
-    SessionAuthentication,
-    BasicAuthentication,
-    )
 from tastypie.authorization import Authorization
 from tastypie.authentication import Authentication
 from tastypie.exceptions import ImmediateHttpResponse, NotFound
 from tastypie.http import HttpNotFound
 from tastypie.serializers import Serializer
+from tastypie.constants import ALL
+
+from django.core.exceptions import PermissionDenied
+from django.contrib.auth import authenticate
+from django.conf.urls import url
+from django.utils import translation
 from django.http import HttpResponse
-from almanet.settings import DEFAULT_SERVICE
-from almanet.utils.api import RequestContext
+from django.db.models import Q
+
+from .models import User
+from alm_vcard.models import *
+from alm_crm.models import SalesCycle, SalesCycleLogEntry, Contact, Category
+from alm_user.models import Account, User
+from alm_company.models import Company
+from tastypie.authentication import (
+    MultiAuthentication,
+    SessionAuthentication,
+    BasicAuthentication,
+    )
+
+from almanet.settings import DEFAULT_SERVICE, TIME_ZONE
+from almanet.utils.api import RequestContext, CommonMeta
 from almanet.utils.env import get_subscr_id
-from alm_crm.api import CRMUserResource
 import json
 import datetime
 import ast
+from django.contrib.auth import login
+from almanet.middleware import GetSubdomainMiddleware
 
 
 
-# class OpenAuthEndpoint(Authentication):
+class OpenAuthEndpoint(Authentication):
 
-#     def is_authenticated(self, request, **kwargs):
-#         """
-#         Identifies if the user is authenticated to continue or not.
-#         Should return either ``True`` if allowed, ``False`` if not or an
-#         ``HttpResponse`` if you need something custom.
-#         """
+    def is_authenticated(self, request, **kwargs):
+        """
+        Identifies if the user is authenticated to continue or not.
+        Should return either ``True`` if allowed, ``False`` if not or an
+        ``HttpResponse`` if you need something custom.
+        """
+        auth_endpoint = '/api/v1/%s/auth%s' % (UserResource._meta.resource_name, trailing_slash())
 
-#         auth_endpoint = '/api/v1/%s/auth%s' % (UserResource._meta.resource_name, trailing_slash())
-
-#         # return request.path == auth_endpoint
+        return request.path == auth_endpoint
 
 
-class UserSession(object):
+# class UserSession(object):
 
-    @classmethod
-    def session_get_key(cls, request, create_if_needed=True):
-        if not request.session.session_key and create_if_needed:
-            request.session.create()
-        return request.session.session_key
+#     @classmethod
+#     def session_get_key(cls, request, create_if_needed=True):
+#         if not request.session.session_key and create_if_needed:
+#             request.session.create()
+#         return request.session.session_key
 
-    @classmethod
-    def object_for_request(cls, request):
-        s = cls()
-        s.id = cls.session_get_key(request)
-        s.expire_date = request.session.get_expiry_date()
-        s.user = None
+#     @classmethod
+#     def object_for_request(cls, request):
+#         s = cls()
+#         s.id = cls.session_get_key(request)
+#         s.expire_date = request.session.get_expiry_date()
+#         s.user = None
 
-        if request.user.is_authenticated():
-            s.user = request.user
+#         if request.user.is_authenticated():
+#             s.user = request.user
 
-        return s
+#         return s
 
 
 class UserResource(ModelResource):
@@ -98,21 +106,34 @@ class UserResource(ModelResource):
 
     @undocumented: Meta
     '''
-    vcard = fields.ToOneField('alm_vcard.api.VCardResource', 'vcard', null=True, full=True)
+    vcard = fields.ToOneField(
+        'alm_vcard.api.VCardResource', 'vcard', null=True, full=True)
 
-    class Meta:
+    class Meta(CommonMeta):
         queryset = User.objects.all()
         excludes = ['password', 'is_admin']
         list_allowed_methods = ['get', 'patch']
         detail_allowed_methods = ['get', 'patch']
         resource_name = 'user'
+        filtering = {
+            'id': ALL
+        }
+
         authentication = MultiAuthentication(
-            # OpenAuthEndpoint(),
-            BasicAuthentication(),
+            OpenAuthEndpoint(),
+            # BasicAuthentication(),
             SessionAuthentication()
             )
-        authorization = Authorization()
+        # authorization = Authorization()
 
+    def apply_filters(self, request, applicable_filters):
+        subdomain = request.subdomain
+        company = Company.objects.get(subdomain=subdomain)
+        user_ids = [acc.user_id for acc in company.accounts.all()]
+        q = Q(id__in=user_ids)
+        objects = super(ModelResource, self).apply_filters(request, applicable_filters)
+        return objects.filter(q)
+        
     def prepend_urls(self):
         return [
             url(
@@ -154,20 +175,21 @@ class UserResource(ModelResource):
             from django.core.files.uploadedfile import SimpleUploadedFile
             file_contents = SimpleUploadedFile("%s" %(data['name']), base64.b64decode(data['pic']), content_type='image')
             request.user.userpic.save(data['name'], file_contents, True)
-            raise ImmediateHttpResponse(
-                HttpResponse(
-                    content=Serializer().to_json(
-                        CRMUserResource().full_dehydrate(
-                            CRMUserResource().build_bundle(
-                                obj=CRMUser.objects.get(id=request.user.get_crmuser().id))
-                            )
-                        ),
-                    content_type='application/json; charset=utf-8', status=200)
-            )
+            
+            user = User.objects.get(id=request.user.id)
+
+            bundle = self.build_bundle(obj=user, request=request)
+            bundle = self.full_dehydrate(bundle)
+
+            return self.create_response(request, bundle,
+                                            response_class=http.HttpAccepted)
 
     def change_password(self, request, **kwargs):
         with RequestContext(self, request, allowed_methods=['post']):
-            data = self.deserialize(request, request.body, format=request.META.get('CONTENT_TYPE', 'application/json'))
+            data = self.deserialize(
+                request, request.body, 
+                format=request.META.get('CONTENT_TYPE', 'application/json')
+                )
             old_password = data.get('old_password', None)
             new_password = data.get('new_password', None)
             user = request.user
@@ -175,7 +197,6 @@ class UserResource(ModelResource):
             if old_password is None or new_password is None:
                 self.error_response(request, {}, response_class=http.HttpBadRequest)
 
-            print old_password, new_password
             if user.check_password(old_password):
                 user.set_password(new_password)
                 user.save()
@@ -193,15 +214,22 @@ class UserResource(ModelResource):
                         'error_message': "current password is incorrect"
                     }
                 )
-
-    def dehydrate(self, bundle):
-        bundle.data['crm_user_id'] = bundle.obj.get_crmuser().pk
-        bundle.data['is_supervisor'] = bundle.obj.get_crmuser().is_supervisor
-        return bundle
+    # def dehydrate(self, bundle):
+    #     subscription_id = get_subscr_id(bundle.request.user_env, DEFAULT_SERVICE)
+    #     bundle.data['crm_user_id'] = bundle.obj.get_subscr_user(subscription_id=subscription_id).pk
+    #     bundle.data['is_supervisor'] = bundle.obj.get_subscr_user(subscription_id=subscription_id).is_supervisor
+    #     return bundle
 
     def get_current_user(self, request, **kwargs):
         with RequestContext(self, request, allowed_methods=['get']):
             bundle = self.build_bundle(obj=request.user, request=request)
+            
+            bundle.company = request.company
+            bundle.session = {
+                'user_id': request.user.id,
+                'session_key': request.session.session_key
+            }
+
             bundle = self.full_dehydrate(bundle)
             return self.create_response(request, bundle)
 
@@ -235,18 +263,17 @@ class UserResource(ModelResource):
 
         bundle = self.full_hydrate(bundle, **kwargs)
         #return self.save(bundle, skip_errors=skip_errors)
+        user = User.objects.get(id=bundle.request.user.id)
+        bundle = self.build_bundle(obj=user, request=bundle.request)
+        bundle = self.full_dehydrate(bundle)
         raise ImmediateHttpResponse(
             HttpResponse(
                 content=Serializer().to_json(
-                    self.full_dehydrate(
-                        self.build_bundle(
-                            obj=User.objects.get(id=bundle.obj.id))
-                        )
+                    bundle
                     ),
                 content_type='application/json; charset=utf-8', status=200
                 )
             )
-        return bundle
 
     def full_hydrate(self, bundle, **kwargs):
         user_id = kwargs.get('pk', None)
@@ -259,12 +286,28 @@ class UserResource(ModelResource):
 
     def full_dehydrate(self, bundle, for_list=False):
         bundle = super(self.__class__, self).full_dehydrate(bundle, for_list=True)
-        bundle.data['unfollow_list'] = [contact.id for contact in bundle.obj.get_crmuser().unfollow_list.all()]
+        company_list = []
+        subdomain = bundle.request.subdomain
+        is_supervisor = False
+        current_account = None
+        for account in bundle.obj.accounts.all():
+            if subdomain == account.company.subdomain:
+                current_account = account
+            company_list.append(
+                {
+                 'id':account.company.id, 
+                 'name':account.company.name, 
+                 'subdomain':account.company.subdomain
+                }
+            )
+        bundle.data['is_supervisor'] = current_account.is_supervisor
+        bundle.data['is_active'] = current_account.is_active
+        bundle.data['companies'] = company_list
+        # TODO: use CustomFields with use_in_ids
         return bundle
 
     def vcard_full_hydrate(self, bundle):
         field_object = bundle.data.get('vcard',{})
-        subscription_id = self.get_crm_subscription(bundle.request)
         if bundle.obj.vcard:
             vcard = bundle.obj.vcard
         else:
@@ -330,7 +373,6 @@ class UserResource(ModelResource):
                             vcard_obj.vcard = VCard.objects.get(id=value)
                         else:
                             vcard_obj.__setattr__(key, value)
-                    vcard_obj.subscription_id = subscription_id
                     vcard_obj.save()
                     id_list.append(vcard_obj.id)
                 for obj in queryset:
@@ -339,7 +381,6 @@ class UserResource(ModelResource):
             else:
                 for obj in model.objects.filter(vcard=vcard):
                     obj.delete()
-        vcard.subscription_id = subscription_id
         vcard.save()
 
     def subscriptions(self, request, **kwargs):
@@ -370,10 +411,16 @@ class UserResource(ModelResource):
 
 
     def authorization(self, request, **kwargs):
-        with RequestContext(self, request, auth=False, allowed_methods=['post']):
+        '''
+        X-User-Agent: net.alma.app.mobile
+        '''
+        with RequestContext(self, request, allowed_methods=['post']):
             data = self.deserialize(request, request.body, format=request.META.get('CONTENT_TYPE', 'application/json'))
 
-            user = authenticate(username=data.get('email'), password=data.get('password'))
+            user = authenticate(
+                username=data.get('email'), 
+                password=data.get('password')
+                )
             session_key = None
             session_expire_date = None
             if user is not None:
@@ -387,11 +434,79 @@ class UserResource(ModelResource):
             else:
                 data = {'message': "Invalid login"}
                 return self.error_response(request, data, response_class=http.HttpUnauthorized)
-
-            # request.user = user
-            bundle = self.build_bundle(obj=None, data={
-                'user': self.full_dehydrate(self.build_bundle(obj=request.user, request=request)),
+            data = {
+                'user': self.full_dehydrate(self.build_bundle(
+                    obj=request.user, request=request)),
                 'session_key': session_key,
                 'session_expire_date': session_expire_date
-                }, request=request)
+                }
+            # if request.META.get('X-User-Agent',"") == 'net.alma.app.mobile':
+            #     data['api_token'] = account.key
+
+            bundle = self.build_bundle(obj=None, data=data, request=request)
             return self.create_response(request, bundle)
+
+
+class SessionObject(object):
+    '''
+    @undocumented: __init__, get_users, get_company(request), get_contacts,
+    get_sales_cycles, get_activities, get_shares, get_constants,
+    get_session
+    '''
+
+    def __init__(self, request=None):
+        self.company = request.company
+        self.user = request.user
+        self.session = self.get_session(request)
+
+    def get_session(self, request):
+        return {
+            'user_id': self.user.pk,
+            # 'session_key': request.session.session_key,
+            # 'logged_in': request.account.is_authenticated(),
+            'language': translation.get_language(),
+            'timezone': TIME_ZONE
+        }
+
+
+class SessionResource(Resource):
+
+    session = fields.DictField(attribute='session', readonly=True)
+    company = fields.DictField(readonly=True)
+
+    class Meta:
+        resource_name = 'session_state'
+        object_class = SessionObject
+        authentication = MultiAuthentication(
+            OpenAuthEndpoint(),
+            # BasicAuthentication(),
+            SessionAuthentication()
+        )
+        authorization = Authorization()
+
+    def prepend_urls(self):
+        return [
+            url(
+                r"^(?P<resource_name>%s)/current%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('get_current_state'),
+                name='api_current_state'
+            )]
+
+    def dehydrate_company(self, bundle):
+        company = bundle.obj.company
+        return {
+            'id': company.id,
+            'name': company.name,
+            'subdomain': company.subdomain
+        }
+
+    def get_current_state(self, request, **kwargs):
+        with RequestContext(self, request, allowed_methods=['get']):
+            bundle = self.build_bundle(
+                obj=SessionObject(request=request), request=request)
+            data = self.full_dehydrate(bundle)
+            return self.create_response(request, data)
+
+
+

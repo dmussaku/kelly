@@ -49,11 +49,6 @@ class Subscription(models.Model):
         verbose_name = _('subscription')
         db_table = settings.DB_PREFIX.format('subscription')
 
-    @property
-    def backend(self):
-        # TODO backend pattern
-        return self
-
     def get_home_url(self):
         url_key = '{}_home'.format(settings.DEFAULT_SERVICE)
         return almanet_reverse(
@@ -61,23 +56,21 @@ class Subscription(models.Model):
             subdomain=self.organization.subdomain,
             kwargs={'service_slug': self.service.slug.lower()})
 
-
 class SubscriptionObject(models.Model):
-    subscription_id = models.IntegerField(_('subscription id'),
-                                          null=True, blank=True)
+    # subscription_id = models.IntegerField(_('subscription id'),
+    #                                       null=True, blank=True)
+    company_id = models.IntegerField(_('company_id'), null=True, blank=True)
     date_created = models.DateTimeField(auto_now_add=True, blank=True)
     date_edited = models.DateTimeField(auto_now=True, blank=True)
-
+    
     class Meta:
         abstract = True
 
     def save(self, **kwargs):
-        if not self.subscription_id and self.owner:
-            self.subscription_id = self.owner.subscription_id
         super(SubscriptionObject, self).save(**kwargs)
 
 
 class SerializableSubscriptionObject(SubscriptionObject, SerializableModel):
-
+    
     class Meta:
         abstract = True

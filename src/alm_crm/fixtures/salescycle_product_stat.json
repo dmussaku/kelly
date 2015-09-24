@@ -4,7 +4,7 @@
     "model": "alm_crm.salescycleproductstat", 
     "fields": {
         "sales_cycle": 1, 
-        "subscription_id": 1, 
+        "company_id": 1, 
         "product": 1, 
         "real_value": 0,
         "projected_value": 0,
@@ -17,7 +17,7 @@
     "model": "alm_crm.salescycleproductstat", 
     "fields": {
         "sales_cycle": 1, 
-        "subscription_id": 1, 
+        "company_id": 1, 
         "product": 2, 
         "real_value": 0,
         "projected_value": 0,

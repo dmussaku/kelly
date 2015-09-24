@@ -1,0 +1,1 @@
+#this file was created because client url is static 127.0.0.1 but we need url with company subdomain 

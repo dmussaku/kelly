@@ -1,5 +1,5 @@
 {% extends "user/base.html" %}
-{% load i18n %}
+{% load i18n almanet_tags %}
 {% load static from staticfiles %}
 {% block head_title %} Login page {% endblock %}
 {% block content %}
@@ -8,7 +8,7 @@
         <div class="login-body">
             <div class="login-switcher">
                 <a href="{% url 'user_login' %}" class="login-switcher-button active">{{ _("Sign in") }}</a>
-                <a href="{% url 'user_referral' %}" class="login-switcher-button">{{ _("Register") }}</a>
+                <a href="{% url 'user_registration' %}" class="login-switcher-button">{{ _("Register") }}</a>
             </div>
             <div class="login-form">
             <form name="login-form" action="" method="post">
@@ -24,7 +24,7 @@
 
                     <input class="login-input" id="login-email" name="username" type="email" placeholder="E-mail">
                     {% if form.username.errors %}
-                    <div class="login-error">{{ form.username.errors }}</div>
+                        <div class="login-error">{{ form.username.errors }}</div>
                     {% endif %}
                     {% if form.non_field_errors %}
                         {% for error in form.non_field_errors %}
@@ -48,7 +48,7 @@
                         <a href="{% url 'password_reset' %}">{{ _("Forgot your password?") }}</a>
                     </div>
                     <div>
-                        <a href="{% url 'agreement' %}"> Соглашение о порядке предоставления услуг </a>
+                        <a href="{% url 'agreement' %}">{{ _("Соглашение о порядке предоставления услуг") }}  </a>
                     </div>
         <div class="login-fieldset" style="margin-top: 0;">
           <button class="login-submit" type="submit">{{ _("Login") }}</button>
@@ -56,12 +56,21 @@
       </div>
     </form>
             </div>
+
+    <div>
+        {% if logged_in_companies %}
+            <p>Компании, в которые вы залогинены</p>
+            {% for company in logged_in_companies %}
+                <a href="{% subdomain_url 'crm_home' subdomain=company.subdomain service_slug='crm'  %}" class="login-submit">{{ company.name }}</a>
+                <br/>
+            {% endfor %}
+        {% endif %}
+    </div>
     <p class="p1 text-center">
         <a href='https://appsto.re/kz/pvzn8.i' target="_blank">
             <img style='display:inline-block' src="{% static 'img/app_store_badge.svg' %}" />
         </a>
     </p>
   </div>
-
-  </div>
+</div>
 {% endblock %}

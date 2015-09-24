@@ -5,14 +5,14 @@ from alm_crm.models import (
 	HashTag, 
 	HashTagReference, 
 	Mention,
-	CRMUser,
 	Comment, 
 	Activity,
 	Share,
 	)
 
-def text_parser(base_text, content_class=None, object_id=None):
-	if base_text == None:
+
+def text_parser(base_text, company_id, content_class=None, object_id=None):
+	if base_text == None or base_text == "":
 		return
 		
 	content_type =  ContentType.objects.get_for_model(content_class)
@@ -52,6 +52,7 @@ def text_parser(base_text, content_class=None, object_id=None):
 					hashtag_id=hashtag.id, 
 					content_class=content_class,
 					object_id=object_id,
+					company_id = company_id,
 					save=True)
 
 
@@ -61,5 +62,6 @@ def text_parser(base_text, content_class=None, object_id=None):
 		mention = Mention.build_new(user_id=user_id,
 									content_class=content_class,
 									object_id=object_id,
+									company_id = company_id,
 									save=True)
 		

@@ -10,31 +10,36 @@ from django.views.decorators.cache import never_cache
 from django.conf import settings
 from almanet.settings import MY_SD
 
-from alm_user.models import User, Referral
+from alm_company.models import Company
+from alm_user.models import User, Referral, Account
 from alm_user.forms import(
-    RegistrationForm, 
+    # RegistrationForm, 
     UserBaseSettingsForm, 
     UserPasswordSettingsForm, 
     ReferralForm, 
     PasswordResetForm,
+    AuthenticationForm,
+    RegistrationForm,
 ) 
+# from alm_user.auth_backend import login, logout
 from almanet.models import Service
 from almanet.url_resolvers import reverse_lazy
 
 # for testing, need to be deleted
 from datetime import datetime
+# from django.contrib.auth.forms import AuthenticationForm
 from django.views.decorators.csrf import csrf_protect
-from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.sites.models import get_current_site
 from django.utils.http import is_safe_url
 from django.shortcuts import resolve_url
-from django.contrib.auth import REDIRECT_FIELD_NAME, login as auth_login, logout as auth_logout, get_user_model
+from django.contrib.auth import login, logout, REDIRECT_FIELD_NAME
 from almanet.url_resolvers import reverse as almanet_reverse
+
 
 @sensitive_post_parameters()
 @csrf_protect
 @never_cache
-def login(request, template_name='registration/login.html',
+def login_view(request, template_name='registration/login.html',
           redirect_field_name=REDIRECT_FIELD_NAME,
           authentication_form=AuthenticationForm,
           current_app=None, extra_context=None):
@@ -49,23 +54,92 @@ def login(request, template_name='registration/login.html',
             if not is_safe_url(url=redirect_to, host=request.get_host()):
                 redirect_to = resolve_url(settings.LOGIN_REDIRECT_URL)
             # Okay, security check complete. Log the user in.
-            auth_login(request, form.get_user())
-            if request.user:
-                subscr = request.user.get_subscriptions()[0]
-                print subscr.get_home_url()
-                if not subscr is None:
-                    return HttpResponseRedirect(subscr.get_home_url())
-            return HttpResponseRedirect(redirect_to)
+            login(request, form.get_user())
+
+            accounts = request.user.accounts.all()
+            if len(accounts) > 1:
+                return HttpResponseRedirect(
+                    reverse_lazy('choose_subdomain')
+                )
+            return HttpResponseRedirect(
+                reverse_lazy('crm_home', 
+                        subdomain=accounts[0].company.subdomain,
+                        kwargs={'service_slug': settings.DEFAULT_SERVICE}))
     else:
         form = authentication_form(request)
-
-    current_site = get_current_site(request)
-
+    comps = request.COOKIES.get('comps', None)
+    logged_in_companies = []
+    if request.user and not request.user.is_anonymous():
+        logged_in_companies = [account.company for account in request.user.accounts.all()]
     context = {
         'form': form,
         redirect_field_name: redirect_to,
-        'site': current_site,
-        'site_name': current_site.name,
+        'logged_in_companies': logged_in_companies
+    }
+    if extra_context is not None:
+        context.update(extra_context)
+    return TemplateResponse(request, template_name, context,
+                            current_app=current_app)
+
+
+def logout_view(request, next_page=None,
+           template_name='registration/logged_out.html',
+           redirect_field_name=REDIRECT_FIELD_NAME,
+           current_app=None, extra_context=None, **kwargs):
+    """
+    Logs out the user and displays 'You are logged out' message.
+    """
+    logout(request)
+
+    if next_page is not None:
+        next_page = resolve_url(next_page)
+
+    if redirect_field_name in request.REQUEST:
+        next_page = request.REQUEST[redirect_field_name]
+        # Security check -- don't allow redirection to a different host.
+        if not is_safe_url(url=next_page, host=request.get_host()):
+            next_page = request.path
+
+    if next_page:
+        # Redirect to this page until the session has been cleared.
+        return HttpResponseRedirect(next_page)
+
+    return HttpResponseRedirect('/auth/signin')
+
+@csrf_protect
+def password_reset(request, is_admin_site=False,
+                   template_name='registration/password_reset_form.html',
+                   email_template_name='registration/password_reset_email.html',
+                   subject_template_name='registration/password_reset_subject.txt',
+                   password_reset_form=PasswordResetForm,
+                   token_generator=default_token_generator,
+                   post_reset_redirect=None,
+                   from_email=None,
+                   current_app=None,
+                   extra_context=None):
+    if post_reset_redirect is None:
+        post_reset_redirect = reverse('password_reset_done')
+    else:
+        post_reset_redirect = resolve_url(post_reset_redirect)
+    if request.method == "POST":
+        form = password_reset_form(request.POST)
+        if form.is_valid():
+            opts = {
+                'use_https': request.is_secure(),
+                'token_generator': token_generator,
+                'from_email': from_email,
+                'email_template_name': email_template_name,
+                'subject_template_name': subject_template_name,
+                'request': request,
+            }
+            if is_admin_site:
+                opts = dict(opts, domain_override=request.get_host())
+            form.save(**opts)
+            return HttpResponseRedirect(post_reset_redirect)
+    else:
+        form = password_reset_form()
+    context = {
+        'form': form,
     }
     if extra_context is not None:
         context.update(extra_context)
@@ -78,12 +152,13 @@ class UserListView(ListView):
     def get_context_data(self, **kwargs):
         return super(UserListView, self).get_context_data(**kwargs)
 
-
+'''
 class UserRegistrationView(CreateView):
 
     form_class = RegistrationForm
     success_url = reverse_lazy('user_profile_url', subdomain=settings.MY_SD)
     template_name = 'user/user_registration.html'
+'''
 
 @sensitive_post_parameters()
 @never_cache
@@ -103,7 +178,8 @@ def password_reset_confirm(request, user_pk=None, token=None,
         post_reset_redirect = reverse_lazy('password_reset_success')
 
     try:
-        user = User._default_manager.get(pk=user_pk)
+        user = User.objects.get(pk=user_pk)
+        print user
     except User.DoesNotExist:
         user = None
 
@@ -199,6 +275,40 @@ def referral(request, template_name='user/login-registration.html',
     }
     return TemplateResponse(request, template_name, context)
 
+def registration(request, template_name='user/registration.html',
+    registration_form=RegistrationForm):
+    if request.method == "POST":
+        form = registration_form(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            accounts = request.user.accounts.all()
+            if len(accounts) > 1:
+                return HttpResponseRedirect(
+                    reverse_lazy('choose_subdomain')
+                )
+            return HttpResponseRedirect(
+                reverse_lazy('crm_home', 
+                        subdomain=accounts[0].company.subdomain,
+                        kwargs={'service_slug': settings.DEFAULT_SERVICE}))
+            # return HttpResponseRedirect(reverse_lazy('user_registration_success'))
+    else:
+        email = request.GET.get('email','')
+        form = registration_form(initial={"email":email})
+    context = {
+        'form': form
+    }
+    return TemplateResponse(request, template_name, context)
+
 
 def referral_complete(request, template_name='user/referral-complete.html'):
     return TemplateResponse(request, template_name)
+
+
+class ChooseSubdomain(TemplateView):
+
+    def get_context_data(self, **kwargs):
+        ctx = super(ChooseSubdomain, self).get_context_data(**kwargs)
+        accounts = self.request.user.accounts.all()
+        ctx['companies'] = [account.company for account in accounts]
+        return ctx

@@ -33,10 +33,11 @@ def check_task_status(uuid):
 
 class GroupSplitIterator(object):
 
-    def __init__(self, nrows, gsize, ignore_first_row):
+    def __init__(self, nrows, gsize, ignore_first_row=False):
         self.nrows = nrows
         self.gsize = gsize
-        self.next_group = 0 if not ignore_first_row else 1
+        self.next_group = 0
+        self.ignore_first_row = ignore_first_row
         self.__should_stop = False
 
     def __iter__(self):
@@ -52,28 +53,31 @@ class GroupSplitIterator(object):
             self.__should_stop = True
             self.next_group -= self.gsize
             self.next_group += (self.nrows - self.next_group)
-            return self.next_group
+            return self.next_group+1
 
         self.next_group += self.gsize
+        num = self.next_group - self.gsize
+        if num == 0 and self.ignore_first_row:
+            return num+1
         return self.next_group - self.gsize
 
 
-def current_next_iter(nrows, gsize, ignore_first_row):
+def current_next_iter(nrows, gsize, ignore_first_row=False):
     a, b = itertools.tee(GroupSplitIterator(nrows, gsize, ignore_first_row), 2)
     next(b, None)
     return itertools.izip(a, b)
 
-def grouped_contact_import_task(file_structure, filename, creator, ignore_first_row=False):
+def grouped_contact_import_task(file_structure, filename, creator, company_id, creator_email, ignore_first_row=False):
     book = xlrd.open_workbook(filename=os.path.join(TEMP_DIR, filename))
     sheet = book.sheets()[0]
     nrows = sheet.nrows
-    i = 0
     import_task = ImportTask()
     import_task.save()
-    chord_task = chord([
-        add_contacts_by_chunks.s(import_task.id, file_structure, filename, creator.id, curg, nextg)
+    task_list = [
+        add_contacts_by_chunks.s(import_task.id, file_structure, filename, creator.id, company_id, curg, nextg)
         for curg, nextg in current_next_iter(nrows, 100, ignore_first_row)
-    ])(finish_add_contacts.s(filename, import_task.id, creator.id))
+    ]
+    chord_task = chord(task_list)(finish_add_contacts.s(filename, import_task.id, creator.id, company_id, creator_email))
     import_task.uuid = chord_task.id
     import_task.filename = filename 
     import_task.save()
@@ -81,7 +85,7 @@ def grouped_contact_import_task(file_structure, filename, creator, ignore_first_
 
 
 @app.task
-def add_contacts_by_chunks(import_task_id, file_structure, filename, creator_id, start_row=0, fin_row=100):
+def add_contacts_by_chunks(import_task_id, file_structure, filename, creator_id, company_id, start_row=0, fin_row=100):
     '''Task that will have file_structure, filename and start_col and finish col inputed
     this task will open the file and only parse selected rows'''
     creator = User.objects.get(id=creator_id)
@@ -93,7 +97,7 @@ def add_contacts_by_chunks(import_task_id, file_structure, filename, creator_id,
     for i in xrange(start_row, fin_row - 1):
         data = sheet.row(i)
         response = Contact.create_from_structure(
-            data, file_structure, creator, import_task)
+            data, file_structure, creator, import_task, company_id)
         if response['error']:
             error_cell = ErrorCell(
                 import_task=import_task,
@@ -106,7 +110,7 @@ def add_contacts_by_chunks(import_task_id, file_structure, filename, creator_id,
 
 
 @app.task
-def finish_add_contacts(list_of_responses, filename, import_task_id, creator_id):
+def finish_add_contacts(list_of_responses, filename, import_task_id, creator_id, company_id, creator_email):
     '''A task that creates a list of created contacts and sends a file containing rows with errors
     also saves statistics in ImportTask model'''    
     os.remove(os.path.join(TEMP_DIR, filename))
@@ -125,8 +129,9 @@ def finish_add_contacts(list_of_responses, filename, import_task_id, creator_id)
 
     # filter bad contacts
     contact_list = ContactList(
-                owner = creator.get_crmuser(),
-                title = filename)
+                owner = creator,
+                title = filename,
+                company_id=company_id)
     contact_list.save()
     for contact in import_task.contacts.all():
         if not contact.vcard:
@@ -162,7 +167,7 @@ def finish_add_contacts(list_of_responses, filename, import_task_id, creator_id)
             subject=EMAIL_SUBJECT_PREFIX+'файл с ошибками , do not reply',
             body='Исправьте файл и загрузите его снова',
             from_email=SUPPORT_EMAIL,
-            to=[creator.email]
+            to=[creator_email]
             )
         msg.attach_file(filename)
         msg.send()

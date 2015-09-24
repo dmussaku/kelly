@@ -7,7 +7,7 @@
         "date_created":"2014-02-01T01:43:00.827Z",
         "date_edited":"2014-02-01T01:43:00.827Z",
         "content_type":["alm_crm", "product"],
-        "subscription_id": 1
+        "company_id": 1
     }
 },
 {
@@ -18,7 +18,7 @@
         "date_created":"2014-02-01T02:18:00.827Z",
         "date_edited":"2014-02-01T02:18:00.827Z",
         "content_type":["alm_crm", "product"],
-        "subscription_id": 1
+        "company_id": 1
     }
 },
 {
@@ -29,7 +29,7 @@
         "date_created":"2014-02-01T03:19:00.827Z",
         "date_edited":"2014-02-01T03:19:00.827Z",
         "content_type":["alm_crm", "product"],
-        "subscription_id": 1
+        "company_id": 1
     }
 },
 {
@@ -40,7 +40,7 @@
         "date_created":"2014-02-01T04:57:00.827Z",
         "date_edited":"2014-02-01T04:57:00.827Z",
         "content_type":["alm_crm", "product"],
-        "subscription_id": 1
+        "company_id": 1
     }
 },
 {
@@ -51,7 +51,7 @@
         "date_created":"2014-02-01T05:55:00.827Z",
         "date_edited":"2014-02-01T05:55:00.827Z",
         "content_type":["alm_crm", "product"],
-        "subscription_id": 1
+        "company_id": 1
     }
 },
 {
@@ -62,7 +62,7 @@
         "date_created":"2014-02-01T06:36:00.827Z",
         "date_edited":"2014-02-01T06:36:00.827Z",
         "content_type":["alm_crm", "contact"],
-        "subscription_id": 1
+        "company_id": 1
     }
 },
 {
@@ -73,7 +73,7 @@
         "date_created":"2014-02-01T07:01:00.827Z",
         "date_edited":"2014-02-01T07:01:00.827Z",
         "content_type":["alm_crm", "contact"],
-        "subscription_id": 1
+        "company_id": 1
     }
 },
 {
@@ -84,7 +84,7 @@
         "date_created":"2014-02-01T08:17:00.827Z",
         "date_edited":"2014-02-01T08:17:00.827Z",
         "content_type":["alm_crm", "contact"],
-        "subscription_id": 1
+        "company_id": 1
     }
 },
 {
@@ -95,7 +95,7 @@
         "date_created":"2014-02-01T09:12:00.827Z",
         "date_edited":"2014-02-01T09:12:00.827Z",
         "content_type":["alm_crm", "contact"],
-        "subscription_id": 1
+        "company_id": 1
     }
 },
 {
@@ -106,7 +106,7 @@
         "date_created":"2014-02-01T10:48:00.827Z",
         "date_edited":"2014-02-01T10:48:00.827Z",
         "content_type":["alm_crm", "product"],
-        "subscription_id": 1
+        "company_id": 1
     }
 }
 ]

@@ -3,7 +3,7 @@
 from django.views.generic import TemplateView, ListView, DetailView, RedirectView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.http import Http404, HttpResponseRedirect, HttpResponse
-from django.core.urlresolvers import reverse_lazy
+from django.core.urlresolvers import reverse, reverse_lazy
 from almanet.url_resolvers import reverse_lazy as almanet_reverse_lazy
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
@@ -12,17 +12,15 @@ from alm_crm.models import Contact, ContactList, Share, SalesCycle
 from alm_vcard.models import *
 from alm_user.models import User
 from .models import Service
-from .forms import ServiceCreateForm
+from .forms import ServiceCreateForm, ReferralForm
+from django.views.generic.edit import FormView
+from django.views.generic.base import TemplateView, TemplateResponse
 
 
 class RedirectHomeView(RedirectView):
 
     def get(self, request, *a, **kw):
-        if request.user.is_authenticated():
-            subscr = request.user.get_subscriptions()[0]
-            return HttpResponseRedirect(subscr.get_home_url())
-        else:
-            return HttpResponseRedirect(
+        return HttpResponseRedirect(
                 almanet_reverse_lazy('user_login', subdomain=None))
 
 
@@ -43,7 +41,7 @@ class TestView2(TemplateView):
 
 
 def fork_index(request):
-    if request.user.is_authenticated():
+    if request.account.is_authenticated():
         return HttpResponseRedirect(settings.LOGIN_REDIRECT_URL)
     else:
         return HttpResponseRedirect(reverse_lazy('user_login'))
@@ -117,6 +115,24 @@ def disconnect_service(request, slug, *args, **kwargs):
 from django.views.decorators.csrf import csrf_exempt
 from urlparse import parse_qs
 
+def landing(request):
+    template_name='index2.html'
+    if request.method == 'POST':
+        form = ReferralForm(request.POST)
+        if form.is_valid():
+            form.save()
+            email = form.cleaned_data['email']
+            url = reverse('user_registration')
+            return HttpResponseRedirect(url+'?email='+email)
+    else:
+        form = ReferralForm()
+    context = {
+        'form': form,
+    }
+    return TemplateResponse(request, template_name, context)
+
+        
+
 @csrf_exempt
 def landing_form(request):
     if request.method == 'POST':
@@ -158,3 +174,5 @@ def landing_form(request):
         return HttpResponse('Cool')
     else:
         return HttpResponse('None')
+
+

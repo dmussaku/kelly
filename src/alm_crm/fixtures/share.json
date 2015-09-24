@@ -8,7 +8,7 @@
         "is_read": false,
         "contact": 1,
         "date_created": "2014-11-18T05:32:28.379Z",
-        "subscription_id": null,
+        "company_id": 1,
         "note": "Share note",
         "date_edited": "2014-11-24T07:49:32.991Z" 
     }
@@ -22,7 +22,7 @@
         "is_read": false,
         "contact": 1,
         "date_created": "2014-11-18T09:02:47.080Z",
-        "subscription_id": null,
+        "company_id": 1,
         "note": "Share note",
         "date_edited": "2014-11-24T07:49:32.991Z" 
 
@@ -37,7 +37,7 @@
         "is_read": false,
         "contact": 4,
         "date_created": "2014-11-18T09:02:47.080Z",
-        "subscription_id": null,
+        "company_id": 1,
         "note": "Share note",
         "date_edited": "2014-11-24T07:49:32.991Z" 
     }

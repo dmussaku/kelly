@@ -130,7 +130,7 @@ class BaseConfiguration(SubdomainConfiguration, Configuration):
         'djrill',
         'django.contrib.contenttypes',
         'django.contrib.sessions',
-        'django.contrib.messages',
+        # 'django.contrib.messages',
         'django.contrib.staticfiles',
         'django_hosts',
         'south',
@@ -148,19 +148,17 @@ class BaseConfiguration(SubdomainConfiguration, Configuration):
     )
 
     MIDDLEWARE_CLASSES = (
-        'django.contrib.sessions.middleware.SessionMiddleware',
+        'almanet.middleware.GetSubdomainMiddleware',
         'django.middleware.common.CommonMiddleware',
         'corsheaders.middleware.CorsMiddleware',
         'django.middleware.csrf.CsrfViewMiddleware',
-        'django.contrib.auth.middleware.AuthenticationMiddleware',
-        'django.contrib.messages.middleware.MessageMiddleware',
         'almanet.middleware.ForceDefaultLanguageMiddleware',
         'django.middleware.locale.LocaleMiddleware',
-        # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
         'django_hosts.middleware.HostsMiddleware',
-        #'almanet.middleware.XsSharingMiddleware',
-        'almanet.middleware.GetSubdomainMiddleware',
-        'almanet.middleware.UserEnvMiddleware'
+        'django.contrib.sessions.middleware.SessionMiddleware',
+        'django.contrib.auth.middleware.AuthenticationMiddleware',
+        # 'almanet.middleware.AlmanetSessionMiddleware',
+        # 'almanet.middleware.MyAuthenticationMiddleware',
     )
 
     SESSION_COOKIE_DOMAIN = '.alma.net'
@@ -279,11 +277,6 @@ class BaseConfiguration(SubdomainConfiguration, Configuration):
     def LOGIN_REDIRECT_URL(self):
         return self.__class__.reverse_lazy('user_profile_url',
                                            subdomain=self.MY_SD)
-
-    @property
-    def LOGIN_REDIRECT_CRM_URL(self):
-        return self.__class__.reverse_lazy('feed', subdomain='bwayne')
-
     @property
     def LOGIN_URL(self):
         return self.__class__.reverse_lazy('user_login', subdomain=None)
@@ -299,11 +292,14 @@ class BaseConfiguration(SubdomainConfiguration, Configuration):
 
     DB_PREFIX = 'alma_{}'
     AUTHENTICATION_BACKENDS = (
-        'django.contrib.auth.backends.ModelBackend',
-        'alm_user.authbackend.MyAuthBackend',)  # for admin
+        'django.contrib.auth.backends.ModelBackend',)  # for admin
+
+    # AUTHENTICATION_BACKENDS = (
+    #     'alm_user.auth_backend.MyAuthBackend',)
+
 
     SITE_NAME = 'alma.net'
-    SITE_DOMAIN = 'http://localhost:8000'
+    SITE_DOMAIN = 'http://alma.net:8000'
 
     DEFAULT_URL_SCHEME = 'http'
 
@@ -357,7 +353,7 @@ class DevConfiguration(
     CORS_ALLOW_CREDENTIALS = True
     BROKER_URL = 'amqp://dev:dev@almasales.kz:5672//almasales/dev'
 
-    RUSTEM_SETTINGS = True
+    RUSTEM_SETTINGS = False
 
 
 class QAConfiguration(DevConfiguration):
@@ -406,13 +402,13 @@ class TestConfiguration(
 
 class StagingConfiguration(FileSettings('~/.almanet/almanet.conf.py'), BaseConfiguration):
     DEBUG = False
-    PARENT_HOST = 'almasales.qa:3082'
-    HOSTCONF_REGEX = r'almasales\.qa:3082'
+    PARENT_HOST = 'origamibar.kz:3082'
+    HOSTCONF_REGEX = r'origamibar\.kz:3082'
 
-    SITE_NAME = 'almasales.qa:3082'
-    SITE_DOMAIN = 'http://almasales.qa:3082'
-    CSRF_COOKIE_DOMAIN = '.almasales.qa'
-    SESSION_COOKIE_DOMAIN = '.almasales.qa'
+    SITE_NAME = 'origamibar.kz:3082'
+    SITE_DOMAIN = 'http://origamibar.kz:3082'
+    CSRF_COOKIE_DOMAIN = '.origamibar.kz'
+    SESSION_COOKIE_DOMAIN = '.origamibar.kz'
     # CORS_ORIGIN_WHITELIST = (
     #     'almasales.kz',
     #     'almacloud.almasales.kz',
@@ -424,6 +420,47 @@ class StagingConfiguration(FileSettings('~/.almanet/almanet.conf.py'), BaseConfi
         'default': {
             'ENGINE': 'django.db.backends.postgresql_psycopg2',
             'NAME': 'qa_almanet',
+            'TEST_NAME': 'test_almanet',
+            'USER': 'xepa4ep',
+            'PASSWORD': 'f1b0nacc1',
+            'HOST': 'db.alma.net',
+            'PORT': '5432'
+        }
+    }
+
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.memcached.PyLibMCCache',
+            'LOCATION': '127.0.0.1:11211'
+        }
+    }
+
+    MEDIA_ROOT = os.path.expanduser('~/.almanet/stagemedia/')
+    STATIC_ROOT = os.path.expanduser('~/.almanet/stagestatic/')
+    BROKER_URL = 'amqp://stage:n0easyway1n@10.10.10.245:5672//almasales/stage'
+    CELERY_RESULT_BACKEND = 'djcelery.backends.database:DatabaseBackend'
+
+
+class StagingConfiguration2(FileSettings('~/.almanet/almanet.conf.py'), BaseConfiguration):
+    DEBUG = False
+    PARENT_HOST = 'almasales.qa2:4369'
+    HOSTCONF_REGEX = r'almasales\.qa2:4369'
+
+    SITE_NAME = 'almasales.qa2:4369'
+    SITE_DOMAIN = 'http://almasales.qa2:4369'
+    CSRF_COOKIE_DOMAIN = '.almasales.qa2'
+    SESSION_COOKIE_DOMAIN = '.almasales.qa2'
+    # CORS_ORIGIN_WHITELIST = (
+    #     'almasales.kz',
+    #     'almacloud.almasales.kz',
+    #     'arta.almasales.kz'
+    # )
+    CORS_ALLOW_CREDENTIALS = True
+
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'NAME': 'qa2_almanet',
             'TEST_NAME': 'test_almanet',
             'USER': 'xepa4ep',
             'PASSWORD': 'f1b0nacc1',

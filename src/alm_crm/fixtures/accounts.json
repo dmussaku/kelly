@@ -1,0 +1,152 @@
+[
+{
+    "pk": 1, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 1, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 1, 
+        "date_created": "2015-08-10T07:25:07.482Z", 
+        "last_login": "2015-08-10T07:25:07.482Z", 
+        "password": "pbkdf2_sha256$12000$dcNiQ9QChKm8$uVTTDuMI5Fjbm9CKEvYksxDj+F3jETaO7yp1ImxYpSk=", 
+        "email": "abyken@gmail.com", 
+        "date_edited": "2015-08-10T07:25:07.482Z"
+    }
+},
+{
+    "pk": 2, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 1, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 2, 
+        "date_created": "2015-08-10T07:25:07.486Z", 
+        "last_login": "2015-08-10T07:25:07.486Z", 
+        "password": "pbkdf2_sha256$12000$dcNiQ9QChKm8$uVTTDuMI5Fjbm9CKEvYksxDj+F3jETaO7yp1ImxYpSk=", 
+        "email": "omarov@gmail.com", 
+        "date_edited": "2015-08-10T07:25:07.486Z"
+    }
+},
+{
+    "pk": 3, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 1, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 3, 
+        "date_created": "2015-08-10T07:25:07.489Z", 
+        "last_login": "2015-08-10T07:25:07.489Z", 
+        "password": "pbkdf2_sha256$12000$dcNiQ9QChKm8$uVTTDuMI5Fjbm9CKEvYksxDj+F3jETaO7yp1ImxYpSk=", 
+        "email": "kamun@gmail.com", 
+        "date_edited": "2015-08-10T07:25:07.489Z"
+    }
+},
+{
+    "pk": 4, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 1, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 4, 
+        "date_created": "2015-08-10T07:25:07.493Z", 
+        "last_login": "2015-08-10T07:25:07.492Z", 
+        "password": "pbkdf2_sha256$12000$dcNiQ9QChKm8$uVTTDuMI5Fjbm9CKEvYksxDj+F3jETaO7yp1ImxYpSk=", 
+        "email": "mussakulov@gmail.com", 
+        "date_edited": "2015-08-10T07:25:07.493Z"
+    }
+},
+{
+    "pk": 5, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 1, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 5, 
+        "date_created": "2015-08-10T07:25:07.496Z", 
+        "last_login": "2015-08-10T07:25:07.495Z", 
+        "password": "pbkdf2_sha256$12000$dcNiQ9QChKm8$uVTTDuMI5Fjbm9CKEvYksxDj+F3jETaO7yp1ImxYpSk=", 
+        "email": "stamkulov@gmail.com", 
+        "date_edited": "2015-08-10T07:25:07.496Z"
+    }
+},
+{
+    "pk": 6, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 1, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 6, 
+        "date_created": "2015-08-10T07:25:07.499Z", 
+        "last_login": "2015-08-10T07:25:07.498Z", 
+        "password": "pbkdf2_sha256$12000$dcNiQ9QChKm8$uVTTDuMI5Fjbm9CKEvYksxDj+F3jETaO7yp1ImxYpSk=", 
+        "email": "mailubay@gmail.com", 
+        "date_edited": "2015-08-10T07:25:07.499Z"
+    }
+},
+{
+    "pk": 7, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 1, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 7, 
+        "date_created": "2015-08-10T07:25:07.501Z", 
+        "last_login": "2015-08-10T07:25:07.501Z", 
+        "password": "pbkdf2_sha256$12000$dcNiQ9QChKm8$uVTTDuMI5Fjbm9CKEvYksxDj+F3jETaO7yp1ImxYpSk=", 
+        "email": "serdalin@gmail.com", 
+        "date_edited": "2015-08-10T07:25:07.501Z"
+    }
+},
+{
+    "pk": 8, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 1, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 8, 
+        "date_created": "2015-08-10T07:25:07.504Z", 
+        "last_login": "2015-08-10T07:25:07.504Z", 
+        "password": "pbkdf2_sha256$12000$dcNiQ9QChKm8$uVTTDuMI5Fjbm9CKEvYksxDj+F3jETaO7yp1ImxYpSk=", 
+        "email": "mukatayev@gmail.com", 
+        "date_edited": "2015-08-10T07:25:07.504Z"
+    }
+},
+{
+    "pk": 9, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 1, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 9, 
+        "date_created": "2015-08-10T07:25:07.507Z", 
+        "last_login": "2015-08-10T07:25:07.507Z", 
+        "password": "pbkdf2_sha256$12000$dcNiQ9QChKm8$uVTTDuMI5Fjbm9CKEvYksxDj+F3jETaO7yp1ImxYpSk=", 
+        "email": "bimurzayev@gmail.com", 
+        "date_edited": "2015-08-10T07:25:07.507Z"
+    }
+},
+{
+    "pk": 10, 
+    "model": "alm_user.account", 
+    "fields": {
+        "company": 1, 
+        "is_active": true, 
+        "is_admin": false, 
+        "user": 10, 
+        "date_created": "2015-08-10T07:25:07.510Z", 
+        "last_login": "2015-08-10T07:25:07.510Z", 
+        "password": "pbkdf2_sha256$12000$dcNiQ9QChKm8$uVTTDuMI5Fjbm9CKEvYksxDj+F3jETaO7yp1ImxYpSk=", 
+        "email": "kotov@gmail.com", 
+        "date_edited": "2015-08-10T07:25:07.510Z"
+    }
+}
+]

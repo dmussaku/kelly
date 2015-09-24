@@ -1,0 +1,20 @@
+{% extends "user/base.html" %}
+{% load i18n %}
+{% block head_title %} _("Registration successful") {% endblock %}
+{% block content %}
+    {{ message }}
+    <div class="login">
+        <div class="login-body">
+            <div class="login-form">
+				<h1>{% trans 'Registration successful' %}</h1>
+
+				<p>{% trans "Thank you for registring with Almasales you can go ahead and log in to your account by following the link below. We also sent you the confirmation email, so check it out" %}</p>
+
+				<p>{% trans "If you don't receive an email, please make sure you've entered the address you registered with, and check your spam folder." %}</p>
+
+				<a href="{% url 'user_login' %}">{% trans "Return to main page" %}</a>
+            </div>
+  		</div>
+
+    </div>
+{% endblock %}

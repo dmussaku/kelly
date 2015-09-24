@@ -8,7 +8,7 @@
     <link rel="shortcut icon" type="image/ico" href="img/favicon.ico" />
     <link rel="stylesheet" href="{% static 'css/app.min.css' %}" media="all">
   </head>
-  <body>
+  <body oncopy="return false" oncut="return false">
 
   <figure>
   <svg xmlns='http://www.w3.org/2000/svg' style='display: none;' xmlns:xlink='http://www.w3.org/1999/xlink'>
@@ -178,7 +178,11 @@
     <symbol id='comment' viewbox='0 0 24 24'>
       <path class='svg-currentColor' d='M20 2h-16c-1.1 0-1.99.9-1.99 2l-.01 18 4-4h14c1.1 0 2-.9 2-2v-12c0-1.1-.9-2-2-2zm-14 7h12v2h-12v-2zm8 5h-8v-2h8v2zm4-6h-12v-2h12v2z'/>
     </symbol>
-
+    <symbol id='unfold-more' viewbox='0 0 1408 1024'>
+      <path class="path1" d="M0 192h896v192h-896v-192zM0 448h896v192h-896v-192zM0 704h896v192h-896v-192z"></path>
+    	<path class="path2" d="M992 576l192 192 192-192z"></path>
+    	<path class="path3" d="M1376 512l-192-192-192 192z"></path>
+    </symbol>
   </svg>
 </figure>
     <div id="js-crm-app" class="body-container">
@@ -208,6 +212,6 @@
     <script type="text/javascript" src="{% static 'js/bundle.min.js' %}"></script>
     {% endif %}
 
-  
+
   </body>
 </html>

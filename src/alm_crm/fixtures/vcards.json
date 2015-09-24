@@ -1,97 +1,342 @@
 [
-    {
-        "pk": 1,
-        "model": "alm_vcard.vcard",
-        "fields": {
-            "family_name": "",
-            "uid": null,
-            "honorific_suffix": "",
-            "additional_name": "",
-            "rev": null,
-            "honorific_prefix": "",
-            "bday": "1990-09-10",
-            "given_name": "Akerke",
-            "sort_string": null,
-            "classP": null,
-            "fn": "Akerke Akerke"
-            }
-    },
-    {
-        "pk": 2,
-        "model": "alm_vcard.vcard",
-        "fields": {
-            "family_name": "Heisenberg",
-            "uid": null,
-            "honorific_suffix": "",
-            "additional_name": "",
-            "rev": null,
-            "honorific_prefix": "",
-            "bday": "1991-09-10",
-            "given_name": "Nurlan",
-            "sort_string": null,
-            "classP": null,
-            "fn": "Nurlan Heisenberg"
-        }
-    },
-    {
-        "pk": 3,
-        "model": "alm_vcard.vcard",
-        "fields": {
-            "family_name": "Mussina",
-            "uid": null,
-            "honorific_suffix": "",
-            "additional_name": "",
-            "rev": null,
-            "honorific_prefix": "",
-            "bday": "1991-09-11",
-            "given_name": "Aliya",
-            "sort_string": null,
-            "classP": null,
-            "fn": "Aliya Mussina"
-        }
-    },
-    {
-        "pk": 4,
-        "model": "alm_vcard.vcard",
-        "fields": {
-            "family_name": "Mussakulov",
-            "uid": null,
-            "honorific_suffix": "",
-            "additional_name": "",
-            "rev": null,
-            "honorific_prefix": "",
-            "bday": "1989-09-10",
-            "given_name": "Daniyar",
-            "sort_string": null,
-            "classP": null,
-            "fn": "Daniyar Mussakulov"
-        }
-    },
-    {
-        "pk": 1,
-        "model": "alm_vcard.tel",
-        "fields": {
-            "type": "CELL",
-            "vcard": 1,
-            "value": "87753591453"
-        }
-    },
-
-    {
-        "pk": 5,
-        "model": "alm_vcard.vcard",
-        "fields": {
-            "family_name": "Altel",
-            "uid": null,
-            "honorific_suffix": "",
-            "additional_name": "",
-            "rev": null,
-            "honorific_prefix": "",
-            "bday": "1999-09-09",
-            "given_name": "Tumar",
-            "sort_string": null,
-            "classP": null,
-            "fn": "Tumar Altel"
-        }
+{
+    "pk": 1, 
+    "model": "alm_vcard.vcard", 
+    "fields": {
+        "family_name": "Abyken", 
+        "uid": null, 
+        "honorific_suffix": "", 
+        "additional_name": "", 
+        "rev": null, 
+        "honorific_prefix": "", 
+        "bday": null, 
+        "given_name": "Nurlan", 
+        "sort_string": null, 
+        "classP": null, 
+        "fn": "Nurlan Abyken"
     }
+},
+{
+    "pk": 2, 
+    "model": "alm_vcard.vcard", 
+    "fields": {
+        "family_name": "Askhat", 
+        "uid": null, 
+        "honorific_suffix": "", 
+        "additional_name": "", 
+        "rev": "1970-08-22T05:15:14Z", 
+        "honorific_prefix": "", 
+        "bday": null, 
+        "given_name": "Omarov", 
+        "sort_string": null, 
+        "classP": null, 
+        "fn": "Askhat Omarov"
+    }
+},
+{
+    "pk": 3, 
+    "model": "alm_vcard.vcard", 
+    "fields": {
+        "family_name": "Rustem", 
+        "uid": null, 
+        "honorific_suffix": "", 
+        "additional_name": "", 
+        "rev": "1970-08-22T05:15:14Z", 
+        "honorific_prefix": "", 
+        "bday": null, 
+        "given_name": "Kamun", 
+        "sort_string": null, 
+        "classP": null, 
+        "fn": "Rustem Kamun"
+    }
+},
+{
+    "pk": 4, 
+    "model": "alm_vcard.vcard", 
+    "fields": {
+        "family_name": "Daniyar", 
+        "uid": null, 
+        "honorific_suffix": "", 
+        "additional_name": "", 
+        "rev": "1970-08-22T05:15:14Z", 
+        "honorific_prefix": "", 
+        "bday": null, 
+        "given_name": "Mussakulov", 
+        "sort_string": null, 
+        "classP": null, 
+        "fn": "Daniyar Mussakulov"
+    }
+},
+{
+    "pk": 5, 
+    "model": "alm_vcard.vcard", 
+    "fields": {
+        "family_name": "Sattar", 
+        "uid": null, 
+        "honorific_suffix": "", 
+        "additional_name": "", 
+        "rev": null, 
+        "honorific_prefix": "", 
+        "bday": null, 
+        "given_name": "Stamkulov", 
+        "sort_string": null, 
+        "classP": null, 
+        "fn": "Sattar Stamkulov"
+    }
+},
+{
+    "pk": 6, 
+    "model": "alm_vcard.vcard", 
+    "fields": {
+        "family_name": "Yernar", 
+        "uid": null, 
+        "honorific_suffix": "", 
+        "additional_name": "", 
+        "rev": null, 
+        "honorific_prefix": "", 
+        "bday": null, 
+        "given_name": "Mailubay", 
+        "sort_string": null, 
+        "classP": null, 
+        "fn": "Yernar Mailubay"
+    }
+},
+{
+    "pk": 7, 
+    "model": "alm_vcard.vcard", 
+    "fields": {
+        "family_name": "Birzhan", 
+        "uid": null, 
+        "honorific_suffix": "", 
+        "additional_name": "", 
+        "rev": null, 
+        "honorific_prefix": "", 
+        "bday": null, 
+        "given_name": "Serdalin", 
+        "sort_string": null, 
+        "classP": null, 
+        "fn": "Birzhan Serdalin"
+    }
+},
+{
+    "pk": 8, 
+    "model": "alm_vcard.vcard", 
+    "fields": {
+        "family_name": "Aslan", 
+        "uid": null, 
+        "honorific_suffix": "", 
+        "additional_name": "", 
+        "rev": null, 
+        "honorific_prefix": "", 
+        "bday": null, 
+        "given_name": "Mukatayev", 
+        "sort_string": null, 
+        "classP": null, 
+        "fn": "Aslan Mukatayev"
+    }
+},
+{
+    "pk": 9, 
+    "model": "alm_vcard.vcard", 
+    "fields": {
+        "family_name": "Serik", 
+        "uid": null, 
+        "honorific_suffix": "", 
+        "additional_name": "", 
+        "rev": null, 
+        "honorific_prefix": "", 
+        "bday": null, 
+        "given_name": "Bimurzayev", 
+        "sort_string": null, 
+        "classP": null, 
+        "fn": "Serik Bimurzayev"
+    }
+},
+{
+    "pk": 10, 
+    "model": "alm_vcard.vcard", 
+    "fields": {
+        "family_name": "Vadim", 
+        "uid": null, 
+        "honorific_suffix": "", 
+        "additional_name": "", 
+        "rev": null, 
+        "honorific_prefix": "", 
+        "bday": null, 
+        "given_name": "Kotov", 
+        "sort_string": null, 
+        "classP": null, 
+        "fn": "Vadim Kotov"
+    }
+},
+{
+    "pk": 11, 
+    "model": "alm_vcard.vcard", 
+    "fields": {
+        "family_name": "Masimov", 
+        "uid": null, 
+        "honorific_suffix": "", 
+        "additional_name": "", 
+        "rev": null, 
+        "honorific_prefix": "", 
+        "bday": null, 
+        "given_name": "Karim", 
+        "sort_string": null, 
+        "classP": null, 
+        "fn": "Karim Masimov"
+    }
+},
+{
+    "pk": 12, 
+    "model": "alm_vcard.vcard", 
+    "fields": {
+        "family_name": "Akhmetov", 
+        "uid": null, 
+        "honorific_suffix": "", 
+        "additional_name": "", 
+        "rev": null, 
+        "honorific_prefix": "", 
+        "bday": null, 
+        "given_name": "Danial", 
+        "sort_string": null, 
+        "classP": null, 
+        "fn": "Danial Akhmetov"
+    }
+},
+{
+    "pk": 13, 
+    "model": "alm_vcard.vcard", 
+    "fields": {
+        "family_name": "Rakishev", 
+        "uid": null, 
+        "honorific_suffix": "", 
+        "additional_name": "", 
+        "rev": null, 
+        "honorific_prefix": "", 
+        "bday": null, 
+        "given_name": "Serik", 
+        "sort_string": null, 
+        "classP": null, 
+        "fn": "Serik Rakishev"
+    }
+},
+{
+    "pk": 14, 
+    "model": "alm_vcard.vcard", 
+    "fields": {
+        "family_name": "Rakishev", 
+        "uid": null, 
+        "honorific_suffix": "", 
+        "additional_name": "", 
+        "rev": null, 
+        "honorific_prefix": "", 
+        "bday": null, 
+        "given_name": "Berik", 
+        "sort_string": null, 
+        "classP": null, 
+        "fn": "Berik Rakishev"
+    }
+},
+{
+    "pk": 15, 
+    "model": "alm_vcard.vcard", 
+    "fields": {
+        "family_name": "\u0414\u044e\u0441\u0443\u043f\u043e\u0432\u0430", 
+        "uid": null, 
+        "honorific_suffix": "", 
+        "additional_name": "", 
+        "rev": null, 
+        "honorific_prefix": "", 
+        "bday": null, 
+        "given_name": "\u0414\u0438\u043d\u0430\u0440\u0430", 
+        "sort_string": null, 
+        "classP": null, 
+        "fn": "\u0414\u0438\u043d\u0430\u0440\u0430 \u0414\u044e\u0441\u0443\u043f\u043e\u0432\u0430"
+    }
+},
+{
+    "pk": 16, 
+    "model": "alm_vcard.vcard", 
+    "fields": {
+        "family_name": "", 
+        "uid": "", 
+        "honorific_suffix": "", 
+        "additional_name": "", 
+        "rev": null, 
+        "honorific_prefix": "", 
+        "bday": null, 
+        "given_name": "", 
+        "sort_string": "", 
+        "classP": "", 
+        "fn": "\u0414\u0430\u043d\u0438\u043a \u041c\u0443\u0441\u0430\u043a\u0443\u043b\u043e\u0432"
+    }
+},
+{
+    "pk": 17, 
+    "model": "alm_vcard.vcard", 
+    "fields": {
+        "family_name": "\u041f\u0443\u043f\u043a\u0438\u043d", 
+        "uid": null, 
+        "honorific_suffix": "", 
+        "additional_name": "", 
+        "rev": "1970-08-22T05:15:14Z", 
+        "honorific_prefix": "", 
+        "bday": null, 
+        "given_name": "\u0412\u0430\u0441\u044f", 
+        "sort_string": null, 
+        "classP": null, 
+        "fn": "\u0412\u0430\u0441\u044f \u041f\u0443\u043f\u043a\u0438\u043d"
+    }
+},
+{
+    "pk": 18, 
+    "model": "alm_vcard.vcard", 
+    "fields": {
+        "family_name": "\u041f\u0443\u043f\u043a\u0438\u043d", 
+        "uid": null, 
+        "honorific_suffix": "", 
+        "additional_name": "", 
+        "rev": "1970-08-22T05:15:14Z", 
+        "honorific_prefix": "", 
+        "bday": null, 
+        "given_name": "\u0412\u0430\u0441\u044f", 
+        "sort_string": null, 
+        "classP": null, 
+        "fn": "\u0412\u0430\u0441\u044f \u041f\u0443\u043f\u043a\u0438\u043d"
+    }
+},
+{
+    "pk": 19, 
+    "model": "alm_vcard.vcard", 
+    "fields": {
+        "family_name": "\u0415\u0440\u043d\u0430\u0440", 
+        "uid": null, 
+        "honorific_suffix": "", 
+        "additional_name": "", 
+        "rev": "1970-08-22T05:15:14Z", 
+        "honorific_prefix": "", 
+        "bday": null, 
+        "given_name": "\u041c\u0430\u0439\u043b\u044e\u0431\u0430\u0435\u0432", 
+        "sort_string": null, 
+        "classP": null, 
+        "fn": "\u041c\u0430\u0439\u043b\u044e\u0431\u0430\u0435\u0432 \u0415\u0440\u043d\u0430\u0440"
+    }
+},
+{
+    "pk": 20, 
+    "model": "alm_vcard.vcard", 
+    "fields": {
+        "family_name": "", 
+        "uid": "", 
+        "honorific_suffix": "", 
+        "additional_name": "", 
+        "rev": null, 
+        "honorific_prefix": "", 
+        "bday": null, 
+        "given_name": "", 
+        "sort_string": "", 
+        "classP": "", 
+        "fn": "Washington Denzel"
+    }
+}
 ]

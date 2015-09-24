@@ -3,7 +3,8 @@
     "pk": 1, 
     "model": "alm_crm.milestone", 
     "fields": {
-        "subscription_id": 1, 
+        "is_system": 0, 
+        "company_id": 1, 
         "color_code": "#CCB2FF", 
         "title": "\u041f\u043e\u0434\u0433\u043e\u0442\u043e\u0432\u043a\u0430 \u043a \u0442\u0443\u0440\u0443",
         "date_created": "2014-11-24T07:49:32.991Z",
@@ -15,7 +16,8 @@
     "pk": 2, 
     "model": "alm_crm.milestone", 
     "fields": {
-        "subscription_id": 1, 
+        "is_system": 0, 
+        "company_id": 1, 
         "color_code": "#FFFF99", 
         "title": "\u041e\u0444\u043e\u0440\u043c\u043b\u0435\u043d\u0438\u0435 \u0434\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u043e\u0432",
         "date_created": "2014-11-24T07:49:32.991Z",
@@ -27,7 +29,8 @@
     "pk": 3, 
     "model": "alm_crm.milestone", 
     "fields": {
-        "subscription_id": 1, 
+        "is_system": 0, 
+        "company_id": 1, 
         "color_code": "#CCEBF5", 
         "title": "\u0422\u0443\u0440",
         "date_created": "2014-11-24T07:49:32.991Z",
@@ -39,7 +42,8 @@
     "pk": 4, 
     "model": "alm_crm.milestone", 
     "fields": {
-        "subscription_id": 2, 
+        "is_system": 0, 
+        "company_id": 2, 
         "color_code": "#CCB2FF", 
         "title": "\u041f\u043e\u0434\u0433\u043e\u0442\u043e\u0432\u043a\u0430 \u043a \u0442\u0443\u0440\u0443",
         "date_created": "2014-11-24T07:49:32.991Z",
@@ -51,7 +55,8 @@
     "pk": 5, 
     "model": "alm_crm.milestone", 
     "fields": {
-        "subscription_id": 2, 
+        "is_system": 0, 
+        "company_id": 2, 
         "color_code": "#FFFF99", 
         "title": "\u041e\u0444\u043e\u0440\u043c\u043b\u0435\u043d\u0438\u0435 \u0434\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u043e\u0432",
         "date_created": "2014-11-24T07:49:32.991Z",
@@ -63,7 +68,8 @@
     "pk": 6, 
     "model": "alm_crm.milestone", 
     "fields": {
-        "subscription_id": 2, 
+        "is_system": 0, 
+        "company_id": 2, 
         "color_code": "#CCEBF5", 
         "title": "\u0422\u0443\u0440",
         "date_created": "2014-11-24T07:49:32.991Z",
