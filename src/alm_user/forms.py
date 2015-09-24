@@ -57,6 +57,8 @@ class RegistrationForm(forms.Form):
     def save(self, commit=True):
         user = User(email=self.cleaned_data['email'])
         user.set_password(self.cleaned_data['password'])
+        username = self.cleaned_data['email']
+        password = self.cleaned_data['password']
         if commit:
             gened_subdomain = Company.generate_subdomain(
                 self.cleaned_data['company_subdomain'])
@@ -78,6 +80,7 @@ class RegistrationForm(forms.Form):
             UserRegistrationEmail(**mail_context).send(
                 to=(user.email,),
                 bcc=settings.BCC_EMAILS)
+        user = authenticate(username=username, password=password)
         return user
 
 class AuthenticationForm(forms.Form):

@@ -279,10 +279,19 @@ def registration(request, template_name='user/registration.html',
     registration_form=RegistrationForm):
     if request.method == "POST":
         form = registration_form(request.POST)
-
         if form.is_valid():
-            form.save()
-            return HttpResponseRedirect(reverse_lazy('user_registration_success'))
+            user = form.save()
+            login(request, user)
+            accounts = request.user.accounts.all()
+            if len(accounts) > 1:
+                return HttpResponseRedirect(
+                    reverse_lazy('choose_subdomain')
+                )
+            return HttpResponseRedirect(
+                reverse_lazy('crm_home', 
+                        subdomain=accounts[0].company.subdomain,
+                        kwargs={'service_slug': settings.DEFAULT_SERVICE}))
+            # return HttpResponseRedirect(reverse_lazy('user_registration_success'))
     else:
         email = request.GET.get('email','')
         form = registration_form(initial={"email":email})
