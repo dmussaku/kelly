@@ -48,7 +48,7 @@
             .imac {
                 position: relative;
                 overflow: hidden;
-                background: url('images/imac.png') no-repeat;
+                background: url("{% static 'images/imac.png' %}") no-repeat;
                 padding: 29px 0 0 31px;
                 width: 738px;
                 height: 644px;
@@ -69,7 +69,7 @@
             }
             .imac .arrow a {
                 display: block;
-                background: url('images/arrows.png') no-repeat 0 0;
+                background: url("{% static 'images/arrows.png' %}") no-repeat 0 0;
                 margin: 0 40px;
                 width: 41px;
                 height: 51px;
@@ -323,7 +323,7 @@
                             <b>1 GB</b> на пользователя<br>
                             Первый месяц бесплатно
                         </div>
-                        <a class="btn btn-primary" href="registration.html">Выбрать план</a>
+                        <a class="btn btn-primary" href="{% url 'user_registration' %}">Выбрать план</a>
                     </div>
                     <div class="plan plan-2">
                         <div class="title">
@@ -337,7 +337,7 @@
                             <b>5 GB</b> на пользователя<br>
                             Первый месяц бесплатно
                         </div>
-                        <a class="btn btn-primary" href="registration.html">Выбрать план</a>
+                        <a class="btn btn-primary" href="{% url 'user_registration' %}">Выбрать план</a>
                     </div>
                     <div class="plan">
                         <div class="title">
@@ -351,7 +351,7 @@
                             <b>10 GB</b> на пользователя<br>
                             Первый месяц бесплатно
                         </div>
-                        <a class="btn btn-primary" href="registration.html">Выбрать план</a>
+                        <a class="btn btn-primary" href="{% url 'user_registration' %}">Выбрать план</a>
                     </div>
                 </div>
             </div>
@@ -441,7 +441,7 @@
                     /.container
                 </section>-->
 
-        <section id="contacts" class="contacts-2">
+        <section id="contacts" class="contacts-2" style='padding-bottom:20px;'>
             <div class="container">
                 <div class="row">
                     <div class="col-sm-8">
@@ -450,7 +450,7 @@
                 </div>
                 <div class="row">
                     <div class="col-sm-6">
-                        <form>
+                        <!-- <form>
                             <label class="h6">Имя / Фамилия</label>
                             <input type="text" class="form-control">
                             <label class="h6">E-mail</label>
@@ -458,15 +458,16 @@
                             <label class="h6">Сообщение</label>
                             <textarea rows="7" class="form-control"></textarea>
                             <button type="submit" class="btn btn-primary"><span class="fui-mail"></span></button>
-                        </form>
-                    </div>
-                    <div class="col-sm-5 col-sm-offset-1">
+                        </form> -->
                         <h6>Где нас найти</h6>
                         <p>Вы можете найти нас по адресу Республика Казахстан, г. Алматы, мкр. Самал 1, д. 1 </p>
-                        <div class="map">
+                        <div class="map" style='height:300px;'>
                             <!--map-->
                             <iframe width="100%" height="100%" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="https://maps.google.com/?ie=UTF8&amp;t=m&amp;ll=43.237874,76.956366&amp;spn=0.04554,0.072956&amp;z=15&amp;output=embed"></iframe>
                         </div>
+                    </div>
+                    <div class="col-sm-5 col-sm-offset-1">
+                        
                         <h6>Контакты</h6>
                         <div class="links">
                             <a href="#"><span class="fui-phone"></span> +7 777 00 777 05</a><br>
@@ -477,25 +478,25 @@
             </div>
         </section>
 
-        <footer class="footer-6">
+        <footer class="footer-6" style='padding-bottom:30px; padding-top:10px;'>
             <div class="container">
                 <div class="row">
-                    <div class="col-sm-3">
+                    <div class="col-sm-6">
                         <div><a class="brand" href="#"><img src="{% static 'common-files/img/logo2.png' %}" width="140" alt=""></a></div>
                     </div>
                     <nav>
-                        <div class="col-sm-6">
+                        <!-- <div class="col-sm-6">
                             &nbsp;
-<!--                            <h6>О нас</h6>
+                            <h6>О нас</h6>
                             <ul>
                                 <li><a href="#">О нас</a></li>
                                 <li><a href="#">Блог</a></li>
                                 <li><a href="#contacts">Контакты</a></li>
-                            </ul>-->
-                        </div>
+                            </ul>
+                        </div> -->
 
                     </nav>
-                    <div class="col-sm-3">
+                    <div class="col-sm-3 col-sm-offset-1">
                         <h6>Подписаться на рассылку</h6>
                         <div class="input-group">
                             <input type="text" class="form-control">
@@ -505,7 +506,7 @@
                                 </button>
                             </span>
                         </div>
-                        <div class="social-btns">
+                        <!-- <div class="social-btns">
                             <a href="#">
                                 <div class="fui-facebook"></div>
                                 <div class="fui-facebook"></div>
@@ -518,7 +519,7 @@
                                 <div class="fui-vimeo"></div>
                                 <div class="fui-vimeo"></div>
                             </a>
-                        </div>
+                        </div> -->
                     </div>
                 </div>
             </div>
