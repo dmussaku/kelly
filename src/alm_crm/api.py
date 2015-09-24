@@ -2356,7 +2356,6 @@ class ActivityResource(CRMServiceModelResource):
                                     format = request.META.get('CONTENT_TYPE', 'application/json'))
 
             new_activities_list = []
-            subscription_id = self.get_crmsubscr_id(request)
 
             for new_activity_data in data:
                 new_activity = Activity()
@@ -2378,10 +2377,12 @@ class ActivityResource(CRMServiceModelResource):
                         owner_id=new_activity.author_id)
                     new_activity.feedback.save()
 
+                account = Account.objects.get(company=request.company, user=request.user)
 
-                new_activity.spray(subscription_id)
+                new_activity.spray(request.company.id, account)
 
                 text_parser(base_text=new_activity.description,
+                            company_id=request.company.id,
                             content_class=new_activity.__class__,
                             object_id=new_activity.id)
 
