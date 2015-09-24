@@ -175,16 +175,14 @@ class UserResource(ModelResource):
             from django.core.files.uploadedfile import SimpleUploadedFile
             file_contents = SimpleUploadedFile("%s" %(data['name']), base64.b64decode(data['pic']), content_type='image')
             request.user.userpic.save(data['name'], file_contents, True)
-            raise ImmediateHttpResponse(
-                HttpResponse(
-                    content=Serializer().to_json(
-                        UserResource().full_dehydrate(
-                            UserResource().build_bundle(
-                                obj=User.objects.get(id=request.user.id))
-                            )
-                        ),
-                    content_type='application/json; charset=utf-8', status=200)
-            )
+            
+            user = User.objects.get(id=request.user.id)
+
+            bundle = self.build_bundle(obj=user, request=request)
+            bundle = self.full_dehydrate(bundle)
+
+            return self.create_response(request, bundle,
+                                            response_class=http.HttpAccepted)
 
     def change_password(self, request, **kwargs):
         with RequestContext(self, request, allowed_methods=['post']):
