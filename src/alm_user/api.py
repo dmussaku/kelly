@@ -315,7 +315,6 @@ class UserResource(ModelResource):
 
     def vcard_full_hydrate(self, bundle):
         field_object = bundle.data.get('vcard',{})
-        subscription_id = self.get_crm_subscription(bundle.request)
         if bundle.obj.vcard:
             vcard = bundle.obj.vcard
         else:
@@ -381,7 +380,6 @@ class UserResource(ModelResource):
                             vcard_obj.vcard = VCard.objects.get(id=value)
                         else:
                             vcard_obj.__setattr__(key, value)
-                    vcard_obj.subscription_id = subscription_id
                     vcard_obj.save()
                     id_list.append(vcard_obj.id)
                 for obj in queryset:
@@ -390,7 +388,6 @@ class UserResource(ModelResource):
             else:
                 for obj in model.objects.filter(vcard=vcard):
                     obj.delete()
-        vcard.subscription_id = subscription_id
         vcard.save()
 
     def subscriptions(self, request, **kwargs):

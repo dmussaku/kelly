@@ -8,22 +8,11 @@
         <div class="login-body">
             <div class="login-switcher">
                 <a href="{% url 'user_login' %}" class="login-switcher-button active">{{ _("Sign in") }}</a>
-                <a href="{% url 'user_referral' %}" class="login-switcher-button">{{ _("Register") }}</a>
+                <a href="{% url 'user_registration' %}" class="login-switcher-button">{{ _("Register") }}</a>
             </div>
             <div class="login-form">
             <form name="login-form" action="" method="post">
                 {% csrf_token %}
-                <!-- <div class="login-fieldset">
-                    <label class="login-fieldset-icon" for="login-subdomain">
-                        <figure class="icon icon--organization">
-                          <svg version="1.1">
-                            <use xlink:href="#icon-organization"></use>
-                          </svg>
-                        </figure>
-                    </label>
-
-                    <input class="login-input" id="login-subdomain" name="subdomain" type="text" placeholder="Subdomain">
-                </div> -->
                 <div class="login-fieldset {% if form.username.errors or form.non_field_errors %}has-error{% endif %}">
                     <label class="login-fieldset-icon" for="login-email">
                         <figure class="icon icon--mail">
@@ -35,7 +24,7 @@
 
                     <input class="login-input" id="login-email" name="username" type="email" placeholder="E-mail">
                     {% if form.username.errors %}
-                    <div class="login-error">{{ form.username.errors }}</div>
+                        <div class="login-error">{{ form.username.errors }}</div>
                     {% endif %}
                     {% if form.non_field_errors %}
                         {% for error in form.non_field_errors %}

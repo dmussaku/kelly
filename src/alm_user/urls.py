@@ -4,7 +4,7 @@ from django.contrib.auth.views import (
     password_reset as django_password_reset,
     password_reset_done as django_password_reset_done,)
 
-from alm_user.forms import PasswordResetForm, SubdomainForgotForm
+from alm_user.forms import PasswordResetForm
 # from alm_user.views import UserListView, UserRegistrationView 
 from alm_user.views import (
     login_view, 
@@ -12,8 +12,8 @@ from alm_user.views import (
     referral, 
     referral_complete, 
     password_reset_success,
-    subdomain_forgot,
-    ChooseSubdomain
+    ChooseSubdomain,
+    registration,
     )
 from alm_user.models import User
 from django.views.generic import TemplateView
@@ -34,6 +34,14 @@ urlpatterns = patterns(
         referral, {'template_name': 'user/login-register.html'},
         name='user_referral'),
 
+    url(r'^registration/$',
+        registration, {'template_name': 'user/registration.html'},
+        name='user_registration'),
+
+    url(r'^registration/success/$',
+        TemplateView.as_view(template_name='user/registration-done.html'),
+        name='user_registration_success'),
+
     url(r'^referral/complete/$', referral_complete, {'template_name': 'user/referral-complete.html'}, 
         name='referral_complete'),
 
@@ -49,16 +57,6 @@ urlpatterns = patterns(
         django_password_reset_done, {
         'template_name': 'user/password_reset_done.html'},
         name='password_reset_done'),
-
-    url(r'^password-reset/subdomain_forgot/$', 
-        subdomain_forgot, {
-        'template_name': 'user/subdomain_forgot.html'},
-        name='subdomain_forgot'),
-
-    url(r'^password-reset/subdomain_forgot/done/$', 
-        django_password_reset_done, {
-        'template_name': 'user/subdomain_forgot_done.html'},
-        name='subdomain_forgot_done'),
 
     url(r'^password-reset/success/$', 
         password_reset_success, {

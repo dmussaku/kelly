@@ -7,7 +7,7 @@
     <div class="login-body">
       <div class="login-switcher">
         <a href="{% url 'user_login' %}" class="login-switcher-button">{{ _("Sign in") }}</a>
-        <a href="{% url 'user_referral' %}" class="login-switcher-button active">{{ _("Register") }}</a>
+        <a href="{% url 'user_registration' %}" class="login-switcher-button active">{{ _("Register") }}</a>
       </div>
       <div class="login-form">
       <form name="login-form" action="" method="post">{% csrf_token %}
