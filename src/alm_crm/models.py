@@ -7,6 +7,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from almanet.utils.metaprogramming import DirtyFieldsMixin
 from almanet.models import SubscriptionObject, Subscription
+from alm_company.models import Company
 from alm_vcard.models import (
     VCard,
     BadVCardError,
@@ -1986,8 +1987,8 @@ def delete_related_milestones(sender, instance, **kwargs):
 
 signals.post_delete.connect(on_activity_delete, sender=Activity)
 signals.pre_save.connect(check_is_title_empty, sender=SalesCycle)
-signals.post_save.connect(create_milestones, sender=Subscription)
-signals.pre_delete.connect(delete_related_milestones, sender=Subscription)
+signals.post_save.connect(create_milestones, sender=Company)
+signals.pre_delete.connect(delete_related_milestones, sender=Company)
 
 '''
 Function to get mentions by 3 of optional parameters:
