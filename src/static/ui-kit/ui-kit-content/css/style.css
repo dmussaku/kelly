@@ -1961,7 +1961,7 @@ section * {
 }
 .content-14 .features h6 {
   text-transform: none;
-  color: #e74c3c;
+  /* color: #e74c3c; */
   font-size: 18px;
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-weight: 500;
@@ -3908,7 +3908,7 @@ section * {
 .content-30 .features .img {
   position: relative;
   display: inline-block;
-  margin: 150px auto;
+  /* margin: 150px auto; */
 }
 @media (max-width: 1200px) and (min-width: 768px) {
   .content-30 .features .img {

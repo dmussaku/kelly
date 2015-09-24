@@ -284,7 +284,8 @@ def registration(request, template_name='user/registration.html',
             form.save()
             return HttpResponseRedirect(reverse_lazy('user_registration_success'))
     else:
-        form = registration_form(request)
+        email = request.GET.get('email','')
+        form = registration_form(initial={"email":email})
     context = {
         'form': form
     }

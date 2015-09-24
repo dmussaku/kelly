@@ -13,6 +13,7 @@ from almanet.views import (
     ServiceDetailView,
     RedirectHomeView,
     landing_form,
+    landing
     )
 from django.views.generic import TemplateView
 
@@ -47,7 +48,7 @@ urlpatterns = patterns(
     url(r'api/doc/', include('tastypie_swagger.urls', namespace='tastypie_swagger')),
     url(r'agreement/$', TemplateView.as_view(template_name='almanet/agreement.crm.html'), name='agreement'),
     url(r'landing_form/$', landing_form, name='landing_form'),
-    url(r'landing/$', TemplateView.as_view(template_name='index.html'), name='landing_page'),
+    url(r'landing/$', landing, name='landing_page'),
 
 )
 

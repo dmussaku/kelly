@@ -263,18 +263,17 @@ class UserResource(ModelResource):
 
         bundle = self.full_hydrate(bundle, **kwargs)
         #return self.save(bundle, skip_errors=skip_errors)
+        user = User.objects.get(id=bundle.request.user.id)
+        bundle = self.build_bundle(obj=user, request=bundle.request)
+        bundle = self.full_dehydrate(bundle)
         raise ImmediateHttpResponse(
             HttpResponse(
                 content=Serializer().to_json(
-                    self.full_dehydrate(
-                        self.build_bundle(
-                            obj=User.objects.get(id=bundle.obj.id))
-                        )
+                    bundle
                     ),
                 content_type='application/json; charset=utf-8', status=200
                 )
             )
-        return bundle
 
     def full_hydrate(self, bundle, **kwargs):
         user_id = kwargs.get('pk', None)
