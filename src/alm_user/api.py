@@ -287,11 +287,11 @@ class UserResource(ModelResource):
     def full_dehydrate(self, bundle, for_list=False):
         bundle = super(self.__class__, self).full_dehydrate(bundle, for_list=True)
         company_list = []
-        subdomain = bundle.request.subdomain
+        subdomain = bundle.request.subdomain if hasattr(bundle.request, 'subdomain') else None
         is_supervisor = False
         current_account = None
         for account in bundle.obj.accounts.all():
-            if subdomain == account.company.subdomain:
+            if subdomain and subdomain == account.company.subdomain:
                 current_account = account
             company_list.append(
                 {
@@ -300,8 +300,9 @@ class UserResource(ModelResource):
                  'subdomain':account.company.subdomain
                 }
             )
-        bundle.data['is_supervisor'] = current_account.is_supervisor
-        bundle.data['is_active'] = current_account.is_active
+        if subdomain:
+            bundle.data['is_supervisor'] = current_account.is_supervisor
+            bundle.data['is_active'] = current_account.is_active
         bundle.data['companies'] = company_list
         # TODO: use CustomFields with use_in_ids
         return bundle
