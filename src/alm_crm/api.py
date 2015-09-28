@@ -67,6 +67,7 @@ from alm_vcard.models import *
 from almanet.settings import DEFAULT_SERVICE
 from almanet.settings import TIME_ZONE
 from almanet.utils.api import RequestContext, SessionAuthentication
+from tastypie.authentication import BasicAuthentication
 from almanet.utils.env import get_subscr_id
 from almanet.utils.ds import StreamList
 from django.conf.urls import url
