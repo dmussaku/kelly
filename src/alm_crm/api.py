@@ -251,7 +251,7 @@ class CRMServiceModelResource(ModelResource):
     class Meta:
         list_allowed_methods = ['get', 'post', 'patch']
         detail_allowed_methods = ['get', 'post', 'put', 'delete', 'patch']
-        authentication = MultiAuthentication(SessionAuthentication())
+        authentication = MultiAuthentication(SessionAuthentication(), BasicAuthentication())
         authorization = Authorization()
 
 

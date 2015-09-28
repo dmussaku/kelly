@@ -1538,21 +1538,15 @@ class Activity(SubscriptionObject):
             )
 
     def spray(self, company_id, account):
-        unfollow_set = {
-            unfollower.id for unfollower
-            in account.unfollow_list.all()}
-
-        # q = Q(company_id=company_id)
-        accounts = Account.objects.filter(company_id=company_id)
-        university_set = set(User.objects.filter(accounts__in=accounts).values_list(
-                             'id', flat=True))
-        followers = User.objects.filter(
-            pk__in=(university_set - unfollow_set))
+        accounts = []
+        for account in Account.objects.filter(company_id=company_id):
+            if not (self.contact in account.unfollow_list):
+                accounts.append(account)
 
         with transaction.atomic():
-            for follower in followers:
-                act_recip = ActivityRecipient(user=follower, activity=self)
-                if follower==self.owner:
+            for account in accounts:
+                act_recip = ActivityRecipient(user=account.user, activity=self)
+                if account==self.owner:
                     act_recip.has_read = True
                 act_recip.save()
 
@@ -1817,23 +1811,17 @@ class Comment(SubscriptionObject):
         return self.owner
 
     def spray(self, company_id, account):
-        unfollow_set = {
-            unfollower.id for unfollower
-            in account.unfollow_list.all()}
-
-        # q = Q(company_id=company_id)
-        accounts = Account.objects.filter(company_id=company_id)
-        university_set = set(User.objects.filter(accounts__in=accounts).values_list(
-                             'id', flat=True))
-        followers = User.objects.filter(
-            pk__in=(university_set - unfollow_set))
-
+        accounts = []
+        for account in Account.objects.filter(company_id=company_id):
+            if not (self.contact in account.unfollow_list):
+                accounts.append(account)
+                
         with transaction.atomic():
-            for follower in followers:
-                comment_recipient = CommentRecipient(user=follower, comment=self)
-                if follower==self.owner:
-                    comment_recipient.has_read = True
-                comment_recipient.save()
+            for account in accounts:
+                com_recipient = CommentRecipient(user=account.user, activity=self)
+                if account==self.owner:
+                    com_recipient.has_read = True
+                com_recipient.save()
 
     def has_read(self, user_id):
         recip = self.recipients.filter(user_id=user_id).first()
