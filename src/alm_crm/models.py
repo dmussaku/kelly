@@ -723,7 +723,7 @@ class Contact(SubscriptionObject):
         except:
             return {'success':False}
         ext = filename.split('.')[len(filename.split('.')) - 1]
-        new_filename = filename.strip('.' + ext) + datetime.now().__str__() + '.' + ext
+        new_filename = datetime.now().__str__()
         if not os.path.exists(os.path.join(TEMP_DIR)):
             os.makedirs(TEMP_DIR)
         myfile = open(
@@ -736,6 +736,7 @@ class Contact(SubscriptionObject):
             'success':True,
             'col_num':sheet.ncols,
             'filename':new_filename,
+            'contact_list_name':filename,
             'data':[d.value for d in data]
         }
 
