@@ -1546,7 +1546,7 @@ class Activity(SubscriptionObject):
         with transaction.atomic():
             for account in accounts:
                 act_recip = ActivityRecipient(user=account.user, activity=self)
-                if account==self.owner:
+                if account.user.id==self.owner.id:
                     act_recip.has_read = True
                 act_recip.save()
 
@@ -1819,7 +1819,7 @@ class Comment(SubscriptionObject):
         with transaction.atomic():
             for account in accounts:
                 com_recipient = CommentRecipient(user=account.user, activity=self)
-                if account==self.owner:
+                if account.user.id==self.owner.id:
                     com_recipient.has_read = True
                 com_recipient.save()
 
