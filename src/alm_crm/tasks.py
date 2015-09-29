@@ -94,8 +94,11 @@ def add_contacts_by_chunks(import_task_id, file_structure, filename, creator_id,
     sheet = book.sheets()[0]
     row_num = fin_row - start_row
     error_counter = 0
-    for i in xrange(start_row, fin_row - 1):
-        data = sheet.row(i)
+    for i in xrange(start_row, fin_row):
+        try:
+            data = sheet.row(i)
+        except:
+            continue
         response = Contact.create_from_structure(
             data, file_structure, creator, import_task, company_id)
         if response['error']:
