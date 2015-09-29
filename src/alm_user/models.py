@@ -178,6 +178,10 @@ class User(AbstractBaseUser):
         '''
         return request.company
 
+    @property
+    def is_staff(self):
+        return self.is_admin
+
     def get_account(self, request):
         '''
         Returns a account taken from request
@@ -190,6 +194,33 @@ class User(AbstractBaseUser):
         account = Account.objects.get(
             user=self, company__subdomain=subdomain)
         return account.is_supervisor
+
+    def has_perm(self, perm, obj=None):
+        """
+        Returns True if the user has the specified permission. This method
+        queries all available auth backends, but returns immediately if any
+        backend returns True. Thus, a user who has permission from a single
+        auth backend is assumed to have permission in general. If an object is
+        provided, permissions for this specific object are checked.
+        """
+
+        # Active superusers have all permissions.
+        if self.is_active and self.is_admin:
+            return True
+
+        # Otherwise we need to check the backends.
+        return _user_has_perm(self, perm, obj)
+
+    def has_module_perms(self, app_label):
+        """
+        Returns True if the user has any permissions in the given app label.
+        Uses pretty much the same logic as has_perm, above.
+        """
+        # Active superusers have all permissions.
+        if self.is_active and self.is_admin:
+            return True
+
+        return False
 
 '''
     def connect_service(self, service):

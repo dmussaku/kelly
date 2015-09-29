@@ -67,6 +67,7 @@ from alm_vcard.models import *
 from almanet.settings import DEFAULT_SERVICE
 from almanet.settings import TIME_ZONE
 from almanet.utils.api import RequestContext, SessionAuthentication
+from tastypie.authentication import BasicAuthentication
 from almanet.utils.env import get_subscr_id
 from almanet.utils.ds import StreamList
 from django.conf.urls import url
@@ -251,7 +252,7 @@ class CRMServiceModelResource(ModelResource):
     class Meta:
         list_allowed_methods = ['get', 'post', 'patch']
         detail_allowed_methods = ['get', 'post', 'put', 'delete', 'patch']
-        authentication = MultiAuthentication(SessionAuthentication())
+        authentication = MultiAuthentication(SessionAuthentication(), BasicAuthentication())
         authorization = Authorization()
 
 
