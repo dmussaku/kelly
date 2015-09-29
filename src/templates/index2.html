@@ -1,4 +1,5 @@
 {% load static from staticfiles %}
+{% load almanet_tags %}
 <!--DOCTYPE html -->
 <html >
     <head>
@@ -456,6 +457,9 @@
             });
           });
     </script>
+    {% settings_value 'DEBUG' as debug_mode_on %}
+    {% if debug_mode_on %}
+    <script type="text/javascript" src="{% static 'js/bundle.js' %}"></script>
     <script>
  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -466,4 +470,5 @@
  ga('send', 'pageview');
 
 </script>
+    {% endif %}
 </html>
