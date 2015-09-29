@@ -1541,7 +1541,7 @@ class Activity(SubscriptionObject):
     def spray(self, company_id, account):
         accounts = []
         for account in Account.objects.filter(company_id=company_id):
-            if not (self.contact in account.unfollow_list):
+            if not (self.contact in account.unfollow_list.all()):
                 accounts.append(account)
 
         with transaction.atomic():
@@ -1814,7 +1814,7 @@ class Comment(SubscriptionObject):
     def spray(self, company_id, account):
         accounts = []
         for account in Account.objects.filter(company_id=company_id):
-            if not (self.contact in account.unfollow_list):
+            if not (self.contact in account.unfollow_list.all()):
                 accounts.append(account)
                 
         with transaction.atomic():
