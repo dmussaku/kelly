@@ -1,7 +1,8 @@
 from django.contrib import admin
 from django import forms
 from alm_user.models import (
-    User
+    User,
+    Account
 )
 from alm_company.models import Company
 from almanet.models import Service, Subscription
@@ -36,6 +37,7 @@ class MilestoneAdmin(admin.ModelAdmin):
     list_display = ['title', 'color_code']
 
 admin.site.register(User, UserAdmin)
+admin.site.register(Account)
 admin.site.register(Company)
 admin.site.register(Service)
 admin.site.register(Subscription, SubscriptionAdmin)

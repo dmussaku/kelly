@@ -77,6 +77,14 @@ class Account(models.Model):
             return True
         return False
 
+    def __unicode__(self):
+        return_s = ""
+        if self.user:
+            return_s += self.user.email
+        if self.company:
+            return_s += ' ' + self.company.name
+        return return_s
+
     def has_perm(self, perm, obj=None):
         return self.is_admin
 
