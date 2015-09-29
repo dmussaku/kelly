@@ -3,7 +3,7 @@ from optparse import make_option
 from django.core.management.base import BaseCommand
 from django.utils.translation import ugettext as _
 
-from alm_user.models import User, UserManager, Account
+from alm_user.models import User, Account
 from alm_company.models import Company
 from almanet.models import Service, Subscription
 
@@ -40,14 +40,17 @@ class Command(BaseCommand):
         except (Company.DoesNotExist, KeyError):
             c = Company.build_company(name=name, subdomain=subdomain)
             sys.stderr.write("Company created successfully.\n")
+
         try:
-            acc = Account.objects.get(email=email, company=c)
-            u = acc.user
+            u = User.objects.get(email=email)
+            acc = Account.objects.get(user=u, company=c)
             sys.stderr.write("Error: bwayne@batman.bat email is already taken.\n")
-        except (Account.DoesNotExist, KeyError):
-            u = UserManager.create_user(first_name=first_name, last_name=last_name, is_supervisor=is_supervisor)
-            acc = Account.objects.create_user(
-                email=email, password=password, user=u, company=c, is_admin=True)
+        except User.DoesNotExist:
+            u = User.objects.create_user(email=email, password=password,
+                    first_name=first_name, last_name=last_name, is_admin=True)
+        except Account.DoesNotExist:
+            acc = Account.objects.create_account(user=u, company=c, is_supervisor=is_supervisor)
+        finally:
             sys.stderr.write("Account and User created successfully.\n")
         subscription.user = u
         subscription.organization = c

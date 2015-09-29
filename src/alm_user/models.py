@@ -20,10 +20,9 @@ except ImportError:
 
 
 class AccountManager(contrib_user_manager):
-    def create_user(self, email, password, user, company, is_supervisor=False):
-        acc = Account(email=email, 
-            is_supervisor=is_supervisor, user=user, company=company)
-        acc.set_password(password)
+    @classmethod
+    def create_account(self, user, company, is_supervisor=False):
+        acc = Account(user=user, company=company, is_supervisor=is_supervisor)
         acc.save()
         return acc
 
@@ -103,8 +102,9 @@ class Account(models.Model):
 
 class UserManager(contrib_user_manager):
     @classmethod
-    def create_user(self, first_name, last_name, is_admin=False):
-        user = User(first_name=first_name, last_name=last_name, is_admin=is_admin)
+    def create_user(self,  email, password, first_name, last_name, is_admin=False):
+        user = User(email=email, first_name=first_name, last_name=last_name, is_admin=is_admin)
+        user.set_password(password)
         user.save()
         return user
 
