@@ -2364,6 +2364,7 @@ class ActivityResource(CRMServiceModelResource):
                 new_activity.description = new_activity_data.get('description')
                 new_activity.sales_cycle_id = new_activity_data.get('sales_cycle_id')
                 new_activity.assignee_id = new_activity_data.get('assignee_id')
+                new_activity.company_id = request.company.id
 
                 if 'deadline' in new_activity_data:
                     new_activity.deadline = new_activity_data.get('deadline')
