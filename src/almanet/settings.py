@@ -156,6 +156,7 @@ class BaseConfiguration(SubdomainConfiguration, Configuration):
         'django.middleware.locale.LocaleMiddleware',
         'django_hosts.middleware.HostsMiddleware',
         'django.contrib.sessions.middleware.SessionMiddleware',
+        'django.contrib.messages.middleware.MessageMiddleware',
         'django.contrib.auth.middleware.AuthenticationMiddleware',
         # 'almanet.middleware.AlmanetSessionMiddleware',
         # 'almanet.middleware.MyAuthenticationMiddleware',

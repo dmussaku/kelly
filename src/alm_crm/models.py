@@ -723,7 +723,7 @@ class Contact(SubscriptionObject):
         except:
             return {'success':False}
         ext = filename.split('.')[len(filename.split('.')) - 1]
-        new_filename = filename.strip('.' + ext) + datetime.now().__str__() + '.' + ext
+        new_filename = datetime.now().__str__()
         if not os.path.exists(os.path.join(TEMP_DIR)):
             os.makedirs(TEMP_DIR)
         myfile = open(
@@ -736,6 +736,7 @@ class Contact(SubscriptionObject):
             'success':True,
             'col_num':sheet.ncols,
             'filename':new_filename,
+            'contact_list_name':filename,
             'data':[d.value for d in data]
         }
 
@@ -1540,7 +1541,7 @@ class Activity(SubscriptionObject):
     def spray(self, company_id, account):
         accounts = []
         for account in Account.objects.filter(company_id=company_id):
-            if not (self.contact in account.unfollow_list):
+            if not (self.contact in account.unfollow_list.all()):
                 accounts.append(account)
 
         with transaction.atomic():
@@ -1813,12 +1814,12 @@ class Comment(SubscriptionObject):
     def spray(self, company_id, account):
         accounts = []
         for account in Account.objects.filter(company_id=company_id):
-            if not (self.contact in account.unfollow_list):
+            if not (self.content_object.contact in account.unfollow_list.all()):
                 accounts.append(account)
                 
         with transaction.atomic():
             for account in accounts:
-                com_recipient = CommentRecipient(user=account.user, activity=self)
+                com_recipient = CommentRecipient(user=account.user, comment=self)
                 if account.user.id==self.owner.id:
                     com_recipient.has_read = True
                 com_recipient.save()
