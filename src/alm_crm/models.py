@@ -1814,12 +1814,12 @@ class Comment(SubscriptionObject):
     def spray(self, company_id, account):
         accounts = []
         for account in Account.objects.filter(company_id=company_id):
-            if not (self.contact in account.unfollow_list.all()):
+            if not (self.content_object.contact in account.unfollow_list.all()):
                 accounts.append(account)
                 
         with transaction.atomic():
             for account in accounts:
-                com_recipient = CommentRecipient(user=account.user, activity=self)
+                com_recipient = CommentRecipient(user=account.user, comment=self)
                 if account.user.id==self.owner.id:
                     com_recipient.has_read = True
                 com_recipient.save()

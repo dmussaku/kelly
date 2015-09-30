@@ -214,6 +214,7 @@ class CRMServiceModelResource(ModelResource):
         return objects.filter(q)
 
     def hydrate(self, bundle):
+        print 'at hydrate'
         """
         bundle.request.user_env is empty dict{}
         because bundle.request.user is AnonymousUser
@@ -224,7 +225,7 @@ class CRMServiceModelResource(ModelResource):
         if user:
             bundle.obj.owner = user
             bundle.obj.company_id = bundle.request.company.id
-
+        print bundle.obj.company_id
         return bundle
 
     def get_bundle_list(self, obj_list, request):
@@ -2393,10 +2394,12 @@ class ActivityResource(CRMServiceModelResource):
             return self.create_response(request, new_activities_list, response_class=http.HttpCreated)
 
     def finish_activity(self, request, **kwargs):
+        print 'at finish activity' 
         with RequestContext(self, request, allowed_methods=['post']):
             data = self.deserialize(
                 request, request.body,
                 format=request.META.get('CONTENT_TYPE', 'application/json'))
+            print data
             activity = Activity.objects.get(id=data.get('id'))
             activity.result = data.get('result')
             activity.date_finished = datetime.now(request.user.timezone)
@@ -2407,10 +2410,12 @@ class ActivityResource(CRMServiceModelResource):
                         ActivityResource().build_bundle(obj=activity, request=request) )})
 
     def move_activity(self, request, **kwargs):
+        print 'at move activity'
         with RequestContext(self, request, allowed_methods=['post']):
             data = self.deserialize(
-            request, request.body,
-            format=request.META.get('CONTENT_TYPE', 'application/json'))
+                request, request.body,
+                format=request.META.get('CONTENT_TYPE', 'application/json'))
+            print data
             if not data.get('sales_cycle_id', None):
                 return http.HttpBadRequest()
             try:
@@ -2441,6 +2446,7 @@ class ActivityResource(CRMServiceModelResource):
             return self.create_response(request, {'objects':objects}, response_class=http.HttpAccepted)
 
     def obj_create(self, bundle, **kwargs): ## TODO
+        print 'at obj create'
         act = bundle.obj = self._meta.object_class()
         act.author_id = bundle.data.get('author_id')
         act.description = bundle.data.get('description')
@@ -2452,6 +2458,7 @@ class ActivityResource(CRMServiceModelResource):
         if 'need_preparation' in bundle.data:
             act.need_preparation = bundle.data.get('need_preparation')
         act.save()
+        print act.company_id
         text_parser(base_text=act.description, content_class=act.__class__,
                     object_id=act.id, company_id = bundle.request.company.id)
         subdomain = bundle.request.subdomain
@@ -2464,6 +2471,7 @@ class ActivityResource(CRMServiceModelResource):
         return bundle
 
     def save(self, bundle, **kwargs):
+        print 'at save'
         bundle = super(ActivityResource, self).save(bundle, **kwargs)
         if bundle.data.get('sales_cycle_id', None):
             new_sc_id = bundle.data.get('sales_cycle_id')
@@ -2476,6 +2484,7 @@ class ActivityResource(CRMServiceModelResource):
         bundle.obj.save()
         text_parser(base_text=bundle.obj.description, content_class=bundle.obj.__class__,
                     object_id=bundle.obj.id, company_id = bundle.request.company.id)
+        print bundle.obj.company_id
         return bundle
 
 
