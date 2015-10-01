@@ -3301,7 +3301,7 @@ class AppStateObject(object):
         return [x.data for x in Category.objects.filter(vcard__contact__company_id=self.company.id)]
 
     def get_hashtags(self):
-        return [x.text for x in HashTag.objects.filter(company_id=self.company.id)]
+        return [{'id': x.id, 'text': x.text, 'count': x.references.count()} for x in HashTag.objects.filter(company_id=self.company.id)]
 
     def get_constants(self):
         return {
