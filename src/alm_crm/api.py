@@ -3295,9 +3295,13 @@ class AppStateObject(object):
 
         self.constants = self.get_constants()
         self.categories = self.get_categories()
+        self.hashtags = self.get_hashtags()
 
     def get_categories(self):
         return [x.data for x in Category.objects.filter(vcard__contact__company_id=self.company.id)]
+
+    def get_hashtags(self):
+        return [x.text for x in HashTag.objects.filter(company_id=self.company.id)]
 
     def get_constants(self):
         return {
@@ -3339,6 +3343,7 @@ class AppStateResource(Resource):
     '''
     categories = fields.ListField(attribute='categories', readonly=True)
     constants = fields.DictField(attribute='constants', readonly=True)
+    hashtags = fields.ListField(attribute='hashtags', readonly=True)
 
     class Meta:
         resource_name = 'app_state'
@@ -3358,6 +3363,12 @@ class AppStateResource(Resource):
                 (self._meta.resource_name, trailing_slash()),
                 self.wrap_view('get_categories'),
                 name='api_get_categories'
+            ),
+            url(
+                r"^(?P<resource_name>%s)/(?P<slug>\w+)/hashtags%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('get_hashtags'),
+                name='api_get_hashtags'
             ),
             url(
                 r"^(?P<resource_name>%s)/(?P<slug>\w+)/company%s$" %
@@ -3501,6 +3512,11 @@ class AppStateResource(Resource):
         with RequestContext(self, request, allowed_methods=['get']):
             obj = AppStateObject(service_slug=kwargs['slug'], request=request)
             return self.create_response(request, {'objects': obj.get_categories()}, response_class=http.HttpAccepted)
+
+    def get_hashtags(self, request, **kwargs):
+        with RequestContext(self, request, allowed_methods=['get']):
+            obj = AppStateObject(service_slug=kwargs['slug'], request=request)
+            return self.create_response(request, {'objects': obj.get_hashtags()}, response_class=http.HttpAccepted)
 
     def get_company(self, request, **kwargs):
         with RequestContext(self, request, allowed_methods=['get']):
