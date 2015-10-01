@@ -2104,17 +2104,17 @@ class Filter(SubscriptionObject):
         super(self.__class__, self).save(**kwargs)
 
 
-class HashTag(models.Model):
-    text = models.CharField(max_length=500, unique=True)
-    date_created = models.DateTimeField(auto_now_add=True, blank=True)
-    date_edited = models.DateTimeField(auto_now=True, blank=True)
+class HashTag(SubscriptionObject):
+    text = models.CharField(max_length=500)
 
     class Meta:
         verbose_name = _('hashtag')
         db_table = settings.DB_PREFIX.format('hashtag')
+        unique_together = ('company_id', 'text')
 
     def __unicode__(self):
         return u'%s' % (self.text)
+
 
 class HashTagReference(SubscriptionObject):
     hashtag = models.ForeignKey(HashTag, related_name="references")
