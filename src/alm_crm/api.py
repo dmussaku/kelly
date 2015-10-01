@@ -589,23 +589,39 @@ class ContactResource(CRMServiceModelResource):
         for key, value in kwargs.items():
             setattr(bundle.obj, key, value)
 
-
         bundle = self.full_hydrate(bundle)
+        contacts = []
+        contact = Contact.objects.get(id=bundle.obj.id)
+        company = contact.parent
+
         if bundle.data.get('custom_fields', None):
             processing_custom_field_data(bundle.data['custom_fields'], bundle.obj)
-        new_bundle = self.full_dehydrate(
+        contact_bundle = self.full_dehydrate(
                         self.build_bundle(
-                            obj=Contact.objects.get(id=bundle.obj.id))
+                            obj=contact)
                         )
-        new_bundle.data['global_sales_cycle'] = SalesCycleResource().full_dehydrate(
+        contact_bundle.data['global_sales_cycle'] = SalesCycleResource().full_dehydrate(
                 SalesCycleResource().build_bundle(
                     obj=SalesCycle.objects.get(contact_id=bundle.obj.id)
                 )
             )
+        contacts.append(contact_bundle)
+        if company:
+            company_bundle = self.full_dehydrate(
+                            self.build_bundle(
+                                obj=company)
+                            )
+            company_bundle.data['global_sales_cycle'] = SalesCycleResource().full_dehydrate(
+                    SalesCycleResource().build_bundle(
+                        obj=SalesCycle.objects.get(contact_id=company.id)
+                    )
+                )
+            contacts.append(company_bundle)
+        bundle.data['contacts'] = contacts
         #return self.save(bundle, skip_errors=skip_errors)
         raise ImmediateHttpResponse(
             HttpResponse(
-                content=Serializer().to_json(new_bundle),
+                content=Serializer().to_json(bundle),
                 content_type='application/json; charset=utf-8', status=200
                 )
             )
@@ -713,8 +729,8 @@ class ContactResource(CRMServiceModelResource):
         the json that has been submitted. So if the attribute is there
         then i use bundle.obj and setattr of current field_name to whatever
         i got in a json. If its missing then i just delete it.
-
         '''
+
         bundle = self.hydrate_sales_cycles(bundle)
         bundle = self.hydrate_parent(bundle)
         if bundle.data.get('user_id', ""):
@@ -763,6 +779,28 @@ class ContactResource(CRMServiceModelResource):
                     bundle.data.get('note'))
                 text_parser(base_text=share.note, content_class=share.__class__,
                     object_id=share.id, company_id = bundle.request.company.id)
+            company_name = bundle.data.get('company_name',"")
+            if company_name:
+                print 'company_name supplied'
+                if bundle.obj.parent:
+                    if not (bundle.obj.parent.vcard.fn==company_name):
+                        company = bundle.obj.create_company_for_contact(company_name)
+                        SalesCycle.create_globalcycle(
+                            **{
+                             'company_id':company_id,
+                             'owner_id':bundle.request.user.id,
+                             'contact_id':company.id
+                            }
+                        )
+                else:
+                    company = bundle.obj.create_company_for_contact(company_name)
+                    SalesCycle.create_globalcycle(
+                        **{
+                         'company_id':company_id,
+                         'owner_id':bundle.request.user.id,
+                         'contact_id':company.id
+                        }
+                    )
             if not kwargs.get('pk'):
                 SalesCycle.create_globalcycle(
                     **{
@@ -2491,7 +2529,7 @@ class ProductResource(CRMServiceModelResource):
     @undocumented: Meta
     '''
     owner_id = fields.IntegerField(attribute='author_id', null=True)
-#    sales_cycles = fields.ToManyField(SalesCycleResource, 'sales_cycles', readonly=True)
+    # sales_cycles = fields.ToManyField(SalesCycleResource, 'sales_cycles', readonly=True)
 
     class Meta(CommonMeta):
         queryset = Product.objects.all().prefetch_related('custom_field_values')

@@ -248,6 +248,22 @@ class Contact(SubscriptionObject):
     def share_contact(cls, share_from, share_to, contact_id, company_id, comment=None):
         return cls.share_contacts(share_from, share_to, [contact_id], company_id, comment)
 
+    def create_company_for_contact(self, company_name):
+        with transaction.atomic():
+            vcard = VCard(fn=company_name)
+            vcard.save()
+            c = Contact(
+                tp='co',
+                vcard=vcard,
+                owner=self.owner,
+                company_id=self.company_id
+                )
+            c.save()
+            self.parent = c
+            self.save()
+            return c
+
+
     @classmethod
     def share_contacts(cls, share_from, share_to, contact_ids, company_id, comment=None):
         '''
