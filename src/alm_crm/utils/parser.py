@@ -38,7 +38,7 @@ def text_parser(base_text, company_id, content_class=None, object_id=None):
 
 
 	for hashtag_item in hashtags:
-		hashtag, created = HashTag.objects.get_or_create(text=hashtag_item)
+		hashtag, created = HashTag.objects.get_or_create(text=hashtag_item, company_id=company_id)
 		if created:
 			hashtag.save()
 
