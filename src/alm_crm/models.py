@@ -644,6 +644,7 @@ class Contact(SubscriptionObject):
                         objects = data[col_num].value.split(';')
                         for object in objects:
                             v_type = structure_dict.get('attr','')
+                            company_name = object
                             obj = model(organization_name = object)
                             obj.vcard = vcard
                             obj.save()
@@ -728,6 +729,28 @@ class Contact(SubscriptionObject):
                          'contact_id':contact.id
                         }
                     )
+        try:
+            if contact.vcard.fn != company_name:
+                company = Contact.objects.filter(
+                    tp='co',
+                    company_id=contact.company_id,
+                    vcard__fn=company_name
+                    ).first()
+                if company:
+                    contact.parent = company
+                    contact.save()
+                else:
+                    company = contact.create_company_for_contact(company_name)
+                    company.import_task = import_task
+                    company.save()
+                    SalesCycle.create_globalcycle(
+                            **{'company_id':company.company_id,
+                             'owner_id':creator.id,
+                             'contact_id':company.id
+                            }
+                        )
+        except:
+            pass
         return {'error':False, 'contact_id':contact.id}
 
     @classmethod
