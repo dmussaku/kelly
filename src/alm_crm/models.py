@@ -182,13 +182,13 @@ class Contact(SubscriptionObject):
     def email_work(self):
         return self.email(type='INTERNET')
 
-    def company(self):
-        if not self.vcard:
-            return _('Unknown organization')
-        org = self.vcard.org_set.first()
-        if not org:
-            return _('Unknown organization')
-        return org.name
+    # def company(self):
+    #     if not self.vcard:
+    #         return _('Unknown organization')
+    #     org = self.vcard.org_set.first()
+    #     if not org:
+    #         return _('Unknown organization')
+    #     return org.name
 
     def get_tp(self):
         return dict(self.TYPES_OPTIONS).get(self.tp, None)
@@ -590,8 +590,12 @@ class Contact(SubscriptionObject):
         vcard.save()
         response = {}
         for structure_dict in file_structure:
+            company_name = ""
             col_num = int(structure_dict.get('num'))
-            model = getattr(vcard_models, structure_dict.get('model'))
+            if structure_dict.get('model') == 'Org':
+                model = 'Org'
+            else:
+                model = getattr(vcard_models, structure_dict.get('model'))
             if type(data[col_num].value) == float:
                 data[col_num].value = str(data[col_num].value)
             if model == vcard_models.VCard:
@@ -638,16 +642,16 @@ class Contact(SubscriptionObject):
                     response['error'] = True
                     response['error_col'] = col_num
                     return response
-            elif model == vcard_models.Org:
+            elif model == 'Org':
                 try:
                     if data[col_num].value:
                         objects = data[col_num].value.split(';')
                         for object in objects:
                             v_type = structure_dict.get('attr','')
                             company_name = object
-                            obj = model(organization_name = object)
-                            obj.vcard = vcard
-                            obj.save()
+                            # obj = model(organization_name = object)
+                            # obj.vcard = vcard
+                            # obj.save()
                 except Exception as e:
                     print str(e) + 'at col {} at 633'.format(col_num)
                     # transaction.savepoint_rollback(sid)
@@ -711,8 +715,8 @@ class Contact(SubscriptionObject):
             response['error'] = True
             response['error_col'] = 0
             return response
-        if vcard.fn == 'Без Имени' and vcard.org_set.first():
-            vcard.fn = vcard.org_set.first().organization_name
+        if vcard.fn == 'Без Имени' and company_name:
+            vcard.fn = company_name
             vcard.save()
             contact.tp = 'co'
         elif vcard.fn == 'Без Имени' and vcard.email_set.first():

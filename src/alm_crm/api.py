@@ -29,26 +29,6 @@ from alm_vcard.api import (
     VCardResource,
     VCardEmailResource,
     VCardTelResource,
-    VCardOrgResource,
-    VCardGeoResource,
-    VCardAdrResource,
-    VCardAgentResource,
-    VCardCategoryResource,
-    VCardKeyResource,
-    VCardLabelResource,
-    VCardMailerResource,
-    VCardNicknameResource,
-    VCardNoteResource,
-    VCardRoleResource,
-    VCardTitleResource,
-    VCardTzResource,
-    VCardUrlResource
-    )
-from alm_vcard.api import (
-    VCardResource,
-    VCardEmailResource,
-    VCardTelResource,
-    VCardOrgResource,
     VCardGeoResource,
     VCardAdrResource,
     VCardAgentResource,
@@ -594,7 +574,9 @@ class ContactResource(CRMServiceModelResource):
         company_name = bundle.data.get('company_name',"").strip()
         if company_name:
             company = Contact.objects.filter(
-                        vcard__fn=company_name, company_id=company_id, tp='co').first()
+                        vcard__fn=company_name, 
+                        company_id=company_id, 
+                        tp='co').first()
             if not company:
                 company = bundle.obj.create_company_for_contact(company_name)
                 SalesCycle.create_globalcycle(
@@ -628,7 +610,7 @@ class ContactResource(CRMServiceModelResource):
                             )
             company_bundle.data['global_sales_cycle'] = SalesCycleResource().full_dehydrate(
                     SalesCycleResource().build_bundle(
-                        obj=SalesCycle.objects.get(contact_id=company.id)
+                        obj=SalesCycle.objects.get(contact_id=company.id, is_global=True)
                     )
                 )
             contact_bundle.data['parent'] = company_bundle

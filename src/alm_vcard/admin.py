@@ -28,11 +28,6 @@ class GeoInline(admin.StackedInline):
     extra = 1
 
 
-class OrgInline(admin.StackedInline):
-    model = Org
-    extra = 1
-
-
 class AgentInline(admin.StackedInline):
     model = Agent
     extra = 1
@@ -112,7 +107,7 @@ class VCardAdmin(admin.ModelAdmin):
     actions = [to_vcf_file]
     # list_display = ('selectVCFLink')
     fields = ['fn', 'family_name', 'given_name', 'additional_name', 'honorific_prefix', 'honorific_suffix', 'bday', 'classP']
-    inlines = [TelInline, EmailInline, AdrInline, TitleInline, OrgInline, AgentInline, CategoryInline, KeyInline, NicknameInline, MailerInline, NoteInline, RoleInline, TzInline, UrlInline, GeoInline]
+    inlines = [TelInline, EmailInline, AdrInline, TitleInline, AgentInline, CategoryInline, KeyInline, NicknameInline, MailerInline, NoteInline, RoleInline, TzInline, UrlInline, GeoInline]
 
     def get_urls(self):
         urls = super(VCardAdmin, self).get_urls()
