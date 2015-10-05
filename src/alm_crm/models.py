@@ -11,7 +11,6 @@ from alm_company.models import Company
 from alm_vcard.models import (
     VCard,
     BadVCardError,
-    Org,
     Title,
     Tel,
     Email,
@@ -516,9 +515,10 @@ class Contact(SubscriptionObject):
                         }
                     )
                 if data[i][5]:
-                    org = Org(vcard=v)
-                    org.organization_name = data[i][5].decode('utf-8')
-                    org.save()
+                    # org = Org(vcard=v)
+                    # org.organization_name = data[i][5].decode('utf-8')
+                    # org.save()
+                    pass
                 if data[i][6]:
                     title = Title(vcard=v)
                     title.data = data[i][6].decode('utf-8')
