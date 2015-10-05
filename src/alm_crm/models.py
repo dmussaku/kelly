@@ -290,7 +290,7 @@ class Contact(SubscriptionObject):
 
     def create_share_to(self, user_id, company_id, note=None):
         default_note = self.SHARE_IMPORTED_TEXT + \
-            self.date_created.strftime(settings.DATETIME_FORMAT_NORMAL)
+            date_created.strftime(settings.DATETIME_FORMAT_NORMAL)
 
         share = Share(
             note=note or default_note,
@@ -1502,6 +1502,7 @@ class Activity(SubscriptionObject):
     owner = models.ForeignKey(User, related_name='activity_owner', null=True)
     mentions = generic.GenericRelation('Mention', null=True)
     comments = generic.GenericRelation('Comment', null=True)
+    attached_files = generic.GenericRelation('AttachedFile', null=True, blank=True)
     hashtags = generic.GenericRelation('HashTagReference', null=True, blank=True)
 
     class Meta:
@@ -1883,7 +1884,6 @@ class Comment(SubscriptionObject):
             content_type=cttype)
 
 
-
 class CommentRecipient(SubscriptionObject):
     comment = models.ForeignKey(Comment, related_name='recipients')
     user = models.ForeignKey(User, related_name='comments')
@@ -1898,6 +1898,45 @@ class CommentRecipient(SubscriptionObject):
 
     def __unicode__(self):
         return u'Comment: %s' % self.pk or 'Unknown'
+
+
+class AttachedFile(SubscriptionObject):
+    file_object = models.ForeignKey('almastorage.SwiftFile', related_name='attachments')
+    owner = models.ForeignKey(User, related_name='owned_attachments', null=True)
+    content_type = models.ForeignKey(ContentType, null=True, blank=True)
+    object_id = models.IntegerField(null=True, blank=True)
+    content_object = generic.GenericForeignKey('content_type', 'object_id')
+
+    def __unicode__(self):
+        return "%s %s" % (self.file_object, self.content_object)
+
+    @property
+    def author(self):
+        return self.owner
+
+    @property
+    def is_active(self):
+        if self.content_object == None:
+            return False
+        
+        return True
+
+    @classmethod
+    def build_new(cls, file_object, owner, company_id, content_class=None,
+                  object_id=None, save=False):
+        attached_file = cls(file_object=file_object, owner=owner, company_id=company_id)
+        attached_file.content_type = ContentType.objects.get_for_model(content_class)
+        attached_file.object_id = object_id
+        if save:
+            attached_file.save()
+        return attached_file
+
+
+def delete_related_file_objs(sender, instance, **kwargs):
+    file_obj = instance.file_object
+    file_obj.delete()
+
+signals.post_delete.connect(delete_related_file_objs, sender=AttachedFile)
 
 
 class Share(SubscriptionObject):

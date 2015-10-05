@@ -8,12 +8,13 @@ import os
 import json
 import itertools
 from django.conf import settings
-from alm_crm.models import Contact, ImportTask, ErrorCell, ContactList
+from alm_crm.models import Contact, ImportTask, ErrorCell, ContactList, AttachedFile
 from alm_vcard import models as vcard_models
 from alm_user.models import User
 from celery import group, result, chord, task
 import xlsxwriter
 from django.core.mail import send_mail, EmailMessage
+import logging
 
 TEMP_DIR = getattr(settings, 'TEMP_DIR')
 EMAIL_SUBJECT_PREFIX = getattr(settings, 'EMAIL_SUBJECT_PREFIX')
@@ -179,3 +180,21 @@ def finish_add_contacts(list_of_responses, filename, contact_list_name, import_t
         import_task.save()
         os.remove(filename)
         return import_task.id
+
+@app.task
+def cleanup_inactive_files():
+    logging.basicConfig(filename='files_cleanup.log', 
+                        format='%(asctime)s - %(levelname)s - %(message)s', 
+                        datefmt='%m/%d/%Y %I:%M:%S %p')
+    logging.info("Clean up started.")
+    inactive_files = filter(lambda file: not file.is_active, AttachedFile.objects.all())
+    for _file in inactive_files:
+        try:
+            filename = _file.file_object.filename
+            _file.delete()
+        except Exception as e:
+            logging.error("Error to delete file '%s': %s"%(filename, e.message))
+        else:
+            logging.info("File '%s' successfully deleted"%filename)
+
+    logging.info("Clean up finished.")

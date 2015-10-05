@@ -19,6 +19,7 @@ from .models import (
     HashTagReference,
     CustomSection,
     CustomField,
+    AttachedFile,
     CustomFieldValue,
     ImportTask,
     ErrorCell
@@ -64,6 +65,7 @@ from alm_vcard.api import (
     VCardUrlResource
     )
 from alm_vcard.models import *
+from almastorage.models import SwiftFile
 from almanet.settings import DEFAULT_SERVICE
 from almanet.settings import TIME_ZONE
 from almanet.utils.api import RequestContext, SessionAuthentication
@@ -111,6 +113,7 @@ from .tasks import grouped_contact_import_task, check_task_status
 from almanet.middleware import GetSubdomainMiddleware
 import time
 
+CRM_CONTAINER_TITLE = 'CRM_FILES'
 
 def _firstOfQuerySet(queryset):
     try :
@@ -2266,6 +2269,14 @@ class ActivityResource(CRMServiceModelResource):
 
     def dehydrate(self, bundle):
         bundle.data['has_read'] = self._has_read(bundle, bundle.request.user.id)
+        files = []
+        for attached_file in bundle.obj.attached_files.all():
+            files.append({
+                            'file_id':attached_file.id,
+                            'filename':attached_file.file_object.filename,
+                            'swiftfile_id':attached_file.file_object.id
+                        })
+        bundle.data['attached_files'] = files
 
         # send updated contact (status was changed to LEAD)
         if bundle.data.get('obj_created'):
@@ -2452,6 +2463,13 @@ class ActivityResource(CRMServiceModelResource):
         if 'need_preparation' in bundle.data:
             act.need_preparation = bundle.data.get('need_preparation')
         act.save()
+
+        if 'files' in bundle.data:
+            for file_data in bundle.data['files']:
+                att_file = AttachedFile.objects.get(id=file_data['file_id'])
+                att_file.object_id = act.id
+                att_file.save()
+
         text_parser(base_text=act.description, content_class=act.__class__,
                     object_id=act.id, company_id = bundle.request.company.id)
         subdomain = bundle.request.subdomain
@@ -2474,6 +2492,11 @@ class ActivityResource(CRMServiceModelResource):
             if bundle.obj.company_id == None:
                 bundle.obj.company_id = bundle.request.company.id
         bundle.obj.save()
+        if 'files' in bundle.data:
+            for file_data in bundle.data['files']:
+                att_file = AttachedFile.objects.get(id=file_data['file_id'])
+                att_file.object_id = bundle.obj.id
+                att_file.save()
         text_parser(base_text=bundle.obj.description, content_class=bundle.obj.__class__,
                     object_id=bundle.obj.id, company_id = bundle.request.company.id)
         return bundle
@@ -2918,6 +2941,77 @@ class MentionResource(CRMServiceModelResource):
     class Meta(CommonMeta):
         queryset = Mention.objects.all()
         resource_name = 'mention'
+
+
+class AttachedFileResource(CRMServiceModelResource):
+    '''
+    ALL Method
+    I{URL}:  U{alma.net/api/v1/attached_file/}
+
+    B{Description}:
+    API resource to manage Attached Files
+    (GenericRelation with Activity)
+
+    @undocumented: Meta
+    '''
+    content_object = GenericForeignKeyField({
+        Activity: ActivityResource
+    }, 'content_object')
+
+    swiftfile_id = fields.IntegerField(attribute='file_object_id', readonly=True)
+
+    class Meta(CommonMeta):
+        queryset = AttachedFile.objects.all()
+        resource_name = 'files'
+        always_return_data = True
+
+    def prepend_urls(self):
+        return [
+            url(
+                r"^(?P<resource_name>%s)/attach%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('attach_file'),
+                name='api_attach_file'
+            )
+        ]
+
+    def deserialize(self, request, data, format=None):
+        if not format:
+            format = request.META.get('CONTENT_TYPE', 'application/json')
+
+        if format.startswith('multipart'):
+            data = request.POST.copy()
+            return data
+
+        return super(self.__class__, self).deserialize(request, data, format)
+
+    def attach_file(self, request, **kwargs):
+        with RequestContext(self, request, allowed_methods=['post']):
+            data = self.deserialize(request, request.body, format=request.META.get('CONTENT_TYPE', 'application/json'))
+            try:
+                swiftfile = SwiftFile.upload_file(file_contents=request.FILES['file'],
+                                                    filename=data['name'], 
+                                                    content_type=data['type'], 
+                                                    container_title = CRM_CONTAINER_TITLE,
+                                                    filesize=data['size'])
+            except Exception as e:
+                return http.HttpApplicationError(e.message)
+
+            attached_file = AttachedFile.build_new(file_object=swiftfile, 
+                                                owner=request.user,
+                                                company_id=request.company.id,
+                                                content_class=ContentType.objects.get(app_label='alm_crm', 
+                                                    model=data['content_class'].lower()).model_class(),
+                                                object_id=None,
+                                                save=True)
+
+            return self.create_response(request,
+                                        {
+                                            'file_id': attached_file.id, 
+                                            'swiftfile_id': swiftfile.id,
+                                            'filename': data['name']
+                                        }, 
+                                        response_class=http.HttpCreated)
 
 
 class ContactListResource(CRMServiceModelResource):

@@ -8,6 +8,7 @@ from timezone_field import TimeZoneField
 from almanet.models import Subscription
 from alm_vcard.models import VCard, Email
 
+from almastorage.utils import default_file
 from datetime import datetime
 import hmac
 import uuid
@@ -100,7 +101,6 @@ class Account(models.Model):
         return hmac.new(new_uuid.bytes, digestmod=sha1).hexdigest()
 
 
-
 class UserManager(contrib_user_manager):
     @classmethod
     def create_user(self, first_name, last_name, is_admin=False):
@@ -126,8 +126,8 @@ class User(AbstractBaseUser):
     # is_admin = models.BooleanField(default=False)
 
     vcard = models.OneToOneField(VCard, blank=True, null=True)
-    userpic = models.ImageField(upload_to='userpics')
-
+    userpic_obj = models.ForeignKey('almastorage.SwiftFile', related_name='users', 
+                                default=lambda: default_file.set_file('default_userpic.png', 'image', container_title='CRM_USERPICS').id)
     date_created = models.DateTimeField(auto_now_add=True, blank=True)
     date_edited = models.DateTimeField(auto_now=True, blank=True)
 
