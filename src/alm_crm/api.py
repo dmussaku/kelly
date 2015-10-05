@@ -3038,13 +3038,14 @@ class AttachedFileResource(CRMServiceModelResource):
                 swiftfile = SwiftFile.upload_file(file_contents=request.FILES['file'],
                                                     filename=data['name'], 
                                                     content_type=data['type'], 
-                                                    author=request.user)
+                                                    filesize=data['size'])
             except Exception as e:
                 return http.HttpApplicationError(e.message)
 
-            attached_file = AttachedFile.build_new( file_object=swiftfile, 
+            attached_file = AttachedFile.build_new(file_object=swiftfile, 
+                                                owner=request.user.get_crmuser(),
                                                 content_class=ContentType.objects.get(app_label='alm_crm', 
-                                                model=data['content_class'].lower()).model_class(),
+                                                    model=data['content_class'].lower()).model_class(),
                                                 object_id=None,
                                                 save=True)
 

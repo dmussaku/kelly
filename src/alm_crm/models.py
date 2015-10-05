@@ -2142,9 +2142,9 @@ class AttachedFile(SubscriptionObject):
         return True
 
     @classmethod
-    def build_new(cls, file_object, content_class=None,
+    def build_new(cls, file_object, owner, content_class=None,
                   object_id=None, save=False):
-        attached_file = cls(file_object=file_object)
+        attached_file = cls(file_object=file_object, owner=owner)
         attached_file.content_type = ContentType.objects.get_for_model(content_class)
         attached_file.object_id = object_id
         if save:

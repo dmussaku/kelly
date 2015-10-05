@@ -156,7 +156,7 @@ class UserResource(ModelResource):
             # file_contents = SimpleUploadedFile("%s" %(data['name']), base64.b64decode(data['pic']), content_type='image')
             # request.user.userpic.save(data['name'], file_contents, True)
             swiftfile = SwiftFile.upload_file(file_contents=base64.b64decode(data['pic']), filename=data['name'], 
-                                                content_type='image', author=request.user, container_title='userpics')
+                                                content_type='image', container_title='userpics')
             request.user.userpic_obj = swiftfile
             request.user.save()
             raise ImmediateHttpResponse(
