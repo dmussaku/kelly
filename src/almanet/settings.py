@@ -158,6 +158,7 @@ class BaseConfiguration(SubdomainConfiguration, Configuration):
         'django.contrib.sessions.middleware.SessionMiddleware',
         'django.contrib.messages.middleware.MessageMiddleware',
         'django.contrib.auth.middleware.AuthenticationMiddleware',
+        'django.middleware.gzip.GZipMiddleware',
         # 'almanet.middleware.AlmanetSessionMiddleware',
         # 'almanet.middleware.MyAuthenticationMiddleware',
     )

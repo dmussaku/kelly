@@ -1575,7 +1575,7 @@ class Activity(SubscriptionObject):
 
     @classmethod
     def get_filter_for_mobile(cls):
-        month = (datetime.now(pytz.timezone(settings.TIME_ZONE)) - timedelta(days=31))
+        month = (datetime.now(pytz.timezone(settings.TIME_ZONE)) - timedelta(days=7))
         return (
             Q(deadline__isnull=False, date_finished__isnull=True) |
             Q(deadline__isnull=False, date_finished__isnull=False, date_finished__gte=month) |
