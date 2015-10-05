@@ -1,6 +1,6 @@
 from contextlib import contextmanager
 from django.middleware.csrf import _sanitize_token, constant_time_compare
-from tastypie.authentication import Authentication, MultiAuthentication, ApiKeyAuthentication
+from tastypie.authentication import Authentication, MultiAuthentication, ApiKeyAuthentication, BasicAuthentication
 from tastypie.authorization import Authorization
 from tastypie.constants import ALL, ALL_WITH_RELATIONS
 
@@ -90,7 +90,7 @@ class DummyPaginator(object):
 class CommonMeta:
     list_allowed_methods = ['get', 'post', 'patch']
     detail_allowed_methods = ['get', 'post', 'put', 'delete', 'patch']
-    authentication = MultiAuthentication(SessionAuthentication(), ApiKeyAuthentication())
+    authentication = MultiAuthentication(SessionAuthentication(), ApiKeyAuthentication(), BasicAuthentication())
     authorization = Authorization()
 
     if not settings.RUSTEM_SETTINGS:

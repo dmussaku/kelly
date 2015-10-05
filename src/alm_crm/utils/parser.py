@@ -10,6 +10,9 @@ from alm_crm.models import (
 	Share,
 	)
 
+MENTION_PARSER = re.compile('\B@\[[0-9]*\:')
+HASHTAG_PARSER = re.compile(u'\B#\w*[а-яА-ЯёЁa-zA-Z]+\w*', re.U)
+
 
 def text_parser(base_text, company_id, content_class=None, object_id=None):
 	if base_text == None or base_text == "":
@@ -17,11 +20,8 @@ def text_parser(base_text, company_id, content_class=None, object_id=None):
 		
 	content_type =  ContentType.objects.get_for_model(content_class)
 
-	hashtag_parser = re.compile(u'\B#\w*[а-яА-ЯёЁa-zA-Z]+\w*', re.U)
-	mention_parser = re.compile('\B@\[[0-9]*\:')
-
-	hashtags = hashtag_parser.findall(base_text)
-	mentions = mention_parser.findall(base_text)
+	hashtags = HASHTAG_PARSER.findall(base_text)
+	mentions = MENTION_PARSER.findall(base_text)
 
 	# delete hashtags and mention references in case of editing objects
 	# content_class.objects.get(id=object_id).hashtags.clear()

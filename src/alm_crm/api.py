@@ -95,7 +95,7 @@ from datetime import datetime, timedelta
 import dateutil.parser
 import pytz
 
-from .utils.parser import text_parser
+from .utils.parser import HASHTAG_PARSER, MENTION_PARSER, text_parser
 from .utils import report_builders
 from .utils.data_processing import (
     processing_custom_field_data,
@@ -3388,6 +3388,12 @@ class AppStateResource(Resource):
                 self.wrap_view('get_session'),
                 name='api_get_session'
             ),
+            url(
+                r"^(?P<resource_name>%s)/(?P<slug>\w+)/search%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('search'),
+                name='api_search'
+            ),
         ]
 
     def obj_get(self, bundle, **kwargs):
@@ -3532,6 +3538,87 @@ class AppStateResource(Resource):
         with RequestContext(self, request, allowed_methods=['get']):
             obj = AppStateObject(service_slug=kwargs['slug'], request=request)
             return self.create_response(request, {'objects': obj.get_session()}, response_class=http.HttpAccepted)
+
+    def search(self, request, **kwargs):
+        '''
+        POST METHOD
+        I{URL}:  U{alma.net/api/v1/app_state/crm/search/}
+
+        Description:
+        This method returns list of object by specified search params
+
+        @return:  objects
+
+        >>> {
+        ...    "objects": {
+        ...        "activities":[],
+        ...        "contacts": [],
+        ...        "comments": [],
+        ...        "sales_cycles": []}
+        ... }
+
+        '''
+
+
+        with RequestContext(self, request, allowed_methods=['get']):
+            obj_dict = {'objects':{}}
+            search_query = request.GET.get('q', '')
+
+            if not search_query:
+                return self.create_response(request, obj_dict, response_class=http.HttpAccepted)
+
+            activities = []
+            shares = []
+            sales_cycles = []
+            all_references = []
+            hashtags = HASHTAG_PARSER.findall(search_query)
+            for hashtag in hashtags:
+                try:
+                    hashtag = HashTag.objects.get(text=hashtag, company_id=request.company.id)
+                    all_references.append(hashtag.references.all())
+                except HashTag.DoesNotExist:
+                    # если какого-то хэштега нет, значит не возможно найти такие объекты со всем указанными хэштегами
+                    # поэтому возвращаем пустой лист объектов
+                    return self.create_response(request, obj_dict, response_class=http.HttpAccepted)
+
+            masked_objects = []
+            for htr in all_references:
+                tmp = map(lambda x: '%s_%d' % (x.content_object.__class__.__name__, x.content_object.id), htr)
+                masked_objects.append(set(tmp))
+
+            result = set.intersection(*masked_objects)
+
+            for obj in result:
+                parts = obj.split('_')
+                class_name = parts[0]
+                id = parts[1]
+
+                if class_name == 'Activity':
+                    activity = Activity.objects.get(id=id)
+                    activities.append(activity)
+                    if activity.sales_cycle not in sales_cycles:
+                        sales_cycles.append(activity.sales_cycle)
+                elif class_name == 'Share':
+                    share = Share.objects.get(id=id)
+                    shares.append(share)
+
+            
+            if activities:
+                activity_resource = ActivityResource()
+                obj_dict['objects']['activities'] = \
+                    activity_resource.get_bundle_list(activities, request)
+
+            if shares:
+                share_resource = ShareResource()
+                shares_list = []
+                for share in shares:
+                    if share.share_to == request.user:
+                        shares_list.append(share)
+
+                obj_dict['objects']['shares'] = \
+                    share_resource.get_bundle_list(shares_list, request)
+
+            return self.create_response(request, obj_dict, response_class=http.HttpAccepted)
 
 
 class MobileStateObject(object):
@@ -3693,86 +3780,6 @@ class HashTagReferenceResource(CRMServiceModelResource):
     class Meta(CommonMeta):
         queryset = HashTagReference.objects.all()
         resource_name = 'hashtag_reference'
-
-
-    def prepend_urls(self):
-        return [
-            url(
-                r"^(?P<resource_name>%s)/search/(?P<pattern>\w+)%s$" %
-                (self._meta.resource_name, trailing_slash()),
-                self.wrap_view('search'),
-                name='api_search'
-            )]
-
-    def search(self, request, **kwargs):
-        '''
-        GET METHOD
-        I{URL}:  U{alma.net/api/v1/hashtag_reference/search/:hashtag/}
-
-        Description:
-        Api function to return Objects related with giver hashtag
-
-        @type  hashtag: string
-        @param hashtag: hashtag format string.
-
-        @return:  objects
-
-        >>> {
-        ...    "objects": {
-        ...        "activities":[],
-        ...        "contacts": [],
-        ...        "comments": [],
-        ...        "sales_cycles": []}
-        ... }
-
-        '''
-        try:
-            if not kwargs.get('pattern', None):
-                return http.HttpBadRequest()
-
-            hashtag = HashTag.objects.get(text='#'+kwargs.get('pattern', None))
-            activities = []
-            shares = []
-            comments = []
-            sales_cycles = []
-            for reference in hashtag.references.all():
-                if isinstance(reference.content_object, Activity):
-                    activities.append(reference.content_object)
-                    if reference.content_object.sales_cycle not in sales_cycles:
-                        sales_cycles.append(reference.content_object.sales_cycle)
-                elif isinstance(reference.content_object, Share):
-                    shares.append(reference.content_object)
-                elif isinstance(reference.content_object, Comment):
-                    comments.append(reference.content_object)
-
-            obj_dict = {'objects':{}}
-            if activities:
-                activity_resource = ActivityResource()
-                obj_dict['objects']['activities'] = \
-                    activity_resource.get_bundle_list(activities, request)
-
-            if shares:
-                share_resource = ShareResource()
-                shares_list = []
-                for share in shares:
-                    if share.share_to == request.user:
-                        shares_list.append(share)
-
-                obj_dict['objects']['shares'] = \
-                    share_resource.get_bundle_list(shares_list, request)
-
-            if comments:
-                comment_resource = CommentResource()
-                obj_dict['objects']['comments'] = \
-                    comment_resource.get_bundle_list(comments, request)
-
-            if sales_cycles:
-                salescycle_resource = SalesCycleResource()
-                obj_dict['objects']['sales_cycles'] = \
-                    salescycle_resource.get_bundle_list(sales_cycles, request)
-            return self.create_response(request, obj_dict, response_class=http.HttpAccepted)
-        except HashTag.DoesNotExist:
-            return http.HttpNotFound()
 
 
 class CustomSectionResource(CRMServiceModelResource):
