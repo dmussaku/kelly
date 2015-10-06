@@ -413,8 +413,8 @@ class ContactResource(CRMServiceModelResource):
             'owner', 'parent', 'vcard').prefetch_related(
                 'sales_cycles', 'children', 'share_set',
                 'vcard__tel_set', 'vcard__category_set',
-                'vcard__adr_set', 'vcard__title_set', 'vcard__url_set',
-                'vcard__org_set', 'vcard__email_set')
+                'vcard__adr_set', 'vcard__title_set', 
+                'vcard__url_set', 'vcard__email_set')
         resource_name = 'contact'
         filtering = {
             'status': ['exact'],
@@ -2081,6 +2081,7 @@ class MilestoneResource(CRMServiceModelResource):
                                         )],
                     response_class=http.HttpAccepted)
 
+
 class ActivityResource(CRMServiceModelResource):
     '''
     GET Method
@@ -2626,6 +2627,7 @@ class ProductResource(CRMServiceModelResource):
         if bundle.data.get('custom_fields', None):
             processing_custom_field_data(bundle.data['custom_fields'], bundle.obj)
         return bundle
+
 
 class ProductGroupResource(CRMServiceModelResource):
     '''
