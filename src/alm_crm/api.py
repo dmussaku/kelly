@@ -1464,7 +1464,6 @@ class ContactResource(CRMServiceModelResource):
             return self.create_response(
                 request, response
                 )
-        t = time.time()
         contact = ContactResource().full_dehydrate(
             ContactResource().build_bundle(
                 obj=response['contact'], request=request

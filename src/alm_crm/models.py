@@ -849,24 +849,18 @@ class Contact(SubscriptionObject):
         return cls.objects.filter(q).order_by('-date_created')
 
     def merge_contacts(self, alias_objects=[], delete_merged=True):
-        t = time.time()
         if not alias_objects:
             return {'success':False, 'message':'No alias objects appended'}
         for obj in alias_objects:
             if not isinstance(obj, self.__class__):
                 return {'success':False, 'message':'Not Instance of Contact'}
 
-        # original_sales_cycles = self.sales_cycles.filter(
-        #     is_global=False) 
-        # original_activities = [obj.id for obj in Activity.objects.filter(
-        #             sales_cycle__in=self.sales_cycles.all())] 
-        # original_shares = [ obj.id for obj in self.share_set.all() ]
         global_sales_cycle = SalesCycle.get_global(self.company_id, self.id)
         deleted_sales_cycle_ids = [ obj.sales_cycles.get(is_global=True).id for obj in alias_objects ]
-        # Merging sales Cycles
         activities = []
         sales_cycles = []
         shares = []
+        fn_list = [obj.vcard.fn for obj in alias_objects]
         try:
             note_data = self.vcard.note_set.last().data
         except:
@@ -886,15 +880,17 @@ class Contact(SubscriptionObject):
                         sales_cycle.contact = self
                         sales_cycle.save()
                         sales_cycles.append(sales_cycle)
-                        # [activities.append(obj) for obj in sales_cycle.rel_activities.all()]
+                if obj.children.all():
+                    for child in obj.children.all():
+                        self.children.add(child)
 
-        # Merging vcards
         VCard.merge_model_objects(self.vcard, [c.vcard for c in alias_objects])
         self.vcard.note_set.all().delete()
-        if note_data:
-            note = Note(data=note_data, vcard=self.vcard)
+        if note_data or fn_list:
+            note = Note(
+                data=','.join(map(str,fn_list)) + ' ' + note_data, 
+                vcard=self.vcard)
             note.save()
-        #mergin shares
         with transaction.atomic():
             for obj in alias_objects:
                 for share in obj.share_set.all():
@@ -906,11 +902,6 @@ class Contact(SubscriptionObject):
             alias_objects.delete()
         else:
             deleted_contacts = []
-        # sales_cycles = self.sales_cycles.all().exclude(
-        #     id__in=original_sales_cycles).prefetch_related('rel_activities')
-        # activities = Activity.objects.filter(
-        #     sales_cycle__in=self.sales_cycles.all()).exclude(id__in=original_activities)
-        # shares = self.share_set.all().exclude(id__in=original_shares)
         response = {
             'success':True,
             'contact':self,
@@ -920,7 +911,6 @@ class Contact(SubscriptionObject):
             'activities':activities,
             'shares':shares,
         }
-        # print "Approximate time of merging contacts %s " % str(time.time()-t)
         return response
 
 
