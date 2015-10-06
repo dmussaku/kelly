@@ -3675,10 +3675,15 @@ class AppStateResource(Resource):
                     # поэтому возвращаем пустой лист объектов
                     return self.create_response(request, obj_dict, response_class=http.HttpAccepted)
 
-            masked_objects = []
-            for htr in all_references:
-                tmp = map(lambda x: '%s_%d' % (x.content_object.__class__.__name__, x.content_object.id), htr)
-                masked_objects.append(set(tmp))
+            # превращает из списка списков с hashtag_reference'ами в список списков строчек с закодированнами объектами
+            # [[<HashTagReference: #almacloud>, <HashTagReference: #almacloud>]] => [['Activity_10', 'Activity_11']]
+            # это нужно для использования set.intersection
+            masked_objects = map(
+                lambda y: set(
+                    map(lambda x: '%s_%d' % (x.content_object.__class__.__name__, x.content_object.id), y)
+                ), 
+                all_references
+            )
 
             result = set.intersection(*masked_objects)
 
