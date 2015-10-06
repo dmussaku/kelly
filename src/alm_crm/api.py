@@ -644,9 +644,12 @@ class ContactResource(CRMServiceModelResource):
 
 
         bundle = self.full_hydrate(bundle, **kwargs)
+        old_parent = bundle.obj.parent
         company_id = bundle.request.company.id
         company_name = bundle.data.get('company_name',"").strip()
-        if company_name:
+        if (not company_name):
+            bundle.obj.parent = None
+        elif company_name:
             company = Contact.objects.filter(
                         vcard__fn=company_name, company_id=company_id, tp='co').first()
             if not company:
@@ -663,6 +666,8 @@ class ContactResource(CRMServiceModelResource):
         bundle.obj.save()
         contact = Contact.objects.get(id=bundle.obj.id)
         company = contact.parent
+        print contact
+        print company
 
         if bundle.data.get('custom_fields', None):
             processing_custom_field_data(bundle.data['custom_fields'], bundle.obj)
@@ -676,6 +681,15 @@ class ContactResource(CRMServiceModelResource):
                                 obj=company)
                             )
             contact_bundle.data['parent'] = company_bundle
+            if old_parent:
+                old_parent_bundle = self.full_dehydrate(
+                                self.build_bundle(
+                                    obj=old_parent
+                                    )
+                                )
+                contact_bundle.data['old_parent'] = old_parent_bundle
+            else:
+                contact_bundle.data['old_parent'] = None
         raise ImmediateHttpResponse(
             HttpResponse(
                 content=Serializer().to_json(

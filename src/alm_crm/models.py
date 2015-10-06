@@ -888,7 +888,7 @@ class Contact(SubscriptionObject):
         self.vcard.note_set.all().delete()
         if note_data or fn_list:
             note = Note(
-                data=','.join(map(str,fn_list)) + ' ' + note_data, 
+                data=', '.join(map(str,fn_list)) + ' ' + note_data, 
                 vcard=self.vcard)
             note.save()
         with transaction.atomic():
