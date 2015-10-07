@@ -30,26 +30,6 @@ from alm_vcard.api import (
     VCardResource,
     VCardEmailResource,
     VCardTelResource,
-    VCardOrgResource,
-    VCardGeoResource,
-    VCardAdrResource,
-    VCardAgentResource,
-    VCardCategoryResource,
-    VCardKeyResource,
-    VCardLabelResource,
-    VCardMailerResource,
-    VCardNicknameResource,
-    VCardNoteResource,
-    VCardRoleResource,
-    VCardTitleResource,
-    VCardTzResource,
-    VCardUrlResource
-    )
-from alm_vcard.api import (
-    VCardResource,
-    VCardEmailResource,
-    VCardTelResource,
-    VCardOrgResource,
     VCardGeoResource,
     VCardAdrResource,
     VCardAgentResource,
@@ -421,7 +401,7 @@ class ContactResource(CRMServiceModelResource):
         null=True, full=False, full_use_ids=True)
     parent = fields.ToOneField(
         'alm_crm.api.ContactResource', 'parent',
-        null=True, full=False
+        null=True, full=True
         )
 
     share = fields.ToOneField('alm_crm.api.ShareResource',
@@ -436,8 +416,8 @@ class ContactResource(CRMServiceModelResource):
             'owner', 'parent', 'vcard').prefetch_related(
                 'sales_cycles', 'children', 'share_set',
                 'vcard__tel_set', 'vcard__category_set',
-                'vcard__adr_set', 'vcard__title_set', 'vcard__url_set',
-                'vcard__org_set', 'vcard__email_set')
+                'vcard__adr_set', 'vcard__title_set', 
+                'vcard__url_set', 'vcard__email_set')
         resource_name = 'contact'
         filtering = {
             'status': ['exact'],
@@ -592,23 +572,56 @@ class ContactResource(CRMServiceModelResource):
         for key, value in kwargs.items():
             setattr(bundle.obj, key, value)
 
-
         bundle = self.full_hydrate(bundle)
+        company_id = bundle.request.company.id
+        company_name = bundle.data.get('company_name',"").strip()
+        if company_name:
+            company = Contact.objects.filter(
+                        vcard__fn=company_name, 
+                        company_id=company_id, 
+                        tp='co').first()
+            if not company:
+                company = bundle.obj.create_company_for_contact(company_name)
+                SalesCycle.create_globalcycle(
+                    **{
+                     'company_id':company_id,
+                     'owner_id':bundle.request.user.id,
+                     'contact_id':company.id
+                    }
+                )
+            else:
+                bundle.obj.parent = company
+        bundle.obj.save()
+        contact = Contact.objects.get(id=bundle.obj.id)
+        company = contact.parent
+
         if bundle.data.get('custom_fields', None):
             processing_custom_field_data(bundle.data['custom_fields'], bundle.obj)
-        new_bundle = self.full_dehydrate(
+        contact_bundle = self.full_dehydrate(
                         self.build_bundle(
-                            obj=Contact.objects.get(id=bundle.obj.id))
+                            obj=contact)
                         )
-        new_bundle.data['global_sales_cycle'] = SalesCycleResource().full_dehydrate(
+        contact_bundle.data['global_sales_cycle'] = SalesCycleResource().full_dehydrate(
                 SalesCycleResource().build_bundle(
                     obj=SalesCycle.objects.get(contact_id=bundle.obj.id)
                 )
             )
-        #return self.save(bundle, skip_errors=skip_errors)
+        if company:
+            company_bundle = self.full_dehydrate(
+                            self.build_bundle(
+                                obj=company)
+                            )
+            company_bundle.data['global_sales_cycle'] = SalesCycleResource().full_dehydrate(
+                    SalesCycleResource().build_bundle(
+                        obj=SalesCycle.objects.get(contact_id=company.id, is_global=True)
+                    )
+                )
+            contact_bundle.data['parent'] = company_bundle
         raise ImmediateHttpResponse(
             HttpResponse(
-                content=Serializer().to_json(new_bundle),
+                content=Serializer().to_json(
+                        contact_bundle
+                    ),
                 content_type='application/json; charset=utf-8', status=200
                 )
             )
@@ -634,21 +647,61 @@ class ContactResource(CRMServiceModelResource):
 
 
         bundle = self.full_hydrate(bundle, **kwargs)
-        #return self.save(bundle, skip_errors=skip_errors)
+        old_parent = bundle.obj.parent
+        company_id = bundle.request.company.id
+        company_name = bundle.data.get('company_name',"").strip()
+        if (not company_name):
+            bundle.obj.parent = None
+        elif company_name:
+            company = Contact.objects.filter(
+                        vcard__fn=company_name, company_id=company_id, tp='co').first()
+            if not company:
+                company = bundle.obj.create_company_for_contact(company_name)
+                SalesCycle.create_globalcycle(
+                    **{
+                     'company_id':company_id,
+                     'owner_id':bundle.request.user.id,
+                     'contact_id':company.id
+                    }
+                )
+            else:
+                bundle.obj.parent = company
+        bundle.obj.save()
+        contact = Contact.objects.get(id=bundle.obj.id)
+        company = contact.parent
+
         if bundle.data.get('custom_fields', None):
             processing_custom_field_data(bundle.data['custom_fields'], bundle.obj)
+        contact_bundle = self.full_dehydrate(
+                        self.build_bundle(
+                            obj=contact)
+                        )
+        if company:
+            company_bundle = self.full_dehydrate(
+                            self.build_bundle(
+                                obj=company)
+                            )
+            contact_bundle.data['parent'] = company_bundle
+            if old_parent:
+                old_parent_bundle = self.full_dehydrate(
+                                self.build_bundle(
+                                    obj=old_parent
+                                    )
+                                )
+                contact_bundle.data['old_parent'] = old_parent_bundle
+            else:
+                contact_bundle.data['old_parent'] = None
         raise ImmediateHttpResponse(
             HttpResponse(
                 content=Serializer().to_json(
-                    self.full_dehydrate(
-                        self.build_bundle(
-                            obj=Contact.objects.get(id=bundle.obj.id))
-                        )
+                        contact_bundle
                     ),
                 content_type='application/json; charset=utf-8', status=200
                 )
             )
         return bundle
+
+        #return self.save(bundle, skip_errors=skip_errors)
 
     def full_dehydrate(self, bundle, for_list=False):
         '''Custom representation of followers, assignees etc.'''
@@ -716,8 +769,8 @@ class ContactResource(CRMServiceModelResource):
         the json that has been submitted. So if the attribute is there
         then i use bundle.obj and setattr of current field_name to whatever
         i got in a json. If its missing then i just delete it.
-
         '''
+
         bundle = self.hydrate_sales_cycles(bundle)
         bundle = self.hydrate_parent(bundle)
         if bundle.data.get('user_id', ""):
@@ -1426,7 +1479,6 @@ class ContactResource(CRMServiceModelResource):
             return self.create_response(
                 request, response
                 )
-        t = time.time()
         contact = ContactResource().full_dehydrate(
             ContactResource().build_bundle(
                 obj=response['contact'], request=request
@@ -1459,6 +1511,8 @@ class ContactResource(CRMServiceModelResource):
                  'contact':contact,
                  'deleted_contacts_ids':response['deleted_contacts_ids'],
                  'deleted_sales_cycle_ids':response['deleted_sales_cycle_ids'],
+                 'parent_dict': response['parent_dict'],
+                 'children_dict': response['children_dict'],
                  'sales_cycles':sales_cycles,
                  'activities':activities,
                  'shares':shares,
@@ -2043,6 +2097,7 @@ class MilestoneResource(CRMServiceModelResource):
                                         )],
                     response_class=http.HttpAccepted)
 
+
 class ActivityResource(CRMServiceModelResource):
     '''
     GET Method
@@ -2514,7 +2569,7 @@ class ProductResource(CRMServiceModelResource):
     @undocumented: Meta
     '''
     owner_id = fields.IntegerField(attribute='author_id', null=True)
-#    sales_cycles = fields.ToManyField(SalesCycleResource, 'sales_cycles', readonly=True)
+    # sales_cycles = fields.ToManyField(SalesCycleResource, 'sales_cycles', readonly=True)
 
     class Meta(CommonMeta):
         queryset = Product.objects.all().prefetch_related('custom_field_values')
@@ -2608,6 +2663,7 @@ class ProductResource(CRMServiceModelResource):
         if bundle.data.get('custom_fields', None):
             processing_custom_field_data(bundle.data['custom_fields'], bundle.obj)
         return bundle
+
 
 class ProductGroupResource(CRMServiceModelResource):
     '''

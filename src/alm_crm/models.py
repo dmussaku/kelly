@@ -11,7 +11,6 @@ from alm_company.models import Company
 from alm_vcard.models import (
     VCard,
     BadVCardError,
-    Org,
     Title,
     Tel,
     Email,
@@ -125,7 +124,7 @@ class Contact(SubscriptionObject):
     vcard = models.OneToOneField('alm_vcard.VCard', blank=True, null=True,
                                  on_delete=models.SET_NULL, related_name='contact')
     parent = models.ForeignKey(
-        'Contact', blank=True, null=True, related_name='children')
+        'Contact', blank=True, null=True, related_name='children', on_delete=models.SET_NULL)
     owner = models.ForeignKey(
         User, related_name='owned_contacts',
         null=True)
@@ -183,13 +182,13 @@ class Contact(SubscriptionObject):
     def email_work(self):
         return self.email(type='INTERNET')
 
-    def company(self):
-        if not self.vcard:
-            return _('Unknown organization')
-        org = self.vcard.org_set.first()
-        if not org:
-            return _('Unknown organization')
-        return org.name
+    # def company(self):
+    #     if not self.vcard:
+    #         return _('Unknown organization')
+    #     org = self.vcard.org_set.first()
+    #     if not org:
+    #         return _('Unknown organization')
+    #     return org.name
 
     def get_tp(self):
         return dict(self.TYPES_OPTIONS).get(self.tp, None)
@@ -247,6 +246,22 @@ class Contact(SubscriptionObject):
     @classmethod
     def share_contact(cls, share_from, share_to, contact_id, company_id, comment=None):
         return cls.share_contacts(share_from, share_to, [contact_id], company_id, comment)
+
+    def create_company_for_contact(self, company_name):
+        with transaction.atomic():
+            vcard = VCard(fn=company_name)
+            vcard.save()
+            c = Contact(
+                tp='co',
+                vcard=vcard,
+                owner=self.owner,
+                company_id=self.company_id
+                )
+            c.save()
+            self.parent = c
+            self.save()
+            return c
+
 
     @classmethod
     def share_contacts(cls, share_from, share_to, contact_ids, company_id, comment=None):
@@ -500,9 +515,10 @@ class Contact(SubscriptionObject):
                         }
                     )
                 if data[i][5]:
-                    org = Org(vcard=v)
-                    org.organization_name = data[i][5].decode('utf-8')
-                    org.save()
+                    # org = Org(vcard=v)
+                    # org.organization_name = data[i][5].decode('utf-8')
+                    # org.save()
+                    pass
                 if data[i][6]:
                     title = Title(vcard=v)
                     title.data = data[i][6].decode('utf-8')
@@ -574,8 +590,12 @@ class Contact(SubscriptionObject):
         vcard.save()
         response = {}
         for structure_dict in file_structure:
+            company_name = ""
             col_num = int(structure_dict.get('num'))
-            model = getattr(vcard_models, structure_dict.get('model'))
+            if structure_dict.get('model') == 'Org':
+                model = 'Org'
+            else:
+                model = getattr(vcard_models, structure_dict.get('model'))
             if type(data[col_num].value) == float:
                 data[col_num].value = str(data[col_num].value)
             if model == vcard_models.VCard:
@@ -622,15 +642,16 @@ class Contact(SubscriptionObject):
                     response['error'] = True
                     response['error_col'] = col_num
                     return response
-            elif model == vcard_models.Org:
+            elif model == 'Org':
                 try:
                     if data[col_num].value:
                         objects = data[col_num].value.split(';')
                         for object in objects:
                             v_type = structure_dict.get('attr','')
-                            obj = model(organization_name = object)
-                            obj.vcard = vcard
-                            obj.save()
+                            company_name = object
+                            # obj = model(organization_name = object)
+                            # obj.vcard = vcard
+                            # obj.save()
                 except Exception as e:
                     print str(e) + 'at col {} at 633'.format(col_num)
                     # transaction.savepoint_rollback(sid)
@@ -694,8 +715,8 @@ class Contact(SubscriptionObject):
             response['error'] = True
             response['error_col'] = 0
             return response
-        if vcard.fn == 'Без Имени' and vcard.org_set.first():
-            vcard.fn = vcard.org_set.first().organization_name
+        if vcard.fn == 'Без Имени' and company_name:
+            vcard.fn = company_name
             vcard.save()
             contact.tp = 'co'
         elif vcard.fn == 'Без Имени' and vcard.email_set.first():
@@ -712,6 +733,28 @@ class Contact(SubscriptionObject):
                          'contact_id':contact.id
                         }
                     )
+        try:
+            if contact.vcard.fn != company_name:
+                company = Contact.objects.filter(
+                    tp='co',
+                    company_id=contact.company_id,
+                    vcard__fn=company_name
+                    ).first()
+                if company:
+                    contact.parent = company
+                    contact.save()
+                else:
+                    company = contact.create_company_for_contact(company_name)
+                    company.import_task = import_task
+                    company.save()
+                    SalesCycle.create_globalcycle(
+                            **{'company_id':company.company_id,
+                             'owner_id':creator.id,
+                             'contact_id':company.id
+                            }
+                        )
+        except:
+            pass
         return {'error':False, 'contact_id':contact.id}
 
     @classmethod
@@ -806,24 +849,25 @@ class Contact(SubscriptionObject):
         return cls.objects.filter(q).order_by('-date_created')
 
     def merge_contacts(self, alias_objects=[], delete_merged=True):
-        t = time.time()
         if not alias_objects:
             return {'success':False, 'message':'No alias objects appended'}
         for obj in alias_objects:
             if not isinstance(obj, self.__class__):
                 return {'success':False, 'message':'Not Instance of Contact'}
 
-        # original_sales_cycles = self.sales_cycles.filter(
-        #     is_global=False) 
-        # original_activities = [obj.id for obj in Activity.objects.filter(
-        #             sales_cycle__in=self.sales_cycles.all())] 
-        # original_shares = [ obj.id for obj in self.share_set.all() ]
         global_sales_cycle = SalesCycle.get_global(self.company_id, self.id)
         deleted_sales_cycle_ids = [ obj.sales_cycles.get(is_global=True).id for obj in alias_objects ]
-        # Merging sales Cycles
         activities = []
         sales_cycles = []
         shares = []
+        parent_dict = {}    # Dict of type contact.id:contact.parent.id
+        children_dict = {}  # Dict of type contact.id:contact.children.all()
+        fn_list = []
+        for obj in alias_objects:
+            if type(obj.vcard.fn)==unicode:
+                fn_list.append(obj.vcard.fn.encode('utf-8'))
+            else:
+                fn_list.append(obj.vcard.fn)
         try:
             note_data = self.vcard.note_set.last().data
         except:
@@ -831,6 +875,11 @@ class Contact(SubscriptionObject):
         for obj in alias_objects:
             if obj.vcard.note_set.all():
                 note_data += "\n" + obj.vcard.note_set.last().data
+        for alias_obj in alias_objects:
+            if alias_obj.parent:
+                parent_dict[alias_obj.id]=alias_obj.parent.id
+            if alias_obj.children.all():
+                children_dict[alias_obj.id] = [child.id for child in alias_obj.children.all()]
         with transaction.atomic():
             for obj in alias_objects:
                 for sales_cycle in obj.sales_cycles.all():
@@ -843,15 +892,17 @@ class Contact(SubscriptionObject):
                         sales_cycle.contact = self
                         sales_cycle.save()
                         sales_cycles.append(sales_cycle)
-                        # [activities.append(obj) for obj in sales_cycle.rel_activities.all()]
+                if obj.children.all():
+                    for child in obj.children.all():
+                        self.children.add(child)
 
-        # Merging vcards
         VCard.merge_model_objects(self.vcard, [c.vcard for c in alias_objects])
         self.vcard.note_set.all().delete()
-        if note_data:
-            note = Note(data=note_data, vcard=self.vcard)
+        if note_data or fn_list:
+            note = Note(
+                data=', '.join(map(str,fn_list)) + ' ' + note_data, 
+                vcard=self.vcard)
             note.save()
-        #mergin shares
         with transaction.atomic():
             for obj in alias_objects:
                 for share in obj.share_set.all():
@@ -863,21 +914,17 @@ class Contact(SubscriptionObject):
             alias_objects.delete()
         else:
             deleted_contacts = []
-        # sales_cycles = self.sales_cycles.all().exclude(
-        #     id__in=original_sales_cycles).prefetch_related('rel_activities')
-        # activities = Activity.objects.filter(
-        #     sales_cycle__in=self.sales_cycles.all()).exclude(id__in=original_activities)
-        # shares = self.share_set.all().exclude(id__in=original_shares)
         response = {
             'success':True,
             'contact':self,
             'deleted_contacts_ids':deleted_contacts,
             'deleted_sales_cycle_ids':deleted_sales_cycle_ids,
+            'parent_dict':parent_dict,
+            'children_dict':children_dict,
             'sales_cycles':sales_cycles,
             'activities':activities,
             'shares':shares,
         }
-        # print "Approximate time of merging contacts %s " % str(time.time()-t)
         return response
 
 
@@ -889,6 +936,8 @@ class Contact(SubscriptionObject):
         with transaction.atomic():
             objects = {
                 "contacts": [],
+                "parent_dict": {},
+                "children_dict": {},
                 "sales_cycles": [],
                 "activities": [],
                 "shares": [],
@@ -898,6 +947,10 @@ class Contact(SubscriptionObject):
                 try:
                     # print contact_id
                     obj = Contact.objects.get(id=contact_id)
+                    if obj.parent:
+                        objects['parent_dict'][obj.id]=obj.parent.id
+                    if obj.children:
+                        objects['children_dict'][obj.id] = [child.id for child in obj.children.all()]
                     objects['contacts'].append(contact_id)
                     objects['sales_cycles'] += list(obj.sales_cycles.all().values_list("id", flat=True))
                     for sales_cycle in obj.sales_cycles.all():

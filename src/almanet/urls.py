@@ -29,7 +29,7 @@ urlpatterns = patterns(
     
     # TODO: temp, needs to be deleted
     # url(r'^crm/', include('alm_crm.urls')),
-    url(r'^vcard/', include('alm_vcard.urls')),
+    # url(r'^vcard/', include('alm_vcard.urls')),
     url(r'^services/$', ServiceList.as_view(
         template_name='almanet/service/service_list.html'),
         name='service_list'),

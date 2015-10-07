@@ -39,8 +39,8 @@ class VCardResource(ModelResource):
                                 full=True)
     tels = fields.ToManyField('alm_vcard.api.VCardTelResource', 'tel_set',
                               related_name='vcard', null=True, full=True)
-    orgs = fields.ToManyField('alm_vcard.api.VCardOrgResource', 'org_set',
-                              related_name='vcard', null=True, full=True)
+    # orgs = fields.ToManyField('alm_vcard.api.VCardOrgResource', 'org_set',
+    #                           related_name='vcard', null=True, full=True)
     # geos = fields.ToManyField('alm_vcard.api.VCardGeoResource', 'geo_set',
     #                           related_name='vcard', null=True, full=True)
     adrs = fields.ToManyField('alm_vcard.api.VCardAdrResource', 'adr_set',
@@ -136,20 +136,6 @@ class VCardTelResource(VCardRelatedResource):
         queryset = Tel.objects.all()
         excludes = ['id', 'vcard', 'resource_uri']
         resource_name = 'vcard_tel'
-
-    def full_dehydrate(self, bundle, for_list=True):
-        bundle = super(self.__class__, self).full_dehydrate(bundle, for_list=True)
-        del bundle.data['vcard']
-        return bundle
-
-
-class VCardOrgResource(VCardRelatedResource):
-    vcard = fields.ForeignKey('alm_vcard.api.VCardResource', 'vcard')
-
-    class Meta(CommonMeta):
-        queryset = Org.objects.all()
-        excludes = ['id', 'vcard', 'resource_uri']
-        resource_name = 'vcard_org'
 
     def full_dehydrate(self, bundle, for_list=True):
         bundle = super(self.__class__, self).full_dehydrate(bundle, for_list=True)
