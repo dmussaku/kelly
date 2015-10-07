@@ -124,7 +124,8 @@ class Contact(SubscriptionObject):
     vcard = models.OneToOneField('alm_vcard.VCard', blank=True, null=True,
                                  on_delete=models.SET_NULL, related_name='contact')
     parent = models.ForeignKey(
-        'Contact', blank=True, null=True, related_name='children', on_delete=models.SET_NULL)
+        'Contact', blank=True, null=True, 
+        related_name='children', on_delete=models.SET_NULL)
     owner = models.ForeignKey(
         User, related_name='owned_contacts',
         null=True)
@@ -980,10 +981,6 @@ class Contact(SubscriptionObject):
             'vcard_id': self.vcard_id
         }
 
-    @classmethod
-    def before_save(cls, sender, instance, **kwargs):
-        print "%s %s" % (instance.pk, instance.children.all())
-        pass
 
     @classmethod
     def after_save(cls, sender, instance, **kwargs):
@@ -1035,7 +1032,6 @@ class Contact(SubscriptionObject):
         contact_raws = [c.serialize() for c in contact_qs]
         cache.set_many({build_key(cls._meta.model_name, contact_raw['id']): json.dumps(contact_raw, default=date_handler) for contact_raw in contact_raws})
 
-pre_save.connect(Contact.before_save, sender=Contact)
 post_save.connect(Contact.after_save, sender=Contact)
 post_delete.connect(Contact.after_delete, sender=Contact)
 
