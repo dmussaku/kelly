@@ -860,7 +860,14 @@ class Contact(SubscriptionObject):
         activities = []
         sales_cycles = []
         shares = []
-        fn_list = [obj.vcard.fn for obj in alias_objects]
+        parent_dict = {}    # Dict of type contact.id:contact.parent.id
+        children_dict = {}  # Dict of type contact.id:contact.children.all()
+        fn_list = []
+        for obj in alias_objects:
+            if type(obj.vcard.fn)==unicode:
+                fn_list.append(obj.vcard.fn.encode('utf-8'))
+            else:
+                fn_list.append(obj.vcard.fn)
         try:
             note_data = self.vcard.note_set.last().data
         except:
@@ -868,6 +875,13 @@ class Contact(SubscriptionObject):
         for obj in alias_objects:
             if obj.vcard.note_set.all():
                 note_data += "\n" + obj.vcard.note_set.last().data
+        for alias_obj in alias_objects:
+            print alias_objects
+            if alias_obj.parent:
+                parent_dict[alias_obj.id]=alias_obj.parent.id
+            if alias_obj.children.all():
+                children_dict[alias_obj.id] = [child.id for child in alias_obj.children.all()]
+                print children_dict
         with transaction.atomic():
             for obj in alias_objects:
                 for sales_cycle in obj.sales_cycles.all():
@@ -907,6 +921,8 @@ class Contact(SubscriptionObject):
             'contact':self,
             'deleted_contacts_ids':deleted_contacts,
             'deleted_sales_cycle_ids':deleted_sales_cycle_ids,
+            'parent_dict':parent_dict,
+            'children_dict':children_dict,
             'sales_cycles':sales_cycles,
             'activities':activities,
             'shares':shares,

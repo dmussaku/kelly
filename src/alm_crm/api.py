@@ -666,8 +666,6 @@ class ContactResource(CRMServiceModelResource):
         bundle.obj.save()
         contact = Contact.objects.get(id=bundle.obj.id)
         company = contact.parent
-        print contact
-        print company
 
         if bundle.data.get('custom_fields', None):
             processing_custom_field_data(bundle.data['custom_fields'], bundle.obj)
@@ -1510,6 +1508,8 @@ class ContactResource(CRMServiceModelResource):
                  'contact':contact,
                  'deleted_contacts_ids':response['deleted_contacts_ids'],
                  'deleted_sales_cycle_ids':response['deleted_sales_cycle_ids'],
+                 'parent_dict': response['parent_dict'],
+                 'children_dict': response['children_dict'],
                  'sales_cycles':sales_cycles,
                  'activities':activities,
                  'shares':shares,
