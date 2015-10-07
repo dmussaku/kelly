@@ -26,7 +26,7 @@ from django.core.cache import cache
 from django.db.models import signals, Q
 from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
-from django.db.models.signals import post_save, post_delete, pre_delete
+from django.db.models.signals import pre_save, post_save, post_delete, pre_delete
 from django.utils import timezone
 from datetime import datetime, timedelta
 import xlrd
@@ -972,7 +972,7 @@ class Contact(SubscriptionObject):
             'id': self.pk,
             'pk': self.pk,
             'owner': self.owner_id,
-            'parent_id': hasattr(self, 'parent_id') and self.parent_id or None,
+            'parent_id': self.parent_id,
             'children': [child.pk for child in self.children.all()],
             'sales_cycles': [cycle.pk for cycle in self.sales_cycles.all()],
             'status': self.status,
@@ -981,9 +981,13 @@ class Contact(SubscriptionObject):
         }
 
     @classmethod
+    def before_save(cls, sender, instance, **kwargs):
+        print "%s %s" % (instance.pk, instance.children.all())
+        pass
+
+    @classmethod
     def after_save(cls, sender, instance, **kwargs):
         cache.set(build_key(cls._meta.model_name, instance.pk), json.dumps(instance.serialize(), default=date_handler))
-    
         # TODO: each time when contact is updated vcard is recreated. So if it is the case then reinvalidate cache
         vcard = instance.vcard
         if vcard:
@@ -1031,7 +1035,7 @@ class Contact(SubscriptionObject):
         contact_raws = [c.serialize() for c in contact_qs]
         cache.set_many({build_key(cls._meta.model_name, contact_raw['id']): json.dumps(contact_raw, default=date_handler) for contact_raw in contact_raws})
 
-
+pre_save.connect(Contact.before_save, sender=Contact)
 post_save.connect(Contact.after_save, sender=Contact)
 post_delete.connect(Contact.after_delete, sender=Contact)
 
