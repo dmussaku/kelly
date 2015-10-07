@@ -124,7 +124,7 @@ class Contact(SubscriptionObject):
     vcard = models.OneToOneField('alm_vcard.VCard', blank=True, null=True,
                                  on_delete=models.SET_NULL, related_name='contact')
     parent = models.ForeignKey(
-        'Contact', blank=True, null=True, related_name='children')
+        'Contact', blank=True, null=True, related_name='children', on_delete=models.SET_NULL)
     owner = models.ForeignKey(
         User, related_name='owned_contacts',
         null=True)
@@ -922,6 +922,8 @@ class Contact(SubscriptionObject):
         with transaction.atomic():
             objects = {
                 "contacts": [],
+                "parent_dict": {},
+                "children_dict": {},
                 "sales_cycles": [],
                 "activities": [],
                 "shares": [],
@@ -931,6 +933,10 @@ class Contact(SubscriptionObject):
                 try:
                     # print contact_id
                     obj = Contact.objects.get(id=contact_id)
+                    if obj.parent:
+                        objects['parent_dict'][obj.id]=obj.parent.id
+                    if obj.children:
+                        objects['children_dict'][obj.id] = [child.id for child in obj.children.all()]
                     objects['contacts'].append(contact_id)
                     objects['sales_cycles'] += list(obj.sales_cycles.all().values_list("id", flat=True))
                     for sales_cycle in obj.sales_cycles.all():
