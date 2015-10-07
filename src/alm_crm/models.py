@@ -876,12 +876,10 @@ class Contact(SubscriptionObject):
             if obj.vcard.note_set.all():
                 note_data += "\n" + obj.vcard.note_set.last().data
         for alias_obj in alias_objects:
-            print alias_objects
             if alias_obj.parent:
                 parent_dict[alias_obj.id]=alias_obj.parent.id
             if alias_obj.children.all():
                 children_dict[alias_obj.id] = [child.id for child in alias_obj.children.all()]
-                print children_dict
         with transaction.atomic():
             for obj in alias_objects:
                 for sales_cycle in obj.sales_cycles.all():
