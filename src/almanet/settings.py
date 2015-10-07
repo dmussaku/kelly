@@ -246,7 +246,7 @@ class BaseConfiguration(SubdomainConfiguration, Configuration):
         "django.contrib.auth.context_processors.auth",
         'almanet.context_processors.available_subdomains',
         'almanet.context_processors.misc',
-        'almanet.context_processors.get_vcard_upload_form',
+        # 'almanet.context_processors.get_vcard_upload_form',
         # 'launch.context_processors.launch',
     )
 
