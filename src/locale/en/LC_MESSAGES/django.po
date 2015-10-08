@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-09-24 19:54+0600\n"
+"POT-Creation-Date: 2015-10-08 16:24+0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -90,103 +90,103 @@ msgstr ""
 msgid "incorrect modifier"
 msgstr ""
 
-#: alm_crm/models.py:1017
+#: alm_crm/models.py:1018
 msgid "product name"
 msgstr ""
 
-#: alm_crm/models.py:1018
+#: alm_crm/models.py:1019
 msgid "product description"
 msgstr ""
 
-#: alm_crm/models.py:1029
+#: alm_crm/models.py:1030
 msgid "product"
 msgstr ""
 
-#: alm_crm/models.py:1122
+#: alm_crm/models.py:1123
 msgid "product_group"
 msgstr ""
 
-#: alm_crm/models.py:1131
+#: alm_crm/models.py:1132
 msgid "New"
 msgstr ""
 
-#: alm_crm/models.py:1132
+#: alm_crm/models.py:1133
 msgid "Pending"
 msgstr ""
 
-#: alm_crm/models.py:1133
+#: alm_crm/models.py:1134
 msgid "Completed"
 msgstr ""
 
-#: alm_crm/models.py:1474
+#: alm_crm/models.py:1475
 msgid "Milestone change"
 msgstr ""
 
-#: alm_crm/models.py:1475
+#: alm_crm/models.py:1476
 msgid "Milestone edited"
 msgstr ""
 
-#: alm_crm/models.py:1476
+#: alm_crm/models.py:1477
 msgid "Milestone deleted"
 msgstr ""
 
-#: alm_crm/models.py:1477
+#: alm_crm/models.py:1478
 msgid "Products changed"
 msgstr ""
 
-#: alm_crm/models.py:1478
+#: alm_crm/models.py:1479
 msgid "Success close"
 msgstr ""
 
-#: alm_crm/models.py:1479
+#: alm_crm/models.py:1480
 msgid "Fail close"
 msgstr ""
 
-#: alm_crm/models.py:2015
+#: alm_crm/models.py:2043
 msgid "contact_list"
 msgstr ""
 
-#: alm_crm/models.py:2086
+#: alm_crm/models.py:2114
 msgid "sales_cycle_product_stat"
 msgstr ""
 
-#: alm_crm/models.py:2095
+#: alm_crm/models.py:2123
 msgid "all"
 msgstr ""
 
-#: alm_crm/models.py:2096
+#: alm_crm/models.py:2124
 msgid "recent"
 msgstr ""
 
-#: alm_crm/models.py:2097
+#: alm_crm/models.py:2125
 msgid "cold"
 msgstr ""
 
-#: alm_crm/models.py:2098
+#: alm_crm/models.py:2126
 msgid "lead"
 msgstr ""
 
-#: alm_crm/models.py:2106
+#: alm_crm/models.py:2134
 msgid "filter"
 msgstr ""
 
-#: alm_crm/models.py:2124
+#: alm_crm/models.py:2150
 msgid "hashtag"
 msgstr ""
 
-#: alm_crm/models.py:2141
+#: alm_crm/models.py:2169
 msgid "hashtag_reference"
 msgstr ""
 
-#: alm_crm/models.py:2172
+#: alm_crm/models.py:2200
 msgid "custom_section"
 msgstr ""
 
-#: alm_crm/models.py:2194
+#: alm_crm/models.py:2222
 msgid "custom_field"
 msgstr ""
 
-#: alm_crm/models.py:2231
+#: alm_crm/models.py:2259
 msgid "custom_field_value"
 msgstr ""
 
@@ -255,23 +255,35 @@ msgstr ""
 msgid "Enter valid old password."
 msgstr ""
 
-#: alm_user/models.py:108
+#: alm_user/models.py:118
+msgid "ru-RU"
+msgstr ""
+
+#: alm_user/models.py:119
+msgid "en-US"
+msgstr ""
+
+#: alm_user/models.py:121
 msgid "first name"
 msgstr ""
 
-#: alm_user/models.py:110
+#: alm_user/models.py:123
 msgid "last name"
 msgstr ""
 
-#: alm_user/models.py:111
+#: alm_user/models.py:124
 msgid "email address"
 msgstr ""
 
-#: alm_user/models.py:127
+#: alm_user/models.py:129
+msgid "language"
+msgstr ""
+
+#: alm_user/models.py:144
 msgid "user"
 msgstr ""
 
-#: alm_user/models.py:252
+#: alm_user/models.py:300
 msgid "referral"
 msgstr ""
 
@@ -335,7 +347,7 @@ msgstr ""
 
 #: alm_user/templates/user/login-register.html:9
 #: alm_user/templates/user/registration.html:9
-#: alm_user/templates/user/user_login.html:10
+#: alm_user/templates/user/user_login.html:10 templates/index2.html:115
 msgid "Sign in"
 msgstr "Логин"
 
@@ -899,6 +911,205 @@ msgstr ""
 #: almanet/utils/gcal.py:49
 #, python-format
 msgid "Activity was created at %(cycle)s for contact %(contact)s."
+msgstr ""
+
+#: templates/index2.html:108
+msgid "Main"
+msgstr ""
+
+#: templates/index2.html:110
+msgid "Plans"
+msgstr ""
+
+#: templates/index2.html:112 templates/index2.html.py:326
+#: templates/index2.html:340 templates/index2.html.py:392
+msgid "Contacts"
+msgstr ""
+
+#: templates/index2.html:128
+msgid "Selling - is our mission!"
+msgstr ""
+
+#: templates/index2.html:136
+msgid "Your email"
+msgstr ""
+
+#: templates/index2.html:139 templates/index2.html.py:306
+msgid "Try service"
+msgstr ""
+
+#: templates/index2.html:156
+msgid "Will increase your sales capacity through:"
+msgstr ""
+
+#: templates/index2.html:160
+msgid "Goals"
+msgstr ""
+
+#: templates/index2.html:161
+msgid "Set the goal and prepare and develop financial and sales plan"
+msgstr ""
+
+#: templates/index2.html:165
+msgid "Product"
+msgstr ""
+
+#: templates/index2.html:166
+msgid "Identifying the ideal product/client sales channels"
+msgstr ""
+
+#: templates/index2.html:170
+msgid "Reports"
+msgstr ""
+
+#: templates/index2.html:171
+msgid "Implement KPI and Reports with ALMASALES"
+msgstr ""
+
+#: templates/index2.html:175
+msgid "Tools"
+msgstr ""
+
+#: templates/index2.html:176
+msgid "Strengthen sales instruments"
+msgstr ""
+
+#: templates/index2.html:185
+msgid "Our capabilites"
+msgstr ""
+
+#: templates/index2.html:186
+msgid "Check out what Almasales can do for your business"
+msgstr ""
+
+#: templates/index2.html:198
+msgid "Client database and map"
+msgstr ""
+
+#: templates/index2.html:199
+msgid "Activity management"
+msgstr ""
+
+#: templates/index2.html:200
+msgid "Products management"
+msgstr ""
+
+#: templates/index2.html:201
+msgid "Data warehouse"
+msgstr ""
+
+#: templates/index2.html:202
+msgid "Control orders"
+msgstr ""
+
+#: templates/index2.html:203
+msgid "Work planning"
+msgstr ""
+
+#: templates/index2.html:204
+msgid "Building sales strategy"
+msgstr ""
+
+#: templates/index2.html:205
+msgid "Forecasting sales"
+msgstr ""
+
+#: templates/index2.html:206
+msgid "Control of sales plan"
+msgstr ""
+
+#: templates/index2.html:207
+msgid "Adjusting KPI’s for sales managers"
+msgstr ""
+
+#: templates/index2.html:208
+msgid "Sales cycle analysis"
+msgstr ""
+
+#: templates/index2.html:209
+msgid "Marketing effectiveness analysis"
+msgstr ""
+
+#: templates/index2.html:210
+msgid "Business process standardization"
+msgstr ""
+
+#: templates/index2.html:226
+msgid "Be mobile"
+msgstr ""
+
+#: templates/index2.html:228
+msgid ""
+"Our mobile app allows you to stay connect to your sales department anywhere "
+"at any time."
+msgstr ""
+
+#: templates/index2.html:276
+msgid "The singularity of ALMASALES"
+msgstr ""
+
+#: templates/index2.html:278
+msgid ""
+"lies in its philosophy, including OKR methodology (Objectives and Key "
+"results), implemented by such companies as  Google, Facebook, Apple, LinkedIn"
+msgstr ""
+
+#: templates/index2.html:321
+msgid "Starters plan"
+msgstr ""
+
+#: templates/index2.html:323 templates/index2.html.py:337
+#: templates/index2.html:351
+msgid "month"
+msgstr ""
+
+#: templates/index2.html:325 templates/index2.html.py:339
+#: templates/index2.html:353
+msgid "Users"
+msgstr ""
+
+#: templates/index2.html:327 templates/index2.html.py:341
+#: templates/index2.html:355
+msgid "per user"
+msgstr ""
+
+#: templates/index2.html:328 templates/index2.html.py:342
+#: templates/index2.html:356
+msgid "First month is free"
+msgstr ""
+
+#: templates/index2.html:330 templates/index2.html.py:344
+#: templates/index2.html:358
+msgid "Choose plan"
+msgstr ""
+
+#: templates/index2.html:335
+msgid "Medium business"
+msgstr ""
+
+#: templates/index2.html:349
+msgid "Corporate business"
+msgstr ""
+
+#: templates/index2.html:354
+msgid "Unlimited"
+msgstr ""
+
+#: templates/index2.html:369
+msgid "We are always happy with your feedback"
+msgstr ""
+
+#: templates/index2.html:383
+msgid "Where to find us"
+msgstr ""
+
+#: templates/index2.html:384
+msgid ""
+"You can find us by address: Samal 1, house 1, Almaty, Kazakhstan 050010."
+msgstr ""
+
+#: templates/index2.html:422
+msgid "Subscribe"
 msgstr ""
 
 #: templates/layout.crm.html:63

@@ -18,8 +18,6 @@ except ImportError:
     import sha
     sha1 = sha.sha
 
-
-
 class AccountManager(contrib_user_manager):
     def create_user(self, email, password, user, company, is_supervisor=False):
         acc = Account(email=email, 
@@ -44,11 +42,14 @@ class Account(models.Model):
         'alm_crm.Contact', #related_name='followers',
         null=True, blank=True
         )
+    # language = models.CharField(max_length=2, 
+    #     choices=settings.LANGUAGE_CHOICES, default='ru')
     class Meta:
         verbose_name = 'account'
         db_table = settings.DB_PREFIX.format('account')
 
     objects = AccountManager()
+
 
     @property
     def is_staff(self):
