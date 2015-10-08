@@ -26,7 +26,7 @@ from django.core.cache import cache
 from django.db.models import signals, Q
 from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
-from django.db.models.signals import post_save, post_delete, pre_delete
+from django.db.models.signals import pre_save, post_save, post_delete, pre_delete
 from django.utils import timezone
 from datetime import datetime, timedelta
 import xlrd
@@ -124,7 +124,8 @@ class Contact(SubscriptionObject):
     vcard = models.OneToOneField('alm_vcard.VCard', blank=True, null=True,
                                  on_delete=models.SET_NULL, related_name='contact')
     parent = models.ForeignKey(
-        'Contact', blank=True, null=True, related_name='children', on_delete=models.SET_NULL)
+        'Contact', blank=True, null=True, 
+        related_name='children', on_delete=models.SET_NULL)
     owner = models.ForeignKey(
         User, related_name='owned_contacts',
         null=True)
@@ -962,7 +963,17 @@ class Contact(SubscriptionObject):
             return objects
 
     def serialize(self):
-
+        try:
+            parent_id = self.parent.id
+        except:
+            parent_id = None
+        children = []
+        for child in self.children.all():
+            try:
+                child_id = child.id
+                children.append(child_id)
+            except:
+                pass
         return {
             'author_id': self.owner_id,
             'company_id': self.company_id,
@@ -972,8 +983,8 @@ class Contact(SubscriptionObject):
             'id': self.pk,
             'pk': self.pk,
             'owner': self.owner_id,
-            'parent_id': hasattr(self, 'parent_id') and self.parent_id or None,
-            'children': [child.pk for child in self.children.all()],
+            'parent_id': parent_id,
+            'children': children,
             'sales_cycles': [cycle.pk for cycle in self.sales_cycles.all()],
             'status': self.status,
             'tp': self.tp,
@@ -982,8 +993,10 @@ class Contact(SubscriptionObject):
 
     @classmethod
     def after_save(cls, sender, instance, **kwargs):
+        print instance.children.all(), instance
         cache.set(build_key(cls._meta.model_name, instance.pk), json.dumps(instance.serialize(), default=date_handler))
-    
+        if instance.parent:
+            instance.parent.save()
         # TODO: each time when contact is updated vcard is recreated. So if it is the case then reinvalidate cache
         vcard = instance.vcard
         if vcard:
@@ -1030,7 +1043,6 @@ class Contact(SubscriptionObject):
         contact_qs = cls.objects.all().prefetch_related('sales_cycles', 'children')
         contact_raws = [c.serialize() for c in contact_qs]
         cache.set_many({build_key(cls._meta.model_name, contact_raw['id']): json.dumps(contact_raw, default=date_handler) for contact_raw in contact_raws})
-
 
 post_save.connect(Contact.after_save, sender=Contact)
 post_delete.connect(Contact.after_delete, sender=Contact)
