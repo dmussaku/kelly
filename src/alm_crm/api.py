@@ -2308,7 +2308,8 @@ class ActivityResource(CRMServiceModelResource):
             files.append({
                             'file_id':attached_file.id,
                             'filename':attached_file.file_object.filename,
-                            'swiftfile_id':attached_file.file_object.id
+                            'swiftfile_id':attached_file.file_object.id,
+                            'delete': False
                         })
         bundle.data['attached_files'] = files
 
@@ -2437,6 +2438,19 @@ class ActivityResource(CRMServiceModelResource):
 
             return self.create_response(request, {'objects':objects}, response_class=http.HttpAccepted)
 
+    def attach_files(self, attached_files, act_id):
+        for file_data in attached_files:
+            att_file = AttachedFile.objects.get(id=file_data['file_id'])
+            if file_data['delete'] == False:
+                att_file.object_id = act_id
+                att_file.save()
+            else:
+                try: 
+                    att_file.delete()
+                except:
+                    pass
+
+
     def obj_create(self, bundle, **kwargs): ## TODO
         act = bundle.obj = self._meta.object_class()
         act.author_id = bundle.data.get('author_id')
@@ -2449,11 +2463,8 @@ class ActivityResource(CRMServiceModelResource):
             act.need_preparation = bundle.data.get('need_preparation')
         act.save()
 
-        if 'files' in bundle.data:
-            for file_data in bundle.data['files']:
-                att_file = AttachedFile.objects.get(id=file_data['file_id'])
-                att_file.object_id = act.id
-                att_file.save()
+        if 'attached_files' in bundle.data:
+            self.attach_files(bundle.data['attached_files'], act.id)
 
         text_parser(base_text=act.description, content_class=act.__class__,
                     object_id=act.id)
@@ -2486,11 +2497,9 @@ class ActivityResource(CRMServiceModelResource):
                 bundle.obj.sales_cycle = sales_cycle
                 bundle.obj.save()
         bundle.obj.save()
-        if 'files' in bundle.data:
-            for file_data in bundle.data['files']:
-                att_file = AttachedFile.objects.get(id=file_data['file_id'])
-                att_file.object_id = bundle.obj.id
-                att_file.save()
+        if 'attached_files' in bundle.data:
+            self.attach_files(bundle.data['attached_files'], bundle.obj.id)
+
         text_parser(base_text=bundle.obj.description, content_class=bundle.obj.__class__,
                     object_id=bundle.obj.id)
         return bundle
@@ -3045,7 +3054,7 @@ class AttachedFileResource(CRMServiceModelResource):
             attached_file = AttachedFile.build_new(file_object=swiftfile, 
                                                 owner=request.user.get_crmuser(),
                                                 content_class=ContentType.objects.get(app_label='alm_crm', 
-                                                    model=data['content_class'].lower()).model_class(),
+                                                model=data['content_class'].lower()).model_class(),
                                                 object_id=None,
                                                 save=True)
 
@@ -3053,7 +3062,8 @@ class AttachedFileResource(CRMServiceModelResource):
                                         {
                                             'file_id': attached_file.id, 
                                             'swiftfile_id': swiftfile.id,
-                                            'filename': data['name']
+                                            'filename': data['name'],
+                                            'delete': False
                                         }, 
                                         response_class=http.HttpCreated)
 
