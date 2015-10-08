@@ -51,8 +51,10 @@ CURRENCY_OPTIONS = (
     ('KZT', 'Tenge'),
 )
 
-GLOBAL_CYCLE_TITLE = u'Основной поток'
-GLOBAL_CYCLE_DESCRIPTION = u'Автоматически созданный цикл'
+# GLOBAL_CYCLE_TITLE = u'Основной поток'
+# GLOBAL_CYCLE_DESCRIPTION = u'Автоматически созданный цикл'
+GLOBAL_CYCLE_TITLE = _('Main flow')
+GLOBAL_CYCLE_DESCRIPTION = _('Automatically generated cycle')
 
 def type_cast(input):
     return input if type(input) != float else str(input)
@@ -71,15 +73,25 @@ class Milestone(SubscriptionObject):
     @classmethod
     def create_default_milestones(cls, company_id):
         milestones = []
-        default_data = [{'title':u'Звонок/Заявка', 'color_code': '#F4B59C', 'is_system':0, 'sort':1},
-                        {'title':u'Отправка КП', 'color_code': '#F59CC8', 'is_system':0, 'sort':2},
-                        {'title':u'Согласование договора', 'color_code': '#A39CF4', 'is_system':0, 'sort':3},
-                        {'title':u'Выставление счета', 'color_code': '#9CE5F4', 'is_system':0, 'sort':4},
-                        {'title':u'Контроль оплаты', 'color_code': '#9CF4A7', 'is_system':0, 'sort':5},
-                        {'title':u'Предоставление услуги', 'color_code': '#D4F49B', 'is_system':0, 'sort':6},
-                        {'title':u'Upsales', 'color_code': '#F4DC9C', 'is_system':0, 'sort':7},
-                        {'title':u'Успешно завершено', 'color_code':'#9CF4A7', 'is_system':1, 'sort':8},
-                        {'title':u'Не реализовано', 'color_code':'#F4A09C', 'is_system':2, 'sort':9}]
+        """
+            'Звонок/Заявка'
+            'Отправка КП'
+            'Согласование договора'
+            'Выставление счета'
+            'Контроль оплаты'
+            'Предоставление услуги'
+            'Upsales'
+            'Успешно завершено'
+            'Не реализовано'
+        """
+        default_data = [{'title':_('Call/request'), 'color_code': '#F4B59C', 'is_system':0, 'sort':1},
+                        {'title':_('Dispatching business offer'), 'color_code': '#F59CC8', 'is_system':0, 'sort':2},
+                        {'title':_('Negotiating contract'), 'color_code': '#A39CF4', 'is_system':0, 'sort':3},
+                        {'title':_('Invoicing'), 'color_code': '#9CE5F4', 'is_system':0, 'sort':4},
+                        {'title':_('Payment control'), 'color_code': '#9CF4A7', 'is_system':0, 'sort':5},
+                        {'title':_('Service provision'), 'color_code': '#D4F49B', 'is_system':0, 'sort':6},
+                        {'title':_('Successful'), 'color_code':'#9CF4A7', 'is_system':1, 'sort':7},
+                        {'title':_('Failed'), 'color_code':'#F4A09C', 'is_system':2, 'sort':8}]
 
         for data in default_data:
             milestone = Milestone()
@@ -570,7 +582,7 @@ class Contact(SubscriptionObject):
     @classmethod
     def create_from_structure(cls, data, file_structure, creator, import_task, company_id):
         contact = cls()
-        vcard = VCard(fn='Без Имени')
+        vcard = VCard(fn=_('No name'))
         vcard.save()
         response = {}
         for structure_dict in file_structure:

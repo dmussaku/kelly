@@ -22,6 +22,7 @@ class RegistrationForm(forms.Form):
     email = forms.EmailField(label=_("Email"), max_length=254)
     company_name = forms.CharField(max_length=200)
     company_subdomain = forms.CharField(max_length=20)
+    language = forms.ChoiceField(choices=User.LANGUAGES_OPTIONS)
     password = forms.CharField(widget=forms.PasswordInput(),
                                max_length=100)
 
@@ -46,6 +47,15 @@ class RegistrationForm(forms.Form):
                 )
         return company_subdomain
 
+    def clean_language(self):
+        language = self.cleaned_data['language']
+        print language
+        if not language:
+            raise forms.ValidationError( _("Please input language") )
+        if not any(language in lang for lang in User.LANGUAGES_OPTIONS):
+            raise forms.ValidationError( _("Invalid language") )
+        return language
+
     def clean_password(self):
         password = self.cleaned_data.get('password', None)
         if not password:
@@ -58,6 +68,7 @@ class RegistrationForm(forms.Form):
         user = User(email=self.cleaned_data['email'])
         user.set_password(self.cleaned_data['password'])
         username = self.cleaned_data['email']
+        language = self.cleaned_data['language']
         password = self.cleaned_data['password']
         if commit:
             gened_subdomain = Company.generate_subdomain(
@@ -66,6 +77,7 @@ class RegistrationForm(forms.Form):
                 name=self.cleaned_data['company_name'],
                 subdomain=gened_subdomain)
             company.save()
+            user.language = language
             user.save()
             account = Account(
                 company=company,

@@ -1,6 +1,11 @@
 {% extends "user/base.html" %}
 {% load i18n %}
+{% load static from staticfiles %}
+
 {% block head_title %} Register &mdash; Almanet {% endblock %}
+{% block block_head %} 
+  <link rel="stylesheet" href="{% static 'flat-ui/bootstrap/css/bootstrap.css' %}" media="all"> 
+{% endblock %}
 {% block content %}
   {{message}}
   <div class="login">
@@ -54,6 +59,31 @@
           <input class="login-input" id="login-company-subdomain" name="company_subdomain" type="text" placeholder={{ _("Subdomain") }} required>
           {% if form.company_subdomain.errors %}
               <div class="login-error">{{ form.company_subdomain.errors }}</div>
+          {% endif %}
+          {% if form.non_field_errors %}
+              {% for error in form.non_field_errors %}
+              <div class="login-error">{{ error }}</div>
+              {% endfor %}
+          {% endif %}
+        </div>
+
+        <div class="login-fieldset {% if form.language.errors or form.non_field_errors %}has-error{% endif %}">
+          <label class="login-fieldset-icon" for="login-company-name">
+            <figure class="icon icon--organization">
+              <svg>
+                <use xlink:href="#icon-organization"></use>
+              </svg>
+            </figure>
+          </label>
+          <div class='form-group'>
+            <select class="form-control" id="login-company-subdomain" name="language" type="text" placeholder={{ _("Language") }} style='padding-left:28px;' required>
+              <option value="" selected="selected"> {{_("Choose language")}}</option>
+              <option value='ru-RU'> Русский </option>
+              <option value='en-US'> English </option>
+            </select>
+          </div>
+          {% if form.language.errors %}
+              <div class="login-error">{{ form.language.errors }}</div>
           {% endif %}
           {% if form.non_field_errors %}
               {% for error in form.non_field_errors %}

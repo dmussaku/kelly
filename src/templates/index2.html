@@ -110,6 +110,16 @@
                                 <li><a href="#plans">{{_("Plans")}} </a></li>
                                 <!--                                <li><a href="#">Блог</a></li>-->
                                 <li><a href="#contacts">{{_("Contacts")}} </a></li>
+                                <li>
+                                    <a style="padding:34px 0px 0px;" href="{% url 'landing_page' %}?lang=ru">
+                                        <img src="{% static 'images/ru.png' %}"/>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a style="padding:34px 0px 0px;" href="{% url 'landing_page' %}?lang=en">
+                                        <img src="{% static 'images/us.png' %}"/>
+                                    </a>
+                                </li>
                             </ul>
                             <form class="navbar-form pull-left">
                                 <a class="btn btn-info" href="{% url 'user_login' %}">{{_("Sign in")}}</a>
@@ -334,9 +344,9 @@
                         </div>
                         <div class="price">50$/{{ _("month") }}</div>
                         <div class="description">
-                            <b>20</b>{{ _("Users") }}<br>
-                            <b>2000</b>{{ _("Contacts") }} <br>
-                            <b>5 GB</b>{{ _("per user") }} <br>
+                            <b>20</b> {{ _("Users") }}<br>
+                            <b>2000</b> {{ _("Contacts") }} <br>
+                            <b>5 GB</b> {{ _("per user") }} <br>
                             {{ _("First month is free") }} 
                         </div>
                         <a class="btn btn-primary" href="{% url 'user_registration' %}">{{ _("Choose plan") }}</a>
@@ -348,9 +358,9 @@
                         </div>
                         <div class="price">100$/{{ _("month") }}</div>
                         <div class="description">
-                            <b>30+</b>{{ _("Users") }}<br>
+                            <b>30+</b> {{ _("Users") }}<br>
                             <b>{{ _("Unlimited") }} </b><br>
-                            <b>10 GB</b>{{ _("per user") }}<br>
+                            <b>10 GB</b> {{ _("per user") }}<br>
                             {{ _("First month is free") }} 
                         </div>
                         <a class="btn btn-primary" href="{% url 'user_registration' %}">{{ _("Choose plan") }}</a>
