@@ -2274,7 +2274,8 @@ class ActivityResource(CRMServiceModelResource):
             files.append({
                             'file_id':attached_file.id,
                             'filename':attached_file.file_object.filename,
-                            'swiftfile_id':attached_file.file_object.id
+                            'swiftfile_id':attached_file.file_object.id,
+                            'delete': False
                         })
         bundle.data['attached_files'] = files
 
@@ -2362,6 +2363,18 @@ class ActivityResource(CRMServiceModelResource):
         return self.create_response(
             request, {'success': rv})
 
+    def attach_files(self, attached_files, act_id):
+        for file_data in attached_files:
+            att_file = AttachedFile.objects.get(id=file_data['file_id'])
+            if file_data['delete'] == False:
+                att_file.object_id = act_id
+                att_file.save()
+            else:
+                try: 
+                    att_file.delete()
+                except:
+                    pass
+
     def create_multiple(self, request, **kwargs):
         with RequestContext(self, request, allowed_methods=['post']):
             data = self.deserialize(request, request.body,
@@ -2383,6 +2396,9 @@ class ActivityResource(CRMServiceModelResource):
                 if 'need_preparation' in new_activity_data:
                     new_activity.need_preparation = new_activity_data.get('need_preparation')
                 new_activity.save()
+
+                if 'attached_files' in bundle.data:
+                    self.attach_files(bundle.data['attached_files'], new_activity.id)
 
                 if new_activity_data.get('feedback_status'):
                     new_activity.feedback = Feedback(
@@ -2451,6 +2467,7 @@ class ActivityResource(CRMServiceModelResource):
 
             return self.create_response(request, {'objects':objects}, response_class=http.HttpAccepted)
 
+
     def obj_create(self, bundle, **kwargs): ## TODO
         act = bundle.obj = self._meta.object_class()
         act.author_id = bundle.data.get('author_id')
@@ -2464,11 +2481,8 @@ class ActivityResource(CRMServiceModelResource):
             act.need_preparation = bundle.data.get('need_preparation')
         act.save()
 
-        if 'files' in bundle.data:
-            for file_data in bundle.data['files']:
-                att_file = AttachedFile.objects.get(id=file_data['file_id'])
-                att_file.object_id = act.id
-                att_file.save()
+        if 'attached_files' in bundle.data:
+            self.attach_files(bundle.data['attached_files'], act.id)
 
         text_parser(base_text=act.description, content_class=act.__class__,
                     object_id=act.id, company_id = bundle.request.company.id)
@@ -2492,11 +2506,8 @@ class ActivityResource(CRMServiceModelResource):
             if bundle.obj.company_id == None:
                 bundle.obj.company_id = bundle.request.company.id
         bundle.obj.save()
-        if 'files' in bundle.data:
-            for file_data in bundle.data['files']:
-                att_file = AttachedFile.objects.get(id=file_data['file_id'])
-                att_file.object_id = bundle.obj.id
-                att_file.save()
+        if 'attached_files' in bundle.data:
+            self.attach_files(bundle.data['attached_files'], bundle.obj.id)
         text_parser(base_text=bundle.obj.description, content_class=bundle.obj.__class__,
                     object_id=bundle.obj.id, company_id = bundle.request.company.id)
         return bundle
@@ -3009,7 +3020,8 @@ class AttachedFileResource(CRMServiceModelResource):
                                         {
                                             'file_id': attached_file.id, 
                                             'swiftfile_id': swiftfile.id,
-                                            'filename': data['name']
+                                            'filename': data['name'],
+                                            'delete': False
                                         }, 
                                         response_class=http.HttpCreated)
 
