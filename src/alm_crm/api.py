@@ -752,8 +752,15 @@ class ContactResource(CRMServiceModelResource):
             raise Exception
         contact_id = kwargs.get('pk', None)
         company_id = bundle.request.company.id
+        children_to_update = []
+        parent_to_update = None
+        # if contact_id is provided then the object is being updated
+        # else, it will be a new object
         if contact_id:
             bundle.obj = Contact.objects.get(id=int(contact_id))
+            children_to_update = bundle.obj.children.all()
+            parent_to_update = bundle.obj.parent
+            print "%s %s" % (bundle.obj.parent, 'at hydrate')
             bundle.obj.company_id = company_id
         else:
             bundle.obj = self._meta.object_class()
@@ -808,6 +815,10 @@ class ContactResource(CRMServiceModelResource):
                             )
         bundle.obj.vcard = vcard_bundle.obj
         bundle.obj.save()
+        for child in children_to_update:
+            child.save()
+        if parent_to_update:
+            parent_to_update.save()
         with transaction.atomic():
             if bundle.data.get('note') and not kwargs.get('pk'):
                 share = bundle.obj.create_share_to(
