@@ -2452,8 +2452,8 @@ class ActivityResource(CRMServiceModelResource):
                     new_activity.need_preparation = new_activity_data.get('need_preparation')
                 new_activity.save()
 
-                if 'attached_files' in bundle.data:
-                    self.attach_files(bundle.data['attached_files'], new_activity.id)
+                if 'attached_files' in new_activity_data:
+                    self.attach_files(new_activity_data['attached_files'], new_activity.id)
 
                 if new_activity_data.get('feedback_status'):
                     new_activity.feedback = Feedback(
