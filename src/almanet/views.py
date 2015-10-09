@@ -137,7 +137,6 @@ def landing(request):
 def landing_form(request):
     if request.method == 'POST':
         response = parse_qs(request.body, keep_blank_values=True)
-        print response
         vcard = VCard(fn=response.get('fn')[0])
         vcard.save()
         if response.get('tel', None):
