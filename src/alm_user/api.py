@@ -473,7 +473,7 @@ class SessionObject(object):
             'user_id': self.user.pk,
             # 'session_key': request.session.session_key,
             # 'logged_in': request.account.is_authenticated(),
-            'language': translation.get_language(),
+            'language': self.user.language,
             'timezone': TIME_ZONE
         }
 

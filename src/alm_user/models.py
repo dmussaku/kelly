@@ -113,6 +113,10 @@ class User(AbstractBaseUser):
 
     # REQUIRED_FIELDS = ['email']
     USERNAME_FIELD = 'email'
+    LANGUAGES = (RU_RU, EN_US) = ('ru-RU', 'en-US')
+    LANGUAGES_OPTIONS = ((RU_RU, _('ru-RU')),
+                         (EN_US, _('en-US')))
+
     first_name = models.CharField(_('first name'), max_length=31,
                                   null=False, blank=False)
     last_name = models.CharField(_('last name'), max_length=30, blank=False)
@@ -120,6 +124,10 @@ class User(AbstractBaseUser):
     # is_active = models.BooleanField(_('active'), default=True)
 
     timezone = TimeZoneField(default='Asia/Almaty')
+    language = models.CharField(
+        _('language'),
+        max_length=30,
+        choices=LANGUAGES_OPTIONS, default=RU_RU)
     is_admin = models.BooleanField(default=False)
     # company = models.ManyToManyField('alm_company.Company',
     #                                  related_name='users')
