@@ -18,8 +18,6 @@ except ImportError:
     import sha
     sha1 = sha.sha
 
-
-
 class AccountManager(contrib_user_manager):
     def create_user(self, email, password, user, company, is_supervisor=False):
         acc = Account(email=email, 
@@ -49,6 +47,7 @@ class Account(models.Model):
         db_table = settings.DB_PREFIX.format('account')
 
     objects = AccountManager()
+
 
     @property
     def is_staff(self):

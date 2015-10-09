@@ -15,6 +15,7 @@ import imp
 from django.utils.functional import lazy
 from configurations import Configuration, pristinemethod
 from configurations.utils import uppercase_attributes
+from django.utils.translation import ugettext_lazy as _
 from celery.schedules import crontab
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
@@ -164,13 +165,13 @@ class BaseConfiguration(SubdomainConfiguration, Configuration):
         'django.middleware.common.CommonMiddleware',
         'corsheaders.middleware.CorsMiddleware',
         'django.middleware.csrf.CsrfViewMiddleware',
-        'almanet.middleware.ForceDefaultLanguageMiddleware',
         'django.middleware.locale.LocaleMiddleware',
         'django_hosts.middleware.HostsMiddleware',
         'django.contrib.sessions.middleware.SessionMiddleware',
         'django.contrib.messages.middleware.MessageMiddleware',
         'django.contrib.auth.middleware.AuthenticationMiddleware',
         'django.middleware.gzip.GZipMiddleware',
+        'almanet.middleware.ForceDefaultLanguageMiddleware',
         # 'almanet.middleware.AlmanetSessionMiddleware',
         # 'almanet.middleware.MyAuthenticationMiddleware',
     )
@@ -213,8 +214,8 @@ class BaseConfiguration(SubdomainConfiguration, Configuration):
     LANGUAGE_CODE = 'ru'
 
     LANGUAGES = (
-        ('ru', lambda: 'Russian'),
-        ('en', lambda: 'English'),
+        ('ru', _('Russian')),
+        ('en', _('English')),
     )
 
     TIME_ZONE = 'Asia/Almaty'

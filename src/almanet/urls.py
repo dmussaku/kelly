@@ -47,7 +47,6 @@ urlpatterns = patterns(
     url(r'api/doc/', include('tastypie_swagger.urls', namespace='tastypie_swagger')),
     url(r'agreement/$', TemplateView.as_view(template_name='almanet/agreement.crm.html'), name='agreement'),
     # url(r'landing_form/$', landing_form, name='landing_form'),
-    url(r'landing/$', landing, name='landing_page'),
     url(r'^files', include('almastorage.urls')),
 )
 

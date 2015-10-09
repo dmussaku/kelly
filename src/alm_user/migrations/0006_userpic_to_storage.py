@@ -16,6 +16,13 @@ class Migration(DataMigration):
         # and orm['appname.ModelName'] for models in other applications.
         for user in orm.User.objects.all():
             if user.userpic != None:
+                try:
+                    user.userpic.url
+                except:
+                    swiftfile_id = set_file('default_userpic.png', 'image', container_title='userpics').id
+                    user.userpic_obj = orm['almastorage.SwiftFile'].objects.get(id=swiftfile_id)
+                    user.save()
+                    continue
                 if os.path.isfile(user.userpic.url):
                     swiftfile = SwiftFile.upload_file( file_contents=user.userpic.file.read(), 
                                                         filename=user.userpic.name.split('/')[1], 

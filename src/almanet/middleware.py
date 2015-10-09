@@ -6,6 +6,7 @@ from django.conf import settings
 from django.utils.functional import SimpleLazyObject
 from django.utils.importlib import import_module
 from django.utils.cache import patch_vary_headers
+from django.utils import translation
 from django.utils.http import cookie_date
 
 from alm_company.models import Company
@@ -37,5 +38,13 @@ class ForceDefaultLanguageMiddleware(object):
     """
 
     def process_request(self, request):
-        if 'HTTP_ACCEPT_LANGUAGE' in request.META:
-            del request.META['HTTP_ACCEPT_LANGUAGE']
+        lang = request.GET.get('lang', None) or request.session.get('lang')
+        try:
+            lang = request.user.language
+        except:
+            pass
+        if lang:
+            translation.activate(lang)
+            request.LANGUAGE_CODE = translation.get_language()
+            request.META['HTTP_ACCEPT_LANGUAGE'] = lang
+            request.session.update({'lang':lang})
