@@ -561,7 +561,6 @@ class Contact(SubscriptionObject):
                     email.value = data[i][15].decode('utf-8')
                     email.save()
                 contact_list.append(c)
-                print "%s created contact %s" % (c, c.id)
                 # print contact_list
         return contact_list
 
@@ -963,17 +962,7 @@ class Contact(SubscriptionObject):
             return objects
 
     def serialize(self):
-        try:
-            parent_id = self.parent.id
-        except:
-            parent_id = None
-        children = []
-        for child in self.children.all():
-            try:
-                child_id = child.id
-                children.append(child_id)
-            except:
-                pass
+        print self, self.parent_id, 'serialize'
         return {
             'author_id': self.owner_id,
             'company_id': self.company_id,
@@ -983,8 +972,8 @@ class Contact(SubscriptionObject):
             'id': self.pk,
             'pk': self.pk,
             'owner': self.owner_id,
-            'parent_id': parent_id,
-            'children': children,
+            'parent_id': self.parent_id,
+            # 'children': [child.pk for child in self.children.all()],
             'sales_cycles': [cycle.pk for cycle in self.sales_cycles.all()],
             'status': self.status,
             'tp': self.tp,
@@ -993,10 +982,7 @@ class Contact(SubscriptionObject):
 
     @classmethod
     def after_save(cls, sender, instance, **kwargs):
-        print instance.children.all(), instance
         cache.set(build_key(cls._meta.model_name, instance.pk), json.dumps(instance.serialize(), default=date_handler))
-        if instance.parent:
-            instance.parent.save()
         # TODO: each time when contact is updated vcard is recreated. So if it is the case then reinvalidate cache
         vcard = instance.vcard
         if vcard:
@@ -1235,7 +1221,6 @@ class SalesCycle(SubscriptionObject):
         return '%s [%s %s]' % (self.title, self.contact, self.status)
 
     def delete(self):
-        print 'at salescycle delete'
         super(self.__class__, self).delete()
 
     @property

@@ -646,6 +646,7 @@ class ContactResource(CRMServiceModelResource):
                 raise NotFound("A model instance matching the provided arguments could not be found.")
 
 
+        children = [child.id for child in Contact.objects.get(id=bundle.obj.id).children.all()]
         bundle = self.full_hydrate(bundle, **kwargs)
         old_parent = bundle.obj.parent
         company_id = bundle.request.company.id
@@ -681,6 +682,11 @@ class ContactResource(CRMServiceModelResource):
                             self.build_bundle(
                                 obj=company)
                             )
+            company_bundle.data['global_sales_cycle'] = SalesCycleResource().full_dehydrate(
+                    SalesCycleResource().build_bundle(
+                        obj=SalesCycle.objects.get(contact_id=company.id, is_global=True)
+                    )
+                )
             contact_bundle.data['parent'] = company_bundle
             if old_parent:
                 old_parent_bundle = self.full_dehydrate(
@@ -691,6 +697,7 @@ class ContactResource(CRMServiceModelResource):
                 contact_bundle.data['old_parent'] = old_parent_bundle
             else:
                 contact_bundle.data['old_parent'] = None
+        self.update_children(bundle, children)
         raise ImmediateHttpResponse(
             HttpResponse(
                 content=Serializer().to_json(
@@ -702,6 +709,21 @@ class ContactResource(CRMServiceModelResource):
         return bundle
 
         #return self.save(bundle, skip_errors=skip_errors)
+
+    def update_children(self, bundle, old_children):
+        print 'at hydrate children function'
+        print old_children
+        new_children = bundle.data.get('children')
+        print new_children
+        for child in [obj for obj in new_children if obj not in set(old_children)]:
+            child = Contact.objects.get(id=child)
+            child.parent_id = bundle.obj.id
+            child.save()
+        for child in [obj for obj in old_children if obj not in set(new_children)]:
+            child = Contact.objects.get(id=child)
+            child.parent_id = None
+            child.save()
+
 
     def full_dehydrate(self, bundle, for_list=False):
         '''Custom representation of followers, assignees etc.'''
@@ -755,15 +777,10 @@ class ContactResource(CRMServiceModelResource):
             raise Exception
         contact_id = kwargs.get('pk', None)
         company_id = bundle.request.company.id
-        children_to_update = []
-        parent_to_update = None
         # if contact_id is provided then the object is being updated
         # else, it will be a new object
         if contact_id:
             bundle.obj = Contact.objects.get(id=int(contact_id))
-            children_to_update = bundle.obj.children.all()
-            parent_to_update = bundle.obj.parent
-            print "%s %s" % (bundle.obj.parent, 'at hydrate')
             bundle.obj.company_id = company_id
         else:
             bundle.obj = self._meta.object_class()
@@ -818,10 +835,6 @@ class ContactResource(CRMServiceModelResource):
                             )
         bundle.obj.vcard = vcard_bundle.obj
         bundle.obj.save()
-        for child in children_to_update:
-            child.save()
-        if parent_to_update:
-            parent_to_update.save()
         with transaction.atomic():
             if bundle.data.get('note') and not kwargs.get('pk'):
                 share = bundle.obj.create_share_to(
