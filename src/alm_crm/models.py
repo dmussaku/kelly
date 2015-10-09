@@ -318,7 +318,7 @@ class Contact(SubscriptionObject):
 
     def create_share_to(self, user_id, company_id, note=None):
         default_note = self.SHARE_IMPORTED_TEXT + \
-            date_created.strftime(settings.DATETIME_FORMAT_NORMAL)
+            self.date_created.strftime(settings.DATETIME_FORMAT_NORMAL)
 
         share = Share(
             note=note or default_note,

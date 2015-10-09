@@ -38,11 +38,7 @@ class ForceDefaultLanguageMiddleware(object):
     """
 
     def process_request(self, request):
-        lang = request.GET.get('lang', None) or request.session.get('lang')
-        try:
-            lang = request.user.language
-        except:
-            pass
+        lang = request.GET.get('lang', None) or request.session.get('lang') or (hasattr(request.user, 'language') and request.user.language)
         if lang:
             translation.activate(lang)
             request.LANGUAGE_CODE = translation.get_language()
