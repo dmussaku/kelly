@@ -962,7 +962,6 @@ class Contact(SubscriptionObject):
             return objects
 
     def serialize(self):
-        print self, self.parent_id, 'serialize'
         return {
             'author_id': self.owner_id,
             'company_id': self.company_id,

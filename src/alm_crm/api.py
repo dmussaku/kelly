@@ -711,10 +711,7 @@ class ContactResource(CRMServiceModelResource):
         #return self.save(bundle, skip_errors=skip_errors)
 
     def update_children(self, bundle, old_children):
-        print 'at hydrate children function'
-        print old_children
         new_children = bundle.data.get('children')
-        print new_children
         for child in [obj for obj in new_children if obj not in set(old_children)]:
             child = Contact.objects.get(id=child)
             child.parent_id = bundle.obj.id
