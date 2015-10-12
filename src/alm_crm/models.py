@@ -1593,10 +1593,10 @@ class Activity(SubscriptionObject):
     def comments_count(self):
         return self.comments.count()
 
-    @property
-    def new_comments_count(self):
+    
+    def new_comments_count(self, user_id):
         return len(
-            filter(lambda(comment): not comment.has_read(comment.owner_id),
+            filter(lambda(comment): not comment.has_read(user_id),
                    self.comments.all())
             )
 

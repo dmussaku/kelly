@@ -2263,7 +2263,7 @@ class ActivityResource(CRMServiceModelResource):
     need_preparation = fields.BooleanField(attribute='need_preparation')
     sales_cycle_id = fields.IntegerField(attribute='sales_cycle_id', null=True)
     comments_count = fields.IntegerField(attribute='comments_count', readonly=True)
-    new_comments_count = fields.IntegerField(attribute='new_comments_count', readonly=True)
+    # new_comments_count = fields.IntegerField(attribute='new_comments_count', readonly=True)
 
     class Meta(CommonMeta):
         queryset = Activity.objects.all().select_related('owner').prefetch_related('comments', 'recipients')
@@ -2345,6 +2345,7 @@ class ActivityResource(CRMServiceModelResource):
 
     def dehydrate(self, bundle):
         bundle.data['has_read'] = self._has_read(bundle, bundle.request.user.id)
+        bundle.data['new_comments_count'] = bundle.obj.new_comments_count(bundle.request.user.id)
         files = []
         for attached_file in bundle.obj.attached_files.all():
             files.append({
