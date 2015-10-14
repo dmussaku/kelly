@@ -15,6 +15,7 @@ from .models import Service
 from .forms import ServiceCreateForm, ReferralForm
 from django.views.generic.edit import FormView
 from django.views.generic.base import TemplateView, TemplateResponse
+import kkb
 
 
 class RedirectHomeView(RedirectView):
@@ -175,3 +176,11 @@ def landing_form(request):
         return HttpResponse('None')
 
 
+def payment_view(request):
+    if request.method == 'POST':
+        print request.POST
+    template_name='billing/input_payment.html'
+    context = kkb.get_context(
+        order_id = '333',amount="666",currency_id = "398") 
+    print context
+    return TemplateResponse(request, template_name, context)

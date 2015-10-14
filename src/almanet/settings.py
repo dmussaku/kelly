@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 """
 Django settings for src project.
 
@@ -158,6 +160,7 @@ class BaseConfiguration(SubdomainConfiguration, Configuration):
         'django_extensions',
         'almastorage',
         'djcelery',
+        'kkb',
     )
 
     MIDDLEWARE_CLASSES = (
@@ -354,6 +357,14 @@ class BaseConfiguration(SubdomainConfiguration, Configuration):
     SW_USERNAME = 'ALMASALES'
     SW_KEY = 'x3IFqvHB'
     SW_AUTH_URL = 'http://178.88.64.78/auth/v1.0'
+
+    MERCHANT_CERTIFICATE_ID = "" # Серийный номер сертификата Cert Serial Number
+    MERCHANT_NAME = "" # Название магазина (продавца) Shop/merchant Name
+    PRIVATE_KEY_FN = "" # Абсолютный путь к закрытому ключу Private cert path
+    PRIVATE_KEY_PASS = "" # Пароль к закрытому ключу Private cert password
+    PUBLIC_KEY_FN = "" # Абсолютный путь к открытому ключу Public cert path
+    MERCHANT_ID="" # Терминал ИД в банковской Системе
+
     
     RUSTEM_SETTINGS = False
 

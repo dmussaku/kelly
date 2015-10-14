@@ -13,7 +13,8 @@ from almanet.views import (
     ServiceDetailView,
     RedirectHomeView,
     landing_form,
-    landing
+    landing,
+    payment_view,
     )
 from django.views.generic import TemplateView
 
@@ -46,8 +47,10 @@ urlpatterns = patterns(
     url(r'^services/service_delete/(?P<pk>\d+)/$', ServiceDeleteView.as_view(), name='service_delete'),
     url(r'api/doc/', include('tastypie_swagger.urls', namespace='tastypie_swagger')),
     url(r'agreement/$', TemplateView.as_view(template_name='almanet/agreement.crm.html'), name='agreement'),
+    url(r'^payment/$', payment_view, name='payment_view'),
     # url(r'landing_form/$', landing_form, name='landing_form'),
     url(r'^files', include('almastorage.urls')),
+
 )
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

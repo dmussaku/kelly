@@ -2273,6 +2273,7 @@ class ActivityResource(CRMServiceModelResource):
         filtering = {
             'author_id': ('exact', ),
             'owner': ALL_WITH_RELATIONS,
+            'date_edited': ['exact', 'gt', 'gte', 'lt', 'lte', 'range'],
             'sales_cycle_id': ALL_WITH_RELATIONS
             }
         filtering.update(CommonMeta.filtering)

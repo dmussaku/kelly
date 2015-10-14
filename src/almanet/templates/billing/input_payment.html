@@ -1,0 +1,16 @@
+{% extends "user/base.html" %}
+{% load i18n almanet_tags %}
+{% load static from staticfiles %}
+{% block head_title %} Login page {% endblock %}
+{% block content %}
+	<form name="SendOrder" method="post" action="https://testpay.kkb.kz/jsp/process/logon.jsp">
+		<input type="hidden" name="Signed_Order_B64" value="{{context}}">
+		E-mail: <input type="text" name="email" size=50 maxlength=50  value="test@tes.kz">
+	   
+	   <input type="hidden" name="Language" value="eng">
+	   <input type="hidden" name="BackLink" value="{%  %}">
+	   <input type="hidden" name="PostLink" value="{%  %}">
+		<button class="login-submit" type="submit">{{ _("Pay") }}</button>
+	</form>
+	
+{% endblock %}
