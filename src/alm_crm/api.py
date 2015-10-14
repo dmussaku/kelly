@@ -421,6 +421,8 @@ class ContactResource(CRMServiceModelResource):
         resource_name = 'contact'
         filtering = {
             'status': ['exact'],
+            'date_created': ['exact', 'range', 'gt', 'gte', 'lt', 'lte'],
+            'date_edited': ['exact', 'range', 'gt', 'gte', 'lt', 'lte'],
             'tp': ['exact'],
             'id': ALL
         }
@@ -1675,6 +1677,10 @@ class SalesCycleResource(CRMServiceModelResource):
         resource_name = 'sales_cycle'
         excludes = ['from_date', 'to_date']
         detail_allowed_methods = ['get', 'post', 'put', 'patch', 'delete']
+        filtering={
+            'date_created': ['exact', 'range', 'gt', 'gte', 'lt', 'lte'],
+            'date_edited': ['exact', 'range', 'gt', 'gte', 'lt', 'lte'],
+        }
         always_return_data = True
 
     def prepend_urls(self):
@@ -2273,6 +2279,8 @@ class ActivityResource(CRMServiceModelResource):
         filtering = {
             'author_id': ('exact', ),
             'owner': ALL_WITH_RELATIONS,
+            'date_created': ['exact', 'range', 'gt', 'gte', 'lt', 'lte'],
+            'date_edited': ['exact', 'range', 'gt', 'gte', 'lt', 'lte'],
             'sales_cycle_id': ALL_WITH_RELATIONS
             }
         filtering.update(CommonMeta.filtering)
@@ -3861,14 +3869,17 @@ class MobileStateObject(object):
         self.company = request.company
         self.account = request.user
 
-        sales_cycles = SalesCycleResource().obj_get_list(bundle, limit_for='mobile')
 
-        sc_ids_param = ','.join([str(sc.id) for sc in sales_cycles])
-        activities = ActivityResource().obj_get_list(bundle, limit_for='mobile',
-            sales_cycle_id__in=sc_ids_param)
+        activities = ActivityResource().obj_get_list(bundle, limit_for='mobile')
+        sales_cycles = []
+        for activity in activities:
+            if activity.sales_cycle not in sales_cycles:
+                sales_cycles.append(activity.sales_cycle)
 
-        contact_ids_param = ','.join(set([str(sc.contact_id) for sc in sales_cycles]))
-        contacts = ContactResource().obj_get_list(bundle, id__in=contact_ids_param)
+        contacts = []
+        for sales_cycle in sales_cycles:
+            if sales_cycle.contact not in contacts:
+                contacts.append(sales_cycle.contact)
 
         cu_ids = set([str(a.owner_id) for a in activities])
         cu_ids = cu_ids.union([str(sc.owner_id) for sc in sales_cycles])
