@@ -2441,6 +2441,9 @@ class ActivityResource(CRMServiceModelResource):
             request, {'success': rv})
 
     def attach_files(self, attached_files, act_id):
+        '''
+            TODO bind existing AttachedFile with activity.
+        '''
         for file_data in attached_files:
             att_file = AttachedFile.objects.get(id=file_data['file_id'])
             if file_data['delete'] == False:
@@ -3065,6 +3068,9 @@ class AttachedFileResource(CRMServiceModelResource):
         ]
 
     def deserialize(self, request, data, format=None):
+        '''
+            TODO deserialize request with multipart.
+        '''
         if not format:
             format = request.META.get('CONTENT_TYPE', 'application/json')
 
@@ -3075,6 +3081,34 @@ class AttachedFileResource(CRMServiceModelResource):
         return super(self.__class__, self).deserialize(request, data, format)
 
     def attach_file(self, request, **kwargs):
+        '''
+        POST METHOD
+        I{URL}:  U{alma.net/api/v1/files/attach/}
+
+        B{Description}:
+        creates attached_file object with swiftfile object and upload to storage.
+
+        @type  file: tuple
+        @param file: file tuple
+
+        @type name: string
+        @param name: filename
+
+        @type type: string
+        @param type: content type of file_object 
+
+        @type size: int
+        @param size: filesize
+
+        @return: {
+            'file_id': /AttachedFile id,
+            'swiftfile_id': /SwiftFile id,
+            'filename': /filename for display in frontend,
+            'delete': /Status of deletion of file
+        }
+
+
+        '''
         with RequestContext(self, request, allowed_methods=['post']):
             data = self.deserialize(request, request.body, format=request.META.get('CONTENT_TYPE', 'application/json'))
             try:

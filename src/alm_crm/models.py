@@ -1985,6 +1985,20 @@ class AttachedFile(SubscriptionObject):
     @classmethod
     def build_new(cls, file_object, owner, company_id, content_class=None,
                   object_id=None, save=False):
+        """TODO builds new AttachedFile objects with generic relation,
+            and relation with SwiftFile object.
+
+            arguments:
+                file_object - SwiftFile object
+                owner - User object, 
+                company_id - Company id,
+                content_class - class which be related with the model,
+                object_id - related object id
+
+        Returns
+        --------
+            attached_file - AttachedFile object
+        """
         attached_file = cls(file_object=file_object, owner=owner, company_id=company_id)
         attached_file.content_type = ContentType.objects.get_for_model(content_class)
         attached_file.object_id = object_id
@@ -1994,6 +2008,8 @@ class AttachedFile(SubscriptionObject):
 
 
 def delete_related_file_objs(sender, instance, **kwargs):
+    """TODO deletes swift file object on after attached_file deletes
+        """
     file_obj = instance.file_object
     file_obj.delete()
 
