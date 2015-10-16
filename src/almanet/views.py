@@ -175,12 +175,17 @@ def landing_form(request):
     else:
         return HttpResponse('None')
 
-
+import random
 def payment_view(request):
     if request.method == 'POST':
         print request.POST
     template_name='billing/input_payment.html'
     context = kkb.get_context(
-        order_id = '333',amount="666",currency_id = "398") 
-    print context
+        order_id = random.randint(1,1000000000),amount="666",currency_id = "398") 
+    context = {'context':context}
     return TemplateResponse(request, template_name, context)
+
+def payment_post_view(request):
+    print request.GET
+    print request.POST
+    return HttpResponse(request.GET)
