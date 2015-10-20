@@ -186,6 +186,14 @@ def payment_view(request):
     return TemplateResponse(request, template_name, context)
 
 def payment_post_view(request):
-    print request.GET
-    print request.POST
+    response = request.POST.get('response',"")
+    print response
+    result = kkb.postlink(response)
+    if result.status:
+        print result
+        # операция прошла успешно
+        # все данные в result.data 
+        # (result.data['ORDER_AMOUNT'],result.data['ORDER_ID'],....)
+    else:
+        print result.message
     return HttpResponse(request.GET)

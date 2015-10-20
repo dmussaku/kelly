@@ -358,12 +358,12 @@ class BaseConfiguration(SubdomainConfiguration, Configuration):
     SW_KEY = 'x3IFqvHB'
     SW_AUTH_URL = 'http://178.88.64.78/auth/v1.0'
 
-    MERCHANT_CERTIFICATE_ID = "00C182B189" # Серийный номер сертификата Cert Serial Number
-    MERCHANT_NAME = "Test shop" # Название магазина (продавца) Shop/merchant Name
-    PRIVATE_KEY_FN = os.path.join(BASE_DIR, "certificates/test_prv.pem") # Абсолютный путь к закрытому ключу Private cert path
-    PRIVATE_KEY_PASS = "nissan" # Пароль к закрытому ключу Private cert password
-    PUBLIC_KEY_FN = os.path.join(BASE_DIR, "certificates/test_pub.pem") # Абсолютный путь к открытому ключу Public cert path
-    MERCHANT_ID="92061101" # Терминал ИД в банковской Системе
+    MERCHANT_CERTIFICATE_ID = "00C182B189" 
+    MERCHANT_NAME = "Test shop" 
+    PRIVATE_KEY_FN = os.path.join(BASE_DIR, "certificates/test_prv.pem") 
+    PRIVATE_KEY_PASS = "nissan"
+    PUBLIC_KEY_FN = os.path.join(BASE_DIR, "certificates/test_pub.pem")
+    MERCHANT_ID="92061101"
     XML_TEMPLATE_FN = 'template.xml'
     XML_COMMAND_TEMPLATE_FN = 'command_template.xml'
     RUSTEM_SETTINGS = False
