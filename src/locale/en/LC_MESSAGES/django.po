@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-09-24 19:54+0600\n"
+"POT-Creation-Date: 2015-10-08 20:15+0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -25,253 +25,317 @@ msgstr ""
 msgid "company"
 msgstr ""
 
-#: alm_crm/models.py:62 alm_vcard/models.py:1214
+#: alm_crm/models.py:56
+msgid "Main flow"
+msgstr ""
+
+#: alm_crm/models.py:57
+msgid "Automatically generated cycle"
+msgstr ""
+
+#: alm_crm/models.py:64 alm_vcard/models.py:1214
 msgid "title"
 msgstr ""
 
-#: alm_crm/models.py:64
+#: alm_crm/models.py:66
 msgid "color code"
 msgstr ""
 
-#: alm_crm/models.py:68
+#: alm_crm/models.py:70
 msgid "milestone"
 msgstr ""
 
-#: alm_crm/models.py:102
+#: alm_crm/models.py:87
+msgid "Call/request"
+msgstr ""
+
+#: alm_crm/models.py:88
+msgid "Dispatching business offer"
+msgstr ""
+
+#: alm_crm/models.py:89
+msgid "Negotiating contract"
+msgstr ""
+
+#: alm_crm/models.py:90
+msgid "Invoicing"
+msgstr ""
+
+#: alm_crm/models.py:91
+msgid "Payment control"
+msgstr ""
+
+#: alm_crm/models.py:92
+msgid "Service provision"
+msgstr ""
+
+#: alm_crm/models.py:93
+msgid "Successful"
+msgstr ""
+
+#: alm_crm/models.py:94
+msgid "Failed"
+msgstr ""
+
+#: alm_crm/models.py:114
 msgid "new_contact"
 msgstr ""
 
-#: alm_crm/models.py:103
+#: alm_crm/models.py:115
 msgid "lead_contact"
 msgstr ""
 
-#: alm_crm/models.py:104
+#: alm_crm/models.py:116
 msgid "opportunity_contact"
 msgstr ""
 
-#: alm_crm/models.py:105
+#: alm_crm/models.py:117
 msgid "client_contact"
 msgstr ""
 
-#: alm_crm/models.py:111
+#: alm_crm/models.py:123
 msgid "company type"
 msgstr ""
 
-#: alm_crm/models.py:112
+#: alm_crm/models.py:124
 msgid "user type"
 msgstr ""
 
-#: alm_crm/models.py:115
+#: alm_crm/models.py:127
 msgid "Imported at "
 msgstr ""
 
-#: alm_crm/models.py:118
+#: alm_crm/models.py:130
 msgid "contact status"
 msgstr ""
 
-#: alm_crm/models.py:122
+#: alm_crm/models.py:134
 msgid "contact type"
 msgstr ""
 
-#: alm_crm/models.py:142
+#: alm_crm/models.py:154
 msgid "contact"
 msgstr ""
 
-#: alm_crm/models.py:163 alm_crm/models.py:168 alm_crm/models.py:174
-#: alm_crm/models.py:179
+#: alm_crm/models.py:175 alm_crm/models.py:180 alm_crm/models.py:186
+#: alm_crm/models.py:191
 msgid "Unknown"
 msgstr ""
 
-#: alm_crm/models.py:188 alm_crm/models.py:191
+#: alm_crm/models.py:200 alm_crm/models.py:203
 msgid "Unknown organization"
 msgstr ""
 
-#: alm_crm/models.py:359
+#: alm_crm/models.py:371
 msgid "incorrect modifier"
 msgstr ""
 
-#: alm_crm/models.py:1017
+#: alm_crm/models.py:585
+msgid "No name"
+msgstr ""
+
+#: alm_crm/models.py:1030
 msgid "product name"
 msgstr ""
 
-#: alm_crm/models.py:1018
+#: alm_crm/models.py:1031
 msgid "product description"
 msgstr ""
 
-#: alm_crm/models.py:1029
+#: alm_crm/models.py:1042
 msgid "product"
 msgstr ""
 
-#: alm_crm/models.py:1122
+#: alm_crm/models.py:1135
 msgid "product_group"
 msgstr ""
 
-#: alm_crm/models.py:1131
+#: alm_crm/models.py:1144
 msgid "New"
 msgstr ""
 
-#: alm_crm/models.py:1132
+#: alm_crm/models.py:1145
 msgid "Pending"
 msgstr ""
 
-#: alm_crm/models.py:1133
+#: alm_crm/models.py:1146
 msgid "Completed"
 msgstr ""
 
-#: alm_crm/models.py:1474
+#: alm_crm/models.py:1487
 msgid "Milestone change"
 msgstr ""
 
-#: alm_crm/models.py:1475
+#: alm_crm/models.py:1488
 msgid "Milestone edited"
 msgstr ""
 
-#: alm_crm/models.py:1476
+#: alm_crm/models.py:1489
 msgid "Milestone deleted"
 msgstr ""
 
-#: alm_crm/models.py:1477
+#: alm_crm/models.py:1490
 msgid "Products changed"
 msgstr ""
 
-#: alm_crm/models.py:1478
+#: alm_crm/models.py:1491
 msgid "Success close"
 msgstr ""
 
-#: alm_crm/models.py:1479
+#: alm_crm/models.py:1492
 msgid "Fail close"
 msgstr ""
 
-#: alm_crm/models.py:2015
+#: alm_crm/models.py:2055
 msgid "contact_list"
 msgstr ""
 
-#: alm_crm/models.py:2086
+#: alm_crm/models.py:2126
 msgid "sales_cycle_product_stat"
 msgstr ""
 
-#: alm_crm/models.py:2095
+#: alm_crm/models.py:2135
 msgid "all"
 msgstr ""
 
-#: alm_crm/models.py:2096
+#: alm_crm/models.py:2136
 msgid "recent"
 msgstr ""
 
-#: alm_crm/models.py:2097
+#: alm_crm/models.py:2137
 msgid "cold"
 msgstr ""
 
-#: alm_crm/models.py:2098
+#: alm_crm/models.py:2138
 msgid "lead"
 msgstr ""
 
-#: alm_crm/models.py:2106
+#: alm_crm/models.py:2146
 msgid "filter"
 msgstr ""
 
-#: alm_crm/models.py:2124
+#: alm_crm/models.py:2162
 msgid "hashtag"
 msgstr ""
 
-#: alm_crm/models.py:2141
+#: alm_crm/models.py:2181
 msgid "hashtag_reference"
 msgstr ""
 
-#: alm_crm/models.py:2172
+#: alm_crm/models.py:2212
 msgid "custom_section"
 msgstr ""
 
-#: alm_crm/models.py:2194
+#: alm_crm/models.py:2234
 msgid "custom_field"
 msgstr ""
 
-#: alm_crm/models.py:2231
+#: alm_crm/models.py:2271
 msgid "custom_field_value"
 msgstr ""
 
-#: alm_user/forms.py:22 alm_user/forms.py:152 almanet/forms.py:16
+#: alm_user/forms.py:22 alm_user/forms.py:164 almanet/forms.py:16
 msgid "Email"
 msgstr ""
 
-#: alm_user/forms.py:31
+#: alm_user/forms.py:32
 #, python-format
 msgid "Email %s is already registered"
 msgstr ""
 
-#: alm_user/forms.py:39
+#: alm_user/forms.py:40
 #, python-format
 msgid "The following company names are busy: %(names)s"
 msgstr ""
 
-#: alm_user/forms.py:42
+#: alm_user/forms.py:43
 msgid "Subdomain is already taken"
 msgstr ""
 
-#: alm_user/forms.py:45
+#: alm_user/forms.py:46
 msgid "Subdomain must be written in latin alphabet letters"
 msgstr ""
 
-#: alm_user/forms.py:53
+#: alm_user/forms.py:54
+msgid "Please input language"
+msgstr ""
+
+#: alm_user/forms.py:56
+msgid "Invalid language"
+msgstr ""
+
+#: alm_user/forms.py:63
 msgid "Enter valid password"
 msgstr ""
 
-#: alm_user/forms.py:92 alm_user/templates/user/registration.html:73
+#: alm_user/forms.py:104 alm_user/templates/user/registration.html:103
 msgid "Password"
 msgstr ""
 
-#: alm_user/forms.py:95
+#: alm_user/forms.py:107
 #, python-format
 msgid ""
 "Please enter a correct %(username)s and password. Note that both fields may "
 "be case-sensitive."
 msgstr ""
 
-#: alm_user/forms.py:97
+#: alm_user/forms.py:109
 msgid "This account is inactive."
 msgstr ""
 
-#: alm_user/forms.py:153
+#: alm_user/forms.py:165
 msgid "Account with such email is not registered."
 msgstr ""
 
-#: alm_user/forms.py:196
+#: alm_user/forms.py:208
 msgid "Old password"
 msgstr ""
 
-#: alm_user/forms.py:198
+#: alm_user/forms.py:210
 msgid "New Password"
 msgstr ""
 
-#: alm_user/forms.py:200
+#: alm_user/forms.py:212
 msgid "Repeat your password"
 msgstr ""
 
-#: alm_user/forms.py:203
+#: alm_user/forms.py:215
 msgid "New passwords are not equal"
 msgstr ""
 
-#: alm_user/forms.py:204
+#: alm_user/forms.py:216
 msgid "Enter valid old password."
 msgstr ""
 
-#: alm_user/models.py:108
+#: alm_user/models.py:116
+msgid "ru-RU"
+msgstr ""
+
+#: alm_user/models.py:117
+msgid "en-US"
+msgstr ""
+
+#: alm_user/models.py:119
 msgid "first name"
 msgstr ""
 
-#: alm_user/models.py:110
+#: alm_user/models.py:121
 msgid "last name"
 msgstr ""
 
-#: alm_user/models.py:111
+#: alm_user/models.py:122
 msgid "email address"
 msgstr ""
 
 #: alm_user/models.py:127
+msgid "language"
+msgstr ""
+
+#: alm_user/models.py:142
 msgid "user"
 msgstr ""
 
-#: alm_user/models.py:252
+#: alm_user/models.py:298
 msgid "referral"
 msgstr ""
 
@@ -334,14 +398,14 @@ msgid "Subdomains"
 msgstr ""
 
 #: alm_user/templates/user/login-register.html:9
-#: alm_user/templates/user/registration.html:9
-#: alm_user/templates/user/user_login.html:10
+#: alm_user/templates/user/registration.html:14
+#: alm_user/templates/user/user_login.html:10 templates/index2.html:125
 msgid "Sign in"
-msgstr "Логин"
+msgstr ""
 
 #: alm_user/templates/user/login-register.html:10
-#: alm_user/templates/user/registration.html:10
-#: alm_user/templates/user/registration.html:80
+#: alm_user/templates/user/registration.html:15
+#: alm_user/templates/user/registration.html:110
 #: alm_user/templates/user/user_login.html:11
 msgid "Register"
 msgstr ""
@@ -450,12 +514,20 @@ msgid ""
 "email, so check it out"
 msgstr ""
 
-#: alm_user/templates/user/registration.html:43
+#: alm_user/templates/user/registration.html:48
 msgid "Company"
 msgstr ""
 
-#: alm_user/templates/user/registration.html:54
+#: alm_user/templates/user/registration.html:59
 msgid "Subdomain"
+msgstr ""
+
+#: alm_user/templates/user/registration.html:79
+msgid "Language"
+msgstr ""
+
+#: alm_user/templates/user/registration.html:80
+msgid "Choose language"
 msgstr ""
 
 #: alm_user/templates/user/services.html:3
@@ -475,9 +547,8 @@ msgstr ""
 
 #: alm_user/templates/user/subdomain_forgot.html:3
 #: alm_user/templates/user/subdomain_forgot.html:9
-#, fuzzy
 msgid "Forgot subdomain"
-msgstr "Забыли ваш поддомен?"
+msgstr ""
 
 #: alm_user/templates/user/subdomain_forgot.html:11
 msgid ""
@@ -505,15 +576,19 @@ msgstr ""
 
 #: alm_user/templates/user/user_login.html:48
 msgid "Forgot your password?"
-msgstr "Забыли пароль?"
+msgstr ""
 
 #: alm_user/templates/user/user_login.html:51
-msgid "Соглашение о порядке предоставления услуг"
+msgid "Legal details"
 msgstr ""
 
 #: alm_user/templates/user/user_login.html:54
 msgid "Login"
-msgstr "Войти"
+msgstr ""
+
+#: alm_user/templates/user/user_login.html:62
+msgid "Companies that you are logged into"
+msgstr ""
 
 #: alm_vcard/admin.py:170
 msgid "Select VCF"
@@ -892,6 +967,14 @@ msgstr ""
 msgid "company_id"
 msgstr ""
 
+#: almanet/settings.py:217
+msgid "Russian"
+msgstr ""
+
+#: almanet/settings.py:218
+msgid "English"
+msgstr ""
+
 #: almanet/templates/almanet/value_list.html:3
 msgid "Value List Page"
 msgstr ""
@@ -901,6 +984,205 @@ msgstr ""
 msgid "Activity was created at %(cycle)s for contact %(contact)s."
 msgstr ""
 
+#: templates/index2.html:108
+msgid "Main"
+msgstr ""
+
+#: templates/index2.html:110
+msgid "Plans"
+msgstr ""
+
+#: templates/index2.html:112 templates/index2.html.py:334
+#: templates/index2.html:348 templates/index2.html.py:400
+msgid "Contacts"
+msgstr ""
+
+#: templates/index2.html:138
+msgid "Selling - is our mission!"
+msgstr ""
+
+#: templates/index2.html:146
+msgid "Your email"
+msgstr ""
+
+#: templates/index2.html:149 templates/index2.html.py:314
+msgid "Try service"
+msgstr ""
+
+#: templates/index2.html:166
+msgid "Will increase your sales capacity through:"
+msgstr ""
+
+#: templates/index2.html:170
+msgid "Goals"
+msgstr ""
+
+#: templates/index2.html:171
+msgid "Set the goal and prepare and develop financial and sales plan"
+msgstr ""
+
+#: templates/index2.html:175
+msgid "Product"
+msgstr ""
+
+#: templates/index2.html:176
+msgid "Identifying the ideal product/client sales channels"
+msgstr ""
+
+#: templates/index2.html:180
+msgid "Reports"
+msgstr ""
+
+#: templates/index2.html:181
+msgid "Implement KPI and Reports with ALMASALES"
+msgstr ""
+
+#: templates/index2.html:185
+msgid "Tools"
+msgstr ""
+
+#: templates/index2.html:186
+msgid "Strengthen sales instruments"
+msgstr ""
+
+#: templates/index2.html:195
+msgid "Our capabilites"
+msgstr ""
+
+#: templates/index2.html:196
+msgid "Check out what Almasales can do for your business"
+msgstr ""
+
+#: templates/index2.html:208
+msgid "Client database and map"
+msgstr ""
+
+#: templates/index2.html:209
+msgid "Activity management"
+msgstr ""
+
+#: templates/index2.html:210
+msgid "Products management"
+msgstr ""
+
+#: templates/index2.html:211
+msgid "Data warehouse"
+msgstr ""
+
+#: templates/index2.html:212
+msgid "Control orders"
+msgstr ""
+
+#: templates/index2.html:213
+msgid "Work planning"
+msgstr ""
+
+#: templates/index2.html:214
+msgid "Building sales strategy"
+msgstr ""
+
+#: templates/index2.html:215
+msgid "Forecasting sales"
+msgstr ""
+
+#: templates/index2.html:216
+msgid "Control of sales plan"
+msgstr ""
+
+#: templates/index2.html:217
+msgid "Adjusting KPI’s for sales managers"
+msgstr ""
+
+#: templates/index2.html:218
+msgid "Sales cycle analysis"
+msgstr ""
+
+#: templates/index2.html:219
+msgid "Marketing effectiveness analysis"
+msgstr ""
+
+#: templates/index2.html:220
+msgid "Business process standardization"
+msgstr ""
+
+#: templates/index2.html:236
+msgid "Be mobile"
+msgstr ""
+
+#: templates/index2.html:238
+msgid ""
+"Our mobile app allows you to stay connect to your sales department anywhere "
+"at any time."
+msgstr ""
+
+#: templates/index2.html:285
+msgid "The singularity of ALMASALES"
+msgstr ""
+
+#: templates/index2.html:287
+msgid ""
+"lies in its philosophy, including OKR methodology (Objectives and Key "
+"results), implemented by such companies as  Google, Facebook, Apple, LinkedIn"
+msgstr ""
+
+#: templates/index2.html:329
+msgid "Starters plan"
+msgstr ""
+
+#: templates/index2.html:331 templates/index2.html.py:345
+#: templates/index2.html:359
+msgid "month"
+msgstr ""
+
+#: templates/index2.html:333 templates/index2.html.py:347
+#: templates/index2.html:361
+msgid "Users"
+msgstr ""
+
+#: templates/index2.html:335 templates/index2.html.py:349
+#: templates/index2.html:363
+msgid "per user"
+msgstr ""
+
+#: templates/index2.html:336 templates/index2.html.py:350
+#: templates/index2.html:364
+msgid "First month is free"
+msgstr ""
+
+#: templates/index2.html:338 templates/index2.html.py:352
+#: templates/index2.html:366
+msgid "Choose plan"
+msgstr ""
+
+#: templates/index2.html:343
+msgid "Medium business"
+msgstr ""
+
+#: templates/index2.html:357
+msgid "Corporate business"
+msgstr ""
+
+#: templates/index2.html:362
+msgid "Unlimited"
+msgstr ""
+
+#: templates/index2.html:377
+msgid "We are always happy with your feedback"
+msgstr ""
+
+#: templates/index2.html:391
+msgid "Where to find us"
+msgstr ""
+
+#: templates/index2.html:392
+msgid ""
+"You can find us by address: Samal 1, house 1, Almaty, Kazakhstan 050010."
+msgstr ""
+
+#: templates/index2.html:430
+msgid "Subscribe"
+msgstr ""
+
 #: templates/layout.crm.html:63
 msgid "contacts"
 msgstr ""
@@ -908,9 +1190,3 @@ msgstr ""
 #: templates/layout.crm.html:66
 msgid "feed"
 msgstr ""
-
-#~ msgid "Forgot your subdomain?"
-#~ msgstr "Забыли ваш поддомен?"
-
-#~ msgid "Legal details"
-#~ msgstr "Соглашение о порядке предоставления услуг"

@@ -11,7 +11,6 @@ from alm_company.models import Company
 from alm_vcard.models import (
     VCard,
     BadVCardError,
-    Org,
     Title,
     Tel,
     Email,
@@ -27,7 +26,7 @@ from django.core.cache import cache
 from django.db.models import signals, Q
 from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
-from django.db.models.signals import post_save, post_delete, pre_delete
+from django.db.models.signals import pre_save, post_save, post_delete, pre_delete
 from django.utils import timezone
 from datetime import datetime, timedelta
 import xlrd
@@ -51,8 +50,10 @@ CURRENCY_OPTIONS = (
     ('KZT', 'Tenge'),
 )
 
-GLOBAL_CYCLE_TITLE = u'Основной поток'
-GLOBAL_CYCLE_DESCRIPTION = u'Автоматически созданный цикл'
+# GLOBAL_CYCLE_TITLE = u'Основной поток'
+# GLOBAL_CYCLE_DESCRIPTION = u'Автоматически созданный цикл'
+GLOBAL_CYCLE_TITLE = _('Main flow')
+GLOBAL_CYCLE_DESCRIPTION = _('Automatically generated cycle')
 
 def type_cast(input):
     return input if type(input) != float else str(input)
@@ -71,15 +72,25 @@ class Milestone(SubscriptionObject):
     @classmethod
     def create_default_milestones(cls, company_id):
         milestones = []
-        default_data = [{'title':u'Звонок/Заявка', 'color_code': '#F4B59C', 'is_system':0, 'sort':1},
-                        {'title':u'Отправка КП', 'color_code': '#F59CC8', 'is_system':0, 'sort':2},
-                        {'title':u'Согласование договора', 'color_code': '#A39CF4', 'is_system':0, 'sort':3},
-                        {'title':u'Выставление счета', 'color_code': '#9CE5F4', 'is_system':0, 'sort':4},
-                        {'title':u'Контроль оплаты', 'color_code': '#9CF4A7', 'is_system':0, 'sort':5},
-                        {'title':u'Предоставление услуги', 'color_code': '#D4F49B', 'is_system':0, 'sort':6},
-                        {'title':u'Upsales', 'color_code': '#F4DC9C', 'is_system':0, 'sort':7},
-                        {'title':u'Успешно завершено', 'color_code':'#9CF4A7', 'is_system':1, 'sort':8},
-                        {'title':u'Не реализовано', 'color_code':'#F4A09C', 'is_system':2, 'sort':9}]
+        """
+            'Звонок/Заявка'
+            'Отправка КП'
+            'Согласование договора'
+            'Выставление счета'
+            'Контроль оплаты'
+            'Предоставление услуги'
+            'Upsales'
+            'Успешно завершено'
+            'Не реализовано'
+        """
+        default_data = [{'title':_('Call/request'), 'color_code': '#F4B59C', 'is_system':0, 'sort':1},
+                        {'title':_('Dispatching business offer'), 'color_code': '#F59CC8', 'is_system':0, 'sort':2},
+                        {'title':_('Negotiating contract'), 'color_code': '#A39CF4', 'is_system':0, 'sort':3},
+                        {'title':_('Invoicing'), 'color_code': '#9CE5F4', 'is_system':0, 'sort':4},
+                        {'title':_('Payment control'), 'color_code': '#9CF4A7', 'is_system':0, 'sort':5},
+                        {'title':_('Service provision'), 'color_code': '#D4F49B', 'is_system':0, 'sort':6},
+                        {'title':_('Successful'), 'color_code':'#9CF4A7', 'is_system':1, 'sort':7},
+                        {'title':_('Failed'), 'color_code':'#F4A09C', 'is_system':2, 'sort':8}]
 
         for data in default_data:
             milestone = Milestone()
@@ -125,7 +136,8 @@ class Contact(SubscriptionObject):
     vcard = models.OneToOneField('alm_vcard.VCard', blank=True, null=True,
                                  on_delete=models.SET_NULL, related_name='contact')
     parent = models.ForeignKey(
-        'Contact', blank=True, null=True, related_name='children')
+        'Contact', blank=True, null=True, 
+        related_name='children', on_delete=models.SET_NULL)
     owner = models.ForeignKey(
         User, related_name='owned_contacts',
         null=True)
@@ -183,13 +195,13 @@ class Contact(SubscriptionObject):
     def email_work(self):
         return self.email(type='INTERNET')
 
-    def company(self):
-        if not self.vcard:
-            return _('Unknown organization')
-        org = self.vcard.org_set.first()
-        if not org:
-            return _('Unknown organization')
-        return org.name
+    # def company(self):
+    #     if not self.vcard:
+    #         return _('Unknown organization')
+    #     org = self.vcard.org_set.first()
+    #     if not org:
+    #         return _('Unknown organization')
+    #     return org.name
 
     def get_tp(self):
         return dict(self.TYPES_OPTIONS).get(self.tp, None)
@@ -247,6 +259,22 @@ class Contact(SubscriptionObject):
     @classmethod
     def share_contact(cls, share_from, share_to, contact_id, company_id, comment=None):
         return cls.share_contacts(share_from, share_to, [contact_id], company_id, comment)
+
+    def create_company_for_contact(self, company_name):
+        with transaction.atomic():
+            vcard = VCard(fn=company_name)
+            vcard.save()
+            c = Contact(
+                tp='co',
+                vcard=vcard,
+                owner=self.owner,
+                company_id=self.company_id
+                )
+            c.save()
+            self.parent = c
+            self.save()
+            return c
+
 
     @classmethod
     def share_contacts(cls, share_from, share_to, contact_ids, company_id, comment=None):
@@ -500,9 +528,10 @@ class Contact(SubscriptionObject):
                         }
                     )
                 if data[i][5]:
-                    org = Org(vcard=v)
-                    org.organization_name = data[i][5].decode('utf-8')
-                    org.save()
+                    # org = Org(vcard=v)
+                    # org.organization_name = data[i][5].decode('utf-8')
+                    # org.save()
+                    pass
                 if data[i][6]:
                     title = Title(vcard=v)
                     title.data = data[i][6].decode('utf-8')
@@ -544,7 +573,6 @@ class Contact(SubscriptionObject):
                     email.value = data[i][15].decode('utf-8')
                     email.save()
                 contact_list.append(c)
-                print "%s created contact %s" % (c, c.id)
                 # print contact_list
         return contact_list
 
@@ -570,12 +598,16 @@ class Contact(SubscriptionObject):
     @classmethod
     def create_from_structure(cls, data, file_structure, creator, import_task, company_id):
         contact = cls()
-        vcard = VCard(fn='Без Имени')
+        vcard = VCard(fn=_('No name'))
         vcard.save()
         response = {}
         for structure_dict in file_structure:
+            company_name = ""
             col_num = int(structure_dict.get('num'))
-            model = getattr(vcard_models, structure_dict.get('model'))
+            if structure_dict.get('model') == 'Org':
+                model = 'Org'
+            else:
+                model = getattr(vcard_models, structure_dict.get('model'))
             if type(data[col_num].value) == float:
                 data[col_num].value = str(data[col_num].value)
             if model == vcard_models.VCard:
@@ -622,15 +654,16 @@ class Contact(SubscriptionObject):
                     response['error'] = True
                     response['error_col'] = col_num
                     return response
-            elif model == vcard_models.Org:
+            elif model == 'Org':
                 try:
                     if data[col_num].value:
                         objects = data[col_num].value.split(';')
                         for object in objects:
                             v_type = structure_dict.get('attr','')
-                            obj = model(organization_name = object)
-                            obj.vcard = vcard
-                            obj.save()
+                            company_name = object
+                            # obj = model(organization_name = object)
+                            # obj.vcard = vcard
+                            # obj.save()
                 except Exception as e:
                     print str(e) + 'at col {} at 633'.format(col_num)
                     # transaction.savepoint_rollback(sid)
@@ -694,8 +727,8 @@ class Contact(SubscriptionObject):
             response['error'] = True
             response['error_col'] = 0
             return response
-        if vcard.fn == 'Без Имени' and vcard.org_set.first():
-            vcard.fn = vcard.org_set.first().organization_name
+        if vcard.fn == 'Без Имени' and company_name:
+            vcard.fn = company_name
             vcard.save()
             contact.tp = 'co'
         elif vcard.fn == 'Без Имени' and vcard.email_set.first():
@@ -712,6 +745,28 @@ class Contact(SubscriptionObject):
                          'contact_id':contact.id
                         }
                     )
+        try:
+            if contact.vcard.fn != company_name:
+                company = Contact.objects.filter(
+                    tp='co',
+                    company_id=contact.company_id,
+                    vcard__fn=company_name
+                    ).first()
+                if company:
+                    contact.parent = company
+                    contact.save()
+                else:
+                    company = contact.create_company_for_contact(company_name)
+                    company.import_task = import_task
+                    company.save()
+                    SalesCycle.create_globalcycle(
+                            **{'company_id':company.company_id,
+                             'owner_id':creator.id,
+                             'contact_id':company.id
+                            }
+                        )
+        except:
+            pass
         return {'error':False, 'contact_id':contact.id}
 
     @classmethod
@@ -806,24 +861,25 @@ class Contact(SubscriptionObject):
         return cls.objects.filter(q).order_by('-date_created')
 
     def merge_contacts(self, alias_objects=[], delete_merged=True):
-        t = time.time()
         if not alias_objects:
             return {'success':False, 'message':'No alias objects appended'}
         for obj in alias_objects:
             if not isinstance(obj, self.__class__):
                 return {'success':False, 'message':'Not Instance of Contact'}
 
-        # original_sales_cycles = self.sales_cycles.filter(
-        #     is_global=False) 
-        # original_activities = [obj.id for obj in Activity.objects.filter(
-        #             sales_cycle__in=self.sales_cycles.all())] 
-        # original_shares = [ obj.id for obj in self.share_set.all() ]
         global_sales_cycle = SalesCycle.get_global(self.company_id, self.id)
         deleted_sales_cycle_ids = [ obj.sales_cycles.get(is_global=True).id for obj in alias_objects ]
-        # Merging sales Cycles
         activities = []
         sales_cycles = []
         shares = []
+        parent_dict = {}    # Dict of type contact.id:contact.parent.id
+        children_dict = {}  # Dict of type contact.id:contact.children.all()
+        fn_list = []
+        for obj in alias_objects:
+            if type(obj.vcard.fn)==unicode:
+                fn_list.append(obj.vcard.fn.encode('utf-8'))
+            else:
+                fn_list.append(obj.vcard.fn)
         try:
             note_data = self.vcard.note_set.last().data
         except:
@@ -831,6 +887,11 @@ class Contact(SubscriptionObject):
         for obj in alias_objects:
             if obj.vcard.note_set.all():
                 note_data += "\n" + obj.vcard.note_set.last().data
+        for alias_obj in alias_objects:
+            if alias_obj.parent:
+                parent_dict[alias_obj.id]=alias_obj.parent.id
+            if alias_obj.children.all():
+                children_dict[alias_obj.id] = [child.id for child in alias_obj.children.all()]
         with transaction.atomic():
             for obj in alias_objects:
                 for sales_cycle in obj.sales_cycles.all():
@@ -843,15 +904,17 @@ class Contact(SubscriptionObject):
                         sales_cycle.contact = self
                         sales_cycle.save()
                         sales_cycles.append(sales_cycle)
-                        # [activities.append(obj) for obj in sales_cycle.rel_activities.all()]
+                if obj.children.all():
+                    for child in obj.children.all():
+                        self.children.add(child)
 
-        # Merging vcards
         VCard.merge_model_objects(self.vcard, [c.vcard for c in alias_objects])
         self.vcard.note_set.all().delete()
-        if note_data:
-            note = Note(data=note_data, vcard=self.vcard)
+        if note_data or fn_list:
+            note = Note(
+                data=', '.join(map(str,fn_list)) + ' ' + note_data, 
+                vcard=self.vcard)
             note.save()
-        #mergin shares
         with transaction.atomic():
             for obj in alias_objects:
                 for share in obj.share_set.all():
@@ -863,21 +926,17 @@ class Contact(SubscriptionObject):
             alias_objects.delete()
         else:
             deleted_contacts = []
-        # sales_cycles = self.sales_cycles.all().exclude(
-        #     id__in=original_sales_cycles).prefetch_related('rel_activities')
-        # activities = Activity.objects.filter(
-        #     sales_cycle__in=self.sales_cycles.all()).exclude(id__in=original_activities)
-        # shares = self.share_set.all().exclude(id__in=original_shares)
         response = {
             'success':True,
             'contact':self,
             'deleted_contacts_ids':deleted_contacts,
             'deleted_sales_cycle_ids':deleted_sales_cycle_ids,
+            'parent_dict':parent_dict,
+            'children_dict':children_dict,
             'sales_cycles':sales_cycles,
             'activities':activities,
             'shares':shares,
         }
-        # print "Approximate time of merging contacts %s " % str(time.time()-t)
         return response
 
 
@@ -889,6 +948,8 @@ class Contact(SubscriptionObject):
         with transaction.atomic():
             objects = {
                 "contacts": [],
+                "parent_dict": {},
+                "children_dict": {},
                 "sales_cycles": [],
                 "activities": [],
                 "shares": [],
@@ -898,6 +959,10 @@ class Contact(SubscriptionObject):
                 try:
                     # print contact_id
                     obj = Contact.objects.get(id=contact_id)
+                    if obj.parent:
+                        objects['parent_dict'][obj.id]=obj.parent.id
+                    if obj.children:
+                        objects['children_dict'][obj.id] = [child.id for child in obj.children.all()]
                     objects['contacts'].append(contact_id)
                     objects['sales_cycles'] += list(obj.sales_cycles.all().values_list("id", flat=True))
                     for sales_cycle in obj.sales_cycles.all():
@@ -909,7 +974,6 @@ class Contact(SubscriptionObject):
             return objects
 
     def serialize(self):
-
         return {
             'author_id': self.owner_id,
             'company_id': self.company_id,
@@ -919,8 +983,8 @@ class Contact(SubscriptionObject):
             'id': self.pk,
             'pk': self.pk,
             'owner': self.owner_id,
-            'parent_id': hasattr(self, 'parent_id') and self.parent_id or None,
-            'children': [child.pk for child in self.children.all()],
+            'parent_id': self.parent_id,
+            # 'children': [child.pk for child in self.children.all()],
             'sales_cycles': [cycle.pk for cycle in self.sales_cycles.all()],
             'status': self.status,
             'tp': self.tp,
@@ -930,7 +994,6 @@ class Contact(SubscriptionObject):
     @classmethod
     def after_save(cls, sender, instance, **kwargs):
         cache.set(build_key(cls._meta.model_name, instance.pk), json.dumps(instance.serialize(), default=date_handler))
-    
         # TODO: each time when contact is updated vcard is recreated. So if it is the case then reinvalidate cache
         vcard = instance.vcard
         if vcard:
@@ -977,7 +1040,6 @@ class Contact(SubscriptionObject):
         contact_qs = cls.objects.all().prefetch_related('sales_cycles', 'children')
         contact_raws = [c.serialize() for c in contact_qs]
         cache.set_many({build_key(cls._meta.model_name, contact_raw['id']): json.dumps(contact_raw, default=date_handler) for contact_raw in contact_raws})
-
 
 post_save.connect(Contact.after_save, sender=Contact)
 post_delete.connect(Contact.after_delete, sender=Contact)
@@ -1170,7 +1232,6 @@ class SalesCycle(SubscriptionObject):
         return '%s [%s %s]' % (self.title, self.contact, self.status)
 
     def delete(self):
-        print 'at salescycle delete'
         super(self.__class__, self).delete()
 
     @property
@@ -1502,6 +1563,7 @@ class Activity(SubscriptionObject):
     owner = models.ForeignKey(User, related_name='activity_owner', null=True)
     mentions = generic.GenericRelation('Mention', null=True)
     comments = generic.GenericRelation('Comment', null=True)
+    attached_files = generic.GenericRelation('AttachedFile', null=True, blank=True)
     hashtags = generic.GenericRelation('HashTagReference', null=True, blank=True)
 
     class Meta:
@@ -1531,10 +1593,10 @@ class Activity(SubscriptionObject):
     def comments_count(self):
         return self.comments.count()
 
-    @property
-    def new_comments_count(self):
+    
+    def new_comments_count(self, user_id):
         return len(
-            filter(lambda(comment): not comment.has_read(comment.owner_id),
+            filter(lambda(comment): not comment.has_read(user_id),
                    self.comments.all())
             )
 
@@ -1575,7 +1637,7 @@ class Activity(SubscriptionObject):
 
     @classmethod
     def get_filter_for_mobile(cls):
-        month = (datetime.now(pytz.timezone(settings.TIME_ZONE)) - timedelta(days=31))
+        month = (datetime.now(pytz.timezone(settings.TIME_ZONE)) - timedelta(days=7))
         return (
             Q(deadline__isnull=False, date_finished__isnull=True) |
             Q(deadline__isnull=False, date_finished__isnull=False, date_finished__gte=month) |
@@ -1883,7 +1945,6 @@ class Comment(SubscriptionObject):
             content_type=cttype)
 
 
-
 class CommentRecipient(SubscriptionObject):
     comment = models.ForeignKey(Comment, related_name='recipients')
     user = models.ForeignKey(User, related_name='comments')
@@ -1898,6 +1959,61 @@ class CommentRecipient(SubscriptionObject):
 
     def __unicode__(self):
         return u'Comment: %s' % self.pk or 'Unknown'
+
+
+class AttachedFile(SubscriptionObject):
+    file_object = models.ForeignKey('almastorage.SwiftFile', related_name='attachments')
+    owner = models.ForeignKey(User, related_name='owned_attachments', null=True)
+    content_type = models.ForeignKey(ContentType, null=True, blank=True)
+    object_id = models.IntegerField(null=True, blank=True)
+    content_object = generic.GenericForeignKey('content_type', 'object_id')
+
+    def __unicode__(self):
+        return "%s %s" % (self.file_object, self.content_object)
+
+    @property
+    def author(self):
+        return self.owner
+
+    @property
+    def is_active(self):
+        if self.content_object == None:
+            return False
+        
+        return True
+
+    @classmethod
+    def build_new(cls, file_object, owner, company_id, content_class=None,
+                  object_id=None, save=False):
+        """TODO builds new AttachedFile objects with generic relation,
+            and relation with SwiftFile object.
+
+            arguments:
+                file_object - SwiftFile object
+                owner - User object, 
+                company_id - Company id,
+                content_class - class which be related with the model,
+                object_id - related object id
+
+        Returns
+        --------
+            attached_file - AttachedFile object
+        """
+        attached_file = cls(file_object=file_object, owner=owner, company_id=company_id)
+        attached_file.content_type = ContentType.objects.get_for_model(content_class)
+        attached_file.object_id = object_id
+        if save:
+            attached_file.save()
+        return attached_file
+
+
+def delete_related_file_objs(sender, instance, **kwargs):
+    """TODO deletes swift file object on after attached_file deletes
+        """
+    file_obj = instance.file_object
+    file_obj.delete()
+
+signals.post_delete.connect(delete_related_file_objs, sender=AttachedFile)
 
 
 class Share(SubscriptionObject):
@@ -2104,17 +2220,17 @@ class Filter(SubscriptionObject):
         super(self.__class__, self).save(**kwargs)
 
 
-class HashTag(models.Model):
-    text = models.CharField(max_length=500, unique=True)
-    date_created = models.DateTimeField(auto_now_add=True, blank=True)
-    date_edited = models.DateTimeField(auto_now=True, blank=True)
+class HashTag(SubscriptionObject):
+    text = models.CharField(max_length=500)
 
     class Meta:
         verbose_name = _('hashtag')
         db_table = settings.DB_PREFIX.format('hashtag')
+        unique_together = ('company_id', 'text')
 
     def __unicode__(self):
         return u'%s' % (self.text)
+
 
 class HashTagReference(SubscriptionObject):
     hashtag = models.ForeignKey(HashTag, related_name="references")

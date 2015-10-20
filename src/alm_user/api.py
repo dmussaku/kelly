@@ -34,6 +34,7 @@ from tastypie.authentication import (
 from almanet.settings import DEFAULT_SERVICE, TIME_ZONE
 from almanet.utils.api import RequestContext, CommonMeta
 from almanet.utils.env import get_subscr_id
+from almastorage.models import SwiftFile
 import json
 import datetime
 import ast
@@ -172,18 +173,22 @@ class UserResource(ModelResource):
         with RequestContext(self, request, allowed_methods=['post']):
             data = self.deserialize(request, request.body, format=request.META.get('CONTENT_TYPE', 'application/json'))
 
-            from django.core.files.uploadedfile import SimpleUploadedFile
-            file_contents = SimpleUploadedFile("%s" %(data['name']), base64.b64decode(data['pic']), content_type='image')
-            request.user.userpic.save(data['name'], file_contents, True)
-            
+            # from django.core.files.uploadedfile import SimpleUploadedFile
+            # file_contents = SimpleUploadedFile("%s" %(data['name']), base64.b64decode(data['pic']), content_type='image')
+            # request.user.userpic.save(data['name'], file_contents, True)
+
             user = User.objects.get(id=request.user.id)
 
+            swiftfile = SwiftFile.upload_file(file_contents=base64.b64decode(data['pic']), filename=data['name'], 
+                                                content_type='image', container_title='CRM_USERPICS')
+            user.userpic_obj = swiftfile
+            user.save()
             bundle = self.build_bundle(obj=user, request=request)
             bundle = self.full_dehydrate(bundle)
 
             return self.create_response(request, bundle,
                                             response_class=http.HttpAccepted)
-
+            
     def change_password(self, request, **kwargs):
         with RequestContext(self, request, allowed_methods=['post']):
             data = self.deserialize(
@@ -305,6 +310,9 @@ class UserResource(ModelResource):
             bundle.data['is_active'] = current_account.is_active
         bundle.data['companies'] = company_list
         # TODO: use CustomFields with use_in_ids
+
+        if bundle.obj.userpic_obj != None:
+            bundle.data['userpic'] = bundle.obj.userpic_obj.url
         return bundle
 
     def vcard_full_hydrate(self, bundle):
@@ -465,7 +473,7 @@ class SessionObject(object):
             'user_id': self.user.pk,
             # 'session_key': request.session.session_key,
             # 'logged_in': request.account.is_authenticated(),
-            'language': translation.get_language(),
+            'language': self.user.language,
             'timezone': TIME_ZONE
         }
 

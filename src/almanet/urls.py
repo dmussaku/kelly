@@ -17,7 +17,6 @@ from almanet.views import (
     )
 from django.views.generic import TemplateView
 
-
 admin.autodiscover()
 
 urlpatterns = patterns(
@@ -30,7 +29,7 @@ urlpatterns = patterns(
     
     # TODO: temp, needs to be deleted
     # url(r'^crm/', include('alm_crm.urls')),
-    url(r'^vcard/', include('alm_vcard.urls')),
+    # url(r'^vcard/', include('alm_vcard.urls')),
     url(r'^services/$', ServiceList.as_view(
         template_name='almanet/service/service_list.html'),
         name='service_list'),
@@ -48,8 +47,7 @@ urlpatterns = patterns(
     url(r'api/doc/', include('tastypie_swagger.urls', namespace='tastypie_swagger')),
     url(r'agreement/$', TemplateView.as_view(template_name='almanet/agreement.crm.html'), name='agreement'),
     # url(r'landing_form/$', landing_form, name='landing_form'),
-    url(r'landing/$', landing, name='landing_page'),
-
+    url(r'^files', include('almastorage.urls')),
 )
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

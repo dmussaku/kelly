@@ -19,6 +19,7 @@ from .models import (
     HashTagReference,
     CustomSection,
     CustomField,
+    AttachedFile,
     CustomFieldValue,
     ImportTask,
     ErrorCell
@@ -29,26 +30,6 @@ from alm_vcard.api import (
     VCardResource,
     VCardEmailResource,
     VCardTelResource,
-    VCardOrgResource,
-    VCardGeoResource,
-    VCardAdrResource,
-    VCardAgentResource,
-    VCardCategoryResource,
-    VCardKeyResource,
-    VCardLabelResource,
-    VCardMailerResource,
-    VCardNicknameResource,
-    VCardNoteResource,
-    VCardRoleResource,
-    VCardTitleResource,
-    VCardTzResource,
-    VCardUrlResource
-    )
-from alm_vcard.api import (
-    VCardResource,
-    VCardEmailResource,
-    VCardTelResource,
-    VCardOrgResource,
     VCardGeoResource,
     VCardAdrResource,
     VCardAgentResource,
@@ -64,6 +45,7 @@ from alm_vcard.api import (
     VCardUrlResource
     )
 from alm_vcard.models import *
+from almastorage.models import SwiftFile
 from almanet.settings import DEFAULT_SERVICE
 from almanet.settings import TIME_ZONE
 from almanet.utils.api import RequestContext, SessionAuthentication
@@ -95,7 +77,7 @@ from datetime import datetime, timedelta
 import dateutil.parser
 import pytz
 
-from .utils.parser import text_parser
+from .utils.parser import HASHTAG_PARSER, MENTION_PARSER, text_parser
 from .utils import report_builders
 from .utils.data_processing import (
     processing_custom_field_data,
@@ -111,6 +93,7 @@ from .tasks import grouped_contact_import_task, check_task_status
 from almanet.middleware import GetSubdomainMiddleware
 import time
 
+CRM_CONTAINER_TITLE = 'CRM_FILES'
 
 def _firstOfQuerySet(queryset):
     try :
@@ -418,7 +401,7 @@ class ContactResource(CRMServiceModelResource):
         null=True, full=False, full_use_ids=True)
     parent = fields.ToOneField(
         'alm_crm.api.ContactResource', 'parent',
-        null=True, full=False
+        null=True, full=True
         )
 
     share = fields.ToOneField('alm_crm.api.ShareResource',
@@ -433,11 +416,13 @@ class ContactResource(CRMServiceModelResource):
             'owner', 'parent', 'vcard').prefetch_related(
                 'sales_cycles', 'children', 'share_set',
                 'vcard__tel_set', 'vcard__category_set',
-                'vcard__adr_set', 'vcard__title_set', 'vcard__url_set',
-                'vcard__org_set', 'vcard__email_set')
+                'vcard__adr_set', 'vcard__title_set', 
+                'vcard__url_set', 'vcard__email_set')
         resource_name = 'contact'
         filtering = {
             'status': ['exact'],
+            'date_created': ['exact', 'range', 'gt', 'gte', 'lt', 'lte'],
+            'date_edited': ['exact', 'range', 'gt', 'gte', 'lt', 'lte'],
             'tp': ['exact'],
             'id': ALL
         }
@@ -589,23 +574,56 @@ class ContactResource(CRMServiceModelResource):
         for key, value in kwargs.items():
             setattr(bundle.obj, key, value)
 
-
         bundle = self.full_hydrate(bundle)
+        company_id = bundle.request.company.id
+        company_name = bundle.data.get('company_name',"").strip()
+        if company_name:
+            company = Contact.objects.filter(
+                        vcard__fn=company_name, 
+                        company_id=company_id, 
+                        tp='co').first()
+            if not company:
+                company = bundle.obj.create_company_for_contact(company_name)
+                SalesCycle.create_globalcycle(
+                    **{
+                     'company_id':company_id,
+                     'owner_id':bundle.request.user.id,
+                     'contact_id':company.id
+                    }
+                )
+            else:
+                bundle.obj.parent = company
+        bundle.obj.save()
+        contact = Contact.objects.get(id=bundle.obj.id)
+        company = contact.parent
+
         if bundle.data.get('custom_fields', None):
             processing_custom_field_data(bundle.data['custom_fields'], bundle.obj)
-        new_bundle = self.full_dehydrate(
+        contact_bundle = self.full_dehydrate(
                         self.build_bundle(
-                            obj=Contact.objects.get(id=bundle.obj.id))
+                            obj=contact)
                         )
-        new_bundle.data['global_sales_cycle'] = SalesCycleResource().full_dehydrate(
+        contact_bundle.data['global_sales_cycle'] = SalesCycleResource().full_dehydrate(
                 SalesCycleResource().build_bundle(
                     obj=SalesCycle.objects.get(contact_id=bundle.obj.id)
                 )
             )
-        #return self.save(bundle, skip_errors=skip_errors)
+        if company:
+            company_bundle = self.full_dehydrate(
+                            self.build_bundle(
+                                obj=company)
+                            )
+            company_bundle.data['global_sales_cycle'] = SalesCycleResource().full_dehydrate(
+                    SalesCycleResource().build_bundle(
+                        obj=SalesCycle.objects.get(contact_id=company.id, is_global=True)
+                    )
+                )
+            contact_bundle.data['parent'] = company_bundle
         raise ImmediateHttpResponse(
             HttpResponse(
-                content=Serializer().to_json(new_bundle),
+                content=Serializer().to_json(
+                        contact_bundle
+                    ),
                 content_type='application/json; charset=utf-8', status=200
                 )
             )
@@ -630,22 +648,81 @@ class ContactResource(CRMServiceModelResource):
                 raise NotFound("A model instance matching the provided arguments could not be found.")
 
 
+        children = [child.id for child in Contact.objects.get(id=bundle.obj.id).children.all()]
         bundle = self.full_hydrate(bundle, **kwargs)
-        #return self.save(bundle, skip_errors=skip_errors)
+        old_parent = bundle.obj.parent
+        company_id = bundle.request.company.id
+        company_name = bundle.data.get('company_name',"").strip()
+        if (not company_name):
+            bundle.obj.parent = None
+        elif company_name:
+            company = Contact.objects.filter(
+                        vcard__fn=company_name, company_id=company_id, tp='co').first()
+            if not company:
+                company = bundle.obj.create_company_for_contact(company_name)
+                SalesCycle.create_globalcycle(
+                    **{
+                     'company_id':company_id,
+                     'owner_id':bundle.request.user.id,
+                     'contact_id':company.id
+                    }
+                )
+            else:
+                bundle.obj.parent = company
+        bundle.obj.save()
+        contact = Contact.objects.get(id=bundle.obj.id)
+        company = contact.parent
+
         if bundle.data.get('custom_fields', None):
             processing_custom_field_data(bundle.data['custom_fields'], bundle.obj)
+        contact_bundle = self.full_dehydrate(
+                        self.build_bundle(
+                            obj=contact)
+                        )
+        if company:
+            company_bundle = self.full_dehydrate(
+                            self.build_bundle(
+                                obj=company)
+                            )
+            company_bundle.data['global_sales_cycle'] = SalesCycleResource().full_dehydrate(
+                    SalesCycleResource().build_bundle(
+                        obj=SalesCycle.objects.get(contact_id=company.id, is_global=True)
+                    )
+                )
+            contact_bundle.data['parent'] = company_bundle
+            if old_parent:
+                old_parent_bundle = self.full_dehydrate(
+                                self.build_bundle(
+                                    obj=old_parent
+                                    )
+                                )
+                contact_bundle.data['old_parent'] = old_parent_bundle
+            else:
+                contact_bundle.data['old_parent'] = None
+        self.update_children(bundle, children)
         raise ImmediateHttpResponse(
             HttpResponse(
                 content=Serializer().to_json(
-                    self.full_dehydrate(
-                        self.build_bundle(
-                            obj=Contact.objects.get(id=bundle.obj.id))
-                        )
+                        contact_bundle
                     ),
                 content_type='application/json; charset=utf-8', status=200
                 )
             )
         return bundle
+
+        #return self.save(bundle, skip_errors=skip_errors)
+
+    def update_children(self, bundle, old_children=[]):
+        new_children = bundle.data.get('children', [])
+        for child in [obj for obj in new_children if obj not in set(old_children)]:
+            child = Contact.objects.get(id=child)
+            child.parent_id = bundle.obj.id
+            child.save()
+        for child in [obj for obj in old_children if obj not in set(new_children)]:
+            child = Contact.objects.get(id=child)
+            child.parent_id = None
+            child.save()
+
 
     def full_dehydrate(self, bundle, for_list=False):
         '''Custom representation of followers, assignees etc.'''
@@ -699,6 +776,8 @@ class ContactResource(CRMServiceModelResource):
             raise Exception
         contact_id = kwargs.get('pk', None)
         company_id = bundle.request.company.id
+        # if contact_id is provided then the object is being updated
+        # else, it will be a new object
         if contact_id:
             bundle.obj = Contact.objects.get(id=int(contact_id))
             bundle.obj.company_id = company_id
@@ -713,8 +792,8 @@ class ContactResource(CRMServiceModelResource):
         the json that has been submitted. So if the attribute is there
         then i use bundle.obj and setattr of current field_name to whatever
         i got in a json. If its missing then i just delete it.
-
         '''
+
         bundle = self.hydrate_sales_cycles(bundle)
         bundle = self.hydrate_parent(bundle)
         if bundle.data.get('user_id', ""):
@@ -1423,7 +1502,6 @@ class ContactResource(CRMServiceModelResource):
             return self.create_response(
                 request, response
                 )
-        t = time.time()
         contact = ContactResource().full_dehydrate(
             ContactResource().build_bundle(
                 obj=response['contact'], request=request
@@ -1456,6 +1534,8 @@ class ContactResource(CRMServiceModelResource):
                  'contact':contact,
                  'deleted_contacts_ids':response['deleted_contacts_ids'],
                  'deleted_sales_cycle_ids':response['deleted_sales_cycle_ids'],
+                 'parent_dict': response['parent_dict'],
+                 'children_dict': response['children_dict'],
                  'sales_cycles':sales_cycles,
                  'activities':activities,
                  'shares':shares,
@@ -1597,6 +1677,10 @@ class SalesCycleResource(CRMServiceModelResource):
         resource_name = 'sales_cycle'
         excludes = ['from_date', 'to_date']
         detail_allowed_methods = ['get', 'post', 'put', 'patch', 'delete']
+        filtering={
+            'date_created': ['exact', 'range', 'gt', 'gte', 'lt', 'lte'],
+            'date_edited': ['exact', 'range', 'gt', 'gte', 'lt', 'lte'],
+        }
         always_return_data = True
 
     def prepend_urls(self):
@@ -2040,6 +2124,7 @@ class MilestoneResource(CRMServiceModelResource):
                                         )],
                     response_class=http.HttpAccepted)
 
+
 class ActivityResource(CRMServiceModelResource):
     '''
     GET Method
@@ -2184,7 +2269,7 @@ class ActivityResource(CRMServiceModelResource):
     need_preparation = fields.BooleanField(attribute='need_preparation')
     sales_cycle_id = fields.IntegerField(attribute='sales_cycle_id', null=True)
     comments_count = fields.IntegerField(attribute='comments_count', readonly=True)
-    new_comments_count = fields.IntegerField(attribute='new_comments_count', readonly=True)
+    # new_comments_count = fields.IntegerField(attribute='new_comments_count', readonly=True)
 
     class Meta(CommonMeta):
         queryset = Activity.objects.all().select_related('owner').prefetch_related('comments', 'recipients')
@@ -2194,6 +2279,8 @@ class ActivityResource(CRMServiceModelResource):
         filtering = {
             'author_id': ('exact', ),
             'owner': ALL_WITH_RELATIONS,
+            'date_created': ['exact', 'range', 'gt', 'gte', 'lt', 'lte'],
+            'date_edited': ['exact', 'range', 'gt', 'gte', 'lt', 'lte'],
             'sales_cycle_id': ALL_WITH_RELATIONS
             }
         filtering.update(CommonMeta.filtering)
@@ -2266,6 +2353,16 @@ class ActivityResource(CRMServiceModelResource):
 
     def dehydrate(self, bundle):
         bundle.data['has_read'] = self._has_read(bundle, bundle.request.user.id)
+        bundle.data['new_comments_count'] = bundle.obj.new_comments_count(bundle.request.user.id)
+        files = []
+        for attached_file in bundle.obj.attached_files.all():
+            files.append({
+                            'file_id':attached_file.id,
+                            'filename':attached_file.file_object.filename,
+                            'swiftfile_id':attached_file.file_object.id,
+                            'delete': False
+                        })
+        bundle.data['attached_files'] = files
 
         # send updated contact (status was changed to LEAD)
         if bundle.data.get('obj_created'):
@@ -2351,6 +2448,21 @@ class ActivityResource(CRMServiceModelResource):
         return self.create_response(
             request, {'success': rv})
 
+    def attach_files(self, attached_files, act_id):
+        '''
+            TODO bind existing AttachedFile with activity.
+        '''
+        for file_data in attached_files:
+            att_file = AttachedFile.objects.get(id=file_data['file_id'])
+            if file_data['delete'] == False:
+                att_file.object_id = act_id
+                att_file.save()
+            else:
+                try: 
+                    att_file.delete()
+                except:
+                    pass
+
     def create_multiple(self, request, **kwargs):
         with RequestContext(self, request, allowed_methods=['post']):
             data = self.deserialize(request, request.body,
@@ -2364,6 +2476,7 @@ class ActivityResource(CRMServiceModelResource):
                 new_activity.description = new_activity_data.get('description')
                 new_activity.sales_cycle_id = new_activity_data.get('sales_cycle_id')
                 new_activity.assignee_id = new_activity_data.get('assignee_id')
+                new_activity.company_id = request.company.id
 
                 if 'deadline' in new_activity_data:
                     new_activity.deadline = new_activity_data.get('deadline')
@@ -2371,6 +2484,9 @@ class ActivityResource(CRMServiceModelResource):
                 if 'need_preparation' in new_activity_data:
                     new_activity.need_preparation = new_activity_data.get('need_preparation')
                 new_activity.save()
+
+                if 'attached_files' in new_activity_data:
+                    self.attach_files(new_activity_data['attached_files'], new_activity.id)
 
                 if new_activity_data.get('feedback_status'):
                     new_activity.feedback = Feedback(
@@ -2439,6 +2555,7 @@ class ActivityResource(CRMServiceModelResource):
 
             return self.create_response(request, {'objects':objects}, response_class=http.HttpAccepted)
 
+
     def obj_create(self, bundle, **kwargs): ## TODO
         act = bundle.obj = self._meta.object_class()
         act.author_id = bundle.data.get('author_id')
@@ -2451,6 +2568,10 @@ class ActivityResource(CRMServiceModelResource):
         if 'need_preparation' in bundle.data:
             act.need_preparation = bundle.data.get('need_preparation')
         act.save()
+
+        if 'attached_files' in bundle.data:
+            self.attach_files(bundle.data['attached_files'], act.id)
+
         text_parser(base_text=act.description, content_class=act.__class__,
                     object_id=act.id, company_id = bundle.request.company.id)
         subdomain = bundle.request.subdomain
@@ -2473,6 +2594,8 @@ class ActivityResource(CRMServiceModelResource):
             if bundle.obj.company_id == None:
                 bundle.obj.company_id = bundle.request.company.id
         bundle.obj.save()
+        if 'attached_files' in bundle.data:
+            self.attach_files(bundle.data['attached_files'], bundle.obj.id)
         text_parser(base_text=bundle.obj.description, content_class=bundle.obj.__class__,
                     object_id=bundle.obj.id, company_id = bundle.request.company.id)
         return bundle
@@ -2490,7 +2613,7 @@ class ProductResource(CRMServiceModelResource):
     @undocumented: Meta
     '''
     owner_id = fields.IntegerField(attribute='author_id', null=True)
-#    sales_cycles = fields.ToManyField(SalesCycleResource, 'sales_cycles', readonly=True)
+    # sales_cycles = fields.ToManyField(SalesCycleResource, 'sales_cycles', readonly=True)
 
     class Meta(CommonMeta):
         queryset = Product.objects.all().prefetch_related('custom_field_values')
@@ -2584,6 +2707,7 @@ class ProductResource(CRMServiceModelResource):
         if bundle.data.get('custom_fields', None):
             processing_custom_field_data(bundle.data['custom_fields'], bundle.obj)
         return bundle
+
 
 class ProductGroupResource(CRMServiceModelResource):
     '''
@@ -2917,6 +3041,109 @@ class MentionResource(CRMServiceModelResource):
     class Meta(CommonMeta):
         queryset = Mention.objects.all()
         resource_name = 'mention'
+
+
+class AttachedFileResource(CRMServiceModelResource):
+    '''
+    ALL Method
+    I{URL}:  U{alma.net/api/v1/attached_file/}
+
+    B{Description}:
+    API resource to manage Attached Files
+    (GenericRelation with Activity)
+
+    @undocumented: Meta
+    '''
+    content_object = GenericForeignKeyField({
+        Activity: ActivityResource
+    }, 'content_object')
+
+    swiftfile_id = fields.IntegerField(attribute='file_object_id', readonly=True)
+
+    class Meta(CommonMeta):
+        queryset = AttachedFile.objects.all()
+        resource_name = 'files'
+        always_return_data = True
+
+    def prepend_urls(self):
+        return [
+            url(
+                r"^(?P<resource_name>%s)/attach%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('attach_file'),
+                name='api_attach_file'
+            )
+        ]
+
+    def deserialize(self, request, data, format=None):
+        '''
+            TODO deserialize request with multipart.
+        '''
+        if not format:
+            format = request.META.get('CONTENT_TYPE', 'application/json')
+
+        if format.startswith('multipart'):
+            data = request.POST.copy()
+            return data
+
+        return super(self.__class__, self).deserialize(request, data, format)
+
+    def attach_file(self, request, **kwargs):
+        '''
+        POST METHOD
+        I{URL}:  U{alma.net/api/v1/files/attach/}
+
+        B{Description}:
+        creates attached_file object with swiftfile object and upload to storage.
+
+        @type  file: tuple
+        @param file: file tuple
+
+        @type name: string
+        @param name: filename
+
+        @type type: string
+        @param type: content type of file_object 
+
+        @type size: int
+        @param size: filesize
+
+        @return: {
+            'file_id': /AttachedFile id,
+            'swiftfile_id': /SwiftFile id,
+            'filename': /filename for display in frontend,
+            'delete': /Status of deletion of file
+        }
+
+
+        '''
+        with RequestContext(self, request, allowed_methods=['post']):
+            data = self.deserialize(request, request.body, format=request.META.get('CONTENT_TYPE', 'application/json'))
+            try:
+                swiftfile = SwiftFile.upload_file(file_contents=request.FILES['file'],
+                                                    filename=data['name'], 
+                                                    content_type=data['type'], 
+                                                    container_title = CRM_CONTAINER_TITLE,
+                                                    filesize=data['size'])
+            except Exception as e:
+                return http.HttpApplicationError(e.message)
+
+            attached_file = AttachedFile.build_new(file_object=swiftfile, 
+                                                owner=request.user,
+                                                company_id=request.company.id,
+                                                content_class=ContentType.objects.get(app_label='alm_crm', 
+                                                    model=data['content_class'].lower()).model_class(),
+                                                object_id=None,
+                                                save=True)
+
+            return self.create_response(request,
+                                        {
+                                            'file_id': attached_file.id, 
+                                            'swiftfile_id': swiftfile.id,
+                                            'filename': data['name'],
+                                            'delete': False
+                                        }, 
+                                        response_class=http.HttpCreated)
 
 
 class ContactListResource(CRMServiceModelResource):
@@ -3294,9 +3521,13 @@ class AppStateObject(object):
 
         self.constants = self.get_constants()
         self.categories = self.get_categories()
+        self.hashtags = self.get_hashtags()
 
     def get_categories(self):
         return [x.data for x in Category.objects.filter(vcard__contact__company_id=self.company.id)]
+
+    def get_hashtags(self):
+        return [{'id': x.id, 'text': x.text, 'count': x.references.count()} for x in HashTag.objects.filter(company_id=self.company.id)]
 
     def get_constants(self):
         return {
@@ -3338,6 +3569,7 @@ class AppStateResource(Resource):
     '''
     categories = fields.ListField(attribute='categories', readonly=True)
     constants = fields.DictField(attribute='constants', readonly=True)
+    hashtags = fields.ListField(attribute='hashtags', readonly=True)
 
     class Meta:
         resource_name = 'app_state'
@@ -3359,6 +3591,12 @@ class AppStateResource(Resource):
                 name='api_get_categories'
             ),
             url(
+                r"^(?P<resource_name>%s)/(?P<slug>\w+)/hashtags%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('get_hashtags'),
+                name='api_get_hashtags'
+            ),
+            url(
                 r"^(?P<resource_name>%s)/(?P<slug>\w+)/company%s$" %
                 (self._meta.resource_name, trailing_slash()),
                 self.wrap_view('get_account(request).company'),
@@ -3375,6 +3613,12 @@ class AppStateResource(Resource):
                 (self._meta.resource_name, trailing_slash()),
                 self.wrap_view('get_session'),
                 name='api_get_session'
+            ),
+            url(
+                r"^(?P<resource_name>%s)/(?P<slug>\w+)/search%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('search'),
+                name='api_search'
             ),
         ]
 
@@ -3501,6 +3745,11 @@ class AppStateResource(Resource):
             obj = AppStateObject(service_slug=kwargs['slug'], request=request)
             return self.create_response(request, {'objects': obj.get_categories()}, response_class=http.HttpAccepted)
 
+    def get_hashtags(self, request, **kwargs):
+        with RequestContext(self, request, allowed_methods=['get']):
+            obj = AppStateObject(service_slug=kwargs['slug'], request=request)
+            return self.create_response(request, {'objects': obj.get_hashtags()}, response_class=http.HttpAccepted)
+
     def get_company(self, request, **kwargs):
         with RequestContext(self, request, allowed_methods=['get']):
             obj = AppStateObject(service_slug=kwargs['slug'], request=request)
@@ -3515,6 +3764,92 @@ class AppStateResource(Resource):
         with RequestContext(self, request, allowed_methods=['get']):
             obj = AppStateObject(service_slug=kwargs['slug'], request=request)
             return self.create_response(request, {'objects': obj.get_session()}, response_class=http.HttpAccepted)
+
+    def search(self, request, **kwargs):
+        '''
+        POST METHOD
+        I{URL}:  U{alma.net/api/v1/app_state/crm/search/}
+
+        Description:
+        This method returns list of object by specified search params
+
+        @return:  objects
+
+        >>> {
+        ...    "objects": {
+        ...        "activities":[],
+        ...        "contacts": [],
+        ...        "comments": [],
+        ...        "sales_cycles": []}
+        ... }
+
+        '''
+
+
+        with RequestContext(self, request, allowed_methods=['get']):
+            obj_dict = {'objects':{}}
+            search_query = request.GET.get('q', '')
+
+            if not search_query:
+                return self.create_response(request, obj_dict, response_class=http.HttpAccepted)
+
+            activities = []
+            shares = []
+            sales_cycles = []
+            all_references = []
+            hashtags = HASHTAG_PARSER.findall(search_query)
+            for hashtag in hashtags:
+                try:
+                    hashtag = HashTag.objects.get(text=hashtag, company_id=request.company.id)
+                    all_references.append(hashtag.references.all())
+                except HashTag.DoesNotExist:
+                    # если какого-то хэштега нет, значит не возможно найти такие объекты со всем указанными хэштегами
+                    # поэтому возвращаем пустой лист объектов
+                    return self.create_response(request, obj_dict, response_class=http.HttpAccepted)
+
+            # превращает из списка списков с hashtag_reference'ами в список списков строчек с закодированнами объектами
+            # [[<HashTagReference: #almacloud>, <HashTagReference: #almacloud>]] => [['Activity_10', 'Activity_11']]
+            # это нужно для использования set.intersection
+            masked_objects = map(
+                lambda y: set(
+                    map(lambda x: '%s_%d' % (x.content_object.__class__.__name__, x.content_object.id), y)
+                ), 
+                all_references
+            )
+
+            result = set.intersection(*masked_objects)
+
+            for obj in result:
+                parts = obj.split('_')
+                class_name = parts[0]
+                id = parts[1]
+
+                if class_name == 'Activity':
+                    activity = Activity.objects.get(id=id)
+                    activities.append(activity)
+                    if activity.sales_cycle not in sales_cycles:
+                        sales_cycles.append(activity.sales_cycle)
+                elif class_name == 'Share':
+                    share = Share.objects.get(id=id)
+                    shares.append(share)
+
+            
+            if activities:
+                activity_resource = ActivityResource()
+                obj_dict['objects']['activities'] = \
+                    activity_resource.get_bundle_list(activities, request)
+
+            if shares:
+                share_resource = ShareResource()
+                shares_list = []
+                for share in shares:
+                    if share.share_to == request.user:
+                        shares_list.append(share)
+
+                obj_dict['objects']['shares'] = \
+                    share_resource.get_bundle_list(shares_list, request)
+
+            return self.create_response(request, obj_dict, response_class=http.HttpAccepted)
 
 
 class MobileStateObject(object):
@@ -3534,14 +3869,17 @@ class MobileStateObject(object):
         self.company = request.company
         self.account = request.user
 
-        sales_cycles = SalesCycleResource().obj_get_list(bundle, limit_for='mobile')
 
-        sc_ids_param = ','.join([str(sc.id) for sc in sales_cycles])
-        activities = ActivityResource().obj_get_list(bundle, limit_for='mobile',
-            sales_cycle_id__in=sc_ids_param)
+        activities = ActivityResource().obj_get_list(bundle, limit_for='mobile')
+        sales_cycles = []
+        for activity in activities:
+            if activity.sales_cycle not in sales_cycles:
+                sales_cycles.append(activity.sales_cycle)
 
-        contact_ids_param = ','.join(set([str(sc.contact_id) for sc in sales_cycles]))
-        contacts = ContactResource().obj_get_list(bundle, id__in=contact_ids_param)
+        contacts = []
+        for sales_cycle in sales_cycles:
+            if sales_cycle.contact not in contacts:
+                contacts.append(sales_cycle.contact)
 
         cu_ids = set([str(a.owner_id) for a in activities])
         cu_ids = cu_ids.union([str(sc.owner_id) for sc in sales_cycles])
@@ -3676,86 +4014,6 @@ class HashTagReferenceResource(CRMServiceModelResource):
     class Meta(CommonMeta):
         queryset = HashTagReference.objects.all()
         resource_name = 'hashtag_reference'
-
-
-    def prepend_urls(self):
-        return [
-            url(
-                r"^(?P<resource_name>%s)/search/(?P<pattern>\w+)%s$" %
-                (self._meta.resource_name, trailing_slash()),
-                self.wrap_view('search'),
-                name='api_search'
-            )]
-
-    def search(self, request, **kwargs):
-        '''
-        GET METHOD
-        I{URL}:  U{alma.net/api/v1/hashtag_reference/search/:hashtag/}
-
-        Description:
-        Api function to return Objects related with giver hashtag
-
-        @type  hashtag: string
-        @param hashtag: hashtag format string.
-
-        @return:  objects
-
-        >>> {
-        ...    "objects": {
-        ...        "activities":[],
-        ...        "contacts": [],
-        ...        "comments": [],
-        ...        "sales_cycles": []}
-        ... }
-
-        '''
-        try:
-            if not kwargs.get('pattern', None):
-                return http.HttpBadRequest()
-
-            hashtag = HashTag.objects.get(text='#'+kwargs.get('pattern', None))
-            activities = []
-            shares = []
-            comments = []
-            sales_cycles = []
-            for reference in hashtag.references.all():
-                if isinstance(reference.content_object, Activity):
-                    activities.append(reference.content_object)
-                    if reference.content_object.sales_cycle not in sales_cycles:
-                        sales_cycles.append(reference.content_object.sales_cycle)
-                elif isinstance(reference.content_object, Share):
-                    shares.append(reference.content_object)
-                elif isinstance(reference.content_object, Comment):
-                    comments.append(reference.content_object)
-
-            obj_dict = {'objects':{}}
-            if activities:
-                activity_resource = ActivityResource()
-                obj_dict['objects']['activities'] = \
-                    activity_resource.get_bundle_list(activities, request)
-
-            if shares:
-                share_resource = ShareResource()
-                shares_list = []
-                for share in shares:
-                    if share.share_to == request.user:
-                        shares_list.append(share)
-
-                obj_dict['objects']['shares'] = \
-                    share_resource.get_bundle_list(shares_list, request)
-
-            if comments:
-                comment_resource = CommentResource()
-                obj_dict['objects']['comments'] = \
-                    comment_resource.get_bundle_list(comments, request)
-
-            if sales_cycles:
-                salescycle_resource = SalesCycleResource()
-                obj_dict['objects']['sales_cycles'] = \
-                    salescycle_resource.get_bundle_list(sales_cycles, request)
-            return self.create_response(request, obj_dict, response_class=http.HttpAccepted)
-        except HashTag.DoesNotExist:
-            return http.HttpNotFound()
 
 
 class CustomSectionResource(CRMServiceModelResource):

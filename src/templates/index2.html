@@ -1,4 +1,5 @@
 {% load static from staticfiles %}
+{% load i18n %}
 {% load almanet_tags %}
 <!--DOCTYPE html -->
 <html >
@@ -70,7 +71,7 @@
             }
             .imac .arrow a {
                 display: block;
-                background: url("{% static 'images/arrows.png' %}") no-repeat 0 0;
+                background: url("{% static 'images/arrows.png' %}")}} no-repeat 0 0;
                 margin: 0 40px;
                 width: 41px;
                 height: 51px;
@@ -104,14 +105,24 @@
                         </div>
                         <div class="collapse navbar-collapse pull-right">
                             <ul class="nav pull-left">
-                                <li><a href="#main">Главная</a></li>
+                                <li><a href="#main">{{_("Main")}} </a></li>
                                 <!--                                <li><a href="#">О компании</a></li>-->
-                                <li><a href="#plans">Планы</a></li>
+                                <li><a href="#plans">{{_("Plans")}} </a></li>
                                 <!--                                <li><a href="#">Блог</a></li>-->
-                                <li><a href="#contacts">Контакты</a></li>
+                                <li><a href="#contacts">{{_("Contacts")}} </a></li>
+                                <li>
+                                    <a style="padding:34px 0px 0px;" href="{% url 'landing_page' %}?lang=ru">
+                                        <img src="{% static 'images/ru.png' %}"/>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a style="padding:34px 0px 0px;" href="{% url 'landing_page' %}?lang=en">
+                                        <img src="{% static 'images/us.png' %}"/>
+                                    </a>
+                                </li>
                             </ul>
                             <form class="navbar-form pull-left">
-                                <a class="btn btn-info" href="{% url 'user_login' %}">Войти</a>
+                                <a class="btn btn-info" href="{% url 'user_login' %}">{{_("Sign in")}}</a>
                             </form>
                         </div>
                     </div>
@@ -124,7 +135,7 @@
             <div class="container">
                 <div class="row">
                     <div class="col-sm-5">
-                        <h2>Миссия продавать!</h2>
+                        <h2>{{_("Selling - is our mission!")}}</h2>
                         <!--                        <h4>ALMASALES – увеличим продажи вместе.</h4>-->
                         <!--                           Особенность ALMASALES заложена в его философии, включающей методологию OKR (Objectives and Keyresults)-->
 
@@ -132,10 +143,10 @@
                             <form action="" method="post">
                                 {% csrf_token %}
                                 <div class="form-group">
-                                    <input class="form-control" type="text" name="email" placeholder="Ваш E-mail">
+                                    <input class="form-control" type="text" name="email" placeholder="{{_('Your email')}}">
                                 </div>
                                 <div class="form-group">
-                                    <button type="submit" class="btn btn-block btn-info">Попробовать сервис</button>
+                                    <button type="submit" class="btn btn-block btn-info">{{_("Try service")}} </button>
                                 </div>
                             </form>
                         </div>
@@ -152,27 +163,27 @@
 
         <section class="content-4">
             <div class="container">
-                <h3>AlmaSales увеличивает Ваши продажи, через</h3>
+                <h3>AlmaSales {{_("Will increase your sales capacity through:")}} </h3>
                 <div class="center-block row features">
                     <div class="col-sm-3">
                         <img src="{% static 'common-files/icons/retina-ready-s@2x.png' %}" alt="" width="117" height="104">
-                        <h6>Цели</h6>
-                        <p>Разработка целей и подготовка планов по продажам</p>
+                        <h6>{{_("Goals")}}</h6>
+                        <p>{{_("Set the goal and prepare and develop financial and sales plan")}}</p>
                     </div>
                     <div class="col-sm-3">
                         <img src="{% static 'common-files/icons/Pocket@2x.png' %}" alt="" width="104" height="104">
-                        <h6>Продукт</h6>
-                        <p>Определение идеального продукта/каналов продаж</p>
+                        <h6>{{_("Product")}}</h6>
+                        <p>{{_("Identifying the ideal product/client sales channels")}} </p>
                     </div>
                     <div class="col-sm-3">
                         <img src="{% static 'common-files/icons/Graph@2x.png' %}" alt="" width="101" height="101">
-                        <h6>Отчеты</h6>
-                        <p>Внедрение KPI и отчетов</p>
+                        <h6>{{_("Reports")}}</h6>
+                        <p>{{_("Implement KPI and Reports with ALMASALES")}} </p>
                     </div>
                     <div class="col-sm-3">
                         <img src="{% static 'common-files/icons/Settings@2x.png' %}" alt="" width="101" height="101">
-                        <h6>Инструмент</h6>
-                        <p>Усовершенствования инструментов продаж</p>
+                        <h6>{{_("Tools")}}</h6>
+                        <p>{{_("Strengthen sales instruments")}}</p>
                     </div>
                 </div>
             </div>
@@ -181,8 +192,8 @@
         <section class="content-14 v-center">
             <div>
                 <div class="container">
-                    <h3>Наши возможности</h3>
-                    <p class="lead">Проверьте наши возможности для вашего бизнеса</p>
+                    <h3>{{_("Our capabilites")}}</h3>
+                    <p class="lead">{{_("Check out what Almasales can do for your business")}}</p>
                     <div class="row features">
                         <div class="col-sm-8">
                             <div class="imac">
@@ -194,19 +205,19 @@
                         </div>
                         <div class="col-sm-4 ">
                             <div class="" style="color:black;">
-                                <h6>- Клиентская карта и база</h6>
-                                <h6>- Управление взаимодействиями</h6>
-                                <h6>- Управление ассортиментом</h6>
-                                <h6>- Электронный архив материалов</h6>
-                                <h6>- Поручения и контроль их выполнения</h6>
-                                <h6>- Планирование работы</h6>
-                                <h6>- Построение стратегии продаж</h6>
-                                <h6>- Прогнозирование продаж</h6>
-                                <h6>- Контроль плана продаж</h6>
-                                <h6>- Настройка KPI для продавцов</h6>
-                                <h6>- Анализ «воронки» продаж</h6>
-                                <h6>- Анализ эффективности маркетинга</h6>
-                                <h6>- Стандартизация бизнес процессов</h6>
+                                <h6>- {{_("Client database and map")}}</h6>
+                                <h6>- {{_("Activity management")}}</h6>
+                                <h6>- {{ _("Products management") }}</h6>
+                                <h6>- {{ _("Data warehouse") }}</h6>
+                                <h6>- {{ _("Control orders") }}</h6>
+                                <h6>- {{ _("Work planning") }}</h6>
+                                <h6>- {{ _("Building sales strategy") }}</h6>
+                                <h6>- {{ _("Forecasting sales") }}</h6>
+                                <h6>- {{ _("Control of sales plan") }}</h6>
+                                <h6>- {{ _("Adjusting KPI’s for sales managers") }} </h6>
+                                <h6>- {{ _("Sales cycle analysis") }}</h6>
+                                <h6>- {{ _("Marketing effectiveness analysis") }} </h6>
+                                <h6>- {{ _("Business process standardization") }} </h6>
                             </div>
                         </div>
                     </div>
@@ -222,9 +233,10 @@
 
                     </div>
                     <div class="col-sm-7 col-sm-offset-1">
-                        <h3>Будьте мобильнее</h3>
+                        <h3>{{ _("Be mobile") }}</h3>
                         <p>
-                            Разработанное нами удобное мобильное приложение, поможет вам работать в нашей программе где угодно.
+                            {{ _("Our mobile app allows you to stay connect to your sales department anywhere at any time.") }}
+                            }
                         </p>
                         <div class="btns">
                             <a class="btn btn-inverse" href="https://itunes.apple.com/kz/app/almasales/id1010144591?mt=8"><span class="fui-apple"> </span>
@@ -270,8 +282,10 @@
             <div class="container">
                 <div class="row">
                     <div class="col-sm-8 col-sm-offset-2">
-                        <h3>Особенность ALMASALES</h3>
-                        <p class="lead"> заложена в его философии, включающей методологию OKR (Objectives and Key results), используемую такими мировыми компаниями как Google, Facebook, Apple, LinkedIn</p>
+                        <h3>{{ _("The singularity of ALMASALES") }}</h3>
+                        <p class="lead"> 
+                        {{ _("lies in its philosophy, including OKR methodology (Objectives and Key results), implemented by such companies as  Google, Facebook, Apple, LinkedIn") }}
+                        </p>
                         <p>&nbsp;</p><p>&nbsp;</p>
                     </div>
                 </div>
@@ -297,7 +311,7 @@
                                     <input class="form-control" type="email" name="email" placeholder="Ваш E-mail">
                                 </div>
                                 <div class="form-group">
-                                    <button type="submit" class="btn btn-block btn-info">Попробовать сервис</button>
+                                    <button type="submit" class="btn btn-block btn-info">{{ _("Try service") }}</button>
                                 </div>
                             </form>
                         </div>
@@ -312,44 +326,44 @@
                     <div class="plan">
                         <div class="title">
                             <div class="img"><img src="{% static 'common-files/icons/retina-ready-s@2x.png' %}" width="117" height="104" alt=""></div>
-                            Стартовый план
+                            {{ _("Starters plan") }}
                         </div>
-                        <div class="price">25$/месяц</div>
+                        <div class="price">25$/{{ _("month") }}</div>
                         <div class="description">
-                            <b>10</b> Пользователей<br>
-                            <b>100</b> Контактов<br>
-                            <b>1 GB</b> на пользователя<br>
-                            Первый месяц бесплатно
+                            <b>10</b> {{ _("Users") }}<br>
+                            <b>100</b> {{ _("Contacts") }}<br>
+                            <b>1 GB</b> {{ _("per user") }}<br>
+                            {{ _("First month is free") }}
                         </div>
-                        <a class="btn btn-primary" href="{% url 'user_registration' %}">Выбрать план</a>
+                        <a class="btn btn-primary" href="{% url 'user_registration' %}">{{ _("Choose plan") }}</a>
                     </div>
                     <div class="plan plan-2">
                         <div class="title">
                             <div class="img"><img src="{% static 'common-files/icons/rocket@2x.png' %}" width="101" height="101" alt=""></div>
-                            Средний бизнес
+                            {{ _("Medium business") }}
                         </div>
-                        <div class="price">50$/месяц</div>
+                        <div class="price">50$/{{ _("month") }}</div>
                         <div class="description">
-                            <b>20</b> Пользователей<br>
-                            <b>2000</b> Контактов<br>
-                            <b>5 GB</b> на пользователя<br>
-                            Первый месяц бесплатно
+                            <b>20</b> {{ _("Users") }}<br>
+                            <b>2000</b> {{ _("Contacts") }} <br>
+                            <b>5 GB</b> {{ _("per user") }} <br>
+                            {{ _("First month is free") }} 
                         </div>
-                        <a class="btn btn-primary" href="{% url 'user_registration' %}">Выбрать план</a>
+                        <a class="btn btn-primary" href="{% url 'user_registration' %}">{{ _("Choose plan") }}</a>
                     </div>
                     <div class="plan">
                         <div class="title">
                             <div class="img"><img src="{% static 'common-files/icons/magic-wand@2x.png' %}" width="100" height="100" alt=""></div>
-                            Крупный бизнес
+                            {{ _("Corporate business") }}
                         </div>
-                        <div class="price">100$/месяц</div>
+                        <div class="price">100$/{{ _("month") }}</div>
                         <div class="description">
-                            <b>30+</b> Пользователей<br>
-                            <b>Безлимит </b> Контактов<br>
-                            <b>10 GB</b> на пользователя<br>
-                            Первый месяц бесплатно
+                            <b>30+</b> {{ _("Users") }}<br>
+                            <b>{{ _("Unlimited") }} </b><br>
+                            <b>10 GB</b> {{ _("per user") }}<br>
+                            {{ _("First month is free") }} 
                         </div>
-                        <a class="btn btn-primary" href="{% url 'user_registration' %}">Выбрать план</a>
+                        <a class="btn btn-primary" href="{% url 'user_registration' %}">{{ _("Choose plan") }}</a>
                     </div>
                 </div>
             </div>
@@ -360,7 +374,7 @@
             <div class="container">
                 <div class="row">
                     <div class="col-sm-8">
-                        <h3>Мы всегда рады вашим предложениям.</h3>
+                        <h3>{{ _("We are always happy with your feedback") }}</h3>
                     </div>
                 </div>
                 <div class="row">
@@ -374,8 +388,8 @@
                             <textarea rows="7" class="form-control"></textarea>
                             <button type="submit" class="btn btn-primary"><span class="fui-mail"></span></button>
                         </form> -->
-                        <h6>Где нас найти</h6>
-                        <p>Вы можете найти нас по адресу Республика Казахстан, г. Алматы, мкр. Самал 1, д. 1 </p>
+                        <h6>{{ _("Where to find us") }}</h6>
+                        <p>{{ _("You can find us by address: Samal 1, house 1, Almaty, Kazakhstan 050010.") }}</p>
                         <div class="map" style='height:300px;'>
                             <!--map-->
                             <iframe width="100%" height="100%" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="https://maps.google.com/?ie=UTF8&amp;t=m&amp;ll=43.237874,76.956366&amp;spn=0.04554,0.072956&amp;z=15&amp;output=embed"></iframe>
@@ -383,7 +397,7 @@
                     </div>
                     <div class="col-sm-5 col-sm-offset-1">
                         
-                        <h6>Контакты</h6>
+                        <h6>{{ _("Contacts") }}</h6>
                         <div class="links">
                             <a href="#"><span class="fui-phone"></span> +7 777 00 777 05</a><br>
                             <a href="#"><span class="fui-phone"></span> +7 708 88 870 88</a><br>
@@ -413,7 +427,7 @@
 
                     </nav>
                     <div class="col-sm-3 col-sm-offset-1">
-                        <h6>Подписаться на рассылку</h6>
+                        <h6>{{ _("Subscribe") }}</h6>
                         <div class="input-group">
                             <input type="text" class="form-control">
                             <span class="input-group-btn">

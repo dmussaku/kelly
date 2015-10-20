@@ -8,6 +8,7 @@ from timezone_field import TimeZoneField
 from almanet.models import Subscription
 from alm_vcard.models import VCard, Email
 
+from almastorage.utils import default_file
 from datetime import datetime
 import hmac
 import uuid
@@ -16,8 +17,6 @@ try:
 except ImportError:
     import sha
     sha1 = sha.sha
-
-
 
 class AccountManager(contrib_user_manager):
     @classmethod
@@ -47,6 +46,7 @@ class Account(models.Model):
         db_table = settings.DB_PREFIX.format('account')
 
     objects = AccountManager()
+
 
     @property
     def is_staff(self):
@@ -99,7 +99,6 @@ class Account(models.Model):
         return hmac.new(new_uuid.bytes, digestmod=sha1).hexdigest()
 
 
-
 class UserManager(contrib_user_manager):
     @classmethod
     def create_user(self,  email, password, first_name, last_name, is_admin=False):
@@ -113,6 +112,10 @@ class User(AbstractBaseUser):
 
     # REQUIRED_FIELDS = ['email']
     USERNAME_FIELD = 'email'
+    LANGUAGES = (RU_RU, EN_US) = ('ru-RU', 'en-US')
+    LANGUAGES_OPTIONS = ((RU_RU, _('ru-RU')),
+                         (EN_US, _('en-US')))
+
     first_name = models.CharField(_('first name'), max_length=31,
                                   null=False, blank=False)
     last_name = models.CharField(_('last name'), max_length=30, blank=False)
@@ -120,14 +123,18 @@ class User(AbstractBaseUser):
     # is_active = models.BooleanField(_('active'), default=True)
 
     timezone = TimeZoneField(default='Asia/Almaty')
+    language = models.CharField(
+        _('language'),
+        max_length=30,
+        choices=LANGUAGES_OPTIONS, default=RU_RU)
     is_admin = models.BooleanField(default=False)
     # company = models.ManyToManyField('alm_company.Company',
     #                                  related_name='users')
     # is_admin = models.BooleanField(default=False)
 
     vcard = models.OneToOneField(VCard, blank=True, null=True)
-    userpic = models.ImageField(upload_to='userpics')
-
+    userpic_obj = models.ForeignKey('almastorage.SwiftFile', related_name='users', 
+                                default=lambda: default_file.set_file('default_userpic.png', 'image', container_title='CRM_USERPICS').id)
     date_created = models.DateTimeField(auto_now_add=True, blank=True)
     date_edited = models.DateTimeField(auto_now=True, blank=True)
 

@@ -15,6 +15,12 @@ comments = (
     'The Senate Banking panel`s Subcommittee on Financial Institutions and Consumer Protection will host the hearing.',
     )
 
+product_names = ['Microsoft', '1C Enterprise', 'Almasales', 'SalesForce']
+product_descs = ('is an American multinational technology company headquartered in Redmond', 
+                ' is one of the largest independent Russian software developers ', 
+                ' the best software service system in the WORLD ', 
+                ' is a global cloud computing company headquartered in San Francisco')
+
 
 f = {
     'company': '',
@@ -24,9 +30,10 @@ f = {
     'vcard': '',
     'crmuser': '',
     'sales_cycles': '',
-    # 'values': '',
     'activities': '',
-    'comments': ''
+    'comments': '',
+    'products': '',
+    'sc_prod_stat': ''
 }
 
 id_subscr = 1
@@ -37,14 +44,15 @@ id_vcard = 1
 id_vcard_email = 1
 id_crmuser = 1
 id_sales_cycles = 1
-# id_values = 1
 id_activities = 1
 id_comments = 1
+id_product = 1
+id_stat = 1
 
 
 limits = [  # limits by subscription ids
-    {'user': 5, 'contact': 11, 'sales_cycle': 4, 'activity': 10, 'comment': 30},
-    {'user': 2, 'contact': 3, 'sales_cycle': 2, 'activity': 4, 'comment': 5}
+    {'user': 20, 'contact': randint(2000, 2500), 'sales_cycle': randint(1, 3), 'activity': randint(1, 3), 'comment': randint(0, 4), 'products': 20},
+    {'user': 10, 'contact': randint(700, 1500), 'sales_cycle': randint(1, 3), 'activity': randint(1, 2), 'comment': randint(0, 3), 'products': 1000}
 ]
 
 
@@ -63,7 +71,6 @@ def gen_email(user_name):
         except Exception:
             _emails.append(email)
             return email
-
 
 def gen_vcard(user_name):
     global id_vcard, id_vcard_email
@@ -102,6 +109,23 @@ def gen_vcard(user_name):
     f['vcard'] += vcard_email
     id_vcard_email += 1
 
+def gen_sc_prod_stat(cycle_id, product_id, subscription_id):
+    global id_stat
+    value = randint(2000, 10000)
+    stat = ''
+    stat += '{\n'
+    stat += '    "pk": %i,\n' % (id_stat)
+    stat += '    "model": "alm_crm.salescycleproductstat",\n'
+    stat += '    "fields": {\n'
+    stat += '        "sales_cycle": %i,\n' % (cycle_id)
+    stat += '        "product": %i,\n' % (product_id)
+    stat += '        "subscription_id": %i,\n' % (subscription_id)
+    stat += '        "value": %i \n' % (value)
+    stat += '    }\n'
+    stat += '},\n'
+    f['sc_prod_stat'] += stat
+    id_stat += 1
+    return value
 
 for index_subscr in range(0, len(limits)):
 
@@ -118,6 +142,7 @@ for index_subscr in range(0, len(limits)):
     ss += '},\n'
     f['subscription'] += ss
     id_subscr += 1
+    print "Subscription %i created" % index_subscr
 
     comp_name = 'ALMACloud' if index_subscr == 0 else words[randint(0, len(words)-1)] + words[randint(0, len(words)-1)]
     comp = ''
@@ -132,6 +157,7 @@ for index_subscr in range(0, len(limits)):
     comp += '},\n'
     f['company'] += comp
     id_company += 1
+    print "Company %s created"%comp_name
 
     for index_user in range(0, limits[index_subscr]['user']):
         is_first_user = lambda: index_subscr == 0 and index_user == 0
@@ -146,7 +172,7 @@ for index_subscr in range(0, len(limits)):
         user += '        "company": [%i],\n' % (id_company - 1)
         user += '        "is_active": true,\n'
         user += '        "last_login": "2014-11-11T07:51:02.253Z",\n'
-        user += '        "is_admin": false,\n'
+        user += '        "is_admin": %s,\n' % ('true' if is_first_user() else 'false')
         user += '        "timezone": "Asia/Almaty",\n'
         user += '        "password": "pbkdf2_sha256$12000$RfGiFmGJSeoz$063rfBSPM0AsFi1prglD5BW8qD1ElMYxBpRr5tO1M08=",\n'
         user += '        "email": "%s",\n' % ('b.wayne@batman.bat' if is_first_user() else gen_email(user_name))
@@ -170,6 +196,33 @@ for index_subscr in range(0, len(limits)):
         crmuser += '},\n'
         f['crmuser'] += crmuser
         id_crmuser += 1
+
+        print "User %s created" % user_name
+
+    subscr_prod_indx = []
+    for index_product in range(0, limits[index_subscr]['products']):
+        def gen_user_id():
+            ids = range(id_user - limits[index_subscr]['user'], id_user)
+            return ids[randint(0, len(ids)-1)]
+        product_name = product_names[randint(0, 3)]
+        product = ''
+        product += '{\n'
+        product += '    "pk": %i,\n' % (id_product)
+        product += '    "model": "alm_crm.product",\n'
+        product += '    "fields": {\n'
+        product += '        "name": "Product %s",\n' % (product_name)
+        product += '        "description": " Product %s - %s",\n' % (product_name, product_descs[randint(0,3)])
+        product += '        "price": %i,\n' % (randint(2000, 80000))
+        product += '        "currency": "KZT",\n'
+        product += '        "date_created":"2014-10-%02i 00:00:00+00:00",\n' % \
+                (index_product%28 + 1)
+        product += '        "owner": %i,\n' % (gen_user_id())
+        product += '        "subscription_id": %i \n' % (id_subscr - 1)
+        product += '    }\n'
+        product += '},\n'
+        f['products'] += product
+        subscr_prod_indx.append(id_product)
+        id_product += 1
 
     for index_contact in range(0, limits[index_subscr]['contact']):
 
@@ -198,9 +251,8 @@ for index_subscr in range(0, len(limits)):
 
         gen_vcard(cont_name)
 
-        for index_s in range(0, limits[index_subscr]['sales_cycle']):
-
-            s_status = ('N', 'P', 'C')[randint(0, 2)]
+        for index_s in range(0, randint(1, 4)):
+            s_status = ('N', 'P', 'C')[randint(0, 2 if index_s != 0 else 1)]
             s = ''
             s += '{\n'
             s += '    "pk": %i,\n' % (id_sales_cycles)
@@ -208,7 +260,7 @@ for index_subscr in range(0, len(limits)):
             s += '    "fields": {\n'
             s += '        "is_global":%s,\n' % ('true' if index_s == 0 else 'false')
             s += '        "title":"SalesCycle #%i",\n' % (id_sales_cycles)
-            # s += '        "products":[%i],\n' % (randint(1, 4))
+            # s += '        "products":[%i],\n' % (product_id)
             s += '        "owner":%i,\n' % (gen_user_id())
             s += '        "followers":[],\n'
             s += '        "contact":%i,\n' % (id_contact - 1)
@@ -228,23 +280,11 @@ for index_subscr in range(0, len(limits)):
             f['sales_cycles'] += s
             id_sales_cycles += 1
 
-            # # 2 values: real and projected
-            # for index_v in range(0, 2):
-            #     v = ''
-            #     v += '{\n'
-            #     v += '    "pk": %i, \n' % (id_values)
-            #     v += '    "model": "alm_crm.Value", \n'
-            #     v += '    "fields": {\n'
-            #     v += '        "salary":"monthly",\n'
-            #     v += '        "amount":%i,\n' % (5000*randint(1, 10))
-            #     v += '        "currency":"KZT",\n'
-            #     v += '        "subscription_id": %i\n' % (id_subscr - 1)
-            #     v += '    }\n'
-            #     v += '},\n'
-            #     fixture_values += v
-            #     id_values += 1
+            value = 0
+            if s_status == 'C':
+                value = gen_sc_prod_stat(id_sales_cycles, subscr_prod_indx[randint(0, len(subscr_prod_indx)-1)], id_subscr - 1)
 
-            for index_a in range(0, limits[index_subscr]['activity']):
+            for index_a in range(0, randint(1, 4)):
                 # skip if SalesCycle is NEW, mean without Activities
                 if s_status == 'N':
                     continue
@@ -268,7 +308,27 @@ for index_subscr in range(0, len(limits)):
                 f['activities'] += a
                 id_activities += 1
 
-                for index_c in range(0, limits[index_subscr]['comment']):
+                if s_status == 'C':
+                    a = ''
+                    a += '{\n'
+                    a += '    "pk": %i,\n' % (id_activities)
+                    a += '    "model": "alm_crm.Activity",\n'
+                    a += '    "fields": {\n'
+                    a += '        "title":"activity #%i of SalesCycle #%i",\n' % \
+                        (index_a + 1, id_sales_cycles - 1)
+                    a += '        "description":"Closed. Amount Value is #%i",\n' %\
+                        value
+                    a += '        "date_created":"2014-%02i-%02i 00:00:00+00:00",\n' %\
+                        (index_s%12 + 1, (index_a*2)%28 + 1)
+                    a += '        "sales_cycle": %i,\n' % (id_sales_cycles - 1)
+                    a += '        "owner":%i,\n' % (gen_user_id())
+                    a += '        "subscription_id": %i\n' % (id_subscr - 1)
+                    a += '    }\n'
+                    a += '},\n'
+                    f['activities'] += a
+                    id_activities += 1
+
+                for index_c in range(0, randint(0, 3)):
                     c_owner = gen_user_id()
                     c_date = '2014-%02i-%02iT%02i:%02i:00.827Z' % (
                         index_s%12 + 1, (index_a*2)%28 + 1, index_c%23 + 1, randint(0, 59))
@@ -293,11 +353,27 @@ for index_subscr in range(0, len(limits)):
                     c += '},\n'
                     f['comments'] += c
                     id_comments += 1
+    
+print 'created %i subscriptions'%(id_subscr-1)
+print 'created %i companies'%(id_company-1)
+print 'created %i users'%(id_user-1)
+print 'created %i contacts'%(id_contact-1)
+print 'created %i vcard'%(id_vcard-1)
+print 'created %i emails'%(id_vcard_email-1)
+print 'created %i crmusers'%(id_crmuser-1)
+print 'created %i sales_cycles'%(id_sales_cycles-1)
+print 'created %i activities'%(id_activities-1)
+print 'created %i comments'%(id_comments-1)
+print 'created %i products'%(id_product-1)
+print 'created %i product stats'%(id_stat-1)
 
 
+print "start writing to file"
 for fname in f:
     f[fname] = '[\n' + f[fname][:-2] + '\n]'
 
     fixture_file = open('%s.json' % (fname), 'w+')
     fixture_file.write(f[fname])
     fixture_file.close()
+print "finished writing"
+print "GENERATED"

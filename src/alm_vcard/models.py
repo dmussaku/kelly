@@ -937,31 +937,31 @@ class Geo(models.Model):
         verbose_name_plural = _("geographic uri's")
 
 
-class Org(SerializableModel):
-    """
-    An organization and unit the contact is affiliated with.
-    """
-    vcard = models.ForeignKey(VCard)
-    organization_name = models.CharField(max_length=1024, verbose_name=_("organization name"))
-    organization_unit = models.CharField(max_length=1024, verbose_name=_("organization unit"), blank=True)
+# class Org(SerializableModel):
+#     """
+#     An organization and unit the contact is affiliated with.
+#     """
+#     vcard = models.ForeignKey(VCard)
+#     organization_name = models.CharField(max_length=1024, verbose_name=_("organization name"))
+#     organization_unit = models.CharField(max_length=1024, verbose_name=_("organization unit"), blank=True)
 
-    class Meta:
-        verbose_name = _("organization")
-        verbose_name_plural = _("organizations")
+#     class Meta:
+#         verbose_name = _("organization")
+#         verbose_name_plural = _("organizations")
 
-    def __eq__(self, r):
-        l = self
-        return (
-            l.organization_name == r.organization_name and
-            l.organization_unit == r.organization_unit)
+#     def __eq__(self, r):
+#         l = self
+#         return (
+#             l.organization_name == r.organization_name and
+#             l.organization_unit == r.organization_unit)
 
-    @property
-    def name(self):
-        return self.organization_name
+#     @property
+#     def name(self):
+#         return self.organization_name
 
-    class SerializerMeta:
-        exclude = ['vcard']
-        alias = 'orgs'
+#     class SerializerMeta:
+#         exclude = ['vcard']
+#         alias = 'orgs'
 
 
 class Adr(SerializableModel):

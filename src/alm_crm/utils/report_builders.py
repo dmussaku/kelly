@@ -118,12 +118,15 @@ def build_activity_feed(company_id, data=None, timezone='UTC'):
         month = date.split('{')[1].split('}')[0]
         date = date.split('{')[0]+months[int(month)-1]+date.split('}')[1]
 
+        contact = activity.sales_cycle.contact
+
         row = {
             'number': cnt,
             'date': date,
             'hashtags': [hr.hashtag.text for hr in activity.hashtags.all()],
             'description': activity.description,
-            'contact': activity.sales_cycle.contact.vcard.fn,
+            'contact': contact.vcard.fn,
+            'org': contact.parent.vcard.fn if contact.parent is not None else '',
             'user': activity.owner.get_full_name()
         }
         report_data.append(row)
@@ -174,7 +177,7 @@ def get_activity_feed_xls(company_id, data=None, timezone='UTC'):
         worksheet.write(row, 1, item['date'], cell_format)
         worksheet.write(row, 2, hashtags, cell_format)
         worksheet.write(row, 3, item['description'], cell_format)
-        worksheet.write(row, 4, item['contact'], cell_format)
+        worksheet.write(row, 4, '%s - %s' % (item['org'], item['contact']) if len(item['org']) > 1 else item['contact'], cell_format)
         worksheet.write(row, 5, item['user'], cell_format)
         row+=1
 
