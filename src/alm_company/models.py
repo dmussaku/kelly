@@ -3,6 +3,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from datetime import datetime
 from alm_user.models import User
+from dateutil.relativedelta import relativedelta
 import re
 
 
@@ -85,12 +86,12 @@ class Payment(models.Model):
         max_length=20, choices=PAYMENT_OPTIONS, default=CARD)
     status = models.BooleanField(default=False)
     date_created = models.DateTimeField(auto_now_add=True, blank=True)
-    date_to_pay = models.DateTimeField(blank=True)
-    date_paid = models.DateTimeField(blank=True)
+    date_to_pay = models.DateTimeField(blank=True, null=True)
+    date_paid = models.DateTimeField(blank=True, null=True)
     bank_statement = models.OneToOneField(
         'BankStatement', blank=True, null=True, on_delete=models.SET_NULL)
 
-    from dateutil.relativedelta import relativedelta
+    
     def save(self, **kwargs):
         if not self.pk:
             self.date_to_pay = datetime.now()+relativedelta(months=1)

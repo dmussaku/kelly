@@ -33,6 +33,10 @@ from alm_crm.api import (
     AttachedFileResource,
     )
 from alm_user.api import UserResource, SessionResource
+from alm_company.api import (
+    PlanResource,
+    PaymentResource,
+    )
 from tastypie.resources import ModelResource
 
 
@@ -66,6 +70,8 @@ v1_api.register(ReportResource())
 v1_api.register(HashTagReferenceResource())
 v1_api.register(SessionResource())
 v1_api.register(AttachedFileResource())
+v1_api.register(PlanResource())
+v1_api.register(PaymentResource())
 
 urlpatterns = patterns(
     '',
