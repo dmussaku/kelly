@@ -1,4 +1,4 @@
-from django.db import models
+from django.db import models, transaction
 from django.contrib.auth.models import (
     AbstractBaseUser, UserManager as contrib_user_manager)
 from django.utils.encoding import python_2_unicode_compatible
@@ -98,6 +98,20 @@ class Account(models.Model):
         # Hmac that beast.
         return hmac.new(new_uuid.bytes, digestmod=sha1).hexdigest()
 
+    @classmethod
+    def set_active_status(cls, user_ids, company_id, value=False):
+        if isinstance(user_ids, int):
+            user_ids = [user_ids]
+        assert isinstance(user_ids, (tuple, list)), "must be a list"
+
+        with transaction.atomic():
+            users = list()
+            for acc in Account.objects.filter(user_id__in=user_ids, company_id=company_id).select_related('user'):
+                acc.is_active = value
+                acc.save()
+                users.append(acc.user)
+            return users
+
 
 class UserManager(contrib_user_manager):
     @classmethod
@@ -133,7 +147,7 @@ class User(AbstractBaseUser):
     # is_admin = models.BooleanField(default=False)
 
     vcard = models.OneToOneField(VCard, blank=True, null=True)
-    userpic_obj = models.ForeignKey('almastorage.SwiftFile', related_name='users', 
+    userpic_obj = models.ForeignKey('almastorage.SwiftFile', related_name='users',
                                 default=lambda: default_file.set_file('default_userpic.png', 'image', container_title='CRM_USERPICS').id)
     date_created = models.DateTimeField(auto_now_add=True, blank=True)
     date_edited = models.DateTimeField(auto_now=True, blank=True)
@@ -205,7 +219,6 @@ class User(AbstractBaseUser):
 
     @classmethod
     def is_superuser(self, subdomain):
-        print subdomain
         account = Account.objects.get(
             user=self, company__subdomain=subdomain)
         return account.is_supervisor

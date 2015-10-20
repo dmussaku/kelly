@@ -7,6 +7,7 @@ from alm_user.models import Account, User
 
 
 class Migration(SchemaMigration):
+    no_dry_run = True
 
     def forwards(self, orm):
         for account in orm.Account.objects.all():

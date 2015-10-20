@@ -134,7 +134,7 @@ class UserResource(ModelResource):
         q = Q(id__in=user_ids)
         objects = super(ModelResource, self).apply_filters(request, applicable_filters)
         return objects.filter(q)
-        
+
     def prepend_urls(self):
         return [
             url(
@@ -167,6 +167,12 @@ class UserResource(ModelResource):
                 self.wrap_view('change_password'),
                 name='api_change_password'
             ),
+            url(
+                r"^(?P<resource_name>%s)/change_active_status%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('change_active_status'),
+                name='api_change_active_status'
+            ),
         ]
 
     def upload_userpic(self, request, **kwargs):
@@ -179,7 +185,7 @@ class UserResource(ModelResource):
 
             user = User.objects.get(id=request.user.id)
 
-            swiftfile = SwiftFile.upload_file(file_contents=base64.b64decode(data['pic']), filename=data['name'], 
+            swiftfile = SwiftFile.upload_file(file_contents=base64.b64decode(data['pic']), filename=data['name'],
                                                 content_type='image', container_title='CRM_USERPICS')
             user.userpic_obj = swiftfile
             user.save()
@@ -188,11 +194,11 @@ class UserResource(ModelResource):
 
             return self.create_response(request, bundle,
                                             response_class=http.HttpAccepted)
-            
+
     def change_password(self, request, **kwargs):
         with RequestContext(self, request, allowed_methods=['post']):
             data = self.deserialize(
-                request, request.body, 
+                request, request.body,
                 format=request.META.get('CONTENT_TYPE', 'application/json')
                 )
             old_password = data.get('old_password', None)
@@ -228,7 +234,7 @@ class UserResource(ModelResource):
     def get_current_user(self, request, **kwargs):
         with RequestContext(self, request, allowed_methods=['get']):
             bundle = self.build_bundle(obj=request.user, request=request)
-            
+
             bundle.company = request.company
             bundle.session = {
                 'user_id': request.user.id,
@@ -247,6 +253,30 @@ class UserResource(ModelResource):
                 user_env['subscriptions']
                 )[0]
         return subscription_pk
+
+    def change_active_status(self, request, **kwargs):
+        """
+        POST METHOD
+        example
+        send {'ids':[1,2,3], 'active': true|false}
+        """
+        with RequestContext(self, request, allowed_methods=['post']):
+            data = self.deserialize(
+                request, request.body,
+                format=request.META.get('CONTENT_TYPE', 'application/json'))
+
+            obj_ids = data.get('ids', "")
+            value = data.get('active', False)
+
+            updated_users = Account.set_active_status(obj_ids, request.company.id, value)
+            does_not_exist = list( set(map((lambda u: u.id), updated_users)).symmetric_difference(set(obj_ids)) )
+
+            dehydrate_user = lambda user: self.full_dehydrate(self.build_bundle(obj=user, request=request))
+            return self.create_response(request, {
+                'users': map(dehydrate_user, updated_users),
+                'does_not_exist': does_not_exist
+            }, response_class=http.HttpAccepted)
+
 
     def obj_update(self, bundle, skip_errors=False, **kwargs):
         """
@@ -300,8 +330,8 @@ class UserResource(ModelResource):
                 current_account = account
             company_list.append(
                 {
-                 'id':account.company.id, 
-                 'name':account.company.name, 
+                 'id':account.company.id,
+                 'name':account.company.name,
                  'subdomain':account.company.subdomain
                 }
             )
@@ -427,7 +457,7 @@ class UserResource(ModelResource):
             data = self.deserialize(request, request.body, format=request.META.get('CONTENT_TYPE', 'application/json'))
 
             user = authenticate(
-                username=data.get('email'), 
+                username=data.get('email'),
                 password=data.get('password')
                 )
             session_key = None
@@ -516,6 +546,3 @@ class SessionResource(Resource):
                 obj=SessionObject(request=request), request=request)
             data = self.full_dehydrate(bundle)
             return self.create_response(request, data)
-
-
-

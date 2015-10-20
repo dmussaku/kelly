@@ -35,23 +35,28 @@ class Command(BaseCommand):
             service.save()
         subscription = Subscription()
         subscription.service = service
+
         try:
             c=Company.objects.get(subdomain=subdomain)
         except (Company.DoesNotExist, KeyError):
             c = Company.build_company(name=name, subdomain=subdomain)
-            sys.stderr.write("Company created successfully.\n")
+            sys.stdout.write("Company created successfully.\n")
 
         try:
             u = User.objects.get(email=email)
-            acc = Account.objects.get(user=u, company=c)
-            sys.stderr.write("Error: bwayne@batman.bat email is already taken.\n")
         except User.DoesNotExist:
             u = User.objects.create_user(email=email, password=password,
                     first_name=first_name, last_name=last_name, is_admin=True)
+            sys.stdout.write("User created successfully.\n")
+        except User.ValidationError:
+            sys.stderr.write("bwayne@batman.bat email is already taken.\n")
+
+        try:
+            acc = Account.objects.get(user=u, company=c)
         except Account.DoesNotExist:
             acc = Account.objects.create_account(user=u, company=c, is_supervisor=is_supervisor)
-        finally:
-            sys.stderr.write("Account and User created successfully.\n")
+            sys.stdout.write("Account created successfully.\n")
+
         subscription.user = u
         subscription.organization = c
         subscription.is_active = True
