@@ -33,7 +33,7 @@ from alm_crm.api import (
     AttachedFileResource,
     )
 from alm_user.api import UserResource, SessionResource
-from alm_company.api import (
+from .api import (
     PlanResource,
     PaymentResource,
     )

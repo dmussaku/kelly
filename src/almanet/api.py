@@ -11,6 +11,7 @@ from tastypie.authentication import (
     ApiKeyAuthentication, 
     BasicAuthentication,
     )
+from django.conf.urls import url
 from tastypie.authorization import Authorization
 from tastypie.constants import ALL, ALL_WITH_RELATIONS
 from tastypie.contrib.contenttypes.fields import GenericForeignKeyField
@@ -31,17 +32,17 @@ class PlanResource(ModelResource):
         queryset = Plan.objects.all()
         resource_name='plan'
 
-    def dehydrate(self, bundle):
-        bundle = super(self.__class__, self).dehydrate(bundle)
-        return bundle
 
-
-class PaymentResource(CRMServiceModelResource):
+class PaymentResource(ModelResource):
 
     class Meta:
         list_allowed_methods = ['get', 'post', 'patch']
         detail_allowed_methods = ['get', 'post', 'put', 'delete', 'patch']
-        authentication = MultiAuthentication(SessionAuthentication(), ApiKeyAuthentication(), BasicAuthentication())
+        authentication = MultiAuthentication(
+            SessionAuthentication(), 
+            ApiKeyAuthentication(), 
+            BasicAuthentication()
+            )
         authorization = Authorization()
         queryset = Payment.objects.all()
         resource_name='payment'
