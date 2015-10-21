@@ -3,7 +3,6 @@ from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from datetime import datetime
 from alm_user.models import User
-from dateutil.relativedelta import relativedelta
 import re
 
 
@@ -13,9 +12,6 @@ class Company(models.Model):
     date_edited = models.DateTimeField(auto_now=True, blank=True)
     subdomain = models.CharField(_('subdomain'), max_length=300,
                                  blank=False, unique=True)
-    plan = models.ForeignKey(
-        'Plan', on_delete=models.SET_NULL, blank=True, 
-        null=True, related_name='companies')
 
     class Meta:
         verbose_name = _('company')
@@ -61,65 +57,3 @@ class Company(models.Model):
         company = Company(name=name, subdomain=subdomain)
         company.save()
         return company
-
-
-
-class Plan(models.Model):
-    users_num = models.IntegerField(blank=False, default=10)
-    contacts_num = models.IntegerField(blank=False, default=100)
-    space_per_user = models.IntegerField(blank=False, default=1)
-
-
-class Payment(models.Model):
-    PAYMENTS = (
-        _('Visa/MasterCard'),
-        _('Clearing Settlement'),
-        )
-    PAYMENT_TYPES = (CARD, CLEARING) = ('CARD', 'CLEARING')
-    PAYMENT_OPTIONS = zip(PAYMENT_TYPES, PAYMENTS)
-    description = models.CharField(max_length=5000)
-    plan = models.ForeignKey(
-        'Plan', related_name='payments', blank=False, null=False)
-    company = models.ForeignKey(
-        'Company', related_name='payments', blank=False, null=False)
-    tp = models.CharField(
-        max_length=20, choices=PAYMENT_OPTIONS, default=CARD)
-    status = models.BooleanField(default=False)
-    date_created = models.DateTimeField(auto_now_add=True, blank=True)
-    date_to_pay = models.DateTimeField(blank=True, null=True)
-    date_paid = models.DateTimeField(blank=True, null=True)
-    bank_statement = models.OneToOneField(
-        'BankStatement', blank=True, null=True, on_delete=models.SET_NULL)
-
-    
-    def save(self, **kwargs):
-        if not self.pk:
-            self.date_to_pay = datetime.now()+relativedelta(months=1)
-        super(self.__class__, self).save(**kwargs)
-    
-
-class BankStatement(models.Model):
-    BANK_NAME = models.CharField(max_length=1000)
-    CUSTOMER_NAME = models.CharField(max_length=1000)
-    CUSTOMER_MAIL = models.CharField(max_length=1000)
-    CUSTOMER_PHONE = models.CharField(max_length=1000)
-    MERCHANT_CERT_ID = models.CharField(max_length=1000)
-    MERCHANT_NAME = models.CharField(max_length=1000)
-    ORDER_ID = models.CharField(max_length=1000)
-    ORDER_AMOUNT = models.CharField(max_length=1000)
-    ORDER_CURRENCY = models.CharField(max_length=1000)
-    DEPARTMENT_MERCHANT_ID = models.CharField(max_length=1000)
-    DEPARTMENT_AMOUNT = models.CharField(max_length=1000)
-    MERCHANT_SIGN_TYPE = models.CharField(max_length=1000)
-    CUSTOMER_SIGN_TYPE = models.CharField(max_length=1000)
-    RESULTS_TIMESTAMP = models.CharField(max_length=1000)
-    PAYMENT_MERCHANT_ID = models.CharField(max_length=1000)
-    PAYMENT_AMOUNT = models.CharField(max_length=1000)
-    PAYMENT_REFERENCE = models.CharField(max_length=1000)
-    PAYMENT_APPROVAL_CODE = models.CharField(max_length=1000)
-    PAYMENT_RESPONSE_CODE = models.CharField(max_length=1000)
-    BANK_SIGN_CERT_ID = models.CharField(max_length=1000)
-    BANK_SIGN_TYPE = models.CharField(max_length=1000)
-    LETTER = models.CharField(max_length=1000)
-    SIGN = models.CharField(max_length=1000)
-    RAWSIGN  = models.CharField(max_length=1000)

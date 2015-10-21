@@ -360,9 +360,9 @@ class BaseConfiguration(SubdomainConfiguration, Configuration):
 
     MERCHANT_CERTIFICATE_ID = "00C182B189" 
     MERCHANT_NAME = "Test shop" 
-    PRIVATE_KEY_FN = os.path.join(BASE_DIR, "certificates/test_prv.pem") 
+    PRIVATE_KEY_FN = os.path.join(BASE_DIR, "static/certificates/test_prv.pem") 
     PRIVATE_KEY_PASS = "nissan"
-    PUBLIC_KEY_FN = os.path.join(BASE_DIR, "certificates/test_pub.pem")
+    PUBLIC_KEY_FN = os.path.join(BASE_DIR, "static/certificates/test_pub.pem")
     MERCHANT_ID="92061101"
     XML_TEMPLATE_FN = 'template.xml'
     XML_COMMAND_TEMPLATE_FN = 'command_template.xml'
@@ -384,6 +384,16 @@ class DevConfiguration(
     BROKER_URL = 'amqp://dev:dev@almasales.kz:5672//almasales/dev'
 
     RUSTEM_SETTINGS = False
+
+    MERCHANT_CERTIFICATE_ID = "00c183d70b"
+    MERCHANT_NAME = "New Demo Shop"
+    PRIVATE_KEY_FN = os.path.join(BASE_DIR, "static/certificates/cert15.prv")
+    PRIVATE_KEY_PASS = "1q2w3e4r"
+    PUBLIC_KEY_FN = os.path.join(BASE_DIR, "static/certificates/kkbca.pub")
+    MERCHANT_ID="92061103"
+    XML_TEMPLATE_FN = 'template.xml'
+    XML_COMMAND_TEMPLATE_FN = 'command_template.xml'
+    PAYMENT_ID_PREFIX = 'ALMASALES'
 
 
 class QAConfiguration(DevConfiguration):

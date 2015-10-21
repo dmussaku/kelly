@@ -1,12 +1,13 @@
-from django.db import models
-from django.utils.translation import ugettext_lazy as _
-from django.conf import settings
-from django.utils.text import slugify
 from almanet.url_resolvers import reverse as almanet_reverse
 from almanet.utils.metaprogramming import SerializableModel
+from datetime import datetime
+from dateutil.relativedelta import relativedelta
+from django.conf import settings
+from django.db import models
 from django.db.models import signals
 from django.utils import timezone
-from datetime import datetime
+from django.utils.text import slugify
+from django.utils.translation import ugettext_lazy as _
 
 
 class Service(models.Model):
@@ -38,6 +39,8 @@ class Subscription(models.Model):
     is_active = models.BooleanField(default=True)
     date_created = models.DateTimeField(auto_now_add=True, blank=True)
     date_edited = models.DateTimeField(auto_now=True, blank=True)
+    plan = models.ForeignKey('Plan', related_name='subscriptions', 
+        null=True, blank=True)
 
     def __init__(self, *args, **kwargs):
         super(Subscription, self).__init__(*args, **kwargs)
@@ -74,3 +77,79 @@ class SerializableSubscriptionObject(SubscriptionObject, SerializableModel):
     
     class Meta:
         abstract = True
+
+
+class Plan(models.Model):
+    name = models.CharField(max_length=100)
+    description = models.CharField(max_length=1000)
+    users_num = models.IntegerField(blank=False, default=10)
+    contacts_num = models.IntegerField(blank=False, default=100)
+    space_per_user = models.IntegerField(blank=False, default=1)
+
+
+class Payment(models.Model):
+    PAYMENTS = (
+        _('Visa/MasterCard'),
+        _('Clearing Settlement'),
+        )
+    PAYMENT_TYPES = (CARD, CLEARING) = ('CARD', 'CLEARING')
+    PAYMENT_OPTIONS = zip(PAYMENT_TYPES, PAYMENTS)
+
+    CURRENCY_TYPES = (KZT, USD) = ('KZT', 'USD')
+    CURRENCIES = (
+        _('KZT'),
+        _('USD'),
+        )
+    CURRENCY_OPTIONS = zip(CURRENCY_TYPES, CURRENCIES)
+    EPAY_CURRENCY_DICT = {'KZT':'398', 'USD':'840'}
+    description = models.CharField(max_length=5000)
+    amount = models.IntegerField(blank=False, null=False)
+    currency = models.CharField(
+        max_length=3, choices=CURRENCY_OPTIONS, default=KZT)
+    plan = models.ForeignKey(
+        'Plan', related_name='payments', blank=False, null=False)
+    subscription = models.ForeignKey(
+        'Subscription', related_name='payments')
+    plan = models.ForeignKey(
+        'Plan', related_name='payments')
+    tp = models.CharField(
+        max_length=20, choices=PAYMENT_OPTIONS, default=CARD)
+    status = models.BooleanField(default=False)
+    date_created = models.DateTimeField(auto_now_add=True, blank=True)
+    date_to_pay = models.DateTimeField(blank=True, null=True)
+    date_paid = models.DateTimeField(blank=True, null=True)
+    bank_statement = models.OneToOneField(
+        'BankStatement', blank=True, null=True, on_delete=models.SET_NULL)
+
+    
+    def save(self, **kwargs):
+        if not self.pk:
+            self.date_to_pay = datetime.now()+relativedelta(months=1)
+        super(self.__class__, self).save(**kwargs)
+    
+
+class BankStatement(models.Model):
+    BANK_NAME = models.CharField(max_length=1000)
+    CUSTOMER_NAME = models.CharField(max_length=1000)
+    CUSTOMER_MAIL = models.CharField(max_length=1000)
+    CUSTOMER_PHONE = models.CharField(max_length=1000)
+    MERCHANT_CERT_ID = models.CharField(max_length=1000)
+    MERCHANT_NAME = models.CharField(max_length=1000)
+    ORDER_ID = models.CharField(max_length=1000)
+    ORDER_AMOUNT = models.CharField(max_length=1000)
+    ORDER_CURRENCY = models.CharField(max_length=1000)
+    DEPARTMENT_MERCHANT_ID = models.CharField(max_length=1000)
+    DEPARTMENT_AMOUNT = models.CharField(max_length=1000)
+    MERCHANT_SIGN_TYPE = models.CharField(max_length=1000)
+    CUSTOMER_SIGN_TYPE = models.CharField(max_length=1000)
+    RESULTS_TIMESTAMP = models.CharField(max_length=1000)
+    PAYMENT_MERCHANT_ID = models.CharField(max_length=1000)
+    PAYMENT_AMOUNT = models.CharField(max_length=1000)
+    PAYMENT_REFERENCE = models.CharField(max_length=1000)
+    PAYMENT_APPROVAL_CODE = models.CharField(max_length=1000)
+    PAYMENT_RESPONSE_CODE = models.CharField(max_length=1000)
+    BANK_SIGN_CERT_ID = models.CharField(max_length=1000)
+    BANK_SIGN_TYPE = models.CharField(max_length=1000)
+    LETTER = models.CharField(max_length=1000)
+    SIGN = models.CharField(max_length=1000)
+    RAWSIGN  = models.CharField(max_length=1000)
