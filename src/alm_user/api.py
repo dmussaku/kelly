@@ -107,18 +107,24 @@ class UserResource(ModelResource):
 
     @undocumented: Meta
     '''
+    first_name = fields.CharField(attribute='first_name', null=True)
+    last_name = fields.CharField(attribute='last_name', null=True)
+    email = fields.CharField(attribute='email')
+
     vcard = fields.ToOneField(
         'alm_vcard.api.VCardResource', 'vcard', null=True, full=True)
+
 
     class Meta(CommonMeta):
         queryset = User.objects.all()
         excludes = ['password', 'is_admin']
-        list_allowed_methods = ['get', 'patch']
+        list_allowed_methods = ['get', 'patch', 'post']
         detail_allowed_methods = ['get', 'patch']
         resource_name = 'user'
         filtering = {
             'id': ALL
         }
+        always_return_data = True
 
         authentication = MultiAuthentication(
             OpenAuthEndpoint(),
@@ -278,6 +284,16 @@ class UserResource(ModelResource):
             }, response_class=http.HttpAccepted)
 
 
+    def obj_create(self, bundle, **kwargs):
+        bundle.obj = self._meta.object_class()
+        bundle = self.full_hydrate(bundle)
+
+        bundle.obj.set_password('123')
+        bundle = self.save(bundle)
+        Account.objects.create_account(bundle.obj, bundle.request.company, False)
+
+        return bundle
+
     def obj_update(self, bundle, skip_errors=False, **kwargs):
         """
         A ORM-specific implementation of ``obj_update``.
@@ -316,6 +332,8 @@ class UserResource(ModelResource):
             if bundle.data.get('vcard', ""):
                 self.vcard_full_hydrate(bundle)
                 bundle.obj.save()
+        else:
+            bundle = super(self.__class__, self).full_hydrate(bundle)
 
         return bundle
 
