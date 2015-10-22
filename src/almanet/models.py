@@ -80,11 +80,16 @@ class SerializableSubscriptionObject(SubscriptionObject, SerializableModel):
 
 
 class Plan(models.Model):
-    name = models.CharField(max_length=100)
-    description = models.CharField(max_length=1000)
+    name_ru = models.CharField(max_length=100)
+    description_ru = models.CharField(max_length=1000)
+    name_en = models.CharField(max_length=100)
+    description_en = models.CharField(max_length=1000)
+    price_kzt = models.IntegerField(blank=False, default=0)
+    price_usd = models.IntegerField(blank=False, default=0)
     users_num = models.IntegerField(blank=False, default=10)
     contacts_num = models.IntegerField(blank=False, default=100)
     space_per_user = models.IntegerField(blank=False, default=1)
+    pic = models.CharField(max_length=100, blank=True)
 
 
 class Payment(models.Model):

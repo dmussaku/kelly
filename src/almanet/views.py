@@ -11,7 +11,7 @@ from alm_company.models import Company
 from alm_crm.models import Contact, ContactList, Share, SalesCycle
 from alm_vcard.models import *
 from alm_user.models import User
-from .models import Service
+from .models import Service, Plan
 from .forms import ServiceCreateForm, ReferralForm
 from django.views.generic.edit import FormView
 from django.views.generic.base import TemplateView, TemplateResponse
@@ -129,6 +129,8 @@ def landing(request):
         form = ReferralForm()
     context = {
         'form': form,
+        'plans': Plan.objects.all(),
+        'language' : request.session.get('lang'),
     }
     return TemplateResponse(request, template_name, context)
 

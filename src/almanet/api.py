@@ -2,6 +2,7 @@ from .models import (
     Plan,
     Payment,
     BankStatement,
+    Subscription,
     )
 from alm_company.models import Company
 from tastypie import fields, http
@@ -22,6 +23,7 @@ from tastypie.utils import trailing_slash
 from alm_crm.api import CRMServiceModelResource
 from almanet.utils.api import RequestContext, SessionAuthentication
 from django.conf import settings
+from datetime import datetime, timedelta
 import kkb
 
 
@@ -30,14 +32,29 @@ class PlanResource(ModelResource):
     class Meta:
         list_allowed_methods = ['get']
         queryset = Plan.objects.all()
-        resource_name='plan'
+        resource_name = 'plan'
+
+
+class SubscriptionResource(ModelResource):
+
+    class Meta:
+        list_allowed_methods = ['get', 'post', 'patch']
+        detail_allowed_methods = ['get', 'post', 'put', 'patch']
+        authentication = MultiAuthentication(
+            SessionAuthentication(), 
+            ApiKeyAuthentication(), 
+            BasicAuthentication()
+            )
+        authorization = Authorization()
+        queryset = Subscription.objects.all()
+        resource_name = 'subscription'
 
 
 class PaymentResource(ModelResource):
 
     class Meta:
         list_allowed_methods = ['get', 'post', 'patch']
-        detail_allowed_methods = ['get', 'post', 'put', 'delete', 'patch']
+        detail_allowed_methods = ['get', 'post', 'put', 'patch']
         authentication = MultiAuthentication(
             SessionAuthentication(), 
             ApiKeyAuthentication(), 
@@ -45,7 +62,7 @@ class PaymentResource(ModelResource):
             )
         authorization = Authorization()
         queryset = Payment.objects.all()
-        resource_name='payment'
+        resource_name = 'payment'
 
 
     '''
@@ -65,10 +82,10 @@ class PaymentResource(ModelResource):
                 name='api_get_epay_response'
                 ),
             url(
-                r"^(?P<resource_name>%s)/(?P<id>\d+)/pay%s$" %
+                r"^(?P<resource_name>%s)/(?P<id>\d+)/get_epay_context%s$" %
                 (self._meta.resource_name, trailing_slash()),
-                self.wrap_view('payment_process'),
-                name='payment_process'
+                self.wrap_view('get_epay_context'),
+                name='api_get_epay_context'
             ),
         ]
 
@@ -89,7 +106,7 @@ class PaymentResource(ModelResource):
     also BackLinks and PostLinks - those are the ones that should change 
     '''
 
-    def get_payment_process(self, request, **kwargs):
+    def get_epay_context(self, request, **kwargs):
         id = kwargs.get('id')
         payment = Payment.objects.get(id=id)
         order_id = settings.PAYMENT_ID_PREFIX + str(id)
@@ -108,4 +125,7 @@ class PaymentResource(ModelResource):
         if result.status:
             bank_statement = BankStatement(**result.data)
             bank_statement.save()
+            payment.status = True
+            payment.date_paid = datetime.now()
+            payment.save()
         return HttpResponse(0)

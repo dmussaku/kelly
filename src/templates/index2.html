@@ -323,48 +323,34 @@
         <section class="price-3" id='plans'>
             <div class="container">
                 <div class="plans">
-                    <div class="plan">
-                        <div class="title">
-                            <div class="img"><img src="{% static 'common-files/icons/retina-ready-s@2x.png' %}" width="117" height="104" alt=""></div>
-                            {{ _("Starters plan") }}
-                        </div>
-                        <div class="price">25$/{{ _("month") }}</div>
-                        <div class="description">
-                            <b>10</b> {{ _("Users") }}<br>
-                            <b>100</b> {{ _("Contacts") }}<br>
-                            <b>1 GB</b> {{ _("per user") }}<br>
-                            {{ _("First month is free") }}
-                        </div>
-                        <a class="btn btn-primary" href="{% url 'user_registration' %}">{{ _("Choose plan") }}</a>
-                    </div>
+                {% for plan in plans %}
                     <div class="plan plan-2">
                         <div class="title">
-                            <div class="img"><img src="{% static 'common-files/icons/rocket@2x.png' %}" width="101" height="101" alt=""></div>
-                            {{ _("Medium business") }}
+                            <div class="img"><img src="{% static plan.pic %}" width="117" height="104" alt=""></div>
+                            {% trans plan.name_en %}
                         </div>
-                        <div class="price">50$/{{ _("month") }}</div>
+                        {% if language == 'ru-RU' %}
+                            <div class="price">{{ plan.price_kzt }} тг/{{ _("month") }}</div>
+                        {% else %}
+                            <div class="price">{{ plan.price_usd }}$/{{ _("month") }}</div>
+                        {% endif %}
                         <div class="description">
-                            <b>20</b> {{ _("Users") }}<br>
-                            <b>2000</b> {{ _("Contacts") }} <br>
-                            <b>5 GB</b> {{ _("per user") }} <br>
-                            {{ _("First month is free") }} 
+                            {% if plan.users_num == 0 %}
+                                <b>30+</b> {{ _("Users") }}<br>
+                            {% else %}
+                                <b>{{ plan.users_num }}</b> {{ _("Users") }}<br>
+                            {% endif %}
+                            {% if plan.contacts_num == 0 %}
+                                <b>3000+</b> {{ _("Contacts") }}<br>
+                            {% else %}
+                                <b>{{ plan.contacts_num }}</b> {{ _("Contacts") }}<br>
+                            {% endif %}
+                            <b>{{ plan.space_per_user }}</b> {{ _("per user") }}<br>
+                            {{ _("First month is free") }}
                         </div>
-                        <a class="btn btn-primary" href="{% url 'user_registration' %}">{{ _("Choose plan") }}</a>
+                        <a class="btn btn-primary" href="{% url 'user_registration' plan_id=plan.id %}">{{ _("Choose plan") }}</a>
                     </div>
-                    <div class="plan">
-                        <div class="title">
-                            <div class="img"><img src="{% static 'common-files/icons/magic-wand@2x.png' %}" width="100" height="100" alt=""></div>
-                            {{ _("Corporate business") }}
-                        </div>
-                        <div class="price">100$/{{ _("month") }}</div>
-                        <div class="description">
-                            <b>30+</b> {{ _("Users") }}<br>
-                            <b>{{ _("Unlimited") }} </b><br>
-                            <b>10 GB</b> {{ _("per user") }}<br>
-                            {{ _("First month is free") }} 
-                        </div>
-                        <a class="btn btn-primary" href="{% url 'user_registration' %}">{{ _("Choose plan") }}</a>
-                    </div>
+                {% endfor %}
                 </div>
             </div>
             <!--/.container-->
