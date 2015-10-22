@@ -160,6 +160,11 @@ class Contact(SubscriptionObject):
         except:
             return "No name %s" % self.tp
 
+    def save(self, **kwargs):
+        if self.parent == self:
+            return False
+        super(self.__class__, self).save(**kwargs)
+
     def delete(self):
         if self.vcard:
             self.vcard.delete()
