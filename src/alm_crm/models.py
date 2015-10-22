@@ -162,7 +162,7 @@ class Contact(SubscriptionObject):
 
     def save(self, **kwargs):
         if self.parent == self:
-            return False
+            raise ValueError("Can't make self.parent=self")
         super(self.__class__, self).save(**kwargs)
 
     def delete(self):
