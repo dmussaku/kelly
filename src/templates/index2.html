@@ -140,13 +140,13 @@
                         <!--                           Особенность ALMASALES заложена в его философии, включающей методологию OKR (Objectives and Keyresults)-->
 
                         <div class="signup-form">
-                            <form action="" method="post">
+                            <form action="" method="POST" id='referal_form'>
                                 {% csrf_token %}
                                 <div class="form-group">
                                     <input class="form-control" type="text" name="email" placeholder="{{_('Your email')}}">
                                 </div>
                                 <div class="form-group">
-                                    <button type="submit" class="btn btn-block btn-info">{{_("Try service")}} </button>
+                                    <button type="submit" class="btn btn-block btn-info" id='try_service_button'>{{_("Try service")}} </button>
                                 </div>
                             </form>
                         </div>
@@ -319,7 +319,7 @@
                 </div>
             </div>
         </section>
-
+        {{ current_path }}
         <section class="price-3" id='plans'>
             <div class="container">
                 <div class="plans">
@@ -329,7 +329,7 @@
                             <div class="img"><img src="{% static plan.pic %}" width="117" height="104" alt=""></div>
                             {% trans plan.name_en %}
                         </div>
-                        {% if language == 'ru-RU' %}
+                        {% if language == 'ru-RU' or language == 'ru' %}
                             <div class="price">{{ plan.price_kzt }} тг/{{ _("month") }}</div>
                         {% else %}
                             <div class="price">{{ plan.price_usd }}$/{{ _("month") }}</div>
@@ -348,7 +348,7 @@
                             <b>{{ plan.space_per_user }}</b> {{ _("per user") }}<br>
                             {{ _("First month is free") }}
                         </div>
-                        <a class="btn btn-primary" href="{% url 'user_registration' plan_id=plan.id %}">{{ _("Choose plan") }}</a>
+                        <a class="btn btn-primary" href="{% url 'user_registration' %}{{current_path}}&plan_id={{plan.id}}">{{ _("Choose plan") }}</a>
                     </div>
                 {% endfor %}
                 </div>
@@ -442,6 +442,15 @@
         </footer>
     </body>
     <script>
+        $('#referal_form').on('submit', function(event){
+            event.preventDefault();
+            var csrf = $('#referal_form').find('input[name=csrfmiddlewaretoken]')[0].value;
+            var email = $('#referal_form').find('input[name=email]')[0].value;
+            console.log(csrf);
+            console.log(email);
+        });
+    </script>
+    <script>
           $(function() {
             $('a[href*=#]:not([href=#])').click(function() {
               if (location.pathname.replace(/^\//,'') == this.pathname.replace(/^\//,'') && location.hostname == this.hostname) {
@@ -461,14 +470,14 @@
     {% if debug_mode_on %}
     <script type="text/javascript" src="{% static 'js/bundle.js' %}"></script>
     <script>
- (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
- (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
- m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
- })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+     m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+     })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
- ga('create', 'UA-68079753-1', 'auto');
- ga('send', 'pageview');
+     ga('create', 'UA-68079753-1', 'auto');
+     ga('send', 'pageview');
 
-</script>
+    </script>
     {% endif %}
 </html>

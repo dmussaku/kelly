@@ -131,10 +131,15 @@ def landing(request):
         'form': form,
         'plans': Plan.objects.all(),
         'language' : request.session.get('lang'),
+        'current_path': request.get_full_path()[1:],
     }
     return TemplateResponse(request, template_name, context)
 
-        
+
+def referal_create(request):
+    if request.method == 'POST' or request.method == 'ajax':
+        pass
+    return HttpResponse(0)
 
 @csrf_exempt
 def landing_form(request):
