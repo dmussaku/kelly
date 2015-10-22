@@ -3870,9 +3870,10 @@ class MobileStateObject(object):
         self.account = request.user
 
 
-        # activities = ActivityResource().obj_get_list(bundle, limit_for='mobile')
-        activities = Activity.objects.filter(
-            company_id=self.company.id).order_by('date_edited')[0:100]
+        activities = ActivityResource().obj_get_list(
+            bundle, limit_for='mobile')[0:200]
+        # activities = Activity.objects.filter(
+        #     company_id=self.company.id).order_by('date_edited')[0:100]
         sales_cycles = []
         for activity in activities:
             if activity.sales_cycle not in sales_cycles:
