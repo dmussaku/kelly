@@ -369,6 +369,10 @@ class BaseConfiguration(SubdomainConfiguration, Configuration):
     RUSTEM_SETTINGS = False
 
 
+    DAYS_BEFORE_DEACTIVATION = 7
+    MONTHS_BEFORE_DELITION = 6
+
+
 class DevConfiguration(
         FileSettings('~/.almanet/almanet.conf.py'), BaseConfiguration):
     DEBUG = True

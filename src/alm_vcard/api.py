@@ -86,8 +86,6 @@ class VCardResource(ModelResource):
             bundle.data['categories'] = [{"data":x} for x in list(OrderedDict.fromkeys(categories))]
         if kwargs.get('pk'):
             bundle.obj = VCard.objects.get(contact=int(kwargs['pk']))
-            print bundle.obj
-            print bundle.obj.id
             bundle.obj.delete()
         bundle.obj = self._meta.object_class()
         bundle = self.full_hydrate(bundle)

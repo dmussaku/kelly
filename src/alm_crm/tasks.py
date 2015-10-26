@@ -237,7 +237,8 @@ def create_payments():
                 amount=amount,
                 currency=pref_currency,
                 date_to_pay=today + next_payment_delta,
-                plan=last_payment.plan
+                plan=last_payment.plan,
+                subscription=company.subscription
                 )
             new_payment.save()
         else:
@@ -254,7 +255,27 @@ def create_payments():
                     amount=plan.price_kzt,
                     currency='KZT',
                     date_to_pay=today + next_payment_delta,
-                    plan=plan
+                    plan=plan,
+                    subscription=company.subscription
                     )
-                new_payment.save()    
+                new_payment.save()
+
+
+@app_task
+def check_payments_dates():
+    today = datetime.datetime.now()
+    for subscription in [company.subscription for company in Company.objects.all()]:
+        if subscription.payments.last():
+            last_payment = subscription.payments.last()
+            if subscription.is_active and (today - last_payment.date_to_pay).days > settings.DAYS_BEFORE_DEACTIVATION:
+                subscription.is_active = False
+                subscription.save()
+            if (today-last_payment.date_to_pay).days > settings.MONTHS_BEFORE_DELITION*31:
+                '''
+                delete all objects with particular company_id
+                '''
+                company_id = subscription.company.id
+
+
+
 

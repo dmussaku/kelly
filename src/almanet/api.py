@@ -23,7 +23,8 @@ from tastypie.utils import trailing_slash
 from alm_crm.api import CRMServiceModelResource
 from almanet.utils.api import RequestContext, SessionAuthentication
 from django.conf import settings
-from datetime import datetime, timedelta
+import datetime
+from datetime import timedelta
 import kkb
 
 
@@ -106,6 +107,8 @@ class PaymentResource(ModelResource):
     also BackLinks and PostLinks - those are the ones that should change 
     '''
 
+
+
     def get_epay_context(self, request, **kwargs):
         id = kwargs.get('id')
         payment = Payment.objects.get(id=id)
@@ -117,15 +120,62 @@ class PaymentResource(ModelResource):
         context = {'context':context}
         return self.create_response(request, context)
 
+    def change_plan(self, request, **kwargs):
+        data = self.deserialize(
+            request, request.body,
+            format=request.META.get('CONTENT_TYPE', 'application/json'))
+        plan_id = data.get('plan_id',"")
+        if not plan_id:
+            return self.create_response(request, {'success':False})
+        try:
+            plan = Plan.objects.get(id=plan_id)
+        except:
+            return self.create_response(request, {'success':False})
+        company = Company.objects.get(id=request.company.id)
+        last_payment = company.subscription.payments.last()
+        if not last_payment.status:
+            last_payment.plan = plan
+            if last_payment.currency == 'KZT':
+                last_payment.amount = plan.price_kzt
+            elif last_payment.currency == 'USD':
+                last_payment.amount = plan.price_usd
+            last_payment.save()
+        else:
+            today = datetime.datetime.now().date()
+            t30 = last_payment.date_to_pay.date()
+            t0 = last_payment.date_created.date()
+            if last_payment.currency == 'KZT':
+                amount2 = plan.price_kzt
+            elif last_payment.currency == 'USD':
+                amount2 = plan.price_usd
+            amount1 = last_payment.amount
+            new_amount = ((t30-today)/float(t30))*amount2 - amount1*(1-(today-t0)/float(t30))
+            new_amount = round(new_amount)
+            payment = Payment(
+                amount=new_amount,
+                currency=last_payment.currency,
+                date_to_pay=last_payment.date_to_pay,
+                plan=plan,
+                subscription=company.subscription
+                )
+            payment.save()
+
+        return self.create_response(request, PaymentResource().full_dehydrate(
+                        PaymentResource().build_bundle(obj=payment, request=request) ))
+
+
     def get_epay_response(self, request, **kwargs):
         response = request.POST['response']
         id = kwargs.get('id')
         payment = Payment.objects.get(id=id)
         result = kkb.postlink(response)
+        data = dict(
+            (k.lower(), v) for k,v in result.data.iteritems()
+            )
         if result.status:
-            bank_statement = BankStatement(**result.data)
+            bank_statement = BankStatement(**data)
             bank_statement.save()
             payment.status = True
-            payment.date_paid = datetime.now()
+            payment.date_paid = datetime.datetime.now()
             payment.save()
         return HttpResponse(0)
