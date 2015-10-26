@@ -348,7 +348,7 @@
                             <b>{{ plan.space_per_user }}</b> {{ _("per user") }}<br>
                             {{ _("First month is free") }}
                         </div>
-                        <a class="btn btn-primary" href="{% url 'user_registration' %}{{current_path}}&plan_id={{plan.id}}">{{ _("Choose plan") }}</a>
+                        <a class="btn btn-primary" href="{% url 'user_registration' %}">{{ _("Choose plan") }}</a>
                     </div>
                 {% endfor %}
                 </div>
@@ -441,15 +441,6 @@
             </div>
         </footer>
     </body>
-    <script>
-        $('#referal_form').on('submit', function(event){
-            event.preventDefault();
-            var csrf = $('#referal_form').find('input[name=csrfmiddlewaretoken]')[0].value;
-            var email = $('#referal_form').find('input[name=email]')[0].value;
-            console.log(csrf);
-            console.log(email);
-        });
-    </script>
     <script>
           $(function() {
             $('a[href*=#]:not([href=#])').click(function() {

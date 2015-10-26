@@ -85,6 +85,10 @@ class RegistrationForm(forms.Form):
                 is_supervisor=True
                 )
             account.save()
+            subscription = Subscription()
+            subscription.save()
+            company.subscription = subscription
+            company.save()
             mail_context = {
                 'site_name': settings.SITE_NAME,
                 'gu__user__email': user.email,

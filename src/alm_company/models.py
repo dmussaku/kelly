@@ -12,6 +12,8 @@ class Company(models.Model):
     date_edited = models.DateTimeField(auto_now=True, blank=True)
     subdomain = models.CharField(_('subdomain'), max_length=300,
                                  blank=False, unique=True)
+    subscription = models.OneToOneField(
+        'almanet.Subscription', null=True)
 
     class Meta:
         verbose_name = _('company')

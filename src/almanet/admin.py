@@ -5,7 +5,7 @@ from alm_user.models import (
     Account
 )
 from alm_company.models import Company
-from almanet.models import Service, Subscription
+from almanet.models import  Subscription
 from alm_crm.models import Contact, Milestone
 
 
@@ -19,7 +19,7 @@ class UserAdmin(admin.ModelAdmin):
 
 class SubscriptionAdmin(admin.ModelAdmin):
 
-    list_display = ['organization', 'user', 'service']
+    # list_display = ['organization', 'user']
 
     def save_model(self, request, obj, form, change):
         obj.save()
@@ -39,7 +39,6 @@ class MilestoneAdmin(admin.ModelAdmin):
 admin.site.register(User, UserAdmin)
 admin.site.register(Account)
 admin.site.register(Company)
-admin.site.register(Service)
 admin.site.register(Subscription, SubscriptionAdmin)
 admin.site.register(Contact, ContactAdmin)
 admin.site.register(Milestone, MilestoneAdmin)

@@ -10,43 +10,18 @@ from django.utils.text import slugify
 from django.utils.translation import ugettext_lazy as _
 
 
-class Service(models.Model):
-
-    title = models.CharField(_('service title'), max_length=100, blank=False)
-    description = models.TextField(_('service description'), null=True)
-    slug = models.CharField(
-        _('service slug'), max_length=30, unique=True, blank=False)
-
-    class Meta:
-        verbose_name = _('service')
-        db_table = settings.DB_PREFIX.format('service')
-
-    def __unicode__(self):
-        return self.title
-
-    def save(self, **kwargs):
-        if not self.slug and self.title:
-            self.slug = slugify(self.title)
-        super(Service, self).save(**kwargs)
-
-
 class Subscription(models.Model):
     # global_sales_cycle_id = models.IntegerField(_('sales_cycle_id'), null=True, blank=True)
-    service = models.ForeignKey(Service, related_name='subscriptions')
-    user = models.ForeignKey('alm_user.User', related_name='subscriptions')
-    organization = models.ForeignKey(
-        'alm_company.Company', related_name='subscriptions')
+    user = models.ForeignKey('alm_user.User', related_name='subscriptions', null=True, blank=True)
     is_active = models.BooleanField(default=True)
     date_created = models.DateTimeField(auto_now_add=True, blank=True)
     date_edited = models.DateTimeField(auto_now=True, blank=True)
-    plan = models.ForeignKey('Plan', related_name='subscriptions', 
-        null=True, blank=True)
 
     def __init__(self, *args, **kwargs):
         super(Subscription, self).__init__(*args, **kwargs)
-        if hasattr(self, 'user') and self.user is not None:
-            if not hasattr(self, 'organization') or not self.organization:
-                self.organization = self.user.get_company()
+        # if hasattr(self, 'user') and self.user is not None:
+        #     if not hasattr(self, 'organization') or not self.organization:
+        #         self.organization = self.user.get_company()
 
     class Meta:
         verbose_name = _('subscription')
@@ -58,6 +33,16 @@ class Subscription(models.Model):
             url_key,
             subdomain=self.organization.subdomain,
             kwargs={'service_slug': self.service.slug.lower()})
+
+    def __unicode__(self):
+        output = "Subscription object "
+        if self.id:
+            output += "id= %s" % self.id
+        try:
+            output += " for company %s" % self.company.name
+        except:
+            pass 
+        return output
 
 class SubscriptionObject(models.Model):
     # subscription_id = models.IntegerField(_('subscription id'),
@@ -115,8 +100,6 @@ class Payment(models.Model):
         'Plan', related_name='payments', blank=False, null=False)
     subscription = models.ForeignKey(
         'Subscription', related_name='payments')
-    plan = models.ForeignKey(
-        'Plan', related_name='payments')
     tp = models.CharField(
         max_length=20, choices=PAYMENT_OPTIONS, default=CARD)
     status = models.BooleanField(default=False)

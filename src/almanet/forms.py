@@ -1,15 +1,7 @@
 from django.forms import ModelForm, Form
 from django import forms
 from django.utils.translation import ugettext_lazy as _
-from models import Service
 from alm_user.models import Referral
-
-
-class ServiceCreateForm(ModelForm):
-
-	class Meta:
-		model = Service
-		fields = ['title', 'description']
 
 
 class ReferralForm(Form):

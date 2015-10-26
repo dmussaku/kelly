@@ -11,8 +11,8 @@ from alm_company.models import Company
 from alm_crm.models import Contact, ContactList, Share, SalesCycle
 from alm_vcard.models import *
 from alm_user.models import User
-from .models import Service, Plan
-from .forms import ServiceCreateForm, ReferralForm
+from .models import Plan
+from .forms import  ReferralForm
 from django.views.generic.edit import FormView
 from django.views.generic.base import TemplateView, TemplateResponse
 import kkb
@@ -48,77 +48,13 @@ def fork_index(request):
         return HttpResponseRedirect(reverse_lazy('user_login'))
 
 
-class ServiceList(ListView):
-
-    model = Service
-    queryset = Service.objects.all()
-
-    def get_context_data(self, **kwargs):
-        ctx = super(ServiceList, self).get_context_data(**kwargs)
-        ctx['user'] = self.request.user
-        return ctx
-
-
-class ServiceCreateView(CreateView):
-    form_class = ServiceCreateForm
-    template_name = "almanet/service/service_create.html"
-    success_url = reverse_lazy('service_list')
-
-
-class ServiceUpdateView(UpdateView):
-    model = Service
-    form_class = ServiceCreateForm
-    template_name = "almanet/service/service_update.html"
-    success_url = reverse_lazy('service_list')
-
-
-class ServiceDetailView(DetailView):
-    model = Service
-    template_name = "almanet/service/service_detail.html"
-
-
-class ServiceDeleteView(DeleteView):
-    model = Service
-    template_name = "almanet/service/service_delete.html"
-    success_url = reverse_lazy('service_list')
-
-
-@login_required
-def connect_service(request, slug, *args, **kwargs):
-    try:
-        service = Service.objects.get(slug=slug)
-    except Service.DoesNotExist:
-        raise Http404
-    else:
-        request.user.connect_service(service)
-        if 'HTTP_REFERER' in request.META:
-            return HttpResponseRedirect(request.META['HTTP_REFERER'])
-        else:
-            subscr = request.user.get_subscr_by_service(service)
-            return HttpResponseRedirect(subscr.backend.get_home_url())
-
-
-@login_required
-def disconnect_service(request, slug, *args, **kwargs):
-    try:
-        service = Service.objects.get(slug=slug)
-    except Service.DoesNotExist:
-        raise Http404
-    else:
-        request.user.disconnect_service(service)
-        if 'HTTP_REFERER' in request.META:
-            return HttpResponseRedirect(request.META['HTTP_REFERER'])
-        else:
-            return HttpResponseRedirect(
-                almanet_reverse_lazy('user_profile_url',
-                                     subdomain=settings.MY_SD))
-
 from django.views.decorators.csrf import csrf_exempt
 from urlparse import parse_qs
 
 def landing(request):
     template_name='index2.html'
     if request.method == 'POST':
+        print request.POST
         form = ReferralForm(request.POST)
         if form.is_valid():
             form.save()
@@ -135,10 +71,14 @@ def landing(request):
     }
     return TemplateResponse(request, template_name, context)
 
-
 def referal_create(request):
-    if request.method == 'POST' or request.method == 'ajax':
-        pass
+    if request.method == 'POST' or request.is_ajax():
+        print request.POST
+        form = ReferralForm(request.POST)
+        if form.is_valid():
+            form.save()
+            email = form.cleaned_data['email']
+            return HttpResponse(email)
     return HttpResponse(0)
 
 @csrf_exempt

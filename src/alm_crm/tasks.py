@@ -4,11 +4,24 @@ from celery import shared_task
 from almanet.celery import app
 import xlrd
 import time
+import datetime
 import os
 import json
 import itertools
 from django.conf import settings
-from alm_crm.models import Contact, ImportTask, ErrorCell, ContactList, AttachedFile
+from alm_crm.models import (
+    Contact, 
+    ImportTask, 
+    ErrorCell, 
+    ContactList, 
+    AttachedFile
+    )
+from almanet.models import (
+    Subscription,
+    Plan,
+    Payment,
+    BankStatement
+    )
 from alm_vcard import models as vcard_models
 from alm_user.models import User
 from celery import group, result, chord, task
@@ -193,8 +206,55 @@ def cleanup_inactive_files():
             filename = _file.file_object.filename
             _file.delete()
         except Exception as e:
-            logging.error("Error to delete file '%s': %s"%(filename, e.message))
+            logging.error("Error to delete file '%s': %s" % (filename, e.message))
         else:
-            logging.info("File '%s' successfully deleted"%filename)
+            logging.info("File '%s' successfully deleted" % filename)
 
     logging.info("Clean up finished.")
+
+
+
+@app.task
+def create_payments():
+    today = datetime.datetime.now()
+    for company in Company.objects.all():
+        payments = company.subscription.payments.all()
+        if payments:
+            last_payment = payments.last()
+            pref_currency = last_payment.pref_currency
+            current_plan = last_payment.plan
+            if pref_currency == 'KZT':
+                amount = plan.price_kzt
+            elif pref_currency == 'USD':
+                amount = plan.price_usd
+            next_year = today.year
+            next_month = today.month
+            if next_month == 12:
+                next_year += 1
+                next_month = 1
+            next_payment_delta = date(next_year, next_month, today.day) - today.date()
+            new_payment = Payment(
+                amount=amount,
+                currency=pref_currency,
+                date_to_pay=today + next_payment_delta,
+                plan=last_payment.plan
+                )
+            new_payment.save()
+        else:
+            subscription = company.subscription
+            if today - subscription.date_created > 31:
+                next_year = today.year
+                next_month = today.month
+                if next_month == 12:
+                    next_year += 1
+                    next_month = 1
+                next_payment_delta = date(next_year, next_month, today.day) - today.date()
+                plan = Plan.objects.first()
+                new_payment = Payment(
+                    amount=plan.price_kzt,
+                    currency='KZT',
+                    date_to_pay=today + next_payment_delta,
+                    plan=plan
+                    )
+                new_payment.save()    
+

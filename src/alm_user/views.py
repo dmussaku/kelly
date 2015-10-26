@@ -22,7 +22,6 @@ from alm_user.forms import(
     RegistrationForm,
 ) 
 # from alm_user.auth_backend import login, logout
-from almanet.models import Service
 from almanet.url_resolvers import reverse_lazy
 
 # for testing, need to be deleted
@@ -240,18 +239,6 @@ class UserProfileSettings(UpdateView):
         return self.request.user
 
 
-class UserServicesView(ListView):
-
-    model = Service
-
-    def get_context_data(self, **kwargs):
-        ctx = super(UserServicesView, self).get_context_data(**kwargs)
-        ctx['user'] = self.request.user
-        return ctx
-
-    def get_queryset(self, *args, **kwargs):
-        queryset = self.request.user.connected_services()
-        return queryset
 
 
 def referral(request, template_name='user/login-registration.html',
