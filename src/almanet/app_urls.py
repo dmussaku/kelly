@@ -36,6 +36,7 @@ from alm_user.api import UserResource, SessionResource
 from .api import (
     PlanResource,
     PaymentResource,
+    BankStatementResource,
     )
 from tastypie.resources import ModelResource
 
@@ -72,6 +73,7 @@ v1_api.register(SessionResource())
 v1_api.register(AttachedFileResource())
 v1_api.register(PlanResource())
 v1_api.register(PaymentResource())
+v1_api.register(BankStatementResource())
 
 urlpatterns = patterns(
     '',

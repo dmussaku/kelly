@@ -261,7 +261,7 @@ def create_payments():
                 new_payment.save()
 
 
-@app_task
+@app.task
 def check_payments_dates():
     today = datetime.datetime.now()
     for subscription in [company.subscription for company in Company.objects.all()]:

@@ -50,8 +50,24 @@ class SubscriptionResource(ModelResource):
         queryset = Subscription.objects.all()
         resource_name = 'subscription'
 
+class BankStatementResource(ModelResource):
+
+    class Meta:
+        list_allowed_methods = ['get',]
+        detail_allowed_methods = ['get',]
+        authentication = MultiAuthentication(
+            SessionAuthentication(), 
+            ApiKeyAuthentication(), 
+            BasicAuthentication()
+            )
+        authorization = Authorization()
+        queryset = BankStatement.objects.all()
+        resource_name = 'bank_statement'
 
 class PaymentResource(ModelResource):
+
+    bank_statement = fields.ToOneField(
+        'almanet.api.BankStatementResource', 'bank_statement', null=True, blank=True, readonly=True, full=True)
 
     class Meta:
         list_allowed_methods = ['get', 'post', 'patch']
@@ -65,7 +81,10 @@ class PaymentResource(ModelResource):
         queryset = Payment.objects.all()
         resource_name = 'payment'
 
-
+    def full_dehydrate(self, bundle, for_list=False):
+        bundle = super(self.__class__, self).full_dehydrate(bundle, for_list)
+        bundle.data['subscription_id'] = bundle.obj.subscription.id
+        return bundle
     '''
     test cards, any name can be entered:
     4405645000006150    09-2025     653
@@ -88,6 +107,12 @@ class PaymentResource(ModelResource):
                 self.wrap_view('get_epay_context'),
                 name='api_get_epay_context'
             ),
+            url(
+                r"^(?P<resource_name>%s)/change_plan%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('get_change_plan'),
+                name='api_get_change_plan'
+                ),
         ]
 
     '''

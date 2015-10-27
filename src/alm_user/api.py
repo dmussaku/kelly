@@ -302,7 +302,12 @@ class UserResource(ModelResource):
                 {
                  'id':account.company.id, 
                  'name':account.company.name, 
-                 'subdomain':account.company.subdomain
+                 'subdomain':account.company.subdomain,
+                 'subscription':{
+                    'id':account.company.subscription.id,
+                    'is_active':account.company.subscription.is_active,
+                    'date_created':account.company.subscription.date_created,
+                    }
                 }
             )
         if subdomain:
