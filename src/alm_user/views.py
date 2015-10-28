@@ -184,7 +184,6 @@ def password_reset_confirm(request, user_pk=None, token=None,
 
     try:
         user = User.objects.get(pk=user_pk)
-        print user
     except User.DoesNotExist:
         user = None
 
@@ -381,10 +380,8 @@ class ActivationView(TemplateView):
         if user.has_usable_password():
             return ('user_login', (), {})
         else:
-            print 'has no password', user
-            # authorize user
-            # redirect to password setting form
-            return ('set_password', (), {})
+            token = default_token_generator.make_token(user)
+            return ('password_reset_confirm', (), {'user_pk': user.pk, 'token': token})
 
     def validate_key(self, activation_key):
         """
