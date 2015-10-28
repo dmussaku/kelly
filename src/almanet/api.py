@@ -84,6 +84,7 @@ class PaymentResource(ModelResource):
     def full_dehydrate(self, bundle, for_list=False):
         bundle = super(self.__class__, self).full_dehydrate(bundle, for_list)
         bundle.data['subscription_id'] = bundle.obj.subscription.id
+        bundle.data['plan_id'] = bundle.obj.plan.id
         return bundle
     '''
     test cards, any name can be entered:
@@ -131,8 +132,6 @@ class PaymentResource(ModelResource):
     context is the thing that gets created by our api function get_payment_process. There are
     also BackLinks and PostLinks - those are the ones that should change 
     '''
-
-
 
     def get_epay_context(self, request, **kwargs):
         id = kwargs.get('id')

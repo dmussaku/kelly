@@ -16,7 +16,8 @@ class Command(BaseCommand):
 		    users_num = 10,
 		    contacts_num = 100,
 		    space_per_user = 1,
-		    pic = 'common-files/icons/retina-ready-s@2x.png'
+		    pic = 'common-files/icons/retina-ready-s@2x.png',
+		    sm_pic = 'common-files/icons/sm_plan_1.png'
 			)
 		plan2 = Plan(
 			name_ru = 'Средний бизнесс',
@@ -28,7 +29,8 @@ class Command(BaseCommand):
 		    users_num = 20,
 		    contacts_num = 2000,
 		    space_per_user = 5,
-		    pic = 'common-files/icons/rocket@2x.png'
+		    pic = 'common-files/icons/rocket@2x.png',
+		    sm_pic = 'common-files/icons/sm_plan_2.png'
 			)
 		plan3 = Plan(
 			name_ru = 'Крупный бизнесс',
@@ -40,7 +42,8 @@ class Command(BaseCommand):
 		    users_num = 0,
 		    contacts_num = 0,
 		    space_per_user = 10,
-		    pic = 'common-files/icons/magic-wand@2x.png'
+		    pic = 'common-files/icons/magic-wand@2x.png',
+		    sm_pic = 'common-files/icons/sm_plan_3.png'
 			)
 		plan1.save()
 		print "%s has been saved" % plan1

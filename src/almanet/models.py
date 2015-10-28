@@ -75,6 +75,7 @@ class Plan(models.Model):
     contacts_num = models.IntegerField(blank=False, default=100)
     space_per_user = models.IntegerField(blank=False, default=1)
     pic = models.CharField(max_length=100, blank=True)
+    sm_pic = models.CharField(max_length=100, blank=True)
 
 
 class Payment(models.Model):
