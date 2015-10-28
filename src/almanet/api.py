@@ -68,6 +68,8 @@ class PaymentResource(ModelResource):
 
     bank_statement = fields.ToOneField(
         'almanet.api.BankStatementResource', 'bank_statement', null=True, blank=True, readonly=True, full=True)
+    subscription = fields.ToOneField(
+        'almanet.api.SubscriptionResource', 'subscription', null=True, blank=True, readonly=True, full=True)
 
     class Meta:
         list_allowed_methods = ['get', 'post', 'patch']
@@ -83,7 +85,7 @@ class PaymentResource(ModelResource):
 
     def full_dehydrate(self, bundle, for_list=False):
         bundle = super(self.__class__, self).full_dehydrate(bundle, for_list)
-        bundle.data['subscription_id'] = bundle.obj.subscription.id
+        # bundle.data['subscription_id'] = bundle.obj.subscription.id
         bundle.data['plan_id'] = bundle.obj.plan.id
         return bundle
     '''
