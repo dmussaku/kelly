@@ -13,14 +13,14 @@ from almanet.settings import MY_SD
 from alm_company.models import Company
 from alm_user.models import User, Referral, Account
 from alm_user.forms import(
-    # RegistrationForm, 
-    UserBaseSettingsForm, 
-    UserPasswordSettingsForm, 
-    ReferralForm, 
+    # RegistrationForm,
+    UserBaseSettingsForm,
+    UserPasswordSettingsForm,
+    ReferralForm,
     PasswordResetForm,
     AuthenticationForm,
     RegistrationForm,
-) 
+)
 # from alm_user.auth_backend import login, logout
 from almanet.models import Service
 from almanet.url_resolvers import reverse_lazy
@@ -34,6 +34,10 @@ from django.utils.http import is_safe_url
 from django.shortcuts import resolve_url
 from django.contrib.auth import login, logout, REDIRECT_FIELD_NAME
 from almanet.url_resolvers import reverse as almanet_reverse
+from django.shortcuts import redirect
+from django.contrib.auth import get_user_model
+from django.core import signing
+
 
 
 @sensitive_post_parameters()
@@ -62,7 +66,7 @@ def login_view(request, template_name='registration/login.html',
                     reverse_lazy('choose_subdomain')
                 )
             return HttpResponseRedirect(
-                reverse_lazy('crm_home', 
+                reverse_lazy('crm_home',
                         subdomain=accounts[0].company.subdomain,
                         kwargs={'service_slug': settings.DEFAULT_SERVICE}))
     else:
@@ -288,7 +292,7 @@ def registration(request, template_name='user/registration.html',
                     reverse_lazy('choose_subdomain')
                 )
             return HttpResponseRedirect(
-                reverse_lazy('crm_home', 
+                reverse_lazy('crm_home',
                         subdomain=accounts[0].company.subdomain,
                         kwargs={'service_slug': settings.DEFAULT_SERVICE}))
             # return HttpResponseRedirect(reverse_lazy('user_registration_success'))
@@ -312,3 +316,98 @@ class ChooseSubdomain(TemplateView):
         accounts = self.request.user.accounts.all()
         ctx['companies'] = [account.company for account in accounts]
         return ctx
+
+
+
+class ActivationView(TemplateView):
+    """
+    Given a valid activation key, activate the user's
+    account. Otherwise, show an error message stating the account
+    couldn't be activated.
+
+    """
+
+
+class ActivationView(TemplateView):
+    """
+    Base class for user activation views.
+
+    """
+    template_name = 'registration/activate.html'
+
+    def get(self, *args, **kwargs):
+        """
+        The base activation logic; subclasses should leave this method
+        alone and implement activate(), which is called from this
+        method.
+        """
+
+        activated_user = self.activate(*args, **kwargs)
+        if activated_user:
+            # signals.user_activated.send(sender=self.__class__,
+            #                             user=activated_user,
+            #                             request=self.request)
+            success_url = self.get_success_url(activated_user)
+            try:
+                to, args, kwargs = success_url
+                return redirect(to, *args, **kwargs)
+            except ValueError:
+                return redirect(success_url)
+        return super(ActivationView, self).get(*args, **kwargs)
+
+    def activate(self, *args, **kwargs):
+        # This is safe even if, somehow, there's no activation key,
+        # because unsign() will raise BadSignature rather than
+        # TypeError on a value of None.
+        username, subdomain = self.validate_key(kwargs.get('activation_key'))
+        if username is not None:
+            print '...', username, subdomain
+            account = self.get_account(username, subdomain)
+            if account is not None:
+                account.is_active = True
+                account.save()
+                return account.user
+        return None
+
+    def get_success_url(self, user):
+        return ('user_login', (), {})
+
+    def validate_key(self, activation_key):
+        """
+        Verify that the activation key is valid and within the
+        permitted activation time window, returning the username if
+        valid or ``None`` if not.
+
+        """
+        signer = signing.TimestampSigner(salt=settings.REGISTRATION_SALT)
+        try:
+            protected_key_struct = signer.unsign(
+                activation_key,
+                max_age=settings.ACCOUNT_ACTIVATION_DAYS * 86400
+            )
+            key_struct = signing.loads(protected_key_struct)
+            return key_struct.get('username'), key_struct.get('subdomain')
+        # SignatureExpired is a subclass of BadSignature, so this will
+        # catch either one.
+        except signing.BadSignature:
+            return None
+
+    def get_account(self, username, subdomain):
+        """
+        Given the verified username, look up and return the
+        corresponding user account if it exists, or ``None`` if it
+        doesn't.
+
+        """
+        User = get_user_model()
+        lookup_kwargs = {
+            User.USERNAME_FIELD: username
+        }
+        try:
+            user = User.objects.get(**lookup_kwargs)
+            account = user.accounts.get(company__subdomain=subdomain)
+            return account
+        except User.DoesNotExist:
+            return None
+        except Account.DoesNotExist:
+            return None

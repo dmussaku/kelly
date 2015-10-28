@@ -1,0 +1,9 @@
+{% extends "emails/base.txt" %}{% load almanet_tags %}
+{% load i18n %}
+{% blocktrans %} You have registered and the activation mail is sent to your email. Click the activation link to activate you account.{% endblocktrans %}
+
+{% block body %}
+{% trans "Click this link to activate your account and set a new password:" %}
+{% absurl "registration_activate" activation_key  %}
+
+{% endblock %}

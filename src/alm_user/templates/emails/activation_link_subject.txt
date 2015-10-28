@@ -1,0 +1,1 @@
+{{ _("Email Verification and Account Activation Link") }}

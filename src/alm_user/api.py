@@ -40,6 +40,7 @@ import datetime
 import ast
 from django.contrib.auth import login
 from almanet.middleware import GetSubdomainMiddleware
+from alm_user.utils.activation import RegistrationHelper
 
 
 
@@ -287,10 +288,12 @@ class UserResource(ModelResource):
     def obj_create(self, bundle, **kwargs):
         bundle.obj = self._meta.object_class()
         bundle = self.full_hydrate(bundle)
-
-        bundle.obj.set_password('123')
+        bundle.obj.is_active = False
         bundle = self.save(bundle)
-        Account.objects.create_account(bundle.obj, bundle.request.company, False)
+        account = Account.objects.create_account(bundle.obj, bundle.request.company, False)
+
+        # send activation link to email
+        RegistrationHelper.send_activation_email(account)
 
         return bundle
 

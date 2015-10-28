@@ -26,7 +26,7 @@ urlpatterns = patterns(
     url(r'^auth/', include('alm_user.urls')),
     url(r'^api/', include('almanet.api_urls')),
 
-    
+
     # TODO: temp, needs to be deleted
     # url(r'^crm/', include('alm_crm.urls')),
     # url(r'^vcard/', include('alm_vcard.urls')),
@@ -48,6 +48,7 @@ urlpatterns = patterns(
     url(r'agreement/$', TemplateView.as_view(template_name='almanet/agreement.crm.html'), name='agreement'),
     # url(r'landing_form/$', landing_form, name='landing_form'),
     url(r'^files', include('almastorage.urls')),
+    url(r'^activation/', include('alm_user.activation_urls')),
 )
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

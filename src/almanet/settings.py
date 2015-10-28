@@ -91,7 +91,7 @@ class BaseConfiguration(SubdomainConfiguration, Configuration):
     # Celery settings
 
     BROKER_URL = 'amqp://guest:guest@localhost//'
-    
+
     #: Only add pickle to this list if your broker is secured
     #: from unwanted access (see userguide/security.html)
     CELERYBEAT_SCHEDULER = 'djcelery.schedulers.DatabaseScheduler'
@@ -288,6 +288,12 @@ class BaseConfiguration(SubdomainConfiguration, Configuration):
     MANAGERS = ADMINS
     BCC_EMAILS = ()
 
+    # django-registration package setting
+    # visit for more details: https://django-registration.readthedocs.org/en/master/quickstart.html
+    ACCOUNT_ACTIVATION_DAYS = 7 # One-week activation window; you may, of course, use a different value.
+    REGISTRATION_SALT = 'registration'
+
+
     @property
     def LOGIN_REDIRECT_URL(self):
         return self.__class__.reverse_lazy('user_profile_url',
@@ -354,7 +360,7 @@ class BaseConfiguration(SubdomainConfiguration, Configuration):
     SW_USERNAME = 'ALMASALES'
     SW_KEY = 'x3IFqvHB'
     SW_AUTH_URL = 'http://178.88.64.78/auth/v1.0'
-    
+
     RUSTEM_SETTINGS = False
 
 

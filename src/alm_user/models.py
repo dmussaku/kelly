@@ -9,6 +9,7 @@ from almanet.models import Subscription
 from alm_vcard.models import VCard, Email
 
 from almastorage.utils import default_file
+from django.core.mail import EmailMessage
 from datetime import datetime
 import hmac
 import uuid
@@ -17,6 +18,9 @@ try:
 except ImportError:
     import sha
     sha1 = sha.sha
+
+SUPPORT_EMAIL = settings.SUPPORT_EMAIL
+
 
 class AccountManager(contrib_user_manager):
     @classmethod
@@ -206,6 +210,15 @@ class User(AbstractBaseUser):
         Returns a company taken from request
         '''
         return request.company
+
+    def email_user(self, subject, body, from_email=SUPPORT_EMAIL):
+        msg = EmailMessage(
+            subject=subject,
+            body=body,
+            from_email=from_email,
+            to=[self.email]
+            )
+        msg.send()
 
     @property
     def is_staff(self):
