@@ -66,8 +66,6 @@ class RegistrationHelper(object):
         # Force subject to a single line to avoid header-injection
         # issues.
 
-        print '*', activation_key, context, subject
-
         subject = ''.join(subject.splitlines())
         message = render_to_string(cls.email_body_template,
                                    context)

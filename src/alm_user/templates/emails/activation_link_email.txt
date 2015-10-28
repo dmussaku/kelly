@@ -4,6 +4,6 @@
 
 {% block body %}
 {% trans "Click this link to activate your account and set a new password:" %}
-{% absurl "registration_activate" activation_key  %}
+{% subdomain_url "registration_activate" activation_key=activation_key  %}
 
 {% endblock %}

@@ -288,12 +288,29 @@ class UserResource(ModelResource):
     def obj_create(self, bundle, **kwargs):
         bundle.obj = self._meta.object_class()
         bundle = self.full_hydrate(bundle)
-        bundle.obj.is_active = False
-        bundle = self.save(bundle)
-        account = Account.objects.create_account(bundle.obj, bundle.request.company, False)
 
-        # send activation link to email
-        RegistrationHelper.send_activation_email(account)
+        try:
+            bundle.obj.validate_unique() # check email for unique
+            bundle.obj.set_unusable_password()
+            bundle = self.save(bundle)
+        except ValidationError:
+            bundle.obj = User.objects.get(email=bundle.data.email)
+
+        try:
+            # to prevent of creating Account two times
+            Account.objects.get(user=bundle.obj, company=bundle.request.company)
+
+            data = {'success': False, 'error':_("Account is already exist")}
+            return self.error_response(request, data, response_class=http.HttpBadRequest)
+
+        except Account.DoesNotExist:
+            account = Account.objects.create_account(bundle.obj, bundle.request.company, False)
+            # below will be setted by default values:
+            #  account.is_active = False
+            #  account.was_actived = False
+
+            # send activation link to email
+            RegistrationHelper.send_activation_email(account)
 
         return bundle
 

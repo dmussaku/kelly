@@ -2,7 +2,7 @@ from django.views.generic import ListView
 from django.views.generic.base import TemplateView, TemplateResponse
 from django.views.generic.edit import CreateView, UpdateView, FormView
 # from django.core.urlresolvers import reverse_lazy
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponseRedirect, HttpResponse, HttpResponseForbidden
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth.forms import SetPasswordForm
 from django.views.decorators.debug import sensitive_post_parameters
@@ -37,6 +37,7 @@ from almanet.url_resolvers import reverse as almanet_reverse
 from django.shortcuts import redirect
 from django.contrib.auth import get_user_model
 from django.core import signing
+from django.core.exceptions import SuspiciousOperation
 
 
 
@@ -342,7 +343,12 @@ class ActivationView(TemplateView):
         method.
         """
 
-        activated_user = self.activate(*args, **kwargs)
+        try:
+            activated_user = self.activate(*args, **kwargs)
+        except SuspiciousOperation as e:
+            # raise 403 error if activation key expired or already used
+            return HttpResponseForbidden()
+
         if activated_user:
             # signals.user_activated.send(sender=self.__class__,
             #                             user=activated_user,
@@ -361,16 +367,24 @@ class ActivationView(TemplateView):
         # TypeError on a value of None.
         username, subdomain = self.validate_key(kwargs.get('activation_key'))
         if username is not None:
-            print '...', username, subdomain
             account = self.get_account(username, subdomain)
             if account is not None:
+                if account.was_actived:
+                    raise SuspiciousOperation('Activation Key already used')
+                account.was_actived = True
                 account.is_active = True
                 account.save()
                 return account.user
         return None
 
     def get_success_url(self, user):
-        return ('user_login', (), {})
+        if user.has_usable_password():
+            return ('user_login', (), {})
+        else:
+            print 'has no password', user
+            # authorize user
+            # redirect to password setting form
+            return ('set_password', (), {})
 
     def validate_key(self, activation_key):
         """

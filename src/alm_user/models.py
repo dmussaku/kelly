@@ -32,7 +32,8 @@ class AccountManager(contrib_user_manager):
 
 class Account(models.Model):
 
-    is_active = models.BooleanField(default=True)
+    is_active = models.BooleanField(default=False)
+    was_actived = models.BooleanField(default=False)
     is_supervisor = models.BooleanField(default=False)
 
     date_created = models.DateTimeField(auto_now_add=True, blank=True)
