@@ -22,7 +22,8 @@ from .models import (
     AttachedFile,
     CustomFieldValue,
     ImportTask,
-    ErrorCell
+    ErrorCell,
+    UsersGroup,
     )
 from alm_user.models import User
 from alm_user.api import UserResource
@@ -416,7 +417,7 @@ class ContactResource(CRMServiceModelResource):
             'owner', 'parent', 'vcard').prefetch_related(
                 'sales_cycles', 'children', 'share_set',
                 'vcard__tel_set', 'vcard__category_set',
-                'vcard__adr_set', 'vcard__title_set', 
+                'vcard__adr_set', 'vcard__title_set',
                 'vcard__url_set', 'vcard__email_set')
         resource_name = 'contact'
         filtering = {
@@ -579,8 +580,8 @@ class ContactResource(CRMServiceModelResource):
         company_name = bundle.data.get('company_name',"").strip()
         if company_name:
             company = Contact.objects.filter(
-                        vcard__fn=company_name, 
-                        company_id=company_id, 
+                        vcard__fn=company_name,
+                        company_id=company_id,
                         tp='co').first()
             if not company:
                 company = bundle.obj.create_company_for_contact(company_name)
@@ -2458,7 +2459,7 @@ class ActivityResource(CRMServiceModelResource):
                 att_file.object_id = act_id
                 att_file.save()
             else:
-                try: 
+                try:
                     att_file.delete()
                 except:
                     pass
@@ -3103,7 +3104,7 @@ class AttachedFileResource(CRMServiceModelResource):
         @param name: filename
 
         @type type: string
-        @param type: content type of file_object 
+        @param type: content type of file_object
 
         @type size: int
         @param size: filesize
@@ -3121,28 +3122,28 @@ class AttachedFileResource(CRMServiceModelResource):
             data = self.deserialize(request, request.body, format=request.META.get('CONTENT_TYPE', 'application/json'))
             try:
                 swiftfile = SwiftFile.upload_file(file_contents=request.FILES['file'],
-                                                    filename=data['name'], 
-                                                    content_type=data['type'], 
+                                                    filename=data['name'],
+                                                    content_type=data['type'],
                                                     container_title = CRM_CONTAINER_TITLE,
                                                     filesize=data['size'])
             except Exception as e:
                 return http.HttpApplicationError(e.message)
 
-            attached_file = AttachedFile.build_new(file_object=swiftfile, 
+            attached_file = AttachedFile.build_new(file_object=swiftfile,
                                                 owner=request.user,
                                                 company_id=request.company.id,
-                                                content_class=ContentType.objects.get(app_label='alm_crm', 
+                                                content_class=ContentType.objects.get(app_label='alm_crm',
                                                     model=data['content_class'].lower()).model_class(),
                                                 object_id=None,
                                                 save=True)
 
             return self.create_response(request,
                                         {
-                                            'file_id': attached_file.id, 
+                                            'file_id': attached_file.id,
                                             'swiftfile_id': swiftfile.id,
                                             'filename': data['name'],
                                             'delete': False
-                                        }, 
+                                        },
                                         response_class=http.HttpCreated)
 
 
@@ -3813,7 +3814,7 @@ class AppStateResource(Resource):
             masked_objects = map(
                 lambda y: set(
                     map(lambda x: '%s_%d' % (x.content_object.__class__.__name__, x.content_object.id), y)
-                ), 
+                ),
                 all_references
             )
 
@@ -3833,7 +3834,7 @@ class AppStateResource(Resource):
                     share = Share.objects.get(id=id)
                     shares.append(share)
 
-            
+
             if activities:
                 activity_resource = ActivityResource()
                 obj_dict['objects']['activities'] = \
@@ -4305,3 +4306,31 @@ class ReportResource(Resource):
                     company_id=request.company.id,
                     data=data), response_class=http.HttpAccepted
                 )
+
+
+class UsersGroupResource(CRMServiceModelResource):
+    '''
+    ALL Method
+    I{URL}:  U{alma.net/api/v1/users_group/}
+
+    B{Description}:
+    API resource to get data for UsersGroup
+
+    @undocumented: Meta
+    '''
+
+    owner_id = fields.IntegerField(attribute='owner_id', null=True)
+    title = fields.CharField(attribute='title')
+    user_ids = CustomToManyField('alm_user.api.UserResource', 'users',
+        null=True, full=False, full_use_ids=True)
+
+    class Meta(CommonMeta):
+        queryset = UsersGroup.objects.all().prefetch_related('users')
+        resource_name = 'users_group'
+        always_return_data = True
+        filtering = {
+            'owner_id': ('exact', ),
+            'date_created': ['exact', 'range', 'gt', 'gte', 'lt', 'lte'],
+            'date_edited': ['exact', 'range', 'gt', 'gte', 'lt', 'lte'],
+            }
+        filtering.update(CommonMeta.filtering)

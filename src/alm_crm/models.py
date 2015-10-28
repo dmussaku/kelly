@@ -136,7 +136,7 @@ class Contact(SubscriptionObject):
     vcard = models.OneToOneField('alm_vcard.VCard', blank=True, null=True,
                                  on_delete=models.SET_NULL, related_name='contact')
     parent = models.ForeignKey(
-        'Contact', blank=True, null=True, 
+        'Contact', blank=True, null=True,
         related_name='children', on_delete=models.SET_NULL)
     owner = models.ForeignKey(
         User, related_name='owned_contacts',
@@ -578,7 +578,7 @@ class Contact(SubscriptionObject):
 
     '''
     Creates contact from data which is row from xls file and file_structure
-    which has a specific format, here's the example of both 
+    which has a specific format, here's the example of both
     file_structure:
     [
         {'num':0, 'model':'VCard', 'attr':'fn'},
@@ -633,7 +633,7 @@ class Contact(SubscriptionObject):
                     response['error'] = True
                     response['error_col'] = col_num
                     return response
-            elif (model == vcard_models.Tel or model == vcard_models.Email 
+            elif (model == vcard_models.Tel or model == vcard_models.Email
                         or model == vcard_models.Url):
                 try:
                     if data[col_num].value:
@@ -695,11 +695,11 @@ class Contact(SubscriptionObject):
                     response['error'] = True
                     response['error_col'] = col_num
                     return response
-            elif (model == vcard_models.Geo or model == vcard_models.Agent 
-                    or model == vcard_models.Category or model == vcard_models.Key 
-                    or model == vcard_models.Label or model == vcard_models.Mailer 
-                    or model == vcard_models.Nickname or model == vcard_models.Note 
-                    or model == vcard_models.Role or model == vcard_models.Title 
+            elif (model == vcard_models.Geo or model == vcard_models.Agent
+                    or model == vcard_models.Category or model == vcard_models.Key
+                    or model == vcard_models.Label or model == vcard_models.Mailer
+                    or model == vcard_models.Nickname or model == vcard_models.Note
+                    or model == vcard_models.Role or model == vcard_models.Title
                     or model == vcard_models.Tz):
                 try:
                     if data[col_num].value:
@@ -912,7 +912,7 @@ class Contact(SubscriptionObject):
         self.vcard.note_set.all().delete()
         if note_data or fn_list:
             note = Note(
-                data=', '.join(map(str,fn_list)) + ' ' + note_data, 
+                data=', '.join(map(str,fn_list)) + ' ' + note_data,
                 vcard=self.vcard)
             note.save()
         with transaction.atomic():
@@ -1377,7 +1377,7 @@ class SalesCycle(SubscriptionObject):
         sc_log_entry = SalesCycleLogEntry(meta=json.dumps(meta),
                                           entry_type=SalesCycleLogEntry.MC,
                                           sales_cycle=self,
-                                          owner=user, 
+                                          owner=user,
                                           company_id=company_id)
         sc_log_entry.save()
         return self
@@ -1517,7 +1517,7 @@ class SalesCycle(SubscriptionObject):
     @classmethod
     def after_save(cls, sender, instance, **kwargs):
         cache.set(build_key(cls._meta.model_name, instance.pk), json.dumps(instance.serialize(), default=date_handler))
-    
+
     @classmethod
     def after_delete(cls, sender, instance, **kwargs):
         cache.delete(build_key(cls._meta.model_name, instance.pk))
@@ -1593,7 +1593,7 @@ class Activity(SubscriptionObject):
     def comments_count(self):
         return self.comments.count()
 
-    
+
     def new_comments_count(self, user_id):
         return len(
             filter(lambda(comment): not comment.has_read(user_id),
@@ -1756,7 +1756,7 @@ class Activity(SubscriptionObject):
 
     def serialize(self):
         return {
-            'assignee_id': self.assignee_id,            
+            'assignee_id': self.assignee_id,
             'author_id': self.owner_id,
             'company_id': self.company_id,
             'comments_count': self.comments_count,
@@ -1790,7 +1790,7 @@ class Activity(SubscriptionObject):
     @classmethod
     def after_save(cls, sender, instance, **kwargs):
         cache.set(build_key(cls._meta.model_name, instance.pk), json.dumps(instance.serialize(), default=date_handler))
-    
+
     @classmethod
     def after_delete(cls, sender, instance, **kwargs):
         cache.delete(build_key(cls._meta.model_name, instance.pk))
@@ -1878,7 +1878,7 @@ class Comment(SubscriptionObject):
         for account in Account.objects.filter(company_id=company_id):
             if not (self.content_object.contact in account.unfollow_list.all()):
                 accounts.append(account)
-                
+
         with transaction.atomic():
             for account in accounts:
                 com_recipient = CommentRecipient(user=account.user, comment=self)
@@ -1979,7 +1979,7 @@ class AttachedFile(SubscriptionObject):
     def is_active(self):
         if self.content_object == None:
             return False
-        
+
         return True
 
     @classmethod
@@ -1990,7 +1990,7 @@ class AttachedFile(SubscriptionObject):
 
             arguments:
                 file_object - SwiftFile object
-                owner - User object, 
+                owner - User object,
                 company_id - Company id,
                 content_class - class which be related with the model,
                 object_id - related object id
@@ -2113,7 +2113,7 @@ class ContactList(SubscriptionObject):
     title = models.CharField(max_length=150)
     contacts = models.ManyToManyField(Contact, related_name='contact_list',
                                    null=True, blank=True)
-    import_task = models.OneToOneField('alm_crm.ImportTask', 
+    import_task = models.OneToOneField('alm_crm.ImportTask',
         blank=True, null=True, on_delete=models.SET_NULL)
 
     class Meta:
@@ -2204,7 +2204,7 @@ class Filter(SubscriptionObject):
     title = models.CharField(max_length=100, default='')
     filter_text = models.CharField(max_length=500)
     owner = models.ForeignKey(User, related_name='owned_filter', null=True)
-    
+
     base = models.CharField(max_length=6, choices=BASE_OPTIONS, default='all')
 
     class Meta:
@@ -2376,3 +2376,17 @@ class ErrorCell(models.Model):
     row = models.IntegerField()
     col = models.IntegerField()
     data = models.CharField(max_length=10000)
+
+
+
+class UsersGroup(SubscriptionObject):
+    title = models.CharField(max_length=100)
+    users = models.ManyToManyField(User, related_name='groups', null=True, blank=True)
+    owner = models.ForeignKey(User, related_name='owned_groups', null=True)
+    #TODO: add permisions
+
+    class Meta:
+        verbose_name = 'users_group'
+
+    def __unicode__(self):
+        return '%s by %s [%s]' % (self.title, self.owner, self.users.all()[:3])
