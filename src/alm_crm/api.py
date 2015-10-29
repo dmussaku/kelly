@@ -177,9 +177,16 @@ class CustomToManyField(fields.ToManyField):
 
 
     def build_related_resource(self, value, request=None, related_obj=None, related_name=None):
-        return super(self.__class__, self).build_related_resource(value, request=request,
-            related_obj=related_obj, related_name=related_name)
-
+        obj_id = value
+        kwargs = {
+            'request': request,
+            'related_obj': related_obj,
+            'related_name': related_name,
+        }
+        self.fk_resource = self.to_class()
+        bundle = self.fk_resource.build_bundle(obj={'pk': obj_id}, request=request)
+        obj = self.fk_resource.obj_get(bundle, pk=obj_id)
+        return self.resource_from_pk(self.fk_resource, obj, **kwargs)
 
 class CRMServiceModelResource(ModelResource):
 

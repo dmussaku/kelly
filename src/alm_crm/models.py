@@ -2389,4 +2389,4 @@ class UsersGroup(SubscriptionObject):
         verbose_name = 'users_group'
 
     def __unicode__(self):
-        return '%s by %s [%s]' % (self.title, self.owner, self.users.all()[:3])
+        return '%s by %s: %s' % (self.title, self.owner, self.users.all()[:3])

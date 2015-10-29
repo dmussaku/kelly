@@ -182,6 +182,9 @@ class UserResource(ModelResource):
             ),
         ]
 
+    def get_resource_id(self, bundle):
+        return self.detail_uri_kwargs(bundle)[self._meta.detail_uri_name]
+
     def upload_userpic(self, request, **kwargs):
         with RequestContext(self, request, allowed_methods=['post']):
             data = self.deserialize(request, request.body, format=request.META.get('CONTENT_TYPE', 'application/json'))
