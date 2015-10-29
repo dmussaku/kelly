@@ -146,6 +146,75 @@ class PaymentResource(ModelResource):
         context = {'context':context}
         return self.create_response(request, context)
 
+    '''
+    When user tries to change plans, we should first check if he can downgrade
+    to plan, in terms of the amount of contacts and users and space allocated to
+    specific plan. Otherwise if user already paid for one plan and now needs 
+    an upgrade we first need to return him the data that shows how much more he 
+    needs to pay in order to make an upgrade
+    '''
+    def check_change_plan(self, request, **kwargs):
+        data = self.deserialize(
+            request, request.body,
+            format=request.META.get('CONTENT_TYPE', 'application/json'))
+        company = Company.objects.get(id=request.company.id)
+        try:
+            new_plan = Plan.objects.get(id=data.get('plan_id'))
+        except:
+            return self.create_response(request, {'success':False})
+        payments = company.subscription.payments.all()
+        if not payments:
+            return self.create_response(request, {'success':True}) 
+        old_plan = payments.last().plan
+        if new_plan.contacts_num > old_plan.contacts_num and new_plan.users_num > old_plan.users_num:
+            context = self.determine_amount(
+                company, payments.last(), new_plan, return_payment=False)
+            return self.create_response(request, {'success':True})
+        else:
+            contacts_num = Contact.objects.filter(company_id=company.id).count()
+            user_num = Account.objects.filter(company_id=company.id).count()
+            context = {'contacts_num':0, 'users_num':0}
+            if contacts_num > new_plan.contacts_num:
+                context['contacts_num'] = contacts_num - new_plan.contacts_num
+            if users_num > new_plan.users_num:
+                context['users_num'] = users_num - new_plan.users_num
+            context['success'] = True
+            return self.create_response(request, context)
+
+    def determine_amount(self, company, last_payment, plan, return_payment=True):
+        if not last_payment.status:
+            last_payment.plan = plan
+            if last_payment.currency == 'KZT':
+                last_payment.amount = plan.price_kzt
+            elif last_payment.currency == 'USD':
+                last_payment.amount = plan.price_usd
+            if not return_payment:
+                return {'amount':0}
+            last_payment.save()
+            return last_payment
+        else:
+            today = datetime.datetime.now().date()
+            t30 = last_payment.date_to_pay.date()
+            t0 = last_payment.date_created.date()
+            if last_payment.currency == 'KZT':
+                amount2 = plan.price_kzt
+            elif last_payment.currency == 'USD':
+                amount2 = plan.price_usd
+            amount1 = last_payment.amount
+            new_amount = ((t30-today)/float(t30))*amount2 - amount1*(1-(today-t0)/float(t30))
+            new_amount = round(new_amount)
+            if not return_payment:
+                return {'amount':new_amount}
+            payment = Payment(
+                amount=new_amount,
+                currency=last_payment.currency,
+                date_to_pay=last_payment.date_to_pay,
+                plan=plan,
+                subscription=company.subscription
+                )
+            payment.save()
+            return payment
+
     def change_plan(self, request, **kwargs):
         data = self.deserialize(
             request, request.body,
@@ -159,32 +228,8 @@ class PaymentResource(ModelResource):
             return self.create_response(request, {'success':False})
         company = Company.objects.get(id=request.company.id)
         last_payment = company.subscription.payments.last()
-        if not last_payment.status:
-            last_payment.plan = plan
-            if last_payment.currency == 'KZT':
-                last_payment.amount = plan.price_kzt
-            elif last_payment.currency == 'USD':
-                last_payment.amount = plan.price_usd
-            last_payment.save()
-        else:
-            today = datetime.datetime.now().date()
-            t30 = last_payment.date_to_pay.date()
-            t0 = last_payment.date_created.date()
-            if last_payment.currency == 'KZT':
-                amount2 = plan.price_kzt
-            elif last_payment.currency == 'USD':
-                amount2 = plan.price_usd
-            amount1 = last_payment.amount
-            new_amount = ((t30-today)/float(t30))*amount2 - amount1*(1-(today-t0)/float(t30))
-            new_amount = round(new_amount)
-            payment = Payment(
-                amount=new_amount,
-                currency=last_payment.currency,
-                date_to_pay=last_payment.date_to_pay,
-                plan=plan,
-                subscription=company.subscription
-                )
-            payment.save()
+        payment = self.determine_amount(
+            company, last_payment, plan, return_payment=True)
 
         return self.create_response(request, PaymentResource().full_dehydrate(
                         PaymentResource().build_bundle(obj=payment, request=request) ))
