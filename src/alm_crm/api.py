@@ -4335,7 +4335,9 @@ class UsersGroupResource(CRMServiceModelResource):
         queryset = UsersGroup.objects.all().prefetch_related('users')
         resource_name = 'users_group'
         always_return_data = True
+        list_allowed_methods = ['get', 'post', 'patch', 'delete']
         filtering = {
+            'id': ALL,
             'owner_id': ('exact', ),
             'date_created': ['exact', 'range', 'gt', 'gte', 'lt', 'lte'],
             'date_edited': ['exact', 'range', 'gt', 'gte', 'lt', 'lte'],
