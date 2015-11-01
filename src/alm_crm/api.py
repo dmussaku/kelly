@@ -833,7 +833,7 @@ class ContactResource(CRMServiceModelResource):
 
         @return:  contacts ordered by last_activity_date.
 
-        >>> "objecs":[
+        >>> "objects":[
         ...    {
         ...     "assignees": [
         ...         "/api/v1/crmuser/1/"

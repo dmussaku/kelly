@@ -8,7 +8,7 @@ from django.contrib.auth.hashers import check_password
 from django.contrib.auth.tokens import default_token_generator
 from alm_user.models import Account, User, Referral
 from alm_user.emails import (
-    UserResetPasswordEmail, 
+    UserResetPasswordEmail,
     UserRegistrationEmail,
     SubdomainForgotEmail,
     )
@@ -42,8 +42,8 @@ class RegistrationForm(forms.Form):
         if company_subdomain in [company.subdomain for company in Company.objects.all()]:
             raise forms.ValidationError( _("Subdomain is already taken") )
         if not re.match('\w', company_subdomain):
-            raise forms.ValidationError( 
-                _("Subdomain must be written in latin alphabet letters") 
+            raise forms.ValidationError(
+                _("Subdomain must be written in latin alphabet letters")
                 )
         return company_subdomain
 
@@ -59,8 +59,8 @@ class RegistrationForm(forms.Form):
     def clean_password(self):
         password = self.cleaned_data.get('password', None)
         if not password:
-            raise forms.ValidationError( 
-                _("Enter valid password") 
+            raise forms.ValidationError(
+                _("Enter valid password")
                 )
         return password
 
@@ -130,7 +130,6 @@ class AuthenticationForm(forms.Form):
         if username and password:
             self.user_cache = authenticate(username=username,
                                            password=password)
-            print self.user_cache
             if self.user_cache is None:
                 raise forms.ValidationError(
                     self.error_messages['invalid_login'],

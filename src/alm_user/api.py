@@ -93,7 +93,7 @@ class UserResource(ModelResource):
 
     @return:  users
 
-    >>> "objecs":[
+    >>> "objects":[
     ... {
     ...     "email": "sattar94@outlook.com",
     ...     "first_name": "Sattar",
@@ -381,6 +381,7 @@ class UserResource(ModelResource):
         if subdomain:
             bundle.data['is_supervisor'] = current_account.is_supervisor
             bundle.data['is_active'] = current_account.is_active
+            bundle.data['was_actived'] = current_account.was_actived
         bundle.data['companies'] = company_list
         # TODO: use CustomFields with use_in_ids
 
