@@ -49,7 +49,14 @@ from alm_vcard.models import *
 from almastorage.models import SwiftFile
 from almanet.settings import DEFAULT_SERVICE
 from almanet.settings import TIME_ZONE
-from almanet.utils.api import RequestContext, SessionAuthentication
+from almanet.utils.api import (
+    RequestContext,
+    SessionAuthentication,
+    CustomToManyField,
+    use_in_field,
+    skip_in_field,
+    firstOfQuerySet,
+    )
 from tastypie.authentication import BasicAuthentication
 from almanet.utils.env import get_subscr_id
 from almanet.utils.ds import StreamList
@@ -96,97 +103,7 @@ import time
 
 CRM_CONTAINER_TITLE = 'CRM_FILES'
 
-def _firstOfQuerySet(queryset):
-    try :
-        return queryset.all()[0]
-    except IndexError:
-        return None
 
-
-def use_in_field(field_name):
-    '''
-        tastypie's 'use_in' keywarg used for:
-             Optionally accepts ``use_in``. This may be one of ``list``, ``detail``
-            ``all``
-            or
-            a callable which accepts a ``bundle`` and returns
-            ``True`` or ``False``. Indicates wheather this field will be included
-            during dehydration of a list of objects or a single object. If ``use_in``
-            is a callable, and returns ``True``, the field will be included during
-            dehydration.
-            Defaults to ``all``.
-
-        Example:
-            see MobileStateResource, where passed to skip 'activities' in SalesCycles
-            see SalesCycleResource, 'activities' CustomToManyField with this function
-    '''
-    def use_in(bundle):
-        if hasattr(bundle, 'use_fields'):
-            if field_name in getattr(bundle, 'use_fields'):
-                return True
-        return False
-    return use_in
-
-
-def skip_in_field(field_name):
-    '''
-        works as use_in_field but opposite
-    '''
-    def use_in(bundle):
-        if hasattr(bundle, 'skip_fields'):
-            if field_name in getattr(bundle, 'skip_fields'):
-                return False
-        return True
-    return use_in
-
-
-class CustomToManyField(fields.ToManyField):
-    """
-    used to add 'full_use_ids' flag for return objects 'ids' not 'resource_uri'
-    """
-    def __init__(self, to, attribute, related_name=None, default=None,
-                 null=False, blank=False, readonly=False, full=False,
-                 unique=False, help_text=None, use_in='all', full_list=True, full_detail=True,
-
-                 full_use_ids=False
-                 ):
-
-        super(self.__class__, self).__init__(
-            to, attribute, related_name=related_name, default=default,
-            null=null, blank=blank, readonly=readonly, full=full,
-            unique=unique, help_text=help_text, use_in=use_in,
-            full_list=full_list, full_detail=full_detail
-        )
-
-        self.full_use_ids = full_use_ids
-
-
-    def dehydrate_related(self, bundle, related_resource, for_list=True):
-        """
-        Based on the ``full_resource``, returns either the endpoint or the data
-        from ``full_dehydrate`` for the related resource.
-
-        CUSTOM:
-            return 'id' as endpoint if full_use_ids
-        """
-
-        if self.full_use_ids:
-            return related_resource.get_resource_id(bundle)
-        else:
-            return super(self.__class__, self).dehydrate_related(bundle, related_resource, for_list=for_list)
-
-
-    def build_related_resource(self, value, request=None, related_obj=None, related_name=None):
-        obj_id = value
-        kwargs = {
-            'request': request,
-            'related_obj': related_obj,
-            'related_name': related_name,
-        }
-        self.fk_resource = self.to_class()
-        bundle = self.fk_resource.build_bundle(obj={'pk': obj_id}, request=request)
-        obj = self.fk_resource.obj_get(bundle, pk=obj_id)
-        return self.resource_from_pk(self.fk_resource, obj, **kwargs)
 
 class CRMServiceModelResource(ModelResource):
 
@@ -413,7 +330,7 @@ class ContactResource(CRMServiceModelResource):
         )
 
     share = fields.ToOneField('alm_crm.api.ShareResource',
-        attribute=lambda bundle: _firstOfQuerySet(bundle.obj.share_set),
+        attribute=lambda bundle: firstOfQuerySet(bundle.obj.share_set),
         null=True, blank=True, readonly=True, full=False)
 
     owner_id = fields.IntegerField(attribute='owner_id', null=True)

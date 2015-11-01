@@ -32,7 +32,7 @@ from tastypie.authentication import (
     )
 
 from almanet.settings import DEFAULT_SERVICE, TIME_ZONE
-from almanet.utils.api import RequestContext, CommonMeta
+from almanet.utils.api import RequestContext, CommonMeta, CustomToManyField
 from almanet.utils.env import get_subscr_id
 from almastorage.models import SwiftFile
 import json
@@ -114,10 +114,12 @@ class UserResource(ModelResource):
 
     vcard = fields.ToOneField(
         'alm_vcard.api.VCardResource', 'vcard', null=True, full=True)
+    group_ids = CustomToManyField('alm_crm.api.UsersGroupResource', 'groups',
+        null=True, full=False, full_use_ids=True)
 
 
     class Meta(CommonMeta):
-        queryset = User.objects.all()
+        queryset = User.objects.all().prefetch_related('groups')
         excludes = ['password', 'is_admin']
         list_allowed_methods = ['get', 'patch', 'post']
         detail_allowed_methods = ['get', 'patch']
