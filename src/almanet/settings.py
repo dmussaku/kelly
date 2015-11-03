@@ -158,6 +158,7 @@ class BaseConfiguration(SubdomainConfiguration, Configuration):
         'django_extensions',
         'almastorage',
         'djcelery',
+        'rest_framework',
     )
 
     MIDDLEWARE_CLASSES = (
@@ -357,10 +358,6 @@ class BaseConfiguration(SubdomainConfiguration, Configuration):
     
     RUSTEM_SETTINGS = False
 
-    # REST_FRAMEWORK = {
-    #     'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.NamespaceVersioning'
-    # }
-
     REST_FRAMEWORK = {
         'DEFAULT_AUTHENTICATION_CLASSES': (
             'rest_framework.authentication.BasicAuthentication',
@@ -370,7 +367,13 @@ class BaseConfiguration(SubdomainConfiguration, Configuration):
             'rest_framework.renderers.JSONRenderer',
         ),
         'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.NamespaceVersioning',
+        'DEFAULT_PERMISSION_CLASSES': (
+            'rest_framework.permissions.IsAuthenticated',
+        ),
+        'PAGE_SIZE': 20,
     }
+
+    SOUTH_TESTS_MIGRATE = False
 
 
 class DevConfiguration(

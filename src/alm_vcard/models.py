@@ -880,7 +880,7 @@ class Tel(SerializableModel):
         ('xadditional',  _(u"xadditional")),
     )
 
-    vcard = models.ForeignKey(VCard)
+    vcard = models.ForeignKey(VCard, related_name='tels')
     # making a choice field of type is incorrect as arbitrary
     # types of phone number are allowed by the vcard specs.
     type  = models.CharField(max_length=30, verbose_name=_("type of phone number"), help_text=_("for instance WORK or HOME"), choices=TYPE_CHOICES)
@@ -906,7 +906,7 @@ class Email(SerializableModel):
         (PREF, _(u"pref")),
     )
 
-    vcard = models.ForeignKey(VCard)
+    vcard = models.ForeignKey(VCard, related_name='emails')
     type = models.CharField(max_length=30, verbose_name=_("type of email"), choices=TYPE_CHOICES)
     value = models.EmailField(max_length=100, verbose_name=_("value"))
 
@@ -979,7 +979,7 @@ class Adr(SerializableModel):
         ('xlegal',  _(u"xlegal")),
     )
 
-    vcard = models.ForeignKey(VCard)
+    vcard = models.ForeignKey(VCard, related_name='adrs')
     type = models.CharField(max_length=1024, verbose_name=_("type"), choices=TYPE_CHOICES)
     street_address = models.CharField(max_length=1024, verbose_name=_("street address"))
     locality = models.CharField(max_length=1024, verbose_name=_("locality"))
@@ -1041,7 +1041,7 @@ class Category(SerializableModel):
     Specifies application category information about the
     contact.  Also known as "tags".
     """
-    vcard = models.ForeignKey(VCard)
+    vcard = models.ForeignKey(VCard, related_name='categories')
     data = models.CharField(max_length=100)
 
     class Meta:
@@ -1133,7 +1133,7 @@ class Note(SerializableModel):
     Supplemental information or a comment that is
     associated with the vCard.
     """
-    vcard = models.ForeignKey(VCard)
+    vcard = models.ForeignKey(VCard, related_name='notes')
     data = models.TextField()
 
     def __unicode__(self):
@@ -1207,7 +1207,7 @@ class Title(SerializableModel):
     """
     The position or job of the contact
     """
-    vcard = models.ForeignKey(VCard)
+    vcard = models.ForeignKey(VCard, related_name='titles')
     data = models.CharField(max_length=100)
 
     class Meta:
@@ -1246,7 +1246,7 @@ class Url(SerializableModel):
         ('website', _(u"website")),
         ('github', _(u"github")),
     )
-    vcard = models.ForeignKey(VCard)
+    vcard = models.ForeignKey(VCard, related_name='urls')
     type = models.CharField(max_length=40, verbose_name=_("type"), choices=TYPE_CHOICES)
     value = models.URLField()
 

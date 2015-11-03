@@ -1,13 +1,31 @@
 # -*- coding: utf-8 -*-
 
-import functools
 import os
-from django.db import models, transaction, IntegrityError
+import xlrd
+import pytz
+import json
+from datetime import datetime, timedelta, time
+from celery import group, Task, result
+
 from django.utils.translation import ugettext_lazy as _
+from django.utils import timezone
+from django.core.exceptions import ObjectDoesNotExist
+from django.core.cache import cache
+from django.contrib.contenttypes import generic
+from django.contrib.contenttypes.models import ContentType
+from django.template.loader import render_to_string
+from django.db.models.signals import pre_save, post_save, post_delete, pre_delete
+from django.db.models import signals, Q
+from django.db import models, transaction, IntegrityError
 from django.conf import settings
+
 from almanet.utils.metaprogramming import DirtyFieldsMixin
+from almanet.utils.cache import build_key, extract_id
+from almanet.utils.json import date_handler
 from almanet.models import SubscriptionObject, Subscription
 from alm_company.models import Company
+from alm_user.models import User, Account
+from alm_vcard import models as vcard_models
 from alm_vcard.models import (
     VCard,
     BadVCardError,
@@ -19,39 +37,16 @@ from alm_vcard.models import (
     Url,
     Note,
     )
-from alm_user.models import User, Account
-from django.template.loader import render_to_string
-from django.core.exceptions import ObjectDoesNotExist
-from django.core.cache import cache
-from django.db.models import signals, Q
-from django.contrib.contenttypes import generic
-from django.contrib.contenttypes.models import ContentType
-from django.db.models.signals import pre_save, post_save, post_delete, pre_delete
-from django.utils import timezone
-from datetime import datetime, timedelta
-import xlrd
-import pytz
-import time
-from django.conf import settings
+
+from .utils import datetimeutils
+
 TEMP_DIR = getattr(settings, 'TEMP_DIR')
-
-from alm_vcard import models as vcard_models
-from celery import group, Task, result
-import json
-from almanet.utils.cache import build_key, extract_id
-from almanet.utils.json import date_handler
-# from .tasks import create_failed_contacts_xls
-
 ALLOWED_TIME_PERIODS = ['week', 'month', 'year']
-
 CURRENCY_OPTIONS = (
     ('USD', 'US Dollar'),
     ('RUB', 'Rubbles'),
     ('KZT', 'Tenge'),
 )
-
-# GLOBAL_CYCLE_TITLE = u'Основной поток'
-# GLOBAL_CYCLE_DESCRIPTION = u'Автоматически созданный цикл'
 GLOBAL_CYCLE_TITLE = _('Main flow')
 GLOBAL_CYCLE_DESCRIPTION = _('Automatically generated cycle')
 
@@ -71,7 +66,6 @@ class Milestone(SubscriptionObject):
 
     @classmethod
     def create_default_milestones(cls, company_id):
-        milestones = []
         """
             'Звонок/Заявка'
             'Отправка КП'
@@ -83,6 +77,7 @@ class Milestone(SubscriptionObject):
             'Успешно завершено'
             'Не реализовано'
         """
+        milestones = []
         default_data = [{'title':_('Call/request'), 'color_code': '#F4B59C', 'is_system':0, 'sort':1},
                         {'title':_('Dispatching business offer'), 'color_code': '#F59CC8', 'is_system':0, 'sort':2},
                         {'title':_('Negotiating contract'), 'color_code': '#A39CF4', 'is_system':0, 'sort':3},
@@ -160,14 +155,15 @@ class Contact(SubscriptionObject):
         except:
             return "No name %s" % self.tp
 
-    def delete(self):
-        if self.vcard:
-            self.vcard.delete()
-        super(self.__class__, self).delete()
 
     @property
     def last_contacted(self):
         return self.latest_activity and self.latest_activity.date_created
+
+    @property
+    def global_sales_cycle(self):
+        return SalesCycle.objects.get(company_id=self.company_id, contact_id=self.id,
+                                      is_global=True)
 
     @property
     def name(self):
@@ -175,106 +171,69 @@ class Contact(SubscriptionObject):
             return _('Unknown')
         return self.vcard.fn
 
-    def tel(self, type='CELL'):
-        if not self.vcard:
-            return _('Unknown')
-        tel = self.vcard.tel_set.filter(type=type).first().value
-        return tel and tel or None
+    @classmethod
+    def get_panel_info(cls, company_id, user_id):
+        contacts_q = Q(company_id=company_id)
+        owner_q = Q(owner_id=user_id)
 
-    def mobile(self):
-        if not self.tel(type='CELL'):
-            return _('Unknown')
-        return self.tel(type='CELL')
+        period_q = {
+            'days_q': Q(date_edited__gte=datetimeutils.get_start_of_today(timezone.now()), date_edited__lte=datetimeutils.get_end_of_today(timezone.now())),
+            'weeks_q': Q(date_edited__gte=datetimeutils.get_start_of_week(timezone.now()), date_edited__lte=datetimeutils.get_end_of_week(timezone.now())),
+            'months_q': Q(date_edited__gte=datetimeutils.get_start_of_month(timezone.now()), date_edited__lte=datetimeutils.get_end_of_month(timezone.now())),
+        }
 
-    def email(self, type='WORK'):
-        if not self.vcard:
-            return _('Unknown')
-        email = self.vcard.email_set.filter(type=type).first().value
-        return email and email or None
+        total = Contact.objects.filter(contacts_q)
+        my_total = total.filter(owner_q)
 
-    def email_work(self):
-        return self.email(type='INTERNET')
+        periods = ['days', 'weeks', 'months']
 
-    # def company(self):
-    #     if not self.vcard:
-    #         return _('Unknown organization')
-    #     org = self.vcard.org_set.first()
-    #     if not org:
-    #         return _('Unknown organization')
-    #     return org.name
+        def get_by_period(queryset):
+            rv = {}
+            for period in periods:
+                period_total = queryset.filter(period_q[period+'_q'])
+                rv[period] = {
+                    'total': period_total.count(),
+                    'people': period_total.filter(Q(tp=Contact.USER_TP)).count(),
+                    'companies': period_total.filter(Q(tp=Contact.COMPANY_TP)).count(),
+                }
+            return rv
 
-    def get_tp(self):
-        return dict(self.TYPES_OPTIONS).get(self.tp, None)
+        return {
+                'all': get_by_period(total),
+                'my': get_by_period(my_total),
+            }
 
-    def is_new(self):
-        return self.status == self.NEW
+    @classmethod
+    def get_active_contacts(cls, company_id, user_id):
+        company_q = Q(company_id=company_id)
+        owner_q = Q(owner_id=user_id)
 
-    def is_lead(self):
-        return self.status == self.LEAD
+        period_q = {
+            'days_q': Q(date_edited__gte=datetimeutils.get_start_of_today(timezone.now()), date_edited__lte=datetimeutils.get_end_of_today(timezone.now())),
+            'weeks_q': Q(date_edited__gte=datetimeutils.get_start_of_week(timezone.now()), date_edited__lte=datetimeutils.get_end_of_week(timezone.now())),
+            'months_q': Q(date_edited__gte=datetimeutils.get_start_of_month(timezone.now()), date_edited__lte=datetimeutils.get_end_of_month(timezone.now())),
+        }
 
-    def is_opportunity(self):
-        return self.status == self.OPPORTUNITY
+        total = Activity.objects.filter(company_q)
+        my_total = total.filter(owner_q)
 
-    def is_client(self):
-        return self.status == self.CLIENT
+        periods = ['days', 'weeks', 'months']
 
-    def change_status(self, new_status, save=False):
-        """TODO Set status to contact. Return instance (self)"""
-        self.status = new_status
-        if save:
-            self.save()
-        return self
+        def get_by_period(queryset):
+            rv = {}
+            for period in periods:
+                period_total = queryset.filter(period_q[period+'_q'])
+                rv[period] = map(lambda x: x.sales_cycle.contact, period_total)
+            return rv
 
-    def export_to(self, tp, **options):
-        if tp not in ('html', 'vcard'):
-            return False
-        exporter = getattr(self, 'to_{}'.format(tp))
-        return exporter(**options)
-
-    def to_html(self, locale='ru_RU'):
-        tpl_name = 'vcard/_detail.%s.html' % locale
-        context = {'object': self.vcard}
-        return render_to_string(tpl_name, context)
-
-    def find_latest_activity(self):
-        """Find latest activity among all sales_cycle_contacts."""
-        sales_cycle = self.sales_cycles.order_by('latest_activity__date_created').first()
-        latest_activity = None
-        try:
-            latest_activity = sales_cycle.latest_activity
-        except Activity.DoesNotExist:
-            return None
-        return sales_cycle and latest_activity or None
-
-    def add_mention(self, user_ids=None):
-        if isinstance(user_ids, int):
-            user_ids = [user_ids]
-        build_single_mention = functools.partial(Mention.build_new,
-                                                 content_class=self.__class__,
-                                                 object_id=self.pk,
-                                                 save=True)
-        self.mentions = map(build_single_mention, user_ids)
-        self.save()
+        return {
+                'all': get_by_period(total),
+                'my': get_by_period(my_total)
+            }
 
     @classmethod
     def share_contact(cls, share_from, share_to, contact_id, company_id, comment=None):
         return cls.share_contacts(share_from, share_to, [contact_id], company_id, comment)
-
-    def create_company_for_contact(self, company_name):
-        with transaction.atomic():
-            vcard = VCard(fn=company_name)
-            vcard.save()
-            c = Contact(
-                tp='co',
-                vcard=vcard,
-                owner=self.owner,
-                company_id=self.company_id
-                )
-            c.save()
-            self.parent = c
-            self.save()
-            return c
-
 
     @classmethod
     def share_contacts(cls, share_from, share_to, contact_ids, company_id, comment=None):
@@ -315,20 +274,6 @@ class Contact(SubscriptionObject):
             return True
         except:
             return False
-
-    def create_share_to(self, user_id, company_id, note=None):
-        default_note = self.SHARE_IMPORTED_TEXT + \
-            self.date_created.strftime(settings.DATETIME_FORMAT_NORMAL)
-
-        share = Share(
-            note=note or default_note,
-            share_to_id=user_id,
-            share_from_id=user_id,
-            contact_id=self.id,
-            company_id=company_id
-        )
-        share.save()
-        return share
 
     @classmethod
     def upd_lst_activity_on_create(cls, sender, created=False,
@@ -408,15 +353,6 @@ class Contact(SubscriptionObject):
         return contacts
 
     @classmethod
-    def get_contact_detail(cls, contact_id, with_vcard=False):
-        """TEST Returns contact detail by `contact_id`."""
-        c = Contact.objects.filter(pk=contact_id)
-        if not with_vcard:
-            return c.first()
-        c = c.select_related('vcard')
-        return c.first()
-
-    @classmethod
     def get_contact_products(cls, contact_id):
         """
             TEST Returns contact products by `contact_id`
@@ -433,36 +369,6 @@ class Contact(SubscriptionObject):
         sales_cycle_ids = c.sales_cycles.values_list('pk', flat=True)
         return Activity.objects.filter(sales_cycle_id__in=sales_cycle_ids)\
             .order_by('-date_created')
-
-    @classmethod
-    def upload_contacts(cls, upload_type, file_obj, save=False):
-        """Extracts contacts from source: vcard file or csv file or any
-        other file objects. Build queryset from them and save if required.
-        Parameters
-        ----------
-            upload_type  - csv or vcard or ...
-            file_obj - file instance"""
-        ALLOWED_CONTACT_UPLOAD_TYPES = ('csv', 'vcard')
-        assert upload_type in ALLOWED_CONTACT_UPLOAD_TYPES, ""
-        upload_handler = getattr(cls, '_upload_contacts_by_%s' % upload_type)
-        contacts = upload_handler(file_obj)
-        if save:
-            contacts.save()
-            # SalesCycle.create_globalcycle(
-            #         **{'company_id': contacts.company_id,
-            #          'owner_id': contacts.owner.id,
-            #          'contact_id': contacts.id
-            #         }
-            #     )
-        return contacts
-
-    @classmethod
-    def _upload_contacts_by_vcard(cls, vcard_obj):
-        """Extracts contacts from vcard string. Returns Queryset<Contact>."""
-        contact = cls()
-        vcard = VCard.fromVCard(vcard_obj, autocommit=True)
-        contact.vcard = vcard
-        return contact
 
     @classmethod
     def import_from_vcard(cls, raw_vcard, creator, company_id):
@@ -860,6 +766,146 @@ class Contact(SubscriptionObject):
         q &= Q(status=cls.NEW)
         return cls.objects.filter(q).order_by('-date_created')
 
+    @classmethod
+    def delete_contacts(cls, obj_ids):
+        if isinstance(obj_ids, int):
+            obj_ids = [obj_ids]
+        assert isinstance(obj_ids, (tuple, list)), "must be a list"
+        with transaction.atomic():
+            objects = {
+                "contacts": [],
+                "parent_dict": {},
+                "children_dict": {},
+                "sales_cycles": [],
+                "activities": [],
+                "shares": [],
+                "does_not_exist": []
+            }
+            for contact_id in obj_ids:
+                try:
+                    # print contact_id
+                    obj = Contact.objects.get(id=contact_id)
+                    if obj.parent:
+                        objects['parent_dict'][obj.id]=obj.parent.id
+                    if obj.children:
+                        objects['children_dict'][obj.id] = [child.id for child in obj.children.all()]
+                    objects['contacts'].append(contact_id)
+                    objects['sales_cycles'] += list(obj.sales_cycles.all().values_list("id", flat=True))
+                    for sales_cycle in obj.sales_cycles.all():
+                        objects['activities'] += list(sales_cycle.rel_activities.all().values_list("id", flat=True))
+                    objects['shares'] += list(obj.share_set.all().values_list("id", flat=True))
+                    obj.delete()
+                except ObjectDoesNotExist:
+                    objects['does_not_exist'].append(contact_id)
+            return objects
+
+    @classmethod
+    def after_save(cls, sender, instance, **kwargs):
+        cache.set(build_key(cls._meta.model_name, instance.pk), json.dumps(instance.serialize(), default=date_handler))
+        # TODO: each time when contact is updated vcard is recreated. So if it is the case then reinvalidate cache
+        vcard = instance.vcard
+        if vcard:
+            cache.set(build_key(vcard.__class__._meta.model_name, vcard.id), json.dumps(vcard.serialize(), default=date_handler))
+        # vcard_id = vcard.id
+        # cached_vcard = cache.get(build_key(vcard.__class__._meta.model_name, vcard_id))
+        # if cached_vcard is None:
+        #     return
+        # cached_vcard = json.loads(cached_vcard)
+        # old_id = cached_vcard['vcard_id']
+        # cached_vcard['vcard_id'] = instance.pk
+        # cache.set(build_key(contact.__class__._meta.model_name, contact_id), json.dumps(cached_vcard))
+        # cache.delete(build_key(cls._meta.model_name, old_id))
+
+    @classmethod
+    def after_delete(cls, sender, instance, **kwargs):
+        cache.delete(build_key(cls._meta.model_name, instance.pk))
+
+    @classmethod
+    def get_by_ids(cls, *ids):
+        """Get vcard by ids from cache with fallback to postgres."""
+        rv = cache.get_many([build_key(cls._meta.model_name, cid) for cid in ids])
+        rv = {extract_id(k, coerce=int): json.loads(v) for k, v in rv.iteritems()}
+
+        not_found_ids = [cid for cid in ids if not cid in rv]
+        if not not_found_ids:
+            return rv.values()
+        contact_qs = cls.objects.filter(pk__in=not_found_ids).prefetch_related('sales_cycles', 'children')
+        more_rv = list(c.serialize() for c in contact_qs)
+        cache.set_many({build_key(cls._meta.model_name, contact_raw['id']): json.dumps(contact_raw, default=date_handler)
+                        for contact_raw in more_rv})
+        return rv.values() + more_rv
+
+    @classmethod
+    def recache(cls, ids):
+        if not isinstance(ids, list):
+            ids=[ids]
+        contact_qs = cls.objects.filter(id__in=ids).prefetch_related('sales_cycles', 'children')
+        contact_raws = [c.serialize() for c in contact_qs]
+        cache.set_many({build_key(cls._meta.model_name, contact_raw['id']): json.dumps(contact_raw, default=date_handler) for contact_raw in contact_raws})
+
+    @classmethod
+    def cache_all(cls):
+        contact_qs = cls.objects.all().prefetch_related('sales_cycles', 'children')
+        contact_raws = [c.serialize() for c in contact_qs]
+        cache.set_many({build_key(cls._meta.model_name, contact_raw['id']): json.dumps(contact_raw, default=date_handler) for contact_raw in contact_raws})
+
+    def delete(self):
+        if self.vcard:
+            self.vcard.delete()
+        super(self.__class__, self).delete()
+
+    def find_latest_activity(self):
+        """Find latest activity among all sales_cycle_contacts."""
+        sales_cycle = self.sales_cycles.order_by('latest_activity__date_created').first()
+        latest_activity = None
+        try:
+            latest_activity = sales_cycle.latest_activity
+        except Activity.DoesNotExist:
+            return None
+        return sales_cycle and latest_activity or None
+
+    def create_company_for_contact(self, company_name):
+        with transaction.atomic():
+            parent = Contact.objects.filter(
+                        vcard__fn=company_name, 
+                        company_id=self.company_id, 
+                        tp='co').first()
+            if not parent:
+                vcard = VCard(fn=company_name)
+                vcard.save()
+                parent = Contact(
+                    tp='co',
+                    vcard=vcard,
+                    owner=self.owner,
+                    company_id=self.company_id
+                )
+                parent.save()
+                SalesCycle.create_globalcycle(
+                    **{
+                     'company_id': self.company_id,
+                     'owner_id': self.owner.id,
+                     'contact_id': parent.id
+                    }
+                )
+
+            self.parent = parent
+            self.save()
+            return self, parent
+
+    def create_share_to(self, user_id, company_id, note=None):
+        default_note = self.SHARE_IMPORTED_TEXT + \
+            self.date_created.strftime(settings.DATETIME_FORMAT_NORMAL)
+
+        share = Share(
+            note=note or default_note,
+            share_to_id=user_id,
+            share_from_id=user_id,
+            contact_id=self.id,
+            company_id=company_id
+        )
+        share.save()
+        return share
+
     def merge_contacts(self, alias_objects=[], delete_merged=True):
         if not alias_objects:
             return {'success':False, 'message':'No alias objects appended'}
@@ -939,40 +985,6 @@ class Contact(SubscriptionObject):
         }
         return response
 
-
-    @classmethod
-    def delete_contacts(cls, obj_ids):
-        if isinstance(obj_ids, int):
-            obj_ids = [obj_ids]
-        assert isinstance(obj_ids, (tuple, list)), "must be a list"
-        with transaction.atomic():
-            objects = {
-                "contacts": [],
-                "parent_dict": {},
-                "children_dict": {},
-                "sales_cycles": [],
-                "activities": [],
-                "shares": [],
-                "does_not_exist": []
-            }
-            for contact_id in obj_ids:
-                try:
-                    # print contact_id
-                    obj = Contact.objects.get(id=contact_id)
-                    if obj.parent:
-                        objects['parent_dict'][obj.id]=obj.parent.id
-                    if obj.children:
-                        objects['children_dict'][obj.id] = [child.id for child in obj.children.all()]
-                    objects['contacts'].append(contact_id)
-                    objects['sales_cycles'] += list(obj.sales_cycles.all().values_list("id", flat=True))
-                    for sales_cycle in obj.sales_cycles.all():
-                        objects['activities'] += list(sales_cycle.rel_activities.all().values_list("id", flat=True))
-                    objects['shares'] += list(obj.share_set.all().values_list("id", flat=True))
-                    obj.delete()
-                except ObjectDoesNotExist:
-                    objects['does_not_exist'].append(contact_id)
-            return objects
-
     def serialize(self):
         return {
             'author_id': self.owner_id,
@@ -991,56 +1003,6 @@ class Contact(SubscriptionObject):
             'vcard_id': self.vcard_id
         }
 
-    @classmethod
-    def after_save(cls, sender, instance, **kwargs):
-        cache.set(build_key(cls._meta.model_name, instance.pk), json.dumps(instance.serialize(), default=date_handler))
-        # TODO: each time when contact is updated vcard is recreated. So if it is the case then reinvalidate cache
-        vcard = instance.vcard
-        if vcard:
-            cache.set(build_key(vcard.__class__._meta.model_name, vcard.id), json.dumps(vcard.serialize(), default=date_handler))
-        # vcard_id = vcard.id
-        # cached_vcard = cache.get(build_key(vcard.__class__._meta.model_name, vcard_id))
-        # if cached_vcard is None:
-        #     return
-        # cached_vcard = json.loads(cached_vcard)
-        # old_id = cached_vcard['vcard_id']
-        # cached_vcard['vcard_id'] = instance.pk
-        # cache.set(build_key(contact.__class__._meta.model_name, contact_id), json.dumps(cached_vcard))
-        # cache.delete(build_key(cls._meta.model_name, old_id))
-
-    @classmethod
-    def after_delete(cls, sender, instance, **kwargs):
-        cache.delete(build_key(cls._meta.model_name, instance.pk))
-
-    @classmethod
-    def get_by_ids(cls, *ids):
-        """Get vcard by ids from cache with fallback to postgres."""
-        rv = cache.get_many([build_key(cls._meta.model_name, cid) for cid in ids])
-        rv = {extract_id(k, coerce=int): json.loads(v) for k, v in rv.iteritems()}
-
-        not_found_ids = [cid for cid in ids if not cid in rv]
-        if not not_found_ids:
-            return rv.values()
-        contact_qs = cls.objects.filter(pk__in=not_found_ids).prefetch_related('sales_cycles', 'children')
-        more_rv = list(c.serialize() for c in contact_qs)
-        cache.set_many({build_key(cls._meta.model_name, contact_raw['id']): json.dumps(contact_raw, default=date_handler)
-                        for contact_raw in more_rv})
-        return rv.values() + more_rv
-
-    @classmethod
-    def recache(cls, ids):
-        if not isinstance(ids, list):
-            ids=[ids]
-        contact_qs = cls.objects.filter(id__in=ids).prefetch_related('sales_cycles', 'children')
-        contact_raws = [c.serialize() for c in contact_qs]
-        cache.set_many({build_key(cls._meta.model_name, contact_raw['id']): json.dumps(contact_raw, default=date_handler) for contact_raw in contact_raws})
-
-    @classmethod
-    def cache_all(cls):
-        contact_qs = cls.objects.all().prefetch_related('sales_cycles', 'children')
-        contact_raws = [c.serialize() for c in contact_qs]
-        cache.set_many({build_key(cls._meta.model_name, contact_raw['id']): json.dumps(contact_raw, default=date_handler) for contact_raw in contact_raws})
-
 post_save.connect(Contact.after_save, sender=Contact)
 post_delete.connect(Contact.after_delete, sender=Contact)
 
@@ -1057,8 +1019,6 @@ class Value(SubscriptionObject):
     amount = models.IntegerField()
     currency = models.CharField(max_length=3, choices=CURRENCY_OPTIONS,
                                 default='KZT')
-    # owner = models.ForeignKey(User, null=True, blank=True,
-    #                           related_name='owned_values')
 
     owner = models.ForeignKey(User, null=True, blank=True,
         related_name='owned_values')
@@ -1070,20 +1030,13 @@ class Value(SubscriptionObject):
     def __unicode__(self):
         return "%s %s %s" % (self.amount, self.currency, self.salary)
 
-    @classmethod
-    def get_values(cls, company_id):
-        q = Q(company_id=company_id)
-        return cls.objects.filter(q)
-
 
 class Product(SubscriptionObject):
     name = models.CharField(_('product name'), max_length=100, blank=False)
-    description = models.TextField(_('product description'))
+    description = models.TextField(_('product description'), blank=True, null=True)
     price = models.IntegerField()
     currency = models.CharField(max_length=3, choices=CURRENCY_OPTIONS,
                                 default='KZT')
-    # owner = models.ForeignKey(User, related_name='crm_products',
-    #                           null=True, blank=True)
     custom_field_values = generic.GenericRelation('CustomFieldValue')
     owner = models.ForeignKey(User, null=True, blank=True,
         related_name='crm_products')
@@ -1096,39 +1049,8 @@ class Product(SubscriptionObject):
         return self.name
 
     @property
-    def author(self):
-        return self.owner
-
-    @property
-    def author_id(self):
-        return self.owner_id
-
-    @author_id.setter
-    def author_id(self, author_id):
-        self.owner = User.objects.get(id=author_id)
-
-    def add_sales_cycle(self, sales_cycle_id, **kw):
-        """TEST Assigns products to salescycle"""
-        return self.add_sales_cycles([sales_cycle_id], **kw)
-
-    def add_sales_cycles(self, sales_cycle_ids):
-        """TEST Assigns products to salescycle"""
-        if isinstance(sales_cycle_ids, int):
-            sales_cycle_ids = [sales_cycle_ids]
-        assert isinstance(sales_cycle_ids, (tuple, list)), "must be a list"
-        sales_cycles = SalesCycle.objects.filter(pk__in=sales_cycle_ids)
-        if not sales_cycles:
-            return False
-        with transaction.atomic():
-            for sales_cycle in sales_cycles:
-                SalesCycleProductStat.objects.get_or_create(
-                    sales_cycle=sales_cycle, product=self)
-        return True
-
-    @classmethod
-    def get_products(cls, company_id):
-        q = Q(company_id=company_id)
-        return cls.objects.filter(q).order_by('-date_created')
+    def stat_value(self):
+        return reduce(lambda x, y: x+y.real_value, self.product_stats.all(), 0)
 
     @classmethod
     @transaction.atomic()
@@ -1173,7 +1095,20 @@ class Product(SubscriptionObject):
             product_list.append(product)
         return product_list
 
-post_save.connect(VCard.after_save, sender=VCard)
+    def add_sales_cycles(self, sales_cycle_ids):
+        """TEST Assigns products to salescycle"""
+        if isinstance(sales_cycle_ids, int):
+            sales_cycle_ids = [sales_cycle_ids]
+        assert isinstance(sales_cycle_ids, (tuple, list)), "must be a list"
+        sales_cycles = SalesCycle.objects.filter(pk__in=sales_cycle_ids)
+        if not sales_cycles:
+            return False
+        with transaction.atomic():
+            for sales_cycle in sales_cycles:
+                SalesCycleProductStat.objects.get_or_create(
+                    sales_cycle=sales_cycle, product=self)
+        return True
+
 
 class ProductGroup(SubscriptionObject):
     title = models.CharField(max_length=150)
@@ -1193,10 +1128,11 @@ class SalesCycle(SubscriptionObject):
     STATUSES_CAPS = (
         _('New'),
         _('Pending'),
-        _('Completed'))
-    STATUSES = (NEW, PENDING, COMPLETED) = ('N', 'P', 'C')
+        _('Successful'),
+        _('Failed'))
+    STATUSES = (NEW, PENDING, SUCCESSFUL, FAILED) = ('N', 'P', 'S', 'F')
     STATUSES_OPTIONS = zip(STATUSES, STATUSES_CAPS)
-    STATUSES_DICT = dict(zip(('NEW', 'PENDING', 'COMPLETED'), STATUSES))
+    STATUSES_DICT = dict(zip(('NEW', 'PENDING', 'SUCCESSFUL', 'FAILED'), STATUSES))
 
     is_global = models.BooleanField(default=False)
 
@@ -1231,9 +1167,6 @@ class SalesCycle(SubscriptionObject):
     def __unicode__(self):
         return '%s [%s %s]' % (self.title, self.contact, self.status)
 
-    def delete(self):
-        super(self.__class__, self).delete()
-
     @property
     def activities_count(self):
         return self.rel_activities.count()
@@ -1243,12 +1176,142 @@ class SalesCycle(SubscriptionObject):
         return SalesCycle.objects.get(company_id=company_id, contact_id=contact_id,
                                       is_global=True)
 
-    def find_latest_activity(self):
-        return self.rel_activities.order_by('-date_created').first()
+    @classmethod
+    def get_panel_info(cls, company_id, user_id):
+        sales_cycle_q = Q(company_id=company_id, is_global=False)
+        owner_q = Q(owner_id=user_id)
 
-    # Adds mentions to a current class, takes a lsit of user_ids as an input
-    # and then runs through the list and calls the function build_new which
-    # is declared in Mention class
+        period_q = {
+            'days_q': Q(date_edited__gte=datetimeutils.get_start_of_today(timezone.now()), date_edited__lte=datetimeutils.get_end_of_today(timezone.now())),
+            'weeks_q': Q(date_edited__gte=datetimeutils.get_start_of_week(timezone.now()), date_edited__lte=datetimeutils.get_end_of_week(timezone.now())),
+            'months_q': Q(date_edited__gte=datetimeutils.get_start_of_month(timezone.now()), date_edited__lte=datetimeutils.get_end_of_month(timezone.now())),
+        }
+
+        total = SalesCycle.objects.filter(sales_cycle_q)
+
+        periods = ['days', 'weeks', 'months']
+
+        new_sales_cycles = total.filter(status=SalesCycle.NEW)
+        successful_sales_cycles = total.filter(status=SalesCycle.SUCCESSFUL)
+        open_sales_cycles = total.filter(status=SalesCycle.PENDING)
+
+        my_new_sales_cycles = new_sales_cycles.filter(owner_q)
+        my_successful_sales_cycles = successful_sales_cycles.filter(owner_q)
+        my_open_sales_cycles = open_sales_cycles.filter(owner_q)
+
+        milestones = Milestone.objects.filter(company_id=company_id)
+
+        by_milestones = {
+            'days': {
+                'none': open_sales_cycles.filter(period_q['days_q'] & Q(milestone_id=None)).distinct().count(),
+            },
+            'weeks': {
+                'none': open_sales_cycles.filter(period_q['weeks_q'] & Q(milestone_id=None)).distinct().count(),
+            },
+            'months': {
+                'none': open_sales_cycles.filter(period_q['months_q'] & Q(milestone_id=None)).distinct().count(),
+            },
+        }
+        my_by_milestones = {
+            'days': {
+                'none': my_open_sales_cycles.filter(period_q['days_q'] & Q(milestone_id=None)).distinct().count(),
+            },
+            'weeks': {
+                'none': my_open_sales_cycles.filter(period_q['weeks_q'] & Q(milestone_id=None)).distinct().count(),
+            },
+            'months': {
+                'none': my_open_sales_cycles.filter(period_q['months_q'] & Q(milestone_id=None)).distinct().count(),
+            },
+        }
+
+        for m in milestones:
+            by_milestones['days'][m.id] = open_sales_cycles.filter(period_q['days_q'] & Q(milestone_id=m.id)).distinct().count()
+            by_milestones['weeks'][m.id] = open_sales_cycles.filter(period_q['weeks_q'] & Q(milestone_id=m.id)).distinct().count()
+            by_milestones['months'][m.id] = open_sales_cycles.filter(period_q['months_q'] & Q(milestone_id=m.id)).distinct().count()
+
+            my_by_milestones['days'][m.id] = my_open_sales_cycles.filter(period_q['days_q'] & Q(milestone_id=m.id)).distinct().count()
+            my_by_milestones['weeks'][m.id] = my_open_sales_cycles.filter(period_q['weeks_q'] & Q(milestone_id=m.id)).distinct().count()
+            my_by_milestones['months'][m.id] = my_open_sales_cycles.filter(period_q['months_q'] & Q(milestone_id=m.id)).distinct().count()
+
+        def get_by_period(queryset):
+            rv = {}
+            for period in periods:
+                period_total = queryset.filter(period_q[period+'_q'])
+                rv[period] = period_total.distinct().count()
+            return rv
+
+        return {
+            'new_sales_cycles': {
+                'all': get_by_period(new_sales_cycles),
+                'my': get_by_period(new_sales_cycles.filter(owner_q)),
+            },
+            'successful_sales_cycles': {
+                'all': get_by_period(successful_sales_cycles),
+                'my': get_by_period(successful_sales_cycles.filter(owner_q)),
+            },
+            'open_sales_cycles': {
+                'all': {
+                    'days': {
+                        'total': open_sales_cycles.filter(period_q['days_q']).distinct().count(),
+                        'by_milestones': by_milestones['days'],
+                    },
+                    'weeks': {
+                        'total': open_sales_cycles.filter(period_q['weeks_q']).distinct().count(),
+                        'by_milestones': by_milestones['weeks'],
+                    },
+                    'months': {
+                        'total': open_sales_cycles.filter(period_q['months_q']).distinct().count(),
+                        'by_milestones': by_milestones['months'],
+                    },
+                },
+                'my': {
+                    'days': {
+                        'total': my_open_sales_cycles.filter(period_q['days_q']).distinct().count(),
+                        'by_milestones': my_by_milestones['days'],
+                    },
+                    'weeks': {
+                        'total': my_open_sales_cycles.filter(period_q['weeks_q']).distinct().count(),
+                        'by_milestones': my_by_milestones['weeks'],
+                    },
+                    'months': {
+                        'total': my_open_sales_cycles.filter(period_q['months_q']).distinct().count(),
+                        'by_milestones': my_by_milestones['months'],
+                    },
+                },
+            },
+        }
+
+    @classmethod
+    def get_active_deals(cls, company_id, user_id):
+        company_q = Q(company_id=company_id)
+        owner_q = Q(owner_id=user_id)
+
+        days_q = Q(date_edited__gte=datetimeutils.get_start_of_today(timezone.now()), date_edited__lte=datetimeutils.get_end_of_today(timezone.now()))
+        weeks_q = Q(date_edited__gte=datetimeutils.get_start_of_week(timezone.now()), date_edited__lte=datetimeutils.get_end_of_week(timezone.now()))
+        months_q = Q(date_edited__gte=datetimeutils.get_start_of_month(timezone.now()), date_edited__lte=datetimeutils.get_end_of_month(timezone.now()))
+
+        activities = Activity.objects.filter(company_q)
+
+        days_act_sales_cycles = map(lambda x: x.sales_cycle_id, activities.filter(days_q))
+        weeks_act_sales_cycles = map(lambda x: x.sales_cycle_id, activities.filter(weeks_q))
+        months_act_sales_cycles = map(lambda x: x.sales_cycle_id, activities.filter(months_q))
+
+        my_days_act_sales_cycles = map(lambda x: x.sales_cycle_id, activities.filter(days_q & owner_q))
+        my_weeks_act_sales_cycles = map(lambda x: x.sales_cycle_id, activities.filter(weeks_q & owner_q))
+        my_months_act_sales_cycles = map(lambda x: x.sales_cycle_id, activities.filter(months_q & owner_q))
+
+        return {
+            'all': {
+                'days': SalesCycle.objects.filter((company_q & days_q) | Q(id__in=days_act_sales_cycles)),
+                'weeks': SalesCycle.objects.filter((company_q & weeks_q) | Q(id__in=weeks_act_sales_cycles)),
+                'months': SalesCycle.objects.filter((company_q & months_q) | Q(id__in=months_act_sales_cycles)),
+            },
+            'my': {
+                'days': SalesCycle.objects.filter((company_q & days_q & owner_q) | Q(id__in=my_days_act_sales_cycles)),
+                'weeks': SalesCycle.objects.filter((company_q & weeks_q & owner_q) | Q(id__in=my_weeks_act_sales_cycles)),
+                'months': SalesCycle.objects.filter((company_q & months_q & owner_q) | Q(id__in=my_months_act_sales_cycles)),
+            },
+        }
 
     @classmethod
     def create_globalcycle(cls, **kwargs):
@@ -1264,30 +1327,66 @@ class SalesCycle(SubscriptionObject):
             global_cycle.save()
         return global_cycle
 
-    def add_mention(self, user_ids=None):
-        if isinstance(user_ids, int):
-            user_ids = [user_ids]
-        build_single_mention = functools.partial(Mention.build_new,
-                                                 content_class=self.__class__,
-                                                 object_id=self.pk,
-                                                 save=True)
+    @classmethod
+    def upd_lst_activity_on_create(cls, sender,
+                                   created=False, instance=None, **kwargs):
+        if not created or not instance.sales_cycle.is_global:
+            return
+        sales_cycle = instance.sales_cycle
+        sales_cycle.latest_activity = sales_cycle.find_latest_activity()
+        sales_cycle.save()
 
-        map(self.mentions.add, map(build_single_mention, user_ids))
-        self.save()
+    @classmethod
+    def get_by_ids(cls, *ids):
+        """Get sales cycles by ids from cache with fallback to postgres."""
+        rv = cache.get_many([build_key(cls._meta.model_name, sid) for sid in ids])
+        rv = {extract_id(k, coerce=int): json.loads(v) for k, v in rv.iteritems()}
 
-    def assign_user(self, user_id, save=False):
-        """TEST Assign user to salescycle."""
-        try:
-            self.owner = User.objects.get(id=user_id)
-            if save:
-                self.save()
-            return True
-        except User.DoesNotExist:
-            return False
+        not_found_ids = [cid for cid in ids if not cid in rv]
+        if not not_found_ids:
+            return rv.values()
+        sales_cycles = cls.objects.filter(pk__in=not_found_ids).prefetch_related('rel_activities')
+        more_rv = list(s.serialize() for s in sales_cycles)
+        cache.set_many({build_key(cls._meta.model_name, salescycle_raw['id']): json.dumps(salescycle_raw, default=date_handler)
+                        for salescycle_raw in more_rv})
+        return rv.values() + more_rv
 
-    def get_activities(self):
-        """TEST Returns list of activities ordered by date."""
-        return self.rel_activities.order_by('-date_created')
+    @classmethod
+    def after_save(cls, sender, instance, **kwargs):
+        cache.set(build_key(cls._meta.model_name, instance.pk), json.dumps(instance.serialize(), default=date_handler))
+    
+    @classmethod
+    def after_delete(cls, sender, instance, **kwargs):
+        cache.delete(build_key(cls._meta.model_name, instance.pk))
+
+    @classmethod
+    def cache_all(cls):
+        sales_cycles_qs = cls.objects.all().prefetch_related('rel_activities')
+        sales_cycle_raws = [c.serialize() for c in sales_cycles_qs]
+        cache.set_many({build_key(cls._meta.model_name, sales_cycle_raw['id']): json.dumps(sales_cycle_raw, default=date_handler) for sales_cycle_raw in sales_cycle_raws})
+
+    def possibly_make_new(self):
+        if self.rel_activities.count() == 0 and self.milestone is None:
+            self.status = SalesCycle.NEW
+            self.save()
+
+    def possibly_make_pending(self):
+        if self.rel_activities.count() != 0 or (self.milestone is not None and self.milestone.is_system == 0):
+            self.status = SalesCycle.PENDING
+            self.save()
+
+    def possibly_make_successful(self):
+        if self.milestone is not None and self.milestone.is_system == 1:
+            self.status = SalesCycle.SUCCESSFUL
+            self.save()
+
+    def possibly_make_failed(self):
+        if self.milestone is not None and self.milestone.is_system == 2:
+            self.status = SalesCycle.FAILED
+            self.save()
+
+    def find_latest_activity(self):
+        return self.rel_activities.order_by('-date_created').first()
 
     def add_product(self, product_id, **kw):
         """TEST Assigns products to salescycle"""
@@ -1309,32 +1408,6 @@ class SalesCycle(SubscriptionObject):
                 s.save()
 
         return True
-
-    def remove_products(self, product_ids):
-        """TEST UnAssigns products to salescycle"""
-        if not isinstance(product_ids, (tuple, list)):
-            product_ids = [product_ids]
-        products = Product.objects.filter(pk__in=product_ids)
-        if not products:
-            return False
-        for product in products:
-            try:
-                s = SalesCycleProductStat.objects.get(sales_cycle=self, product=product)
-                s.delete()
-            except SalesCycleProductStat.DoesNotExist:
-                continue
-        return True
-
-    def remove_product(self, product_id, **kw):
-        """TEST Assigns products to salescycle"""
-        return self.remove_products([product_id], **kw)
-
-    def set_result(self, value_obj, save=False):
-        """TEST Set salescycle.real_value to value_obj. Saves the salescycle
-        if `save` is true"""
-        self.real_value = value_obj
-        if save:
-            self.save()
 
     def set_result_by_amount(self, amount, company_id, succeed):
         v = Value(amount=amount, owner=self.owner)
@@ -1361,11 +1434,15 @@ class SalesCycle(SubscriptionObject):
         self.real_value = None
         self.projected_value = None
         self.save()
+        if milestone.is_system == 0:
+            self.possibly_make_pending()
+        if milestone.is_system == 1:
+            self.possibly_make_successful()
+        if milestone.is_system == 2:
+            self.possibly_make_failed()
 
-        for log_entry in self.log.all():
-            if log_entry.entry_type == SalesCycleLogEntry.ME or \
-               log_entry.entry_type == SalesCycleLogEntry.MD:
-               log_entry.delete()
+        log_entries = self.log.filter(entry_type__in=[SalesCycleLogEntry.ME, SalesCycleLogEntry.MD])
+        log_entries.delete()
 
         meta = {
             "prev_milestone_title": prev_milestone_title,
@@ -1407,69 +1484,6 @@ class SalesCycle(SubscriptionObject):
 
         return [self, log_entry]
 
-    @classmethod
-    def upd_lst_activity_on_create(cls, sender,
-                                   created=False, instance=None, **kwargs):
-        if not created or not instance.sales_cycle.is_global:
-            return
-        sales_cycle = instance.sales_cycle
-        sales_cycle.latest_activity = sales_cycle.find_latest_activity()
-        sales_cycle.save()
-
-    @classmethod
-    def get_salescycles_by_last_activity_date(
-        cls, company_id, user_id=None, owned=True, mentioned=False,
-            followed=False, all=False, include_activities=False):
-        """Returns sales_cycles where user is owner, mentioned or followed
-            ordered by last activity date.
-
-            Returns
-            -------
-            if include_activities=True:
-                (Queryset<SalesCycle>,
-                 Queryset<Activity>,
-                 sales_cycle_activity_map =  {1: [2, 3, 4], 2:[3, 5, 7]})
-            else:
-                Queryset<SalesCycle>
-            Raises:
-                User.DoesNotExist
-        """
-        q0 = Q(company_id=company_id)
-        q = Q()
-        if not all:
-            if owned:
-                q |= Q(owner_id=user_id)
-            if mentioned:
-                q |= Q(mentions__user_id=user_id)
-            if followed:
-                q |= Q(followers__user_id=user_id)
-        if not all and len(q.children) == 0:
-            sales_cycles = SalesCycle.objects.none()
-        else:
-            sales_cycles = SalesCycle.objects.filter(q0 & q).order_by('-latest_activity__date_created')
-
-        if not include_activities:
-            return sales_cycles
-        else:
-            activities = Activity.objects.filter(
-                sales_cycle_id__in=sales_cycles.values_list('pk', flat=True))
-            sales_cycle_activity_map = {}
-            for sc in sales_cycles:
-                sales_cycle_activity_map[sc.id] = \
-                    sc.rel_activities.values_list('pk', flat=True)
-            return (sales_cycles, activities, sales_cycle_activity_map)
-
-    @classmethod
-    def get_salescycles_by_contact(cls, contact_id):
-        """Returns queryset of sales cycles by contact"""
-        return SalesCycle.objects.filter(contact_id=contact_id)
-
-    @classmethod
-    def get_salescycles_of_contact_by_last_activity_date(cls, contact_id):
-        sales_cycles = cls.objects.filter(contact_id=contact_id)\
-            .order_by('-latest_activity__date_created')
-        return sales_cycles
-
     def serialize(self):
         projected_value_id = None
         real_value_id = None
@@ -1499,37 +1513,9 @@ class SalesCycle(SubscriptionObject):
             "title": self.title
         }
 
-    @classmethod
-    def get_by_ids(cls, *ids):
-        """Get sales cycles by ids from cache with fallback to postgres."""
-        rv = cache.get_many([build_key(cls._meta.model_name, sid) for sid in ids])
-        rv = {extract_id(k, coerce=int): json.loads(v) for k, v in rv.iteritems()}
-
-        not_found_ids = [cid for cid in ids if not cid in rv]
-        if not not_found_ids:
-            return rv.values()
-        sales_cycles = cls.objects.filter(pk__in=not_found_ids).prefetch_related('rel_activities')
-        more_rv = list(s.serialize() for s in sales_cycles)
-        cache.set_many({build_key(cls._meta.model_name, salescycle_raw['id']): json.dumps(salescycle_raw, default=date_handler)
-                        for salescycle_raw in more_rv})
-        return rv.values() + more_rv
-
-    @classmethod
-    def after_save(cls, sender, instance, **kwargs):
-        cache.set(build_key(cls._meta.model_name, instance.pk), json.dumps(instance.serialize(), default=date_handler))
-    
-    @classmethod
-    def after_delete(cls, sender, instance, **kwargs):
-        cache.delete(build_key(cls._meta.model_name, instance.pk))
-
-    @classmethod
-    def cache_all(cls):
-        sales_cycles_qs = cls.objects.all().prefetch_related('rel_activities')
-        sales_cycle_raws = [c.serialize() for c in sales_cycles_qs]
-        cache.set_many({build_key(cls._meta.model_name, sales_cycle_raw['id']): json.dumps(sales_cycle_raw, default=date_handler) for sales_cycle_raw in sales_cycle_raws})
-
 post_save.connect(SalesCycle.after_save, sender=SalesCycle)
 post_delete.connect(SalesCycle.after_delete, sender=SalesCycle)
+
 
 class SalesCycleLogEntry(SubscriptionObject):
     TYPES_CAPS = (
@@ -1574,54 +1560,12 @@ class Activity(SubscriptionObject):
         return self.description
 
     @property
-    def author(self):
-        return self.owner
-
-    @property
-    def author_id(self):
-        return self.owner_id
-
-    @author_id.setter
-    def author_id(self, author_id):
-        self.owner = User.objects.get(id=author_id)
-
-    @property
-    def contact(self):
+    def contact(self): # ????
         return self.sales_cycle.contact
 
     @property
     def comments_count(self):
         return self.comments.count()
-
-    
-    def new_comments_count(self, user_id):
-        return len(
-            filter(lambda(comment): not comment.has_read(user_id),
-                   self.comments.all())
-            )
-
-    def spray(self, company_id, account):
-        accounts = []
-        for account in Account.objects.filter(company_id=company_id):
-            if not (self.contact in account.unfollow_list.all()):
-                accounts.append(account)
-
-        with transaction.atomic():
-            for account in accounts:
-                act_recip = ActivityRecipient(user=account.user, activity=self)
-                if account.user.id==self.owner.id:
-                    act_recip.has_read = True
-                act_recip.save()
-
-    def has_read(self, user_id):
-        recip = self.recipients.filter(user_id=user_id).first()
-        # # OPTIMIZE VERSION =D
-        # recip = None
-        # for r in self.recipients.all():
-        #     if r.user_id == user_id:
-        #         recip = r
-        #         break
-        return not recip or recip.has_read
 
     @classmethod
     def mark_as_read(cls, user_id, act_id):
@@ -1643,76 +1587,6 @@ class Activity(SubscriptionObject):
             Q(deadline__isnull=False, date_finished__isnull=False, date_finished__gte=month) |
             Q(deadline__isnull=True,  date_edited__gte=month )
             )
-
-    @classmethod
-    def get_activities_by_contact(cls, contact_id):
-        return Activity.objects.filter(sales_cycle__contact_id=contact_id)
-
-    @classmethod
-    def get_activities_by_salescycle(cls, sales_cycle_id):
-        return cls.objects.filter(sales_cycle_id=sales_cycle_id).order_by('-date_created')
-
-    @classmethod
-    def get_mentioned_activities_of(cls, user_ids):
-        if not user_ids is isinstance(tuple, list):
-            user_ids = [user_ids]
-        return Activity.objects.filter(mentions__user_id__in=user_ids)
-
-    '''--Done--'''
-    @classmethod
-    def get_activity_details(
-            cls, activity_id, include_sales_cycle=False,
-            include_mentioned_users=False, include_comments=True):
-        """TODO Returns activity details with comments by default.
-        If `include_mentioned_users` is ON, then includes mentioned user.
-        If `include_sales_cycle` is ON, then include its sales cycle.
-
-        Returns
-        --------
-            activity - Activity object
-            sales_cycle (if included)
-            comments (if included)
-            mentioned_users (if included)
-            {'activity': {'object': ..., 'comments': [], sales_cycle: ..}}
-        """
-        try:
-            activity = Activity.objects.get(id=activity_id)
-        except Activity.DoesNotExist:
-            return False
-        activity_detail = {'activity': {'object': activity}}
-        if include_sales_cycle:
-            activity_detail['activity'][
-                'sales_cycle'] = activity.sales_cycle
-        if include_mentioned_users:
-            activity_detail['activity'][
-                'mentioned_users'] = activity.mentions.all()
-        if include_comments:
-            activity_detail['activity']['comments'] = activity.comments.all()
-        return activity_detail
-
-    @classmethod
-    def get_number_of_activities_by_day(cls, user_id,
-                                        from_dt=None, to_dt=None):
-        try:
-            user = User.objects.get(id=user_id)
-        except User.DoesNotExist:
-            return False
-        '''
-        need to implement the conversion to datetime object
-        from input arguments
-        '''
-        if (type(from_dt) and type(to_dt) == datetime):
-            pass
-        activity_queryset = Activity.objects.filter(
-            date_created__gte=from_dt, date_created__lte=to_dt, owner=user)
-        date_counts = {}
-        for act in activity_queryset:
-            date = str(act.date_created.date())
-            if date in date_counts:
-                date_counts[date] += 1
-            else:
-                date_counts[date] = 1
-        return date_counts
 
     @classmethod
     def get_activities_by_date_created(
@@ -1754,22 +1628,73 @@ class Activity(SubscriptionObject):
                 s2a_map[sc.id] = sc.rel_activities.values_list('pk', flat=True)
             return (activities, sales_cycles, s2a_map)
 
-    def serialize(self):
+    @classmethod
+    def get_panel_info(cls, company_id, user_id):
+        activity_q = Q(company_id=company_id, deadline__isnull=False)
+        owner_q = Q(owner_id=user_id)
+
+        period_q = {
+            'days_q': Q(date_edited__gte=datetimeutils.get_start_of_today(timezone.now()), date_edited__lte=datetimeutils.get_end_of_today(timezone.now())),
+            'weeks_q': Q(date_edited__gte=datetimeutils.get_start_of_week(timezone.now()), date_edited__lte=datetimeutils.get_end_of_week(timezone.now())),
+            'months_q': Q(date_edited__gte=datetimeutils.get_start_of_month(timezone.now()), date_edited__lte=datetimeutils.get_end_of_month(timezone.now())),
+        }
+
+        total = Activity.objects.filter(activity_q)
+        my_total = total.filter(owner_q)
+
+        periods = ['days', 'weeks', 'months']
+
+        def get_by_period(queryset):
+            rv = {}
+            for period in periods:
+                period_total = queryset.filter(period_q[period+'_q'])
+                rv[period] = {
+                    'total': period_total.count(),
+                    'completed': period_total.filter(Q(date_finished__isnull=False)).count(),
+                    'overdue': period_total.filter(Q(date_finished__isnull=True, deadline__lt=datetime.combine(timezone.now(), time.min))).count(),
+                }
+            return rv
+
         return {
-            'assignee_id': self.assignee_id,            
-            'author_id': self.owner_id,
-            'company_id': self.company_id,
-            'comments_count': self.comments_count,
-            'date_created': self.date_created,
-            'date_edited': self.date_edited,
-            'date_finished': self.date_finished,
-            'deadline': self.deadline,
-            'description': self.description,
-            'id': self.pk,
-            'need_preparation': self.need_preparation,
-            'pk': self.pk,
-            'result': self.result,
-            'sales_cycle_id': self.sales_cycle_id
+                'all': get_by_period(total),
+                'my': get_by_period(my_total),
+            }
+    
+    def new_comments_count(self, user_id):
+        return len(
+            filter(lambda(comment): not comment.has_read(user_id),
+                   self.comments.all())
+            )
+
+    def spray(self, company_id, account):
+        accounts = []
+        for account in Account.objects.filter(company_id=company_id):
+            if not (self.contact in account.unfollow_list.all()):
+                accounts.append(account)
+
+        with transaction.atomic():
+            for account in accounts:
+                act_recip = ActivityRecipient(user=account.user, activity=self)
+                if account.user.id==self.owner.id:
+                    act_recip.has_read = True
+                act_recip.save()
+
+    def has_read(self, user_id):
+        recip = self.recipients.filter(user_id=user_id).first()
+        return not recip or recip.has_read
+
+    def move(self, new_sales_cycle_id):
+        prev_sales_cycle = self.sales_cycle
+        new_sales_cycle = SalesCycle.objects.get(id=new_sales_cycle_id)
+        self.sales_cycle = new_sales_cycle
+        self.save()
+        # новый цикл автоматически выставится как pending из-за after_save
+        # а старый цикл нужно проверить и изменить статус
+        prev_sales_cycle.possibly_make_new()
+        return {
+            'prev_sales_cycle': prev_sales_cycle,
+            'new_sales_cycle': new_sales_cycle,
+            'activity': self.sales_cycle
         }
 
     @classmethod
@@ -1789,21 +1714,18 @@ class Activity(SubscriptionObject):
 
     @classmethod
     def after_save(cls, sender, instance, **kwargs):
-        cache.set(build_key(cls._meta.model_name, instance.pk), json.dumps(instance.serialize(), default=date_handler))
+        # установить статус цикла был новый, то пометить как открытый
+        sales_cycle = instance.sales_cycle
+        if sales_cycle.status == SalesCycle.NEW:
+            sales_cycle.possibly_make_pending()
     
     @classmethod
     def after_delete(cls, sender, instance, **kwargs):
-        cache.delete(build_key(cls._meta.model_name, instance.pk))
+        # при удалении активити, если больше нет активити и нет этапа, то пометить как новый
+        instance.sales_cycle.possibly_make_new()
 
-
-    @classmethod
-    def cache_all(cls):
-        activities = cls.objects.all()
-        activity_raws = [activity.serialize() for activity in activities]
-        cache.set_many({build_key(cls._meta.model_name, activity_raw['id']): json.dumps(activity_raw, default=date_handler) for activity_raw in activity_raws})
-
-# post_save.connect(Activity.after_save, sender=Activity)
-# post_delete.connect(Activity.after_delete, sender=Activity)
+post_save.connect(Activity.after_save, sender=Activity)
+post_delete.connect(Activity.after_delete, sender=Activity)
 
 
 class ActivityRecipient(SubscriptionObject):
@@ -1832,10 +1754,6 @@ class Mention(SubscriptionObject):
     def __unicode__(self):
         return "%s %s" % (self.user, self.content_object)
 
-    @property
-    def author(self):
-        return self.owner
-
     @classmethod
     def build_new(cls, user_id, content_class=None,
                   object_id=None, company_id = None, save=False):
@@ -1846,15 +1764,6 @@ class Mention(SubscriptionObject):
         if save:
             mention.save()
         return mention
-
-    @classmethod
-    def get_all_mentions_of(cls, user_id):
-        """TODO Returns all mentions of user.
-        Returns
-        ----------
-            Queryset<Mention>
-        """
-        return Mention.objects.filter(user_id=user_id)
 
 
 class Comment(SubscriptionObject):
@@ -1869,9 +1778,27 @@ class Comment(SubscriptionObject):
     def __unicode__(self):
         return "%s's comment" % (self.owner)
 
-    @property
-    def author(self):
-        return self.owner
+    @classmethod
+    def mark_as_read(cls, user_id, comment_id):
+        try:
+            comment = CommentRecipient.objects.get(
+                user__id=user_id, comment__id=comment_id)
+        except CommentRecipient.DoesNotExist:
+            pass
+        else:
+            comment.has_read = True
+            comment.save()
+        return True
+
+    @classmethod
+    def build_new(cls, user_id, content_class=None,
+                  object_id=None, save=False):
+        comment = cls(owner_id=user_id)
+        comment.content_type = ContentType.objects.get_for_model(content_class)
+        comment.object_id = object_id
+        if save:
+            comment.save()
+        return comment
 
     def spray(self, company_id, account):
         accounts = []
@@ -1888,61 +1815,12 @@ class Comment(SubscriptionObject):
 
     def has_read(self, user_id):
         recip = self.recipients.filter(user_id=user_id).first()
-        # # OPTIMIZE VERSION =D
-        # recip = None
-        # for r in self.recipients.all():
-        #     if r.user_id == user_id:
-        #         recip = r
-        #         break
         return not recip or recip.has_read
 
-    @classmethod
-    def mark_as_read(cls, user_id, comment_id):
-        try:
-            comment = CommentRecipient.objects.get(
-                user__id=user_id, comment__id=comment_id)
-        except CommentRecipient.DoesNotExist:
-            pass
-        else:
-            comment.has_read = True
-            comment.save()
-        return True
-
-    def save(self, **kwargs):
+    def save(self, **kwargs): # ???
         if self.date_created:
             self.date_edited = timezone.now()
         super(Comment, self).save(**kwargs)
-
-    def add_mention(self, user_ids=None):
-        if isinstance(user_ids, int):
-            user_ids = [user_ids]
-        build_single_mention = functools.partial(Mention.build_new,
-                                                 content_class=self.__class__,
-                                                 object_id=self.pk,
-                                                 save=True)
-        self.mentions = map(build_single_mention, user_ids)
-        self.save()
-
-    @classmethod
-    def build_new(cls, user_id, content_class=None,
-                  object_id=None, save=False):
-        comment = cls(owner_id=user_id)
-        comment.content_type = ContentType.objects.get_for_model(content_class)
-        comment.object_id = object_id
-        if save:
-            comment.save()
-        return comment
-
-    '''---done---'''
-    @classmethod
-    def get_comments_by_context(cls, context_object_id, context_class):
-        try:
-            cttype = ContentType.objects.get_for_model(context_class)
-        except ContentType.DoesNotExist:
-            return False
-        return cls.objects.filter(
-            object_id=context_object_id,
-            content_type=cttype)
 
 
 class CommentRecipient(SubscriptionObject):
@@ -1972,14 +1850,9 @@ class AttachedFile(SubscriptionObject):
         return "%s %s" % (self.file_object, self.content_object)
 
     @property
-    def author(self):
-        return self.owner
-
-    @property
     def is_active(self):
         if self.content_object == None:
             return False
-        
         return True
 
     @classmethod
@@ -2043,15 +1916,8 @@ class Share(SubscriptionObject):
         q = Q(company_id=company_id)
         return cls.objects.filter(q).order_by('-date_created')
 
-    @classmethod
-    def get_shares_in_for(cls, user_id):
-        return cls.objects.filter(share_to__pk=user_id)\
-            .order_by('-date_created')
-
     def __unicode__(self):
         return u'%s : %s -> %s' % (self.contact, self.share_from, self.share_to)
-
-
 
 signals.post_save.connect(
     Contact.upd_lst_activity_on_create, sender=Activity)
@@ -2095,18 +1961,6 @@ signals.pre_save.connect(check_is_title_empty, sender=SalesCycle)
 signals.post_save.connect(create_milestones, sender=Company)
 signals.pre_delete.connect(delete_related_milestones, sender=Company)
 
-'''
-Function to get mentions by 3 of optional parameters:
-either for a particular user or for all users
-'''
-
-
-def get_mentions(user_id=None, content_class=None, object_id=None):
-    cttype = ContentType.objects.get_for_model(content_class)
-    return Mention.objects.filter(user_id=user_id,
-                                  content_type=cttype,
-                                  object_id=object_id)
-
 
 class ContactList(SubscriptionObject):
     owner = models.ForeignKey(User, related_name='owned_list', blank=True, null=True)
@@ -2123,10 +1977,6 @@ class ContactList(SubscriptionObject):
     def __unicode__(self):
         return self.title
 
-    @classmethod
-    def get_for_subscr(cls, company_id):
-        return cls.objects.filter(company_id=company_id)
-
     def check_contact(self, contact_id):
         try:
             contact = self.contacts.get(id=contact_id)
@@ -2136,9 +1986,6 @@ class ContactList(SubscriptionObject):
                 return False
         except Contact.DoesNotExist:
             return False
-
-    def get_contacts(self):
-        return self.contacts
 
     def add_contacts(self, contact_ids):
         assert isinstance(contact_ids, (tuple, list)), 'must be a list'
@@ -2169,7 +2016,6 @@ class ContactList(SubscriptionObject):
                 status = False
         else:
             return False
-
         return status
 
     def count(self):
@@ -2179,7 +2025,7 @@ class ContactList(SubscriptionObject):
 class SalesCycleProductStat(SubscriptionObject):
     sales_cycle = models.ForeignKey(SalesCycle, related_name='product_stats',
                                 null=True, blank=True, on_delete=models.SET_NULL)
-    product = models.ForeignKey(Product)
+    product = models.ForeignKey(Product, related_name='product_stats')
     real_value = models.IntegerField(default=0)
     projected_value = models.IntegerField(default=0)
 
@@ -2204,7 +2050,6 @@ class Filter(SubscriptionObject):
     title = models.CharField(max_length=100, default='')
     filter_text = models.CharField(max_length=500)
     owner = models.ForeignKey(User, related_name='owned_filter', null=True)
-    
     base = models.CharField(max_length=6, choices=BASE_OPTIONS, default='all')
 
     class Meta:
@@ -2213,11 +2058,6 @@ class Filter(SubscriptionObject):
 
     def __unicode__(self):
         return u'%s: %s' % (self.title, self.base)
-
-    def save(self, **kwargs):
-        if not self.company_id and self.owner:
-            self.company_id = self.owner.company_id
-        super(self.__class__, self).save(**kwargs)
 
 
 class HashTag(SubscriptionObject):
@@ -2321,6 +2161,7 @@ class CustomField(SubscriptionObject):
 signals.post_save.connect(CustomField.after_save_delete, sender=CustomField)
 signals.post_delete.connect(CustomField.after_save_delete, sender=CustomField)
 
+
 class CustomFieldValue(SubscriptionObject):
     custom_field = models.ForeignKey('CustomField', related_name="values")
     value = models.TextField(null=True, blank=True)
@@ -2357,6 +2198,7 @@ class CustomFieldValue(SubscriptionObject):
 
 signals.post_save.connect(CustomFieldValue.after_save_delete, sender=CustomFieldValue)
 signals.post_delete.connect(CustomFieldValue.after_save_delete, sender=CustomFieldValue)
+
 
 class ImportTask(models.Model):
     uuid = models.CharField(blank=True, null=True, max_length=100)
