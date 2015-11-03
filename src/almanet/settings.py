@@ -147,6 +147,7 @@ class BaseConfiguration(SubdomainConfiguration, Configuration):
         # 'django.contrib.messages',
         'django.contrib.staticfiles',
         'django_hosts',
+        'debug_toolbar',
         'south',
         'timezone_field',
         'almanet',   # commons, entry point
@@ -174,7 +175,10 @@ class BaseConfiguration(SubdomainConfiguration, Configuration):
         'django.contrib.messages.middleware.MessageMiddleware',
         'django.contrib.auth.middleware.AuthenticationMiddleware',
         'django.middleware.gzip.GZipMiddleware',
+        'debug_toolbar.middleware.DebugToolbarMiddleware',
         'almanet.middleware.ForceDefaultLanguageMiddleware',
+        # 'almanet.middleware.SimpleMemoryMiddleware',
+        
         # 'almanet.middleware.AlmanetSessionMiddleware',
         # 'almanet.middleware.MyAuthenticationMiddleware',
     )
@@ -190,6 +194,8 @@ class BaseConfiguration(SubdomainConfiguration, Configuration):
     HOSTCONF_REGEX = r'alma\.net:8000'
 
     WSGI_APPLICATION = 'almanet.wsgi.application'
+
+    DEBUG_TOOLBAR_PATCH_SETTINGS = False
 
     # Database
     # https://docs.djangoproject.com/en/1.6/ref/settings/#databases
