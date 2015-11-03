@@ -9,6 +9,7 @@ from . import CompanyObjectAPIMixin
 class ProductGroupViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
     
     serializer_class = ProductGroupSerializer
+    pagination_class = None
 
     def get_queryset(self):
         return ProductGroup.objects.filter(company_id=self.request.company.id)

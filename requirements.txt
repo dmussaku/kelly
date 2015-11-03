@@ -61,3 +61,4 @@ xlrd==0.9.3
 django-almastorage==0.4.1
 XlsxWriter==0.7.3
 django-preserialize==1.1.0
+djangorestframework==3.2.4
