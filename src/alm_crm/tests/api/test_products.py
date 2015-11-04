@@ -34,7 +34,7 @@ class ProductAPITests(APITestMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         content = json.loads(response.content)
-        self.assertEqual(content['count'], self.products_count)
+        self.assertEqual(len(content), self.products_count)
 
     def test_get_specific_product(self):
         """
@@ -77,7 +77,7 @@ class ProductAPITests(APITestMixin, APITestCase):
         url, parsed = self.prepare_urls('v1:product-list', subdomain=self.company.subdomain)
         response = self.client.get(url, HTTP_HOST=parsed.netloc)
         content = json.loads(response.content)
-        self.assertEqual(self.products_count+1, content['count'])
+        self.assertEqual(self.products_count+1, len(content))
     
     def test_edit_product(self):
         """
@@ -126,4 +126,4 @@ class ProductAPITests(APITestMixin, APITestCase):
         url, parsed = self.prepare_urls('v1:product-list', subdomain=self.company.subdomain)
         response = self.client.get(url, HTTP_HOST=parsed.netloc)
         content = json.loads(response.content)
-        self.assertEqual(self.products_count-1, content['count'])
+        self.assertEqual(self.products_count-1, len(content))

@@ -1177,27 +1177,102 @@ class SalesCycle(SubscriptionObject):
                                       is_global=True)
 
     @classmethod
-    def get_panel_info(cls, company_id, user_id):
+    def get_statistics(cls, company_id, user_id):
+        return {
+            'all_sales_cycles': SalesCycle.get_all(company_id=company_id).count(),
+            'new_sales_cycles': SalesCycle.get_new_all(company_id=company_id).count(),
+            'successful_sales_cycles': SalesCycle.get_successful_all(company_id=company_id).count(),
+            'failed_sales_cycles': SalesCycle.get_failed_all(company_id=company_id).count(),
+            'open_sales_cycles': SalesCycle.get_pending_all(company_id=company_id).count(),
+            'my_sales_cycles': SalesCycle.get_my(company_id=company_id, user_id=user_id).count(),
+            'my_new_sales_cycles': SalesCycle.get_new_my(company_id=company_id, user_id=user_id).count(),
+            'my_successful_sales_cycles': SalesCycle.get_successful_my(company_id=company_id, user_id=user_id).count(),
+            'my_failed_sales_cycles': SalesCycle.get_failed_my(company_id=company_id, user_id=user_id).count(),
+            'my_open_sales_cycles': SalesCycle.get_pending_my(company_id=company_id, user_id=user_id).count(),
+        }
+
+    @classmethod
+    def get_all(cls, company_id):
         sales_cycle_q = Q(company_id=company_id, is_global=False)
+        total = SalesCycle.objects.filter(sales_cycle_q)
+
+        return total
+
+    @classmethod
+    def get_new_all(cls, company_id):
+        sales_cycle_q = Q(company_id=company_id, is_global=False)
+        total = SalesCycle.objects.filter(sales_cycle_q)
+
+        return total.filter(status=SalesCycle.NEW)
+
+    @classmethod
+    def get_pending_all(cls, company_id):
+        sales_cycle_q = Q(company_id=company_id, is_global=False)
+        total = SalesCycle.objects.filter(sales_cycle_q)
+
+        return total.filter(status=SalesCycle.PENDING)
+
+    @classmethod
+    def get_successful_all(cls, company_id):
+        sales_cycle_q = Q(company_id=company_id, is_global=False)
+        total = SalesCycle.objects.filter(sales_cycle_q)
+
+        return total.filter(status=SalesCycle.SUCCESSFUL)
+
+    @classmethod
+    def get_failed_all(cls, company_id):
+        sales_cycle_q = Q(company_id=company_id, is_global=False)
+        total = SalesCycle.objects.filter(sales_cycle_q)
+
+        return total.filter(status=SalesCycle.FAILED)
+
+    @classmethod
+    def get_my(cls, company_id, user_id):
         owner_q = Q(owner_id=user_id)
 
+        return SalesCycle.get_all(company_id=company_id).filter(owner_q)
+
+    @classmethod
+    def get_new_my(cls, company_id, user_id):
+        owner_q = Q(owner_id=user_id)
+
+        return SalesCycle.get_new_all(company_id=company_id).filter(owner_q)
+
+    @classmethod
+    def get_pending_my(cls, company_id, user_id):
+        owner_q = Q(owner_id=user_id)
+
+        return SalesCycle.get_pending_all(company_id=company_id).filter(owner_q)
+
+    @classmethod
+    def get_successful_my(cls, company_id, user_id):
+        owner_q = Q(owner_id=user_id)
+
+        return SalesCycle.get_successful_all(company_id=company_id).filter(owner_q)
+
+    @classmethod
+    def get_failed_my(cls, company_id, user_id):
+        owner_q = Q(owner_id=user_id)
+
+        return SalesCycle.get_failed_all(company_id=company_id).filter(owner_q)
+
+    @classmethod
+    def get_panel_info(cls, company_id, user_id):
         period_q = {
             'days_q': Q(date_edited__gte=datetimeutils.get_start_of_today(timezone.now()), date_edited__lte=datetimeutils.get_end_of_today(timezone.now())),
             'weeks_q': Q(date_edited__gte=datetimeutils.get_start_of_week(timezone.now()), date_edited__lte=datetimeutils.get_end_of_week(timezone.now())),
             'months_q': Q(date_edited__gte=datetimeutils.get_start_of_month(timezone.now()), date_edited__lte=datetimeutils.get_end_of_month(timezone.now())),
         }
 
-        total = SalesCycle.objects.filter(sales_cycle_q)
-
         periods = ['days', 'weeks', 'months']
 
-        new_sales_cycles = total.filter(status=SalesCycle.NEW)
-        successful_sales_cycles = total.filter(status=SalesCycle.SUCCESSFUL)
-        open_sales_cycles = total.filter(status=SalesCycle.PENDING)
-
-        my_new_sales_cycles = new_sales_cycles.filter(owner_q)
-        my_successful_sales_cycles = successful_sales_cycles.filter(owner_q)
-        my_open_sales_cycles = open_sales_cycles.filter(owner_q)
+        new_sales_cycles =  SalesCycle.get_new_all(company_id=company_id)
+        successful_sales_cycles =  SalesCycle.get_successful_all(company_id=company_id)
+        open_sales_cycles =  SalesCycle.get_pending_all(company_id=company_id)
+        
+        my_new_sales_cycles =  SalesCycle.get_new_my(company_id=company_id, user_id=user_id)
+        my_successful_sales_cycles =  SalesCycle.get_successful_my(company_id=company_id, user_id=user_id)
+        my_open_sales_cycles =  SalesCycle.get_pending_my(company_id=company_id, user_id=user_id)
 
         milestones = Milestone.objects.filter(company_id=company_id)
 
@@ -1243,11 +1318,11 @@ class SalesCycle(SubscriptionObject):
         return {
             'new_sales_cycles': {
                 'all': get_by_period(new_sales_cycles),
-                'my': get_by_period(new_sales_cycles.filter(owner_q)),
+                'my': get_by_period(my_new_sales_cycles),
             },
             'successful_sales_cycles': {
                 'all': get_by_period(successful_sales_cycles),
-                'my': get_by_period(successful_sales_cycles.filter(owner_q)),
+                'my': get_by_period(my_successful_sales_cycles),
             },
             'open_sales_cycles': {
                 'all': {
@@ -1292,13 +1367,13 @@ class SalesCycle(SubscriptionObject):
 
         activities = Activity.objects.filter(company_q)
 
-        days_act_sales_cycles = map(lambda x: x.sales_cycle_id, activities.filter(days_q))
-        weeks_act_sales_cycles = map(lambda x: x.sales_cycle_id, activities.filter(weeks_q))
-        months_act_sales_cycles = map(lambda x: x.sales_cycle_id, activities.filter(months_q))
+        days_act_sales_cycles = activities.filter(days_q).values_list('sales_cycle_id', flat=True)
+        weeks_act_sales_cycles = activities.filter(weeks_q).values_list('sales_cycle_id', flat=True)
+        months_act_sales_cycles = activities.filter(months_q).values_list('sales_cycle_id', flat=True)
 
-        my_days_act_sales_cycles = map(lambda x: x.sales_cycle_id, activities.filter(days_q & owner_q))
-        my_weeks_act_sales_cycles = map(lambda x: x.sales_cycle_id, activities.filter(weeks_q & owner_q))
-        my_months_act_sales_cycles = map(lambda x: x.sales_cycle_id, activities.filter(months_q & owner_q))
+        my_days_act_sales_cycles = activities.filter(days_q & owner_q).values_list('sales_cycle_id', flat=True)
+        my_weeks_act_sales_cycles = activities.filter(weeks_q & owner_q).values_list('sales_cycle_id', flat=True)
+        my_months_act_sales_cycles = activities.filter(months_q & owner_q).values_list('sales_cycle_id', flat=True)
 
         return {
             'all': {
@@ -1651,7 +1726,7 @@ class Activity(SubscriptionObject):
                 rv[period] = {
                     'total': period_total.count(),
                     'completed': period_total.filter(Q(date_finished__isnull=False)).count(),
-                    'overdue': period_total.filter(Q(date_finished__isnull=True, deadline__lt=datetime.combine(timezone.now(), time.min))).count(),
+                    'overdue': period_total.filter(Q(date_finished__isnull=True, deadline__lt=timezone.now().replace(hour=time.min.hour, minute=time.min.minute, second=time.min.second))).count(),
                 }
             return rv
 

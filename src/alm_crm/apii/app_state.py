@@ -2,7 +2,7 @@ from rest_framework.decorators import list_route
 from rest_framework.response import Response
 from rest_framework import viewsets
 
-from alm_crm.utils.helpers import get_dashboard
+from alm_crm.utils.helpers import get_dashboard, get_active_deals, get_active_contacts
 from alm_crm.serializers import MilestoneSerializer
 from alm_crm.models import Contact, SalesCycleLogEntry, HashTag, SalesCycle, SalesCycleLogEntry, Share, Activity
 from alm_vcard.models import Category, Email, Adr, Tel, Url
@@ -41,6 +41,16 @@ class AppStateView(viewsets.ViewSet):
         objects = {
             'objects': get_dashboard(request.company.id, request.user.id)
         }
+        return Response(objects)
+
+    @list_route(methods=['get'], url_path='active_deals')
+    def active_deals(self, request, format=None):
+        objects = get_active_deals(request.company.id, request.user.id)
+        return Response(objects)
+
+    @list_route(methods=['get'], url_path='active_contacts')
+    def active_contacts(self, request, format=None):
+        objects = get_active_contacts(request.company.id, request.user.id)
         return Response(objects)
 
     def get_categories(self):

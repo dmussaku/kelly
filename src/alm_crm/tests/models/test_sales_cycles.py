@@ -40,31 +40,25 @@ class SalesCycleTests(TestMixin, TestCase):
             total_scs.append(sc)
 
         sc1 = my_scs[0]
-        sc1.milestone = success_milestone
-        sc1.save()
+        sc1.change_milestone(self.user, success_milestone.id, self.company.id)
 
         sc1 = my_scs[1]
-        sc1.milestone = milestone
-        sc1.save()
+        sc1.change_milestone(self.user, milestone.id, self.company.id)
 
         sc1 = my_scs[2]
-        sc1.milestone = milestone
-        sc1.save()
+        sc1.change_milestone(self.user, milestone.id, self.company.id)
 
         sc1 = my_scs[3]
         ActivityFactory(sales_cycle=sc1, owner=self.user, company_id=self.company.id)
 
         sc1 = total_scs[0]
-        sc1.milestone = success_milestone
-        sc1.save()
+        sc1.change_milestone(self.user, success_milestone.id, self.company.id)
 
         sc1 = total_scs[1]
-        sc1.milestone = milestone
-        sc1.save()
+        sc1.change_milestone(self.user, milestone.id, self.company.id)
 
         sc1 = total_scs[2]
-        sc1.milestone = milestone2
-        sc1.save()
+        sc1.change_milestone(self.user, milestone2.id, self.company.id)
 
         sc1 = total_scs[2]
         ActivityFactory(sales_cycle=sc1, owner=self.user, company_id=self.company.id)
@@ -135,7 +129,196 @@ class SalesCycleTests(TestMixin, TestCase):
         self.assertEqual(sc.status, SalesCycle.FAILED)
         self.assertEqual(sc.log.count(), 3)
 
-    def test_get_new_all(self):
+    def test_get_all(self):
+        """
+        Ensure we can get all sales cycles
+        """
+        contact = ContactFactory(company_id=self.company.id)
+        for i in range(10):
+            SalesCycleFactory(contact=contact, owner=self.user, company_id=self.company.id)
+
+        self.assertEqual(SalesCycle.get_all(company_id=self.company.id).count(), 10)
+
+    def test_get_all_new(self):
         """
         Ensure we can get all new sales cycles
         """
+        contact = ContactFactory(company_id=self.company.id)
+        milestone = Milestone.objects.filter(is_system=0)[0]
+        scs = []
+        for i in range(10):
+            sc = SalesCycleFactory(contact=contact, owner=self.user, company_id=self.company.id)
+            scs.append(sc)
+
+        for i in range(3):
+            scs[i].change_milestone(self.user, milestone.id, self.company.id)
+
+        self.assertEqual(SalesCycle.get_new_all(company_id=self.company.id).count(), 7)
+
+    def test_get_all_pending(self):
+        """
+        Ensure we can get all pending sales cycles
+        """
+        contact = ContactFactory(company_id=self.company.id)
+        milestone = Milestone.objects.filter(is_system=0)[0]
+        scs = []
+        for i in range(10):
+            sc = SalesCycleFactory(contact=contact, owner=self.user, company_id=self.company.id)
+            scs.append(sc)
+
+        for i in range(3):
+            scs[i].change_milestone(self.user, milestone.id, self.company.id)
+
+        self.assertEqual(SalesCycle.get_pending_all(company_id=self.company.id).count(), 3)
+
+    def test_get_all_successful(self):
+        """
+        Ensure we can get all successful sales cycles
+        """
+        contact = ContactFactory(company_id=self.company.id)
+        milestone = Milestone.objects.get(is_system=1)
+        scs = []
+        for i in range(10):
+            sc = SalesCycleFactory(contact=contact, owner=self.user, company_id=self.company.id)
+            scs.append(sc)
+
+        for i in range(3):
+            scs[i].change_milestone(self.user, milestone.id, self.company.id)
+
+        self.assertEqual(SalesCycle.get_successful_all(company_id=self.company.id).count(), 3)
+
+    def test_get_all_failed(self):
+        """
+        Ensure we can get all failed sales cycles
+        """
+        contact = ContactFactory(company_id=self.company.id)
+        milestone = Milestone.objects.get(is_system=2)
+        scs = []
+        for i in range(10):
+            sc = SalesCycleFactory(contact=contact, owner=self.user, company_id=self.company.id)
+            scs.append(sc)
+
+        for i in range(3):
+            scs[i].change_milestone(self.user, milestone.id, self.company.id)
+
+        self.assertEqual(SalesCycle.get_failed_all(company_id=self.company.id).count(), 3)
+
+    def test_get_all_my(self):
+        """
+        Ensure we can get my sales cycles
+        """
+        account2 = AccountFactory(company=self.company)
+        contact = ContactFactory(company_id=self.company.id)
+        for i in range(10):
+            SalesCycleFactory(contact=contact, owner=self.user, company_id=self.company.id)
+
+        for i in range(3):
+            SalesCycleFactory(contact=contact, owner=account2.user, company_id=self.company.id)
+
+        self.assertEqual(SalesCycle.get_my(company_id=self.company.id, user_id=self.user.id).count(), 10)
+        self.assertEqual(SalesCycle.get_my(company_id=self.company.id, user_id=account2.user.id).count(), 3)
+
+    def test_get_my_new(self):
+        """
+        Ensure we can get my new sales cycles
+        """
+        account2 = AccountFactory(company=self.company)
+        contact = ContactFactory(company_id=self.company.id)
+        milestone = Milestone.objects.filter(is_system=0)[0]
+        scs = []
+        scs2 = []
+        for i in range(10):
+            sc = SalesCycleFactory(contact=contact, owner=self.user, company_id=self.company.id)
+            scs.append(sc)
+
+        for i in range(3):
+            scs[i].change_milestone(self.user, milestone.id, self.company.id)
+
+        for i in range(3):
+            sc = SalesCycleFactory(contact=contact, owner=account2.user, company_id=self.company.id)
+            scs2.append(sc)
+
+        for i in range(2):
+            scs2[i].change_milestone(self.user, milestone.id, self.company.id)
+
+        self.assertEqual(SalesCycle.get_new_my(company_id=self.company.id, user_id=self.user.id).count(), 7)
+        self.assertEqual(SalesCycle.get_new_my(company_id=self.company.id, user_id=account2.user.id).count(), 1)
+
+    def test_get_my_pending(self):
+        """
+        Ensure we can get my pending sales cycles
+        """
+        account2 = AccountFactory(company=self.company)
+        contact = ContactFactory(company_id=self.company.id)
+        milestone = Milestone.objects.filter(is_system=0)[0]
+        scs = []
+        scs2 = []
+        for i in range(10):
+            sc = SalesCycleFactory(contact=contact, owner=self.user, company_id=self.company.id)
+            scs.append(sc)
+
+        for i in range(3):
+            scs[i].change_milestone(self.user, milestone.id, self.company.id)
+
+        for i in range(3):
+            sc = SalesCycleFactory(contact=contact, owner=account2.user, company_id=self.company.id)
+            scs2.append(sc)
+
+        for i in range(2):
+            scs2[i].change_milestone(self.user, milestone.id, self.company.id)
+
+        self.assertEqual(SalesCycle.get_pending_my(company_id=self.company.id, user_id=self.user.id).count(), 3)
+        self.assertEqual(SalesCycle.get_pending_my(company_id=self.company.id, user_id=account2.user.id).count(), 2)
+
+    def test_get_my_successful(self):
+        """
+        Ensure we can get my successful sales cycles
+        """
+        account2 = AccountFactory(company=self.company)
+        contact = ContactFactory(company_id=self.company.id)
+        milestone = Milestone.objects.get(is_system=1)
+        scs = []
+        scs2 = []
+        for i in range(10):
+            sc = SalesCycleFactory(contact=contact, owner=self.user, company_id=self.company.id)
+            scs.append(sc)
+
+        for i in range(3):
+            scs[i].change_milestone(self.user, milestone.id, self.company.id)
+
+        for i in range(3):
+            sc = SalesCycleFactory(contact=contact, owner=account2.user, company_id=self.company.id)
+            scs2.append(sc)
+
+        for i in range(2):
+            scs2[i].change_milestone(self.user, milestone.id, self.company.id)
+
+        self.assertEqual(SalesCycle.get_successful_my(company_id=self.company.id, user_id=self.user.id).count(), 3)
+        self.assertEqual(SalesCycle.get_successful_my(company_id=self.company.id, user_id=account2.user.id).count(), 2)
+
+    def test_get_my_failed(self):
+        """
+        Ensure we can get my failed sales cycles
+        """
+        account2 = AccountFactory(company=self.company)
+        contact = ContactFactory(company_id=self.company.id)
+        milestone = Milestone.objects.get(is_system=2)
+        scs = []
+        scs2 = []
+        for i in range(10):
+            sc = SalesCycleFactory(contact=contact, owner=self.user, company_id=self.company.id)
+            scs.append(sc)
+
+        for i in range(3):
+            scs[i].change_milestone(self.user, milestone.id, self.company.id)
+
+        for i in range(3):
+            sc = SalesCycleFactory(contact=contact, owner=account2.user, company_id=self.company.id)
+            scs2.append(sc)
+
+        for i in range(2):
+            scs2[i].change_milestone(self.user, milestone.id, self.company.id)
+
+        self.assertEqual(SalesCycle.get_failed_my(company_id=self.company.id, user_id=self.user.id).count(), 3)
+        self.assertEqual(SalesCycle.get_failed_my(company_id=self.company.id, user_id=account2.user.id).count(), 2)
+    
