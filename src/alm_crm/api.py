@@ -3870,7 +3870,10 @@ class MobileStateObject(object):
         self.account = request.user
 
 
-        activities = ActivityResource().obj_get_list(bundle, limit_for='mobile')
+        activities = ActivityResource().obj_get_list(
+            bundle, limit_for='mobile')[0:200]
+        # activities = Activity.objects.filter(
+        #     company_id=self.company.id).order_by('date_edited')[0:100]
         sales_cycles = []
         for activity in activities:
             if activity.sales_cycle not in sales_cycles:
@@ -3940,7 +3943,7 @@ class MobileStateResource(Resource):
                 bundle = self.build_bundle(obj=obj, request=request)
                 setattr(bundle, 'skip_fields', ['activities'])
                 setattr(bundle, 'use_fields', ['activities_count'])
-                bundles.append(ResourceInstance.full_dehydrate(bundle, for_list=True))
+                bundles.append(ResourceInstance.full_dehydrate(bundle, for_list=False))
             serialized['objects'][resource_name] = bundles
 
         return self.create_response(request, serialized)
