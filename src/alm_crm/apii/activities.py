@@ -26,7 +26,7 @@ class ActivityViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
 
     @list_route(methods=['get'], url_path='company_feed')
     def company_feed(self, request, *args, **kwargs):    
-        activities = Activity.company_feed(company_id=request.company.id)
+        activities = Activity.company_feed(company_id=request.company.id, user_id=request.user.id)['feed']
 
         page = self.paginate_queryset(activities)
         if page is not None:
@@ -38,7 +38,7 @@ class ActivityViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
 
     @list_route(methods=['get'], url_path='my_feed')
     def my_feed(self, request, *args, **kwargs):    
-        activities = Activity.my_feed(company_id=request.company.id, user_id=request.user.id)
+        activities = Activity.my_feed(company_id=request.company.id, user_id=request.user.id)['feed']
 
         page = self.paginate_queryset(activities)
         if page is not None:

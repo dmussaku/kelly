@@ -1764,17 +1764,29 @@ class Activity(SubscriptionObject):
 
     @classmethod
     def get_statistics(cls, company_id, user_id):
+        company_feed = cls.company_feed(company_id=company_id, user_id=user_id)
+        my_feed = cls.my_feed(company_id=company_id, user_id=user_id)
         return {
-            'company_feed': cls.company_feed(company_id=company_id).count(),
-            'my_feed': cls.my_feed(company_id=company_id, user_id=user_id).count(),
+            'company_feed': {
+                'amount': company_feed['feed'].count(),
+                'not_read': company_feed['not_read'],
+            },
+            'my_feed': {
+                'amount': my_feed['feed'].count(),
+                'not_read': my_feed['not_read'],
+            },
             'my_activities': cls.my_activities(company_id=company_id, user_id=user_id).count(),
             'my_tasks': cls.my_tasks(company_id=company_id, user_id=user_id).count(),
         }
 
     @classmethod
-    def company_feed(cls, company_id):
-        return Activity.objects.filter(company_id=company_id) \
+    def company_feed(cls, company_id, user_id):
+        feed = Activity.objects.filter(company_id=company_id) \
                                .order_by('-date_edited')
+        return {
+            'feed': feed,
+            'not_read': [act.id for act in feed if not act.has_read(user_id=user_id)],
+        }
 
     @classmethod
     def my_feed(cls, company_id, user_id):
@@ -1784,8 +1796,13 @@ class Activity(SubscriptionObject):
                                      .values_list('id', flat=True)
         sales_cycle_ids = SalesCycle.objects.filter(contact_id__in=contact_ids)
 
-        return Activity.objects.filter(company_id=company_id, sales_cycle_id__in=sales_cycle_ids) \
+        feed = Activity.objects.filter(company_id=company_id, sales_cycle_id__in=sales_cycle_ids) \
                                .order_by('-date_edited')
+
+        return {
+            'feed': feed,
+            'not_read': [act.id for act in feed if not act.has_read(user_id=user_id)],
+        }
 
     @classmethod
     def my_activities(cls, company_id, user_id):
