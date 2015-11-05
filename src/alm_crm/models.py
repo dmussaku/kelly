@@ -1785,7 +1785,10 @@ class Activity(SubscriptionObject):
                                .order_by('-date_edited')
         return {
             'feed': feed,
-            'not_read': [act.id for act in feed if not act.has_read(user_id=user_id)],
+            'not_read': ActivityRecipient.objects.filter(activity_id__in=feed.values_list('id', flat=True),  \
+                                                         user_id=user_id, \
+                                                         has_read=False) \
+                                                 .count(),
         }
 
     @classmethod
@@ -1801,7 +1804,10 @@ class Activity(SubscriptionObject):
 
         return {
             'feed': feed,
-            'not_read': [act.id for act in feed if not act.has_read(user_id=user_id)],
+            'not_read': ActivityRecipient.objects.filter(activity_id__in=feed.values_list('id', flat=True),  \
+                                                         user_id=user_id, \
+                                                         has_read=False) \
+                                                 .count(),
         }
 
     @classmethod

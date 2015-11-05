@@ -4,7 +4,15 @@ from rest_framework import viewsets
 
 from alm_crm.utils.helpers import get_dashboard, get_active_deals, get_active_contacts
 from alm_crm.serializers import MilestoneSerializer
-from alm_crm.models import Contact, SalesCycleLogEntry, HashTag, SalesCycle, SalesCycleLogEntry, Share, Activity
+from alm_crm.models import (
+    Contact, 
+    SalesCycle,
+    SalesCycleLogEntry, 
+    HashTag, 
+    Share,
+    Activity,
+    ActivityRecipient,
+)
 from alm_vcard.models import Category, Email, Adr, Tel, Url
 
 class AppStateView(viewsets.ViewSet):
@@ -87,7 +95,9 @@ class AppStateView(viewsets.ViewSet):
         return Share.objects.filter(company_id=self.request.company.id, share_to=self.request.user, is_read=False).count()
 
     def get_new_activities(self):
-        return len([
-            act for act in Activity.objects.filter(company_id=self.request.company.id) if not act.has_read(self.request.user.id)
-        ])
+        feed = Activity.objects.filter(company_id=self.request.company.id)
+        return ActivityRecipient.objects.filter(activity_id__in=feed.values_list('id', flat=True),  \
+                                                 user_id=self.request.user.id, \
+                                                 has_read=False) \
+                                         .count()
 
