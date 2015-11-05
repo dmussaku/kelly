@@ -1819,6 +1819,18 @@ class Activity(SubscriptionObject):
         return Activity.objects.filter(Q(company_id=company_id, deadline__isnull=False) & \
                                       (Q(owner_id=user_id, assignee__isnull=True) | Q(assignee_id=user_id))) \
                                .order_by('-date_edited')
+
+    @classmethod
+    def get_calendar(cls, company_id, user_id, dt):
+        start = datetimeutils.get_start_of_month(dt)
+        end = datetimeutils.get_end_of_month(dt)
+
+        query = Q(company_id=company_id, owner_id=user_id)
+        sub_query = Q(deadline__isnull=False, date_finished__isnull=True, deadline__gte=start, deadline__lte=end) | \
+                    Q(deadline__isnull=False, date_finished__isnull=False, date_finished__gte=start, date_finished__lte=end) | \
+                    Q(deadline__isnull=True, date_created__gte=start, date_created__lte=end)
+
+        return Activity.objects.filter(query & sub_query)
     
     def new_comments_count(self, user_id):
         return len(

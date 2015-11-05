@@ -1,5 +1,7 @@
 import simplejson as json
 
+from django.utils import timezone
+
 from rest_framework import status
 from rest_framework.test import APITestCase
 
@@ -119,3 +121,19 @@ class ActivityAPITests(APITestMixin, APITestCase):
         content = json.loads(response.content)
         self.assertTrue(content.has_key('count'))
         self.assertTrue(content.has_key('statistics'))
+
+    def test_get_calendar(self):
+        """
+        Ensure we can get calendar
+        """
+        url, parsed = self.prepare_urls('v1:activity-calendar', subdomain=self.company.subdomain)
+        
+        response = self.client.post(url, {'dt': timezone.now()}, HTTP_HOST=parsed.netloc, format='json')
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+        self.authenticate_user()
+        response = self.client.post(url, {'dt': timezone.now()}, HTTP_HOST=parsed.netloc, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        content = json.loads(response.content)
+        self.assertTrue(content.has_key('calendar_data'))

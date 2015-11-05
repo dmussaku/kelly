@@ -1,3 +1,5 @@
+import dateutil
+
 from rest_framework.decorators import list_route
 from rest_framework.response import Response
 from rest_framework import viewsets
@@ -81,4 +83,15 @@ class ActivityViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
         return Response({
             'count': count,
             'statistics': statistics,
+        })
+
+    @list_route(methods=['post'], url_path='calendar')
+    def get_calendar(self, request, *args, **kwargs):
+        data = request.data
+        dt = dateutil.parser.parse(data['dt'])
+        calendar_data = Activity.get_calendar(company_id=request.company.id, user_id=request.user.id, dt=dt)
+        serializer = self.get_serializer(calendar_data, many=True)
+
+        return Response({
+            'calendar_data': serializer.data,
         })
