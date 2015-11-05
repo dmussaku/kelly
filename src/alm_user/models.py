@@ -1,6 +1,10 @@
 from django.db import models, transaction
 from django.contrib.auth.models import (
-    AbstractBaseUser, UserManager as contrib_user_manager)
+    AbstractBaseUser,
+    UserManager as contrib_user_manager
+    )
+from django.contrib.contenttypes import generic
+from django.contrib.contenttypes.models import ContentType
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
@@ -375,3 +379,85 @@ class AnonymousAccount(object):
 
     def is_authenticated(self):
         return False
+
+
+
+class PermissionConfiguration(models.Model):
+    CODES = (READ_CONTACTS, EDIT_CONTACTS, READ_ACTIVITY_FEED, COMMENT_ACTIVITY_FEED,
+             READ_PLANNED_ACTIVITY_FEED, MANAGE_PLANNED_ACTIVITY_FEED, READ_REPORTS) = (
+             'read_contacts', 'edit_contacts', 'read_activity_feed', 'comment_activity_feed',
+            'read_planned_activity_feed', 'manage_planned_activity_feed', 'read_reports')
+    CODES_OPTIONS = (
+        (READ_CONTACTS, _('View all contacts')),
+        (EDIT_CONTACTS, _('Edit all contacts')),
+        (READ_ACTIVITY_FEED, _('View activities of colleagues in the feed')),
+        (COMMENT_ACTIVITY_FEED, _('Comment activities of colleagues in the feed')),
+        (READ_PLANNED_ACTIVITY_FEED, _('View planned activities in the feed')),
+        (MANAGE_PLANNED_ACTIVITY_FEED, _('Set colleagues in planned activities')),
+        (READ_REPORTS, _('View reports')),
+    )
+    CODE_GROUPS = (
+        (_('Contacts permissions group'), (READ_CONTACTS, EDIT_CONTACTS)),
+        (_('Activities permissions group'), (READ_ACTIVITY_FEED, COMMENT_ACTIVITY_FEED)),
+        (_('Planned Activities permissions group'), (READ_PLANNED_ACTIVITY_FEED, MANAGE_PLANNED_ACTIVITY_FEED)),
+        (_('Other permissions group'), (READ_REPORTS)),
+    )
+
+    code = models.CharField(max_length=30, blank=False, unique=True,
+                            choices=CODES_OPTIONS, default=READ_CONTACTS)
+    description = models.CharField(max_length=100, blank=False,
+                                   default=CODES_OPTIONS[0][1])
+    bitnumber = models.PositiveIntegerField(default=0, unique=True)
+
+    date_created = models.DateTimeField(auto_now_add=True, blank=True)
+    date_edited = models.DateTimeField(auto_now=True, blank=True)
+
+    class Meta:
+        verbose_name = _('permission_configuration')
+        db_table = settings.DB_PREFIX.format('permission_configuration')
+
+    def __unicode__(self):
+        return '%s - %s' % (self.code.upper(), self.bitnumber)
+
+
+class PermissionEntity(models.Model):
+    bitmask = models.PositiveIntegerField(default=0)
+
+    group = models.OneToOneField(
+        'alm_crm.UsersGroup', on_delete=models.SET_NULL,
+        related_name='permission_entity', null=True)
+    account = models.OneToOneField(
+        'Account', on_delete=models.SET_NULL,
+        related_name='permission_entity', null=True)
+
+    class Meta:
+        verbose_name = _('permission_entity')
+        db_table = settings.DB_PREFIX.format('permission_entity')
+
+    def __unicode__(self):
+        return u'{:08b}'.format(self.bitmask) + (' %s [%s]' % (self.content_object, self.content_object.__class__.__name__))
+
+    @property
+    def content_object(self):
+        return self.account if self.account is not None else self.group
+
+    def has_perm(self, permission_code):
+        if hasattr(self.account, 'is_supervisor') and self.account.is_supervisor:
+            return True
+
+        try:
+            pc = PermissionConfiguration.objects.get(code=permission_code)
+            bitnumber = pc.bitnumber
+        except PermissionConfiguration.DoesNotExist:
+            return False
+        return ((1 << bitnumber) & self.bitmask) > 0
+
+    def add_perm(self, permission_code):
+        pc = PermissionConfiguration.objects.get(code=permission_code)
+        bitnumber = pc.bitnumber
+        self.bitmask = (1 << bitnumber) | self.bitmask
+
+    def del_perm(self, permission_code):
+        pc = PermissionConfiguration.objects.get(code=permission_code)
+        bitnumber = pc.bitnumber
+        self.bitmask = (1 << bitnumber) ^ self.bitmask

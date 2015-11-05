@@ -25,7 +25,7 @@ from .models import (
     ErrorCell,
     UsersGroup,
     )
-from alm_user.models import User
+from alm_user.models import User, PermissionConfiguration
 from alm_user.api import UserResource
 from alm_vcard.api import (
     VCardResource,
@@ -3447,6 +3447,7 @@ class AppStateObject(object):
         self.constants = self.get_constants()
         self.categories = self.get_categories()
         self.hashtags = self.get_hashtags()
+        self.permission_groups = self.get_permission_groups()
 
     def get_categories(self):
         return [x.data for x in Category.objects.filter(vcard__contact__company_id=self.company.id)]
@@ -3477,6 +3478,19 @@ class AppStateObject(object):
             }
         }
 
+    def get_permission_groups(self):
+        def _dehydradePermissionConfiguration(perm_conf):
+            return (perm_conf.description, perm_conf.code, perm_conf.bitnumber)
+
+        def _dehydradeGroup(group):
+            group_desc = group[0]
+            group_codes = group[1]
+            permission_confs = PermissionConfiguration.objects.filter(code__in=group_codes)
+            return (group_desc, map(_dehydradePermissionConfiguration, permission_confs))
+
+        return map(_dehydradeGroup, PermissionConfiguration.CODE_GROUPS)
+
+
     def to_dict(self):
         return self._data
 
@@ -3495,6 +3509,7 @@ class AppStateResource(Resource):
     categories = fields.ListField(attribute='categories', readonly=True)
     constants = fields.DictField(attribute='constants', readonly=True)
     hashtags = fields.ListField(attribute='hashtags', readonly=True)
+    permission_groups = fields.ListField(attribute='permission_groups', readonly=True)
 
     class Meta:
         resource_name = 'app_state'

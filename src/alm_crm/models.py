@@ -2388,7 +2388,6 @@ class UsersGroup(SubscriptionObject):
     title = models.CharField(max_length=100)
     users = models.ManyToManyField(User, related_name='groups', null=True, blank=True)
     owner = models.ForeignKey(User, related_name='owned_groups', null=True)
-    #TODO: add permisions
 
     class Meta:
         verbose_name = 'users_group'

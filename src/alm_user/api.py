@@ -23,14 +23,13 @@ from django.db.models import Q
 from .models import User
 from alm_vcard.models import *
 from alm_crm.models import SalesCycle, SalesCycleLogEntry, Contact, Category
-from alm_user.models import Account, User
+from alm_user.models import Account, User, PermissionConfiguration, PermissionEntity
 from alm_company.models import Company
 from tastypie.authentication import (
     MultiAuthentication,
     SessionAuthentication,
     BasicAuthentication,
     )
-
 from almanet.settings import DEFAULT_SERVICE, TIME_ZONE
 from almanet.utils.api import RequestContext, CommonMeta, CustomToManyField
 from almanet.utils.env import get_subscr_id
