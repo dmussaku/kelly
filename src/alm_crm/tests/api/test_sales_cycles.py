@@ -7,7 +7,7 @@ from alm_crm.factories import ContactFactory, SalesCycleFactory
 
 from . import APITestMixin
 
-class MilestoneAPITests(APITestMixin, APITestCase):
+class SalesCycleAPITests(APITestMixin, APITestCase):
     def setUp(self):
         self.set_user()
         self.sales_cycles_count = 5
@@ -33,6 +33,31 @@ class MilestoneAPITests(APITestMixin, APITestCase):
         
         content = json.loads(response.content)
         self.assertEqual(content['count'], self.sales_cycles_count)
+
+    def get_statistics(self):
+        """
+        Ensure we can get statistics for sales_cycles
+        """
+        url, parsed = self.prepare_urls('v1:sales_cycle-statistics', subdomain=self.company.subdomain)
+        
+        response = self.client.get(url, HTTP_HOST=parsed.netloc)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+        self.authenticate_user()
+        response = self.client.get(url, HTTP_HOST=parsed.netloc)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        
+        content = json.loads(response.content)
+        self.assertTrue(content.has_key('all_sales_cycles'))
+        self.assertTrue(content.has_key('new_sales_cycles'))
+        self.assertTrue(content.has_key('successful_sales_cycles'))
+        self.assertTrue(content.has_key('failed_sales_cycles'))
+        self.assertTrue(content.has_key('open_sales_cycles'))
+        self.assertTrue(content.has_key('my_sales_cycles'))
+        self.assertTrue(content.has_key('my_new_sales_cycles'))
+        self.assertTrue(content.has_key('my_successful_sales_cycles'))
+        self.assertTrue(content.has_key('my_failed_sales_cycles'))
+        self.assertTrue(content.has_key('my_open_sales_cycles'))
 
     def test_get_all_sales_cycles(self):
         """

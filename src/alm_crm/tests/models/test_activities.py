@@ -102,3 +102,74 @@ class ActivityTests(TestMixin, TestCase):
 
         self.assertEqual(sales_cycle.status, SalesCycle.NEW)
         self.assertEqual(sales_cycle2.status, SalesCycle.PENDING)
+
+    def test_company_feed(self):
+        contact = ContactFactory(company_id=self.company.id)
+        sales_cycle = SalesCycleFactory(contact=contact, company_id=self.company.id)
+
+        for i in range(5):
+            ActivityFactory(sales_cycle=sales_cycle, owner=self.user, company_id=self.company.id)
+        
+        feed = Activity.company_feed(company_id=self.company.id)
+        self.assertEqual(feed.count(), 5)
+
+    def test_my_activities(self):
+        account2 = AccountFactory(company=self.company)
+        contact = ContactFactory(company_id=self.company.id)
+        sales_cycle = SalesCycleFactory(contact=contact, company_id=self.company.id)
+
+        for i in range(5):
+            ActivityFactory(sales_cycle=sales_cycle, owner=self.user, company_id=self.company.id)
+
+        for i in range(3):
+            ActivityFactory(sales_cycle=sales_cycle, owner=account2.user, company_id=self.company.id)
+        
+        feed = Activity.my_activities(company_id=self.company.id, user_id=self.user.id)
+        self.assertEqual(feed.count(), 5)
+
+        feed = Activity.my_activities(company_id=self.company.id, user_id=account2.user.id)
+        self.assertEqual(feed.count(), 3)
+
+    def test_my_tasks(self):
+        account2 = AccountFactory(company=self.company)
+        contact = ContactFactory(company_id=self.company.id)
+        sales_cycle = SalesCycleFactory(contact=contact, company_id=self.company.id)
+
+        for i in range(5):
+            ActivityFactory(sales_cycle=sales_cycle, owner=self.user, company_id=self.company.id, deadline=timezone.now())
+
+        for i in range(2):
+            ActivityFactory(sales_cycle=sales_cycle, owner=self.user, company_id=self.company.id, deadline=timezone.now(), assignee=account2.user)
+
+        for i in range(3):
+            ActivityFactory(sales_cycle=sales_cycle, owner=account2.user, company_id=self.company.id)
+        
+        feed = Activity.my_tasks(company_id=self.company.id, user_id=self.user.id)
+        self.assertEqual(feed.count(), 5)
+
+        feed = Activity.my_tasks(company_id=self.company.id, user_id=account2.user.id)
+        self.assertEqual(feed.count(), 2)
+
+    def test_my_feed(self):
+        contact = ContactFactory(company_id=self.company.id)
+        contact2 = ContactFactory(company_id=self.company.id)
+        sales_cycle = SalesCycleFactory(contact=contact, company_id=self.company.id)
+        sales_cycle2 = SalesCycleFactory(contact=contact, company_id=self.company.id)
+        sales_cycle3 = SalesCycleFactory(contact=contact2, company_id=self.company.id)
+
+        for i in range(5):
+            ActivityFactory(sales_cycle=sales_cycle, owner=self.user, company_id=self.company.id)
+
+        for i in range(2):
+            ActivityFactory(sales_cycle=sales_cycle2, owner=self.user, company_id=self.company.id)
+
+        for i in range(3):
+            ActivityFactory(sales_cycle=sales_cycle3, owner=self.user, company_id=self.company.id)
+        
+        feed = Activity.my_feed(company_id=self.company.id, user_id=self.user.id)
+        self.assertEqual(feed.count(), 10)
+
+        account = self.user.accounts.get(company_id=self.company.id)
+        account.unfollow_list.add(contact)
+        feed = Activity.my_feed(company_id=self.company.id, user_id=self.user.id)
+        self.assertEqual(feed.count(), 3)

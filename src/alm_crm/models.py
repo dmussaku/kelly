@@ -1734,6 +1734,69 @@ class Activity(SubscriptionObject):
                 'all': get_by_period(total),
                 'my': get_by_period(my_total),
             }
+
+    @classmethod
+    def get_by_ids(cls, *ids):
+        """Get sales cycles by ids from cache with fallback to postgres."""
+        rv = cache.get_many([build_key(cls._meta.model_name, aid) for aid in ids])
+        rv = {extract_id(k, coerce=int): json.loads(v) for k, v in rv.iteritems()}
+
+        not_found_ids = [aid for aid in ids if not aid in rv]
+        if not not_found_ids:
+            return rv.values()
+        activities = cls.objects.filter(pk__in=not_found_ids)
+        more_rv = list(a.serialize() for a in activities)
+        cache.set_many({build_key(cls._meta.model_name, activity_raw['id']): json.dumps(activity_raw, default=date_handler)
+                        for activity_raw in more_rv})
+        return rv.values() + more_rv
+
+    @classmethod
+    def after_save(cls, sender, instance, **kwargs):
+        # установить статус цикла был новый, то пометить как открытый
+        sales_cycle = instance.sales_cycle
+        if sales_cycle.status == SalesCycle.NEW:
+            sales_cycle.possibly_make_pending()
+    
+    @classmethod
+    def after_delete(cls, sender, instance, **kwargs):
+        # при удалении активити, если больше нет активити и нет этапа, то пометить как новый
+        instance.sales_cycle.possibly_make_new()
+
+    @classmethod
+    def get_statistics(cls, company_id, user_id):
+        return {
+            'company_feed': cls.company_feed(company_id=company_id).count(),
+            'my_feed': cls.my_feed(company_id=company_id, user_id=user_id).count(),
+            'my_activities': cls.my_activities(company_id=company_id, user_id=user_id).count(),
+            'my_tasks': cls.my_tasks(company_id=company_id, user_id=user_id).count(),
+        }
+
+    @classmethod
+    def company_feed(cls, company_id):
+        return Activity.objects.filter(company_id=company_id) \
+                               .order_by('-date_edited')
+
+    @classmethod
+    def my_feed(cls, company_id, user_id):
+        user = User.objects.get(id=user_id)
+        account = user.accounts.get(company_id=company_id)
+        contact_ids = Contact.objects.exclude(id__in=account.unfollow_list.all().values_list('id', flat=True)) \
+                                     .values_list('id', flat=True)
+        sales_cycle_ids = SalesCycle.objects.filter(contact_id__in=contact_ids)
+
+        return Activity.objects.filter(company_id=company_id, sales_cycle_id__in=sales_cycle_ids) \
+                               .order_by('-date_edited')
+
+    @classmethod
+    def my_activities(cls, company_id, user_id):
+        return Activity.objects.filter(company_id=company_id, owner_id=user_id) \
+                               .order_by('-date_edited')
+
+    @classmethod
+    def my_tasks(cls, company_id, user_id):
+        return Activity.objects.filter(Q(company_id=company_id, deadline__isnull=False) & \
+                                      (Q(owner_id=user_id, assignee__isnull=True) | Q(assignee_id=user_id))) \
+                               .order_by('-date_edited')
     
     def new_comments_count(self, user_id):
         return len(
@@ -1771,33 +1834,6 @@ class Activity(SubscriptionObject):
             'new_sales_cycle': new_sales_cycle,
             'activity': self.sales_cycle
         }
-
-    @classmethod
-    def get_by_ids(cls, *ids):
-        """Get sales cycles by ids from cache with fallback to postgres."""
-        rv = cache.get_many([build_key(cls._meta.model_name, aid) for aid in ids])
-        rv = {extract_id(k, coerce=int): json.loads(v) for k, v in rv.iteritems()}
-
-        not_found_ids = [aid for aid in ids if not aid in rv]
-        if not not_found_ids:
-            return rv.values()
-        activities = cls.objects.filter(pk__in=not_found_ids)
-        more_rv = list(a.serialize() for a in activities)
-        cache.set_many({build_key(cls._meta.model_name, activity_raw['id']): json.dumps(activity_raw, default=date_handler)
-                        for activity_raw in more_rv})
-        return rv.values() + more_rv
-
-    @classmethod
-    def after_save(cls, sender, instance, **kwargs):
-        # установить статус цикла был новый, то пометить как открытый
-        sales_cycle = instance.sales_cycle
-        if sales_cycle.status == SalesCycle.NEW:
-            sales_cycle.possibly_make_pending()
-    
-    @classmethod
-    def after_delete(cls, sender, instance, **kwargs):
-        # при удалении активити, если больше нет активити и нет этапа, то пометить как новый
-        instance.sales_cycle.possibly_make_new()
 
 post_save.connect(Activity.after_save, sender=Activity)
 post_delete.connect(Activity.after_delete, sender=Activity)
