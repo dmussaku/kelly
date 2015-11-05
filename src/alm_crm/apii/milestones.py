@@ -24,7 +24,8 @@ class MilestoneViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
         milestones = Milestone.objects.filter(company_id=request.company.id)
         new_milestone_set = []
         sales_cycles = []
-        max_sort_value = (sorted(map(lambda m: m.get('sort',0), data))[-1:] or [0])[0]
+        max_sort_value = (
+            sorted(map(lambda m: m.get('sort',0), data))[-1:] or [0])[0]
         for milestone_data in data:
             try:
                 milestone = milestones.get(id=milestone_data.get('id', -1))
@@ -36,6 +37,7 @@ class MilestoneViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
                    milestone.sort != milestone_data['sort']:
 
                     for sales_cycle in milestone.sales_cycles.all():
+                        # Change status of milestone, change_milestone
                         sales_cycle.milestone = None
                         sales_cycle.save()
                         sales_cycles.append(sales_cycle)
