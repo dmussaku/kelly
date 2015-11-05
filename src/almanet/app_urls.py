@@ -8,12 +8,13 @@ from alm_user.api import UserResource, SessionResource
 from alm_user.views import logout_view
 
 from alm_crm.apii import (
+    activities,
     app_state,
     contacts,
-    activities,
+    custom_fields,
     milestones,
-    products,
     product_groups,
+    products,
     sales_cycles,
 )
 
@@ -85,6 +86,7 @@ v1_api.register(AttachedFileResource())
 router = DefaultRouter()
 router.register(r'milestone', milestones.MilestoneViewSet, 'milestone')
 router.register(r'contact', contacts.ContactViewSet, 'contact')
+router.register(r'custom_field', custom_fields.CustomFieldViewSet, 'custom_field')
 router.register(r'activity', activities.ActivityViewSet, 'activity')
 router.register(r'app_state', app_state.AppStateView, 'app_state')
 router.register(r'product', products.ProductViewSet, 'product')
