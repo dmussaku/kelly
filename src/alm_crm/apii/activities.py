@@ -71,3 +71,10 @@ class ActivityViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
 
         serializer = self.get_serializer(activities, many=True)
         return Response(serializer.data)
+
+    @list_route(methods=['post'], url_path='mark_as_read')
+    def mark_as_read(self, request, *args, **kwargs):
+        data = request.data
+        count = Activity.mark_as_read(user_id=request.user.id, act_ids=data)
+
+        return Response({'count': count})

@@ -1649,16 +1649,9 @@ class Activity(SubscriptionObject):
         return self.comments.count()
 
     @classmethod
-    def mark_as_read(cls, user_id, act_id):
-        try:
-            act = ActivityRecipient.objects.get(
-                user__id=user_id, activity__id=act_id)
-        except ActivityRecipient.DoesNotExist:
-            pass
-        else:
-            act.has_read = True
-            act.save()
-        return True
+    def mark_as_read(cls, user_id, act_ids):
+        return ActivityRecipient.objects.filter(
+                user__id=user_id, activity__id__in=act_ids, has_read=False).update(has_read=True)
 
     @classmethod
     def get_filter_for_mobile(cls):

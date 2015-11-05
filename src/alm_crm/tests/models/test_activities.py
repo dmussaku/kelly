@@ -119,7 +119,7 @@ class ActivityTests(TestMixin, TestCase):
         
         company_feed = Activity.company_feed(company_id=self.company.id, user_id=self.user.id)
         self.assertEqual(company_feed['feed'].count(), 8)
-        self.assertEqual(len(company_feed['not_read']), 3)
+        self.assertEqual(company_feed['not_read'], 3)
 
     def test_my_activities(self):
         account2 = AccountFactory(company=self.company)
@@ -185,9 +185,36 @@ class ActivityTests(TestMixin, TestCase):
         
         my_feed = Activity.my_feed(company_id=self.company.id, user_id=self.user.id)
         self.assertEqual(my_feed['feed'].count(), 14)
-        self.assertEqual(len(my_feed['not_read']), 4)
+        self.assertEqual(my_feed['not_read'], 4)
 
         account.unfollow_list.add(contact)
         my_feed = Activity.my_feed(company_id=self.company.id, user_id=self.user.id)
         self.assertEqual(my_feed['feed'].count(), 7)
-        self.assertEqual(len(my_feed['not_read']), 4)
+        self.assertEqual(my_feed['not_read'], 4)
+
+    def test_mark_as_read(self):
+        account = self.user.accounts.get(company_id=self.company.id)
+        account2 = AccountFactory(company=self.company)
+        contact = ContactFactory(company_id=self.company.id)
+        sales_cycle = SalesCycleFactory(contact=contact, company_id=self.company.id)
+
+        not_read_acts = []
+        for i in range(5):
+            a = ActivityFactory(sales_cycle=sales_cycle, owner=self.user, company_id=self.company.id)
+            a.spray(self.company.id, account)
+
+        for i in range(4):
+            a = ActivityFactory(sales_cycle=sales_cycle, owner=account2.user, company_id=self.company.id)
+            a.spray(self.company.id, account2)
+            not_read_acts.append(a.id)
+        
+        my_feed = Activity.my_feed(company_id=self.company.id, user_id=self.user.id)
+        self.assertEqual(my_feed['feed'].count(), 9)
+        self.assertEqual(my_feed['not_read'], 4)
+
+        read = Activity.mark_as_read(user_id=self.user.id, act_ids=not_read_acts)
+        self.assertEqual(read, 4)
+
+        my_feed = Activity.my_feed(company_id=self.company.id, user_id=self.user.id)
+        self.assertEqual(my_feed['feed'].count(), 9)
+        self.assertEqual(my_feed['not_read'], 0)
