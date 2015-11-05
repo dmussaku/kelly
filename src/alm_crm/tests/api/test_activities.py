@@ -109,11 +109,11 @@ class ActivityAPITests(APITestMixin, APITestCase):
         """
         url, parsed = self.prepare_urls('v1:activity-mark-as-read', subdomain=self.company.subdomain)
         
-        response = self.client.post(url, [], HTTP_HOST=parsed.netloc)
+        response = self.client.post(url, [], HTTP_HOST=parsed.netloc, format='json')
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
         self.authenticate_user()
-        response = self.client.post(url, [], HTTP_HOST=parsed.netloc)
+        response = self.client.post(url, [], HTTP_HOST=parsed.netloc, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         content = json.loads(response.content)
