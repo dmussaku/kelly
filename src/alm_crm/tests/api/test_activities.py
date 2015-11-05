@@ -102,3 +102,19 @@ class ActivityAPITests(APITestMixin, APITestCase):
         self.assertTrue(content.has_key('next'))
         self.assertTrue(content.has_key('previous'))
         self.assertTrue(content.has_key('results'))
+
+    def test_mark_as_read(self):
+        """
+        Ensure we can mark as read
+        """
+        url, parsed = self.prepare_urls('v1:activity-mark-as-read', subdomain=self.company.subdomain)
+        
+        response = self.client.post(url, [], HTTP_HOST=parsed.netloc)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+        self.authenticate_user()
+        response = self.client.post(url, [], HTTP_HOST=parsed.netloc)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        content = json.loads(response.content)
+        self.assertTrue(content.has_key('count'))
