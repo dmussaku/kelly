@@ -83,6 +83,7 @@ class SalesCycleSerializer(RequestContextMixin, serializers.ModelSerializer):
 class ActivitySerializer(RequestContextMixin, serializers.ModelSerializer):
     comments_count = serializers.IntegerField()
     new_comments_count = serializers.SerializerMethodField()
+    has_read = serializers.SerializerMethodField()
 
     class Meta:
         model = Activity
@@ -96,6 +97,9 @@ class ActivitySerializer(RequestContextMixin, serializers.ModelSerializer):
 
     def get_new_comments_count(self, obj):
         return obj.new_comments_count(self.request.user.id)
+
+    def get_has_read(self, obj):
+        return obj.has_read(user_id=self.request.user.id)
 
 
 class ProductSerializer(RequestContextMixin, serializers.ModelSerializer):

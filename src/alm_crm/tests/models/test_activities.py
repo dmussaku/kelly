@@ -104,14 +104,22 @@ class ActivityTests(TestMixin, TestCase):
         self.assertEqual(sales_cycle2.status, SalesCycle.PENDING)
 
     def test_company_feed(self):
+        account = self.user.accounts.get(company_id=self.company.id)
+        account2 = AccountFactory(company=self.company)
         contact = ContactFactory(company_id=self.company.id)
         sales_cycle = SalesCycleFactory(contact=contact, company_id=self.company.id)
 
         for i in range(5):
-            ActivityFactory(sales_cycle=sales_cycle, owner=self.user, company_id=self.company.id)
+            a = ActivityFactory(sales_cycle=sales_cycle, owner=self.user, company_id=self.company.id)
+            a.spray(self.company.id, account)
+
+        for i in range(3):
+            a = ActivityFactory(sales_cycle=sales_cycle, owner=account2.user, company_id=self.company.id)
+            a.spray(self.company.id, account2)
         
-        feed = Activity.company_feed(company_id=self.company.id)
-        self.assertEqual(feed.count(), 5)
+        company_feed = Activity.company_feed(company_id=self.company.id, user_id=self.user.id)
+        self.assertEqual(company_feed['feed'].count(), 8)
+        self.assertEqual(len(company_feed['not_read']), 3)
 
     def test_my_activities(self):
         account2 = AccountFactory(company=self.company)
@@ -151,6 +159,8 @@ class ActivityTests(TestMixin, TestCase):
         self.assertEqual(feed.count(), 2)
 
     def test_my_feed(self):
+        account = self.user.accounts.get(company_id=self.company.id)
+        account2 = AccountFactory(company=self.company)
         contact = ContactFactory(company_id=self.company.id)
         contact2 = ContactFactory(company_id=self.company.id)
         sales_cycle = SalesCycleFactory(contact=contact, company_id=self.company.id)
@@ -158,18 +168,26 @@ class ActivityTests(TestMixin, TestCase):
         sales_cycle3 = SalesCycleFactory(contact=contact2, company_id=self.company.id)
 
         for i in range(5):
-            ActivityFactory(sales_cycle=sales_cycle, owner=self.user, company_id=self.company.id)
+            a = ActivityFactory(sales_cycle=sales_cycle, owner=self.user, company_id=self.company.id)
+            a.spray(self.company.id, account)
 
         for i in range(2):
-            ActivityFactory(sales_cycle=sales_cycle2, owner=self.user, company_id=self.company.id)
+            a = ActivityFactory(sales_cycle=sales_cycle2, owner=self.user, company_id=self.company.id)
+            a.spray(self.company.id, account)
 
         for i in range(3):
-            ActivityFactory(sales_cycle=sales_cycle3, owner=self.user, company_id=self.company.id)
-        
-        feed = Activity.my_feed(company_id=self.company.id, user_id=self.user.id)
-        self.assertEqual(feed.count(), 10)
+            a = ActivityFactory(sales_cycle=sales_cycle3, owner=self.user, company_id=self.company.id)
+            a.spray(self.company.id, account)
 
-        account = self.user.accounts.get(company_id=self.company.id)
+        for i in range(4):
+            a = ActivityFactory(sales_cycle=sales_cycle3, owner=account2.user, company_id=self.company.id)
+            a.spray(self.company.id, account2)
+        
+        my_feed = Activity.my_feed(company_id=self.company.id, user_id=self.user.id)
+        self.assertEqual(my_feed['feed'].count(), 14)
+        self.assertEqual(len(my_feed['not_read']), 4)
+
         account.unfollow_list.add(contact)
-        feed = Activity.my_feed(company_id=self.company.id, user_id=self.user.id)
-        self.assertEqual(feed.count(), 3)
+        my_feed = Activity.my_feed(company_id=self.company.id, user_id=self.user.id)
+        self.assertEqual(my_feed['feed'].count(), 7)
+        self.assertEqual(len(my_feed['not_read']), 4)
