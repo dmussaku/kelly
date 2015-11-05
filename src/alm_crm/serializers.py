@@ -11,6 +11,7 @@ from .models import (
     Product, 
     ProductGroup,
     CustomField,
+    SalesCycleLogEntry,
     )
 
 class RequestContextMixin(object):
@@ -43,7 +44,16 @@ class ContactSerializer(RequestContextMixin, serializers.ModelSerializer):
         super(ContactSerializer, self).__init__(*args, **kwargs)
 
 
+class SalesCycleLogEntrySerializer(RequestContextMixin, serializers.ModelSerializer):
+    class Meta:
+        model = SalesCycleLogEntry
+
+
 class SalesCycleSerializer(RequestContextMixin, serializers.ModelSerializer):
+    log = SalesCycleLogEntrySerializer(many=True)
+    activity_count = serializers.SerializerMethodField()
+    tasks_count = serializers.SerializerMethodField()
+
     class Meta:
         model = SalesCycle
 
@@ -51,8 +61,23 @@ class SalesCycleSerializer(RequestContextMixin, serializers.ModelSerializer):
         # pass contact=True param to get fully hydrated contact
         if kwargs.pop('contact', False):
             self.fields['contact'] = ContactSerializer()
+
+        if kwargs.pop('latest_activity', False):
+            self.fields['latest_activity'] = serializers.SerializerMethodField()
             
         super(SalesCycleSerializer, self).__init__(*args, **kwargs)
+
+    def get_activity_count(self, obj):
+        return obj.rel_activities.filter(deadline__isnull=True).count()
+
+    def get_tasks_count(self, obj):
+        return obj.rel_activities.filter(deadline__isnull=False).count()
+
+    def get_latest_activity(self, obj):
+        activity = obj.rel_activities.order_by('-date_created').first()
+        if activity:
+            return ActivitySerializer(activity, context={'request': self.request}).data
+        return None
 
 
 class ActivitySerializer(RequestContextMixin, serializers.ModelSerializer):

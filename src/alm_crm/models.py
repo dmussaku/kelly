@@ -1177,27 +1177,102 @@ class SalesCycle(SubscriptionObject):
                                       is_global=True)
 
     @classmethod
-    def get_panel_info(cls, company_id, user_id):
+    def get_statistics(cls, company_id, user_id):
+        return {
+            'all_sales_cycles': SalesCycle.get_all(company_id=company_id).count(),
+            'new_sales_cycles': SalesCycle.get_new_all(company_id=company_id).count(),
+            'successful_sales_cycles': SalesCycle.get_successful_all(company_id=company_id).count(),
+            'failed_sales_cycles': SalesCycle.get_failed_all(company_id=company_id).count(),
+            'open_sales_cycles': SalesCycle.get_pending_all(company_id=company_id).count(),
+            'my_sales_cycles': SalesCycle.get_my(company_id=company_id, user_id=user_id).count(),
+            'my_new_sales_cycles': SalesCycle.get_new_my(company_id=company_id, user_id=user_id).count(),
+            'my_successful_sales_cycles': SalesCycle.get_successful_my(company_id=company_id, user_id=user_id).count(),
+            'my_failed_sales_cycles': SalesCycle.get_failed_my(company_id=company_id, user_id=user_id).count(),
+            'my_open_sales_cycles': SalesCycle.get_pending_my(company_id=company_id, user_id=user_id).count(),
+        }
+
+    @classmethod
+    def get_all(cls, company_id):
         sales_cycle_q = Q(company_id=company_id, is_global=False)
+        total = SalesCycle.objects.filter(sales_cycle_q)
+
+        return total
+
+    @classmethod
+    def get_new_all(cls, company_id):
+        sales_cycle_q = Q(company_id=company_id, is_global=False)
+        total = SalesCycle.objects.filter(sales_cycle_q)
+
+        return total.filter(status=SalesCycle.NEW)
+
+    @classmethod
+    def get_pending_all(cls, company_id):
+        sales_cycle_q = Q(company_id=company_id, is_global=False)
+        total = SalesCycle.objects.filter(sales_cycle_q)
+
+        return total.filter(status=SalesCycle.PENDING)
+
+    @classmethod
+    def get_successful_all(cls, company_id):
+        sales_cycle_q = Q(company_id=company_id, is_global=False)
+        total = SalesCycle.objects.filter(sales_cycle_q)
+
+        return total.filter(status=SalesCycle.SUCCESSFUL)
+
+    @classmethod
+    def get_failed_all(cls, company_id):
+        sales_cycle_q = Q(company_id=company_id, is_global=False)
+        total = SalesCycle.objects.filter(sales_cycle_q)
+
+        return total.filter(status=SalesCycle.FAILED)
+
+    @classmethod
+    def get_my(cls, company_id, user_id):
         owner_q = Q(owner_id=user_id)
 
+        return SalesCycle.get_all(company_id=company_id).filter(owner_q)
+
+    @classmethod
+    def get_new_my(cls, company_id, user_id):
+        owner_q = Q(owner_id=user_id)
+
+        return SalesCycle.get_new_all(company_id=company_id).filter(owner_q)
+
+    @classmethod
+    def get_pending_my(cls, company_id, user_id):
+        owner_q = Q(owner_id=user_id)
+
+        return SalesCycle.get_pending_all(company_id=company_id).filter(owner_q)
+
+    @classmethod
+    def get_successful_my(cls, company_id, user_id):
+        owner_q = Q(owner_id=user_id)
+
+        return SalesCycle.get_successful_all(company_id=company_id).filter(owner_q)
+
+    @classmethod
+    def get_failed_my(cls, company_id, user_id):
+        owner_q = Q(owner_id=user_id)
+
+        return SalesCycle.get_failed_all(company_id=company_id).filter(owner_q)
+
+    @classmethod
+    def get_panel_info(cls, company_id, user_id):
         period_q = {
             'days_q': Q(date_edited__gte=datetimeutils.get_start_of_today(timezone.now()), date_edited__lte=datetimeutils.get_end_of_today(timezone.now())),
             'weeks_q': Q(date_edited__gte=datetimeutils.get_start_of_week(timezone.now()), date_edited__lte=datetimeutils.get_end_of_week(timezone.now())),
             'months_q': Q(date_edited__gte=datetimeutils.get_start_of_month(timezone.now()), date_edited__lte=datetimeutils.get_end_of_month(timezone.now())),
         }
 
-        total = SalesCycle.objects.filter(sales_cycle_q)
-
         periods = ['days', 'weeks', 'months']
 
-        new_sales_cycles = total.filter(status=SalesCycle.NEW)
-        successful_sales_cycles = total.filter(status=SalesCycle.SUCCESSFUL)
-        open_sales_cycles = total.filter(status=SalesCycle.PENDING)
-
-        my_new_sales_cycles = new_sales_cycles.filter(owner_q)
-        my_successful_sales_cycles = successful_sales_cycles.filter(owner_q)
-        my_open_sales_cycles = open_sales_cycles.filter(owner_q)
+        new_sales_cycles =  SalesCycle.get_new_all(company_id=company_id)
+        successful_sales_cycles =  SalesCycle.get_successful_all(company_id=company_id)
+        open_sales_cycles =  SalesCycle.get_pending_all(company_id=company_id)
+        
+        my_new_sales_cycles =  SalesCycle.get_new_my(company_id=company_id, user_id=user_id)
+        my_successful_sales_cycles =  SalesCycle.get_successful_my(company_id=company_id, user_id=user_id)
+        my_open_sales_cycles =  SalesCycle.get_pending_my(company_id=company_id, user_id=user_id)
 
         milestones = Milestone.objects.filter(company_id=company_id)
 
@@ -1243,11 +1318,11 @@ class SalesCycle(SubscriptionObject):
         return {
             'new_sales_cycles': {
                 'all': get_by_period(new_sales_cycles),
-                'my': get_by_period(new_sales_cycles.filter(owner_q)),
+                'my': get_by_period(my_new_sales_cycles),
             },
             'successful_sales_cycles': {
                 'all': get_by_period(successful_sales_cycles),
-                'my': get_by_period(successful_sales_cycles.filter(owner_q)),
+                'my': get_by_period(my_successful_sales_cycles),
             },
             'open_sales_cycles': {
                 'all': {
@@ -1292,13 +1367,13 @@ class SalesCycle(SubscriptionObject):
 
         activities = Activity.objects.filter(company_q)
 
-        days_act_sales_cycles = map(lambda x: x.sales_cycle_id, activities.filter(days_q))
-        weeks_act_sales_cycles = map(lambda x: x.sales_cycle_id, activities.filter(weeks_q))
-        months_act_sales_cycles = map(lambda x: x.sales_cycle_id, activities.filter(months_q))
+        days_act_sales_cycles = activities.filter(days_q).values_list('sales_cycle_id', flat=True)
+        weeks_act_sales_cycles = activities.filter(weeks_q).values_list('sales_cycle_id', flat=True)
+        months_act_sales_cycles = activities.filter(months_q).values_list('sales_cycle_id', flat=True)
 
-        my_days_act_sales_cycles = map(lambda x: x.sales_cycle_id, activities.filter(days_q & owner_q))
-        my_weeks_act_sales_cycles = map(lambda x: x.sales_cycle_id, activities.filter(weeks_q & owner_q))
-        my_months_act_sales_cycles = map(lambda x: x.sales_cycle_id, activities.filter(months_q & owner_q))
+        my_days_act_sales_cycles = activities.filter(days_q & owner_q).values_list('sales_cycle_id', flat=True)
+        my_weeks_act_sales_cycles = activities.filter(weeks_q & owner_q).values_list('sales_cycle_id', flat=True)
+        my_months_act_sales_cycles = activities.filter(months_q & owner_q).values_list('sales_cycle_id', flat=True)
 
         return {
             'all': {
@@ -1651,7 +1726,7 @@ class Activity(SubscriptionObject):
                 rv[period] = {
                     'total': period_total.count(),
                     'completed': period_total.filter(Q(date_finished__isnull=False)).count(),
-                    'overdue': period_total.filter(Q(date_finished__isnull=True, deadline__lt=datetime.combine(timezone.now(), time.min))).count(),
+                    'overdue': period_total.filter(Q(date_finished__isnull=True, deadline__lt=timezone.now().replace(hour=time.min.hour, minute=time.min.minute, second=time.min.second))).count(),
                 }
             return rv
 
@@ -1659,6 +1734,69 @@ class Activity(SubscriptionObject):
                 'all': get_by_period(total),
                 'my': get_by_period(my_total),
             }
+
+    @classmethod
+    def get_by_ids(cls, *ids):
+        """Get sales cycles by ids from cache with fallback to postgres."""
+        rv = cache.get_many([build_key(cls._meta.model_name, aid) for aid in ids])
+        rv = {extract_id(k, coerce=int): json.loads(v) for k, v in rv.iteritems()}
+
+        not_found_ids = [aid for aid in ids if not aid in rv]
+        if not not_found_ids:
+            return rv.values()
+        activities = cls.objects.filter(pk__in=not_found_ids)
+        more_rv = list(a.serialize() for a in activities)
+        cache.set_many({build_key(cls._meta.model_name, activity_raw['id']): json.dumps(activity_raw, default=date_handler)
+                        for activity_raw in more_rv})
+        return rv.values() + more_rv
+
+    @classmethod
+    def after_save(cls, sender, instance, **kwargs):
+        # установить статус цикла был новый, то пометить как открытый
+        sales_cycle = instance.sales_cycle
+        if sales_cycle.status == SalesCycle.NEW:
+            sales_cycle.possibly_make_pending()
+    
+    @classmethod
+    def after_delete(cls, sender, instance, **kwargs):
+        # при удалении активити, если больше нет активити и нет этапа, то пометить как новый
+        instance.sales_cycle.possibly_make_new()
+
+    @classmethod
+    def get_statistics(cls, company_id, user_id):
+        return {
+            'company_feed': cls.company_feed(company_id=company_id).count(),
+            'my_feed': cls.my_feed(company_id=company_id, user_id=user_id).count(),
+            'my_activities': cls.my_activities(company_id=company_id, user_id=user_id).count(),
+            'my_tasks': cls.my_tasks(company_id=company_id, user_id=user_id).count(),
+        }
+
+    @classmethod
+    def company_feed(cls, company_id):
+        return Activity.objects.filter(company_id=company_id) \
+                               .order_by('-date_edited')
+
+    @classmethod
+    def my_feed(cls, company_id, user_id):
+        user = User.objects.get(id=user_id)
+        account = user.accounts.get(company_id=company_id)
+        contact_ids = Contact.objects.exclude(id__in=account.unfollow_list.all().values_list('id', flat=True)) \
+                                     .values_list('id', flat=True)
+        sales_cycle_ids = SalesCycle.objects.filter(contact_id__in=contact_ids)
+
+        return Activity.objects.filter(company_id=company_id, sales_cycle_id__in=sales_cycle_ids) \
+                               .order_by('-date_edited')
+
+    @classmethod
+    def my_activities(cls, company_id, user_id):
+        return Activity.objects.filter(company_id=company_id, owner_id=user_id) \
+                               .order_by('-date_edited')
+
+    @classmethod
+    def my_tasks(cls, company_id, user_id):
+        return Activity.objects.filter(Q(company_id=company_id, deadline__isnull=False) & \
+                                      (Q(owner_id=user_id, assignee__isnull=True) | Q(assignee_id=user_id))) \
+                               .order_by('-date_edited')
     
     def new_comments_count(self, user_id):
         return len(
@@ -1696,33 +1834,6 @@ class Activity(SubscriptionObject):
             'new_sales_cycle': new_sales_cycle,
             'activity': self.sales_cycle
         }
-
-    @classmethod
-    def get_by_ids(cls, *ids):
-        """Get sales cycles by ids from cache with fallback to postgres."""
-        rv = cache.get_many([build_key(cls._meta.model_name, aid) for aid in ids])
-        rv = {extract_id(k, coerce=int): json.loads(v) for k, v in rv.iteritems()}
-
-        not_found_ids = [aid for aid in ids if not aid in rv]
-        if not not_found_ids:
-            return rv.values()
-        activities = cls.objects.filter(pk__in=not_found_ids)
-        more_rv = list(a.serialize() for a in activities)
-        cache.set_many({build_key(cls._meta.model_name, activity_raw['id']): json.dumps(activity_raw, default=date_handler)
-                        for activity_raw in more_rv})
-        return rv.values() + more_rv
-
-    @classmethod
-    def after_save(cls, sender, instance, **kwargs):
-        # установить статус цикла был новый, то пометить как открытый
-        sales_cycle = instance.sales_cycle
-        if sales_cycle.status == SalesCycle.NEW:
-            sales_cycle.possibly_make_pending()
-    
-    @classmethod
-    def after_delete(cls, sender, instance, **kwargs):
-        # при удалении активити, если больше нет активити и нет этапа, то пометить как новый
-        instance.sales_cycle.possibly_make_new()
 
 post_save.connect(Activity.after_save, sender=Activity)
 post_delete.connect(Activity.after_delete, sender=Activity)

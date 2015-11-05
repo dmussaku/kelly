@@ -1,4 +1,4 @@
-from rest_framework import viewsets
+from rest_framework import viewsets, permissions
 from rest_framework.decorators import list_route
 from rest_framework.response import Response
 from alm_crm.serializers import MilestoneSerializer, SalesCycleSerializer
@@ -10,6 +10,7 @@ class MilestoneViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
     
     serializer_class = MilestoneSerializer
     pagination_class = None
+    permission_classes = (permissions.IsAuthenticated,)
 
     def get_queryset(self):
         return Milestone.objects.filter(company_id=self.request.company.id)

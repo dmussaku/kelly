@@ -1,3 +1,5 @@
+from rest_framework.decorators import list_route
+from rest_framework.response import Response
 from rest_framework import viewsets
 
 from alm_crm.serializers import ActivitySerializer
@@ -16,3 +18,56 @@ class ActivityViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
 
     def get_queryset(self):
         return Activity.objects.filter(company_id=self.request.company.id).order_by('-date_created')
+
+    @list_route(methods=['get'], url_path='statistics')
+    def get_statistics(self, request, *args, **kwargs):
+        statistics = Activity.get_statistics(company_id=request.company.id, user_id=request.user.id)
+        return Response(statistics)
+
+    @list_route(methods=['get'], url_path='company_feed')
+    def company_feed(self, request, *args, **kwargs):    
+        activities = Activity.company_feed(company_id=request.company.id)
+
+        page = self.paginate_queryset(activities)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(activities, many=True)
+        return Response(serializer.data)
+
+    @list_route(methods=['get'], url_path='my_feed')
+    def my_feed(self, request, *args, **kwargs):    
+        activities = Activity.my_feed(company_id=request.company.id, user_id=request.user.id)
+
+        page = self.paginate_queryset(activities)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(activities, many=True)
+        return Response(serializer.data)
+
+    @list_route(methods=['get'], url_path='my_activities')
+    def my_activities(self, request, *args, **kwargs):    
+        activities = Activity.my_activities(company_id=request.company.id, user_id=request.user.id)
+
+        page = self.paginate_queryset(activities)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(activities, many=True)
+        return Response(serializer.data)
+
+    @list_route(methods=['get'], url_path='my_tasks')
+    def my_tasks(self, request, *args, **kwargs):    
+        activities = Activity.my_tasks(company_id=request.company.id, user_id=request.user.id)
+
+        page = self.paginate_queryset(activities)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(activities, many=True)
+        return Response(serializer.data)

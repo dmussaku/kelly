@@ -20,6 +20,7 @@ class CustomFieldViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
     
     serializer_class = CustomFieldSerializer
     pagination_class = None
+    permission_classes = (permissions.IsAuthenticated,)
 
     def get_queryset(self):
         return CustomField.objects.filter(company_id=self.request.company.id)
