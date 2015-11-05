@@ -3,7 +3,16 @@ from rest_framework import serializers
 from alm_vcard.serializers import VCardSerializer
 from alm_vcard.models import VCard
 
-from .models import Milestone, Contact, SalesCycle, Activity, Product, ProductGroup, SalesCycleLogEntry
+from .models import (
+    Milestone, 
+    Contact, 
+    SalesCycle, 
+    Activity, 
+    Product, 
+    ProductGroup,
+    CustomField,
+    SalesCycleLogEntry,
+    )
 
 class RequestContextMixin(object):
     @property
@@ -106,3 +115,9 @@ class ProductGroupSerializer(RequestContextMixin, serializers.ModelSerializer):
 
     class Meta:
         model = ProductGroup
+
+
+class CustomFieldSerializer(RequestContextMixin, serializers.ModelSerializer):
+
+    class Meta:
+        model = CustomField
