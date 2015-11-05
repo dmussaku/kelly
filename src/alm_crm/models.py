@@ -1496,6 +1496,12 @@ class SalesCycle(SubscriptionObject):
         self.save()
 
     def change_milestone(self, user, milestone_id, company_id):
+        if not milestone_id:
+            self.milestone = None
+            self.save()
+            self.possibly_make_new()
+            return self
+
         milestone = Milestone.objects.get(id=milestone_id)
 
         prev_milestone_title = None

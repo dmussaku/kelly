@@ -129,6 +129,11 @@ class SalesCycleTests(TestMixin, TestCase):
         self.assertEqual(sc.status, SalesCycle.FAILED)
         self.assertEqual(sc.log.count(), 3)
 
+        sc.change_milestone(self.user, None, self.company.id)
+        self.assertEqual(sc.milestone, None)
+        self.assertEqual(sc.status, SalesCycle.NEW)
+        self.assertEqual(sc.log.count(), 3)
+
     def test_get_all(self):
         """
         Ensure we can get all sales cycles
