@@ -24,6 +24,18 @@ class CustomFieldViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
     def get_queryset(self):
         return CustomField.objects.filter(company_id=self.request.company.id)
 
+    def get_for_model(self, request, **kwargs):
+        'at django rest framework get_for_model'
+        try:
+            content_type = ContentType.objects.get(app_label='alm_crm', model=kwargs.get("class", ""))
+        except ContentType.DoesNotExist:
+            return http.HttpNotFound()
+        else:
+            objects = CustomField.objects.filter(company_id=request.company.id,
+                                                content_type=content_type)
+
+        return Response([self.serializer_class(obj).data for obj in objects])
+
     @list_route(methods=['post'], url_path='bulk_edit')
     def bulk_edit(self, request, **kwargs):
         data = request.data
@@ -71,3 +83,12 @@ class CustomFieldViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
                     'changed_objects': changed_objects_bundle}
 
         return Response(bundle)
+
+    @list_route(methods=['get'], url_path='get_for_model/contact')
+    def get_for_model_contact(self, request, **kwargs):
+        return self.get_for_model(request, **{'class':'contact'})
+
+    @list_route(methods=['get'], url_path='get_for_model/product')
+    def get_for_model_product(self, request, **kwargs):
+        return self.get_for_model(request, **{'class':'product'})
+    
