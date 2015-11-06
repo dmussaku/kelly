@@ -15,7 +15,7 @@ from alm_crm.models import (
 )
 from alm_vcard.models import Category, Email, Adr, Tel, Url
 
-class AppStateView(viewsets.ViewSet):
+class AppStateViewSet(viewsets.ViewSet):
 
     @list_route(methods=['get'], url_path='crm')
     def crm(self, request, format=None):
