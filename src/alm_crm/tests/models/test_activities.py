@@ -218,3 +218,21 @@ class ActivityTests(TestMixin, TestCase):
         my_feed = Activity.my_feed(company_id=self.company.id, user_id=self.user.id)
         self.assertEqual(my_feed['feed'].count(), 9)
         self.assertEqual(my_feed['not_read'], 0)
+
+    def test_get_calendar(self):
+        contact = ContactFactory(company_id=self.company.id)
+        sales_cycle = SalesCycleFactory(contact=contact, company_id=self.company.id)
+
+        for i in range(1):
+            ActivityFactory(sales_cycle=sales_cycle, owner=self.user, company_id=self.company.id, deadline=timezone.now()+relativedelta.relativedelta(months=1))
+        for i in range(2):
+            ActivityFactory(sales_cycle=sales_cycle, owner=self.user, company_id=self.company.id, deadline=timezone.now(), need_preparation=True)
+        for i in range(3):
+            ActivityFactory(sales_cycle=sales_cycle, owner=self.user, company_id=self.company.id, deadline=timezone.now(), need_preparation=True, date_finished=timezone.now())
+        for i in range(4):
+            ActivityFactory(sales_cycle=sales_cycle, owner=self.user, company_id=self.company.id, deadline=timezone.now(), need_preparation=False)
+        for i in range(5):
+            ActivityFactory(sales_cycle=sales_cycle, owner=self.user, company_id=self.company.id)
+
+        activities = Activity.get_calendar(company_id=self.company.id, user_id=self.user.id, dt=timezone.now())
+        self.assertEqual(len(activities), 14)

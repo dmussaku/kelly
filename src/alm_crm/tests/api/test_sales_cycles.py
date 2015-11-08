@@ -4,6 +4,7 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 
 from alm_crm.factories import ContactFactory, SalesCycleFactory
+from alm_crm.models import SalesCycle
 
 from . import APITestMixin
 
@@ -33,6 +34,30 @@ class SalesCycleAPITests(APITestMixin, APITestCase):
         
         content = json.loads(response.content)
         self.assertEqual(content['count'], self.sales_cycles_count)
+
+    def test_get_sales_cycles_with_ids(self):
+        """
+        Ensure we can get list of sales_cycles with specific ids
+        """
+        sales_cycles_ids = map(lambda x: x.id, SalesCycle.objects.all()[:3])
+        url, parsed = self.prepare_urls('v1:sales_cycle-list', query={'ids': ','.join(str(x) for x in sales_cycles_ids)}, subdomain=self.company.subdomain)
+        
+        response = self.client.get(url, HTTP_HOST=parsed.netloc)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+        self.authenticate_user()
+        response = self.client.get(url, HTTP_HOST=parsed.netloc)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        
+        content = json.loads(response.content)
+        self.assertEqual(content['count'], 3)
+
+        url, parsed = self.prepare_urls('v1:sales_cycle-list', query={'ids': ''}, subdomain=self.company.subdomain)
+        response = self.client.get(url, HTTP_HOST=parsed.netloc)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        
+        content = json.loads(response.content)
+        self.assertEqual(content['count'], 0)
 
     def get_statistics(self):
         """

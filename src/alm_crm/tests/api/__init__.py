@@ -1,3 +1,4 @@
+import urllib
 from urlparse import urlparse
 from almanet.url_resolvers import reverse
 
@@ -13,7 +14,8 @@ class APITestMixin(object):
     def authenticate_user(self):
         self.client.login(email=self.user.email, password='123')
 
-    def prepare_urls(self, path_name, subdomain=None, *args, **kwargs):
+    def prepare_urls(self, path_name, subdomain=None, query={}, *args, **kwargs):
         url = reverse(path_name, subdomain=subdomain, *args, **kwargs)
+        url += '?' + urllib.urlencode(query)
         parsed = urlparse(url)
         return url, parsed

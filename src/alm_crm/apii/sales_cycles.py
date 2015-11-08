@@ -19,6 +19,22 @@ class SalesCycleViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
     def get_queryset(self):
         return SalesCycle.objects.filter(company_id=self.request.company.id)
 
+    def list(self, request, *args, **kwargs):
+        query_params = request.query_params
+        if(query_params.has_key('ids')):
+            ids = query_params.get('ids', None).split(',') if query_params.get('ids', None) else []
+            queryset = self.filter_queryset(self.get_queryset())
+            queryset = queryset.filter(id__in=ids)
+
+            page = self.paginate_queryset(queryset)
+            if page is not None:
+                serializer = self.get_serializer(page, many=True, latest_activity=True)
+                return self.get_paginated_response(serializer.data)
+
+            serializer = self.get_serializer(queryset, many=True, latest_activity=True)
+            return Response(serializer.data)
+        return super(SalesCycleViewSet, self).list(request, *args, **kwargs)
+
     @list_route(methods=['get'], url_path='statistics')
     def get_statistics(self, request, *args, **kwargs):
         statistics = SalesCycle.get_statistics(company_id=request.company.id, user_id=request.user.id)

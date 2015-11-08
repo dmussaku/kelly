@@ -16,6 +16,7 @@ from alm_crm.apii import (
     product_groups,
     products,
     sales_cycles,
+    reports,
 )
 
 from alm_vcard import api as vcard_api
@@ -88,10 +89,11 @@ router.register(r'milestone', milestones.MilestoneViewSet, 'milestone')
 router.register(r'contact', contacts.ContactViewSet, 'contact')
 router.register(r'custom_field', custom_fields.CustomFieldViewSet, 'custom_field')
 router.register(r'activity', activities.ActivityViewSet, 'activity')
-router.register(r'app_state', app_state.AppStateView, 'app_state')
+router.register(r'app_state', app_state.AppStateViewSet, 'app_state')
 router.register(r'product', products.ProductViewSet, 'product')
 router.register(r'product_group', product_groups.ProductGroupViewSet, 'product_group')
 router.register(r'sales_cycle', sales_cycles.SalesCycleViewSet, 'sales_cycle')
+router.register(r'report', reports.ReportViewSet, 'report')
 
 urlpatterns = patterns(
     '',
