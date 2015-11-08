@@ -84,10 +84,4 @@ class MilestoneViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
 
         return Response(bundle)
 
-        if not self._meta.always_return_data:
-            return http.HttpAccepted()
-        else:
-            return self.create_response(request, bundle,
-                response_class=http.HttpAccepted)
-
     
