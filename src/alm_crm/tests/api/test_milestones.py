@@ -2,6 +2,7 @@ import simplejson as json
 
 from rest_framework import status
 from rest_framework.test import APITestCase
+from alm_crm.serializers import MilestoneSerializer
 
 from . import APITestMixin
 
@@ -23,3 +24,21 @@ class MilestoneAPITests(APITestMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         content = json.loads(response.content)
         self.assertGreaterEqual(len(content), 2)
+
+    def test_post_milestones(self):
+        url, parsed = self.prepare_urls('v1:milestone-bulk_edit', subdomain=self.company.subdomain)
+        milestones = Milestone.objects.filter(company_id=self.company.id)
+        test_data = [MilestoneSerializer(obj).data for obj in milestones]
+        test_data.append({"title":"tes tes","color_code":"#F4B59C","is_system":0,"sort":7})
+        test_data.append({"title":"test2 test 2","color_code":"#9CE5F4","is_system":0,"sort":8})
+        
+        response = self.client.post(url, test_data, HTTP_HOST=parsed.netloc)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+        self.authenticate_user()
+        response = self.client.post(url, test_data, HTTP_HOST=parsed.netloc)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        content = json.loads(response.content)
+        self.assertEqual(len(content.get('milestones',"")), len(test_data))
+
+
