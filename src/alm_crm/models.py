@@ -285,16 +285,6 @@ class Contact(SubscriptionObject):
         c.save()
 
     @classmethod
-    def upd_status_when_first_activity_created(cls, sender, created=False,
-                                               instance=None, **kwargs):
-        if not created or instance.sales_cycle.is_global:
-            return
-        c = instance.sales_cycle.contact
-        if c.status == cls.NEW:
-            c.status = cls.LEAD
-            c.save()
-
-    @classmethod
     def get_contacts_by_status(cls, company_id, status):
         q = Q(company_id=company_id)
         q &= Q(status=status)
@@ -756,15 +746,15 @@ class Contact(SubscriptionObject):
             contact_activity_map.setdefault(contact_pk, []).append(activity.pk)
         return (contacts, activities, contact_activity_map)
 
-    @classmethod
-    def get_cold_base(cls, company_id):
-        """Returns list of contacts that are considered cold.
-        Cold contacts should satisfy two conditions:
-            1. no assignee for contact
-            2. status is NEW"""
-        q = Q(company_id=company_id)
-        q &= Q(status=cls.NEW)
-        return cls.objects.filter(q).order_by('-date_created')
+    # @classmethod
+    # def get_cold_base(cls, company_id):
+    #     """Returns list of contacts that are considered cold.
+    #     Cold contacts should satisfy two conditions:
+    #         1. no assignee for contact
+    #         2. status is NEW"""
+    #     q = Q(company_id=company_id)
+    #     q &= Q(status=cls.NEW)
+    #     return cls.objects.filter(q).order_by('-date_created')
 
     @classmethod
     def delete_contacts(cls, obj_ids):
@@ -798,6 +788,48 @@ class Contact(SubscriptionObject):
                 except ObjectDoesNotExist:
                     objects['does_not_exist'].append(contact_id)
             return objects
+
+    @classmethod
+    def get_statistics(cls, company_id, user_id):
+        shared = Share.get_by_user(company_id=company_id, user_id=user_id)
+
+        return {
+            'shared': {
+                'count': shared['shares'].count(),
+                'not_read': shared['not_read'],
+            },
+            'all': cls.get_all(company_id=company_id).count(),
+            'coldbase': cls.get_cold_base(company_id=company_id, user_id=user_id).count(),
+            'leadbase': cls.get_lead_base(company_id=company_id, user_id=user_id).count(),
+            'recentbase': cls.get_recent_base(company_id=company_id, user_id=user_id).count(),
+        }
+
+    @classmethod
+    def get_lead_base(cls, company_id, user_id):
+        return  Contact.objects.filter(company_id=company_id, id__in= \
+                    SalesCycle.objects.filter(company_id=company_id, id__in= \
+                        Activity.objects.filter(company_id=company_id, owner_id=user_id).values_list('sales_cycle_id', flat=True) \
+                    ).values_list('contact_id', flat=True) \
+                ).order_by('vcard__fn')
+
+    @classmethod
+    def get_cold_base(cls, company_id, user_id):
+        return  Contact.objects.filter(company_id=company_id).exclude(id__in= \
+                    SalesCycle.objects.filter(company_id=company_id, id__in= \
+                        Activity.objects.filter(company_id=company_id, owner_id=user_id).values_list('sales_cycle_id', flat=True) \
+                    ).values_list('contact_id', flat=True) \
+                ).order_by('vcard__fn')
+
+    @classmethod
+    def get_all(cls, company_id):
+        return  Contact.objects.filter(company_id=company_id).order_by('vcard__fn')
+
+    @classmethod
+    def get_recent_base(cls, company_id, user_id):
+        return  Contact.objects.filter(company_id=company_id, \
+                                       latest_activity__owner_id=user_id, \
+                                       latest_activity__date_edited=timezone.now() - timedelta(days=7)) \
+                               .order_by('-latest_activity__date_edited')
 
     @classmethod
     def after_save(cls, sender, instance, **kwargs):
@@ -1405,10 +1437,10 @@ class SalesCycle(SubscriptionObject):
     @classmethod
     def upd_lst_activity_on_create(cls, sender,
                                    created=False, instance=None, **kwargs):
-        if not created or not instance.sales_cycle.is_global:
+        if not created or instance.sales_cycle.is_global:
             return
         sales_cycle = instance.sales_cycle
-        sales_cycle.latest_activity = sales_cycle.find_latest_activity()
+        sales_cycle.latest_activity = instance
         sales_cycle.save()
 
     @classmethod
@@ -1649,9 +1681,9 @@ class Activity(SubscriptionObject):
         return self.comments.count()
 
     @classmethod
-    def mark_as_read(cls, user_id, act_ids):
+    def mark_as_read(cls, company_id, user_id, act_ids):
         return ActivityRecipient.objects.filter(
-                user__id=user_id, activity__id__in=act_ids, has_read=False).update(has_read=True)
+                company_id=company_id, user__id=user_id, activity__id__in=act_ids, has_read=False).update(has_read=True)
 
     @classmethod
     def get_filter_for_mobile(cls):
@@ -1767,11 +1799,11 @@ class Activity(SubscriptionObject):
         my_feed = cls.my_feed(company_id=company_id, user_id=user_id)
         return {
             'company_feed': {
-                'amount': company_feed['feed'].count(),
+                'count': company_feed['feed'].count(),
                 'not_read': company_feed['not_read'],
             },
             'my_feed': {
-                'amount': my_feed['feed'].count(),
+                'count': my_feed['feed'].count(),
                 'not_read': my_feed['not_read'],
             },
             'my_activities': cls.my_activities(company_id=company_id, user_id=user_id).count(),
@@ -1846,7 +1878,7 @@ class Activity(SubscriptionObject):
 
         with transaction.atomic():
             for account in accounts:
-                act_recip = ActivityRecipient(user=account.user, activity=self)
+                act_recip = ActivityRecipient(company_id=company_id, user=account.user, activity=self)
                 if account.user.id==self.owner.id:
                     act_recip.has_read = True
                 act_recip.save()
@@ -1953,7 +1985,7 @@ class Comment(SubscriptionObject):
                 
         with transaction.atomic():
             for account in accounts:
-                com_recipient = CommentRecipient(user=account.user, comment=self)
+                com_recipient = CommentRecipient(company_id=company_id, user=account.user, comment=self)
                 if account.user.id==self.owner.id:
                     com_recipient.has_read = True
                 com_recipient.save()
@@ -2061,13 +2093,27 @@ class Share(SubscriptionObject):
         q = Q(company_id=company_id)
         return cls.objects.filter(q).order_by('-date_created')
 
+    @classmethod
+    def get_by_user(cls, company_id, user_id):
+        shares = Share.objects.filter(company_id=company_id, share_to_id=user_id) \
+                               .order_by('-date_created')
+        return {
+            'shares': shares,
+            'not_read': shares.filter(is_read=False).count(),
+        }
+
+    @classmethod
+    def mark_as_read(cls, company_id, user_id, ids):
+        return Share.objects.filter(
+                company_id=company_id, share_to=user_id, id__in=ids, is_read=False).update(is_read=True)
+
     def __unicode__(self):
         return u'%s : %s -> %s' % (self.contact, self.share_from, self.share_to)
 
 signals.post_save.connect(
     Contact.upd_lst_activity_on_create, sender=Activity)
-signals.post_save.connect(
-    Contact.upd_status_when_first_activity_created, sender=Activity)
+# signals.post_save.connect(
+#     Contact.upd_status_when_first_activity_created, sender=Activity)
 signals.post_save.connect(
     SalesCycle.upd_lst_activity_on_create, sender=Activity)
 

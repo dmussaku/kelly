@@ -2,7 +2,6 @@ import simplejson as json
 
 from rest_framework import status
 from rest_framework.test import APITestCase
-from rest_framework.renderers import JSONRenderer
 
 from alm_crm.models import Contact
 from alm_crm.factories import ContactFactory
@@ -204,3 +203,98 @@ class ContactAPITests(APITestMixin, APITestCase):
         response = self.client.get(url, HTTP_HOST=parsed.netloc)
         content = json.loads(response.content)
         self.assertEqual(self.contacts_count-1, content['count'])
+
+    def test_get_statistics(self):
+        """
+        Ensure we can get statistics for contacts page
+        """
+        url, parsed = self.prepare_urls('v1:contact-statistics', subdomain=self.company.subdomain)
+        
+        response = self.client.get(url, HTTP_HOST=parsed.netloc)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+        self.authenticate_user()
+        response = self.client.get(url, HTTP_HOST=parsed.netloc)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        content = json.loads(response.content)
+        self.assertTrue(content.has_key('shared'))
+        self.assertTrue(content.has_key('all'))
+        self.assertTrue(content.has_key('recentbase'))
+        self.assertTrue(content.has_key('coldbase'))
+        self.assertTrue(content.has_key('leadbase'))
+
+    def test_get_all(self):
+        """
+        Ensure we can get all contacts
+        """
+        url, parsed = self.prepare_urls('v1:contact-list', subdomain=self.company.subdomain)
+        
+        response = self.client.get(url, HTTP_HOST=parsed.netloc)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+        self.authenticate_user()
+        response = self.client.get(url, HTTP_HOST=parsed.netloc)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        
+        content = json.loads(response.content)
+        self.assertTrue(content.has_key('count'))
+        self.assertTrue(content.has_key('next'))
+        self.assertTrue(content.has_key('previous'))
+        self.assertTrue(content.has_key('results'))
+
+    def test_get_recent(self):
+        """
+        Ensure we can get recent contacts
+        """
+        url, parsed = self.prepare_urls('v1:contact-recent', subdomain=self.company.subdomain)
+        
+        response = self.client.get(url, HTTP_HOST=parsed.netloc)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+        self.authenticate_user()
+        response = self.client.get(url, HTTP_HOST=parsed.netloc)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        
+        content = json.loads(response.content)
+        self.assertTrue(content.has_key('count'))
+        self.assertTrue(content.has_key('next'))
+        self.assertTrue(content.has_key('previous'))
+        self.assertTrue(content.has_key('results'))
+
+    def test_get_cold(self):
+        """
+        Ensure we can get cold contacts
+        """
+        url, parsed = self.prepare_urls('v1:contact-cold', subdomain=self.company.subdomain)
+        
+        response = self.client.get(url, HTTP_HOST=parsed.netloc)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+        self.authenticate_user()
+        response = self.client.get(url, HTTP_HOST=parsed.netloc)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        
+        content = json.loads(response.content)
+        self.assertTrue(content.has_key('count'))
+        self.assertTrue(content.has_key('next'))
+        self.assertTrue(content.has_key('previous'))
+        self.assertTrue(content.has_key('results'))
+
+    def test_get_lead(self):
+        """
+        Ensure we can get lead contacts
+        """
+        url, parsed = self.prepare_urls('v1:contact-lead', subdomain=self.company.subdomain)
+        
+        response = self.client.get(url, HTTP_HOST=parsed.netloc)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+        self.authenticate_user()
+        response = self.client.get(url, HTTP_HOST=parsed.netloc)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        
+        content = json.loads(response.content)
+        self.assertTrue(content.has_key('count'))
+        self.assertTrue(content.has_key('next'))
+        self.assertTrue(content.has_key('previous'))
+        self.assertTrue(content.has_key('results'))

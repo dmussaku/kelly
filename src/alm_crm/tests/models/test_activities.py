@@ -212,7 +212,7 @@ class ActivityTests(TestMixin, TestCase):
         self.assertEqual(my_feed['feed'].count(), 9)
         self.assertEqual(my_feed['not_read'], 4)
 
-        read = Activity.mark_as_read(user_id=self.user.id, act_ids=not_read_acts)
+        read = Activity.mark_as_read(company_id=self.company.id, user_id=self.user.id, act_ids=not_read_acts)
         self.assertEqual(read, 4)
 
         my_feed = Activity.my_feed(company_id=self.company.id, user_id=self.user.id)

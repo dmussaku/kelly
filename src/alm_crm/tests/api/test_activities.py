@@ -20,7 +20,7 @@ class ActivityAPITests(APITestMixin, APITestCase):
 
     def test_get_statistics(self):
         """
-        Ensure we can get list of activities
+        Ensure we can get statistics for activities page
         """
         url, parsed = self.prepare_urls('v1:activity-statistics', subdomain=self.company.subdomain)
         

@@ -123,7 +123,6 @@ class ProductGroupSerializer(RequestContextMixin, serializers.ModelSerializer):
 
 
 class CustomFieldSerializer(RequestContextMixin, serializers.ModelSerializer):
-
     class Meta:
         model = CustomField
 
@@ -136,5 +135,7 @@ class HashTagSerializer(RequestContextMixin, serializers.ModelSerializer):
 
 class ShareSerializer(RequestContextMixin, serializers.ModelSerializer):
     contact = ContactSerializer()
+    
     class Meta:
         model = Share
+

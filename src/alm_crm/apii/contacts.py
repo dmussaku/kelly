@@ -6,7 +6,7 @@ from alm_vcard.serializers import VCardSerializer
 from alm_vcard.models import VCard
 
 from alm_crm.serializers import ContactSerializer
-from alm_crm.models import Contact, SalesCycle
+from alm_crm.models import Contact, SalesCycle, Share
 
 from . import CompanyObjectAPIMixin
 
@@ -16,7 +16,7 @@ class ContactViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
     serializer_class = ContactSerializer
 
     def get_queryset(self):
-        return Contact.objects.filter(company_id=self.request.company.id)
+        return Contact.objects.filter(company_id=self.request.company.id).order_by('vcard__fn')
 
     def create(self, request, *args, **kwargs):
     	data = request.data
@@ -85,3 +85,57 @@ class ContactViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
     def get_cached_state(self, request, *args, **kwargs):	
     	contact_ids = self.get_queryset().values_list('id', flat=True)
     	return Response(Contact.get_by_ids(*contact_ids))
+
+    @list_route(methods=['get'], url_path='statistics')
+    def get_statistics(self, request, *args, **kwargs):
+        statistics = Contact.get_statistics(company_id=request.company.id, user_id=request.user.id)
+        return Response(statistics)
+
+    @list_route(methods=['get'], url_path='recent')
+    def recent(self, request, *args, **kwargs):    
+        contacts = Contact.get_recent_base(company_id=request.company.id, user_id=request.user.id)
+
+        page = self.paginate_queryset(contacts)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(contacts, many=True)
+        return Response(serializer.data)
+
+    @list_route(methods=['get'], url_path='cold')
+    def cold(self, request, *args, **kwargs):    
+        contacts = Contact.get_cold_base(company_id=request.company.id, user_id=request.user.id)
+
+        page = self.paginate_queryset(contacts)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(contacts, many=True)
+        return Response(serializer.data)
+
+    @list_route(methods=['get'], url_path='lead')
+    def lead(self, request, *args, **kwargs):    
+        contacts = Contact.get_lead_base(company_id=request.company.id, user_id=request.user.id)
+
+        page = self.paginate_queryset(contacts)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(contacts, many=True)
+        return Response(serializer.data)
+
+    @list_route(methods=['get'], url_path='lead')
+    def lead(self, request, *args, **kwargs):    
+        contacts = Contact.get_lead_base(company_id=request.company.id, user_id=request.user.id)
+
+        page = self.paginate_queryset(contacts)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(contacts, many=True)
+        return Response(serializer.data)
+
