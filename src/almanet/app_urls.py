@@ -20,6 +20,8 @@ from alm_crm.apii import (
     shares,
 )
 
+from alm_user.apii import users
+
 from alm_vcard import api as vcard_api
 
 login_url = reverse_lazy('user_login', subdomain=None)
@@ -96,6 +98,7 @@ router.register(r'product_group', product_groups.ProductGroupViewSet, 'product_g
 router.register(r'sales_cycle', sales_cycles.SalesCycleViewSet, 'sales_cycle')
 router.register(r'report', reports.ReportViewSet, 'report')
 router.register(r'share', shares.ShareViewSet, 'share')
+router.register(r'user', users.UserViewSet, 'user')
 
 urlpatterns = patterns(
     '',

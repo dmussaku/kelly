@@ -15,6 +15,9 @@ from .models import (
     Share,
 )
 
+from alm_user.models import User, Account
+from alm_company.models import Company
+
 class RequestContextMixin(object):
     @property
     def request(self):
