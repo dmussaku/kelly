@@ -12,7 +12,8 @@ from .models import (
     ProductGroup,
     CustomField,
     SalesCycleLogEntry,
-    )
+    Share,
+)
 
 class RequestContextMixin(object):
     @property
@@ -118,6 +119,12 @@ class ProductGroupSerializer(RequestContextMixin, serializers.ModelSerializer):
 
 
 class CustomFieldSerializer(RequestContextMixin, serializers.ModelSerializer):
-
     class Meta:
         model = CustomField
+
+
+class ShareSerializer(RequestContextMixin, serializers.ModelSerializer):
+    contact = ContactSerializer()
+
+    class Meta:
+        model = Share

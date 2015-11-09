@@ -2,7 +2,6 @@ import simplejson as json
 
 from rest_framework import status
 from rest_framework.test import APITestCase
-from rest_framework.renderers import JSONRenderer
 
 from alm_crm.models import Product
 from alm_crm.factories import ProductFactory

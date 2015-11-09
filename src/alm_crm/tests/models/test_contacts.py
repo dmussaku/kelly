@@ -1,7 +1,7 @@
 from django.test import TestCase
 
 from alm_user.factories import AccountFactory
-from alm_crm.factories import ContactFactory
+from alm_crm.factories import ContactFactory, SalesCycleFactory, ActivityFactory
 from alm_crm.models import Contact, Milestone
 
 from . import TestMixin
@@ -53,3 +53,43 @@ class ContactTests(TestMixin, TestCase):
 
         self.assertEqual(panel_info['all']['days']['companies'], 3)
         self.assertEqual(panel_info['my']['days']['companies'], 1)
+
+    def test_get_all(self):
+        account2 = AccountFactory(company=self.company)
+
+        for i in range(5):
+            ContactFactory(company_id=self.company.id, owner_id=self.user.id)
+
+        for i in range(3):
+            ContactFactory(company_id=self.company.id, owner_id=account2.user.id)
+        
+        contacts = Contact.get_all(company_id=self.company.id)
+        self.assertEqual(contacts.count(), 8)
+
+    def test_get_lead_base(self):
+        account2 = AccountFactory(company=self.company)
+
+        for i in range(5):
+            ContactFactory(company_id=self.company.id, owner_id=self.user.id)
+
+        for i in range(3):
+            contact = ContactFactory(company_id=self.company.id, owner_id=account2.user.id)
+            sales_cycle = SalesCycleFactory(contact=contact, company_id=self.company.id)
+            ActivityFactory(sales_cycle=sales_cycle, owner=self.user, company_id=self.company.id)
+        
+        contacts = Contact.get_lead_base(company_id=self.company.id, user_id=self.user.id)
+        self.assertEqual(contacts.count(), 3)
+
+    def test_get_cold_base(self):
+        account2 = AccountFactory(company=self.company)
+
+        for i in range(5):
+            ContactFactory(company_id=self.company.id, owner_id=self.user.id)
+
+        for i in range(3):
+            contact = ContactFactory(company_id=self.company.id, owner_id=account2.user.id)
+            sales_cycle = SalesCycleFactory(contact=contact, company_id=self.company.id)
+            ActivityFactory(sales_cycle=sales_cycle, owner=self.user, company_id=self.company.id)
+        
+        contacts = Contact.get_cold_base(company_id=self.company.id, user_id=self.user.id)
+        self.assertEqual(contacts.count(), 5)

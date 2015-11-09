@@ -10,6 +10,7 @@ from .models import (
     Activity,
     Product,
     ProductGroup,
+    Share,
 )
 
 
@@ -66,3 +67,10 @@ class ProductGroupFactory(CompanyObjectFactoryMixin, factory.django.DjangoModelF
         if extracted:
             for product in extracted:
                 self.products.add(product)
+
+
+class ShareFactory(CompanyObjectFactoryMixin, factory.django.DjangoModelFactory):
+    class Meta:
+        model = Share
+
+    note = factory.Faker('text')
