@@ -12,11 +12,12 @@ from almastorage.models import SwiftFile
 
 from alm_user.serializers import UserSerializer
 
-from . import CompanyObjectAPIMixin
+from alm_crm.apii import CompanyObjectAPIMixin
 
 class UserViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
     
     serializer_class = UserSerializer
+    pagination_class = None
 
     def get_queryset(self):
         return User.objects.filter(

@@ -17,8 +17,9 @@ from alm_crm.apii import (
     products,
     sales_cycles,
     reports,
-    profile,
 )
+
+from alm_user.apii import users
 
 from alm_vcard import api as vcard_api
 
@@ -95,7 +96,7 @@ router.register(r'product', products.ProductViewSet, 'product')
 router.register(r'product_group', product_groups.ProductGroupViewSet, 'product_group')
 router.register(r'sales_cycle', sales_cycles.SalesCycleViewSet, 'sales_cycle')
 router.register(r'report', reports.ReportViewSet, 'report')
-router.register(r'user', profile.UserViewSet, 'user')
+router.register(r'user', users.UserViewSet, 'user')
 
 urlpatterns = patterns(
     '',
