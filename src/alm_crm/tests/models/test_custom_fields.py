@@ -33,6 +33,17 @@ class CustomFieldTests(TestMixin, TestCase):
         	object_id=contact.id,
         	save=True
         	)
+        assertEquals(1, CustomFieldValue.objects.all().count())
+        assertEquals(1, CustomField.objects.all().count())
+        
+        v = VCard(fn='Test')
+        contact = Contact(vcard=v, company_id=c.id, owner_id=self.user.id)
+        contact.save()
+
+        assertEquals(
+            1,
+            Contact.objects.filter(custom_field_values__custom_field__isnull=True)
+            )
         
 
 
