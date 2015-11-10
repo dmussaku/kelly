@@ -400,7 +400,9 @@ class PermissionConfiguration(models.Model):
         (_('Contacts permissions group'), (READ_CONTACTS, EDIT_CONTACTS)),
         (_('Activities permissions group'), (READ_ACTIVITY_FEED, COMMENT_ACTIVITY_FEED)),
         (_('Planned Activities permissions group'), (READ_PLANNED_ACTIVITY_FEED, MANAGE_PLANNED_ACTIVITY_FEED)),
-        (_('Other permissions group'), (READ_REPORTS)),
+        # (_('Other permissions group'), (READ_REPORTS)),
+        # (READ) -> READ, by reason of it is tuple
+        # TODO: show permissions not in groups on front-end
     )
 
     code = models.CharField(max_length=30, blank=False, unique=True,

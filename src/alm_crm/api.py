@@ -3448,6 +3448,7 @@ class AppStateObject(object):
         self.categories = self.get_categories()
         self.hashtags = self.get_hashtags()
         self.permission_groups = self.get_permission_groups()
+        self.permissions = self.get_permissions()
 
     def get_categories(self):
         return [x.data for x in Category.objects.filter(vcard__contact__company_id=self.company.id)]
@@ -3479,17 +3480,18 @@ class AppStateObject(object):
         }
 
     def get_permission_groups(self):
-        def _dehydradePermissionConfiguration(perm_conf):
-            return (perm_conf.description, perm_conf.code, perm_conf.bitnumber)
-
         def _dehydradeGroup(group):
-            group_desc = group[0]
-            group_codes = group[1]
-            permission_confs = PermissionConfiguration.objects.filter(code__in=group_codes)
-            return (group_desc, map(_dehydradePermissionConfiguration, permission_confs))
-
+            return {
+                'description': group[0],
+                'permissions': group[1]
+            }
         return map(_dehydradeGroup, PermissionConfiguration.CODE_GROUPS)
 
+    def get_permissions(self):
+        def _dehydradePermission(perm):
+            return model_to_dict(perm, fields=['code', 'description', 'bitnumber'])
+        permissions = PermissionConfiguration.objects.filter(code__in=PermissionConfiguration.CODES)
+        return reduce(lambda acc, p: acc.update({p.code: _dehydradePermission(p)}) or acc, permissions, dict())
 
     def to_dict(self):
         return self._data
@@ -3510,6 +3512,7 @@ class AppStateResource(Resource):
     constants = fields.DictField(attribute='constants', readonly=True)
     hashtags = fields.ListField(attribute='hashtags', readonly=True)
     permission_groups = fields.ListField(attribute='permission_groups', readonly=True)
+    permissions = fields.DictField(attribute='permissions', readonly=True)
 
     class Meta:
         resource_name = 'app_state'
