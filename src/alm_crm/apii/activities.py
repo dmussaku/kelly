@@ -95,3 +95,29 @@ class ActivityViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
         return Response({
             'calendar_data': serializer.data,
         })
+
+    @list_route(methods=['get'], url_path='search_by_hashtags')
+    def search_by_hashtags(self, request, *args, **kwargs):
+        query = request.GET.get('q',"").strip()
+        if not query.startswith('#'):
+            query = '#' + query
+        activities = Activity.objects.filter(
+            hashtags__hashtag__text=query, company_id=request.company.id)
+        page = self.paginate_queryset(activities)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        serializer = self.get_serializer(activities, many=True)
+        return Response(serializer.data)
+
+        # c = Company.objects.get(subdomain='ordamed')
+        # activities = Activity.objects.filter(company_id=c.id)[0:100]
+        # for activity in activities:
+        #     hash_tag = HashTag(text='#test')
+        #     hash_tag.save()
+        #     HashTagReference.build_new(
+        #         hash_tag.id, 
+        #         content_class=Activity, 
+        #         object_id=activity.id, 
+        #         company_id=c.id, 
+        #         save=True)

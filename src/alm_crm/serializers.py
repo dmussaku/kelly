@@ -12,8 +12,9 @@ from .models import (
     ProductGroup,
     CustomField,
     SalesCycleLogEntry,
+    HashTag,
     Share,
-)
+    )
 
 from alm_user.models import User, Account
 from alm_company.models import Company
@@ -126,8 +127,15 @@ class CustomFieldSerializer(RequestContextMixin, serializers.ModelSerializer):
         model = CustomField
 
 
-class ShareSerializer(RequestContextMixin, serializers.ModelSerializer):
-    contact = ContactSerializer()
+class HashTagSerializer(RequestContextMixin, serializers.ModelSerializer):
 
     class Meta:
+        model = HashTag
+
+
+class ShareSerializer(RequestContextMixin, serializers.ModelSerializer):
+    contact = ContactSerializer()
+    
+    class Meta:
         model = Share
+

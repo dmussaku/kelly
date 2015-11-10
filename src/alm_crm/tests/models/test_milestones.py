@@ -35,14 +35,15 @@ class MilestoneTests(TestMixin, TestCase):
 
     def test_create_delete(self):
         milestones = Milestone.objects.filter(company_id=self.company.id)
+        milestone_count = milestones.count()
         milestone = Milestone(title='test', company_id=self.company.id)
         milestone.save()
         self.assertEqual(
-            milestones.count()+1, 
+            milestone_count+1, 
             Milestone.objects.filter(company_id=self.company.id).count() )
         milestone.delete()
         self.assertEqual(
-            milestones.count(), 
+            milestone_count, 
             Milestone.objects.filter(company_id=self.company.id).count() )
 
 
