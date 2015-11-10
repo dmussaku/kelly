@@ -33,7 +33,7 @@ class ContactAPITests(APITestMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         content = json.loads(response.content)
-        self.assertEqual(content['count'], self.contacts_count)
+        self.assertEqual(len(content), self.contacts_count)
 
     def test_get_specific_contact(self):
         """
@@ -106,7 +106,7 @@ class ContactAPITests(APITestMixin, APITestCase):
         url, parsed = self.prepare_urls('v1:contact-list', subdomain=self.company.subdomain)
         response = self.client.get(url, HTTP_HOST=parsed.netloc)
         content = json.loads(response.content)
-        self.assertEqual(self.contacts_count+1, content['count']) # added 1 contact
+        self.assertEqual(self.contacts_count+1, len(content)) # added 1 contact
 
     def test_create_contact_with_company(self):
         """
@@ -152,7 +152,7 @@ class ContactAPITests(APITestMixin, APITestCase):
         url, parsed = self.prepare_urls('v1:contact-list', subdomain=self.company.subdomain)
         response = self.client.get(url, HTTP_HOST=parsed.netloc)
         content = json.loads(response.content)
-        self.assertEqual(self.contacts_count+2, content['count']) # added 2 contacts: contact and its parent
+        self.assertEqual(self.contacts_count+2, len(content)) # added 2 contacts: contact and its parent
 
     def test_edit_contact(self):
         """
@@ -202,7 +202,7 @@ class ContactAPITests(APITestMixin, APITestCase):
         url, parsed = self.prepare_urls('v1:contact-list', subdomain=self.company.subdomain)
         response = self.client.get(url, HTTP_HOST=parsed.netloc)
         content = json.loads(response.content)
-        self.assertEqual(self.contacts_count-1, content['count'])
+        self.assertEqual(self.contacts_count-1, len(content))
 
     def test_get_statistics(self):
         """
@@ -223,11 +223,12 @@ class ContactAPITests(APITestMixin, APITestCase):
         self.assertTrue(content.has_key('coldbase'))
         self.assertTrue(content.has_key('leadbase'))
 
-    def test_get_all(self):
+    def test_get_contacts_with_ids(self):
         """
-        Ensure we can get all contacts
+        Ensure we can get list of contacts with specific ids
         """
-        url, parsed = self.prepare_urls('v1:contact-list', subdomain=self.company.subdomain)
+        contacts_ids = map(lambda x: x.id, Contact.objects.all()[:3])
+        url, parsed = self.prepare_urls('v1:contact-list', query={'ids': ','.join(str(x) for x in contacts_ids)}, subdomain=self.company.subdomain)
         
         response = self.client.get(url, HTTP_HOST=parsed.netloc)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
@@ -237,10 +238,27 @@ class ContactAPITests(APITestMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         
         content = json.loads(response.content)
-        self.assertTrue(content.has_key('count'))
-        self.assertTrue(content.has_key('next'))
-        self.assertTrue(content.has_key('previous'))
-        self.assertTrue(content.has_key('results'))
+        self.assertEqual(len(content), 3)
+
+        url, parsed = self.prepare_urls('v1:contact-list', query={'ids': ''}, subdomain=self.company.subdomain)
+        response = self.client.get(url, HTTP_HOST=parsed.netloc)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        
+        content = json.loads(response.content)
+        self.assertEqual(len(content), 0)
+
+    def test_get_all(self):
+        """
+        Ensure we can get all contacts
+        """
+        url, parsed = self.prepare_urls('v1:contact-all', subdomain=self.company.subdomain)
+        
+        response = self.client.get(url, HTTP_HOST=parsed.netloc)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+        self.authenticate_user()
+        response = self.client.get(url, HTTP_HOST=parsed.netloc)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_get_recent(self):
         """
@@ -255,12 +273,6 @@ class ContactAPITests(APITestMixin, APITestCase):
         response = self.client.get(url, HTTP_HOST=parsed.netloc)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         
-        content = json.loads(response.content)
-        self.assertTrue(content.has_key('count'))
-        self.assertTrue(content.has_key('next'))
-        self.assertTrue(content.has_key('previous'))
-        self.assertTrue(content.has_key('results'))
-
     def test_get_cold(self):
         """
         Ensure we can get cold contacts
@@ -274,12 +286,6 @@ class ContactAPITests(APITestMixin, APITestCase):
         response = self.client.get(url, HTTP_HOST=parsed.netloc)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         
-        content = json.loads(response.content)
-        self.assertTrue(content.has_key('count'))
-        self.assertTrue(content.has_key('next'))
-        self.assertTrue(content.has_key('previous'))
-        self.assertTrue(content.has_key('results'))
-
     def test_get_lead(self):
         """
         Ensure we can get lead contacts
@@ -292,9 +298,3 @@ class ContactAPITests(APITestMixin, APITestCase):
         self.authenticate_user()
         response = self.client.get(url, HTTP_HOST=parsed.netloc)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        
-        content = json.loads(response.content)
-        self.assertTrue(content.has_key('count'))
-        self.assertTrue(content.has_key('next'))
-        self.assertTrue(content.has_key('previous'))
-        self.assertTrue(content.has_key('results'))

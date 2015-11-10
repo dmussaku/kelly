@@ -13,7 +13,7 @@ from . import TestMixin
 
 
 class CustomFieldTests(TestMixin, TestCase):
-	def setUp(self):
+    def setUp(self):
         self.set_user()
 
 
@@ -28,11 +28,11 @@ class CustomFieldTests(TestMixin, TestCase):
         contact = Contact(vcard=v, company_id=c.id, owner_id=self.user.id)
         contact.save()
         custom_field_value = CustomFieldValue.build_new(
-        	custom_field,
-        	value='test_value',
-        	object_id=contact.id,
-        	save=True
-        	)
+            custom_field,
+            value='test_value',
+            object_id=contact.id,
+            save=True
+            )
         
 
 
