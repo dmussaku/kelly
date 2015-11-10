@@ -5,8 +5,10 @@ from django.utils import timezone
 from rest_framework import status
 from rest_framework.test import APITestCase
 
+from alm_crm.factories import ContactFactory, ShareFactory
 from alm_crm.models import (
     Share,
+    Contact,
     HashTag,
     HashTagReference,
     )
@@ -16,24 +18,19 @@ class ShareAPITests(APITestMixin, APITestCase):
     def setUp(self):
         self.set_user()
 
-	def test_search_by_hashtags(self):
+    def test_search_by_hashtags(self):
         company = self.company
         user = self.user
 
         for i in range(0,100):
-        	c = Contact(
-	            vcard__fn='test', 
-	            owner=user, 
-	            company_id=company.id)
-        	c.save()
-            share = Share(
+            c = ContactFactory(owner=self.user, company_id=self.company.id)
+            share = ShareFactory(
                 contact=c,
                 share_to=user,
                 share_from=user,
-           		owner=user,
-           		company_id=company.id
+                owner=user,
+                company_id=company.id
                 )
-            share.save()
             hash_tag = HashTag(text='#test')
             hash_tag.save()
             HashTagReference.build_new(
@@ -44,7 +41,7 @@ class ShareAPITests(APITestMixin, APITestCase):
                 save=True)
 
         url, parsed = self.prepare_urls(
-            'v1:share-search_by_hashtags', subdomain=self.company.subdomain)
+            'v1:share-search-by-hashtags', subdomain=self.company.subdomain)
 
         response = self.client.get(
             url, {'q': '#test'}, HTTP_HOST=parsed.netloc)
@@ -54,8 +51,8 @@ class ShareAPITests(APITestMixin, APITestCase):
         response = self.client.get(
             url, {'q': '#test'}, HTTP_HOST=parsed.netloc)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-
-        assertEqual(response.count, 100)
+        content = json.loads(response.content)
+        self.assertEqual(content['count'], 100)
 
         
     def test_get_shares_by_user(self):

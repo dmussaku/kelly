@@ -11,6 +11,8 @@ from .models import (
     Product,
     ProductGroup,
     Share,
+    HashTag,
+    HashTagReference,
 )
 
 
@@ -67,6 +69,18 @@ class ProductGroupFactory(CompanyObjectFactoryMixin, factory.django.DjangoModelF
         if extracted:
             for product in extracted:
                 self.products.add(product)
+
+
+class HashTagFactory(CompanyObjectFactoryMixin, factory.django.DjangoModelFactory):
+    class Meta:
+        model = HashTag
+
+    text = factory.Faker('text')
+
+
+class HashTagReferenceFactory(CompanyObjectFactoryMixin, factory.django.DjangoModelFactory):
+    class Meta:
+        model = HashTagReference
 
 
 class ShareFactory(CompanyObjectFactoryMixin, factory.django.DjangoModelFactory):

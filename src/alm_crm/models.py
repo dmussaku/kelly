@@ -2341,8 +2341,8 @@ class CustomField(SubscriptionObject):
             Contact.recache(contact_ids)
 
     @classmethod
-    def build_new(cls, title=None, content_class=None, save=False):
-        custom_field = cls(title=title)
+    def build_new(cls, title=None, content_class=None, company_id=None, save=False):
+        custom_field = cls(title=title, company_id=company_id)
         if content_class:
             custom_field.content_type = ContentType.objects.get_for_model(content_class)
         if save:
