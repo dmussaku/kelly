@@ -1,5 +1,7 @@
 import simplejson as json
 
+from django.db import transaction
+
 from rest_framework.decorators import list_route
 from rest_framework.response import Response
 from rest_framework import viewsets, status
@@ -77,17 +79,18 @@ class ShareViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
         data = request.data
         count = 0
 
-        for new_share_data in data:
-            new_share = Share.create_share(company_id=request.company.id, user_id=request.user.id, data=new_share_data)
-            count+=1
+        with transaction.atomic():
+            for new_share_data in data:
+                new_share = Share.create_share(company_id=request.company.id, user_id=request.user.id, data=new_share_data)
+                count+=1
 
-        notification = Notification(
-            type='SHARE_CREATION',
-            meta=json.dumps({'count': count,}),
-            owner=request.user,
-            company_id=request.company.id,
-        )
-        notification.save()
+            notification = Notification(
+                type='SHARE_CREATION',
+                meta=json.dumps({'count': count,}),
+                owner=request.user,
+                company_id=request.company.id,
+            )
+            notification.save()
 
         return Response({'notification': NotificationSerializer(notification).data})
 
