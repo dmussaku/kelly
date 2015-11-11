@@ -22,9 +22,6 @@ class ShareViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
         return Share.objects.filter(
             company_id=self.request.company.id)
 
-<<<<<<< HEAD
-    @list_route(methods=['post'], url_path='search_by_hashtags')
-=======
     @list_route(methods=['post'], url_path='read')
     def mark_as_read(self, request, *args, **kwargs):
         data = request.data
@@ -36,8 +33,7 @@ class ShareViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
             'statistics': statistics,
         })
 
-    @list_route(methods=['get'], url_path='search_by_hashtags')
->>>>>>> 40f2551989d10836a1fc7283767b54b9b7048321
+    @list_route(methods=['post'], url_path='search_by_hashtags')
     def search_by_hashtags(self, request, *args, **kwargs):
         query = request.data.get('q',"").strip()
         shares = Share.search_by_hashtags(
