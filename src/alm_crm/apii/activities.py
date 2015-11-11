@@ -102,9 +102,9 @@ class ActivityViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
             'calendar_data': serializer.data,
         })
 
-    @list_route(methods=['get'], url_path='search_by_hashtags')
+    @list_route(methods=['post'], url_path='search_by_hashtags')
     def search_by_hashtags(self, request, *args, **kwargs):
-        query = request.GET.get('q',"").strip()
+        query = request.data.get('q',"").strip()
         activities = Activity.search_by_hashtags(
             company_id=request.company.id, search_query=query)
         page = self.paginate_queryset(activities)

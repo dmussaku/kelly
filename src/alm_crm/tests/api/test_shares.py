@@ -43,12 +43,12 @@ class ShareAPITests(APITestMixin, APITestCase):
         url, parsed = self.prepare_urls(
             'v1:share-search-by-hashtags', subdomain=self.company.subdomain)
 
-        response = self.client.get(
+        response = self.client.post(
             url, {'q': '#test'}, HTTP_HOST=parsed.netloc)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
         self.authenticate_user()
-        response = self.client.get(
+        response = self.client.post(
             url, {'q': '#test'}, HTTP_HOST=parsed.netloc)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         content = json.loads(response.content)
