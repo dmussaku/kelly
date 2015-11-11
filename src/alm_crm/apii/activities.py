@@ -6,7 +6,9 @@ from django.db import transaction
 from rest_framework.decorators import list_route
 from rest_framework.response import Response
 from rest_framework import viewsets
+# from rest_framework import filters
 
+# from alm_crm.filters import ActivityFilter
 from alm_crm.serializers import ActivitySerializer, NotificationSerializer
 from alm_crm.models import Activity, Notification
 
@@ -15,6 +17,10 @@ from . import CompanyObjectAPIMixin
 class ActivityViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
     
     serializer_class = ActivitySerializer
+    # filter_backends = (filters.DjangoFilterBackend, filters.OrderingFilter)
+    # filter_class = ActivityFilter
+    # ordering_fields = '__all__'
+
 
     def get_serializer(self, *args, **kwargs):
     	serializer_class = self.get_serializer_class()
@@ -99,13 +105,11 @@ class ActivityViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
             'calendar_data': serializer.data,
         })
 
-    @list_route(methods=['get'], url_path='search_by_hashtags')
+    @list_route(methods=['post'], url_path='search_by_hashtags')
     def search_by_hashtags(self, request, *args, **kwargs):
-        query = request.GET.get('q',"").strip()
-        if not query.startswith('#'):
-            query = '#' + query
-        activities = Activity.objects.filter(
-            hashtags__hashtag__text=query, company_id=request.company.id)
+        query = request.data.get('q',"").strip()
+        activities = Activity.search_by_hashtags(
+            company_id=request.company.id, search_query=query)
         page = self.paginate_queryset(activities)
         if page is not None:
             serializer = self.get_serializer(page, many=True)

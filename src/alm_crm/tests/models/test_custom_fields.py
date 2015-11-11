@@ -3,7 +3,7 @@ import dateutil.relativedelta as relativedelta
 from django.utils import timezone
 from django.test import TestCase
 
-from alm_crm.factories import MilestoneFactory
+from alm_crm.factories import MilestoneFactory, ContactFactory
 from alm_crm.models import CustomField, CustomFieldValue, SalesCycle, Contact, VCard
 from django.contrib.contenttypes.models import ContentType
 from alm_user.factories import AccountFactory
@@ -16,31 +16,21 @@ class CustomFieldTests(TestMixin, TestCase):
     def setUp(self):
         self.set_user()
 
-
-    # create tests for custom fields
-    # 
     def test_custom_field_create(self):
-        c = self.company
         custom_field = CustomField.build_new(
-            title='Test1', content_class='contact', company_id=c.id)
+            title='Test1', content_class=Contact, company_id=self.company.id)
         custom_field.save()
-        v = VCard(fn='Test')
-        contact = Contact(vcard=v, company_id=c.id, owner_id=self.user.id)
-        contact.save()
+        contact = ContactFactory(owner=self.user, company_id=self.company.id)
         custom_field_value = CustomFieldValue.build_new(
             custom_field,
             value='test_value',
             object_id=contact.id,
             save=True
-        )
-        assertEquals(1, CustomFieldValue.objects.all().count())
-        assertEquals(1, CustomField.objects.all().count())
-        
-        v = VCard(fn='Test')
-        contact = Contact(vcard=v, company_id=c.id, owner_id=self.user.id)
-        contact.save()
-
-        assertEquals(1, Contact.objects.filter(custom_field_values__custom_field__isnull=True))
+            )
+        self.assertEqual(1, CustomFieldValue.objects.all().count())
+        self.assertEqual(1, CustomField.objects.all().count())
+        contact = ContactFactory(owner=self.user, company_id=self.company.id)
+        self.assertEqual(1, Contact.objects.filter(custom_field_values__custom_field__isnull=True).count())
         
 
 

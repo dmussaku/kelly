@@ -6,7 +6,7 @@ from django.test import TestCase
 from alm_crm.factories import MilestoneFactory
 from alm_crm.factories import SalesCycleFactory
 from alm_crm.models import Milestone, SalesCycle
-from alm_user.factories import AccountFactory
+from alm_user.factories import AccountFactory, UserFactory
 from alm_company.factories import CompanyFactory
 
 from . import TestMixin
@@ -17,16 +17,11 @@ class MilestoneTests(TestMixin, TestCase):
         self.set_user()
 
     def test_default_milestones(self):
-        milestones = Milestone.objects.all()
-        self.assertEqual(milestones.count(), 0)
 
-        u = User(email='test@test.com')
-        u.set_password('123')
-        u.save()
-        c = Company.build_company(name='TestCompany', subdomain='testsubdomain')
-        c.save()
-        a = Account(user=u, company=c)
-        a.save()
+        u = UserFactory()
+        c = CompanyFactory()
+        a = AccountFactory(
+            user=u, company=c)
 
         milestones = Milestone.objects.all()
         self.assertEqual(milestones.count(), 8)

@@ -39,6 +39,9 @@ from alm_vcard.models import (
     )
 
 from .utils import datetimeutils
+# from alm_crm.utils.parser import HASHTAG_PARSER
+import re
+HASHTAG_PARSER = re.compile(u'\B#\w*[а-яА-ЯёЁa-zA-Z]+\w*', re.U)
 
 TEMP_DIR = getattr(settings, 'TEMP_DIR')
 ALLOWED_TIME_PERIODS = ['week', 'month', 'year']
@@ -1893,6 +1896,15 @@ class Activity(SubscriptionObject):
 
         return new_activity
     
+    @classmethod
+    def search_by_hashtags(cls, company_id=None, search_query=None):
+        hashtags = HASHTAG_PARSER.findall(search_query)
+        activities = Activity.objects.filter(company_id=company_id)
+        for hashtag in hashtags:
+            activities = activities.filter(hashtags__hashtag__text=hashtag)
+        return activities.order_by('date_created')
+
+
     def new_comments_count(self, user_id):
         return len(
             filter(lambda(comment): not comment.has_read(user_id),
@@ -2139,6 +2151,17 @@ class Share(SubscriptionObject):
         return Share.objects.filter(
                 company_id=company_id, share_to=user_id, id__in=ids, is_read=False).update(is_read=True)
 
+    @classmethod
+    def search_by_hashtags(cls, company_id=None, search_query=None):
+        hashtags = HASHTAG_PARSER.findall(search_query)
+        shares = Share.objects.filter(company_id=company_id)
+        for hashtag in hashtags:
+            shares = shares.filter(hashtags__hashtag__text=hashtag)
+        return shares.order_by('date_created')
+
+    def __unicode__(self):
+        return u'%s : %s -> %s' % (self.contact, self.share_from, self.share_to)
+    
     @classmethod
     def create_share(cls, company_id, user_id, data):
         from .utils.parser import text_parser
@@ -2387,8 +2410,8 @@ class CustomField(SubscriptionObject):
             Contact.recache(contact_ids)
 
     @classmethod
-    def build_new(cls, title=None, content_class=None, save=False):
-        custom_field = cls(title=title)
+    def build_new(cls, title=None, content_class=None, company_id=None, save=False):
+        custom_field = cls(title=title, company_id=company_id)
         if content_class:
             custom_field.content_type = ContentType.objects.get_for_model(content_class)
         if save:
