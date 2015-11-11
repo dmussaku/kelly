@@ -3,15 +3,21 @@ import dateutil
 from rest_framework.decorators import list_route
 from rest_framework.response import Response
 from rest_framework import viewsets
+# from rest_framework import filters
 
 from alm_crm.serializers import ActivitySerializer
 from alm_crm.models import Activity
+# from alm_crm.filters import ActivityFilter
 
 from . import CompanyObjectAPIMixin
 
 class ActivityViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
     
     serializer_class = ActivitySerializer
+    # filter_backends = (filters.DjangoFilterBackend, filters.OrderingFilter)
+    # filter_class = ActivityFilter
+    # ordering_fields = '__all__'
+
 
     def get_serializer(self, *args, **kwargs):
     	serializer_class = self.get_serializer_class()

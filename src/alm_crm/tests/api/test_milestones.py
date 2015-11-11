@@ -35,6 +35,7 @@ class MilestoneAPITests(APITestMixin, APITestCase):
         test_data.append({"title":"tes tes","color_code":"#F4B59C","is_system":0,"sort":7})
         test_data.append({"title":"test2 test 2","color_code":"#9CE5F4","is_system":0,"sort":8})
         package = {'milestones': test_data, 'sales_cycles':[]}
+        
         response = self.client.post(url, package, HTTP_HOST=parsed.netloc)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 

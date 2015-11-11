@@ -192,5 +192,9 @@ class ActivityAPITests(APITestMixin, APITestCase):
             url, {'q': '#test'}, HTTP_HOST=parsed.netloc)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         content = json.loads(response.content)
+        self.assertTrue(content.has_key('count'))
         self.assertEqual(content['count'], 100)
+        self.assertTrue(content.has_key('next'))
+        self.assertTrue(content.has_key('previous'))
+        self.assertTrue(content.has_key('results'))
         

@@ -69,7 +69,7 @@ class ShareTests(TestMixin, TestCase):
                 save=True)
         shares = Share.search_by_hashtags(
             company_id=self.company.id, search_query='#test')
-        self.assertEqual(shares.count, 100)
+        self.assertEqual(shares.count(), 100)
 
         for share in shares[0:30]:
             hash_tag = HashTagFactory(
@@ -82,4 +82,4 @@ class ShareTests(TestMixin, TestCase):
                 save=True)
         shares = Share.search_by_hashtags(
             company_id=self.company.id, search_query='#test, #test2')
-        self.assertEqual(shares.count, 30)
+        self.assertEqual(shares.count(), 30)

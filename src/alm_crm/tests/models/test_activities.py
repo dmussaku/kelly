@@ -382,7 +382,7 @@ class ActivityTests(TestMixin, TestCase):
                 save=True)
         activities = Activity.search_by_hashtags(
             company_id=self.company.id, search_query='#test')
-        self.assertEqual(activities.count, 100)
+        self.assertEqual(activities.count(), 100)
 
         for activity in activities[0:30]:
             hash_tag = HashTagFactory(
@@ -395,6 +395,6 @@ class ActivityTests(TestMixin, TestCase):
                 save=True)
         activities = Activity.search_by_hashtags(
             company_id=self.company.id, search_query='#test, #test2')
-        self.assertEqual(activities.count, 30)
+        self.assertEqual(activities.count(), 30)
 
 
