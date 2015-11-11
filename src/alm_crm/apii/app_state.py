@@ -23,10 +23,6 @@ class AppStateViewSet(viewsets.ViewSet):
             'categories': self.get_categories(),
             'constants': self.get_constants(),
             'hashtags': self.get_hashtags(),
-            'badges': {
-                'shares': self.get_new_shares(),
-                'activities': self.get_new_activities(),
-            }
         }
         return Response(objects)
 
@@ -41,6 +37,14 @@ class AppStateViewSet(viewsets.ViewSet):
     def hashtags(self, request, format=None):
         objects = {
             'objects': self.get_hashtags()
+        }
+        return Response(objects)
+
+    @list_route(methods=['get'], url_path='crm/counters')
+    def counters(self, request, format=None):
+        objects = {
+            'shares': self.get_new_shares(),
+            'activities': self.get_new_activities(),
         }
         return Response(objects)
 
