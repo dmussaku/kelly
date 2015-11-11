@@ -99,10 +99,8 @@ class ActivityViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
     @list_route(methods=['get'], url_path='search_by_hashtags')
     def search_by_hashtags(self, request, *args, **kwargs):
         query = request.GET.get('q',"").strip()
-        if not query.startswith('#'):
-            query = '#' + query
-        activities = Activity.objects.filter(
-            hashtags__hashtag__text=query, company_id=request.company.id)
+        activities = Activity.search_by_hashtags(
+            company_id=request.company.id, search_query=query)
         page = self.paginate_queryset(activities)
         if page is not None:
             serializer = self.get_serializer(page, many=True)

@@ -4,7 +4,11 @@ from django.utils import timezone
 
 from rest_framework import status
 from rest_framework.test import APITestCase
-from alm_crm.factories import ContactFactory, ActivityFactory, SalesCycleFactory
+from alm_crm.factories import (
+    ContactFactory, 
+    ActivityFactory, 
+    SalesCycleFactory
+    )
 from alm_crm.models import (
     Activity,
     SalesCycle,
@@ -23,7 +27,8 @@ class ActivityAPITests(APITestMixin, APITestCase):
         """
         Ensure we can get statistics for activities page
         """
-        url, parsed = self.prepare_urls('v1:activity-statistics', subdomain=self.company.subdomain)
+        url, parsed = self.prepare_urls(
+            'v1:activity-statistics', subdomain=self.company.subdomain)
         
         response = self.client.get(url, HTTP_HOST=parsed.netloc)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
@@ -41,7 +46,8 @@ class ActivityAPITests(APITestMixin, APITestCase):
         """
         Ensure we can get company feed
         """
-        url, parsed = self.prepare_urls('v1:activity-company-feed', subdomain=self.company.subdomain)
+        url, parsed = self.prepare_urls(
+            'v1:activity-company-feed', subdomain=self.company.subdomain)
         
         response = self.client.get(url, HTTP_HOST=parsed.netloc)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
@@ -60,7 +66,8 @@ class ActivityAPITests(APITestMixin, APITestCase):
         """
         Ensure we can get my feed
         """
-        url, parsed = self.prepare_urls('v1:activity-my-feed', subdomain=self.company.subdomain)
+        url, parsed = self.prepare_urls(
+            'v1:activity-my-feed', subdomain=self.company.subdomain)
         
         response = self.client.get(url, HTTP_HOST=parsed.netloc)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
@@ -79,7 +86,8 @@ class ActivityAPITests(APITestMixin, APITestCase):
         """
         Ensure we can get my activities
         """
-        url, parsed = self.prepare_urls('v1:activity-my-activities', subdomain=self.company.subdomain)
+        url, parsed = self.prepare_urls(
+            'v1:activity-my-activities', subdomain=self.company.subdomain)
         
         response = self.client.get(url, HTTP_HOST=parsed.netloc)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
@@ -98,7 +106,8 @@ class ActivityAPITests(APITestMixin, APITestCase):
         """
         Ensure we can get my tasks
         """
-        url, parsed = self.prepare_urls('v1:activity-my-tasks', subdomain=self.company.subdomain)
+        url, parsed = self.prepare_urls(
+            'v1:activity-my-tasks', subdomain=self.company.subdomain)
         
         response = self.client.get(url, HTTP_HOST=parsed.netloc)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
@@ -117,7 +126,8 @@ class ActivityAPITests(APITestMixin, APITestCase):
         """
         Ensure we can mark as read
         """
-        url, parsed = self.prepare_urls('v1:activity-read', subdomain=self.company.subdomain)
+        url, parsed = self.prepare_urls(
+            'v1:activity-read', subdomain=self.company.subdomain)
         
         response = self.client.post(url, [], HTTP_HOST=parsed.netloc, format='json')
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
@@ -134,7 +144,8 @@ class ActivityAPITests(APITestMixin, APITestCase):
         """
         Ensure we can get calendar
         """
-        url, parsed = self.prepare_urls('v1:activity-calendar', subdomain=self.company.subdomain)
+        url, parsed = self.prepare_urls(
+            'v1:activity-calendar', subdomain=self.company.subdomain)
         
         response = self.client.post(url, {'dt': timezone.now()}, HTTP_HOST=parsed.netloc, format='json')
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)

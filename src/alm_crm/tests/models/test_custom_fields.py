@@ -29,13 +29,8 @@ class CustomFieldTests(TestMixin, TestCase):
             )
         self.assertEqual(1, CustomFieldValue.objects.all().count())
         self.assertEqual(1, CustomField.objects.all().count())
-        
         contact = ContactFactory(owner=self.user, company_id=self.company.id)
-
-        self.assertEqual(
-            1,
-            Contact.objects.filter(custom_field_values__custom_field__isnull=True).count()
-            )
+        self.assertEqual(1, Contact.objects.filter(custom_field_values__custom_field__isnull=True))
         
 
 
