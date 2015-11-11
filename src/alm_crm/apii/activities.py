@@ -1,13 +1,14 @@
 import dateutil
+import simplejson as json
 
 from rest_framework.decorators import list_route
 from rest_framework.response import Response
 from rest_framework import viewsets
 # from rest_framework import filters
 
-from alm_crm.serializers import ActivitySerializer
-from alm_crm.models import Activity
 # from alm_crm.filters import ActivityFilter
+from alm_crm.serializers import ActivitySerializer, NotificationSerializer
+from alm_crm.models import Activity, Notification
 
 from . import CompanyObjectAPIMixin
 
@@ -125,3 +126,22 @@ class ActivityViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
         #         object_id=activity.id, 
         #         company_id=c.id, 
         #         save=True)
+
+    @list_route(methods=['post'], url_path='create_multiple')
+    def create_multiple(self, request, *args, **kwargs):
+        data = request.data
+        count = 0
+
+        for new_activity_data in data:
+            new_activity = Activity.create_activity(company_id=request.company.id, user_id=request.user.id, data=new_activity_data)
+            count+=1
+
+        notification = Notification(
+            type='ACTIVITY_CREATION',
+            meta=json.dumps({'count': count,}),
+            owner=request.user,
+            company_id=request.company.id,
+        )
+        notification.save()
+
+        return Response({'notification': NotificationSerializer(notification).data})

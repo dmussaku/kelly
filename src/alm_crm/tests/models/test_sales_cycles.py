@@ -326,4 +326,25 @@ class SalesCycleTests(TestMixin, TestCase):
 
         self.assertEqual(SalesCycle.get_failed_my(company_id=self.company.id, user_id=self.user.id).count(), 3)
         self.assertEqual(SalesCycle.get_failed_my(company_id=self.company.id, user_id=account2.user.id).count(), 2)
+
+    def test_get_by_contact(self):
+        """
+        Ensure we can get sales cycles by contact
+        """
+        contact = ContactFactory(company_id=self.company.id)
+        child1 = ContactFactory(company_id=self.company.id, parent=contact)
+        child2 = ContactFactory(company_id=self.company.id, parent=contact)
+
+        for i in range(10):
+            SalesCycleFactory(contact=contact, owner=self.user, company_id=self.company.id)
+
+        for i in range(3):
+            SalesCycleFactory(contact=child1, owner=self.user, company_id=self.company.id)
+
+        for i in range(6):
+            SalesCycleFactory(contact=child2, owner=self.user, company_id=self.company.id)
+
+        self.assertEqual(SalesCycle.get_by_contact(company_id=self.company.id, contact_id=contact.id).count(), 10)
+        self.assertEqual(SalesCycle.get_by_contact(company_id=self.company.id, contact_id=contact.id, include_children=True).count(), 19)
+        self.assertEqual(SalesCycle.get_by_contact(company_id=self.company.id, contact_id=child1.id).count(), 3)
     

@@ -2,6 +2,8 @@ from rest_framework import serializers
 
 from alm_vcard.serializers import VCardSerializer
 from alm_vcard.models import VCard
+from alm_user.models import User, Account
+from alm_company.models import Company
 
 from .models import (
     Milestone, 
@@ -14,10 +16,9 @@ from .models import (
     SalesCycleLogEntry,
     HashTag,
     Share,
-    )
+    Notification,
+)
 
-from alm_user.models import User, Account
-from alm_company.models import Company
 
 class RequestContextMixin(object):
     @property
@@ -139,3 +140,8 @@ class ShareSerializer(RequestContextMixin, serializers.ModelSerializer):
     class Meta:
         model = Share
 
+
+class NotificationSerializer(RequestContextMixin, serializers.ModelSerializer):
+    
+    class Meta:
+        model = Notification

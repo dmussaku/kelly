@@ -749,16 +749,6 @@ class Contact(SubscriptionObject):
             contact_activity_map.setdefault(contact_pk, []).append(activity.pk)
         return (contacts, activities, contact_activity_map)
 
-    # @classmethod
-    # def get_cold_base(cls, company_id):
-    #     """Returns list of contacts that are considered cold.
-    #     Cold contacts should satisfy two conditions:
-    #         1. no assignee for contact
-    #         2. status is NEW"""
-    #     q = Q(company_id=company_id)
-    #     q &= Q(status=cls.NEW)
-    #     return cls.objects.filter(q).order_by('-date_created')
-
     @classmethod
     def delete_contacts(cls, obj_ids):
         if isinstance(obj_ids, int):
@@ -1447,6 +1437,17 @@ class SalesCycle(SubscriptionObject):
         sales_cycle.save()
 
     @classmethod
+    def get_by_contact(cls, company_id, contact_id, include_children=False):
+        contact_ids = [contact_id]
+        if include_children:
+            contact = Contact.objects.get(id=contact_id)
+            contact_ids = contact_ids + list(contact.children.all().values_list('id', flat=True))
+        
+        sales_cycles = SalesCycle.objects.filter(company_id=company_id, contact_id__in=contact_ids)
+
+        return sales_cycles
+
+    @classmethod
     def get_by_ids(cls, *ids):
         """Get sales cycles by ids from cache with fallback to postgres."""
         rv = cache.get_many([build_key(cls._meta.model_name, sid) for sid in ids])
@@ -1866,6 +1867,34 @@ class Activity(SubscriptionObject):
                     Q(deadline__isnull=True, date_created__gte=start, date_created__lte=end)
 
         return Activity.objects.filter(query & sub_query)
+
+    @classmethod
+    def create_activity(cls, company_id, user_id, data):
+        from .utils.parser import text_parser
+        sales_cycle_id = data.get('sales_cycle_id', None) or \
+                         Contact.objects.get(id=data.get('contact_id')).global_sales_cycle.id
+        new_activity = Activity(description=data.get('description', ''),
+                                sales_cycle_id=sales_cycle_id,
+                                assignee_id=data.get('assignee_id', None),
+                                deadline=data.get('deadline', None),
+                                owner_id=user_id,
+                                company_id=company_id,
+                                need_preparation=data.get('need_preparation', False),)
+        new_activity.save()
+
+        if 'attached_files' in data:
+            self.attach_files(data['attached_files'], new_activity.id)
+
+        account = Account.objects.get(company_id=company_id, user_id=user_id)
+
+        new_activity.spray(company_id, account)
+
+        text_parser(base_text=new_activity.description,
+                    company_id=company_id,
+                    content_class=new_activity.__class__,
+                    object_id=new_activity.id)
+
+        return new_activity
     
     @classmethod
     def search_by_hashtags(cls, company_id=None, search_query=None):
@@ -2092,6 +2121,9 @@ class Share(SubscriptionObject):
         verbose_name = 'share'
         db_table = settings.DB_PREFIX.format('share')
 
+    def __unicode__(self):
+        return u'%s : %s -> %s' % (self.contact, self.share_from, self.share_to)
+
     @property
     def owner(self):
         return self.share_from
@@ -2129,6 +2161,23 @@ class Share(SubscriptionObject):
 
     def __unicode__(self):
         return u'%s : %s -> %s' % (self.contact, self.share_from, self.share_to)
+    
+    @classmethod
+    def create_share(cls, company_id, user_id, data):
+        from .utils.parser import text_parser
+        s = Share(
+            note=data.get('note', ''),
+            company_id=company_id,
+            contact_id=data.get('contact_id'),
+            share_from_id=user_id,
+            share_to_id=data.get('share_to')
+        )
+        s.save()
+        text_parser(base_text=s.note,
+                    company_id = company_id,
+                    content_class=s.__class__,
+                    object_id=s.id)
+        return s
 
 signals.post_save.connect(
     Contact.upd_lst_activity_on_create, sender=Activity)
@@ -2429,3 +2478,11 @@ class ErrorCell(models.Model):
     row = models.IntegerField()
     col = models.IntegerField()
     data = models.CharField(max_length=10000)
+
+
+class Notification(SubscriptionObject):
+    # ACTIVITY_CREATION: при создании активити, {'count': N}
+
+    type = models.CharField(blank=True, null=True, max_length=100)
+    meta = models.TextField()
+    owner = models.ForeignKey(User, related_name='notifications', null=True)

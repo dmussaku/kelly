@@ -7,16 +7,43 @@ from rest_framework.test import APITestCase
 
 from alm_crm.factories import ContactFactory, ShareFactory
 from alm_crm.models import (
+    Contact,
     Share,
     Contact,
     HashTag,
     HashTagReference,
-    )
+)
+from alm_crm.factories import ContactFactory, ShareFactory
+
 from . import APITestMixin
 
 class ShareAPITests(APITestMixin, APITestCase):
     def setUp(self):
         self.set_user()
+        self.shares_count = 5
+        self.setUpShares(self.shares_count)
+
+    def setUpShares(self, shares_count):
+        contact = ContactFactory(company_id=self.company.id, owner_id=self.company.id)
+        for i in range(shares_count):
+            ShareFactory(company_id=self.company.id, share_from=self.user, share_to=self.user, contact=contact)
+
+    def test_mark_as_read(self):
+        """
+        Ensure we can mark as read
+        """
+        url, parsed = self.prepare_urls('v1:share-read', subdomain=self.company.subdomain)
+        
+        response = self.client.post(url, [], HTTP_HOST=parsed.netloc, format='json')
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+        self.authenticate_user()
+        response = self.client.post(url, [], HTTP_HOST=parsed.netloc, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        content = json.loads(response.content)
+        self.assertTrue(content.has_key('count'))
+        self.assertTrue(content.has_key('statistics'))
 
     def test_search_by_hashtags(self):
         company = self.company
@@ -77,3 +104,22 @@ class ShareAPITests(APITestMixin, APITestCase):
         # self.assertTrue(content.has_key('next'))
         # self.assertTrue(content.has_key('previous'))
         # self.assertTrue(content.has_key('results'))
+
+    def test_create_multiple(self):
+        """
+        Ensure we can create multiple
+        """
+        contact = Contact.objects.first()
+
+        valid_data = [{'share_to':self.user.id, 'note':'test message', 'contact_id': contact.id}]
+        url, parsed = self.prepare_urls('v1:share-create-multiple', subdomain=self.company.subdomain)
+        
+        response = self.client.post(url, valid_data, HTTP_HOST=parsed.netloc, format='json')
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+        self.authenticate_user()
+        response = self.client.post(url, valid_data, HTTP_HOST=parsed.netloc, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        content = json.loads(response.content)
+        self.assertTrue(content.has_key('notification'))

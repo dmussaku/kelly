@@ -98,6 +98,12 @@ class ContactViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, headers=headers)
 
+    @list_route(methods=['post'], url_path='delete_contacts')
+    def delete_contats(self, request, *args, **kwargs):
+        obj_ids = request.data.get('ids', [])
+        objects = Contact.delete_contacts(obj_ids)
+        return Response(objects)
+
     @list_route(methods=['get'], url_path='state')
     def get_cached_state(self, request, *args, **kwargs):	
     	contact_ids = self.get_queryset().values_list('id', flat=True)

@@ -4,7 +4,7 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 
 from alm_crm.factories import ContactFactory, SalesCycleFactory
-from alm_crm.models import SalesCycle
+from alm_crm.models import Contact, SalesCycle
 
 from . import APITestMixin
 
@@ -283,3 +283,18 @@ class SalesCycleAPITests(APITestMixin, APITestCase):
         self.assertTrue(content.has_key('next'))
         self.assertTrue(content.has_key('previous'))
         self.assertTrue(content.has_key('results'))
+
+    def test_get_my_failed_sales_cycles(self):
+        """
+        Ensure we can get list of my failed sales_cycles
+        """
+        c = Contact.objects.first()
+
+        url, parsed = self.prepare_urls('v1:sales_cycle-get-by-contact', subdomain=self.company.subdomain, query={'contact_id': c.id})
+        
+        response = self.client.get(url, HTTP_HOST=parsed.netloc)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+        self.authenticate_user()
+        response = self.client.get(url, HTTP_HOST=parsed.netloc)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
