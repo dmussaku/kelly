@@ -746,16 +746,6 @@ class Contact(SubscriptionObject):
             contact_activity_map.setdefault(contact_pk, []).append(activity.pk)
         return (contacts, activities, contact_activity_map)
 
-    # @classmethod
-    # def get_cold_base(cls, company_id):
-    #     """Returns list of contacts that are considered cold.
-    #     Cold contacts should satisfy two conditions:
-    #         1. no assignee for contact
-    #         2. status is NEW"""
-    #     q = Q(company_id=company_id)
-    #     q &= Q(status=cls.NEW)
-    #     return cls.objects.filter(q).order_by('-date_created')
-
     @classmethod
     def delete_contacts(cls, obj_ids):
         if isinstance(obj_ids, int):
@@ -2119,6 +2109,9 @@ class Share(SubscriptionObject):
         verbose_name = 'share'
         db_table = settings.DB_PREFIX.format('share')
 
+    def __unicode__(self):
+        return u'%s : %s -> %s' % (self.contact, self.share_from, self.share_to)
+
     @property
     def owner(self):
         return self.share_from
@@ -2146,8 +2139,22 @@ class Share(SubscriptionObject):
         return Share.objects.filter(
                 company_id=company_id, share_to=user_id, id__in=ids, is_read=False).update(is_read=True)
 
-    def __unicode__(self):
-        return u'%s : %s -> %s' % (self.contact, self.share_from, self.share_to)
+    @classmethod
+    def create_share(cls, company_id, user_id, data):
+        from .utils.parser import text_parser
+        s = Share(
+            note=data.get('note', ''),
+            company_id=company_id,
+            contact_id=data.get('contact_id'),
+            share_from_id=user_id,
+            share_to_id=data.get('share_to')
+        )
+        s.save()
+        text_parser(base_text=s.note,
+                    company_id = company_id,
+                    content_class=s.__class__,
+                    object_id=s.id)
+        return s
 
 signals.post_save.connect(
     Contact.upd_lst_activity_on_create, sender=Activity)

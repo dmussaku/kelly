@@ -23,10 +23,10 @@ class ActivityAPITests(APITestMixin, APITestCase):
         self.setUpActivities(self.activities_count)
 
     def setUpActivities(self, activities_count):
-        contact = ContactFactory(company_id=self.company.id, owner_id=self.company.id)
-        sales_cycle = SalesCycleFactory(company_id=self.company.id, owner_id=self.company.id, contact=contact)
+        contact = ContactFactory(company_id=self.company.id, owner_id=self.user.id)
+        sales_cycle = SalesCycleFactory(company_id=self.company.id, owner_id=self.user.id, contact=contact)
         for i in range(activities_count):
-            ActivityFactory(company_id=self.company.id, owner_id=self.company.id, sales_cycle=sales_cycle)
+            ActivityFactory(company_id=self.company.id, owner_id=self.user.id, sales_cycle=sales_cycle)
 
     def test_get_statistics(self):
         """

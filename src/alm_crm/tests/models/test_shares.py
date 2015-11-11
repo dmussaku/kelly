@@ -35,3 +35,20 @@ class ShareTests(TestMixin, TestCase):
         shares = Share.get_by_user(company_id=self.company.id, user_id=self.user.id)
         self.assertEqual(shares['shares'].count(), 3)
         self.assertEqual(shares['not_read'], 0)
+
+    def test_create_share(self):
+        account2 = AccountFactory(company=self.company)
+        contact = ContactFactory(company_id=self.company.id)
+
+        valid_data = {'share_to':account2.user.id, 'note':'test message', 'contact_id': contact.id}
+
+        share = Share.create_share(company_id=self.company.id, user_id=self.user.id, data=valid_data)
+        self.assertEqual(share.note, 'test message')
+        self.assertEqual(share.hashtags.count(), 0)
+
+        valid_data = {'share_to':account2.user.id, 'note':'test message #hashtag', 'contact_id': contact.id}
+
+        share = Share.create_share(company_id=self.company.id, user_id=self.user.id, data=valid_data)
+        self.assertEqual(share.note, 'test message #hashtag')
+        self.assertEqual(share.hashtags.count(), 1)
+
