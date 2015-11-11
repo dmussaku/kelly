@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from rest_framework.decorators import list_route
 from rest_framework.response import Response
 from rest_framework import viewsets
@@ -21,10 +22,16 @@ class SalesCycleViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
 
     def list(self, request, *args, **kwargs):
         query_params = request.query_params
+        # можно передать список айдишников, которые нужно вытащить
         if(query_params.has_key('ids')):
             ids = query_params.get('ids', None).split(',') if query_params.get('ids', None) else []
             queryset = self.filter_queryset(self.get_queryset())
             queryset = queryset.filter(id__in=ids)
+
+            # если передан параметр all, то тогда отдать без pagination'а все циклы
+            if(query_params.has_key('all')):
+                serializer = self.get_serializer(queryset, many=True, latest_activity=True)
+                return Response(serializer.data)
 
             page = self.paginate_queryset(queryset)
             if page is not None:
@@ -159,3 +166,14 @@ class SalesCycleViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
 
         serializer = self.get_serializer(sales_cycles, many=True, latest_activity=True)
         return Response(serializer.data)
+
+    # @list_route(methods=['get'], url_path='get_by_contact')
+    # def get_by_contact(self, request, *args, **kwargs):
+    #     include_children = request.query_params.get('include_children', False)
+    #     contact_id = request.query_params.get('contact_id', None)
+    #     sales_cycles = SalesCycle.get_by_contact(company_id=request.company.id, 
+    #                                              contact_id=contact_id,
+    #                                              include_children=include_children)
+
+    #     serializer = self.get_serializer(sales_cycles, many=True, latest_activity=False)
+    #     return Response(serializer.data)

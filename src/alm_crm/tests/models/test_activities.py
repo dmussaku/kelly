@@ -236,3 +236,34 @@ class ActivityTests(TestMixin, TestCase):
 
         activities = Activity.get_calendar(company_id=self.company.id, user_id=self.user.id, dt=timezone.now())
         self.assertEqual(len(activities), 14)
+
+    def test_create_activity(self):
+        contact = ContactFactory(company_id=self.company.id)
+        sales_cycle = SalesCycleFactory(contact=contact, company_id=self.company.id)
+        SalesCycle.create_globalcycle(
+            **{'company_id': self.company.id,
+               'owner_id': self.user.id,
+               'contact_id': contact.id
+            }
+        )
+
+        valid_data = {'sales_cycle_id':sales_cycle.id, 'description':'test message', 'contact_id': contact.id}
+
+        activity = Activity.create_activity(company_id=self.company.id, user_id=self.user.id, data=valid_data)
+        self.assertEqual(activity.description, 'test message')
+        self.assertEqual(activity.sales_cycle.id, sales_cycle.id)
+        self.assertEqual(activity.hashtags.count(), 0)
+
+        valid_data_with_hashtag = {'sales_cycle_id':sales_cycle.id, 'description':'test message #tag', 'contact_id': contact.id}
+
+        activity = Activity.create_activity(company_id=self.company.id, user_id=self.user.id, data=valid_data_with_hashtag)
+        self.assertEqual(activity.description, 'test message #tag')
+        self.assertEqual(activity.sales_cycle.id, sales_cycle.id)
+        self.assertEqual(activity.hashtags.count(), 1)
+
+        valid_data_with_no_cycle = {'description':'test message2', 'contact_id': contact.id}
+
+        activity = Activity.create_activity(company_id=self.company.id, user_id=self.user.id, data=valid_data_with_no_cycle)
+        self.assertEqual(activity.description, 'test message2')
+        self.assertEqual(activity.sales_cycle.id, contact.global_sales_cycle.id)
+        self.assertEqual(activity.hashtags.count(), 0)

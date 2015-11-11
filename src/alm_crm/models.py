@@ -1444,6 +1444,17 @@ class SalesCycle(SubscriptionObject):
         sales_cycle.save()
 
     @classmethod
+    def get_by_contact(cls, company_id, contact_id, include_children=False):
+        contact_ids = [contact_id]
+        if include_children:
+            contact = Contact.objects.get(id=contact_id)
+            contact_ids = contact_ids + list(contact.children.all().values_list('id', flat=True))
+        
+        sales_cycles = SalesCycle.objects.filter(company_id=company_id, contact_id__in=contact_ids)
+
+        return sales_cycles
+
+    @classmethod
     def get_by_ids(cls, *ids):
         """Get sales cycles by ids from cache with fallback to postgres."""
         rv = cache.get_many([build_key(cls._meta.model_name, sid) for sid in ids])
@@ -1863,6 +1874,34 @@ class Activity(SubscriptionObject):
                     Q(deadline__isnull=True, date_created__gte=start, date_created__lte=end)
 
         return Activity.objects.filter(query & sub_query)
+
+    @classmethod
+    def create_activity(cls, company_id, user_id, data):
+        from .utils.parser import text_parser
+        sales_cycle_id = data.get('sales_cycle_id', None) or \
+                         Contact.objects.get(id=data.get('contact_id')).global_sales_cycle.id
+        new_activity = Activity(description=data.get('description', ''),
+                                sales_cycle_id=sales_cycle_id,
+                                assignee_id=data.get('assignee_id', None),
+                                deadline=data.get('deadline', None),
+                                owner_id=user_id,
+                                company_id=company_id,
+                                need_preparation=data.get('need_preparation', False),)
+        new_activity.save()
+
+        if 'attached_files' in data:
+            self.attach_files(data['attached_files'], new_activity.id)
+
+        account = Account.objects.get(company_id=company_id, user_id=user_id)
+
+        new_activity.spray(company_id, account)
+
+        text_parser(base_text=new_activity.description,
+                    company_id=company_id,
+                    content_class=new_activity.__class__,
+                    object_id=new_activity.id)
+
+        return new_activity
     
     def new_comments_count(self, user_id):
         return len(
@@ -2409,3 +2448,11 @@ class ErrorCell(models.Model):
     row = models.IntegerField()
     col = models.IntegerField()
     data = models.CharField(max_length=10000)
+
+
+class Notification(SubscriptionObject):
+    # ACTIVITY_CREATION: при создании активити, {'count': N}
+
+    type = models.CharField(blank=True, null=True, max_length=100)
+    meta = models.TextField()
+    owner = models.ForeignKey(User, related_name='notifications', null=True)

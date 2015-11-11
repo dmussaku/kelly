@@ -6,17 +6,27 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 
 from alm_crm.models import (
+    Contact,
     Activity,
     SalesCycle,
     HashTag,
     HashTagReference,
-    )
+)
+from alm_crm.factories import ContactFactory, SalesCycleFactory, ActivityFactory
 
 from . import APITestMixin
 
 class ActivityAPITests(APITestMixin, APITestCase):
     def setUp(self):
         self.set_user()
+        self.activities_count = 5
+        self.setUpActivities(self.activities_count)
+
+    def setUpActivities(self, activities_count):
+        contact = ContactFactory(company_id=self.company.id, owner_id=self.company.id)
+        sales_cycle = SalesCycleFactory(company_id=self.company.id, owner_id=self.company.id, contact=contact)
+        for i in range(activities_count):
+            ActivityFactory(company_id=self.company.id, owner_id=self.company.id, sales_cycle=sales_cycle)
 
     def test_get_statistics(self):
         """
@@ -184,4 +194,23 @@ class ActivityAPITests(APITestMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         assertEqual(response.count, 100)
+
+    def test_create_multiple(self):
+        """
+        Ensure we can create multiple
+        """
+        contact = Contact.objects.first()
+        sales_cycle = contact.sales_cycles.first()
+        valid_data = [{'sales_cycle_id':sales_cycle.id, 'description':'test message', 'contact_id': contact.id}]
+        url, parsed = self.prepare_urls('v1:activity-create-multiple', subdomain=self.company.subdomain)
+        
+        response = self.client.post(url, valid_data, HTTP_HOST=parsed.netloc, format='json')
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+        self.authenticate_user()
+        response = self.client.post(url, valid_data, HTTP_HOST=parsed.netloc, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        content = json.loads(response.content)
+        self.assertTrue(content.has_key('notification'))
         

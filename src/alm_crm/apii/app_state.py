@@ -68,6 +68,10 @@ class AppStateViewSet(viewsets.ViewSet):
 
     def get_constants(self):
         return {
+            'sales_cycle': {
+                'statuses': SalesCycle.STATUSES_OPTIONS,
+                'statuses_hash': SalesCycle.STATUSES_DICT
+            },
             'sales_cycle_log_entry': {
                 'types_hash': SalesCycleLogEntry.TYPES_DICT
             },
