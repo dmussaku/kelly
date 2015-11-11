@@ -13,7 +13,7 @@ from tastypie.http import HttpNotFound
 from tastypie.serializers import Serializer
 from tastypie.constants import ALL
 
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import PermissionDenied, ValidationError
 from django.contrib.auth import authenticate
 from django.conf.urls import url
 from django.utils import translation
@@ -116,12 +116,11 @@ class UserResource(ModelResource):
     group_ids = CustomToManyField('alm_crm.api.UsersGroupResource', 'groups',
         null=True, full=False, full_use_ids=True)
 
-
     class Meta(CommonMeta):
         queryset = User.objects.all().prefetch_related('groups')
         excludes = ['password', 'is_admin']
         list_allowed_methods = ['get', 'patch', 'post']
-        detail_allowed_methods = ['get', 'patch']
+        detail_allowed_methods = ['get', 'patch', 'delete']
         resource_name = 'user'
         filtering = {
             'id': ALL
@@ -309,6 +308,12 @@ class UserResource(ModelResource):
 
         except Account.DoesNotExist:
             account = Account.objects.create_account(bundle.obj, bundle.request.company, False)
+
+            # set PermissionEntity with bitmask
+            bitmask = bundle.data.get('permission_bitmask', 0)
+            account.permission_entity = PermissionEntity(bitmask=bitmask)
+            account.permission_entity.save()
+            account.save()
             # below will be setted by default values:
             #  account.is_active = False
             #  account.was_actived = False
@@ -356,6 +361,11 @@ class UserResource(ModelResource):
             if bundle.data.get('vcard', ""):
                 self.vcard_full_hydrate(bundle)
                 bundle.obj.save()
+            # set PermissionEntity's bitmask
+            bitmask = bundle.data.get('permission_bitmask', 0)
+            account = Account.objects.get(user=bundle.obj, company=bundle.request.company)
+            account.permission_entity.bitmask = bitmask
+            account.permission_entity.save()
         else:
             bundle = super(self.__class__, self).full_hydrate(bundle)
 
@@ -381,6 +391,7 @@ class UserResource(ModelResource):
             bundle.data['is_supervisor'] = current_account.is_supervisor
             bundle.data['is_active'] = current_account.is_active
             bundle.data['was_actived'] = current_account.was_actived
+            bundle.data['permission_bitmask'] = current_account.permission_entity.bitmask
         bundle.data['companies'] = company_list
         # TODO: use CustomFields with use_in_ids
 
