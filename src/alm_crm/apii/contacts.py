@@ -5,6 +5,10 @@ from rest_framework import viewsets, status
 from alm_vcard.serializers import VCardSerializer
 from alm_vcard.models import VCard
 
+from rest_framework import filters
+from alm_crm.filters import ContactFilter
+
+
 from alm_crm.serializers import ContactSerializer
 from alm_crm.models import Contact, SalesCycle, Share
 
@@ -14,7 +18,9 @@ from . import CompanyObjectAPIMixin
 class ContactViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
     
     serializer_class = ContactSerializer
-    pagination_class = None
+    # pagination_class = None
+    filter_backends = (filters.DjangoFilterBackend, filters.OrderingFilter)
+    filter_class = ContactFilter
 
     def get_queryset(self):
         return Contact.objects.filter(company_id=self.request.company.id).order_by('vcard__fn')
@@ -22,15 +28,10 @@ class ContactViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
     def list(self, request, *args, **kwargs):
         query_params = request.query_params
         if(query_params.has_key('ids')):
+            self.pagination_class = None
             ids = query_params.get('ids', None).split(',') if query_params.get('ids', None) else []
             queryset = self.filter_queryset(self.get_queryset())
             queryset = queryset.filter(id__in=ids)
-
-            page = self.paginate_queryset(queryset)
-            if page is not None:
-                serializer = self.get_serializer(page, many=True)
-                return self.get_paginated_response(serializer.data)
-
             serializer = self.get_serializer(queryset, many=True)
             return Response(serializer.data)
         return super(ContactViewSet, self).list(request, *args, **kwargs)
@@ -115,22 +116,33 @@ class ContactViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
         return Response(statistics)
 
     @list_route(methods=['get'], url_path='all')
-    def all(self, request, *args, **kwargs):    
-        contact_ids = Contact.get_all(company_id=request.company.id).values_list('id', flat=True)
+    def all(self, request, *args, **kwargs): 
+        queryset = Contact.get_all(company_id=request.company.id)
+        contact_filter = ContactFilter(request.GET, queryset)
+        contact_ids = contact_filter.qs.values_list('id', flat=True)
         return Response(contact_ids)
 
     @list_route(methods=['get'], url_path='recent')
-    def recent(self, request, *args, **kwargs):    
-        contact_ids = Contact.get_recent_base(company_id=request.company.id, user_id=request.user.id).values_list('id', flat=True)
+    def recent(self, request, *args, **kwargs):   
+        queryset = Contact.get_recent_base(
+            company_id=request.company.id, user_id=request.user.id)
+        contact_filter = ContactFilter(request.GET, queryset)
+        contact_ids = contact_filter.qs.values_list('id', flat=True) 
         return Response(contact_ids)
 
     @list_route(methods=['get'], url_path='cold')
     def cold(self, request, *args, **kwargs):    
-        contact_ids = Contact.get_cold_base(company_id=request.company.id, user_id=request.user.id).values_list('id', flat=True)
+        queryset = Contact.get_cold_base(
+            company_id=request.company.id, user_id=request.user.id)
+        contact_filter = ContactFilter(request.GET, queryset)
+        contact_ids = contact_filter.qs.values_list('id', flat=True) 
         return Response(contact_ids)
 
     @list_route(methods=['get'], url_path='lead')
     def lead(self, request, *args, **kwargs):    
-        contact_ids = Contact.get_lead_base(company_id=request.company.id, user_id=request.user.id).values_list('id', flat=True)
+        queryset = Contact.get_lead_base(
+            company_id=request.company.id, user_id=request.user.id)
+        contact_filter = ContactFilter(request.GET, queryset)
+        contact_ids = contact_filter.qs.values_list('id', flat=True) 
         return Response(contact_ids)
 
