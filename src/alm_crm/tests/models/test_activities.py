@@ -129,7 +129,6 @@ class ActivityTests(TestMixin, TestCase):
         self.assertEqual(sales_cycle2.status, SalesCycle.PENDING)
 
     def test_company_feed(self):
-        account = self.user.accounts.get(company_id=self.company.id)
         account2 = AccountFactory(company=self.company)
         contact = ContactFactory(company_id=self.company.id)
         sales_cycle = SalesCycleFactory(
@@ -141,7 +140,7 @@ class ActivityTests(TestMixin, TestCase):
                 owner=self.user, 
                 company_id=self.company.id
                 )
-            a.spray(self.company.id, account)
+            a.spray(self.company.id, self.account)
 
         for i in range(3):
             a = ActivityFactory(
@@ -215,7 +214,6 @@ class ActivityTests(TestMixin, TestCase):
         self.assertEqual(feed.count(), 2)
 
     def test_my_feed(self):
-        account = self.user.accounts.get(company_id=self.company.id)
         account2 = AccountFactory(company=self.company)
         contact = ContactFactory(company_id=self.company.id)
         contact2 = ContactFactory(company_id=self.company.id)
@@ -232,21 +230,21 @@ class ActivityTests(TestMixin, TestCase):
                 owner=self.user, 
                 company_id=self.company.id
                 )
-            a.spray(self.company.id, account)
+            a.spray(self.company.id, self.account)
 
         for i in range(2):
             a = ActivityFactory(
                 sales_cycle=sales_cycle2, 
                 owner=self.user, 
                 company_id=self.company.id)
-            a.spray(self.company.id, account)
+            a.spray(self.company.id, self.account)
 
         for i in range(3):
             a = ActivityFactory(
                 sales_cycle=sales_cycle3, 
                 owner=self.user, 
                 company_id=self.company.id)
-            a.spray(self.company.id, account)
+            a.spray(self.company.id, self.account)
 
         for i in range(4):
             a = ActivityFactory(
@@ -260,7 +258,7 @@ class ActivityTests(TestMixin, TestCase):
         self.assertEqual(my_feed['feed'].count(), 14)
         self.assertEqual(my_feed['not_read'], 4)
 
-        account.unfollow_list.add(contact)
+        self.account.unfollow_list.add(contact)
         my_feed = Activity.my_feed(
             company_id=self.company.id, 
             user_id=self.user.id)
@@ -268,7 +266,6 @@ class ActivityTests(TestMixin, TestCase):
         self.assertEqual(my_feed['not_read'], 4)
 
     def test_mark_as_read(self):
-        account = self.user.accounts.get(company_id=self.company.id)
         account2 = AccountFactory(company=self.company)
         contact = ContactFactory(company_id=self.company.id)
         sales_cycle = SalesCycleFactory(
@@ -281,7 +278,7 @@ class ActivityTests(TestMixin, TestCase):
                 owner=self.user, 
                 company_id=self.company.id
                 )
-            a.spray(self.company.id, account)
+            a.spray(self.company.id, self.account)
 
         for i in range(4):
             a = ActivityFactory(

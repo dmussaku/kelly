@@ -27,4 +27,13 @@ class UserApiTestCase(APITestMixin, APITestCase):
         content = json.loads(response.content)
         self.assertEqual(response.content['success'], True)
 
-    
+    def test_follow_unfollow(self):
+        url, parsed = self.prepare_urls(
+            'v1:user-follow-unfollow', subdomain=self.company.subdomain)
+
+        response = self.client.post(url, [], format='json', HTTP_HOST=parsed.netloc)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+        self.authenticate_user()
+        response = self.client.post(url, [], format='json', HTTP_HOST=parsed.netloc)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)

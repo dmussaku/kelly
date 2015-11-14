@@ -15,25 +15,23 @@ class UserSerializer(RequestContextMixin, serializers.ModelSerializer):
     is_active = serializers.SerializerMethodField()
     is_supervisor = serializers.SerializerMethodField()
     userpic = serializers.SerializerMethodField()
+    unfollow_list = serializers.SerializerMethodField()
 
-    _company = None
-    
     class Meta:
         model = User 
 
-
     def get_companies(self, obj):
-        return [CompanySerializer(company).data for company in Company.objects.filter(accounts__user_id__in=[obj.id])]
+        companies = Company.objects.filter(accounts__user_id=obj.id)
+        return CompanySerializer(companies, many=True).data
 
     def get_is_active(self, obj):
-        account = obj.accounts.get(
-            company_id=self.request.company.id)   
-        return account.is_active
+        return self.request.account.is_active
 
     def get_is_supervisor(self, obj):
-        account = obj.accounts.get(
-            company_id=self.request.company.id)
-        return account.is_supervisor
+        return self.request.account.is_supervisor
 
     def get_userpic(self, obj):
         return obj.userpic_obj.url
+
+    def get_unfollow_list(self, obj):
+        return self.request.account.unfollow_list.all().values_list('id', flat=True)

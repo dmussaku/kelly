@@ -65,3 +65,17 @@ class UserViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
                     'error_message': "current password is incorrect"
                 }
             )
+
+    @list_route(methods=['post'], url_path='follow_unfollow')
+    def follow_unfollow(self, request, **kwargs):
+        contact_ids = request.data
+        if type(contact_ids) != list:
+            return self.create_response(
+                request,
+                {'success': False, 'message': 'Pass a list as a parameter'}
+            )
+        request.account.follow_unfollow(contact_ids=contact_ids)
+
+        user = User.objects.get(id=request.user.id)
+        return Response(
+            self.get_serializer(user, context={'request': self.request}).data)

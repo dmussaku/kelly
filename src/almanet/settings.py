@@ -162,7 +162,6 @@ class BaseConfiguration(SubdomainConfiguration, Configuration):
     )
 
     MIDDLEWARE_CLASSES = (
-        'almanet.middleware.GetSubdomainMiddleware',
         'django.middleware.common.CommonMiddleware',
         'corsheaders.middleware.CorsMiddleware',
         'django.middleware.csrf.CsrfViewMiddleware',
@@ -172,6 +171,7 @@ class BaseConfiguration(SubdomainConfiguration, Configuration):
         'django.contrib.messages.middleware.MessageMiddleware',
         'django.contrib.auth.middleware.AuthenticationMiddleware',
         'django.middleware.gzip.GZipMiddleware',
+        'almanet.middleware.GetSubdomainMiddleware',
         'almanet.middleware.ForceDefaultLanguageMiddleware',
         # 'almanet.middleware.AlmanetSessionMiddleware',
         # 'almanet.middleware.MyAuthenticationMiddleware',
