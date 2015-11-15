@@ -167,13 +167,13 @@ class SalesCycleViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
         serializer = self.get_serializer(sales_cycles, many=True, latest_activity=True)
         return Response(serializer.data)
 
-    # @list_route(methods=['get'], url_path='get_by_contact')
-    # def get_by_contact(self, request, *args, **kwargs):
-    #     include_children = request.query_params.get('include_children', False)
-    #     contact_id = request.query_params.get('contact_id', None)
-    #     sales_cycles = SalesCycle.get_by_contact(company_id=request.company.id, 
-    #                                              contact_id=contact_id,
-    #                                              include_children=include_children)
+    @list_route(methods=['get'], url_path='get_by_contact')
+    def get_by_contact(self, request, *args, **kwargs):
+        include_children = request.query_params.get('include_children', False)
+        contact_id = request.query_params.get('contact_id', None)
+        sales_cycles = SalesCycle.get_by_contact(company_id=request.company.id, 
+                                                 contact_id=contact_id,
+                                                 include_children=include_children)
 
-    #     serializer = self.get_serializer(sales_cycles, many=True, latest_activity=False)
-    #     return Response(serializer.data)
+        serializer = self.get_serializer(sales_cycles, many=True, latest_activity=False)
+        return Response(serializer.data)

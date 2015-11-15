@@ -284,9 +284,9 @@ class SalesCycleAPITests(APITestMixin, APITestCase):
         self.assertTrue(content.has_key('previous'))
         self.assertTrue(content.has_key('results'))
 
-    def test_get_my_failed_sales_cycles(self):
+    def test_get_by_contact(self):
         """
-        Ensure we can get list of my failed sales_cycles
+        Ensure we can get list of sales_cycles by contact
         """
         c = Contact.objects.first()
 
