@@ -46,8 +46,22 @@ class ContactSerializer(RequestContextMixin, serializers.ModelSerializer):
         # pass parent=True param to get fully hydrated parent
         if kwargs.pop('parent', False):
             self.fields['parent'] = ContactSerializer(global_sales_cycle=True)
+
+        # pass products=True param to get hydrated list of products which are connected to contact
+        if kwargs.pop('products', False):
+            self.fields['products'] = serializers.SerializerMethodField()
+
+        # pass sales_cycles=True param to get hydrated list of sales cycles
+        if kwargs.pop('sales_cycles', False):
+            self.fields['sales_cycles'] = SalesCycleSerializer(many=True)
             
         super(ContactSerializer, self).__init__(*args, **kwargs)
+
+    def get_products(self, obj):
+        products = obj.get_products()
+        if products:
+            return ProductSerializer(products, many=True)
+        return []
 
 
 class SalesCycleLogEntrySerializer(RequestContextMixin, serializers.ModelSerializer):
@@ -56,9 +70,9 @@ class SalesCycleLogEntrySerializer(RequestContextMixin, serializers.ModelSeriali
 
 
 class SalesCycleSerializer(RequestContextMixin, serializers.ModelSerializer):
-    log = SalesCycleLogEntrySerializer(many=True)
-    activity_count = serializers.SerializerMethodField()
-    tasks_count = serializers.SerializerMethodField()
+    log = SalesCycleLogEntrySerializer(many=True, read_only=True)
+    activity_count = serializers.SerializerMethodField(read_only=True)
+    tasks_count = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = SalesCycle
@@ -66,7 +80,7 @@ class SalesCycleSerializer(RequestContextMixin, serializers.ModelSerializer):
     def __init__(self, *args, **kwargs):
         # pass contact=True param to get fully hydrated contact
         if kwargs.pop('contact', False):
-            self.fields['contact'] = ContactSerializer()
+            self.fields['contact'] = ContactSerializer(read_only=True)
 
         if kwargs.pop('latest_activity', False):
             self.fields['latest_activity'] = serializers.SerializerMethodField()

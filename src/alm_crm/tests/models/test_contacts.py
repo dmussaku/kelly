@@ -1,7 +1,13 @@
 from django.test import TestCase
 
 from alm_user.factories import AccountFactory
-from alm_crm.factories import ContactFactory, SalesCycleFactory, ActivityFactory
+from alm_crm.factories import (
+    ContactFactory, 
+    SalesCycleFactory, 
+    ActivityFactory, 
+    ProductFactory,
+    SalesCycleProductStatFactory,
+)
 from alm_crm.models import Contact, Milestone
 
 from . import TestMixin
@@ -93,3 +99,20 @@ class ContactTests(TestMixin, TestCase):
         
         contacts = Contact.get_cold_base(company_id=self.company.id, user_id=self.user.id)
         self.assertEqual(contacts.count(), 5)
+
+    def test_get_products(self):
+        p1 = ProductFactory(company_id=self.company.id)
+        p2 = ProductFactory(company_id=self.company.id)
+
+        c1 = ContactFactory(company_id=self.company.id, owner_id=self.user.id)
+        sc1 = SalesCycleFactory(contact=c1, company_id=self.company.id, owner_id=self.user.id)
+        SalesCycleProductStatFactory(sales_cycle=sc1, product=p1)
+
+        c2 = ContactFactory(company_id=self.company.id, owner_id=self.user.id)
+        sc2 = SalesCycleFactory(contact=c2, company_id=self.company.id, owner_id=self.user.id)
+        SalesCycleProductStatFactory(sales_cycle=sc2, product=p1)
+        SalesCycleProductStatFactory(sales_cycle=sc2, product=p2)
+
+        self.assertEqual(len(c1.get_products()), 1)
+        self.assertEqual(len(c2.get_products()), 2)
+

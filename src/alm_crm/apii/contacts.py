@@ -1,11 +1,11 @@
-from rest_framework.decorators import list_route
+from rest_framework.decorators import list_route, detail_route
 from rest_framework.response import Response
 from rest_framework import viewsets, status
 
 from alm_vcard.serializers import VCardSerializer
 from alm_vcard.models import VCard
 
-from alm_crm.serializers import ContactSerializer
+from alm_crm.serializers import ContactSerializer, SalesCycleSerializer
 from alm_crm.models import Contact, SalesCycle, Share
 
 from . import CompanyObjectAPIMixin
@@ -34,6 +34,11 @@ class ContactViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
             serializer = self.get_serializer(queryset, many=True)
             return Response(serializer.data)
         return super(ContactViewSet, self).list(request, *args, **kwargs)
+
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, products=True, global_sales_cycle=True)
+        return Response(serializer.data)
 
     def create(self, request, *args, **kwargs):
     	data = request.data
@@ -134,3 +139,19 @@ class ContactViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
         contact_ids = Contact.get_lead_base(company_id=request.company.id, user_id=request.user.id).values_list('id', flat=True)
         return Response(contact_ids)
 
+    @detail_route(methods=['get'], url_path='sales_cycles')
+    def sales_cycles(self, request, *args, **kwargs):
+        contact = self.get_object()
+        sales_cycles = SalesCycleSerializer(contact.sales_cycles.all(), many=True)
+
+        include_children = request.query_params.get('include_children', False)
+        if include_children:
+            children = ContactSerializer(contact.children.all(), sales_cycles=True, many=True)
+
+            return Response({
+                'sales_cycles': sales_cycles.data,
+                'children': children.data,
+            })
+        return Response({
+            'sales_cycles': sales_cycles.data,
+        })

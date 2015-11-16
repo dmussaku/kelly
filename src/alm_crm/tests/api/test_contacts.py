@@ -298,3 +298,18 @@ class ContactAPITests(APITestMixin, APITestCase):
         self.authenticate_user()
         response = self.client.get(url, HTTP_HOST=parsed.netloc)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_get_sales_cycles(self):
+        """
+        Ensure we can get list of sales_cycles for contact
+        """
+        c = Contact.objects.first()
+
+        url, parsed = self.prepare_urls('v1:contact-sales-cycles', subdomain=self.company.subdomain, query={'contact_id': c.id}, kwargs={'pk': c.id})
+        
+        response = self.client.get(url, HTTP_HOST=parsed.netloc)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+        self.authenticate_user()
+        response = self.client.get(url, HTTP_HOST=parsed.netloc)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)

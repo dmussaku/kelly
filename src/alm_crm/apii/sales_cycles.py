@@ -12,11 +12,6 @@ class SalesCycleViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
     
     serializer_class = SalesCycleSerializer
 
-    def get_serializer(self, *args, **kwargs):
-    	serializer_class = self.get_serializer_class()
-        kwargs['context'] = self.get_serializer_context()
-        return serializer_class(contact=True, *args, **kwargs)
-
     def get_queryset(self):
         return SalesCycle.objects.filter(company_id=self.request.company.id)
 
@@ -30,15 +25,15 @@ class SalesCycleViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
 
             # если передан параметр all, то тогда отдать без pagination'а все циклы
             if(query_params.has_key('all')):
-                serializer = self.get_serializer(queryset, many=True, latest_activity=True)
+                serializer = self.get_serializer(queryset, many=True, contact=True, latest_activity=True)
                 return Response(serializer.data)
 
             page = self.paginate_queryset(queryset)
             if page is not None:
-                serializer = self.get_serializer(page, many=True, latest_activity=True)
+                serializer = self.get_serializer(page, many=True, contact=True, latest_activity=True)
                 return self.get_paginated_response(serializer.data)
 
-            serializer = self.get_serializer(queryset, many=True, latest_activity=True)
+            serializer = self.get_serializer(queryset, many=True, contact=True, latest_activity=True)
             return Response(serializer.data)
         return super(SalesCycleViewSet, self).list(request, *args, **kwargs)
 
@@ -53,10 +48,10 @@ class SalesCycleViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
 
         page = self.paginate_queryset(sales_cycles)
         if page is not None:
-            serializer = self.get_serializer(page, many=True, latest_activity=True)
+            serializer = self.get_serializer(page, many=True, contact=True, latest_activity=True)
             return self.get_paginated_response(serializer.data)
 
-        serializer = self.get_serializer(sales_cycles, many=True, latest_activity=True)
+        serializer = self.get_serializer(sales_cycles, many=True, contact=True, latest_activity=True)
         return Response(serializer.data)
 
     @list_route(methods=['get'], url_path='new/all')
@@ -65,10 +60,10 @@ class SalesCycleViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
 
     	page = self.paginate_queryset(sales_cycles)
         if page is not None:
-            serializer = self.get_serializer(page, many=True, latest_activity=True)
+            serializer = self.get_serializer(page, many=True, contact=True, latest_activity=True)
             return self.get_paginated_response(serializer.data)
 
-        serializer = self.get_serializer(sales_cycles, many=True, latest_activity=True)
+        serializer = self.get_serializer(sales_cycles, many=True, contact=True, latest_activity=True)
         return Response(serializer.data)
 
     @list_route(methods=['get'], url_path='pending/all')
@@ -77,10 +72,10 @@ class SalesCycleViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
 
         page = self.paginate_queryset(sales_cycles)
         if page is not None:
-            serializer = self.get_serializer(page, many=True, latest_activity=True)
+            serializer = self.get_serializer(page, many=True, contact=True, latest_activity=True)
             return self.get_paginated_response(serializer.data)
 
-        serializer = self.get_serializer(sales_cycles, many=True, latest_activity=True)
+        serializer = self.get_serializer(sales_cycles, many=True, contact=True, latest_activity=True)
         return Response(serializer.data)
 
     @list_route(methods=['get'], url_path='successful/all')
@@ -89,10 +84,10 @@ class SalesCycleViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
 
         page = self.paginate_queryset(sales_cycles)
         if page is not None:
-            serializer = self.get_serializer(page, many=True, latest_activity=True)
+            serializer = self.get_serializer(page, many=True, contact=True, latest_activity=True)
             return self.get_paginated_response(serializer.data)
 
-        serializer = self.get_serializer(sales_cycles, many=True, latest_activity=True)
+        serializer = self.get_serializer(sales_cycles, many=True, contact=True, latest_activity=True)
         return Response(serializer.data)
 
     @list_route(methods=['get'], url_path='failed/all')
@@ -101,10 +96,10 @@ class SalesCycleViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
 
         page = self.paginate_queryset(sales_cycles)
         if page is not None:
-            serializer = self.get_serializer(page, many=True, latest_activity=True)
+            serializer = self.get_serializer(page, many=True, contact=True, latest_activity=True)
             return self.get_paginated_response(serializer.data)
 
-        serializer = self.get_serializer(sales_cycles, many=True, latest_activity=True)
+        serializer = self.get_serializer(sales_cycles, many=True, contact=True, latest_activity=True)
         return Response(serializer.data)
 
     @list_route(methods=['get'], url_path='my')
@@ -113,10 +108,10 @@ class SalesCycleViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
 
         page = self.paginate_queryset(sales_cycles)
         if page is not None:
-            serializer = self.get_serializer(page, many=True, latest_activity=True)
+            serializer = self.get_serializer(page, many=True, contact=True, latest_activity=True)
             return self.get_paginated_response(serializer.data)
 
-        serializer = self.get_serializer(sales_cycles, many=True, latest_activity=True)
+        serializer = self.get_serializer(sales_cycles, many=True, contact=True, latest_activity=True)
         return Response(serializer.data)
 
     @list_route(methods=['get'], url_path='new/my')
@@ -125,10 +120,10 @@ class SalesCycleViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
 
         page = self.paginate_queryset(sales_cycles)
         if page is not None:
-            serializer = self.get_serializer(page, many=True, latest_activity=True)
+            serializer = self.get_serializer(page, many=True, contact=True, latest_activity=True)
             return self.get_paginated_response(serializer.data)
 
-        serializer = self.get_serializer(sales_cycles, many=True, latest_activity=True)
+        serializer = self.get_serializer(sales_cycles, many=True, contact=True, latest_activity=True)
         return Response(serializer.data)
 
     @list_route(methods=['get'], url_path='pending/my')
@@ -137,10 +132,10 @@ class SalesCycleViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
 
         page = self.paginate_queryset(sales_cycles)
         if page is not None:
-            serializer = self.get_serializer(page, many=True, latest_activity=True)
+            serializer = self.get_serializer(page, many=True, contact=True, latest_activity=True)
             return self.get_paginated_response(serializer.data)
 
-        serializer = self.get_serializer(sales_cycles, many=True, latest_activity=True)
+        serializer = self.get_serializer(sales_cycles, many=True, contact=True, latest_activity=True)
         return Response(serializer.data)
 
     @list_route(methods=['get'], url_path='successful/my')
@@ -149,10 +144,10 @@ class SalesCycleViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
 
         page = self.paginate_queryset(sales_cycles)
         if page is not None:
-            serializer = self.get_serializer(page, many=True, latest_activity=True)
+            serializer = self.get_serializer(page, many=True, contact=True, latest_activity=True)
             return self.get_paginated_response(serializer.data)
 
-        serializer = self.get_serializer(sales_cycles, many=True, latest_activity=True)
+        serializer = self.get_serializer(sales_cycles, many=True, contact=True, latest_activity=True)
         return Response(serializer.data)
 
     @list_route(methods=['get'], url_path='failed/my')
@@ -161,19 +156,8 @@ class SalesCycleViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
 
         page = self.paginate_queryset(sales_cycles)
         if page is not None:
-            serializer = self.get_serializer(page, many=True, latest_activity=True)
+            serializer = self.get_serializer(page, many=True, contact=True, latest_activity=True)
             return self.get_paginated_response(serializer.data)
 
-        serializer = self.get_serializer(sales_cycles, many=True, latest_activity=True)
-        return Response(serializer.data)
-
-    @list_route(methods=['get'], url_path='get_by_contact')
-    def get_by_contact(self, request, *args, **kwargs):
-        include_children = request.query_params.get('include_children', False)
-        contact_id = request.query_params.get('contact_id', None)
-        sales_cycles = SalesCycle.get_by_contact(company_id=request.company.id, 
-                                                 contact_id=contact_id,
-                                                 include_children=include_children)
-
-        serializer = self.get_serializer(sales_cycles, many=True, latest_activity=False)
+        serializer = self.get_serializer(sales_cycles, many=True, contact=True, latest_activity=True)
         return Response(serializer.data)

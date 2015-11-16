@@ -13,6 +13,7 @@ from .models import (
     Share,
     HashTag,
     HashTagReference,
+    SalesCycleProductStat,
 )
 
 
@@ -88,3 +89,8 @@ class ShareFactory(CompanyObjectFactoryMixin, factory.django.DjangoModelFactory)
         model = Share
 
     note = factory.Faker('text')
+
+
+class SalesCycleProductStatFactory(CompanyObjectFactoryMixin, factory.django.DjangoModelFactory):
+    class Meta:
+        model = SalesCycleProductStat

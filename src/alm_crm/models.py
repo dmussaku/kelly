@@ -1010,6 +1010,10 @@ class Contact(SubscriptionObject):
         }
         return response
 
+    def get_products(self):
+        return Product.objects.filter(id__in= \
+            self.sales_cycles.all().values_list('products', flat=True).distinct())
+
     def serialize(self):
         return {
             'author_id': self.owner_id,
@@ -1162,7 +1166,7 @@ class SalesCycle(SubscriptionObject):
     is_global = models.BooleanField(default=False)
 
     title = models.CharField(max_length=100)
-    description = models.CharField(max_length=500)
+    description = models.CharField(max_length=500, null=True, blank=True)
     products = models.ManyToManyField(Product, related_name='sales_cycles',
                                       null=True, blank=True,
                                       through='SalesCycleProductStat')
@@ -1435,17 +1439,6 @@ class SalesCycle(SubscriptionObject):
         sales_cycle = instance.sales_cycle
         sales_cycle.latest_activity = instance
         sales_cycle.save()
-
-    @classmethod
-    def get_by_contact(cls, company_id, contact_id, include_children=False):
-        contact_ids = [contact_id]
-        if include_children:
-            contact = Contact.objects.get(id=contact_id)
-            contact_ids = contact_ids + list(contact.children.all().values_list('id', flat=True))
-        
-        sales_cycles = SalesCycle.objects.filter(company_id=company_id, contact_id__in=contact_ids)
-
-        return sales_cycles
 
     @classmethod
     def get_by_ids(cls, *ids):
