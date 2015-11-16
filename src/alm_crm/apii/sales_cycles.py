@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
-from rest_framework.decorators import list_route
+from rest_framework.decorators import list_route, detail_route
 from rest_framework.response import Response
 from rest_framework import viewsets
 
-from alm_crm.serializers import SalesCycleSerializer
-from alm_crm.models import SalesCycle
+from alm_crm.serializers import SalesCycleSerializer, ActivitySerializer
+from alm_crm.models import SalesCycle, Activity
 
 from . import CompanyObjectAPIMixin
 
@@ -160,4 +160,17 @@ class SalesCycleViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
             return self.get_paginated_response(serializer.data)
 
         serializer = self.get_serializer(sales_cycles, many=True, contact=True, latest_activity=True)
+        return Response(serializer.data)
+
+    @detail_route(methods=['get'], url_path='activities')
+    def activities(self, request, *args, **kwargs):
+        sales_cycle = self.get_object()
+        activities = sales_cycle.rel_activities.all()
+
+        page = self.paginate_queryset(activities)
+        if page is not None:
+            serializer = ActivitySerializer(page, many=True, context={'request': request}, sales_cycle=True, contact=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = ActivitySerializer(activities, many=True, context={'request': request}, sales_cycle=True, contact=True)
         return Response(serializer.data)

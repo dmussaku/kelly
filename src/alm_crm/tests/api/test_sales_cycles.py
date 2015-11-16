@@ -283,3 +283,18 @@ class SalesCycleAPITests(APITestMixin, APITestCase):
         self.assertTrue(content.has_key('next'))
         self.assertTrue(content.has_key('previous'))
         self.assertTrue(content.has_key('results'))
+
+    def test_get_activities(self):
+        """
+        Ensure we can get list of activities for sales_cycle
+        """
+        sc = SalesCycle.objects.first()
+
+        url, parsed = self.prepare_urls('v1:sales_cycle-activities', subdomain=self.company.subdomain, kwargs={'pk': sc.id})
+        
+        response = self.client.get(url, HTTP_HOST=parsed.netloc)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+        self.authenticate_user()
+        response = self.client.get(url, HTTP_HOST=parsed.netloc)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
