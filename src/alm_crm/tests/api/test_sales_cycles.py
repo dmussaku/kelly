@@ -3,7 +3,7 @@ import simplejson as json
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from alm_crm.factories import ContactFactory, SalesCycleFactory
+from alm_crm.factories import ContactFactory, SalesCycleFactory, ProductFactory
 from alm_crm.models import Contact, SalesCycle, Milestone
 
 from . import APITestMixin
@@ -353,3 +353,23 @@ class SalesCycleAPITests(APITestMixin, APITestCase):
         response = self.client.get(url, HTTP_HOST=parsed.netloc)
         content = json.loads(response.content)
         self.assertEqual(self.sales_cycles_count, content['count']) # nothing was deleted
+
+    def test_change_products(self):
+        """
+        Ensure we can change sales cycle's products
+        """
+        sc = SalesCycle.objects.first()
+        p = ProductFactory(owner=self.user, company_id=self.company.id)
+
+        data = {
+            'product_ids': [p.id]
+        }
+
+        url, parsed = self.prepare_urls('v1:sales_cycle-change-products', subdomain=self.company.subdomain, kwargs={'pk': sc.id})
+        
+        response = self.client.post(url, data, HTTP_HOST=parsed.netloc)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+        self.authenticate_user()
+        response = self.client.post(url, data, HTTP_HOST=parsed.netloc)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)

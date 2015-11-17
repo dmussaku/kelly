@@ -195,3 +195,13 @@ class SalesCycleViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
                                                    company_id=request.company.id)
         serializer = self.get_serializer(sales_cycle, contact=True, latest_activity=True)
         return Response(serializer.data)
+
+    @detail_route(methods=['post'], url_path='change_products')
+    def change_products(self, request, *args, **kwargs):
+        product_ids = request.data.get('product_ids')
+        sales_cycle = self.get_object()
+        sales_cycle = sales_cycle.change_products(product_ids=product_ids,
+                                                  user_id=request.user.id,
+                                                  company_id=request.company.id)
+        serializer = self.get_serializer(sales_cycle, contact=True, latest_activity=True)
+        return Response(serializer.data)

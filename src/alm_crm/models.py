@@ -3,7 +3,7 @@
 import os
 import xlrd
 import pytz
-import json
+import simplejson as json
 from datetime import datetime, timedelta, time
 from celery import group, Task, result
 
@@ -1492,26 +1492,38 @@ class SalesCycle(SubscriptionObject):
     def find_latest_activity(self):
         return self.rel_activities.order_by('-date_created').first()
 
-    def add_product(self, product_id, **kw):
-        """TEST Assigns products to salescycle"""
-        return self.add_products([product_id], **kw)
+    def change_products(self, product_ids, user_id, company_id):
+        old_product_ids = self.products.all().values_list('id', flat=True)
 
-    def add_products(self, product_ids, company_id):
-        """TEST Assigns products to salescycle"""
-        if isinstance(product_ids, int):
-            product_ids = [product_ids]
-        assert isinstance(product_ids, (tuple, list)), "must be a list"
+        added = Product.objects.filter(id__in=list(set(product_ids) - set(old_product_ids))).values_list('name', flat=True)
+        deleted = Product.objects.filter(id__in=list(set(old_product_ids) - set(product_ids))).values_list('name', flat=True)
+        total_products = []
+
+        self.products.clear()
         products = Product.objects.filter(pk__in=product_ids)
-        if not products:
-            return False
+        
         for product in products:
             try:
                 SalesCycleProductStat.objects.get(sales_cycle=self, product=product)
             except SalesCycleProductStat.DoesNotExist:
                 s = SalesCycleProductStat(sales_cycle=self, product=product, company_id=company_id)
                 s.save()
+                total_products.append({
+                    'id': product.id,
+                    'name': product.name
+                })
 
-        return True
+        meta = {"added": list(added),
+                "deleted": list(deleted),
+                "products": total_products}
+        log_entry = SalesCycleLogEntry(sales_cycle=self,
+                                        owner_id=user_id,
+                                        company_id=company_id,
+                                        entry_type=SalesCycleLogEntry.PC,
+                                        meta=json.dumps(meta))
+        log_entry.save()
+
+        return self
 
     def set_result_by_amount(self, amount, company_id, succeed):
         v = Value(amount=amount, owner=self.owner)

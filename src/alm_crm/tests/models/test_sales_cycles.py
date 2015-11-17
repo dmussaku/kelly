@@ -1,10 +1,11 @@
+import simplejson as json
 import dateutil.relativedelta as relativedelta
 
 from django.utils import timezone
 from django.test import TestCase
 
 from alm_user.factories import AccountFactory
-from alm_crm.factories import SalesCycleFactory, ContactFactory, ActivityFactory
+from alm_crm.factories import SalesCycleFactory, ContactFactory, ActivityFactory, ProductFactory
 from alm_crm.models import SalesCycle, Milestone
 
 from . import TestMixin
@@ -327,4 +328,44 @@ class SalesCycleTests(TestMixin, TestCase):
         self.assertEqual(SalesCycle.get_failed_my(company_id=self.company.id, user_id=self.user.id).count(), 3)
         self.assertEqual(SalesCycle.get_failed_my(company_id=self.company.id, user_id=account2.user.id).count(), 2)
 
-    
+    def test_change_products(self):
+        """
+        Ensure we can change list of products
+        """
+        contact = ContactFactory(company_id=self.company.id)
+        sc = SalesCycleFactory(contact=contact, owner=self.user, company_id=self.company.id)
+        p1 = ProductFactory(owner=self.user, company_id=self.company.id)
+        p2 = ProductFactory(owner=self.user, company_id=self.company.id)
+        p3 = ProductFactory(owner=self.user, company_id=self.company.id)
+
+        sc = sc.change_products(product_ids=[p1.id], user_id=self.user.id, company_id=self.company.id)
+        meta = json.loads(sc.log.all()[0].meta)
+        self.assertEqual(sc.products.count(), 1)
+        self.assertEqual(sc.log.count(), 1)
+        self.assertEqual(len(meta['added']), 1)
+        self.assertEqual(len(meta['deleted']), 0)
+        self.assertEqual(len(meta['products']), 1)
+
+        sc = sc.change_products(product_ids=[p2.id], user_id=self.user.id, company_id=self.company.id)
+        meta = json.loads(sc.log.all()[1].meta)
+        self.assertEqual(sc.products.count(), 1)
+        self.assertEqual(sc.log.count(), 2)
+        self.assertEqual(len(meta['added']), 1)
+        self.assertEqual(len(meta['deleted']), 1)
+        self.assertEqual(len(meta['products']), 1)
+
+        sc = sc.change_products(product_ids=[p3.id], user_id=self.user.id, company_id=self.company.id)
+        meta = json.loads(sc.log.all()[2].meta)
+        self.assertEqual(sc.products.count(), 1)
+        self.assertEqual(sc.log.count(), 3)
+        self.assertEqual(len(meta['added']), 1)
+        self.assertEqual(len(meta['deleted']), 1)
+        self.assertEqual(len(meta['products']), 1)
+
+        sc = sc.change_products(product_ids=[p1.id, p2.id, p3.id], user_id=self.user.id, company_id=self.company.id)
+        meta = json.loads(sc.log.all()[3].meta)
+        self.assertEqual(sc.products.count(), 3)
+        self.assertEqual(sc.log.count(), 4)
+        self.assertEqual(len(meta['added']), 2)
+        self.assertEqual(len(meta['deleted']), 0)
+        self.assertEqual(len(meta['products']), 3)
