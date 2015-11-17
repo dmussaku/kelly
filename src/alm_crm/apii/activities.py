@@ -3,13 +3,13 @@ import simplejson as json
 
 from django.db import transaction
 
-from rest_framework.decorators import list_route
+from rest_framework.decorators import list_route, detail_route
 from rest_framework.response import Response
 from rest_framework import viewsets
 # from rest_framework import filters
 
 # from alm_crm.filters import ActivityFilter
-from alm_crm.serializers import ActivitySerializer, NotificationSerializer
+from alm_crm.serializers import ActivitySerializer, NotificationSerializer, SalesCycleSerializer
 from alm_crm.models import Activity, Notification
 
 from . import CompanyObjectAPIMixin
@@ -148,3 +148,15 @@ class ActivityViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
             notification.save()
 
         return Response({'notification': NotificationSerializer(notification).data})
+
+    @detail_route(methods=['post'], url_path='move')
+    def move(self, request, *args, **kwargs):
+        sales_cycle_id = request.data.get('sales_cycle_id')
+        activity = self.get_object()
+        rv = activity.move(sales_cycle_id=sales_cycle_id)
+
+        return Response({
+            'prev_sales_cycle': SalesCycleSerializer(rv['prev_sales_cycle'], context={'request': request}).data,
+            'new_sales_cycle': SalesCycleSerializer(rv['new_sales_cycle'], context={'request': request}).data,
+            'activity': self.get_serializer(rv['activity']).data
+        })

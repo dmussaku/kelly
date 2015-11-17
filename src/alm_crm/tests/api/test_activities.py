@@ -277,4 +277,29 @@ class ActivityAPITests(APITestMixin, APITestCase):
         response = self.client.get(url, HTTP_HOST=parsed.netloc)
         content = json.loads(response.content)
         self.assertEqual(self.activities_count-1, content['count']) # deleted 1 activity
+
+    def test_move_activity(self):
+        """
+        Ensure we can move activity to another sales cycle
+        """
+        activity = Activity.objects.first()
+        sc = SalesCycle.objects.first()
+
+        data = {
+            'sales_cycle_id': sc.id
+        }
+
+        url, parsed = self.prepare_urls('v1:activity-move', subdomain=self.company.subdomain, kwargs={'pk': activity.id})
+        
+        response = self.client.post(url, data, HTTP_HOST=parsed.netloc)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+        self.authenticate_user()
+        response = self.client.post(url, data, HTTP_HOST=parsed.netloc)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        content = json.loads(response.content)
+        self.assertTrue(content.has_key('prev_sales_cycle'))
+        self.assertTrue(content.has_key('new_sales_cycle'))
+        self.assertTrue(content.has_key('activity'))
         

@@ -1921,9 +1921,9 @@ class Activity(SubscriptionObject):
         recip = self.recipients.filter(user_id=user_id).first()
         return not recip or recip.has_read
 
-    def move(self, new_sales_cycle_id):
+    def move(self, sales_cycle_id):
         prev_sales_cycle = self.sales_cycle
-        new_sales_cycle = SalesCycle.objects.get(id=new_sales_cycle_id)
+        new_sales_cycle = SalesCycle.objects.get(id=sales_cycle_id)
         self.sales_cycle = new_sales_cycle
         self.save()
         # новый цикл автоматически выставится как pending из-за after_save
@@ -1932,7 +1932,7 @@ class Activity(SubscriptionObject):
         return {
             'prev_sales_cycle': prev_sales_cycle,
             'new_sales_cycle': new_sales_cycle,
-            'activity': self.sales_cycle
+            'activity': self
         }
 
 post_save.connect(Activity.after_save, sender=Activity)

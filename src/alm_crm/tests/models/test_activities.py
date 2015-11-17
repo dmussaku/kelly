@@ -443,3 +443,22 @@ class ActivityTests(TestMixin, TestCase):
         self.assertEqual(activity.description, 'test message2')
         self.assertEqual(activity.sales_cycle.id, contact.global_sales_cycle.id)
         self.assertEqual(activity.hashtags.count(), 0)
+
+    def test_move_activity(self):
+        contact = ContactFactory(company_id=self.company.id)
+        sales_cycle1 = SalesCycleFactory(
+            contact=contact, company_id=self.company.id)
+        sales_cycle2 = SalesCycleFactory(
+            contact=contact, company_id=self.company.id)
+
+        activity = ActivityFactory(
+            sales_cycle=sales_cycle1, 
+            owner=self.user, 
+            company_id=self.company.id
+            )
+
+        self.assertEqual(activity.sales_cycle.id, sales_cycle1.id)
+
+        activity.move(sales_cycle2.id)
+        self.assertEqual(activity.sales_cycle.id, sales_cycle2.id)
+
