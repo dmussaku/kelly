@@ -4,7 +4,7 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 
 from alm_crm.factories import ContactFactory, SalesCycleFactory
-from alm_crm.models import Contact, SalesCycle
+from alm_crm.models import Contact, SalesCycle, Milestone
 
 from . import APITestMixin
 
@@ -297,4 +297,23 @@ class SalesCycleAPITests(APITestMixin, APITestCase):
 
         self.authenticate_user()
         response = self.client.get(url, HTTP_HOST=parsed.netloc)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_change_milestone(self):
+        """
+        Ensure we can change sales cycle's milestone
+        """
+        sc = SalesCycle.objects.first()
+
+        data = {
+            'milestone_id': Milestone.objects.first().id
+        }
+
+        url, parsed = self.prepare_urls('v1:sales_cycle-change-milestone', subdomain=self.company.subdomain, kwargs={'pk': sc.id})
+        
+        response = self.client.post(url, data, HTTP_HOST=parsed.netloc)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+        self.authenticate_user()
+        response = self.client.post(url, data, HTTP_HOST=parsed.netloc)
         self.assertEqual(response.status_code, status.HTTP_200_OK)

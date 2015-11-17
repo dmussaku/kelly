@@ -1524,7 +1524,7 @@ class SalesCycle(SubscriptionObject):
             self.projected_value = v
         self.save()
 
-    def change_milestone(self, user, milestone_id, company_id):
+    def change_milestone(self, milestone_id, user_id, company_id):
         if not milestone_id:
             self.milestone = None
             self.save()
@@ -1564,7 +1564,7 @@ class SalesCycle(SubscriptionObject):
         sc_log_entry = SalesCycleLogEntry(meta=json.dumps(meta),
                                           entry_type=SalesCycleLogEntry.MC,
                                           sales_cycle=self,
-                                          owner=user, 
+                                          owner_id=user_id, 
                                           company_id=company_id)
         sc_log_entry.save()
         return self

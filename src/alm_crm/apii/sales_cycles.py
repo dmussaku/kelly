@@ -174,3 +174,13 @@ class SalesCycleViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
 
         serializer = ActivitySerializer(activities, many=True, context={'request': request}, sales_cycle=True, contact=True)
         return Response(serializer.data)
+
+    @detail_route(methods=['post'], url_path='change_milestone')
+    def change_milestone(self, request, *args, **kwargs):
+        milestone_id = request.data.get('milestone_id')
+        sales_cycle = self.get_object()
+        sales_cycle = sales_cycle.change_milestone(milestone_id=milestone_id,
+                                                   user_id=request.user.id,
+                                                   company_id=request.company.id)
+        serializer = self.get_serializer(sales_cycle, contact=True, latest_activity=True)
+        return Response(serializer.data)

@@ -40,25 +40,25 @@ class SalesCycleTests(TestMixin, TestCase):
             total_scs.append(sc)
 
         sc1 = my_scs[0]
-        sc1.change_milestone(self.user, success_milestone.id, self.company.id)
+        sc1.change_milestone(success_milestone.id, self.user.id, self.company.id)
 
         sc1 = my_scs[1]
-        sc1.change_milestone(self.user, milestone.id, self.company.id)
+        sc1.change_milestone(milestone.id, self.user.id, self.company.id)
 
         sc1 = my_scs[2]
-        sc1.change_milestone(self.user, milestone.id, self.company.id)
+        sc1.change_milestone(milestone.id, self.user.id, self.company.id)
 
         sc1 = my_scs[3]
         ActivityFactory(sales_cycle=sc1, owner=self.user, company_id=self.company.id)
 
         sc1 = total_scs[0]
-        sc1.change_milestone(self.user, success_milestone.id, self.company.id)
+        sc1.change_milestone(success_milestone.id, self.user.id, self.company.id)
 
         sc1 = total_scs[1]
-        sc1.change_milestone(self.user, milestone.id, self.company.id)
+        sc1.change_milestone(milestone.id, self.user.id, self.company.id)
 
         sc1 = total_scs[2]
-        sc1.change_milestone(self.user, milestone2.id, self.company.id)
+        sc1.change_milestone(milestone2.id, self.user.id, self.company.id)
 
         sc1 = total_scs[2]
         ActivityFactory(sales_cycle=sc1, owner=self.user, company_id=self.company.id)
@@ -114,22 +114,22 @@ class SalesCycleTests(TestMixin, TestCase):
         self.assertEqual(sc.milestone, None)
         self.assertEqual(sc.status, SalesCycle.NEW)
 
-        sc.change_milestone(self.user, milestone.id, self.company.id)
+        sc.change_milestone(milestone.id, self.user.id, self.company.id)
         self.assertEqual(sc.milestone.id, milestone.id)
         self.assertEqual(sc.status, SalesCycle.PENDING)
         self.assertEqual(sc.log.count(), 1)
 
-        sc.change_milestone(self.user, success_milestone.id, self.company.id)
+        sc.change_milestone(success_milestone.id, self.user.id, self.company.id)
         self.assertEqual(sc.milestone.id, success_milestone.id)
         self.assertEqual(sc.status, SalesCycle.SUCCESSFUL)
         self.assertEqual(sc.log.count(), 2)
 
-        sc.change_milestone(self.user, fail_milestone.id, self.company.id)
+        sc.change_milestone(fail_milestone.id, self.user.id, self.company.id)
         self.assertEqual(sc.milestone.id, fail_milestone.id)
         self.assertEqual(sc.status, SalesCycle.FAILED)
         self.assertEqual(sc.log.count(), 3)
 
-        sc.change_milestone(self.user, None, self.company.id)
+        sc.change_milestone(None, self.user.id, self.company.id)
         self.assertEqual(sc.milestone, None)
         self.assertEqual(sc.status, SalesCycle.NEW)
         self.assertEqual(sc.log.count(), 3)
@@ -156,7 +156,7 @@ class SalesCycleTests(TestMixin, TestCase):
             scs.append(sc)
 
         for i in range(3):
-            scs[i].change_milestone(self.user, milestone.id, self.company.id)
+            scs[i].change_milestone(milestone.id, self.user.id, self.company.id)
 
         self.assertEqual(SalesCycle.get_new_all(company_id=self.company.id).count(), 7)
 
@@ -172,7 +172,7 @@ class SalesCycleTests(TestMixin, TestCase):
             scs.append(sc)
 
         for i in range(3):
-            scs[i].change_milestone(self.user, milestone.id, self.company.id)
+            scs[i].change_milestone(milestone.id, self.user.id, self.company.id)
 
         self.assertEqual(SalesCycle.get_pending_all(company_id=self.company.id).count(), 3)
 
@@ -188,7 +188,7 @@ class SalesCycleTests(TestMixin, TestCase):
             scs.append(sc)
 
         for i in range(3):
-            scs[i].change_milestone(self.user, milestone.id, self.company.id)
+            scs[i].change_milestone(milestone.id, self.user.id, self.company.id)
 
         self.assertEqual(SalesCycle.get_successful_all(company_id=self.company.id).count(), 3)
 
@@ -204,7 +204,7 @@ class SalesCycleTests(TestMixin, TestCase):
             scs.append(sc)
 
         for i in range(3):
-            scs[i].change_milestone(self.user, milestone.id, self.company.id)
+            scs[i].change_milestone(milestone.id, self.user.id, self.company.id)
 
         self.assertEqual(SalesCycle.get_failed_all(company_id=self.company.id).count(), 3)
 
@@ -237,14 +237,14 @@ class SalesCycleTests(TestMixin, TestCase):
             scs.append(sc)
 
         for i in range(3):
-            scs[i].change_milestone(self.user, milestone.id, self.company.id)
+            scs[i].change_milestone(milestone.id, self.user.id, self.company.id)
 
         for i in range(3):
             sc = SalesCycleFactory(contact=contact, owner=account2.user, company_id=self.company.id)
             scs2.append(sc)
 
         for i in range(2):
-            scs2[i].change_milestone(self.user, milestone.id, self.company.id)
+            scs2[i].change_milestone(milestone.id, self.user.id, self.company.id)
 
         self.assertEqual(SalesCycle.get_new_my(company_id=self.company.id, user_id=self.user.id).count(), 7)
         self.assertEqual(SalesCycle.get_new_my(company_id=self.company.id, user_id=account2.user.id).count(), 1)
@@ -263,14 +263,14 @@ class SalesCycleTests(TestMixin, TestCase):
             scs.append(sc)
 
         for i in range(3):
-            scs[i].change_milestone(self.user, milestone.id, self.company.id)
+            scs[i].change_milestone(milestone.id, self.user.id, self.company.id)
 
         for i in range(3):
             sc = SalesCycleFactory(contact=contact, owner=account2.user, company_id=self.company.id)
             scs2.append(sc)
 
         for i in range(2):
-            scs2[i].change_milestone(self.user, milestone.id, self.company.id)
+            scs2[i].change_milestone(milestone.id, self.user.id, self.company.id)
 
         self.assertEqual(SalesCycle.get_pending_my(company_id=self.company.id, user_id=self.user.id).count(), 3)
         self.assertEqual(SalesCycle.get_pending_my(company_id=self.company.id, user_id=account2.user.id).count(), 2)
@@ -289,14 +289,14 @@ class SalesCycleTests(TestMixin, TestCase):
             scs.append(sc)
 
         for i in range(3):
-            scs[i].change_milestone(self.user, milestone.id, self.company.id)
+            scs[i].change_milestone(milestone.id, self.user.id, self.company.id)
 
         for i in range(3):
             sc = SalesCycleFactory(contact=contact, owner=account2.user, company_id=self.company.id)
             scs2.append(sc)
 
         for i in range(2):
-            scs2[i].change_milestone(self.user, milestone.id, self.company.id)
+            scs2[i].change_milestone(milestone.id, self.user.id, self.company.id)
 
         self.assertEqual(SalesCycle.get_successful_my(company_id=self.company.id, user_id=self.user.id).count(), 3)
         self.assertEqual(SalesCycle.get_successful_my(company_id=self.company.id, user_id=account2.user.id).count(), 2)
@@ -315,14 +315,14 @@ class SalesCycleTests(TestMixin, TestCase):
             scs.append(sc)
 
         for i in range(3):
-            scs[i].change_milestone(self.user, milestone.id, self.company.id)
+            scs[i].change_milestone(milestone.id, self.user.id, self.company.id)
 
         for i in range(3):
             sc = SalesCycleFactory(contact=contact, owner=account2.user, company_id=self.company.id)
             scs2.append(sc)
 
         for i in range(2):
-            scs2[i].change_milestone(self.user, milestone.id, self.company.id)
+            scs2[i].change_milestone(milestone.id, self.user.id, self.company.id)
 
         self.assertEqual(SalesCycle.get_failed_my(company_id=self.company.id, user_id=self.user.id).count(), 3)
         self.assertEqual(SalesCycle.get_failed_my(company_id=self.company.id, user_id=account2.user.id).count(), 2)
