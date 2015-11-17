@@ -258,4 +258,23 @@ class ActivityAPITests(APITestMixin, APITestCase):
 
         content = json.loads(response.content)
         self.assertTrue(content.has_key('notification'))
+
+    def test_delete(self):
+        """
+        Ensure we can delete activity
+        """
+        activity = Activity.objects.first()
+        url, parsed = self.prepare_urls('v1:activity-detail', subdomain=self.company.subdomain, kwargs={'pk': activity.id})
+        
+        response = self.client.delete(url, HTTP_HOST=parsed.netloc, format='json')
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+        self.authenticate_user()
+        response = self.client.delete(url, HTTP_HOST=parsed.netloc, format='json')
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+        url, parsed = self.prepare_urls('v1:activity-list', subdomain=self.company.subdomain)
+        response = self.client.get(url, HTTP_HOST=parsed.netloc)
+        content = json.loads(response.content)
+        self.assertEqual(self.activities_count-1, content['count']) # deleted 1 activity
         
