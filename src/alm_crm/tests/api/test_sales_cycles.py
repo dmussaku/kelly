@@ -336,3 +336,20 @@ class SalesCycleAPITests(APITestMixin, APITestCase):
         response = self.client.get(url, HTTP_HOST=parsed.netloc)
         content = json.loads(response.content)
         self.assertEqual(self.sales_cycles_count-1, content['count']) # deleted 1 sales_cycle
+
+        contact = ContactFactory(company_id=self.company.id)
+        global_sales_cycle = SalesCycle.create_globalcycle(
+                                **{'company_id': self.company.id,
+                                   'owner_id': self.user.id,
+                                   'contact_id': contact.id
+                                }
+                            )
+        url, parsed = self.prepare_urls('v1:sales_cycle-detail', subdomain=self.company.subdomain, kwargs={'pk': global_sales_cycle.id})
+
+        response = self.client.delete(url, HTTP_HOST=parsed.netloc, format='json')
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+        url, parsed = self.prepare_urls('v1:sales_cycle-list', subdomain=self.company.subdomain)
+        response = self.client.get(url, HTTP_HOST=parsed.netloc)
+        content = json.loads(response.content)
+        self.assertEqual(self.sales_cycles_count, content['count']) # nothing was deleted

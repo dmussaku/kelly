@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from rest_framework.decorators import list_route, detail_route
 from rest_framework.response import Response
-from rest_framework import viewsets
+from rest_framework import viewsets, status
 
 from alm_crm.serializers import SalesCycleSerializer, ActivitySerializer
 from alm_crm.models import SalesCycle, Activity
@@ -36,6 +36,17 @@ class SalesCycleViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
             serializer = self.get_serializer(queryset, many=True, contact=True, latest_activity=True)
             return Response(serializer.data)
         return super(SalesCycleViewSet, self).list(request, *args, **kwargs)
+
+    def destroy(self, request, *args, **kwargs):
+        '''
+        We override this method to ensure that global sales_cycles cannot be deleted through api
+        '''
+        instance = self.get_object()
+        if instance.is_global:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        else:
+            self.perform_destroy(instance)
+            return Response(status=status.HTTP_204_NO_CONTENT)
 
     @list_route(methods=['get'], url_path='statistics')
     def get_statistics(self, request, *args, **kwargs):
