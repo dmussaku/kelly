@@ -317,3 +317,22 @@ class SalesCycleAPITests(APITestMixin, APITestCase):
         self.authenticate_user()
         response = self.client.post(url, data, HTTP_HOST=parsed.netloc)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_delete(self):
+        """
+        Ensure we can delete sales cycle
+        """
+        sales_cycle = SalesCycle.objects.first()
+        url, parsed = self.prepare_urls('v1:sales_cycle-detail', subdomain=self.company.subdomain, kwargs={'pk': sales_cycle.id})
+        
+        response = self.client.delete(url, HTTP_HOST=parsed.netloc, format='json')
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+        self.authenticate_user()
+        response = self.client.delete(url, HTTP_HOST=parsed.netloc, format='json')
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+        url, parsed = self.prepare_urls('v1:sales_cycle-list', subdomain=self.company.subdomain)
+        response = self.client.get(url, HTTP_HOST=parsed.netloc)
+        content = json.loads(response.content)
+        self.assertEqual(self.sales_cycles_count-1, content['count']) # deleted 1 sales_cycle
