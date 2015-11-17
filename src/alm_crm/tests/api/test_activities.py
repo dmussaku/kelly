@@ -208,6 +208,37 @@ class ActivityAPITests(APITestMixin, APITestCase):
         self.assertTrue(content.has_key('previous'))
         self.assertTrue(content.has_key('results'))
 
+    def test_create_activity(self):
+        """
+        Ensure that we can create activity
+        """
+        contact = Contact.objects.first()
+        sales_cycle = contact.sales_cycles.first()
+
+        data = {
+            "owner": self.user.id,
+            "sales_cycle_id": sales_cycle.id,
+            "description": "test text",
+        }
+
+        url, parsed = self.prepare_urls('v1:activity-list', subdomain=self.company.subdomain)
+        
+        response = self.client.post(url, data, HTTP_HOST=parsed.netloc, format='json')
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+        self.authenticate_user()
+        response = self.client.post(url, data, HTTP_HOST=parsed.netloc, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        content = json.loads(response.content)
+        self.assertTrue(content.has_key('owner'))
+        self.assertNotEqual(content['owner'], None)
+        self.assertTrue(content.has_key('company_id'))
+        self.assertNotEqual(content['company_id'], None)
+
+        url, parsed = self.prepare_urls('v1:activity-list', subdomain=self.company.subdomain)
+        response = self.client.get(url, HTTP_HOST=parsed.netloc)
+        content = json.loads(response.content)
+        self.assertEqual(self.activities_count+1, content['count']) # added 1 activity
 
     def test_create_multiple(self):
         """

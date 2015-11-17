@@ -101,9 +101,10 @@ class SalesCycleSerializer(RequestContextMixin, serializers.ModelSerializer):
 
 
 class ActivitySerializer(RequestContextMixin, serializers.ModelSerializer):
-    comments_count = serializers.IntegerField()
+    comments_count = serializers.IntegerField(read_only=True)
     new_comments_count = serializers.SerializerMethodField()
     has_read = serializers.SerializerMethodField()
+    sales_cycle_id = serializers.ModelField(model_field=Activity()._meta.get_field('sales_cycle'), write_only=True)
 
     class Meta:
         model = Activity
@@ -111,7 +112,7 @@ class ActivitySerializer(RequestContextMixin, serializers.ModelSerializer):
     def __init__(self, *args, **kwargs):
         # pass contact=True param to get fully hydrated sales_cycle
         if kwargs.pop('sales_cycle', False):
-            self.fields['sales_cycle'] = SalesCycleSerializer(contact=kwargs.pop('contact', False))
+            self.fields['sales_cycle'] = SalesCycleSerializer(contact=kwargs.pop('contact', False), read_only=True)
             
         super(ActivitySerializer, self).__init__(*args, **kwargs)
 
