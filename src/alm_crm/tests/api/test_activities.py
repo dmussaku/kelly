@@ -302,4 +302,22 @@ class ActivityAPITests(APITestMixin, APITestCase):
         self.assertTrue(content.has_key('prev_sales_cycle'))
         self.assertTrue(content.has_key('new_sales_cycle'))
         self.assertTrue(content.has_key('activity'))
+
+    def test_finish_activity(self):
+        """
+        Ensure we can finish activity
+        """
+        activity = Activity.objects.first()
+
+        data = {
+            'result': 'result text'
+        }
+
+        url, parsed = self.prepare_urls('v1:activity-finish', subdomain=self.company.subdomain, kwargs={'pk': activity.id})
         
+        response = self.client.post(url, data, HTTP_HOST=parsed.netloc)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+        self.authenticate_user()
+        response = self.client.post(url, data, HTTP_HOST=parsed.netloc)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)

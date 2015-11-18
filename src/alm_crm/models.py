@@ -1947,6 +1947,12 @@ class Activity(SubscriptionObject):
             'activity': self
         }
 
+    def finish(self, result):
+        self.result = result
+        self.date_finished = timezone.now()
+        self.save()
+        return self
+
 post_save.connect(Activity.after_save, sender=Activity)
 post_delete.connect(Activity.after_delete, sender=Activity)
 

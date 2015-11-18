@@ -160,3 +160,12 @@ class ActivityViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
             'new_sales_cycle': SalesCycleSerializer(rv['new_sales_cycle'], context={'request': request}).data,
             'activity': self.get_serializer(rv['activity']).data
         })
+
+    @detail_route(methods=['post'], url_path='finish')
+    def finish(self, request, *args, **kwargs):
+        result = request.data.get('result')
+        activity = self.get_object()
+        activity = activity.finish(result=result)
+
+        serializer = self.get_serializer(activity)
+        return Response(serializer.data)

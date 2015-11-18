@@ -455,10 +455,29 @@ class ActivityTests(TestMixin, TestCase):
             sales_cycle=sales_cycle1, 
             owner=self.user, 
             company_id=self.company.id
-            )
+        )
 
         self.assertEqual(activity.sales_cycle.id, sales_cycle1.id)
 
         activity.move(sales_cycle2.id)
         self.assertEqual(activity.sales_cycle.id, sales_cycle2.id)
+
+    def test_finish_activity(self):
+        contact = ContactFactory(company_id=self.company.id)
+        sales_cycle1 = SalesCycleFactory(
+            contact=contact, company_id=self.company.id)
+
+        activity = ActivityFactory(
+            sales_cycle=sales_cycle1, 
+            owner=self.user, 
+            company_id=self.company.id,
+            deadline=timezone.now(),
+        )
+
+        self.assertEqual(activity.result, None)
+        self.assertEqual(activity.date_finished, None)
+
+        activity.finish("It's finished")
+        self.assertEqual(activity.result, "It's finished")
+        self.assertNotEqual(activity.date_finished, None)
 
