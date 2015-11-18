@@ -60,7 +60,7 @@ class ContactSerializer(RequestContextMixin, serializers.ModelSerializer):
     def get_products(self, obj):
         products = obj.get_products()
         if products:
-            return ProductSerializer(products, many=True)
+            return ProductSerializer(products, many=True).data
         return []
 
 
