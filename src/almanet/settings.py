@@ -481,13 +481,13 @@ class StagingConfiguration(FileSettings('~/.almanet/almanet.conf.py'), BaseConfi
 
 class StagingConfiguration2(FileSettings('~/.almanet/almanet.conf.py'), BaseConfiguration):
     DEBUG = False
-    PARENT_HOST = 'almasales.qa2:4369'
-    HOSTCONF_REGEX = r'almasales\.qa2:4369'
+    PARENT_HOST = 'almasales.qa:8000'
+    HOSTCONF_REGEX = r'almasales\.qa:8000'
 
-    SITE_NAME = 'almasales.qa2:4369'
-    SITE_DOMAIN = 'http://almasales.qa2:4369'
-    CSRF_COOKIE_DOMAIN = '.almasales.qa2'
-    SESSION_COOKIE_DOMAIN = '.almasales.qa2'
+    SITE_NAME = 'almasales.qa:8000'
+    SITE_DOMAIN = 'http://almasales.qa:8000'
+    CSRF_COOKIE_DOMAIN = '.almasales.qa'
+    SESSION_COOKIE_DOMAIN = '.almasales.qa'
     # CORS_ORIGIN_WHITELIST = (
     #     'almasales.kz',
     #     'almacloud.almasales.kz',
