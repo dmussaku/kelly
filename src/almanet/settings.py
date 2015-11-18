@@ -159,6 +159,7 @@ class BaseConfiguration(SubdomainConfiguration, Configuration):
         'almastorage',
         'djcelery',
         'rest_framework',
+        'django_filters',
     )
 
     MIDDLEWARE_CLASSES = (

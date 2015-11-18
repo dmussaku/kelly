@@ -37,9 +37,7 @@ from alm_vcard.models import (
     Url,
     Note,
     )
-
 from .utils import datetimeutils
-# from alm_crm.utils.parser import HASHTAG_PARSER
 import re
 HASHTAG_PARSER = re.compile(u'\B#\w*[а-яА-ЯёЁa-zA-Z]+\w*', re.U)
 
@@ -815,7 +813,9 @@ class Contact(SubscriptionObject):
 
     @classmethod
     def get_all(cls, company_id):
-        return  Contact.objects.filter(company_id=company_id).order_by('vcard__fn')
+        queryset = Contact.objects.filter(
+            company_id=company_id).order_by('vcard__fn')
+        return queryset
 
     @classmethod
     def get_recent_base(cls, company_id, user_id):

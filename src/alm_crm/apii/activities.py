@@ -6,10 +6,10 @@ from django.db import transaction
 from rest_framework.decorators import list_route, detail_route
 from rest_framework.response import Response
 from rest_framework import viewsets
-# from rest_framework import filters
+from rest_framework import filters
 
-# from alm_crm.filters import ActivityFilter
 from alm_crm.serializers import ActivitySerializer, NotificationSerializer, SalesCycleSerializer
+from alm_crm.filters import ActivityFilter
 from alm_crm.models import Activity, Notification
 
 from . import CompanyObjectAPIMixin
@@ -17,8 +17,8 @@ from . import CompanyObjectAPIMixin
 class ActivityViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
     
     serializer_class = ActivitySerializer
-    # filter_backends = (filters.DjangoFilterBackend, filters.OrderingFilter)
-    # filter_class = ActivityFilter
+    filter_backends = (filters.DjangoFilterBackend, filters.OrderingFilter)
+    filter_class = ActivityFilter
     # ordering_fields = '__all__'
 
 
