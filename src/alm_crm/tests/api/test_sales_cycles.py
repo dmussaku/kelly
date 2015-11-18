@@ -367,9 +367,55 @@ class SalesCycleAPITests(APITestMixin, APITestCase):
 
         url, parsed = self.prepare_urls('v1:sales_cycle-change-products', subdomain=self.company.subdomain, kwargs={'pk': sc.id})
         
-        response = self.client.post(url, data, HTTP_HOST=parsed.netloc)
+        response = self.client.post(url, data, HTTP_HOST=parsed.netloc, format='json')
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
         self.authenticate_user()
-        response = self.client.post(url, data, HTTP_HOST=parsed.netloc)
+        response = self.client.post(url, data, HTTP_HOST=parsed.netloc, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_succeed(self):
+        """
+        Ensure we can close sales_cycle successfully
+        """
+        sc = SalesCycle.objects.first()
+        p = ProductFactory(owner=self.user, company_id=self.company.id)
+        sc = sc.change_products(product_ids=[p.id], user_id=self.user.id, company_id=self.company.id)
+
+        data = {
+            'stats': {
+                p.id: 10
+            }
+        }
+
+        url, parsed = self.prepare_urls('v1:sales_cycle-succeed', subdomain=self.company.subdomain, kwargs={'pk': sc.id})
+        
+        response = self.client.post(url, data, HTTP_HOST=parsed.netloc, format='json')
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+        self.authenticate_user()
+        response = self.client.post(url, data, HTTP_HOST=parsed.netloc, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_fail(self):
+        """
+        Ensure we can close sales_cycle with failure
+        """
+        sc = SalesCycle.objects.first()
+        p = ProductFactory(owner=self.user, company_id=self.company.id)
+        sc = sc.change_products(product_ids=[p.id], user_id=self.user.id, company_id=self.company.id)
+
+        data = {
+            'stats': {
+                p.id: 10
+            }
+        }
+
+        url, parsed = self.prepare_urls('v1:sales_cycle-fail', subdomain=self.company.subdomain, kwargs={'pk': sc.id})
+        
+        response = self.client.post(url, data, HTTP_HOST=parsed.netloc, format='json')
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+        self.authenticate_user()
+        response = self.client.post(url, data, HTTP_HOST=parsed.netloc, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)

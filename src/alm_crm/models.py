@@ -1525,9 +1525,12 @@ class SalesCycle(SubscriptionObject):
 
         return self
 
-    def set_result_by_amount(self, amount, company_id, succeed):
-        v = Value(amount=amount, owner=self.owner)
-        v.company_id = company_id
+    def set_result_by_amount(self, amount, user_id, company_id, succeed):
+        v = Value(
+            amount=amount, 
+            owner_id=user_id,
+            company_id=company_id
+        )
         v.save()
 
         if succeed:
@@ -1581,30 +1584,45 @@ class SalesCycle(SubscriptionObject):
         sc_log_entry.save()
         return self
 
-    def close(self, products_with_values, company_id, succeed):
+    def succeed(self, stats, user_id, company_id):
         amount = 0
-        for product, value in products_with_values.iteritems():
+        for product_id, value in stats.iteritems():
             amount += value
             s = SalesCycleProductStat.objects.get(sales_cycle=self,
-                                                  product=Product.objects.get(id=product))
-            if succeed:
-                s.real_value = value
-            else:
-                s.projected_value = value
+                                                  product_id=product_id)
+            s.real_value = value
             s.save()
 
-        self.status = self.COMPLETED
-        self.set_result_by_amount(amount, company_id, succeed)
-        self.save()
+        self.set_result_by_amount(amount, user_id, company_id, True)
+        log_entry = SalesCycleLogEntry(
+            sales_cycle=self, 
+            meta=json.dumps({"amount": amount}),
+            owner_id=user_id,
+            company_id=company_id,
+            entry_type = SalesCycleLogEntry.SC
+        )
+        log_entry.save()
+        return self
 
-        log_entry = SalesCycleLogEntry(sales_cycle=self, meta=json.dumps({"amount": amount}))
-        if succeed:
-            log_entry.entry_type = SalesCycleLogEntry.SC
-        else:
-            log_entry.entry_type = SalesCycleLogEntry.FC
-        log_entry.company_id = company_id
+    def fail(self, stats, user_id, company_id):
+        amount = 0
+        for product_id, value in stats.iteritems():
+            amount += value
+            s = SalesCycleProductStat.objects.get(sales_cycle=self,
+                                                  product_id=product_id)
+            s.projected_value = value
+            s.save()
 
-        return [self, log_entry]
+        self.set_result_by_amount(amount, user_id, company_id, False)
+        log_entry = SalesCycleLogEntry(
+            sales_cycle=self, 
+            meta=json.dumps({"amount": amount}),
+            owner_id=user_id,
+            company_id=company_id,
+            entry_type = SalesCycleLogEntry.FC
+        )
+        log_entry.save()
+        return self
 
     def serialize(self):
         projected_value_id = None

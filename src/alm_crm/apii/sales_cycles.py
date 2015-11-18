@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import simplejson as json
+
 from rest_framework.decorators import list_route, detail_route
 from rest_framework.response import Response
 from rest_framework import viewsets, status
@@ -203,5 +205,25 @@ class SalesCycleViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
         sales_cycle = sales_cycle.change_products(product_ids=product_ids,
                                                   user_id=request.user.id,
                                                   company_id=request.company.id)
+        serializer = self.get_serializer(sales_cycle, contact=True, latest_activity=True)
+        return Response(serializer.data)
+
+    @detail_route(methods=['post'], url_path='succeed')
+    def succeed(self, request, *args, **kwargs):
+        stats = request.data.get('stats')
+        sales_cycle = self.get_object()
+        sales_cycle = sales_cycle.succeed(stats=stats,
+                                          user_id=request.user.id,
+                                          company_id=request.company.id)
+        serializer = self.get_serializer(sales_cycle, contact=True, latest_activity=True)
+        return Response(serializer.data)
+
+    @detail_route(methods=['post'], url_path='fail')
+    def fail(self, request, *args, **kwargs):
+        stats = request.data.get('stats')
+        sales_cycle = self.get_object()
+        sales_cycle = sales_cycle.fail(stats=stats,
+                                       user_id=request.user.id,
+                                       company_id=request.company.id)
         serializer = self.get_serializer(sales_cycle, contact=True, latest_activity=True)
         return Response(serializer.data)

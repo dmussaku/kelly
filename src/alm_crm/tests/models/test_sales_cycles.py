@@ -369,3 +369,49 @@ class SalesCycleTests(TestMixin, TestCase):
         self.assertEqual(len(meta['added']), 2)
         self.assertEqual(len(meta['deleted']), 0)
         self.assertEqual(len(meta['products']), 3)
+
+    def test_succeed(self):
+        """
+        Ensure we can succeed
+        """
+        contact = ContactFactory(company_id=self.company.id)
+        sc = SalesCycleFactory(contact=contact, owner=self.user, company_id=self.company.id)
+        p1 = ProductFactory(owner=self.user, company_id=self.company.id)
+        p2 = ProductFactory(owner=self.user, company_id=self.company.id)
+        sc = sc.change_products(product_ids=[p1.id, p2.id], user_id=self.user.id, company_id=self.company.id)
+
+        stats = {
+            p1.id: 10,
+            p2.id: 20,
+        }
+
+        sc = sc.succeed(stats=stats, user_id=self.user.id, company_id=self.company.id)
+        meta = json.loads(sc.log.all()[1].meta)
+        self.assertEqual(sc.real_value.amount, 30)
+        self.assertEqual(sc.log.count(), 2)  # entries about product addition and success
+        self.assertEqual(meta['amount'], 30)
+        self.assertEqual(sc.product_stats.get(product=p1).real_value, 10)
+        self.assertEqual(sc.product_stats.get(product=p2).real_value, 20)
+
+    def test_fail(self):
+        """
+        Ensure we can fail
+        """
+        contact = ContactFactory(company_id=self.company.id)
+        sc = SalesCycleFactory(contact=contact, owner=self.user, company_id=self.company.id)
+        p1 = ProductFactory(owner=self.user, company_id=self.company.id)
+        p2 = ProductFactory(owner=self.user, company_id=self.company.id)
+        sc = sc.change_products(product_ids=[p1.id, p2.id], user_id=self.user.id, company_id=self.company.id)
+
+        stats = {
+            p1.id: 10,
+            p2.id: 20,
+        }
+
+        sc = sc.fail(stats=stats, user_id=self.user.id, company_id=self.company.id)
+        meta = json.loads(sc.log.all()[1].meta)
+        self.assertEqual(sc.projected_value.amount, 30)
+        self.assertEqual(sc.log.count(), 2)  # entries about product addition and fail
+        self.assertEqual(meta['amount'], 30)
+        self.assertEqual(sc.product_stats.get(product=p1).projected_value, 10)
+        self.assertEqual(sc.product_stats.get(product=p2).projected_value, 20)
