@@ -11,7 +11,7 @@ class UserApiTestCase(APITestMixin, APITestCase):
 
     def test_change_password(self):
     	url, parsed = self.prepare_urls(
-    		'v1:users/change_password', subdomain=self.company.subdomain)
+    		'v1:user-change-password', subdomain=self.company.subdomain)
         new_password = '1234'
         data = {
         	"old_password":"123",
@@ -25,7 +25,7 @@ class UserApiTestCase(APITestMixin, APITestCase):
         response = self.client.post(url, data, format='json', HTTP_HOST=parsed.netloc)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         content = json.loads(response.content)
-        self.assertEqual(response.content['success'], True)
+        self.assertEqual(content['success'], True)
 
     def test_follow_unfollow(self):
         url, parsed = self.prepare_urls(

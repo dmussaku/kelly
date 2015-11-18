@@ -33,7 +33,7 @@ class ContactAPITests(APITestMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         content = json.loads(response.content)
-        self.assertEqual(len(content), self.contacts_count)
+        self.assertEqual(content['count'], self.contacts_count)
 
     def test_get_specific_contact(self):
         """
@@ -106,7 +106,7 @@ class ContactAPITests(APITestMixin, APITestCase):
         url, parsed = self.prepare_urls('v1:contact-list', subdomain=self.company.subdomain)
         response = self.client.get(url, HTTP_HOST=parsed.netloc)
         content = json.loads(response.content)
-        self.assertEqual(self.contacts_count+1, len(content)) # added 1 contact
+        self.assertEqual(self.contacts_count+1, content['count']) # added 1 contact
 
     def test_create_contact_with_company(self):
         """
@@ -152,7 +152,7 @@ class ContactAPITests(APITestMixin, APITestCase):
         url, parsed = self.prepare_urls('v1:contact-list', subdomain=self.company.subdomain)
         response = self.client.get(url, HTTP_HOST=parsed.netloc)
         content = json.loads(response.content)
-        self.assertEqual(self.contacts_count+2, len(content)) # added 2 contacts: contact and its parent
+        self.assertEqual(self.contacts_count+2, content['count']) # added 2 contacts: contact and its parent
 
     def test_edit_contact(self):
         """

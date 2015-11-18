@@ -81,8 +81,8 @@ class SalesCycleSerializer(RequestContextMixin, serializers.ModelSerializer):
     log = SalesCycleLogEntrySerializer(many=True, read_only=True)
     activity_count = serializers.SerializerMethodField(read_only=True)
     tasks_count = serializers.SerializerMethodField(read_only=True)
-    real_value = serializers.IntegerField(source='real_value.amount')
-    projected_value = serializers.IntegerField(source='projected_value.amount')
+    real_value = serializers.IntegerField(source='real_value.amount', read_only=True)
+    projected_value = serializers.IntegerField(source='projected_value.amount', read_only=True)
 
     class Meta:
         model = SalesCycle
