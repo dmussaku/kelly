@@ -1,6 +1,10 @@
 import django_filters
 from django_filters import MethodFilter
-from alm_crm.models import Activity, Contact
+from alm_crm.models import (
+    Activity, 
+    Contact,
+    ContactList,
+    )
 # from .serializers import (
 #     ActivitySerializer,
 #     ContactSerializer
@@ -19,8 +23,10 @@ class ActivityFilter(django_filters.FilterSet):
 
 class ContactFilter(django_filters.FilterSet):
     search = MethodFilter()
+    contact_list_id = MethodFilter()
     vcard__emails__value = MethodFilter()
     vcard__tels__value = MethodFilter()
+    tp = MethodFilter()
 
     class Meta:
         model = Contact
@@ -30,7 +36,6 @@ class ContactFilter(django_filters.FilterSet):
 
 
     def filter_search(self, queryset, value):
-        print queryset.count()
         queryset = queryset.filter(
             Q(vcard__fn__icontains=value) |
             Q(vcard__given_name__icontains=value) |
@@ -46,4 +51,27 @@ class ContactFilter(django_filters.FilterSet):
 
     def filter_vcard__tels__value(self, queryset, value):
         queryset = queryset.filter(vcard__tels__value__icontains=value)
+        return queryset
+
+    def filter_tp(search, queryset, value):
+        if value=='all':
+            return queryset
+        else:
+            return queryset.filter(tp=value)
+
+    def filter_contact_list_id(self, queryset, value):
+        queryset = queryset.filter(contact_list__id=value)
+        return queryset
+
+
+class ContactListFilter(django_filters.FilterSet):
+    search_contacts = MethodFilter()
+    
+    class Meta:
+        model = ContactList
+
+    def filter_search_contacts(self, queryset, value):
+        contacts = self.contacts.all()
+        print self.contacts.all()
+        print queryset
         return queryset

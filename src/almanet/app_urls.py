@@ -11,6 +11,7 @@ from alm_crm.apii import (
     activities,
     app_state,
     contacts,
+    contact_lists,
     custom_fields,
     hashtags,
     milestones,
@@ -92,6 +93,7 @@ router = DefaultRouter()
 router.register(r'activity', activities.ActivityViewSet, 'activity')
 router.register(r'app_state', app_state.AppStateViewSet, 'app_state')
 router.register(r'contact', contacts.ContactViewSet, 'contact')
+router.register(r'contact_list', contact_lists.ContactListViewSet, 'contact_list')
 router.register(r'custom_field', custom_fields.CustomFieldViewSet, 'custom_field')
 router.register(r'hashtag', hashtags.HashTagViewSet, 'hashtag')
 router.register(r'milestone', milestones.MilestoneViewSet, 'milestone')

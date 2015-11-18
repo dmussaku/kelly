@@ -7,7 +7,8 @@ from alm_company.models import Company
 
 from .models import (
     Milestone, 
-    Contact, 
+    Contact,
+    ContactList, 
     SalesCycle, 
     Activity, 
     Product, 
@@ -48,6 +49,13 @@ class ContactSerializer(RequestContextMixin, serializers.ModelSerializer):
             self.fields['parent'] = ContactSerializer(global_sales_cycle=True)
             
         super(ContactSerializer, self).__init__(*args, **kwargs)
+
+
+class ContactListSerializer(RequestContextMixin, serializers.ModelSerializer):
+    contacts = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+
+    class Meta:
+        model = ContactList
 
 
 class SalesCycleLogEntrySerializer(RequestContextMixin, serializers.ModelSerializer):
