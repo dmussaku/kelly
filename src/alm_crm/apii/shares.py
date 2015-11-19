@@ -4,7 +4,7 @@ from django.db import transaction
 
 from rest_framework.decorators import list_route
 from rest_framework.response import Response
-from rest_framework import viewsets, status
+from rest_framework import viewsets, status, filters
 
 from alm_crm.models import Share, Notification, Contact
 from alm_crm.serializers import (
@@ -12,6 +12,7 @@ from alm_crm.serializers import (
     NotificationSerializer,
 ) 
 from alm_vcard.serializers import VCardSerializer
+from alm_crm.filters import ShareFilter
 from alm_vcard.models import VCard
 
 from . import CompanyObjectAPIMixin
@@ -19,6 +20,8 @@ from . import CompanyObjectAPIMixin
 class ShareViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
 
     serializer_class = ShareSerializer
+    filter_backends = (filters.DjangoFilterBackend, filters.OrderingFilter)
+    filter_class = ShareFilter
 
     def get_queryset(self):
         return Share.objects.filter(
@@ -63,8 +66,8 @@ class ShareViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
     def get_by_user(self, request, *args, **kwargs):    
         shares = Share.get_by_user(
             company_id=request.company.id, user_id=request.user.id)['shares']
-
-        page = self.paginate_queryset(shares)
+        queryset = ShareFilter(request.GET, shares)
+        page = self.paginate_queryset(queryset)
         if page is not None:
             serializer = self.get_serializer(page, many=True)
             return self.get_paginated_response(serializer.data)
