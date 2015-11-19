@@ -66,10 +66,17 @@ class ContactSerializer(RequestContextMixin, serializers.ModelSerializer):
 
 
 class ContactListSerializer(RequestContextMixin, serializers.ModelSerializer):
-    contacts = serializers.PrimaryKeyRelatedField(queryset=Contact.objects.all(), many=True)
+    contact_ids = serializers.PrimaryKeyRelatedField(queryset=Contact.objects.all(), many=True, write_only=True, source='contacts')
+    contacts = serializers.SerializerMethodField()
 
     class Meta:
         model = ContactList
+
+    def get_contacts(self, instance):
+        return Contact.objects\
+            .filter(id__in=instance.contacts.all())\
+            .order_by('vcard__fn')\
+            .values_list('id', flat=True)
 
 
 class SalesCycleLogEntrySerializer(RequestContextMixin, serializers.ModelSerializer):
