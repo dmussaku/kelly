@@ -10,6 +10,7 @@ from . import CompanyObjectAPIMixin
 
 class ContactListViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
     serializer_class = ContactListSerializer
+    pagination_class = None
 
     def get_queryset(self):
         return ContactList.objects.filter(

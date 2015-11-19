@@ -66,7 +66,7 @@ class ContactSerializer(RequestContextMixin, serializers.ModelSerializer):
 
 
 class ContactListSerializer(RequestContextMixin, serializers.ModelSerializer):
-    contacts = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+    contacts = serializers.PrimaryKeyRelatedField(queryset=Contact.objects.all(), many=True)
 
     class Meta:
         model = ContactList

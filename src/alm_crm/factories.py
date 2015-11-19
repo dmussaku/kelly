@@ -14,6 +14,7 @@ from .models import (
     HashTag,
     HashTagReference,
     SalesCycleProductStat,
+    ContactList
 )
 
 
@@ -94,3 +95,10 @@ class ShareFactory(CompanyObjectFactoryMixin, factory.django.DjangoModelFactory)
 class SalesCycleProductStatFactory(CompanyObjectFactoryMixin, factory.django.DjangoModelFactory):
     class Meta:
         model = SalesCycleProductStat
+
+
+class ContactListFactory(CompanyObjectFactoryMixin, factory.django.DjangoModelFactory):
+    class Meta:
+        model = ContactList
+
+    title = factory.Faker('word')
