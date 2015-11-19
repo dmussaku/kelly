@@ -13,6 +13,8 @@ from alm_crm.models import (
     HashTagReference,
     )
 
+from alm_crm.filters import ShareFilter
+
 from . import TestMixin
 
 
@@ -100,3 +102,32 @@ class ShareTests(TestMixin, TestCase):
         self.assertEqual(share.note, 'test message #hashtag')
         self.assertEqual(share.hashtags.count(), 1)
 
+    def test_share_filter(self):
+        account2 = AccountFactory(company=self.company)
+        contact = ContactFactory(
+            company_id=self.company.id, owner_id=account2.user.id)
+
+        for i in range(100):
+            contact = ContactFactory(
+                company_id=self.company.id, owner_id=account2.user.id)
+            share = ShareFactory(
+                company_id=self.company.id, 
+                contact=contact, 
+                share_from=account2.user, 
+                share_to=self.user,
+                note='test'
+                )
+        for i in range(100):
+            contact = ContactFactory(
+                company_id=self.company.id, owner_id=account2.user.id)
+            share = ShareFactory(
+                company_id=self.company.id, 
+                contact=contact, 
+                share_from=account2.user, 
+                share_to=self.user,
+                note='tset'
+                )
+
+        self.assertEqual(200, Share.objects.all().count())
+        queryset = ShareFilter({'search':'test'}, Share.objects.all()).qs
+        self.assertEqual(100, queryset.count())

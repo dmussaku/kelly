@@ -21,11 +21,13 @@ class MilestoneViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
         #     request, request.body,
         #     format=request.META.get('CONTENT_TYPE', 'application/json'))
         data = request.data
+        print data
         milestones = Milestone.objects.filter(company_id=request.company.id)
         new_milestone_set = []
         sales_cycles = []
         max_sort_value = (
-            sorted(map(lambda m: m.get('sort',0), data))[-1:] or [0])[0]
+            sorted(map(lambda m: m.get('sort',0), data))[-1] or 0)
+
         for milestone_data in data:
             try:
                 milestone = milestones.get(id=milestone_data.get('id', -1))

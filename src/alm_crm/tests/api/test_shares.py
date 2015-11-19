@@ -14,6 +14,7 @@ from alm_crm.models import (
     HashTagReference,
 )
 from alm_crm.factories import ContactFactory, ShareFactory
+from alm_crm.filters import ShareFilter
 
 from . import APITestMixin
 
@@ -123,3 +124,39 @@ class ShareAPITests(APITestMixin, APITestCase):
 
         content = json.loads(response.content)
         self.assertTrue(content.has_key('notification'))
+
+    def test_share_filter(self):
+        company = self.company
+        user = self.user
+
+        for i in range(0,100):
+            c = ContactFactory(owner=self.user, company_id=self.company.id)
+            share = ShareFactory(
+                contact=c,
+                share_to=user,
+                share_from=user,
+                owner=user,
+                company_id=company.id,
+                note='test'
+                )
+        for i in range(0,100):
+            c = ContactFactory(owner=self.user, company_id=self.company.id)
+            share = ShareFactory(
+                contact=c,
+                share_to=user,
+                share_from=user,
+                owner=user,
+                company_id=company.id,
+                note='tset'
+                )
+
+        params = {'search':'test'}
+        url, parsed = self.prepare_urls('v1:share-list', subdomain=self.company.subdomain)
+        response = self.client.get(url, params, HTTP_HOST=parsed.netloc)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+        self.authenticate_user()
+        response = self.client.get(url, params, HTTP_HOST=parsed.netloc)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        content = json.loads(response.content)
+        self.assertEqual(content['count'], 100)
