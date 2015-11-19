@@ -9,6 +9,7 @@ from alm_crm.models import (
     Activity, 
     Contact,
     ContactList,
+    Share,
  )
 # from .serializers import (
 #     ActivitySerializer,
@@ -43,7 +44,15 @@ class ContactFilter(django_filters.FilterSet):
             Q(vcard__given_name__icontains=value) |
             Q(vcard__family_name__icontains=value) |
             Q(vcard__tels__value__icontains=value) |
-            Q(vcard__emails__value__icontains=value) 
+            Q(vcard__emails__value__icontains=value) |
+            Q(vcard__titles__data__icontains=value) | 
+            Q(vcard__urls__value__icontains=value) | 
+            Q(vcard__adrs__country_name__icontains=value) | 
+            Q(vcard__adrs__locality__icontains=value) | 
+            Q(vcard__adrs__postal_code__icontains=value) | 
+            Q(vcard__adrs__region__icontains=value) | 
+            Q(vcard__adrs__street_address__icontains=value) | 
+            Q(vcard__notes__data__icontains=value) 
             )
         return queryset.distinct()
 
@@ -64,3 +73,17 @@ class ContactFilter(django_filters.FilterSet):
     def filter_contact_list_id(self, queryset, value):
         queryset = queryset.filter(contact_list__id=value)
         return queryset
+
+
+class ShareFilter(django_filters.FilterSet):
+    search = MethodFilter()
+
+    class Meta:
+        model = Share
+
+    
+    def filter_search(self, queryset, value):
+        queryset = queryset.filter(
+            Q(note__icontains=value)
+            )
+        return queryset.distinct()
