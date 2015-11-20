@@ -17,7 +17,7 @@ from alm_crm.models import (
     HashTag,
     HashTagReference,
     )
-
+from alm_crm.filters import ActivityFilter
 from . import TestMixin
 
 
@@ -481,3 +481,35 @@ class ActivityTests(TestMixin, TestCase):
         self.assertEqual(activity.result, "It's finished")
         self.assertNotEqual(activity.date_finished, None)
 
+    def test_activity_filter(self):
+        contact = ContactFactory(company_id=self.company.id)
+        sales_cycle = SalesCycleFactory(
+            contact=contact, company_id=self.company.id)
+        for i in range(0,10):
+            ActivityFactory(
+                sales_cycle=sales_cycle, 
+                owner=self.user,
+                title='test', 
+                company_id=self.company.id, 
+                deadline=timezone.now()+relativedelta.relativedelta(months=1)
+                )
+        for i in range(0,10):
+            ActivityFactory(
+                sales_cycle=sales_cycle, 
+                owner=self.user,
+                title='tset',
+                description='test', 
+                company_id=self.company.id, 
+                deadline=timezone.now()+relativedelta.relativedelta(months=1)
+                )
+        for i in range(0,10):
+            ActivityFactory(
+                sales_cycle=sales_cycle, 
+                owner=self.user,
+                title='tset', 
+                company_id=self.company.id, 
+                deadline=timezone.now()+relativedelta.relativedelta(months=1)
+                )
+        self.assertEqual(30, Activity.objects.all().count())
+        queryset = ActivityFilter({'search':'test'}, Activity.objects.all()).qs
+        self.assertEqual(20, queryset.count())

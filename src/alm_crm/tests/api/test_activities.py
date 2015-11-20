@@ -1,9 +1,10 @@
 import simplejson as json
-
+import dateutil.relativedelta as relativedelta
 from django.utils import timezone
-
+from django.utils import timezone
 from rest_framework import status
 from rest_framework.test import APITestCase
+
 from alm_crm.factories import (
     ContactFactory, 
     ActivityFactory, 
@@ -321,3 +322,44 @@ class ActivityAPITests(APITestMixin, APITestCase):
         self.authenticate_user()
         response = self.client.post(url, data, HTTP_HOST=parsed.netloc)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_activity_filter(self):
+        contact = ContactFactory(company_id=self.company.id)
+        sales_cycle = SalesCycleFactory(
+            contact=contact, company_id=self.company.id)
+        for i in range(0,10):
+            ActivityFactory(
+                sales_cycle=sales_cycle, 
+                owner=self.user,
+                title='test', 
+                company_id=self.company.id, 
+                deadline=timezone.now()+relativedelta.relativedelta(months=1)
+                )
+        for i in range(0,10):
+            ActivityFactory(
+                sales_cycle=sales_cycle, 
+                owner=self.user,
+                title='tset',
+                description='test', 
+                company_id=self.company.id, 
+                deadline=timezone.now()+relativedelta.relativedelta(months=1)
+                )
+        for i in range(0,10):
+            ActivityFactory(
+                sales_cycle=sales_cycle, 
+                owner=self.user,
+                title='tset', 
+                company_id=self.company.id, 
+                deadline=timezone.now()+relativedelta.relativedelta(months=1)
+                )
+
+        params = {'search':'test'}
+        url, parsed = self.prepare_urls('v1:activity-list', subdomain=self.company.subdomain)
+        response = self.client.get(url, params, HTTP_HOST=parsed.netloc)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+        self.authenticate_user()
+        response = self.client.get(url, params, HTTP_HOST=parsed.netloc)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        content = json.loads(response.content)
+        self.assertEqual(content['count'], 20)

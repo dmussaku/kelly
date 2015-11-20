@@ -7,6 +7,7 @@ from django.test import TestCase
 from alm_user.factories import AccountFactory
 from alm_crm.factories import SalesCycleFactory, ContactFactory, ActivityFactory, ProductFactory
 from alm_crm.models import SalesCycle, Milestone
+from alm_crm.filters import SalesCycleFilter
 
 from . import TestMixin
 
@@ -415,3 +416,31 @@ class SalesCycleTests(TestMixin, TestCase):
         self.assertEqual(meta['amount'], 30)
         self.assertEqual(sc.product_stats.get(product=p1).projected_value, 10)
         self.assertEqual(sc.product_stats.get(product=p2).projected_value, 20)
+
+    def test_sales_cycle_filter(self):
+        contact = ContactFactory(company_id=self.company.id)
+        for i in range(0,10):
+            SalesCycleFactory(
+                contact=contact, 
+                owner=self.user,
+                title='test', 
+                company_id=self.company.id,
+                )
+        for i in range(0,10):
+            SalesCycleFactory(
+                contact=contact, 
+                owner=self.user,
+                title='tset',
+                description='test', 
+                company_id=self.company.id,
+                )
+        for i in range(0,10):
+            SalesCycleFactory(
+                contact=contact, 
+                owner=self.user,
+                title='tset', 
+                company_id=self.company.id,
+                )
+        self.assertEqual(30, SalesCycle.objects.all().count())
+        queryset = SalesCycleFilter({'search':'test'}, SalesCycle.objects.all()).qs
+        self.assertEqual(20, queryset.count())

@@ -5,8 +5,7 @@ from django.db import transaction
 
 from rest_framework.decorators import list_route, detail_route
 from rest_framework.response import Response
-from rest_framework import viewsets
-from rest_framework import filters
+from rest_framework import viewsets, filters
 
 from alm_crm.serializers import ActivitySerializer, NotificationSerializer, SalesCycleSerializer
 from alm_crm.filters import ActivityFilter
@@ -38,7 +37,7 @@ class ActivityViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
     @list_route(methods=['get'], url_path='company_feed')
     def company_feed(self, request, *args, **kwargs):    
         activities = Activity.company_feed(company_id=request.company.id, user_id=request.user.id)['feed']
-
+        activities = ActivityFilter(request.GET, activities)
         page = self.paginate_queryset(activities)
         if page is not None:
             serializer = self.get_serializer(page, many=True)
@@ -50,7 +49,7 @@ class ActivityViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
     @list_route(methods=['get'], url_path='my_feed')
     def my_feed(self, request, *args, **kwargs):    
         activities = Activity.my_feed(company_id=request.company.id, user_id=request.user.id)['feed']
-
+        activities = ActivityFilter(request.GET, activities)
         page = self.paginate_queryset(activities)
         if page is not None:
             serializer = self.get_serializer(page, many=True)
@@ -62,7 +61,7 @@ class ActivityViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
     @list_route(methods=['get'], url_path='my_activities')
     def my_activities(self, request, *args, **kwargs):    
         activities = Activity.my_activities(company_id=request.company.id, user_id=request.user.id)
-
+        activities = ActivityFilter(request.GET, activities)
         page = self.paginate_queryset(activities)
         if page is not None:
             serializer = self.get_serializer(page, many=True)
@@ -74,7 +73,7 @@ class ActivityViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
     @list_route(methods=['get'], url_path='my_tasks')
     def my_tasks(self, request, *args, **kwargs):    
         activities = Activity.my_tasks(company_id=request.company.id, user_id=request.user.id)
-
+        activities = ActivityFilter(request.GET, activities)
         page = self.paginate_queryset(activities)
         if page is not None:
             serializer = self.get_serializer(page, many=True)
