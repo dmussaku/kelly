@@ -3,27 +3,27 @@ import simplejson as json
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from alm_crm.models import ContactList
-from alm_crm.factories import ContactListFactory, ContactFactory
-from alm_crm.serializers import ContactListSerializer
+from alm_crm.models import Filter
+from alm_crm.factories import FilterFactory
+from alm_crm.serializers import FilterSerializer
 
 from . import APITestMixin
 
-class ContactListAPITests(APITestMixin, APITestCase):
+class FilterAPITests(APITestMixin, APITestCase):
     def setUp(self):
         self.set_user()
-        self.contact_lists_count = 5
-        self.setUpContactLists(self.contact_lists_count)
+        self.filters_count = 5
+        self.setUpFilters(self.filters_count)
 
-    def setUpContactLists(self, contact_lists_count):
-        for i in range(contact_lists_count):
-            ContactListFactory(owner_id=self.user.id, company_id=self.company.id)
+    def setUpFilters(self, filters_count):
+        for i in range(filters_count):
+            FilterFactory(owner_id=self.user.id, company_id=self.company.id)
 
-    def test_get_contact_lists(self):
+    def test_get_filters(self):
         """
-        Ensure we can get list of contact_lists
+        Ensure we can get list of filters
         """
-        url, parsed = self.prepare_urls('v1:contact_list-list', subdomain=self.company.subdomain)
+        url, parsed = self.prepare_urls('v1:filter-list', subdomain=self.company.subdomain)
         
         response = self.client.get(url, HTTP_HOST=parsed.netloc)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
@@ -33,14 +33,14 @@ class ContactListAPITests(APITestMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         content = json.loads(response.content)
-        self.assertEqual(len(content), self.contact_lists_count)
+        self.assertEqual(len(content), self.filters_count)
 
-    def test_get_specific_contact_list(self):
+    def test_get_specific_filter(self):
         """
-        Ensure we can get specific of contact_list by id
+        Ensure we can get specific of filter by id
         """
-        contact_list = ContactList.objects.first()
-        url, parsed = self.prepare_urls('v1:contact_list-detail', subdomain=self.company.subdomain, kwargs={'pk':contact_list.id})
+        f = Filter.objects.first()
+        url, parsed = self.prepare_urls('v1:filter-detail', subdomain=self.company.subdomain, kwargs={'pk':f.id})
 
         response = self.client.get(url, HTTP_HOST=parsed.netloc)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
@@ -49,17 +49,16 @@ class ContactListAPITests(APITestMixin, APITestCase):
         response = self.client.get(url, HTTP_HOST=parsed.netloc)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    def test_create_contact_list(self):
+    def test_create_filter(self):
         """
-        Ensure that we can create contact_list
+        Ensure that we can create filter
         """
-        c1 = ContactFactory(company_id=self.company.id)
         data = {
-            'title': 'ContactList1',
-            'contact_ids': [c1.id],
+            'title': 'Filter1',
+            'filter_text': 'search_string',
         }
 
-        url, parsed = self.prepare_urls('v1:contact_list-list', subdomain=self.company.subdomain)
+        url, parsed = self.prepare_urls('v1:filter-list', subdomain=self.company.subdomain)
         
         response = self.client.post(url, data, HTTP_HOST=parsed.netloc, format='json')
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
@@ -68,28 +67,27 @@ class ContactListAPITests(APITestMixin, APITestCase):
         response = self.client.post(url, data, HTTP_HOST=parsed.netloc, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         content = json.loads(response.content)
-        self.assertEqual(content['title'], 'ContactList1')
-        self.assertEqual(content['contacts'], [c1.id])
+        self.assertEqual(content['title'], 'Filter1')
+        self.assertEqual(content['filter_text'], 'search_string')
         self.assertNotEqual(content['company_id'], None)
         self.assertNotEqual(content['owner'], None)
 
-        url, parsed = self.prepare_urls('v1:contact_list-list', subdomain=self.company.subdomain)
+        url, parsed = self.prepare_urls('v1:filter-list', subdomain=self.company.subdomain)
         response = self.client.get(url, HTTP_HOST=parsed.netloc)
         content = json.loads(response.content)
-        self.assertEqual(self.contact_lists_count+1, len(content))
+        self.assertEqual(self.filters_count+1, len(content))
     
-    def test_edit_contact_list(self):
+    def test_edit_filter(self):
         """
-        Ensure that we can edit contact_list
+        Ensure that we can edit filter
         """
-        c1 = ContactFactory(company_id=self.company.id)
-        contact_list = ContactList.objects.first()
-        data = ContactListSerializer(contact_list).data
+        f = Filter.objects.first()
+        data = FilterSerializer(f).data
 
         data['title'] = 'Nestle'
-        data['contact_ids'] = [c1.id]
+        data['filter_text'] = 'search_string'
 
-        url, parsed = self.prepare_urls('v1:contact_list-detail', subdomain=self.company.subdomain, kwargs={'pk':contact_list.id})
+        url, parsed = self.prepare_urls('v1:filter-detail', subdomain=self.company.subdomain, kwargs={'pk':f.id})
         
         response = self.client.put(url, data, HTTP_HOST=parsed.netloc, format='json')
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
@@ -98,19 +96,19 @@ class ContactListAPITests(APITestMixin, APITestCase):
         response = self.client.put(url, data, HTTP_HOST=parsed.netloc, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        url, parsed = self.prepare_urls('v1:contact_list-detail', subdomain=self.company.subdomain, kwargs={'pk':contact_list.id})
+        url, parsed = self.prepare_urls('v1:filter-detail', subdomain=self.company.subdomain, kwargs={'pk':f.id})
         response = self.client.get(url, HTTP_HOST=parsed.netloc)
         content = json.loads(response.content)
         self.assertEqual(content['title'], 'Nestle')
-        self.assertEqual(content['contacts'], [c1.id])
+        self.assertEqual(content['filter_text'], 'search_string')
 
-    def test_delete_contact_list(self):
+    def test_delete_filter(self):
         """
-        Ensure that we can delete contact_list
+        Ensure that we can delete filter
         """
-        contact_list = ContactList.objects.first()
+        f = Filter.objects.first()
 
-        url, parsed = self.prepare_urls('v1:contact_list-detail', subdomain=self.company.subdomain, kwargs={'pk':contact_list.id})
+        url, parsed = self.prepare_urls('v1:filter-detail', subdomain=self.company.subdomain, kwargs={'pk':f.id})
         
         response = self.client.delete(url, HTTP_HOST=parsed.netloc)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
@@ -122,7 +120,7 @@ class ContactListAPITests(APITestMixin, APITestCase):
         response = self.client.get(url, HTTP_HOST=parsed.netloc)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
-        url, parsed = self.prepare_urls('v1:contact_list-list', subdomain=self.company.subdomain)
+        url, parsed = self.prepare_urls('v1:filter-list', subdomain=self.company.subdomain)
         response = self.client.get(url, HTTP_HOST=parsed.netloc)
         content = json.loads(response.content)
-        self.assertEqual(self.contact_lists_count-1, len(content))
+        self.assertEqual(self.filters_count-1, len(content))

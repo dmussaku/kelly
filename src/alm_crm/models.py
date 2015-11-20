@@ -812,7 +812,7 @@ class Contact(SubscriptionObject):
                 ).order_by('vcard__fn')
 
     @classmethod
-    def get_all(cls, company_id):
+    def get_all(cls, company_id, user_id=None):
         queryset = Contact.objects.filter(
             company_id=company_id).order_by('vcard__fn')
         return queryset
@@ -2332,14 +2332,14 @@ class SalesCycleProductStat(SubscriptionObject):
 
 class Filter(SubscriptionObject):
     BASE_OPTIONS = (
-        ('AL', _('all')),
-        ('RT', _('recent')),
-        ('CD', _('cold')),
-        ('LD', _('lead')))
+        ('allbase', _('all')),
+        ('recent', _('recent')),
+        ('coldbase', _('cold')),
+        ('leadbase', _('lead')))
     title = models.CharField(max_length=100, default='')
     filter_text = models.CharField(max_length=500)
     owner = models.ForeignKey(User, related_name='owned_filter', null=True)
-    base = models.CharField(max_length=6, choices=BASE_OPTIONS, default='all')
+    base = models.CharField(max_length=8, choices=BASE_OPTIONS, default='allbase')
 
     class Meta:
         verbose_name = _('filter')
