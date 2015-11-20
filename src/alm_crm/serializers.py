@@ -188,16 +188,4 @@ class FilterSerializer(RequestContextMixin, serializers.ModelSerializer):
         model = Filter
 
     def get_count(self, obj):
-        qs_case = {
-            'allbase': Contact.get_all,
-            'recent': Contact.get_recent_base,
-            'coldbase': Contact.get_cold_base,
-            'leadbase': Contact.get_lead_base,
-        }
-
-        return ContactFilter({'search': obj.filter_text}, 
-                             qs_case[obj.base](
-                                company_id=self.request.company.id,
-                                user_id=self.request.user.id,
-                             )
-                            ).count()
+        return obj.apply(company_id=self.request.company.id, user_id=self.request.user.id).count()

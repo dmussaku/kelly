@@ -2348,6 +2348,19 @@ class Filter(SubscriptionObject):
     def __unicode__(self):
         return u'%s: %s' % (self.title, self.base)
 
+    def apply(self, company_id, user_id):
+        from .filters import ContactFilter
+        qs_case = {
+            'allbase': Contact.get_all,
+            'recent': Contact.get_recent_base,
+            'coldbase': Contact.get_cold_base,
+            'leadbase': Contact.get_lead_base,
+        }
+
+        queryset =  qs_case[self.base](company_id=company_id, user_id=user_id)
+
+        return ContactFilter({'search': self.filter_text}, queryset)
+
 
 class HashTag(SubscriptionObject):
     text = models.CharField(max_length=500)

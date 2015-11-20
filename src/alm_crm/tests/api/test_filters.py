@@ -124,3 +124,19 @@ class FilterAPITests(APITestMixin, APITestCase):
         response = self.client.get(url, HTTP_HOST=parsed.netloc)
         content = json.loads(response.content)
         self.assertEqual(self.filters_count-1, len(content))
+
+    def test_apply_filter(self):
+        """
+        Ensure that we can apply filter
+        """
+        f = Filter.objects.first()
+
+        url, parsed = self.prepare_urls('v1:filter-apply', subdomain=self.company.subdomain, kwargs={'pk':f.id})
+        
+        response = self.client.get(url, HTTP_HOST=parsed.netloc)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+        self.authenticate_user()
+        response = self.client.get(url, HTTP_HOST=parsed.netloc)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        
