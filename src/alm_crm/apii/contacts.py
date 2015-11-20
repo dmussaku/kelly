@@ -254,3 +254,35 @@ class ContactViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
             'not_imported_num':not_imported_num, 
             'email_sent':email_sent
         })
+
+    @list_route(methods=['post'], url_path='contacts_merge')
+    def contacts_merge(self, request, **kwargs):
+        """
+        POST METHOD
+        example
+        {"merged_contacts":[1,2,3], "merge_into_contact":1, "delete":True/False}
+        """
+        data = request.data
+        merged_contacts_ids = data.get("merged_contacts", [])
+        merge_into_contact_id = data.get("merge_into_contact", "")
+        delete_merged = data.get("merged_contacts", [])
+        if not merged_contacts_ids or not merge_into_contact_id:
+            return Response(
+                {'success':False, 'message':'Contact ids have not been appended'})
+        try:
+            primary_object = Contact.objects.get(id=merge_into_contact_id)
+        except ObjectDoesNotExist:
+            return Response({
+                        'success':False,
+                        'message':'Contact with %s id doesnt exist' % merge_into_contact_id
+                        }
+                    )
+        alias_objects = Contact.objects.filter(id__in=merged_contacts_ids)
+        response = primary_object.merge_contacts(alias_objects, delete_merged)
+        if not response['success']:
+            return Response(response)
+        contact = response['contact']
+        serializer = self.get_serializer(contact, 
+                                         global_sales_cycle=True,
+                                         parent=True)
+        return Response(serializer.data)

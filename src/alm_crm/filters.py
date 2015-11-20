@@ -9,6 +9,7 @@ from alm_crm.models import (
     Activity, 
     Contact,
     ContactList,
+    SalesCycle,
     Share,
  )
 # from .serializers import (
@@ -17,12 +18,16 @@ from alm_crm.models import (
 #     )
 
 class ActivityFilter(django_filters.FilterSet):
-    # id = django_filters.NumberFilter(lookup_type='lt')
+    search = MethodFilter()
     class Meta:
         model = Activity
-        fields = {
-            'id':['lt','gt','exact'],
-        }
+
+    def filter_search(self, queryset, value):
+        queryset = queryset.filter(
+            Q(title__icontains=value) |
+            Q(description__icontains=value)
+            )
+        return queryset.distinct()
 
 class ContactFilter(django_filters.FilterSet):
     search = MethodFilter()
@@ -73,6 +78,20 @@ class ContactFilter(django_filters.FilterSet):
     def filter_contact_list_id(self, queryset, value):
         queryset = queryset.filter(contact_list__id=value)
         return queryset
+
+
+class SalesCycleFilter(django_filters.FilterSet):
+    search = MethodFilter()
+
+    class Meta:
+        model = SalesCycle
+
+    def filter_search(self, queryset, value):
+        queryset = queryset.filter(
+            Q(title__icontains=value) |
+            Q(description__icontains=value)
+            )
+        return queryset.distinct()
 
 
 class ShareFilter(django_filters.FilterSet):

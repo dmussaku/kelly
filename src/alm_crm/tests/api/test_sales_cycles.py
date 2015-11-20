@@ -419,3 +419,39 @@ class SalesCycleAPITests(APITestMixin, APITestCase):
         self.authenticate_user()
         response = self.client.post(url, data, HTTP_HOST=parsed.netloc, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_sales_cycle_filter(self):
+        contact = ContactFactory(company_id=self.company.id)
+        for i in range(0,10):
+            SalesCycleFactory(
+                contact=contact, 
+                owner=self.user,
+                title='test', 
+                company_id=self.company.id,
+                )
+        for i in range(0,10):
+            SalesCycleFactory(
+                contact=contact, 
+                owner=self.user,
+                title='tset',
+                description='test', 
+                company_id=self.company.id,
+                )
+        for i in range(0,10):
+            SalesCycleFactory(
+                contact=contact, 
+                owner=self.user,
+                title='tset', 
+                company_id=self.company.id,
+                )
+
+        params = {'search':'test'}
+        url, parsed = self.prepare_urls('v1:sales_cycle-list', subdomain=self.company.subdomain)
+        response = self.client.get(url, params, HTTP_HOST=parsed.netloc)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+        self.authenticate_user()
+        response = self.client.get(url, params, HTTP_HOST=parsed.netloc)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        content = json.loads(response.content)
+        self.assertEqual(content['count'], 20)
