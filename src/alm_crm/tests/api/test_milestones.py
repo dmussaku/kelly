@@ -31,16 +31,15 @@ class MilestoneAPITests(APITestMixin, APITestCase):
         url, parsed = self.prepare_urls(
             'v1:milestone-bulk-edit', subdomain=self.company.subdomain)
         milestones = Milestone.objects.filter(company_id=self.company.id)
-        test_data = [MilestoneSerializer(obj).data for obj in milestones]
-        test_data.append({"title":"tes tes","color_code":"#F4B59C","is_system":0,"sort":7})
-        test_data.append({"title":"test2 test 2","color_code":"#9CE5F4","is_system":0,"sort":8})
-        package = {'milestones': test_data, 'sales_cycles':[]}
+        test_data = [dict(MilestoneSerializer(obj).data) for obj in milestones]
+        test_data.append({"title":"tes tes","color_code":"#F4B59C","is_system":0,"sort":6})
+        test_data.append({"title":"test2 test 2","color_code":"#9CE5F4","is_system":0,"sort":7})
         
-        response = self.client.post(url, package, HTTP_HOST=parsed.netloc)
+        response = self.client.post(url, json.dumps(test_data), HTTP_HOST=parsed.netloc, format='json')
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
         self.authenticate_user()
-        response = self.client.post(url, package, HTTP_HOST=parsed.netloc)
+        response = self.client.post(url, json.dumps(test_data), HTTP_HOST=parsed.netloc, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         content = json.loads(response.content)
         self.assertEqual(len(content.get('milestones',"")), len(test_data))

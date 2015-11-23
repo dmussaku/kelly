@@ -6,9 +6,11 @@ from alm_crm.factories import (
     SalesCycleFactory, 
     ActivityFactory, 
     ProductFactory,
+    SalesCycleFactory,
     SalesCycleProductStatFactory,
 )
 from alm_crm.models import Contact, Milestone
+from alm_vcard.models import *
 
 from . import TestMixin
 
@@ -116,3 +118,39 @@ class ContactTests(TestMixin, TestCase):
         self.assertEqual(len(c1.get_products()), 1)
         self.assertEqual(len(c2.get_products()), 2)
 
+    def test_merge_contacts(self):
+        v1 = VCard(fn='1')
+        v1.save()
+        tel1 = Tel(value='1', vcard=v1)
+        tel1.save()
+        email1 = Email(value='1', vcard=v1)
+        email1.save()
+        v2 = VCard(fn='2', additional_name='2')
+        v2.save()
+        tel2 = Tel(value='2', vcard=v2)
+        tel2.save()
+        email2 = Email(value='2', vcard=v2)
+        email2.save()
+        c1 = ContactFactory(company_id=self.company.id, owner_id=self.user.id, vcard=v1)
+        sc1 = SalesCycleFactory(contact=c1, company_id=self.company.id, owner_id=self.user.id, is_global=True)
+        sc1_1 = SalesCycleFactory(contact=c1, company_id=self.company.id, owner_id=self.user.id, is_global=False, title='1')
+        for i in range(0,10):
+            ActivityFactory(sales_cycle=sc1, owner=self.user, company_id=self.company.id)
+        c2 = ContactFactory(company_id=self.company.id, owner_id=self.user.id, vcard=v2)
+        sc2 = SalesCycleFactory(contact=c2, company_id=self.company.id, owner_id=self.user.id, is_global=True)
+        sc2_2 = SalesCycleFactory(contact=c2, company_id=self.company.id, owner_id=self.user.id, is_global=False, title='2')
+        for i in range(0,10):
+            ActivityFactory(sales_cycle=sc2, owner=self.user, company_id=self.company.id)
+        
+        contact = c1.merge_contacts(alias_objects=[c2])
+        # self.assertEqual(c1.id, None)
+        # self.assertEqual(c2.id, None)
+        self.assertEqual(contact.vcard.emails.count(), 2)
+        self.assertEqual(contact.vcard.tels.count(), 2)
+        self.assertEqual(contact.vcard.notes.count(), 1)
+        self.assertEqual(contact.vcard.additional_name, '2')
+        self.assertEqual(contact.sales_cycles.filter(is_global=True).count(), 1)
+        self.assertEqual(contact.sales_cycles.get(is_global=True).rel_activities.count(), 20)
+        self.assertEqual(contact.sales_cycles.count(), 3)
+
+        

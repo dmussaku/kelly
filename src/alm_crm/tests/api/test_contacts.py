@@ -4,8 +4,9 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 
 from alm_crm.models import Contact
-from alm_crm.factories import ContactFactory
+from alm_crm.factories import (ContactFactory, SalesCycleFactory,)
 from alm_crm.serializers import ContactSerializer
+from alm_vcard.models import *
 
 from . import APITestMixin
 
@@ -312,4 +313,34 @@ class ContactAPITests(APITestMixin, APITestCase):
 
         self.authenticate_user()
         response = self.client.get(url, HTTP_HOST=parsed.netloc)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_merge_contacts(self):
+        v1 = VCard(fn='1')
+        v1.save()
+        tel1 = Tel(value='1', vcard=v1)
+        tel1.save()
+        email1 = Email(value='1', vcard=v1)
+        email1.save()
+        v2 = VCard(fn='2', additional_name='2')
+        v2.save()
+        tel2 = Tel(value='2', vcard=v2)
+        tel2.save()
+        email2 = Email(value='2', vcard=v2)
+        email2.save()
+        c1 = ContactFactory(company_id=self.company.id, owner_id=self.user.id, vcard=v1)
+        sc1 = SalesCycleFactory(contact=c1, company_id=self.company.id, owner_id=self.user.id, is_global=True)
+        c2 = ContactFactory(company_id=self.company.id, owner_id=self.user.id, vcard=v2)
+        sc2 = SalesCycleFactory(contact=c2, company_id=self.company.id, owner_id=self.user.id, is_global=True)
+        
+        url, parsed = self.prepare_urls('v1:contact-contacts-merge', subdomain=self.company.subdomain)
+        data = {
+            'merge_into_contact':c1.id,
+            'merged_contacts':[c2.id],
+        }
+        response = self.client.post(url, data, HTTP_HOST=parsed.netloc, format='json')
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+        self.authenticate_user()
+        response = self.client.post(url, data, HTTP_HOST=parsed.netloc, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)

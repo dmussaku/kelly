@@ -279,10 +279,11 @@ class ContactViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
                         }
                     )
         alias_objects = Contact.objects.filter(id__in=merged_contacts_ids)
-        response = primary_object.merge_contacts(alias_objects, delete_merged)
-        if not response['success']:
-            return Response(response)
-        contact = response['contact']
+        # response = primary_object.merge_contacts(alias_objects, delete_merged)
+        # if not response['success']:
+        #     return Response(response)
+        # contact = response['contact']
+        contact = primary_object.merge_contacts(alias_objects, delete_merged)
         serializer = self.serializer_class(contact, 
                                          global_sales_cycle=True,
                                          parent=True)
