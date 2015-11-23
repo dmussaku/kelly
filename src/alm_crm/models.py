@@ -952,12 +952,15 @@ class Contact(SubscriptionObject):
             else:
                 fn_list.append(obj.vcard.fn)
         try:
-            note_data = self.vcard.note_set.last().data
+            note_data = self.vcard.notes.last().data if type(self.vcard.notes.last().data)==unicode else self.vcard.notes.last().data.encode('utf-8')
         except:
             note_data = ""
         for obj in alias_objects:
-            if obj.vcard.note_set.all():
-                note_data += "\n" + obj.vcard.note_set.last().data
+            if obj.vcard.notes.all():
+                if type(obj.vcard.notes.last().data)==unicode:
+                    note_data += "\n" + obj.vcard.notes.last().data.encode('utf-8')
+                else:
+                    note_data += "\n" + obj.vcard.notes.last().data
         for alias_obj in alias_objects:
             if alias_obj.parent:
                 parent_dict[alias_obj.id]=alias_obj.parent.id
@@ -980,7 +983,7 @@ class Contact(SubscriptionObject):
                         self.children.add(child)
 
         VCard.merge_model_objects(self.vcard, [c.vcard for c in alias_objects])
-        self.vcard.note_set.all().delete()
+        self.vcard.notes.all().delete()
         if note_data or fn_list:
             note = Note(
                 data=', '.join(map(str,fn_list)) + ' ' + note_data, 
