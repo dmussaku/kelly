@@ -109,7 +109,6 @@ class ContactListAPITests(APITestMixin, APITestCase):
         Ensure that we can delete contact_list
         """
         contact_list = ContactList.objects.first()
-        data = ContactListSerializer(contact_list).data
 
         url, parsed = self.prepare_urls('v1:contact_list-detail', subdomain=self.company.subdomain, kwargs={'pk':contact_list.id})
         

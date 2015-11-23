@@ -14,7 +14,8 @@ from .models import (
     HashTag,
     HashTagReference,
     SalesCycleProductStat,
-    ContactList
+    ContactList,
+    Filter,
 )
 
 
@@ -102,3 +103,11 @@ class ContactListFactory(CompanyObjectFactoryMixin, factory.django.DjangoModelFa
         model = ContactList
 
     title = factory.Faker('word')
+
+
+class FilterFactory(CompanyObjectFactoryMixin, factory.django.DjangoModelFactory):
+    class Meta:
+        model = Filter
+
+    title = factory.Faker('word')
+    filter_text = factory.Faker('word')

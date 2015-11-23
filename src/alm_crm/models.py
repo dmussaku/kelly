@@ -812,7 +812,7 @@ class Contact(SubscriptionObject):
                 ).order_by('vcard__fn')
 
     @classmethod
-    def get_all(cls, company_id):
+    def get_all(cls, company_id, user_id=None):
         queryset = Contact.objects.filter(
             company_id=company_id).order_by('vcard__fn')
         return queryset
@@ -2335,14 +2335,14 @@ class SalesCycleProductStat(SubscriptionObject):
 
 class Filter(SubscriptionObject):
     BASE_OPTIONS = (
-        ('AL', _('all')),
-        ('RT', _('recent')),
-        ('CD', _('cold')),
-        ('LD', _('lead')))
+        ('allbase', _('all')),
+        ('recent', _('recent')),
+        ('coldbase', _('cold')),
+        ('leadbase', _('lead')))
     title = models.CharField(max_length=100, default='')
     filter_text = models.CharField(max_length=500)
     owner = models.ForeignKey(User, related_name='owned_filter', null=True)
-    base = models.CharField(max_length=6, choices=BASE_OPTIONS, default='all')
+    base = models.CharField(max_length=8, choices=BASE_OPTIONS, default='allbase')
 
     class Meta:
         verbose_name = _('filter')
@@ -2350,6 +2350,19 @@ class Filter(SubscriptionObject):
 
     def __unicode__(self):
         return u'%s: %s' % (self.title, self.base)
+
+    def apply(self, company_id, user_id):
+        from .filters import ContactFilter
+        qs_case = {
+            'allbase': Contact.get_all,
+            'recent': Contact.get_recent_base,
+            'coldbase': Contact.get_cold_base,
+            'leadbase': Contact.get_lead_base,
+        }
+
+        queryset =  qs_case[self.base](company_id=company_id, user_id=user_id)
+
+        return ContactFilter({'search': self.filter_text}, queryset)
 
 
 class HashTag(SubscriptionObject):

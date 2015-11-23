@@ -20,6 +20,7 @@ from alm_crm.apii import (
     reports,
     sales_cycles,
     shares,
+    filters,
 )
 
 from alm_user.apii import users
@@ -102,6 +103,7 @@ router.register(r'product_group', product_groups.ProductGroupViewSet, 'product_g
 router.register(r'report', reports.ReportViewSet, 'report')
 router.register(r'sales_cycle', sales_cycles.SalesCycleViewSet, 'sales_cycle')
 router.register(r'share', shares.ShareViewSet, 'share')
+router.register(r'filter', filters.FilterViewSet, 'filter')
 router.register(r'user', users.UserViewSet, 'user')
 
 urlpatterns = patterns(

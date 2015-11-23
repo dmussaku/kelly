@@ -18,7 +18,9 @@ from .models import (
     HashTag,
     Share,
     Notification,
+    Filter,
 )
+from .filters import ContactFilter
 
 
 class RequestContextMixin(object):
@@ -177,3 +179,13 @@ class NotificationSerializer(RequestContextMixin, serializers.ModelSerializer):
     
     class Meta:
         model = Notification
+
+
+class FilterSerializer(RequestContextMixin, serializers.ModelSerializer):
+    count = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = Filter
+
+    def get_count(self, obj):
+        return obj.apply(company_id=self.request.company.id, user_id=self.request.user.id).count()

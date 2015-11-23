@@ -1,6 +1,4 @@
-from rest_framework.decorators import list_route
-from rest_framework.response import Response
-from rest_framework import viewsets, status, filters
+from rest_framework import viewsets
 
 from alm_crm.serializers import ContactListSerializer
 from alm_crm.models import ContactList
