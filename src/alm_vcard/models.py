@@ -122,8 +122,8 @@ class VCard(models.Model):
             self.fn += self.given_name
         if self.family_name:
             self.fn += (' ' if self.fn else '') + self.family_name
-        if not self.fn and self.email_set.first():
-            self.fn = self.email_set.first().value.split('@')[0].replace('.', ' ')
+        if not self.fn and self.emails.first():
+            self.fn = self.emails.first().value.split('@')[0].replace('.', ' ')
         if not self.fn:
             raise BadVCardError('This is bad vcard since user does not know anything about this contact.')
 
@@ -618,7 +618,7 @@ class VCard(models.Model):
             i.value[0]   = j.organization_name
             i.value.append(j.organization_unit)
 
-        for j in self.email_set.all():
+        for j in self.emails.all():
             i = v.add('email')
             i.value = j.value
             i.type_param = j.type

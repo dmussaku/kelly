@@ -100,6 +100,9 @@ class Milestone(SubscriptionObject):
 
         return milestones
 
+    
+
+
     def __unicode__(self):
         return '%s'%self.title
 
@@ -628,8 +631,8 @@ class Contact(SubscriptionObject):
             vcard.fn = company_name
             vcard.save()
             contact.tp = 'co'
-        elif vcard.fn == 'Без Имени' and vcard.email_set.first():
-            vcard.fn = vcard.email_set.first().value
+        elif vcard.fn == 'Без Имени' and vcard.emails.first():
+            vcard.fn = vcard.emails.first().value
             vcard.save()
         contact.vcard = vcard
         contact.import_task = import_task
@@ -939,12 +942,6 @@ class Contact(SubscriptionObject):
                 return {'success':False, 'message':'Not Instance of Contact'}
 
         global_sales_cycle = SalesCycle.get_global(self.company_id, self.id)
-        deleted_sales_cycle_ids = [ obj.sales_cycles.get(is_global=True).id for obj in alias_objects ]
-        activities = []
-        sales_cycles = []
-        shares = []
-        parent_dict = {}    # Dict of type contact.id:contact.parent.id
-        children_dict = {}  # Dict of type contact.id:contact.children.all()
         fn_list = []
         for obj in alias_objects:
             if type(obj.vcard.fn)==unicode:
@@ -952,17 +949,15 @@ class Contact(SubscriptionObject):
             else:
                 fn_list.append(obj.vcard.fn)
         try:
-            note_data = self.vcard.note_set.last().data
+            note_data = self.vcard.notes.last().data if type(self.vcard.notes.last().data)==unicode else self.vcard.notes.last().data.encode('utf-8')
         except:
             note_data = ""
         for obj in alias_objects:
-            if obj.vcard.note_set.all():
-                note_data += "\n" + obj.vcard.note_set.last().data
-        for alias_obj in alias_objects:
-            if alias_obj.parent:
-                parent_dict[alias_obj.id]=alias_obj.parent.id
-            if alias_obj.children.all():
-                children_dict[alias_obj.id] = [child.id for child in alias_obj.children.all()]
+            if obj.vcard.notes.all():
+                if type(obj.vcard.notes.last().data)==unicode:
+                    note_data += "\n" + obj.vcard.notes.last().data.encode('utf-8')
+                else:
+                    note_data += "\n" + obj.vcard.notes.last().data
         with transaction.atomic():
             for obj in alias_objects:
                 for sales_cycle in obj.sales_cycles.all():
@@ -970,17 +965,15 @@ class Contact(SubscriptionObject):
                         for activity in sales_cycle.rel_activities.all():
                             activity.sales_cycle = global_sales_cycle
                             activity.save()
-                            activities.append(activity)
                     else:
                         sales_cycle.contact = self
                         sales_cycle.save()
-                        sales_cycles.append(sales_cycle)
                 if obj.children.all():
                     for child in obj.children.all():
                         self.children.add(child)
 
         VCard.merge_model_objects(self.vcard, [c.vcard for c in alias_objects])
-        self.vcard.note_set.all().delete()
+        self.vcard.notes.all().delete()
         if note_data or fn_list:
             note = Note(
                 data=', '.join(map(str,fn_list)) + ' ' + note_data, 
@@ -991,24 +984,7 @@ class Contact(SubscriptionObject):
                 for share in obj.share_set.all():
                     share.contact = self
                     share.save()
-                    shares.append(share)
-        if delete_merged:
-            deleted_contacts = [contact.id for contact in alias_objects]
-            alias_objects.delete()
-        else:
-            deleted_contacts = []
-        response = {
-            'success':True,
-            'contact':self,
-            'deleted_contacts_ids':deleted_contacts,
-            'deleted_sales_cycle_ids':deleted_sales_cycle_ids,
-            'parent_dict':parent_dict,
-            'children_dict':children_dict,
-            'sales_cycles':sales_cycles,
-            'activities':activities,
-            'shares':shares,
-        }
-        return response
+        return self
 
     def get_products(self):
         return Product.objects.filter(id__in= \
@@ -1540,11 +1516,27 @@ class SalesCycle(SubscriptionObject):
         self.save()
 
     def change_milestone(self, milestone_id, user_id, company_id):
+        """
+        If no milestone is provided then we change sales_cycles milestone to none
+        and create a log that we deleted that particular milestone
+        """
         if not milestone_id:
             self.milestone = None
             self.save()
-            self.possibly_make_new()
+            if not self.log.all():
+                self.possibly_make_new()
+            else:
+                meta = self.log.last().meta
+                sc_log_entry = SalesCycleLogEntry(
+                    meta=meta,
+                    entry_type=SalesCycleLogEntry.MD,
+                    sales_cycle=self,
+                    owner_id=user_id,
+                    company_id=company_id
+                    )
+                sc_log_entry.save()
             return self
+
 
         milestone = Milestone.objects.get(id=milestone_id)
 
