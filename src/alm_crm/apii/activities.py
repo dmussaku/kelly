@@ -5,11 +5,11 @@ from django.db import transaction
 
 from rest_framework.decorators import list_route, detail_route
 from rest_framework.response import Response
-from rest_framework import viewsets, filters
+from rest_framework import viewsets, filters, status
 
 from alm_crm.serializers import ActivitySerializer, NotificationSerializer, SalesCycleSerializer
 from alm_crm.filters import ActivityFilter
-from alm_crm.models import Activity, Notification
+from alm_crm.models import Activity, Notification, AttachedFile
 
 from . import CompanyObjectAPIMixin
 
@@ -20,6 +20,17 @@ class ActivityViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
     filter_class = ActivityFilter
     # ordering_fields = '__all__'
 
+    def attach_files(self, attached_files, act_id):
+        for file_data in attached_files:
+            att_file = AttachedFile.objects.get(id=file_data['id'])
+            if file_data.get('delete', False) == False:
+                att_file.object_id = act_id
+                att_file.save()
+            else:
+                try: 
+                    att_file.delete()
+                except:
+                    pass
 
     def get_serializer(self, *args, **kwargs):
     	serializer_class = self.get_serializer_class()
@@ -28,6 +39,35 @@ class ActivityViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
 
     def get_queryset(self):
         return Activity.objects.filter(company_id=self.request.company.id).order_by('-date_created')
+
+    def create(self, request, *args, **kwargs):
+        data = request.data
+        attached_files = data.pop('attached_files', None)
+
+        serializer = self.get_serializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        act = self.perform_create(serializer)
+        
+        if(attached_files):
+            self.attach_files(attached_files, act.id)
+
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        data = request.data
+        attached_files = data.pop('attached_files', None)
+
+        serializer = self.get_serializer(instance, data=data)
+        serializer.is_valid(raise_exception=True)
+        act = serializer.save()
+        
+        if(attached_files):
+            self.attach_files(attached_files, act.id)
+
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, headers=headers)
 
     @list_route(methods=['get'], url_path='statistics')
     def get_statistics(self, request, *args, **kwargs):
@@ -135,7 +175,10 @@ class ActivityViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
 
         with transaction.atomic():
             for new_activity_data in data:
+                attached_files = new_activity_data.pop('attached_files', None)
                 new_activity = Activity.create_activity(company_id=request.company.id, user_id=request.user.id, data=new_activity_data)
+                if(attached_files):
+                    self.attach_files(attached_files, new_activity.id)
                 count+=1
 
             notification = Notification(

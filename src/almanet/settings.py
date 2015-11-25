@@ -356,6 +356,7 @@ class BaseConfiguration(SubdomainConfiguration, Configuration):
     SW_USERNAME = 'ALMASALES'
     SW_KEY = 'x3IFqvHB'
     SW_AUTH_URL = 'http://178.88.64.78/auth/v1.0'
+    CRM_CONTAINER_TITLE = 'CRM_FILES'
     
     RUSTEM_SETTINGS = False
 
@@ -392,6 +393,8 @@ class DevConfiguration(
     BROKER_URL = 'amqp://dev:dev@almasales.kz:5672//almasales/dev'
 
     RUSTEM_SETTINGS = False
+
+    SW_AUTH_URL = 'http://178.88.64.86/auth/v1.0'
 
 
 class QAConfiguration(DevConfiguration):
