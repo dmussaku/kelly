@@ -105,9 +105,10 @@ class ActivityViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
         serializer = self.get_serializer(activities, many=True)
         return Response(serializer.data)
 
-    @list_route(methods=['get'], url_path='my_activities')
-    def my_activities(self, request, *args, **kwargs):    
-        activities = Activity.my_activities(company_id=request.company.id, user_id=request.user.id)
+    @list_route(methods=['get'], url_path='user_activities')
+    def user_activities(self, request, *args, **kwargs):
+        user_id = request.query_params.get('user_id', None) or request.user.id
+        activities = Activity.user_activities(company_id=request.company.id, user_id=user_id)
         activities = ActivityFilter(request.GET, activities)
         page = self.paginate_queryset(activities)
         if page is not None:

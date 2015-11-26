@@ -1825,7 +1825,7 @@ class Activity(SubscriptionObject):
                 'count': my_feed['feed'].count(),
                 'not_read': my_feed['not_read'],
             },
-            'my_activities': cls.my_activities(company_id=company_id, user_id=user_id).count(),
+            'user_activities': cls.user_activities(company_id=company_id, user_id=user_id).count(),
             'my_tasks': cls.my_tasks(company_id=company_id, user_id=user_id).count(),
         }
 
@@ -1861,7 +1861,7 @@ class Activity(SubscriptionObject):
         }
 
     @classmethod
-    def my_activities(cls, company_id, user_id):
+    def user_activities(cls, company_id, user_id):
         return Activity.objects.filter(company_id=company_id, owner_id=user_id) \
                                .order_by('-date_edited')
 
