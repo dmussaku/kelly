@@ -78,14 +78,18 @@ class ActivityTests(TestMixin, TestCase):
         panel_info = Activity.get_panel_info(
             company_id=self.company.id, user_id=self.user.id)
 
-        self.assertEqual(panel_info['all']['days']['total'], 10)
-        self.assertEqual(panel_info['my']['days']['total'], 5)
+        self.assertEqual(panel_info['all']['total'], 10)
+        self.assertEqual(panel_info['my']['total'], 5)
 
-        self.assertEqual(panel_info['all']['days']['completed'], 3)
-        self.assertEqual(panel_info['my']['days']['completed'], 2)
+        self.assertEqual(panel_info['all']['completed'], 3)
+        self.assertEqual(panel_info['my']['completed'], 2)
 
-        self.assertEqual(panel_info['all']['days']['overdue'], 2)
-        self.assertEqual(panel_info['my']['days']['overdue'], 1)
+        self.assertEqual(panel_info['all']['overdue'], 2)
+        self.assertEqual(panel_info['my']['overdue'], 1)
+
+        self.assertEqual(panel_info['all']['by_period']['days'], 10)
+        self.assertEqual(panel_info['my']['by_period']['days'], 5)
+
 
     def test_change_sales_cycle_status_on_create_delete(self):
         contact = ContactFactory(company_id=self.company.id)
@@ -155,7 +159,7 @@ class ActivityTests(TestMixin, TestCase):
         self.assertEqual(company_feed['feed'].count(), 8)
         self.assertEqual(company_feed['not_read'], 3)
 
-    def test_my_activities(self):
+    def test_user_activities(self):
         account2 = AccountFactory(company=self.company)
         contact = ContactFactory(company_id=self.company.id)
         sales_cycle = SalesCycleFactory(
@@ -174,11 +178,11 @@ class ActivityTests(TestMixin, TestCase):
                 owner=account2.user, 
                 company_id=self.company.id)
         
-        feed = Activity.my_activities(
+        feed = Activity.user_activities(
             company_id=self.company.id, user_id=self.user.id)
         self.assertEqual(feed.count(), 5)
 
-        feed = Activity.my_activities(
+        feed = Activity.user_activities(
             company_id=self.company.id, user_id=account2.user.id)
         self.assertEqual(feed.count(), 3)
 

@@ -1780,16 +1780,22 @@ class Activity(SubscriptionObject):
             rv = {}
             for period in periods:
                 period_total = queryset.filter(period_q[period+'_q'])
-                rv[period] = {
-                    'total': period_total.count(),
-                    'completed': period_total.filter(Q(date_finished__isnull=False)).count(),
-                    'overdue': period_total.filter(Q(date_finished__isnull=True, deadline__lt=timezone.now().replace(hour=time.min.hour, minute=time.min.minute, second=time.min.second))).count(),
-                }
+                rv[period] = period_total.count()
             return rv
 
         return {
-                'all': get_by_period(total),
-                'my': get_by_period(my_total),
+                'all': {
+                    'total': total.count(),
+                    'completed': total.filter(Q(date_finished__isnull=False)).count(),
+                    'overdue': total.filter(date_finished__isnull=True, deadline__lt=timezone.now().replace(hour=time.min.hour, minute=time.min.minute, second=time.min.second)).count(),
+                    'by_period': get_by_period(total),
+                },
+                'my': {
+                    'total': my_total.count(),
+                    'completed': my_total.filter(Q(date_finished__isnull=False)).count(),
+                    'overdue': my_total.filter(date_finished__isnull=True, deadline__lt=timezone.now().replace(hour=time.min.hour, minute=time.min.minute, second=time.min.second)).count(),
+                    'by_period': get_by_period(my_total),
+                },
             }
 
     @classmethod
