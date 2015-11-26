@@ -15,6 +15,7 @@ from alm_crm.serializers import (
 )
 from alm_crm.filters import ActivityFilter
 from alm_crm.models import Activity, Notification, AttachedFile, Comment
+from alm_crm.utils.parser import text_parser
 
 from . import CompanyObjectAPIMixin
 
@@ -52,6 +53,8 @@ class ActivityViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
         serializer = self.get_serializer(data=data)
         serializer.is_valid(raise_exception=True)
         act = self.perform_create(serializer)
+        text_parser(base_text=act.description, content_class=act.__class__,
+                    object_id=act.id, company_id = request.company.id)
         
         if(attached_files):
             self.attach_files(attached_files, act.id)
@@ -67,6 +70,8 @@ class ActivityViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
         serializer = self.get_serializer(instance, data=data)
         serializer.is_valid(raise_exception=True)
         act = serializer.save()
+        text_parser(base_text=act.description, content_class=act.__class__,
+                    object_id=act.id, company_id = request.company.id)
         
         if(attached_files):
             self.attach_files(attached_files, act.id)
@@ -182,6 +187,8 @@ class ActivityViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
             for new_activity_data in data:
                 attached_files = new_activity_data.pop('attached_files', None)
                 new_activity = Activity.create_activity(company_id=request.company.id, user_id=request.user.id, data=new_activity_data)
+                text_parser(base_text=new_activity.description, content_class=new_activity.__class__,
+                    object_id=new_activity.id, company_id = request.company.id)
                 if(attached_files):
                     self.attach_files(attached_files, new_activity.id)
                 count+=1

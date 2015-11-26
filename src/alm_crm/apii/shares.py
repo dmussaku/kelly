@@ -6,14 +6,15 @@ from rest_framework.decorators import list_route
 from rest_framework.response import Response
 from rest_framework import viewsets, status, filters
 
+from alm_vcard.serializers import VCardSerializer
+from alm_vcard.models import VCard
 from alm_crm.models import Share, Notification, Contact
 from alm_crm.serializers import (
     ShareSerializer,
     NotificationSerializer,
 ) 
-from alm_vcard.serializers import VCardSerializer
 from alm_crm.filters import ShareFilter
-from alm_vcard.models import VCard
+from alm_crm.utils.parser import text_parser
 
 from . import CompanyObjectAPIMixin
 
@@ -83,6 +84,8 @@ class ShareViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
         with transaction.atomic():
             for new_share_data in data:
                 new_share = Share.create_share(company_id=request.company.id, user_id=request.user.id, data=new_share_data)
+                text_parser(base_text=new_share.note, content_class=new_share.__class__,
+                    object_id=new_share.id, company_id = request.company.id)
                 count+=1
 
             notification = Notification(
