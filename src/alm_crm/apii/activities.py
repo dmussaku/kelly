@@ -50,15 +50,14 @@ class ActivityViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
         data = request.data
         attached_files = data.pop('attached_files', None)
 
-        serializer = self.get_serializer(data=data)
-        serializer.is_valid(raise_exception=True)
-        act = self.perform_create(serializer)
+        act = Activity.create_activity(company_id=request.company.id, user_id=request.user.id, data=data)
         text_parser(base_text=act.description, content_class=act.__class__,
                     object_id=act.id, company_id = request.company.id)
         
         if(attached_files):
             self.attach_files(attached_files, act.id)
 
+        serializer = self.get_serializer(act)
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
