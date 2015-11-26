@@ -22,6 +22,7 @@ from alm_crm.apii import (
     shares,
     filters,
     attached_files,
+    comments,
 )
 
 from alm_user.apii import users
@@ -107,6 +108,7 @@ router.register(r'share', shares.ShareViewSet, 'share')
 router.register(r'filter', filters.FilterViewSet, 'filter')
 router.register(r'user', users.UserViewSet, 'user')
 router.register(r'attached_file', attached_files.AttachedFileViewSet, 'attached_file')
+router.register(r'comment', comments.CommentViewSet, 'comment')
 
 urlpatterns = patterns(
     '',

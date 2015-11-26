@@ -7,9 +7,14 @@ from rest_framework.decorators import list_route, detail_route
 from rest_framework.response import Response
 from rest_framework import viewsets, filters, status
 
-from alm_crm.serializers import ActivitySerializer, NotificationSerializer, SalesCycleSerializer
+from alm_crm.serializers import (
+    ActivitySerializer, 
+    NotificationSerializer, 
+    SalesCycleSerializer,
+    CommentSerializer,
+)
 from alm_crm.filters import ActivityFilter
-from alm_crm.models import Activity, Notification, AttachedFile
+from alm_crm.models import Activity, Notification, AttachedFile, Comment
 
 from . import CompanyObjectAPIMixin
 
@@ -211,3 +216,18 @@ class ActivityViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
 
         serializer = self.get_serializer(activity)
         return Response(serializer.data)
+
+    @detail_route(methods=['get'], url_path='comments')
+    def comments(self, request, *args, **kwargs):
+        activity = self.get_object()
+        comments = activity.comments.order_by('date_edited')
+        Comment.mark_as_read(company_id=request.company.id, 
+                             user_id=request.user.id,
+                             comment_ids=comments.values_list('id', flat=True))
+        
+        activity_serializer = self.get_serializer(activity)
+        comments_serializer = CommentSerializer(comments, many=True, context={'request': request})
+        return Response({
+                    'activity': activity_serializer.data,
+                    'comments': comments_serializer.data,
+                })

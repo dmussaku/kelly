@@ -2018,16 +2018,9 @@ class Comment(SubscriptionObject):
         return "%s's comment" % (self.owner)
 
     @classmethod
-    def mark_as_read(cls, user_id, comment_id):
-        try:
-            comment = CommentRecipient.objects.get(
-                user__id=user_id, comment__id=comment_id)
-        except CommentRecipient.DoesNotExist:
-            pass
-        else:
-            comment.has_read = True
-            comment.save()
-        return True
+    def mark_as_read(cls, company_id, user_id, comment_ids):
+        return CommentRecipient.objects.filter(
+                company_id=company_id, user__id=user_id, comment__id__in=comment_ids, has_read=False).update(has_read=True)
 
     @classmethod
     def build_new(cls, user_id, content_class=None,

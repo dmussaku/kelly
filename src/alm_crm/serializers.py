@@ -20,6 +20,7 @@ from .models import (
     Notification,
     Filter,
     AttachedFile,
+    Comment,
 )
 from .filters import ContactFilter
 
@@ -200,3 +201,9 @@ class FilterSerializer(RequestContextMixin, serializers.ModelSerializer):
 
     def get_count(self, obj):
         return obj.apply(company_id=self.request.company.id, user_id=self.request.user.id).count()
+
+
+class CommentSerializer(RequestContextMixin, serializers.ModelSerializer):
+    
+    class Meta:
+        model = Comment

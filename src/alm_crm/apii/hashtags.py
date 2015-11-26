@@ -3,13 +3,10 @@ from rest_framework.response import Response
 from rest_framework import viewsets, status
 
 from alm_crm.models import HashTag
+from alm_crm.serializers import HashTagSerializer
 
 from . import CompanyObjectAPIMixin
-from alm_crm.serializers import (
-    ContactSerializer,
-    ShareSerializer,
-    HashTagSerializer
-    ) 
+
 
 class HashTagViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
 
