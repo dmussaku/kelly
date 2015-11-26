@@ -20,14 +20,8 @@ class CommentViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         data = request.data
-    	content_class =  ContentType.objects.get(app_label='alm_crm', 
-                                                     model=data.pop('content_class').lower()
-                                                    ).model_class()
-        content_type = ContentType.objects.get_for_model(content_class)
-        data['content_type'] = content_type.id
+    	comment = Comment.create_comment(company_id=request.company.id, user_id=request.user.id, data=data)
 
-        serializer = self.get_serializer(data=data)
-        serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
+        serializer = self.get_serializer(comment)
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)

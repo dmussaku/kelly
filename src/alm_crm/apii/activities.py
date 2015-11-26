@@ -51,8 +51,6 @@ class ActivityViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
         attached_files = data.pop('attached_files', None)
 
         act = Activity.create_activity(company_id=request.company.id, user_id=request.user.id, data=data)
-        text_parser(base_text=act.description, content_class=act.__class__,
-                    object_id=act.id, company_id = request.company.id)
         
         if(attached_files):
             self.attach_files(attached_files, act.id)
@@ -186,8 +184,7 @@ class ActivityViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
             for new_activity_data in data:
                 attached_files = new_activity_data.pop('attached_files', None)
                 new_activity = Activity.create_activity(company_id=request.company.id, user_id=request.user.id, data=new_activity_data)
-                text_parser(base_text=new_activity.description, content_class=new_activity.__class__,
-                    object_id=new_activity.id, company_id = request.company.id)
+
                 if(attached_files):
                     self.attach_files(attached_files, new_activity.id)
                 count+=1

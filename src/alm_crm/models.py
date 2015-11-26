@@ -1897,9 +1897,6 @@ class Activity(SubscriptionObject):
                                 need_preparation=data.get('need_preparation', False),)
         new_activity.save()
 
-        if 'attached_files' in data:
-            self.attach_files(data['attached_files'], new_activity.id)
-
         account = Account.objects.get(company_id=company_id, user_id=user_id)
 
         new_activity.spray(company_id, account)
@@ -2030,6 +2027,23 @@ class Comment(SubscriptionObject):
         comment.object_id = object_id
         if save:
             comment.save()
+        return comment
+
+    @classmethod
+    def create_comment(cls, company_id, user_id, data):
+        content_class =  ContentType.objects.get(app_label='alm_crm', 
+                                                     model=data.pop('content_class').lower()
+                                                    ).model_class()
+        content_type = ContentType.objects.get_for_model(content_class)
+        data['content_type'] = content_type
+        comment = Comment(owner_id=user_id,
+                          company_id=company_id,
+                          **data)
+        comment.save()
+
+        account = Account.objects.get(company_id=company_id, user_id=user_id)
+        comment.spray(company_id, account)
+
         return comment
 
     def spray(self, company_id, account):

@@ -84,8 +84,6 @@ class ShareViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
         with transaction.atomic():
             for new_share_data in data:
                 new_share = Share.create_share(company_id=request.company.id, user_id=request.user.id, data=new_share_data)
-                text_parser(base_text=new_share.note, content_class=new_share.__class__,
-                    object_id=new_share.id, company_id = request.company.id)
                 count+=1
 
             notification = Notification(
