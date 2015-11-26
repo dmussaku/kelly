@@ -219,28 +219,26 @@ class Contact(SubscriptionObject):
         company_q = Q(company_id=company_id)
         owner_q = Q(owner_id=user_id)
 
-        period_q = {
-            'days_q': Q(date_edited__gte=datetimeutils.get_start_of_today(timezone.now()), date_edited__lte=datetimeutils.get_end_of_today(timezone.now())),
-            'weeks_q': Q(date_edited__gte=datetimeutils.get_start_of_week(timezone.now()), date_edited__lte=datetimeutils.get_end_of_week(timezone.now())),
-            'months_q': Q(date_edited__gte=datetimeutils.get_start_of_month(timezone.now()), date_edited__lte=datetimeutils.get_end_of_month(timezone.now())),
-        }
+        days_q = Q(date_edited__gte=datetimeutils.get_start_of_today(timezone.now()), date_edited__lte=datetimeutils.get_end_of_today(timezone.now()))
+        weeks_q = Q(date_edited__gte=datetimeutils.get_start_of_week(timezone.now()), date_edited__lte=datetimeutils.get_end_of_week(timezone.now()))
+        months_q = Q(date_edited__gte=datetimeutils.get_start_of_month(timezone.now()), date_edited__lte=datetimeutils.get_end_of_month(timezone.now()))
 
-        total = Activity.objects.filter(company_q)
-        my_total = total.filter(owner_q)
-
-        periods = ['days', 'weeks', 'months']
-
-        def get_by_period(queryset):
-            rv = {}
-            for period in periods:
-                period_total = queryset.filter(period_q[period+'_q'])
-                rv[period] = map(lambda x: x.sales_cycle.contact, period_total)
-            return rv
+        latest_activity_days_q = Q(latest_activity__date_edited__gte=datetimeutils.get_start_of_today(timezone.now()), latest_activity__date_edited__lte=datetimeutils.get_end_of_today(timezone.now()))
+        latest_activity_weeks_q = Q(latest_activity__date_edited__gte=datetimeutils.get_start_of_week(timezone.now()), latest_activity__date_edited__lte=datetimeutils.get_end_of_week(timezone.now()))
+        latest_activity_months_q = Q(latest_activity__date_edited__gte=datetimeutils.get_start_of_month(timezone.now()), latest_activity__date_edited__lte=datetimeutils.get_end_of_month(timezone.now()))
 
         return {
-                'all': get_by_period(total),
-                'my': get_by_period(my_total)
-            }
+            'all': {
+                'days': Contact.objects.filter(company_q & (days_q | latest_activity_days_q)),
+                'weeks': Contact.objects.filter(company_q & (days_q | latest_activity_weeks_q)),
+                'months': Contact.objects.filter(company_q & (days_q | latest_activity_months_q)),
+            },
+            'my': {
+                'days': Contact.objects.filter((company_q & owner_q) & (days_q | latest_activity_days_q)),
+                'weeks': Contact.objects.filter((company_q & owner_q) & (weeks_q | latest_activity_days_q)),
+                'months': Contact.objects.filter((company_q & owner_q) & (months_q | latest_activity_days_q)),
+            },
+        }
 
     @classmethod
     def share_contact(cls, share_from, share_to, contact_id, company_id, comment=None):
@@ -1350,26 +1348,20 @@ class SalesCycle(SubscriptionObject):
         weeks_q = Q(date_edited__gte=datetimeutils.get_start_of_week(timezone.now()), date_edited__lte=datetimeutils.get_end_of_week(timezone.now()))
         months_q = Q(date_edited__gte=datetimeutils.get_start_of_month(timezone.now()), date_edited__lte=datetimeutils.get_end_of_month(timezone.now()))
 
-        activities = Activity.objects.filter(company_q)
-
-        days_act_sales_cycles = activities.filter(days_q).values_list('sales_cycle_id', flat=True)
-        weeks_act_sales_cycles = activities.filter(weeks_q).values_list('sales_cycle_id', flat=True)
-        months_act_sales_cycles = activities.filter(months_q).values_list('sales_cycle_id', flat=True)
-
-        my_days_act_sales_cycles = activities.filter(days_q & owner_q).values_list('sales_cycle_id', flat=True)
-        my_weeks_act_sales_cycles = activities.filter(weeks_q & owner_q).values_list('sales_cycle_id', flat=True)
-        my_months_act_sales_cycles = activities.filter(months_q & owner_q).values_list('sales_cycle_id', flat=True)
+        latest_activity_days_q = Q(latest_activity__date_edited__gte=datetimeutils.get_start_of_today(timezone.now()), latest_activity__date_edited__lte=datetimeutils.get_end_of_today(timezone.now()))
+        latest_activity_weeks_q = Q(latest_activity__date_edited__gte=datetimeutils.get_start_of_week(timezone.now()), latest_activity__date_edited__lte=datetimeutils.get_end_of_week(timezone.now()))
+        latest_activity_months_q = Q(latest_activity__date_edited__gte=datetimeutils.get_start_of_month(timezone.now()), latest_activity__date_edited__lte=datetimeutils.get_end_of_month(timezone.now()))
 
         return {
             'all': {
-                'days': SalesCycle.objects.filter((company_q & days_q) | Q(id__in=days_act_sales_cycles)),
-                'weeks': SalesCycle.objects.filter((company_q & weeks_q) | Q(id__in=weeks_act_sales_cycles)),
-                'months': SalesCycle.objects.filter((company_q & months_q) | Q(id__in=months_act_sales_cycles)),
+                'days': SalesCycle.objects.filter(company_q & (days_q | latest_activity_days_q)),
+                'weeks': SalesCycle.objects.filter(company_q & (days_q | latest_activity_weeks_q)),
+                'months': SalesCycle.objects.filter(company_q & (days_q | latest_activity_months_q)),
             },
             'my': {
-                'days': SalesCycle.objects.filter((company_q & days_q & owner_q) | Q(id__in=my_days_act_sales_cycles)),
-                'weeks': SalesCycle.objects.filter((company_q & weeks_q & owner_q) | Q(id__in=my_weeks_act_sales_cycles)),
-                'months': SalesCycle.objects.filter((company_q & months_q & owner_q) | Q(id__in=my_months_act_sales_cycles)),
+                'days': SalesCycle.objects.filter((company_q & owner_q) & (days_q | latest_activity_days_q)),
+                'weeks': SalesCycle.objects.filter((company_q & owner_q) & (weeks_q | latest_activity_days_q)),
+                'months': SalesCycle.objects.filter((company_q & owner_q) & (months_q | latest_activity_days_q)),
             },
         }
 
