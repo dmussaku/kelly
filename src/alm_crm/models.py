@@ -1289,36 +1289,15 @@ class SalesCycle(SubscriptionObject):
         milestones = Milestone.objects.filter(company_id=company_id)
 
         by_milestones = {
-            'days': {
-                'none': open_sales_cycles.filter(period_q['days_q'] & Q(milestone_id=None)).distinct().count(),
-            },
-            'weeks': {
-                'none': open_sales_cycles.filter(period_q['weeks_q'] & Q(milestone_id=None)).distinct().count(),
-            },
-            'months': {
-                'none': open_sales_cycles.filter(period_q['months_q'] & Q(milestone_id=None)).distinct().count(),
-            },
+            'none': open_sales_cycles.filter(Q(milestone_id=None)).distinct().count(),
         }
         my_by_milestones = {
-            'days': {
-                'none': my_open_sales_cycles.filter(period_q['days_q'] & Q(milestone_id=None)).distinct().count(),
-            },
-            'weeks': {
-                'none': my_open_sales_cycles.filter(period_q['weeks_q'] & Q(milestone_id=None)).distinct().count(),
-            },
-            'months': {
-                'none': my_open_sales_cycles.filter(period_q['months_q'] & Q(milestone_id=None)).distinct().count(),
-            },
+            'none': my_open_sales_cycles.filter(Q(milestone_id=None)).distinct().count(),
         }
 
         for m in milestones:
-            by_milestones['days'][m.id] = open_sales_cycles.filter(period_q['days_q'] & Q(milestone_id=m.id)).distinct().count()
-            by_milestones['weeks'][m.id] = open_sales_cycles.filter(period_q['weeks_q'] & Q(milestone_id=m.id)).distinct().count()
-            by_milestones['months'][m.id] = open_sales_cycles.filter(period_q['months_q'] & Q(milestone_id=m.id)).distinct().count()
-
-            my_by_milestones['days'][m.id] = my_open_sales_cycles.filter(period_q['days_q'] & Q(milestone_id=m.id)).distinct().count()
-            my_by_milestones['weeks'][m.id] = my_open_sales_cycles.filter(period_q['weeks_q'] & Q(milestone_id=m.id)).distinct().count()
-            my_by_milestones['months'][m.id] = my_open_sales_cycles.filter(period_q['months_q'] & Q(milestone_id=m.id)).distinct().count()
+            by_milestones[m.id] = open_sales_cycles.filter(Q(milestone_id=m.id)).distinct().count()
+            my_by_milestones[m.id] = my_open_sales_cycles.filter(Q(milestone_id=m.id)).distinct().count()
 
         def get_by_period(queryset):
             rv = {}
@@ -1329,41 +1308,35 @@ class SalesCycle(SubscriptionObject):
 
         return {
             'new_sales_cycles': {
-                'all': get_by_period(new_sales_cycles),
-                'my': get_by_period(my_new_sales_cycles),
+                'all': {
+                    'total': new_sales_cycles.count(),
+                    'by_period': get_by_period(new_sales_cycles),
+                },
+                'my': {
+                    'total': my_new_sales_cycles.count(),
+                    'by_period': get_by_period(my_new_sales_cycles),
+                },
             },
             'successful_sales_cycles': {
-                'all': get_by_period(successful_sales_cycles),
-                'my': get_by_period(my_successful_sales_cycles),
+                'all': {
+                    'total': successful_sales_cycles.count(),
+                    'by_period': get_by_period(successful_sales_cycles),
+                },
+                'my': {
+                    'total': my_successful_sales_cycles.count(),
+                    'by_period': get_by_period(my_successful_sales_cycles),
+                },
             },
             'open_sales_cycles': {
                 'all': {
-                    'days': {
-                        'total': open_sales_cycles.filter(period_q['days_q']).distinct().count(),
-                        'by_milestones': by_milestones['days'],
-                    },
-                    'weeks': {
-                        'total': open_sales_cycles.filter(period_q['weeks_q']).distinct().count(),
-                        'by_milestones': by_milestones['weeks'],
-                    },
-                    'months': {
-                        'total': open_sales_cycles.filter(period_q['months_q']).distinct().count(),
-                        'by_milestones': by_milestones['months'],
-                    },
+                    'total': open_sales_cycles.count(),
+                    'by_milestones': by_milestones,
+                    'by_period': get_by_period(open_sales_cycles),
                 },
                 'my': {
-                    'days': {
-                        'total': my_open_sales_cycles.filter(period_q['days_q']).distinct().count(),
-                        'by_milestones': my_by_milestones['days'],
-                    },
-                    'weeks': {
-                        'total': my_open_sales_cycles.filter(period_q['weeks_q']).distinct().count(),
-                        'by_milestones': my_by_milestones['weeks'],
-                    },
-                    'months': {
-                        'total': my_open_sales_cycles.filter(period_q['months_q']).distinct().count(),
-                        'by_milestones': my_by_milestones['months'],
-                    },
+                    'total': my_open_sales_cycles.count(),
+                    'by_milestones': my_by_milestones,
+                    'by_period': get_by_period(my_open_sales_cycles),
                 },
             },
         }
