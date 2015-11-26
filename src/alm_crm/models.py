@@ -4,6 +4,7 @@ import os
 import xlrd
 import pytz
 import simplejson as json
+import dateutil.parser
 from datetime import datetime, timedelta, time
 from celery import group, Task, result
 
@@ -1891,7 +1892,7 @@ class Activity(SubscriptionObject):
         new_activity = Activity(description=data.get('description', ''),
                                 sales_cycle_id=sales_cycle_id,
                                 assignee_id=data.get('assignee_id', None),
-                                deadline=data.get('deadline', None),
+                                deadline=dateutil.parser.parse(data.get('deadline', None)) if data.get('deadline', None) else None,
                                 owner_id=user_id,
                                 company_id=company_id,
                                 need_preparation=data.get('need_preparation', False),)
