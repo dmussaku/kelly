@@ -196,16 +196,22 @@ class Contact(SubscriptionObject):
             rv = {}
             for period in periods:
                 period_total = queryset.filter(period_q[period+'_q'])
-                rv[period] = {
-                    'total': period_total.count(),
-                    'people': period_total.filter(Q(tp=Contact.USER_TP)).count(),
-                    'companies': period_total.filter(Q(tp=Contact.COMPANY_TP)).count(),
-                }
+                rv[period] = period_total.count()
             return rv
 
         return {
-                'all': get_by_period(total),
-                'my': get_by_period(my_total),
+                'all': {
+                    'total': total.count(),
+                    'people': total.filter(Q(tp=Contact.USER_TP)).count(),
+                    'companies': total.filter(Q(tp=Contact.COMPANY_TP)).count(),
+                    'by_period': get_by_period(total),
+                },
+                'my': {
+                    'total': my_total.count(),
+                    'people': my_total.filter(Q(tp=Contact.USER_TP)).count(),
+                    'companies': my_total.filter(Q(tp=Contact.COMPANY_TP)).count(),
+                    'by_period': get_by_period(my_total),
+                },
             }
 
     @classmethod
