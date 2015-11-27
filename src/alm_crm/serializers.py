@@ -62,6 +62,9 @@ class ContactSerializer(RequestContextMixin, serializers.ModelSerializer):
         # pass sales_cycles=True param to get hydrated list of sales cycles
         if kwargs.pop('sales_cycles', False):
             self.fields['sales_cycles'] = SalesCycleSerializer(many=True)
+
+        if kwargs.pop('custom_fields', False):
+            self.fields['custom_fields'] = serializers.SerializerMethodField()
             
         super(ContactSerializer, self).__init__(*args, **kwargs)
 
@@ -73,6 +76,9 @@ class ContactSerializer(RequestContextMixin, serializers.ModelSerializer):
 
     def get_children(self, obj):
         return [{child.id: child.vcard.fn} for child in obj.children.all()]
+
+    def get_custom_fields(self, obj):
+        return {field.custom_field.id:field.value for field in obj.custom_field_values.all()}
 
 
 class ContactListSerializer(RequestContextMixin, serializers.ModelSerializer):

@@ -22,6 +22,9 @@ from alm_crm.tasks import (
     grouped_contact_import_task, 
     check_task_status,
 )
+from alm_crm.utils.data_processing import (
+    processing_custom_field_data,
+    )
 
 from . import CompanyObjectAPIMixin
 
@@ -49,7 +52,7 @@ class ContactViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
 
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
-        serializer = self.get_serializer(instance, products=True, children=True, parent=True, global_sales_cycle=True)
+        serializer = self.get_serializer(instance, products=True, custom_fields=True, children=True, parent=True, global_sales_cycle=True)
         return Response(serializer.data)
 
     def create(self, request, *args, **kwargs):
@@ -58,6 +61,7 @@ class ContactViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
 
     	# create vcard for contact
     	vcard_data = data.pop('vcard')
+        custom_fields = data.pop('custom_fields') if data.get('custom_fields') else {}
     	vcard_serializer = VCardSerializer(data=vcard_data)
         vcard_serializer.is_valid(raise_exception=True)
         vcard = vcard_serializer.save()
@@ -81,9 +85,13 @@ class ContactViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
         if parent_name:
             contact, parent = contact.create_company_for_contact(parent_name)
 
+        if custom_fields:
+            processing_custom_field_data(custom_fields, contact)
+
         headers = self.get_success_headers(serializer.data)
         serializer = self.get_serializer(contact, 
         								 global_sales_cycle=True,
+                                         custom_fields=True,
         								 parent=True)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
@@ -93,6 +101,7 @@ class ContactViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
 
     	# update vcard for contact
     	vcard = instance.vcard
+        custom_fields = data.pop('custom_fields') if data.get('custom_fields') else {}
     	if vcard:
     		vcard.delete()
     	vcard_data = data.pop('vcard')
@@ -109,9 +118,11 @@ class ContactViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
         parent_name = data.get('company_name','').strip()
         if parent_name:
             contact, parent = contact.create_company_for_contact(parent_name)
-
+        if custom_fields:
+            processing_custom_field_data(custom_fields, contact)
         serializer = self.get_serializer(contact,
-                                         products=True, 
+                                         products=True,
+                                         custom_fields=True, 
                                          children=True, 
                                          parent=True, 
                                          global_sales_cycle=True)

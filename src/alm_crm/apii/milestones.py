@@ -18,9 +18,6 @@ class MilestoneViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
 
     @list_route(methods=['post'], url_path='bulk_edit')
     def bulk_edit(self, request, *args, **kwargs):
-        # data = self.deserialize(
-        #     request, request.body,
-        #     format=request.META.get('CONTENT_TYPE', 'application/json'))
         data = request.data
         milestones = Milestone.objects.filter(company_id=request.company.id)
         new_milestone_set = []
@@ -71,7 +68,6 @@ class MilestoneViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
                     log_entry.save()
                 milestone.delete()
         bundle = {
-            # "milestones": self.get_serializer(new_milestone_set, many=True).data,
             "milestones": [self.get_serializer(milestone).data
                                                         for milestone in new_milestone_set]
         }

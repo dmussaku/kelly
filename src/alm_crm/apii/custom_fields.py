@@ -92,4 +92,11 @@ class CustomFieldViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
     @list_route(methods=['get'], url_path='get_for_model/product')
     def get_for_model_product(self, request, **kwargs):
         return self.get_for_model(request, **{'class':'product'})
+
+    @list_route(methods=['get'], url_path='custom_field_dict')
+    def custom_field_dict(self, request, **kwargs):
+        tp = request.GET.get('tp','contact')
+        custom_field_dict = CustomField.objects.filter(
+            company_id=request.company.id, content_type__name=tp).values_list('id', 'title')
+        return Response(custom_field_dict)
     
