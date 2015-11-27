@@ -344,3 +344,50 @@ class ContactAPITests(APITestMixin, APITestCase):
         self.authenticate_user()
         response = self.client.post(url, data, HTTP_HOST=parsed.netloc, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+
+    '''
+def test_edit_contact(self):
+        """
+        Ensure that we can edit contact
+        """
+        contact = Contact.objects.first()
+        data = ContactSerializer(contact).data
+        old_vcard_id = data['vcard']['id']
+
+        data['vcard']['adrs'][0]['locality'] = 'Almaty'
+
+        url, parsed = self.prepare_urls('v1:contact-detail', subdomain=self.company.subdomain, kwargs={'pk':contact.id})
+        
+        response = self.client.put(url, data, HTTP_HOST=parsed.netloc, format='json')
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+        self.authenticate_user()
+        response = self.client.put(url, data, HTTP_HOST=parsed.netloc, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        url, parsed = self.prepare_urls('v1:contact-detail', subdomain=self.company.subdomain, kwargs={'pk':contact.id})
+        response = self.client.get(url, HTTP_HOST=parsed.netloc)
+        content = json.loads(response.content)
+        self.assertEqual(content['vcard']['adrs'][0]['locality'], 'Almaty')
+        self.assertNotEqual(content['vcard']['id'], old_vcard_id) # ensure that we really delete vcard and create new one
+
+    '''
+
+    def test_update_children(self):
+        self.setUp()
+        children = [c.id for c in Contact.objects.all()]
+        contact = ContactFactory(company_id=self.company.id, owner_id=self.user.id, tp='co')
+        self.assertEqual(contact.children.count(), 0)
+        data = ContactSerializer(contact).data
+        data['children'] = children
+        url, parsed = self.prepare_urls('v1:contact-detail', subdomain=self.company.subdomain, kwargs={'pk':contact.id})
+        self.authenticate_user()
+        response = self.client.put(url, data, HTTP_HOST=parsed.netloc, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(contact.children.count(), len(children))
+        data['children'] = children[0:3]
+        response = self.client.put(url, data, HTTP_HOST=parsed.netloc, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(contact.children.count(), 3)
+        print 'test_update_children ran successfuly'

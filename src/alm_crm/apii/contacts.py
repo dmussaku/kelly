@@ -43,13 +43,13 @@ class ContactViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
             ids = query_params.get('ids', None).split(',') if query_params.get('ids', None) else []
             queryset = self.filter_queryset(self.get_queryset())
             queryset = queryset.filter(id__in=ids)
-            serializer = self.get_serializer(queryset, many=True)
+            serializer = self.get_serializer(queryset, children=True, parent=True, many=True)
             return Response(serializer.data)
         return super(ContactViewSet, self).list(request, *args, **kwargs)
 
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
-        serializer = self.get_serializer(instance, products=True, global_sales_cycle=True)
+        serializer = self.get_serializer(instance, products=True, children=True, parent=True, global_sales_cycle=True)
         return Response(serializer.data)
 
     def create(self, request, *args, **kwargs):
@@ -90,6 +90,7 @@ class ContactViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
     def update(self, request, *args, **kwargs):
         instance = self.get_object()
     	data = request.data
+        print data
 
     	# update vcard for contact
     	vcard = instance.vcard
@@ -110,8 +111,11 @@ class ContactViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
         if parent_name:
             contact, parent = contact.create_company_for_contact(parent_name)
 
-        serializer = self.get_serializer(contact, 
-        								 parent=True)
+        serializer = self.get_serializer(contact,
+                                         products=True, 
+                                         children=True, 
+                                         parent=True, 
+                                         global_sales_cycle=True)
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, headers=headers)
 
@@ -288,3 +292,10 @@ class ContactViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
                                          global_sales_cycle=True,
                                          parent=True)
         return Response(serializer.data)
+
+    @list_route(methods=['get'], url_path='contact_dict')
+    def contact_dict(self, request, **kwargs):
+        tp = request.GET.get('tp','user')
+        contact_dict = Contact.objects.filter(
+            company_id=request.company.id, tp=tp).values_list('id', 'vcard__fn')
+        return Response(contact_dict)

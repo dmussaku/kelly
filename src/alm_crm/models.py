@@ -1523,21 +1523,8 @@ class SalesCycle(SubscriptionObject):
         if not milestone_id:
             self.milestone = None
             self.save()
-            if not self.log.all():
-                self.possibly_make_new()
-            else:
-                meta = self.log.last().meta
-                sc_log_entry = SalesCycleLogEntry(
-                    meta=meta,
-                    entry_type=SalesCycleLogEntry.MD,
-                    sales_cycle=self,
-                    owner_id=user_id,
-                    company_id=company_id
-                    )
-                sc_log_entry.save()
+            self.possibly_make_new()
             return self
-
-
         milestone = Milestone.objects.get(id=milestone_id)
 
         prev_milestone_title = None

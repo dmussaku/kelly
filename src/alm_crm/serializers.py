@@ -37,6 +37,7 @@ class MilestoneSerializer(RequestContextMixin, serializers.ModelSerializer):
 class ContactSerializer(RequestContextMixin, serializers.ModelSerializer):
     vcard = VCardSerializer(required=False)
     sales_cycles = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+    children = serializers.PrimaryKeyRelatedField(many=True, required=False, queryset=Contact.objects.all())
 
     class Meta:
         model = Contact
@@ -49,10 +50,12 @@ class ContactSerializer(RequestContextMixin, serializers.ModelSerializer):
         # pass parent=True param to get fully hydrated parent
         if kwargs.pop('parent', False):
             self.fields['parent'] = ContactSerializer(global_sales_cycle=True)
-
         # pass products=True param to get hydrated list of products which are connected to contact
         if kwargs.pop('products', False):
             self.fields['products'] = serializers.SerializerMethodField()
+
+        if kwargs.pop('children', False):
+            self.fields['children'] = serializers.SerializerMethodField()
 
         # pass sales_cycles=True param to get hydrated list of sales cycles
         if kwargs.pop('sales_cycles', False):
@@ -65,6 +68,9 @@ class ContactSerializer(RequestContextMixin, serializers.ModelSerializer):
         if products:
             return ProductSerializer(products, many=True).data
         return []
+
+    def get_children(self, obj):
+        return [{child.id: child.vcard.fn} for child in obj.children.all()]
 
 
 class ContactListSerializer(RequestContextMixin, serializers.ModelSerializer):
