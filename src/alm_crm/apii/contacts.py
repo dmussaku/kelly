@@ -90,7 +90,6 @@ class ContactViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
     def update(self, request, *args, **kwargs):
         instance = self.get_object()
     	data = request.data
-        print data
 
     	# update vcard for contact
     	vcard = instance.vcard
@@ -267,10 +266,9 @@ class ContactViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
         {"merged_contacts":[1,2,3], "merge_into_contact":1, "delete":True/False}
         """
         data = request.data
-        fn = data.get("fn", None)
-        merged_contacts_ids = data.get("merged_contacts", [])
-        merge_into_contact_id = data.get("merge_into_contact", "")
-        delete_merged = data.get("merged_contacts", [])
+        merged_contacts_ids = data.pop("merged_contacts", [])
+        merge_into_contact_id = data.pop("merge_into_contact", "")
+        delete_merged = merged_contacts_ids
         if not merged_contacts_ids or not merge_into_contact_id:
             return Response(
                 {'success':False, 'message':'Contact ids have not been appended'})
@@ -287,7 +285,7 @@ class ContactViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
         # if not response['success']:
         #     return Response(response)
         # contact = response['contact']
-        contact = primary_object.merge_contacts(fn, alias_objects, delete_merged)
+        contact = primary_object.merge_contacts(alias_objects=alias_objects, delete_merged=delete_merged, **data)
         serializer = self.get_serializer(contact, 
                                          global_sales_cycle=True,
                                          parent=True)
