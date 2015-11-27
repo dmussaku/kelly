@@ -826,7 +826,7 @@ class Contact(SubscriptionObject):
     def get_recent_base(cls, company_id, user_id):
         return  Contact.objects.filter(company_id=company_id, \
                                        latest_activity__owner_id=user_id, \
-                                       latest_activity__date_edited=timezone.now() - timedelta(days=7)) \
+                                       latest_activity__date_edited__gte=datetimeutils.get_start_of_week(timezone.now())) \
                                .order_by('-latest_activity__date_edited')
 
     @classmethod
