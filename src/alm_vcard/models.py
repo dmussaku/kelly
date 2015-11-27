@@ -734,7 +734,7 @@ class VCard(models.Model):
 
     @classmethod
     @transaction.atomic
-    def merge_model_objects(cls, primary_object, alias_objects=[], keep_old=True, fn=None):
+    def merge_model_objects(cls, primary_object, alias_objects=[], keep_old=True, **kwargs):
         """
 
         """
@@ -813,8 +813,11 @@ class VCard(models.Model):
                 
             if not keep_old:
                 alias_object.delete()
-        if fn:
-            primary_object.fn = fn
+        if kwargs.get('fn'):
+            primary_object.fn = kwargs.get('fn')
+        elif kwargs.get('given_name') or kwargs.get('family_name'):
+            primary_object.given_name = kwargs.get('given_name', '')
+            primary_object.family_name = kwargs.get('family_name', '')
         primary_object.save()
         return primary_object
 

@@ -130,26 +130,34 @@ class ContactTests(TestMixin, TestCase):
     def test_merge_contacts(self):
         v1 = VCardFactory(fn='1')
         v2 = VCardFactory(fn='2', additional_name='2')
-        c1 = ContactFactory(company_id=self.company.id, owner_id=self.user.id, vcard=v1)
+        c1 = ContactFactory(company_id=self.company.id, owner_id=self.user.id, vcard=v1, tp=Contact.COMPANY_TP)
         sc1 = SalesCycleFactory(contact=c1, company_id=self.company.id, owner_id=self.user.id, is_global=True)
         sc1_1 = SalesCycleFactory(contact=c1, company_id=self.company.id, owner_id=self.user.id, is_global=False, title='1')
         for i in range(0,10):
             ActivityFactory(sales_cycle=sc1, owner=self.user, company_id=self.company.id)
-        c2 = ContactFactory(company_id=self.company.id, owner_id=self.user.id, vcard=v2)
+        c2 = ContactFactory(company_id=self.company.id, owner_id=self.user.id, vcard=v2, tp=Contact.COMPANY_TP)
         sc2 = SalesCycleFactory(contact=c2, company_id=self.company.id, owner_id=self.user.id, is_global=True)
         sc2_2 = SalesCycleFactory(contact=c2, company_id=self.company.id, owner_id=self.user.id, is_global=False, title='2')
         for i in range(0,10):
             ActivityFactory(sales_cycle=sc2, owner=self.user, company_id=self.company.id)
         
-        contact = c1.merge_contacts(fn='My New FN', alias_objects=[c2])
-        # self.assertEqual(c1.id, None)
-        # self.assertEqual(c2.id, None)
+        contact = c1.merge_contacts(alias_objects=[c2], fn='My New FN')
         self.assertEqual(contact.vcard.fn, 'My New FN')
-        self.assertEqual(contact.vcard.emails.count(), 2)
-        self.assertEqual(contact.vcard.tels.count(), 2)
+        self.assertEqual(contact.vcard.emails.count(), 6)
+        self.assertEqual(contact.vcard.tels.count(), 4)
         self.assertEqual(contact.vcard.additional_name, '2')
         self.assertEqual(contact.sales_cycles.filter(is_global=True).count(), 1)
         self.assertEqual(contact.sales_cycles.get(is_global=True).rel_activities.count(), 20)
         self.assertEqual(contact.sales_cycles.count(), 3)
+
+        v1 = VCardFactory(given_name='gn1', family_name='fn1')
+        v2 = VCardFactory(given_name='gn2', family_name='fn2')
+        c1 = ContactFactory(company_id=self.company.id, owner_id=self.user.id, vcard=v1, tp=Contact.USER_TP)
+        c2 = ContactFactory(company_id=self.company.id, owner_id=self.user.id, vcard=v2, tp=Contact.USER_TP)
+        
+        contact = c1.merge_contacts(alias_objects=[c2], given_name='My New Given Name')
+        self.assertEqual(contact.vcard.given_name, 'My New Given Name')
+        self.assertEqual(contact.vcard.fn, 'My New Given Name')
+
 
         

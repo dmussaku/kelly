@@ -66,6 +66,9 @@ class Milestone(SubscriptionObject):
         verbose_name = _('milestone')
         db_table = settings.DB_PREFIX.format('milestone')
 
+    def __unicode__(self):
+        return '%s' % self.title
+
     @classmethod
     def create_default_milestones(cls, company_id):
         """
@@ -100,12 +103,6 @@ class Milestone(SubscriptionObject):
             milestones.append(milestone)
 
         return milestones
-
-    
-
-
-    def __unicode__(self):
-        return '%s'%self.title
 
 
 class Contact(SubscriptionObject):
@@ -939,7 +936,7 @@ class Contact(SubscriptionObject):
         share.save()
         return share
 
-    def merge_contacts(self, fn=None, alias_objects=[], delete_merged=True):
+    def merge_contacts(self, alias_objects=[], delete_merged=True, **kwargs):
         if not alias_objects:
             return {'success':False, 'message':'No alias objects appended'}
         for obj in alias_objects:
@@ -960,7 +957,7 @@ class Contact(SubscriptionObject):
                     for child in obj.children.all():
                         self.children.add(child)
 
-        VCard.merge_model_objects(self.vcard, [c.vcard for c in alias_objects], fn=(fn or self.vcard.fn))
+        VCard.merge_model_objects(self.vcard, [c.vcard for c in alias_objects], **kwargs)
         with transaction.atomic():
             for obj in alias_objects:
                 for share in obj.share_set.all():
