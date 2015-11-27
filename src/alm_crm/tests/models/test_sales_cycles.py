@@ -138,7 +138,7 @@ class SalesCycleTests(TestMixin, TestCase):
         sc.change_milestone(None, self.user.id, self.company.id)
         self.assertEqual(sc.milestone, None)
         # self.assertEqual(sc.status, SalesCycle.NEW)
-        self.assertEqual(sc.log.count(), 4)
+        self.assertEqual(sc.log.count(), 3)
 
     def test_get_all(self):
         """

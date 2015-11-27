@@ -210,6 +210,8 @@ class FilterSerializer(RequestContextMixin, serializers.ModelSerializer):
         model = Filter
 
     def get_count(self, obj):
+        if not self.request:
+            return 0
         return obj.apply(company_id=self.request.company.id, user_id=self.request.user.id).count()
 
 

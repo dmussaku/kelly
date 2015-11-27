@@ -522,6 +522,7 @@ class StagingConfiguration2(FileSettings('~/.almanet/almanet.conf.py'), BaseConf
     BROKER_URL = 'amqp://stage:n0easyway1n@10.10.10.245:5672//almasales/stage'
     CELERY_RESULT_BACKEND = 'djcelery.backends.database:DatabaseBackend'
 
+    SW_AUTH_URL = 'http://178.88.64.86/auth/v1.0'
 
 
 class DemoConfiguration(FileSettings('~/.almanet/almanet.conf.py'), BaseConfiguration):
