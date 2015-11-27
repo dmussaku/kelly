@@ -9,6 +9,12 @@ from alm_crm.factories import (
     SalesCycleFactory,
     SalesCycleProductStatFactory,
 )
+from alm_vcard.factories import (
+    VCardFactory,
+    TelFactory,
+    EmailFactory,
+
+    )
 from alm_crm.models import Contact, Milestone
 from alm_vcard.models import *
 
@@ -122,18 +128,8 @@ class ContactTests(TestMixin, TestCase):
         self.assertEqual(len(c2.get_products()), 2)
 
     def test_merge_contacts(self):
-        v1 = VCard(fn='1')
-        v1.save()
-        tel1 = Tel(value='1', vcard=v1)
-        tel1.save()
-        email1 = Email(value='1', vcard=v1)
-        email1.save()
-        v2 = VCard(fn='2', additional_name='2')
-        v2.save()
-        tel2 = Tel(value='2', vcard=v2)
-        tel2.save()
-        email2 = Email(value='2', vcard=v2)
-        email2.save()
+        v1 = VCardFactory(fn='1')
+        v2 = VCardFactory(fn='2', additional_name='2')
         c1 = ContactFactory(company_id=self.company.id, owner_id=self.user.id, vcard=v1)
         sc1 = SalesCycleFactory(contact=c1, company_id=self.company.id, owner_id=self.user.id, is_global=True)
         sc1_1 = SalesCycleFactory(contact=c1, company_id=self.company.id, owner_id=self.user.id, is_global=False, title='1')

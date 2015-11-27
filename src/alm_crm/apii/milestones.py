@@ -36,7 +36,15 @@ class MilestoneViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
                    milestone.color_code != milestone_data['color_code'] or \
                    milestone.sort != milestone_data['sort']:
                     for sales_cycle in milestone.sales_cycles.all():
-                        sales_cycle.change_milestone(milestone.id, sales_cycle.owner_id, request.company.id)
+                        sales_cycle.milestone = None
+                        sales_cycle.save()
+                        meta = {"prev_milestone_color_code": milestone.color_code,
+                                    "prev_milestone_title": milestone.title}
+                        log_entry = SalesCycleLogEntry(sales_cycle=sales_cycle,
+                                                        owner=request.user,
+                                                        entry_type=SalesCycleLogEntry.ME,
+                                                        meta=json.dumps(meta))
+                        log_entry.save()
             finally:
                 milestone.title = milestone_data['title']
                 milestone.color_code = milestone_data['color_code']
@@ -51,10 +59,20 @@ class MilestoneViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
         for milestone in milestones:
             if milestone not in new_milestone_set:
                 for sales_cycle in milestone.sales_cycles.all():
-                    sales_cycle.change_milestone(None, sales_cycle.owner_id, request.company.id)
+                    sales_cycle.milestone = None
+                    sales_cycle.save()
+                    sales_cycles.append(sales_cycle)
+                    meta = {"prev_milestone_color_code": milestone.color_code,
+                            "prev_milestone_title": milestone.title}
+                    log_entry = SalesCycleLogEntry(sales_cycle=sales_cycle,
+                                                    owner=request.user,
+                                                    entry_type=SalesCycleLogEntry.MD,
+                                                    meta=json.dumps(meta))
+                    log_entry.save()
                 milestone.delete()
         bundle = {
-            "milestones": [self.serializer_class(milestone).data
+            # "milestones": self.get_serializer(new_milestone_set, many=True).data,
+            "milestones": [self.get_serializer(milestone).data
                                                         for milestone in new_milestone_set]
         }
         return Response(bundle)

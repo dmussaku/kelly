@@ -57,9 +57,17 @@ class TitleSerializer(serializers.ModelSerializer):
 
 
 class UrlSerializer(serializers.ModelSerializer):
+    value = serializers.CharField()
     class Meta:
         model = Url
-        fields = ('value', 'type',)
+        fields = ('type', 'value')
+
+    def validate_value(self, value):
+        if value.startswith('http://') or value.startswith('https://'):
+            return value
+        else:
+            return 'http://'+value
+
 
 
 class VCardSerializer(serializers.ModelSerializer):
@@ -111,7 +119,8 @@ class VCardSerializer(serializers.ModelSerializer):
         for note in notes:
             Note.objects.create(vcard=vcard, **note)
         for title in titles:
-            Title.objects.create(vcard=vcard, **title)
+            if title.get('data'):
+                Title.objects.create(vcard=vcard, **title)
         for url in urls:
             Url.objects.create(vcard=vcard, **url)
         return vcard
