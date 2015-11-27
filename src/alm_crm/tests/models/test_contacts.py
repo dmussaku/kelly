@@ -141,12 +141,12 @@ class ContactTests(TestMixin, TestCase):
         for i in range(0,10):
             ActivityFactory(sales_cycle=sc2, owner=self.user, company_id=self.company.id)
         
-        contact = c1.merge_contacts(alias_objects=[c2])
+        contact = c1.merge_contacts(fn='My New FN', alias_objects=[c2])
         # self.assertEqual(c1.id, None)
         # self.assertEqual(c2.id, None)
-        self.assertEqual(contact.vcard.emails.count(), 6)
-        self.assertEqual(contact.vcard.tels.count(), 4)
-        self.assertEqual(contact.vcard.notes.count(), 1)
+        self.assertEqual(contact.vcard.fn, 'My New FN')
+        self.assertEqual(contact.vcard.emails.count(), 2)
+        self.assertEqual(contact.vcard.tels.count(), 2)
         self.assertEqual(contact.vcard.additional_name, '2')
         self.assertEqual(contact.sales_cycles.filter(is_global=True).count(), 1)
         self.assertEqual(contact.sales_cycles.get(is_global=True).rel_activities.count(), 20)
