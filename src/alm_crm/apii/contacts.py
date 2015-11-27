@@ -52,7 +52,7 @@ class ContactViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
 
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
-        serializer = self.get_serializer(instance, products=True, custom_fields=True, children=True, parent=True, global_sales_cycle=True)
+        serializer = self.get_serializer(instance, products=True, children=True, parent=True, global_sales_cycle=True)
         return Response(serializer.data)
 
     def create(self, request, *args, **kwargs):
@@ -91,7 +91,7 @@ class ContactViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
         headers = self.get_success_headers(serializer.data)
         serializer = self.get_serializer(contact, 
         								 global_sales_cycle=True,
-                                         custom_fields=True,
+                                        
         								 parent=True)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
@@ -122,7 +122,7 @@ class ContactViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
             processing_custom_field_data(custom_fields, contact)
         serializer = self.get_serializer(contact,
                                          products=True,
-                                         custom_fields=True, 
+                                         
                                          children=True, 
                                          parent=True, 
                                          global_sales_cycle=True)
