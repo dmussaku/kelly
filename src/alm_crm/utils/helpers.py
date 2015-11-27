@@ -59,13 +59,13 @@ def get_active_contacts(company_id, user_id):
     active_contacts = Contact.get_active_contacts(company_id=company_id, user_id=user_id)
     return { 
             'all': {
-                'days': ContactSerializer(active_contacts['all']['days'], many=True).data,
-                'weeks': ContactSerializer(active_contacts['all']['weeks'], many=True).data,
-                'months': ContactSerializer(active_contacts['all']['months'], many=True).data,
+                'days': ContactSerializer(active_contacts['all']['days'], parent=True, many=True).data,
+                'weeks': ContactSerializer(active_contacts['all']['weeks'], parent=True, many=True).data,
+                'months': ContactSerializer(active_contacts['all']['months'], parent=True, many=True).data,
             },
             'my': {
-                'days': ContactSerializer(active_contacts['my']['days'], many=True).data,
-                'weeks': ContactSerializer(active_contacts['my']['weeks'], many=True).data,
-                'months': ContactSerializer(active_contacts['my']['months'], many=True).data,
+                'days': ContactSerializer(active_contacts['my']['days'], parent=True, many=True).data,
+                'weeks': ContactSerializer(active_contacts['my']['weeks'], parent=True, many=True).data,
+                'months': ContactSerializer(active_contacts['my']['months'], parent=True, many=True).data,
             },
         }
