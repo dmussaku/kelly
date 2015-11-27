@@ -734,7 +734,7 @@ class VCard(models.Model):
 
     @classmethod
     @transaction.atomic
-    def merge_model_objects(cls, primary_object, alias_objects=[], keep_old=True):
+    def merge_model_objects(cls, primary_object, alias_objects=[], keep_old=True, fn=None):
         """
 
         """
@@ -813,6 +813,8 @@ class VCard(models.Model):
                 
             if not keep_old:
                 alias_object.delete()
+        if fn:
+            primary_object.fn = fn
         primary_object.save()
         return primary_object
 

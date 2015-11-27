@@ -335,6 +335,7 @@ class ContactAPITests(APITestMixin, APITestCase):
         
         url, parsed = self.prepare_urls('v1:contact-contacts-merge', subdomain=self.company.subdomain)
         data = {
+            'fn': 'My New FN',
             'merge_into_contact':c1.id,
             'merged_contacts':[c2.id],
         }

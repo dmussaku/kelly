@@ -263,7 +263,7 @@ class ContactViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
         {"merged_contacts":[1,2,3], "merge_into_contact":1, "delete":True/False}
         """
         data = request.data
-        print data
+        fn = data.get("fn", None)
         merged_contacts_ids = data.get("merged_contacts", [])
         merge_into_contact_id = data.get("merge_into_contact", "")
         delete_merged = data.get("merged_contacts", [])
@@ -283,8 +283,8 @@ class ContactViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
         # if not response['success']:
         #     return Response(response)
         # contact = response['contact']
-        contact = primary_object.merge_contacts(alias_objects, delete_merged)
-        serializer = self.serializer_class(contact, 
+        contact = primary_object.merge_contacts(fn, alias_objects, delete_merged)
+        serializer = self.get_serializer(contact, 
                                          global_sales_cycle=True,
                                          parent=True)
         return Response(serializer.data)

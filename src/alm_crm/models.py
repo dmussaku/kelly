@@ -939,36 +939,19 @@ class Contact(SubscriptionObject):
         share.save()
         return share
 
-    def merge_contacts(self, alias_objects=[], delete_merged=True):
+    def merge_contacts(self, fn=None, alias_objects=[], delete_merged=True):
         if not alias_objects:
             return {'success':False, 'message':'No alias objects appended'}
         for obj in alias_objects:
             if not isinstance(obj, self.__class__):
                 return {'success':False, 'message':'Not Instance of Contact'}
 
-        global_sales_cycle = SalesCycle.get_global(self.company_id, self.id)
-        fn_list = []
-        for obj in alias_objects:
-            if type(obj.vcard.fn)==unicode:
-                fn_list.append(obj.vcard.fn.encode('utf-8'))
-            else:
-                fn_list.append(obj.vcard.fn)
-        try:
-            note_data = self.vcard.notes.last().data if type(self.vcard.notes.last().data)==unicode else self.vcard.notes.last().data.encode('utf-8')
-        except:
-            note_data = ""
-        for obj in alias_objects:
-            if obj.vcard.notes.all():
-                if type(obj.vcard.notes.last().data)==unicode:
-                    note_data += "\n" + obj.vcard.notes.last().data.encode('utf-8')
-                else:
-                    note_data += "\n" + obj.vcard.notes.last().data
         with transaction.atomic():
             for obj in alias_objects:
                 for sales_cycle in obj.sales_cycles.all():
                     if sales_cycle.is_global:
                         for activity in sales_cycle.rel_activities.all():
-                            activity.sales_cycle = global_sales_cycle
+                            activity.sales_cycle = self.global_sales_cycle
                             activity.save()
                     else:
                         sales_cycle.contact = self
@@ -977,13 +960,7 @@ class Contact(SubscriptionObject):
                     for child in obj.children.all():
                         self.children.add(child)
 
-        VCard.merge_model_objects(self.vcard, [c.vcard for c in alias_objects])
-        self.vcard.notes.all().delete()
-        if note_data or fn_list:
-            note = Note(
-                data=', '.join(map(str,fn_list)) + ' ' + note_data, 
-                vcard=self.vcard)
-            note.save()
+        VCard.merge_model_objects(self.vcard, [c.vcard for c in alias_objects], fn=(fn or self.vcard.fn))
         with transaction.atomic():
             for obj in alias_objects:
                 for share in obj.share_set.all():
