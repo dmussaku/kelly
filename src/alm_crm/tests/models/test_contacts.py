@@ -59,14 +59,17 @@ class ContactTests(TestMixin, TestCase):
 
         panel_info = Contact.get_panel_info(company_id=self.company.id, user_id=self.user.id)
 
-        self.assertEqual(panel_info['all']['days']['total'], 10)
-        self.assertEqual(panel_info['my']['days']['total'], 5)
+        self.assertEqual(panel_info['all']['total'], 10)
+        self.assertEqual(panel_info['my']['total'], 5)
 
-        self.assertEqual(panel_info['all']['days']['people'], 7)
-        self.assertEqual(panel_info['my']['days']['people'], 4)
+        self.assertEqual(panel_info['all']['people'], 7)
+        self.assertEqual(panel_info['my']['people'], 4)
 
-        self.assertEqual(panel_info['all']['days']['companies'], 3)
-        self.assertEqual(panel_info['my']['days']['companies'], 1)
+        self.assertEqual(panel_info['all']['companies'], 3)
+        self.assertEqual(panel_info['my']['companies'], 1)
+        
+        self.assertEqual(panel_info['all']['by_period']['days'], 10)
+        self.assertEqual(panel_info['my']['by_period']['days'], 5)
 
     def test_get_all(self):
         account2 = AccountFactory(company=self.company)

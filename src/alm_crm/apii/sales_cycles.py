@@ -181,7 +181,7 @@ class SalesCycleViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
     @detail_route(methods=['get'], url_path='activities')
     def activities(self, request, *args, **kwargs):
         sales_cycle = self.get_object()
-        activities = sales_cycle.rel_activities.all()
+        activities = sales_cycle.rel_activities.order_by('-date_edited')
         
         page = self.paginate_queryset(activities)
         if page is not None:

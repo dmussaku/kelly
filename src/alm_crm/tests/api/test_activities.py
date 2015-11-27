@@ -1,6 +1,6 @@
 import simplejson as json
 import dateutil.relativedelta as relativedelta
-from django.utils import timezone
+
 from django.utils import timezone
 from rest_framework import status
 from rest_framework.test import APITestCase
@@ -50,7 +50,7 @@ class ActivityAPITests(APITestMixin, APITestCase):
         content = json.loads(response.content)
         self.assertTrue(content.has_key('company_feed'))
         self.assertTrue(content.has_key('my_feed'))
-        self.assertTrue(content.has_key('my_activities'))
+        self.assertTrue(content.has_key('user_activities'))
         self.assertTrue(content.has_key('my_tasks'))
 
     def test_company_feed(self):
@@ -93,12 +93,12 @@ class ActivityAPITests(APITestMixin, APITestCase):
         self.assertTrue(content.has_key('previous'))
         self.assertTrue(content.has_key('results'))
 
-    def test_my_activities(self):
+    def test_user_activities(self):
         """
-        Ensure we can get my activities
+        Ensure we can get user activities
         """
         url, parsed = self.prepare_urls(
-            'v1:activity-my-activities', subdomain=self.company.subdomain)
+            'v1:activity-user-activities', subdomain=self.company.subdomain)
         
         response = self.client.get(url, HTTP_HOST=parsed.netloc)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
@@ -220,6 +220,39 @@ class ActivityAPITests(APITestMixin, APITestCase):
             "owner": self.user.id,
             "sales_cycle_id": sales_cycle.id,
             "description": "test text",
+        }
+
+        url, parsed = self.prepare_urls('v1:activity-list', subdomain=self.company.subdomain)
+        
+        response = self.client.post(url, data, HTTP_HOST=parsed.netloc, format='json')
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+        self.authenticate_user()
+        response = self.client.post(url, data, HTTP_HOST=parsed.netloc, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        content = json.loads(response.content)
+        self.assertTrue(content.has_key('owner'))
+        self.assertNotEqual(content['owner'], None)
+        self.assertTrue(content.has_key('company_id'))
+        self.assertNotEqual(content['company_id'], None)
+
+        url, parsed = self.prepare_urls('v1:activity-list', subdomain=self.company.subdomain)
+        response = self.client.get(url, HTTP_HOST=parsed.netloc)
+        content = json.loads(response.content)
+        self.assertEqual(self.activities_count+1, content['count']) # added 1 activity
+
+    def test_create_planned_activity(self):
+        """
+        Ensure that we can create planned activity
+        """
+        contact = Contact.objects.first()
+        sales_cycle = contact.sales_cycles.first()
+
+        data = {
+            "owner": self.user.id,
+            "sales_cycle_id": sales_cycle.id,
+            "description": "test text",
+            "deadline": timezone.now(),
         }
 
         url, parsed = self.prepare_urls('v1:activity-list', subdomain=self.company.subdomain)

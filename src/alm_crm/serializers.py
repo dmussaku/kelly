@@ -19,6 +19,8 @@ from .models import (
     Share,
     Notification,
     Filter,
+    AttachedFile,
+    Comment,
 )
 from .filters import ContactFilter
 
@@ -125,11 +127,21 @@ class SalesCycleSerializer(RequestContextMixin, serializers.ModelSerializer):
         return None
 
 
+class AttachedFileSerializer(RequestContextMixin, serializers.ModelSerializer):
+    filename = serializers.CharField(source='file_object.filename', read_only=True)
+    swiftfile_id = serializers.IntegerField(source='file_object.id', read_only=True)
+    delete = serializers.BooleanField(write_only=True, required=False)
+    
+    class Meta:
+        model = AttachedFile
+
+
 class ActivitySerializer(RequestContextMixin, serializers.ModelSerializer):
     comments_count = serializers.IntegerField(read_only=True)
     new_comments_count = serializers.SerializerMethodField()
     has_read = serializers.SerializerMethodField()
     sales_cycle_id = serializers.ModelField(model_field=Activity()._meta.get_field('sales_cycle'), write_only=True)
+    attached_files = AttachedFileSerializer(many=True, required=False)
 
     class Meta:
         model = Activity
@@ -195,3 +207,9 @@ class FilterSerializer(RequestContextMixin, serializers.ModelSerializer):
 
     def get_count(self, obj):
         return obj.apply(company_id=self.request.company.id, user_id=self.request.user.id).count()
+
+
+class CommentSerializer(RequestContextMixin, serializers.ModelSerializer):
+    
+    class Meta:
+        model = Comment

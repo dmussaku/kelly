@@ -5,11 +5,17 @@ from django.db import transaction
 
 from rest_framework.decorators import list_route, detail_route
 from rest_framework.response import Response
-from rest_framework import viewsets, filters
+from rest_framework import viewsets, filters, status
 
-from alm_crm.serializers import ActivitySerializer, NotificationSerializer, SalesCycleSerializer
+from alm_crm.serializers import (
+    ActivitySerializer, 
+    NotificationSerializer, 
+    SalesCycleSerializer,
+    CommentSerializer,
+)
 from alm_crm.filters import ActivityFilter
-from alm_crm.models import Activity, Notification
+from alm_crm.models import Activity, Notification, AttachedFile, Comment
+from alm_crm.utils.parser import text_parser
 
 from . import CompanyObjectAPIMixin
 
@@ -20,6 +26,17 @@ class ActivityViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
     filter_class = ActivityFilter
     # ordering_fields = '__all__'
 
+    def attach_files(self, attached_files, act_id):
+        for file_data in attached_files:
+            att_file = AttachedFile.objects.get(id=file_data['id'])
+            if file_data.get('delete', False) == False:
+                att_file.object_id = act_id
+                att_file.save()
+            else:
+                try: 
+                    att_file.delete()
+                except:
+                    pass
 
     def get_serializer(self, *args, **kwargs):
     	serializer_class = self.get_serializer_class()
@@ -28,6 +45,36 @@ class ActivityViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
 
     def get_queryset(self):
         return Activity.objects.filter(company_id=self.request.company.id).order_by('-date_created')
+
+    def create(self, request, *args, **kwargs):
+        data = request.data
+        attached_files = data.pop('attached_files', None)
+
+        act = Activity.create_activity(company_id=request.company.id, user_id=request.user.id, data=data)
+        
+        if(attached_files):
+            self.attach_files(attached_files, act.id)
+
+        serializer = self.get_serializer(act)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        data = request.data
+        attached_files = data.pop('attached_files', None)
+
+        serializer = self.get_serializer(instance, data=data)
+        serializer.is_valid(raise_exception=True)
+        act = serializer.save()
+        text_parser(base_text=act.description, content_class=act.__class__,
+                    object_id=act.id, company_id = request.company.id)
+        
+        if(attached_files):
+            self.attach_files(attached_files, act.id)
+
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, headers=headers)
 
     @list_route(methods=['get'], url_path='statistics')
     def get_statistics(self, request, *args, **kwargs):
@@ -58,9 +105,10 @@ class ActivityViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
         serializer = self.get_serializer(activities, many=True)
         return Response(serializer.data)
 
-    @list_route(methods=['get'], url_path='my_activities')
-    def my_activities(self, request, *args, **kwargs):    
-        activities = Activity.my_activities(company_id=request.company.id, user_id=request.user.id)
+    @list_route(methods=['get'], url_path='user_activities')
+    def user_activities(self, request, *args, **kwargs):
+        user_id = request.query_params.get('user_id', None) or request.user.id
+        activities = Activity.user_activities(company_id=request.company.id, user_id=user_id)
         activities = ActivityFilter(request.GET, activities)
         page = self.paginate_queryset(activities)
         if page is not None:
@@ -135,7 +183,11 @@ class ActivityViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
 
         with transaction.atomic():
             for new_activity_data in data:
+                attached_files = new_activity_data.pop('attached_files', None)
                 new_activity = Activity.create_activity(company_id=request.company.id, user_id=request.user.id, data=new_activity_data)
+
+                if(attached_files):
+                    self.attach_files(attached_files, new_activity.id)
                 count+=1
 
             notification = Notification(
@@ -168,3 +220,18 @@ class ActivityViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
 
         serializer = self.get_serializer(activity)
         return Response(serializer.data)
+
+    @detail_route(methods=['get'], url_path='comments')
+    def comments(self, request, *args, **kwargs):
+        activity = self.get_object()
+        comments = activity.comments.order_by('date_edited')
+        Comment.mark_as_read(company_id=request.company.id, 
+                             user_id=request.user.id,
+                             comment_ids=comments.values_list('id', flat=True))
+        
+        activity_serializer = self.get_serializer(activity)
+        comments_serializer = CommentSerializer(comments, many=True, context={'request': request})
+        return Response({
+                    'activity': activity_serializer.data,
+                    'comments': comments_serializer.data,
+                })

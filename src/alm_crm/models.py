@@ -4,6 +4,7 @@ import os
 import xlrd
 import pytz
 import simplejson as json
+import dateutil.parser
 from datetime import datetime, timedelta, time
 from celery import group, Task, result
 
@@ -195,16 +196,22 @@ class Contact(SubscriptionObject):
             rv = {}
             for period in periods:
                 period_total = queryset.filter(period_q[period+'_q'])
-                rv[period] = {
-                    'total': period_total.count(),
-                    'people': period_total.filter(Q(tp=Contact.USER_TP)).count(),
-                    'companies': period_total.filter(Q(tp=Contact.COMPANY_TP)).count(),
-                }
+                rv[period] = period_total.count()
             return rv
 
         return {
-                'all': get_by_period(total),
-                'my': get_by_period(my_total),
+                'all': {
+                    'total': total.count(),
+                    'people': total.filter(Q(tp=Contact.USER_TP)).count(),
+                    'companies': total.filter(Q(tp=Contact.COMPANY_TP)).count(),
+                    'by_period': get_by_period(total),
+                },
+                'my': {
+                    'total': my_total.count(),
+                    'people': my_total.filter(Q(tp=Contact.USER_TP)).count(),
+                    'companies': my_total.filter(Q(tp=Contact.COMPANY_TP)).count(),
+                    'by_period': get_by_period(my_total),
+                },
             }
 
     @classmethod
@@ -212,28 +219,26 @@ class Contact(SubscriptionObject):
         company_q = Q(company_id=company_id)
         owner_q = Q(owner_id=user_id)
 
-        period_q = {
-            'days_q': Q(date_edited__gte=datetimeutils.get_start_of_today(timezone.now()), date_edited__lte=datetimeutils.get_end_of_today(timezone.now())),
-            'weeks_q': Q(date_edited__gte=datetimeutils.get_start_of_week(timezone.now()), date_edited__lte=datetimeutils.get_end_of_week(timezone.now())),
-            'months_q': Q(date_edited__gte=datetimeutils.get_start_of_month(timezone.now()), date_edited__lte=datetimeutils.get_end_of_month(timezone.now())),
-        }
+        days_q = Q(date_edited__gte=datetimeutils.get_start_of_today(timezone.now()), date_edited__lte=datetimeutils.get_end_of_today(timezone.now()))
+        weeks_q = Q(date_edited__gte=datetimeutils.get_start_of_week(timezone.now()), date_edited__lte=datetimeutils.get_end_of_week(timezone.now()))
+        months_q = Q(date_edited__gte=datetimeutils.get_start_of_month(timezone.now()), date_edited__lte=datetimeutils.get_end_of_month(timezone.now()))
 
-        total = Activity.objects.filter(company_q)
-        my_total = total.filter(owner_q)
-
-        periods = ['days', 'weeks', 'months']
-
-        def get_by_period(queryset):
-            rv = {}
-            for period in periods:
-                period_total = queryset.filter(period_q[period+'_q'])
-                rv[period] = map(lambda x: x.sales_cycle.contact, period_total)
-            return rv
+        latest_activity_days_q = Q(latest_activity__date_edited__gte=datetimeutils.get_start_of_today(timezone.now()), latest_activity__date_edited__lte=datetimeutils.get_end_of_today(timezone.now()))
+        latest_activity_weeks_q = Q(latest_activity__date_edited__gte=datetimeutils.get_start_of_week(timezone.now()), latest_activity__date_edited__lte=datetimeutils.get_end_of_week(timezone.now()))
+        latest_activity_months_q = Q(latest_activity__date_edited__gte=datetimeutils.get_start_of_month(timezone.now()), latest_activity__date_edited__lte=datetimeutils.get_end_of_month(timezone.now()))
 
         return {
-                'all': get_by_period(total),
-                'my': get_by_period(my_total)
-            }
+            'all': {
+                'days': Contact.objects.filter(company_q & (days_q | latest_activity_days_q)),
+                'weeks': Contact.objects.filter(company_q & (days_q | latest_activity_weeks_q)),
+                'months': Contact.objects.filter(company_q & (days_q | latest_activity_months_q)),
+            },
+            'my': {
+                'days': Contact.objects.filter((company_q & owner_q) & (days_q | latest_activity_days_q)),
+                'weeks': Contact.objects.filter((company_q & owner_q) & (weeks_q | latest_activity_days_q)),
+                'months': Contact.objects.filter((company_q & owner_q) & (months_q | latest_activity_days_q)),
+            },
+        }
 
     @classmethod
     def share_contact(cls, share_from, share_to, contact_id, company_id, comment=None):
@@ -1282,36 +1287,15 @@ class SalesCycle(SubscriptionObject):
         milestones = Milestone.objects.filter(company_id=company_id)
 
         by_milestones = {
-            'days': {
-                'none': open_sales_cycles.filter(period_q['days_q'] & Q(milestone_id=None)).distinct().count(),
-            },
-            'weeks': {
-                'none': open_sales_cycles.filter(period_q['weeks_q'] & Q(milestone_id=None)).distinct().count(),
-            },
-            'months': {
-                'none': open_sales_cycles.filter(period_q['months_q'] & Q(milestone_id=None)).distinct().count(),
-            },
+            'none': open_sales_cycles.filter(Q(milestone_id=None)).distinct().count(),
         }
         my_by_milestones = {
-            'days': {
-                'none': my_open_sales_cycles.filter(period_q['days_q'] & Q(milestone_id=None)).distinct().count(),
-            },
-            'weeks': {
-                'none': my_open_sales_cycles.filter(period_q['weeks_q'] & Q(milestone_id=None)).distinct().count(),
-            },
-            'months': {
-                'none': my_open_sales_cycles.filter(period_q['months_q'] & Q(milestone_id=None)).distinct().count(),
-            },
+            'none': my_open_sales_cycles.filter(Q(milestone_id=None)).distinct().count(),
         }
 
         for m in milestones:
-            by_milestones['days'][m.id] = open_sales_cycles.filter(period_q['days_q'] & Q(milestone_id=m.id)).distinct().count()
-            by_milestones['weeks'][m.id] = open_sales_cycles.filter(period_q['weeks_q'] & Q(milestone_id=m.id)).distinct().count()
-            by_milestones['months'][m.id] = open_sales_cycles.filter(period_q['months_q'] & Q(milestone_id=m.id)).distinct().count()
-
-            my_by_milestones['days'][m.id] = my_open_sales_cycles.filter(period_q['days_q'] & Q(milestone_id=m.id)).distinct().count()
-            my_by_milestones['weeks'][m.id] = my_open_sales_cycles.filter(period_q['weeks_q'] & Q(milestone_id=m.id)).distinct().count()
-            my_by_milestones['months'][m.id] = my_open_sales_cycles.filter(period_q['months_q'] & Q(milestone_id=m.id)).distinct().count()
+            by_milestones[m.id] = open_sales_cycles.filter(Q(milestone_id=m.id)).distinct().count()
+            my_by_milestones[m.id] = my_open_sales_cycles.filter(Q(milestone_id=m.id)).distinct().count()
 
         def get_by_period(queryset):
             rv = {}
@@ -1322,41 +1306,35 @@ class SalesCycle(SubscriptionObject):
 
         return {
             'new_sales_cycles': {
-                'all': get_by_period(new_sales_cycles),
-                'my': get_by_period(my_new_sales_cycles),
+                'all': {
+                    'total': new_sales_cycles.count(),
+                    'by_period': get_by_period(new_sales_cycles),
+                },
+                'my': {
+                    'total': my_new_sales_cycles.count(),
+                    'by_period': get_by_period(my_new_sales_cycles),
+                },
             },
             'successful_sales_cycles': {
-                'all': get_by_period(successful_sales_cycles),
-                'my': get_by_period(my_successful_sales_cycles),
+                'all': {
+                    'total': successful_sales_cycles.count(),
+                    'by_period': get_by_period(successful_sales_cycles),
+                },
+                'my': {
+                    'total': my_successful_sales_cycles.count(),
+                    'by_period': get_by_period(my_successful_sales_cycles),
+                },
             },
             'open_sales_cycles': {
                 'all': {
-                    'days': {
-                        'total': open_sales_cycles.filter(period_q['days_q']).distinct().count(),
-                        'by_milestones': by_milestones['days'],
-                    },
-                    'weeks': {
-                        'total': open_sales_cycles.filter(period_q['weeks_q']).distinct().count(),
-                        'by_milestones': by_milestones['weeks'],
-                    },
-                    'months': {
-                        'total': open_sales_cycles.filter(period_q['months_q']).distinct().count(),
-                        'by_milestones': by_milestones['months'],
-                    },
+                    'total': open_sales_cycles.count(),
+                    'by_milestones': by_milestones,
+                    'by_period': get_by_period(open_sales_cycles),
                 },
                 'my': {
-                    'days': {
-                        'total': my_open_sales_cycles.filter(period_q['days_q']).distinct().count(),
-                        'by_milestones': my_by_milestones['days'],
-                    },
-                    'weeks': {
-                        'total': my_open_sales_cycles.filter(period_q['weeks_q']).distinct().count(),
-                        'by_milestones': my_by_milestones['weeks'],
-                    },
-                    'months': {
-                        'total': my_open_sales_cycles.filter(period_q['months_q']).distinct().count(),
-                        'by_milestones': my_by_milestones['months'],
-                    },
+                    'total': my_open_sales_cycles.count(),
+                    'by_milestones': my_by_milestones,
+                    'by_period': get_by_period(my_open_sales_cycles),
                 },
             },
         }
@@ -1370,26 +1348,20 @@ class SalesCycle(SubscriptionObject):
         weeks_q = Q(date_edited__gte=datetimeutils.get_start_of_week(timezone.now()), date_edited__lte=datetimeutils.get_end_of_week(timezone.now()))
         months_q = Q(date_edited__gte=datetimeutils.get_start_of_month(timezone.now()), date_edited__lte=datetimeutils.get_end_of_month(timezone.now()))
 
-        activities = Activity.objects.filter(company_q)
-
-        days_act_sales_cycles = activities.filter(days_q).values_list('sales_cycle_id', flat=True)
-        weeks_act_sales_cycles = activities.filter(weeks_q).values_list('sales_cycle_id', flat=True)
-        months_act_sales_cycles = activities.filter(months_q).values_list('sales_cycle_id', flat=True)
-
-        my_days_act_sales_cycles = activities.filter(days_q & owner_q).values_list('sales_cycle_id', flat=True)
-        my_weeks_act_sales_cycles = activities.filter(weeks_q & owner_q).values_list('sales_cycle_id', flat=True)
-        my_months_act_sales_cycles = activities.filter(months_q & owner_q).values_list('sales_cycle_id', flat=True)
+        latest_activity_days_q = Q(latest_activity__date_edited__gte=datetimeutils.get_start_of_today(timezone.now()), latest_activity__date_edited__lte=datetimeutils.get_end_of_today(timezone.now()))
+        latest_activity_weeks_q = Q(latest_activity__date_edited__gte=datetimeutils.get_start_of_week(timezone.now()), latest_activity__date_edited__lte=datetimeutils.get_end_of_week(timezone.now()))
+        latest_activity_months_q = Q(latest_activity__date_edited__gte=datetimeutils.get_start_of_month(timezone.now()), latest_activity__date_edited__lte=datetimeutils.get_end_of_month(timezone.now()))
 
         return {
             'all': {
-                'days': SalesCycle.objects.filter((company_q & days_q) | Q(id__in=days_act_sales_cycles)),
-                'weeks': SalesCycle.objects.filter((company_q & weeks_q) | Q(id__in=weeks_act_sales_cycles)),
-                'months': SalesCycle.objects.filter((company_q & months_q) | Q(id__in=months_act_sales_cycles)),
+                'days': SalesCycle.objects.filter(company_q & (days_q | latest_activity_days_q)),
+                'weeks': SalesCycle.objects.filter(company_q & (days_q | latest_activity_weeks_q)),
+                'months': SalesCycle.objects.filter(company_q & (days_q | latest_activity_months_q)),
             },
             'my': {
-                'days': SalesCycle.objects.filter((company_q & days_q & owner_q) | Q(id__in=my_days_act_sales_cycles)),
-                'weeks': SalesCycle.objects.filter((company_q & weeks_q & owner_q) | Q(id__in=my_weeks_act_sales_cycles)),
-                'months': SalesCycle.objects.filter((company_q & months_q & owner_q) | Q(id__in=my_months_act_sales_cycles)),
+                'days': SalesCycle.objects.filter((company_q & owner_q) & (days_q | latest_activity_days_q)),
+                'weeks': SalesCycle.objects.filter((company_q & owner_q) & (weeks_q | latest_activity_days_q)),
+                'months': SalesCycle.objects.filter((company_q & owner_q) & (months_q | latest_activity_days_q)),
             },
         }
 
@@ -1760,16 +1732,22 @@ class Activity(SubscriptionObject):
             rv = {}
             for period in periods:
                 period_total = queryset.filter(period_q[period+'_q'])
-                rv[period] = {
-                    'total': period_total.count(),
-                    'completed': period_total.filter(Q(date_finished__isnull=False)).count(),
-                    'overdue': period_total.filter(Q(date_finished__isnull=True, deadline__lt=timezone.now().replace(hour=time.min.hour, minute=time.min.minute, second=time.min.second))).count(),
-                }
+                rv[period] = period_total.count()
             return rv
 
         return {
-                'all': get_by_period(total),
-                'my': get_by_period(my_total),
+                'all': {
+                    'total': total.count(),
+                    'completed': total.filter(Q(date_finished__isnull=False)).count(),
+                    'overdue': total.filter(date_finished__isnull=True, deadline__lt=timezone.now().replace(hour=time.min.hour, minute=time.min.minute, second=time.min.second)).count(),
+                    'by_period': get_by_period(total),
+                },
+                'my': {
+                    'total': my_total.count(),
+                    'completed': my_total.filter(Q(date_finished__isnull=False)).count(),
+                    'overdue': my_total.filter(date_finished__isnull=True, deadline__lt=timezone.now().replace(hour=time.min.hour, minute=time.min.minute, second=time.min.second)).count(),
+                    'by_period': get_by_period(my_total),
+                },
             }
 
     @classmethod
@@ -1812,7 +1790,7 @@ class Activity(SubscriptionObject):
                 'count': my_feed['feed'].count(),
                 'not_read': my_feed['not_read'],
             },
-            'my_activities': cls.my_activities(company_id=company_id, user_id=user_id).count(),
+            'user_activities': cls.user_activities(company_id=company_id, user_id=user_id).count(),
             'my_tasks': cls.my_tasks(company_id=company_id, user_id=user_id).count(),
         }
 
@@ -1848,7 +1826,7 @@ class Activity(SubscriptionObject):
         }
 
     @classmethod
-    def my_activities(cls, company_id, user_id):
+    def user_activities(cls, company_id, user_id):
         return Activity.objects.filter(company_id=company_id, owner_id=user_id) \
                                .order_by('-date_edited')
 
@@ -1878,14 +1856,11 @@ class Activity(SubscriptionObject):
         new_activity = Activity(description=data.get('description', ''),
                                 sales_cycle_id=sales_cycle_id,
                                 assignee_id=data.get('assignee_id', None),
-                                deadline=data.get('deadline', None),
+                                deadline=dateutil.parser.parse(data.get('deadline', None)) if data.get('deadline', None) else None,
                                 owner_id=user_id,
                                 company_id=company_id,
                                 need_preparation=data.get('need_preparation', False),)
         new_activity.save()
-
-        if 'attached_files' in data:
-            self.attach_files(data['attached_files'], new_activity.id)
 
         account = Account.objects.get(company_id=company_id, user_id=user_id)
 
@@ -2005,16 +1980,9 @@ class Comment(SubscriptionObject):
         return "%s's comment" % (self.owner)
 
     @classmethod
-    def mark_as_read(cls, user_id, comment_id):
-        try:
-            comment = CommentRecipient.objects.get(
-                user__id=user_id, comment__id=comment_id)
-        except CommentRecipient.DoesNotExist:
-            pass
-        else:
-            comment.has_read = True
-            comment.save()
-        return True
+    def mark_as_read(cls, company_id, user_id, comment_ids):
+        return CommentRecipient.objects.filter(
+                company_id=company_id, user__id=user_id, comment__id__in=comment_ids, has_read=False).update(has_read=True)
 
     @classmethod
     def build_new(cls, user_id, content_class=None,
@@ -2024,6 +1992,23 @@ class Comment(SubscriptionObject):
         comment.object_id = object_id
         if save:
             comment.save()
+        return comment
+
+    @classmethod
+    def create_comment(cls, company_id, user_id, data):
+        content_class =  ContentType.objects.get(app_label='alm_crm', 
+                                                     model=data.pop('content_class').lower()
+                                                    ).model_class()
+        content_type = ContentType.objects.get_for_model(content_class)
+        data['content_type'] = content_type
+        comment = Comment(owner_id=user_id,
+                          company_id=company_id,
+                          **data)
+        comment.save()
+
+        account = Account.objects.get(company_id=company_id, user_id=user_id)
+        comment.spray(company_id, account)
+
         return comment
 
     def spray(self, company_id, account):

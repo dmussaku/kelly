@@ -3,6 +3,7 @@ import time
 import tldextract
 
 from django.contrib.auth import load_backend
+from django.shortcuts import get_object_or_404
 from django.conf import settings
 from django.utils import translation
 from django.utils.functional import SimpleLazyObject
@@ -24,7 +25,7 @@ class GetSubdomainMiddleware(object):
             request.subdomain = subdomain
             request.company = Company.objects.get(subdomain=subdomain)
             if request.user.is_authenticated():
-                request.account = Account.objects.get(company_id=request.company.id, user_id=request.user.id)
+                request.account = get_object_or_404(Account, company_id=request.company.id, user_id=request.user.id)
 
 
 class ForceDefaultLanguageMiddleware(object):

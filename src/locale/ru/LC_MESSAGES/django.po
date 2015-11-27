@@ -1012,7 +1012,7 @@ msgstr "Миссия продавать!"
 
 #: templates/index2.html:146
 msgid "Your email"
-msgstr "Ваш имэйл"
+msgstr "Ваш e-mail"
 
 #: templates/index2.html:149 templates/index2.html.py:314
 msgid "Try service"

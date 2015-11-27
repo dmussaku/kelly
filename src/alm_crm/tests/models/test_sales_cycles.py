@@ -67,20 +67,24 @@ class SalesCycleTests(TestMixin, TestCase):
 
         panel_info = SalesCycle.get_panel_info(company_id=self.company.id, user_id=self.user.id)
 
-        self.assertEqual(panel_info['new_sales_cycles']['all']['days'], 3)
-        self.assertEqual(panel_info['new_sales_cycles']['my']['days'], 1)
+        self.assertEqual(panel_info['new_sales_cycles']['all']['total'], 3)
+        self.assertEqual(panel_info['new_sales_cycles']['my']['total'], 1)
+        self.assertEqual(panel_info['new_sales_cycles']['all']['by_period']['days'], 3)
+        self.assertEqual(panel_info['new_sales_cycles']['my']['by_period']['days'], 1)
 
-        self.assertEqual(panel_info['successful_sales_cycles']['all']['days'], 2)
-        self.assertEqual(panel_info['successful_sales_cycles']['my']['days'], 1)
+        self.assertEqual(panel_info['successful_sales_cycles']['all']['total'], 2)
+        self.assertEqual(panel_info['successful_sales_cycles']['my']['total'], 1)
+        self.assertEqual(panel_info['successful_sales_cycles']['all']['by_period']['days'], 2)
+        self.assertEqual(panel_info['successful_sales_cycles']['my']['by_period']['days'], 1)
 
-        self.assertEqual(panel_info['open_sales_cycles']['all']['days']['total'], 5)
-        self.assertEqual(panel_info['open_sales_cycles']['my']['days']['total'], 3)
+        self.assertEqual(panel_info['open_sales_cycles']['all']['total'], 5)
+        self.assertEqual(panel_info['open_sales_cycles']['my']['total'], 3)
 
-        self.assertEqual(panel_info['open_sales_cycles']['all']['days']['by_milestones'][milestone.id], 3)
-        self.assertEqual(panel_info['open_sales_cycles']['my']['days']['by_milestones'][milestone.id], 2)
+        self.assertEqual(panel_info['open_sales_cycles']['all']['by_milestones'][milestone.id], 3)
+        self.assertEqual(panel_info['open_sales_cycles']['my']['by_milestones'][milestone.id], 2)
 
-        self.assertEqual(panel_info['open_sales_cycles']['all']['days']['by_milestones'][milestone2.id], 1)
-        self.assertEqual(panel_info['open_sales_cycles']['my']['days']['by_milestones'][milestone2.id], 0)        
+        self.assertEqual(panel_info['open_sales_cycles']['all']['by_period']['days'], 5)
+        self.assertEqual(panel_info['open_sales_cycles']['my']['by_period']['days'], 3)        
 
     # def test_get_active_deals(self):
     #     """

@@ -6,14 +6,15 @@ from rest_framework.decorators import list_route
 from rest_framework.response import Response
 from rest_framework import viewsets, status, filters
 
+from alm_vcard.serializers import VCardSerializer
+from alm_vcard.models import VCard
 from alm_crm.models import Share, Notification, Contact
 from alm_crm.serializers import (
     ShareSerializer,
     NotificationSerializer,
 ) 
-from alm_vcard.serializers import VCardSerializer
 from alm_crm.filters import ShareFilter
-from alm_vcard.models import VCard
+from alm_crm.utils.parser import text_parser
 
 from . import CompanyObjectAPIMixin
 
