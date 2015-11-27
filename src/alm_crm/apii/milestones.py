@@ -21,7 +21,7 @@ class MilestoneViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
         # data = self.deserialize(
         #     request, request.body,
         #     format=request.META.get('CONTENT_TYPE', 'application/json'))
-        data = json.loads(request.data)
+        data = request.data
         milestones = Milestone.objects.filter(company_id=request.company.id)
         new_milestone_set = []
         max_sort_value = (
