@@ -138,9 +138,8 @@ class Contact(SubscriptionObject):
     owner = models.ForeignKey(
         User, related_name='owned_contacts',
         null=True)
-    latest_activity = models.OneToOneField(
-        'Activity', on_delete=models.SET_NULL,
-        related_name='contact_latest_activity', null=True)
+    latest_activity = models.ForeignKey(
+        'Activity', related_name='contact_latest_activity', null=True)
     mentions = generic.GenericRelation('Mention')
     comments = generic.GenericRelation('Comment')
     import_task = models.ForeignKey(
@@ -886,7 +885,7 @@ class Contact(SubscriptionObject):
 
     def find_latest_activity(self):
         """Find latest activity among all sales_cycle_contacts."""
-        sales_cycle = self.sales_cycles.order_by('latest_activity__date_created').first()
+        sales_cycle = self.sales_cycles.filter(is_global=False, latest_activity__isnull=False).order_by('-latest_activity__date_edited').first()
         latest_activity = None
         try:
             latest_activity = sales_cycle.latest_activity
@@ -1128,9 +1127,7 @@ class SalesCycle(SubscriptionObject):
     owner = models.ForeignKey(User, related_name='owned_sales_cycles', null=True)
 
     contact = models.ForeignKey(Contact, related_name='sales_cycles')
-    latest_activity = models.OneToOneField('Activity',
-                                           blank=True, null=True,
-                                           on_delete=models.SET_NULL)
+    latest_activity = models.ForeignKey('Activity', blank=True, null=True)
     projected_value = models.OneToOneField(
         Value, related_name='sales_cycle_as_projected', null=True, blank=True,)
     real_value = models.OneToOneField(
@@ -1178,37 +1175,33 @@ class SalesCycle(SubscriptionObject):
     @classmethod
     def get_all(cls, company_id):
         sales_cycle_q = Q(company_id=company_id, is_global=False)
-        total = SalesCycle.objects.filter(sales_cycle_q)
+        total = SalesCycle.objects.filter(sales_cycle_q).order_by('-latest_activity__date_edited', '-date_edited')
 
         return total
 
     @classmethod
     def get_new_all(cls, company_id):
         sales_cycle_q = Q(company_id=company_id, is_global=False)
-        total = SalesCycle.objects.filter(sales_cycle_q)
-
-        return total.filter(status=SalesCycle.NEW)
+        
+        return SalesCycle.get_all(company_id=company_id).filter(status=SalesCycle.NEW)
 
     @classmethod
     def get_pending_all(cls, company_id):
         sales_cycle_q = Q(company_id=company_id, is_global=False)
-        total = SalesCycle.objects.filter(sales_cycle_q)
-
-        return total.filter(status=SalesCycle.PENDING)
+        
+        return SalesCycle.get_all(company_id=company_id).filter(status=SalesCycle.PENDING)
 
     @classmethod
     def get_successful_all(cls, company_id):
         sales_cycle_q = Q(company_id=company_id, is_global=False)
-        total = SalesCycle.objects.filter(sales_cycle_q)
-
-        return total.filter(status=SalesCycle.SUCCESSFUL)
+        
+        return SalesCycle.get_all(company_id=company_id).filter(status=SalesCycle.SUCCESSFUL)
 
     @classmethod
     def get_failed_all(cls, company_id):
         sales_cycle_q = Q(company_id=company_id, is_global=False)
-        total = SalesCycle.objects.filter(sales_cycle_q)
-
-        return total.filter(status=SalesCycle.FAILED)
+        
+        return SalesCycle.get_all(company_id=company_id).filter(status=SalesCycle.FAILED)
 
     @classmethod
     def get_my(cls, company_id, user_id):
@@ -1412,7 +1405,7 @@ class SalesCycle(SubscriptionObject):
             self.save()
 
     def find_latest_activity(self):
-        return self.rel_activities.order_by('-date_created').first()
+        return self.rel_activities.order_by('-date_edited').first()
 
     def change_products(self, product_ids, user_id, company_id):
         old_product_ids = self.products.all().values_list('id', flat=True)
@@ -1829,7 +1822,7 @@ class Activity(SubscriptionObject):
                          Contact.objects.get(id=data.get('contact_id')).global_sales_cycle.id
         new_activity = Activity(description=data.get('description', ''),
                                 sales_cycle_id=sales_cycle_id,
-                                assignee_id=data.get('assignee_id', None),
+                                assignee_id=data.get('assignee', None),
                                 deadline=dateutil.parser.parse(data.get('deadline', None)) if data.get('deadline', None) else None,
                                 owner_id=user_id,
                                 company_id=company_id,

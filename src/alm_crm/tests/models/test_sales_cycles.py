@@ -448,3 +448,13 @@ class SalesCycleTests(TestMixin, TestCase):
         self.assertEqual(30, SalesCycle.objects.all().count())
         queryset = SalesCycleFilter({'search':'test'}, SalesCycle.objects.all()).qs
         self.assertEqual(20, queryset.count())
+
+    def test_find_latest_activity(self):
+        c1 = ContactFactory(company_id=self.company.id, owner_id=self.user.id)
+
+        sc1 = SalesCycleFactory(contact=c1, company_id=self.company.id, owner_id=self.user.id, is_global=False)
+        ActivityFactory(sales_cycle=sc1, owner=self.user, company_id=self.company.id)
+        a = ActivityFactory(sales_cycle=sc1, owner=self.user, company_id=self.company.id)
+
+        latest_activity = sc1.find_latest_activity()
+        self.assertEqual(latest_activity.id, a.id)

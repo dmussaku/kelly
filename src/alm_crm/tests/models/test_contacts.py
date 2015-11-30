@@ -159,5 +159,19 @@ class ContactTests(TestMixin, TestCase):
         self.assertEqual(contact.vcard.given_name, 'My New Given Name')
         self.assertEqual(contact.vcard.fn, 'My New Given Name')
 
+    def test_find_latest_activity(self):
+        c1 = ContactFactory(company_id=self.company.id, owner_id=self.user.id)
+
+        sc1 = SalesCycleFactory(contact=c1, company_id=self.company.id, owner_id=self.user.id, is_global=False)
+        ActivityFactory(sales_cycle=sc1, owner=self.user, company_id=self.company.id)
+
+        sc2 = SalesCycleFactory(contact=c1, company_id=self.company.id, owner_id=self.user.id, is_global=False)
+        a = ActivityFactory(sales_cycle=sc2, owner=self.user, company_id=self.company.id)
+
+        sc3 = SalesCycleFactory(contact=c1, company_id=self.company.id, owner_id=self.user.id, is_global=True)
+        ActivityFactory(sales_cycle=sc3, owner=self.user, company_id=self.company.id)
+
+        latest_activity = c1.find_latest_activity()
+        self.assertEqual(latest_activity.id, a.id)
 
         
