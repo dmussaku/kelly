@@ -42,6 +42,6 @@ class MilestoneAPITests(APITestMixin, APITestCase):
         response = self.client.post(url, test_data, HTTP_HOST=parsed.netloc, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         content = json.loads(response.content)
-        self.assertEqual(len(content.get('milestones',"")), len(test_data))
+        self.assertEqual(len(content), len(test_data))
 
 

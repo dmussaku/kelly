@@ -67,10 +67,7 @@ class MilestoneViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
                                                     meta=json.dumps(meta))
                     log_entry.save()
                 milestone.delete()
-        bundle = {
-            "milestones": [self.get_serializer(milestone).data
-                                                        for milestone in new_milestone_set]
-        }
+        bundle = self.get_serializer(new_milestone_set, many=True).data
         return Response(bundle)
 
     
