@@ -888,7 +888,7 @@ class Contact(SubscriptionObject):
         sales_cycle = self.sales_cycles.filter(is_global=False, latest_activity__isnull=False).order_by('-latest_activity__date_edited').first()
         latest_activity = None
         try:
-            latest_activity = sales_cycle.latest_activity
+            latest_activity = sales_cycle and sales_cycle.latest_activity
         except Activity.DoesNotExist:
             return None
         return sales_cycle and latest_activity or None
