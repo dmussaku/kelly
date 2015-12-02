@@ -1175,7 +1175,9 @@ class SalesCycle(SubscriptionObject):
     @classmethod
     def get_all(cls, company_id):
         sales_cycle_q = Q(company_id=company_id, is_global=False)
-        total = SalesCycle.objects.filter(sales_cycle_q).order_by('-latest_activity__date_edited', '-date_edited')
+        total = SalesCycle.objects.filter(sales_cycle_q) \
+                                  .extra(select={'sorted_date': "COALESCE((select date_edited from alma_activity where alma_activity.id=alma_sales_cycle.latest_activity_id), date_edited)"}) \
+                                  .order_by('-sorted_date')
 
         return total
 
