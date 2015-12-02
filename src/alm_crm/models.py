@@ -1245,13 +1245,13 @@ class SalesCycle(SubscriptionObject):
 
         periods = ['days', 'weeks', 'months']
 
-        new_sales_cycles =  SalesCycle.get_new_all(company_id=company_id)
-        successful_sales_cycles =  SalesCycle.get_successful_all(company_id=company_id)
-        open_sales_cycles =  SalesCycle.get_pending_all(company_id=company_id)
+        new_sales_cycles = SalesCycle.get_new_all(company_id=company_id)
+        successful_sales_cycles = SalesCycle.get_successful_all(company_id=company_id)
+        open_sales_cycles = SalesCycle.get_pending_all(company_id=company_id)
         
-        my_new_sales_cycles =  SalesCycle.get_new_my(company_id=company_id, user_id=user_id)
-        my_successful_sales_cycles =  SalesCycle.get_successful_my(company_id=company_id, user_id=user_id)
-        my_open_sales_cycles =  SalesCycle.get_pending_my(company_id=company_id, user_id=user_id)
+        my_new_sales_cycles = SalesCycle.get_new_my(company_id=company_id, user_id=user_id)
+        my_successful_sales_cycles = SalesCycle.get_successful_my(company_id=company_id, user_id=user_id)
+        my_open_sales_cycles = SalesCycle.get_pending_my(company_id=company_id, user_id=user_id)
 
         milestones = Milestone.objects.filter(company_id=company_id)
 
@@ -1273,6 +1273,17 @@ class SalesCycle(SubscriptionObject):
                 rv[period] = period_total.distinct().count()
             return rv
 
+        def filter_successful(my=False):
+            rv = {}
+            log_entries = SalesCycleLogEntry.objects.filter(entry_type=SalesCycleLogEntry.SC, sales_cycle__status=SalesCycle.SUCCESSFUL)
+            for period in periods:
+                period_total = log_entries.filter(period_q[period+'_q']).values_list('sales_cycle_id', flat=True)
+                sales_cycles = SalesCycle.objects.filter(id__in=period_total).distinct()
+                if my:
+                    sales_cycles = sales_cycles.filter(owner_id=user_id)
+                rv[period] = sales_cycles.count()
+            return rv
+
         return {
             'new_sales_cycles': {
                 'all': {
@@ -1287,11 +1298,11 @@ class SalesCycle(SubscriptionObject):
             'successful_sales_cycles': {
                 'all': {
                     'total': successful_sales_cycles.count(),
-                    'by_period': get_by_period(successful_sales_cycles),
+                    'by_period': filter_successful(),
                 },
                 'my': {
                     'total': my_successful_sales_cycles.count(),
-                    'by_period': get_by_period(my_successful_sales_cycles),
+                    'by_period': filter_successful(my=True),
                 },
             },
             'open_sales_cycles': {
