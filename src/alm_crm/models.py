@@ -178,9 +178,9 @@ class Contact(SubscriptionObject):
         owner_q = Q(owner_id=user_id)
 
         period_q = {
-            'days_q': Q(date_edited__gte=datetimeutils.get_start_of_today(timezone.now()), date_edited__lte=datetimeutils.get_end_of_today(timezone.now())),
-            'weeks_q': Q(date_edited__gte=datetimeutils.get_start_of_week(timezone.now()), date_edited__lte=datetimeutils.get_end_of_week(timezone.now())),
-            'months_q': Q(date_edited__gte=datetimeutils.get_start_of_month(timezone.now()), date_edited__lte=datetimeutils.get_end_of_month(timezone.now())),
+            'days_q': Q(date_created__gte=datetimeutils.get_start_of_today(timezone.now()), date_created__lte=datetimeutils.get_end_of_today(timezone.now())),
+            'weeks_q': Q(date_created__gte=datetimeutils.get_start_of_week(timezone.now()), date_created__lte=datetimeutils.get_end_of_week(timezone.now())),
+            'months_q': Q(date_created__gte=datetimeutils.get_start_of_month(timezone.now()), date_created__lte=datetimeutils.get_end_of_month(timezone.now())),
         }
 
         total = Contact.objects.filter(contacts_q)
@@ -1238,9 +1238,9 @@ class SalesCycle(SubscriptionObject):
     @classmethod
     def get_panel_info(cls, company_id, user_id):
         period_q = {
-            'days_q': Q(date_edited__gte=datetimeutils.get_start_of_today(timezone.now()), date_edited__lte=datetimeutils.get_end_of_today(timezone.now())),
-            'weeks_q': Q(date_edited__gte=datetimeutils.get_start_of_week(timezone.now()), date_edited__lte=datetimeutils.get_end_of_week(timezone.now())),
-            'months_q': Q(date_edited__gte=datetimeutils.get_start_of_month(timezone.now()), date_edited__lte=datetimeutils.get_end_of_month(timezone.now())),
+            'days_q': Q(date_created__gte=datetimeutils.get_start_of_today(timezone.now()), date_created__lte=datetimeutils.get_end_of_today(timezone.now())),
+            'weeks_q': Q(date_created__gte=datetimeutils.get_start_of_week(timezone.now()), date_created__lte=datetimeutils.get_end_of_week(timezone.now())),
+            'months_q': Q(date_created__gte=datetimeutils.get_start_of_month(timezone.now()), date_created__lte=datetimeutils.get_end_of_month(timezone.now())),
         }
 
         periods = ['days', 'weeks', 'months']
@@ -1687,9 +1687,9 @@ class Activity(SubscriptionObject):
         owner_q = Q(owner_id=user_id)
 
         period_q = {
-            'days_q': Q(date_edited__gte=datetimeutils.get_start_of_today(timezone.now()), date_edited__lte=datetimeutils.get_end_of_today(timezone.now())),
-            'weeks_q': Q(date_edited__gte=datetimeutils.get_start_of_week(timezone.now()), date_edited__lte=datetimeutils.get_end_of_week(timezone.now())),
-            'months_q': Q(date_edited__gte=datetimeutils.get_start_of_month(timezone.now()), date_edited__lte=datetimeutils.get_end_of_month(timezone.now())),
+            'days_q': Q(date_created__gte=datetimeutils.get_start_of_today(timezone.now()), date_created__lte=datetimeutils.get_end_of_today(timezone.now())),
+            'weeks_q': Q(date_created__gte=datetimeutils.get_start_of_week(timezone.now()), date_created__lte=datetimeutils.get_end_of_week(timezone.now())),
+            'months_q': Q(date_created__gte=datetimeutils.get_start_of_month(timezone.now()), date_created__lte=datetimeutils.get_end_of_month(timezone.now())),
         }
 
         total = Activity.objects.filter(activity_q)
