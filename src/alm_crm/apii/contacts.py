@@ -274,12 +274,12 @@ class ContactViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
         """
         POST METHOD
         example
-        {"merged_contacts":[1,2,3], "merge_into_contact":1, "delete":True/False}
+        {"merged_contacts":[1,2,3], "merge_into_contact":1, "delete_merged":True/False}
         """
         data = request.data
         merged_contacts_ids = data.pop("merged_contacts", [])
         merge_into_contact_id = data.pop("merge_into_contact", "")
-        delete_merged = merged_contacts_ids
+        delete_merged = True
         if not merged_contacts_ids or not merge_into_contact_id:
             return Response(
                 {'success':False, 'message':'Contact ids have not been appended'})

@@ -962,6 +962,8 @@ class Contact(SubscriptionObject):
                 for share in obj.share_set.all():
                     share.contact = self
                     share.save()
+        if delete_merged:
+            alias_objects.delete()
         return self
 
     def get_products(self):
@@ -1859,7 +1861,7 @@ class Activity(SubscriptionObject):
         activities = Activity.objects.filter(company_id=company_id)
         for hashtag in hashtags:
             activities = activities.filter(hashtags__hashtag__text=hashtag)
-        return activities.order_by('date_created')
+        return activities.order_by('-date_edited')
 
 
     def new_comments_count(self, user_id):
@@ -2130,7 +2132,7 @@ class Share(SubscriptionObject):
         shares = Share.objects.filter(company_id=company_id)
         for hashtag in hashtags:
             shares = shares.filter(hashtags__hashtag__text=hashtag)
-        return shares.order_by('date_created')
+        return shares.order_by('-date_edited')
 
     def __unicode__(self):
         return u'%s : %s -> %s' % (self.contact, self.share_from, self.share_to)
