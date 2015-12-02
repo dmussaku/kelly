@@ -173,7 +173,7 @@ class ProductSerializer(RequestContextMixin, serializers.ModelSerializer):
 
 
 class ProductGroupSerializer(RequestContextMixin, serializers.ModelSerializer):
-    products = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+    products = serializers.PrimaryKeyRelatedField(many=True, queryset=Product.objects.all())
 
     class Meta:
         model = ProductGroup
