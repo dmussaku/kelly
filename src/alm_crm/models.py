@@ -2268,7 +2268,7 @@ class Filter(SubscriptionObject):
         ('coldbase', _('cold')),
         ('leadbase', _('lead')))
     title = models.CharField(max_length=100, default='')
-    filter_text = models.CharField(max_length=500)
+    filter_text = models.CharField(max_length=500, null=True, blank=True)
     owner = models.ForeignKey(User, related_name='owned_filter', null=True)
     base = models.CharField(max_length=8, choices=BASE_OPTIONS, default='allbase')
 
