@@ -1,17 +1,19 @@
+import hmac
+import uuid
+
+from timezone_field import TimeZoneField
+from datetime import datetime
 from django.db import models
 from django.contrib.auth.models import (
     AbstractBaseUser, UserManager as contrib_user_manager)
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
-from timezone_field import TimeZoneField
+from almastorage.utils import default_file
+
 from almanet.models import Subscription
 from alm_vcard.models import VCard, Email
 
-from almastorage.utils import default_file
-from datetime import datetime
-import hmac
-import uuid
 try:
     from hashlib import sha1
 except ImportError:
@@ -99,6 +101,21 @@ class Account(models.Model):
         # Hmac that beast.
         return hmac.new(new_uuid.bytes, digestmod=sha1).hexdigest()
 
+    def follow_unfollow(self, contact_ids):
+        '''
+        Function received list of contact contact_ids
+        removes from unfollow_list if present
+        adds to unfollow_list if absent
+        '''
+        unfollow_list = self.unfollow_list.all().values_list('id', flat=True)
+        for contact_id in contact_ids:
+            if contact_id in unfollow_list:
+                self.unfollow_list.remove(contact_id)
+            else:
+                self.unfollow_list.add(contact_id)
+
+        return self
+
 
 class UserManager(contrib_user_manager):
     @classmethod
@@ -132,7 +149,7 @@ class User(AbstractBaseUser):
     #                                  related_name='users')
     # is_admin = models.BooleanField(default=False)
 
-    vcard = models.OneToOneField(VCard, blank=True, null=True)
+    vcard = models.OneToOneField(VCard, blank=True, null=True, on_delete=models.SET_NULL)
     userpic_obj = models.ForeignKey('almastorage.SwiftFile', related_name='users', 
                                 default=lambda: default_file.set_file('default_userpic.png', 'image', container_title='CRM_USERPICS').id)
     date_created = models.DateTimeField(auto_now_add=True, blank=True)

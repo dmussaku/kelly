@@ -51,27 +51,18 @@ class Migration(SchemaMigration):
         ))
         db.send_create_signal(u'alm_vcard', ['Geo'])
 
-        # Adding model 'Org'
-        db.create_table(u'alm_vcard_org', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('vcard', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['alm_vcard.VCard'])),
-            ('organization_name', self.gf('django.db.models.fields.CharField')(max_length=1024)),
-            ('organization_unit', self.gf('django.db.models.fields.CharField')(max_length=1024, blank=True)),
-        ))
-        db.send_create_signal(u'alm_vcard', ['Org'])
-
         # Adding model 'Adr'
         db.create_table(u'alm_vcard_adr', (
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('vcard', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['alm_vcard.VCard'])),
-            ('post_office_box', self.gf('django.db.models.fields.CharField')(max_length=1024, blank=True)),
-            ('extended_address', self.gf('django.db.models.fields.CharField')(max_length=1024, blank=True)),
+            ('type', self.gf('django.db.models.fields.CharField')(max_length=1024)),
             ('street_address', self.gf('django.db.models.fields.CharField')(max_length=1024)),
             ('locality', self.gf('django.db.models.fields.CharField')(max_length=1024)),
             ('region', self.gf('django.db.models.fields.CharField')(max_length=1024)),
-            ('postal_code', self.gf('django.db.models.fields.CharField')(max_length=1024)),
             ('country_name', self.gf('django.db.models.fields.CharField')(max_length=1024)),
-            ('type', self.gf('django.db.models.fields.CharField')(max_length=1024)),
+            ('post_office_box', self.gf('django.db.models.fields.CharField')(max_length=1024, blank=True)),
+            ('extended_address', self.gf('django.db.models.fields.CharField')(max_length=1024, blank=True)),
+            ('postal_code', self.gf('django.db.models.fields.CharField')(max_length=1024)),
         ))
         db.send_create_signal(u'alm_vcard', ['Adr'])
 
@@ -178,9 +169,6 @@ class Migration(SchemaMigration):
         # Deleting model 'Geo'
         db.delete_table(u'alm_vcard_geo')
 
-        # Deleting model 'Org'
-        db.delete_table(u'alm_vcard_org')
-
         # Deleting model 'Adr'
         db.delete_table(u'alm_vcard_adr')
 
@@ -285,13 +273,6 @@ class Migration(SchemaMigration):
             'Meta': {'object_name': 'Note'},
             'data': ('django.db.models.fields.TextField', [], {}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'vcard': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['alm_vcard.VCard']"})
-        },
-        u'alm_vcard.org': {
-            'Meta': {'object_name': 'Org'},
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'organization_name': ('django.db.models.fields.CharField', [], {'max_length': '1024'}),
-            'organization_unit': ('django.db.models.fields.CharField', [], {'max_length': '1024', 'blank': 'True'}),
             'vcard': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['alm_vcard.VCard']"})
         },
         u'alm_vcard.role': {
