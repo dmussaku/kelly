@@ -2,7 +2,7 @@ from rest_framework import viewsets, permissions
 from rest_framework.decorators import list_route
 from rest_framework.response import Response
 from alm_crm.serializers import MilestoneSerializer, SalesCycleSerializer
-from alm_crm.models import Milestone
+from alm_crm.models import Milestone, SalesCycleLogEntry
 import json
 
 from . import CompanyObjectAPIMixin
@@ -21,8 +21,7 @@ class MilestoneViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
         data = request.data
         milestones = Milestone.objects.filter(company_id=request.company.id)
         new_milestone_set = []
-        max_sort_value = (
-            sorted(map(lambda m: m.get('sort',0), data))[-1] or 0)
+        i = 1
         for milestone_data in data:
             try:
                 milestone = milestones.get(id=milestone_data.get('id', -1))
@@ -45,11 +44,9 @@ class MilestoneViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
             finally:
                 milestone.title = milestone_data['title']
                 milestone.color_code = milestone_data['color_code']
-                try:
-                    milestone.sort = milestone_data['sort']
-                except Exception as e:
-                    max_sort_value += 1;
-                    milestone.sort = max_sort_value;
+                if not milestone_data.get('is_system', 0):
+                    milestone.sort = i
+                    i+=1
                 milestone.company_id = request.company.id
                 milestone.save()
                 new_milestone_set.append(milestone)

@@ -141,7 +141,8 @@ class ContactTests(TestMixin, TestCase):
         for i in range(0,10):
             ActivityFactory(sales_cycle=sc2, owner=self.user, company_id=self.company.id)
         
-        contact = c1.merge_contacts(alias_objects=[c2], fn='My New FN')
+        alias_objects = Contact.objects.filter(id__in=[c2.id]) 
+        contact = c1.merge_contacts(alias_objects=alias_objects, fn='My New FN')
         self.assertEqual(contact.vcard.fn, 'My New FN')
         self.assertEqual(contact.vcard.emails.count(), 6)
         self.assertEqual(contact.vcard.tels.count(), 4)
@@ -154,8 +155,8 @@ class ContactTests(TestMixin, TestCase):
         v2 = VCardFactory(given_name='gn2', family_name='fn2')
         c1 = ContactFactory(company_id=self.company.id, owner_id=self.user.id, vcard=v1, tp=Contact.USER_TP)
         c2 = ContactFactory(company_id=self.company.id, owner_id=self.user.id, vcard=v2, tp=Contact.USER_TP)
-        
-        contact = c1.merge_contacts(alias_objects=[c2], given_name='My New Given Name')
+        alias_objects = Contact.objects.filter(id__in=[c2.id]) 
+        contact = c1.merge_contacts(alias_objects=alias_objects, given_name='My New Given Name')
         self.assertEqual(contact.vcard.given_name, 'My New Given Name')
         self.assertEqual(contact.vcard.fn, 'My New Given Name')
 
