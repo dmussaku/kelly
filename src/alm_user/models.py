@@ -149,7 +149,7 @@ class User(AbstractBaseUser):
     #                                  related_name='users')
     # is_admin = models.BooleanField(default=False)
 
-    vcard = models.OneToOneField(VCard, blank=True, null=True)
+    vcard = models.OneToOneField(VCard, blank=True, null=True, on_delete=models.SET_NULL)
     userpic_obj = models.ForeignKey('almastorage.SwiftFile', related_name='users', 
                                 default=lambda: default_file.set_file('default_userpic.png', 'image', container_title='CRM_USERPICS').id)
     date_created = models.DateTimeField(auto_now_add=True, blank=True)

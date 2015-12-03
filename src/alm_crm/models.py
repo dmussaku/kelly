@@ -1809,7 +1809,7 @@ class Activity(SubscriptionObject):
 
     @classmethod
     def user_activities(cls, company_id, user_id):
-        return Activity.objects.filter(company_id=company_id, owner_id=user_id) \
+        return Activity.objects.filter(company_id=company_id, owner_id=user_id, deadline=None) \
                                .order_by('-date_edited')
 
     @classmethod
