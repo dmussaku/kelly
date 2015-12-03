@@ -1858,6 +1858,8 @@ class Activity(SubscriptionObject):
     @classmethod
     def search_by_hashtags(cls, company_id=None, search_query=None):
         hashtags = HASHTAG_PARSER.findall(search_query)
+        if not hashtags:
+            return []
         activities = Activity.objects.filter(company_id=company_id)
         for hashtag in hashtags:
             activities = activities.filter(hashtags__hashtag__text=hashtag)
@@ -2129,6 +2131,8 @@ class Share(SubscriptionObject):
     @classmethod
     def search_by_hashtags(cls, company_id=None, search_query=None):
         hashtags = HASHTAG_PARSER.findall(search_query)
+        if not hashtags:
+            return []
         shares = Share.objects.filter(company_id=company_id)
         for hashtag in hashtags:
             shares = shares.filter(hashtags__hashtag__text=hashtag)
