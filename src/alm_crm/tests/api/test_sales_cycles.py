@@ -50,14 +50,14 @@ class SalesCycleAPITests(APITestMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         
         content = json.loads(response.content)
-        self.assertEqual(content['count'], 3)
+        self.assertEqual(len(content), 3)
 
         url, parsed = self.prepare_urls('v1:sales_cycle-list', query={'ids': ''}, subdomain=self.company.subdomain)
         response = self.client.get(url, HTTP_HOST=parsed.netloc)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         
         content = json.loads(response.content)
-        self.assertEqual(content['count'], 0)
+        self.assertEqual(len(content), 0)
 
     def get_statistics(self):
         """

@@ -28,6 +28,10 @@ class SalesCycleTests(TestMixin, TestCase):
         success_milestone = Milestone.objects.get(is_system=1)
         milestone = Milestone.objects.filter(is_system=0)[0]
         milestone2 = Milestone.objects.filter(is_system=0)[1]
+        p1 = ProductFactory(owner=self.user, company_id=self.company.id)
+        stats = {
+            p1.id: 10,
+        }
 
         my_scs = []
         total_scs = []
@@ -43,6 +47,8 @@ class SalesCycleTests(TestMixin, TestCase):
 
         sc1 = my_scs[0]
         sc1.change_milestone(success_milestone.id, self.user.id, self.company.id)
+        sc1 = sc1.change_products(product_ids=[p1.id], user_id=self.user.id, company_id=self.company.id)
+        sc1 = sc1.succeed(stats=stats, user_id=self.user.id, company_id=self.company.id)
 
         sc1 = my_scs[1]
         sc1.change_milestone(milestone.id, self.user.id, self.company.id)
@@ -55,6 +61,8 @@ class SalesCycleTests(TestMixin, TestCase):
 
         sc1 = total_scs[0]
         sc1.change_milestone(success_milestone.id, self.user.id, self.company.id)
+        sc1 = sc1.change_products(product_ids=[p1.id], user_id=self.user.id, company_id=self.company.id)
+        sc1 = sc1.succeed(stats=stats, user_id=self.user.id, company_id=self.company.id)
 
         sc1 = total_scs[1]
         sc1.change_milestone(milestone.id, self.user.id, self.company.id)
