@@ -1,6 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import re
+import pytz
+import xlsxwriter
+
+from dateutil import tz
+from datetime import datetime
+from django.utils import timezone
+from django.db.models import Q, Sum
+
 from alm_crm.models import (
     SalesCycle,
     Milestone,
@@ -10,65 +18,54 @@ from alm_crm.models import (
     ProductGroup,
     SalesCycleLogEntry,
     Milestone
-    )
-from datetime import datetime
-from django.utils import timezone
-from django.db.models import Q
-import pytz
-import xlsxwriter
-from dateutil import tz
+)
 
 def build_funnel(company_id, data=None):
     data = {} if data is None else data
     rv = {
         'report_name': 'funnel'
     }
-    q = Q(products__isnull=False,
-            company_id=company_id,
-            is_global=False)
+    q = Q(company_id=company_id, is_global=False)
 
     if 'products' in data:
         q &= Q(products__pk__in=data.get('products', []))
 
-    sales_cycles = list(set(SalesCycle.objects.filter(q)))
+    sales_cycles = SalesCycle.objects.filter(q)
 
-    rv['total'] = len(sales_cycles)
-    rv['undefined'] = len(filter(lambda sc: sc.milestone == None, sales_cycles))
+    rv['total'] = sales_cycles.count()
+    rv['undefined'] = sales_cycles.filter(milestone__isnull=True).count()
     rv['funnel'] = {}
-    milestones = Milestone.objects.filter(company_id=company_id)
-    system_milestones = milestones.filter(is_system__in=[1,2]).order_by('is_system')
-    milestones = milestones.exclude(is_system__in=[1,2]).order_by('sort')
-    sc_in_funnel = [sc for sc in sales_cycles if sc.milestone != None]
-    for m in milestones:
-        rv['funnel'][m.id] = [sc.id for sc in sc_in_funnel]
-        sc_in_funnel = [sc for sc in sc_in_funnel if sc.milestone.id != m.id]
-    for m in system_milestones:
-        rv['funnel'][m.id] = [sc.id for sc in sales_cycles if sc.milestone_id == m.id]
+    milestone_ids = Milestone.objects.filter(company_id=company_id).order_by('is_system', 'sort')
+    system_milestone_ids = milestone_ids.filter(is_system__in=[1,2]).values_list('id', flat=True)
+    milestone_ids = list(milestone_ids.values_list('id', flat=True))
+    
+    for i in range(len(milestone_ids)):
+        rv['funnel'][milestone_ids[0]] = sales_cycles.filter(milestone__id__in=milestone_ids).values_list('id', flat=True)
+        milestone_ids.pop(0)
+    for m_id in system_milestone_ids:
+        rv['funnel'][m_id] = sales_cycles.filter(milestone__id=m_id).values_list('id', flat=True)
     return rv
 
 def build_realtime_funnel(company_id, data={}):
     rv = {
         'report_name': 'realtime_funnel'
     }
-    q = Q(products__isnull=False,
-            company_id=company_id,
-            is_global=False)
+    q = Q(company_id=company_id, is_global=False)
 
     if 'products' in data:
         q &= Q(products__pk__in=data.get('products', []))
 
-    sales_cycles = list(set(SalesCycle.objects.filter(q)))
+    sales_cycles = SalesCycle.objects.filter(q)
 
-    rv['total'] = len(sales_cycles)
+    rv['total'] = sales_cycles.count()
 
-    rv['undefined'] = len(filter(lambda sc: sc.milestone == None, sales_cycles))
+    rv['undefined'] = sales_cycles.filter(milestone__isnull=True).count()
 
     rv['funnel'] = {}
     milestones = Milestone.objects.filter(company_id=company_id)
 
-    sc_in_funnel = [sc for sc in sales_cycles if sc.milestone != None]
     for m in milestones:
-        rv['funnel'][m.id] = [sc.id for sc in sc_in_funnel if sc.milestone.id == m.id]
+        rv['funnel'][m.id] = sales_cycles.filter(milestone__id=m.id).values_list('id', flat=True)
     return rv
 
 def build_activity_feed(company_id, data=None, timezone='UTC'):
@@ -270,86 +267,26 @@ def build_product_report(company_id, data={}):
             }
         '''
         by_milestone = {
-            0: [sc.id for sc in SalesCycle.objects.filter(products__pk__in=[product.id],
-                                                                milestone_id=None,
-                                                                company_id=company_id,
-                                                                is_global=False)]
+            0: SalesCycle.objects.filter(products__pk__in=[product.id],
+                                         milestone_id=None,
+                                         company_id=company_id,
+                                         is_global=False).values_list('id', flat=True)
         }
 
         for m in milestones:
-            by_milestone[m.id] = [sc.id for sc in SalesCycle.objects.filter(products__pk__in=[product.id],
-                                                                milestone_id=m.id,
-                                                                company_id=company_id,
-                                                                is_global=False)]
+            by_milestone[m.id] = SalesCycle.objects.filter(products__pk__in=[product.id],
+                                                           milestone_id=m.id,
+                                                           company_id=company_id,
+                                                           is_global=False).values_list('id', flat=True)
         rv['products'][product.id] = {
-            'earned_money': sum(SalesCycleProductStat.objects.filter(
+            'earned_money': SalesCycleProductStat.objects.filter(
                                     company_id=company_id,
                                     product_id=product.id,
-                                    sales_cycle__milestone__is_system=1).values_list('real_value', flat=True)),
+                                    sales_cycle__milestone__is_system=1).aggregate(sum=Sum('real_value'))['sum'],
             'total_cycles': SalesCycle.objects.filter(products__pk__in=[product.id],
                                                         company_id=company_id,
                                                         is_global=False).count(),
             'by_milestone': by_milestone,
         }
 
-
-
-
-    # open_sales_cycles = SalesCycle.objects.filter(
-    # 						products__in = product_ids if product_ids[0] != -1
-    # 						else Product.objects.filter(company_id=company_id).values_list('id', flat=True),
-    # 						milestone__is_system=0, is_global=False, date_created__range=(from_date, to_date)
-    # 					)
-
-    # closed_sales_cycles = SalesCycle.objects.filter(
-    # 							products__in = product_ids if product_ids[0] != -1
-    # 							else Product.objects.filter(company_id=company_id).values_list('id', flat=True),
-    # 							milestone__is_system__in=[1,2],
-    # 							is_global=False, date_created__range=(from_date, to_date)
-    # 						)
-    # successfull_cycles = closed_sales_cycles.filter(milestone__is_system=1)
-    # unsuccessfull_cycles = closed_sales_cycles.filter(milestone__is_system=2)
-
-    # earned_money = sum(SalesCycleProductStat.objects.filter(sales_cycle__in=closed_sales_cycles).values_list('real_value', flat=True))
-
-
-    # if product_ids == [-1]:
-    # 	products = Product.objects.filter(company_id=company_id, date_created__range=(from_date, to_date))
-    # else:
-    # 	products = Product.objects.filter(company_id=company_id, id__in=product_ids, date_created__range=(from_date, to_date))
-
-    # product_stat_array = []
-
-    # for product in products:
-    # 	product_obj = {}
-    # 	product_obj['id'] = product.id
-    # 	obj = []
-    # 	for prod_stat in product.salescycleproductstat_set.all():
-    # 		obj.append({'date_edited':prod_stat.date_edited, 'real_value':prod_stat.real_value})
-    # 	product_obj['object'] = obj
-    # 	product_stat_array.append(product_obj)
-
-    # product_array = []
-    # for product in products:
-    # 	product_obj = {}
-    # 	product_obj['id'] = product.id
-    # 	obj = {}
-    # 	obj['open_sales_cycles'] = open_sales_cycles.filter(products__in=[product.id]).count()
-    # 	obj['closed_sales_cycles'] = closed_sales_cycles.filter(products__in=[product.id]).count()
-    # 	obj['successfull'] = closed_sales_cycles.filter(products__in=[product.id], milestone__is_system=1).count()
-    # 	obj['unsuccessfull'] = closed_sales_cycles.filter(products__in=[product.id], milestone__is_system=2).count()
-    # 	product_obj['stats'] = obj
-    # 	product_array.append(product_obj)
-    # user_report = {
-    # 	'report_name': 'product_report',
-    # 	'product_ids': product_ids if not product_ids[0] == -1 else None,
-    # 	'open_sales_cycles':open_sales_cycles.count(),
-    # 	'closed_sales_cycles':closed_sales_cycles.count(),
-    # 	'earned_money': earned_money,
-    # 	'product_stat_array':product_stat_array,
-    # 	'product_array':product_array,
-    # 	'successfull_cycles': successfull_cycles.count(),
-    # 	'unsuccessfull_cycles': unsuccessfull_cycles.count(),
-    # 	'from_date': from_date,
-    # 	'to_date': to_date}
     return rv

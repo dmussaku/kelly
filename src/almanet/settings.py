@@ -158,10 +158,11 @@ class BaseConfiguration(SubdomainConfiguration, Configuration):
         'django_extensions',
         'almastorage',
         'djcelery',
+        'rest_framework',
+        'django_filters',
     )
 
     MIDDLEWARE_CLASSES = (
-        'almanet.middleware.GetSubdomainMiddleware',
         'django.middleware.common.CommonMiddleware',
         'corsheaders.middleware.CorsMiddleware',
         'django.middleware.csrf.CsrfViewMiddleware',
@@ -171,6 +172,7 @@ class BaseConfiguration(SubdomainConfiguration, Configuration):
         'django.contrib.messages.middleware.MessageMiddleware',
         'django.contrib.auth.middleware.AuthenticationMiddleware',
         'django.middleware.gzip.GZipMiddleware',
+        'almanet.middleware.GetSubdomainMiddleware',
         'almanet.middleware.ForceDefaultLanguageMiddleware',
         # 'almanet.middleware.AlmanetSessionMiddleware',
         # 'almanet.middleware.MyAuthenticationMiddleware',
@@ -354,8 +356,26 @@ class BaseConfiguration(SubdomainConfiguration, Configuration):
     SW_USERNAME = 'ALMASALES'
     SW_KEY = 'x3IFqvHB'
     SW_AUTH_URL = 'http://178.88.64.78/auth/v1.0'
+    CRM_CONTAINER_TITLE = 'CRM_FILES'
     
     RUSTEM_SETTINGS = False
+
+    REST_FRAMEWORK = {
+        'DEFAULT_AUTHENTICATION_CLASSES': (
+            'rest_framework.authentication.BasicAuthentication',
+            'rest_framework.authentication.SessionAuthentication',
+        ),
+        'DEFAULT_RENDERER_CLASSES': (
+            'rest_framework.renderers.JSONRenderer',
+        ),
+        'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.NamespaceVersioning',
+        'DEFAULT_PERMISSION_CLASSES': (
+            'rest_framework.permissions.IsAuthenticated',
+        ),
+        'PAGE_SIZE': 20,
+    }
+
+    SOUTH_TESTS_MIGRATE = False
 
 
 class DevConfiguration(
@@ -373,6 +393,8 @@ class DevConfiguration(
     BROKER_URL = 'amqp://dev:dev@almasales.kz:5672//almasales/dev'
 
     RUSTEM_SETTINGS = False
+
+    SW_AUTH_URL = 'http://178.88.64.86/auth/v1.0'
 
 
 class QAConfiguration(DevConfiguration):
@@ -462,13 +484,13 @@ class StagingConfiguration(FileSettings('~/.almanet/almanet.conf.py'), BaseConfi
 
 class StagingConfiguration2(FileSettings('~/.almanet/almanet.conf.py'), BaseConfiguration):
     DEBUG = False
-    PARENT_HOST = 'almasales.qa2:4369'
-    HOSTCONF_REGEX = r'almasales\.qa2:4369'
+    PARENT_HOST = 'almasales.qa:8000'
+    HOSTCONF_REGEX = r'almasales\.qa:8000'
 
-    SITE_NAME = 'almasales.qa2:4369'
-    SITE_DOMAIN = 'http://almasales.qa2:4369'
-    CSRF_COOKIE_DOMAIN = '.almasales.qa2'
-    SESSION_COOKIE_DOMAIN = '.almasales.qa2'
+    SITE_NAME = 'almasales.qa:8000'
+    SITE_DOMAIN = 'http://almasales.qa:8000'
+    CSRF_COOKIE_DOMAIN = '.almasales.qa'
+    SESSION_COOKIE_DOMAIN = '.almasales.qa'
     # CORS_ORIGIN_WHITELIST = (
     #     'almasales.kz',
     #     'almacloud.almasales.kz',
@@ -500,6 +522,7 @@ class StagingConfiguration2(FileSettings('~/.almanet/almanet.conf.py'), BaseConf
     BROKER_URL = 'amqp://stage:n0easyway1n@10.10.10.245:5672//almasales/stage'
     CELERY_RESULT_BACKEND = 'djcelery.backends.database:DatabaseBackend'
 
+    SW_AUTH_URL = 'http://178.88.64.86/auth/v1.0'
 
 
 class DemoConfiguration(FileSettings('~/.almanet/almanet.conf.py'), BaseConfiguration):

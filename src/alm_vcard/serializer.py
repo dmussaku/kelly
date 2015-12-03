@@ -17,21 +17,17 @@ def vcard_rel_components():
 	return inspect.getmembers(sys.modules['alm_vcard.models'], is_target)
 
 def vcard_rel_fields():
-	return ["{}_set".format(comp[1]._meta.model_name)
+	return [comp[1]._ser_meta.alias
 	        for comp in vcard_rel_components()]
-
-def build_tmpl_for(vcard_comp):
-	meta = vcard_comp._ser_meta
-	return meta
 
 def serialize_objs(vcards):
 	comps = vcard_rel_components()
 	related_tmpls, aliases = {}, {}
 	for i in xrange(len(comps)):
 		comp_name, comp = comps[i]
-		key = "{}_set".format(comp._meta.model_name)
-		aliases[comp._ser_meta.alias] = key
-		related_tmpls[key] = build_tmpl_for(comp)
+		key = comp._ser_meta.alias
+		aliases[key] = key
+		related_tmpls[key] = comp._ser_meta
 	return serialize(vcards, **{
 		'fields': aliases.keys() + [':local'],
 		'related': related_tmpls,

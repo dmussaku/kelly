@@ -50,7 +50,7 @@ from almanet.settings import DEFAULT_SERVICE
 from almanet.settings import TIME_ZONE
 from almanet.utils.api import RequestContext, SessionAuthentication
 from tastypie.authentication import BasicAuthentication
-from almanet.utils.env import get_subscr_id
+# from almanet.utils.env import get_subscr_id
 from almanet.utils.ds import StreamList
 from django.conf.urls import url
 from django.contrib.contenttypes.models import ContentType
@@ -421,6 +421,8 @@ class ContactResource(CRMServiceModelResource):
         resource_name = 'contact'
         filtering = {
             'status': ['exact'],
+            'date_created': ['exact', 'range', 'gt', 'gte', 'lt', 'lte'],
+            'date_edited': ['exact', 'range', 'gt', 'gte', 'lt', 'lte'],
             'tp': ['exact'],
             'id': ALL
         }
@@ -1675,6 +1677,10 @@ class SalesCycleResource(CRMServiceModelResource):
         resource_name = 'sales_cycle'
         excludes = ['from_date', 'to_date']
         detail_allowed_methods = ['get', 'post', 'put', 'patch', 'delete']
+        filtering={
+            'date_created': ['exact', 'range', 'gt', 'gte', 'lt', 'lte'],
+            'date_edited': ['exact', 'range', 'gt', 'gte', 'lt', 'lte'],
+        }
         always_return_data = True
 
     def prepend_urls(self):
@@ -2273,6 +2279,8 @@ class ActivityResource(CRMServiceModelResource):
         filtering = {
             'author_id': ('exact', ),
             'owner': ALL_WITH_RELATIONS,
+            'date_created': ['exact', 'range', 'gt', 'gte', 'lt', 'lte'],
+            'date_edited': ['exact', 'range', 'gt', 'gte', 'lt', 'lte'],
             'sales_cycle_id': ALL_WITH_RELATIONS
             }
         filtering.update(CommonMeta.filtering)
@@ -3612,6 +3620,12 @@ class AppStateResource(Resource):
                 self.wrap_view('search'),
                 name='api_search'
             ),
+            url(
+                r"^(?P<resource_name>%s)/(?P<slug>\w+)/dashboard%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('dashboard'),
+                name='api_dashboard'
+            ),
         ]
 
     def obj_get(self, bundle, **kwargs):
@@ -3730,6 +3744,37 @@ class AppStateResource(Resource):
             {
                 'sales_cycles': SalesCycleResource().get_bundle_list(sales_cycles, request),
                 'activities': ActivityResource().get_bundle_list(activities, request)
+            })
+
+    def dashboard(self, request, **kwargs):
+        '''
+        prepare data for dashboard
+        '''
+        new_sales_cycles_q = Q(company_id=request.company.id, is_global=False, rel_activities__isnull=True, milestone__isnull=True)
+        successful_sales_cycles_q = Q(company_id=request.company.id, is_global=False, milestone__is_system=1)
+        open_sales_cycles_q = Q(company_id=request.company.id, is_global=False) & (Q(rel_activities__isnull=False) | Q(milestone__isnull=False, milestone__is_system=0))
+
+        rv = {
+            'panels': {
+                'new_sales_cycles': {
+                    'all': SalesCycle.objects.filter(new_sales_cycles_q).distinct().count(),
+                    'my': SalesCycle.objects.filter(new_sales_cycles_q & Q(owner_id=request.user.id)).distinct().count(),
+                },
+                'successful_sales_cycles': {
+                    'all': SalesCycle.objects.filter(successful_sales_cycles_q).count(),
+                    'my': SalesCycle.objects.filter(successful_sales_cycles_q & Q(owner_id=request.user.id)).count(),
+                },
+                'open_sales_cycles': {
+                    'all': SalesCycle.objects.filter(open_sales_cycles_q).distinct().count(),
+                    'my': SalesCycle.objects.filter(open_sales_cycles_q & Q(owner_id=request.user.id)).distinct().count(),
+                },
+            }
+        }
+        
+        return self.create_response(
+            request,
+            {
+                'objects': rv
             })
 
     def get_categories(self, request, **kwargs):
@@ -3861,14 +3906,20 @@ class MobileStateObject(object):
         self.company = request.company
         self.account = request.user
 
-        sales_cycles = SalesCycleResource().obj_get_list(bundle, limit_for='mobile')
 
-        sc_ids_param = ','.join([str(sc.id) for sc in sales_cycles])
-        activities = ActivityResource().obj_get_list(bundle, limit_for='mobile',
-            sales_cycle_id__in=sc_ids_param)
+        activities = ActivityResource().obj_get_list(
+            bundle, limit_for='mobile')[0:200]
+        # activities = Activity.objects.filter(
+        #     company_id=self.company.id).order_by('date_edited')[0:100]
+        sales_cycles = []
+        for activity in activities:
+            if activity.sales_cycle not in sales_cycles:
+                sales_cycles.append(activity.sales_cycle)
 
-        contact_ids_param = ','.join(set([str(sc.contact_id) for sc in sales_cycles]))
-        contacts = ContactResource().obj_get_list(bundle, id__in=contact_ids_param)
+        contacts = []
+        for sales_cycle in sales_cycles:
+            if sales_cycle.contact not in contacts:
+                contacts.append(sales_cycle.contact)
 
         cu_ids = set([str(a.owner_id) for a in activities])
         cu_ids = cu_ids.union([str(sc.owner_id) for sc in sales_cycles])
@@ -3929,7 +3980,7 @@ class MobileStateResource(Resource):
                 bundle = self.build_bundle(obj=obj, request=request)
                 setattr(bundle, 'skip_fields', ['activities'])
                 setattr(bundle, 'use_fields', ['activities_count'])
-                bundles.append(ResourceInstance.full_dehydrate(bundle, for_list=True))
+                bundles.append(ResourceInstance.full_dehydrate(bundle, for_list=False))
             serialized['objects'][resource_name] = bundles
 
         return self.create_response(request, serialized)

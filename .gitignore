@@ -5,6 +5,7 @@ venv
 *.save
 *.DS_store
 *.mo
+*.sqlite
 .coverage
 api_docs/*
 src/static/js/bundle.js

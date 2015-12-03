@@ -1,15 +1,18 @@
 import string
 import time
 import tldextract
+
 from django.contrib.auth import load_backend
+from django.shortcuts import get_object_or_404
 from django.conf import settings
+from django.utils import translation
 from django.utils.functional import SimpleLazyObject
 from django.utils.importlib import import_module
 from django.utils.cache import patch_vary_headers
-from django.utils import translation
 from django.utils.http import cookie_date
 
 from alm_company.models import Company
+from alm_user.models import Account
 
 
 class GetSubdomainMiddleware(object):
@@ -21,6 +24,8 @@ class GetSubdomainMiddleware(object):
         if subdomain:
             request.subdomain = subdomain
             request.company = Company.objects.get(subdomain=subdomain)
+            if request.user.is_authenticated():
+                request.account = get_object_or_404(Account, company_id=request.company.id, user_id=request.user.id)
 
 
 class ForceDefaultLanguageMiddleware(object):
