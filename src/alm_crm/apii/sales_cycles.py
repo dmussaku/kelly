@@ -24,20 +24,10 @@ class SalesCycleViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
         query_params = request.query_params
         # можно передать список айдишников, которые нужно вытащить
         if(query_params.has_key('ids')):
+            self.pagination_class = None
             ids = query_params.get('ids', None).split(',') if query_params.get('ids', None) else []
             queryset = self.filter_queryset(self.get_queryset())
             queryset = queryset.filter(id__in=ids)
-
-            # если передан параметр all, то тогда отдать без pagination'а все циклы
-            if(query_params.has_key('all')):
-                serializer = self.get_serializer(queryset, many=True, contact=True, latest_activity=True)
-                return Response(serializer.data)
-            queryset = self.filter_class(request.GET, queryset)
-            page = self.paginate_queryset(queryset)
-            if page is not None:
-                serializer = self.get_serializer(page, many=True, contact=True, latest_activity=True)
-                return self.get_paginated_response(serializer.data)
-
             serializer = self.get_serializer(queryset, many=True, contact=True, latest_activity=True)
             return Response(serializer.data)
         return super(SalesCycleViewSet, self).list(request, *args, **kwargs)
