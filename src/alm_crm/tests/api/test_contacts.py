@@ -391,4 +391,3 @@ def test_edit_contact(self):
         response = self.client.put(url, data, HTTP_HOST=parsed.netloc, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(contact.children.count(), 3)
-        print 'test_update_children ran successfuly'
