@@ -62,16 +62,12 @@ class ContactViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
     	vcard_data = data.pop('vcard')
         custom_fields = data.pop('custom_fields') if data.get('custom_fields') else {}
         vcard_serializer = VCardSerializer(data=vcard_data)
-        print 'raise exception'
         vcard_serializer.is_valid(raise_exception=True)
-        print 'no raise exception'
         vcard = vcard_serializer.save()
 
         # save contact
         serializer = self.get_serializer(data=data)
-        print 'raise exception'
         serializer.is_valid(raise_exception=True)
-        print 'no raise exception'
         contact = self.perform_create(serializer, vcard=vcard)
 
         # create global sales_cycle for this contact
