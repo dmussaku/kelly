@@ -11,8 +11,12 @@ from almanet.models import Subscription
 from almastorage.models import SwiftFile
 
 from alm_user.serializers import UserSerializer
+from alm_vcard.serializers import VCardSerializer
 
 from alm_crm.apii import CompanyObjectAPIMixin
+from alm_crm.utils.data_processing import (
+    processing_custom_field_data,
+    )
 
 class UserViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
     
@@ -23,6 +27,31 @@ class UserViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
         return User.objects.filter(
                 accounts__company_id__in=[self.request.company.id]
             ).order_by('-date_created')
+
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        data = request.data
+
+        # update vcard for user
+        vcard = instance.vcard
+        custom_fields = data.pop('custom_fields') if data.get('custom_fields') else {}
+        if vcard:
+            vcard.delete()
+
+        vcard_data = data.pop('vcard')
+        vcard_serializer = VCardSerializer(data=vcard_data)
+        vcard_serializer.is_valid(raise_exception=True)
+        vcard = vcard_serializer.save()
+        serializer = self.get_serializer(instance, data=data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.save(vcard=vcard)
+        if custom_fields:
+            processing_custom_field_data(custom_fields, user)
+        serializer = self.get_serializer(user)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, headers=headers)
+
+
 
     @list_route(methods=['post'], url_path='upload_userpic')
     def upload_userpic(self, request, **kwargs):
