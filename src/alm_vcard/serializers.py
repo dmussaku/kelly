@@ -25,11 +25,11 @@ class EmailSerializer(serializers.ModelSerializer):
 
 
 class AdrSerializer(serializers.ModelSerializer):
-    street_address = serializers.CharField(required=False, allow_blank=True)
-    region = serializers.CharField(required=False, allow_blank=True)
-    locality = serializers.CharField(required=False, allow_blank=True)
-    country_name = serializers.CharField(required=False, allow_blank=True)
-    postal_code = serializers.CharField(required=False, allow_blank=True)
+    street_address = serializers.CharField(required=False, allow_blank=True, allow_null=True)
+    region = serializers.CharField(required=False, allow_blank=True, allow_null=True)
+    locality = serializers.CharField(required=False, allow_blank=True, allow_null=True)
+    country_name = serializers.CharField(required=False, allow_blank=True, allow_null=True)
+    postal_code = serializers.CharField(required=False, allow_blank=True, allow_null=True)
 
     class Meta:
         model = Adr
@@ -107,7 +107,6 @@ class VCardSerializer(serializers.ModelSerializer):
         titles = validated_data.pop('titles', [])
         urls = validated_data.pop('urls', [])
         vcard = super(VCardSerializer, self).create(validated_data)
-        
         for tel in tels:
             Tel.objects.create(vcard=vcard, **tel)
         for email in emails:

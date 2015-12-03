@@ -986,13 +986,13 @@ class Adr(SerializableModel):
 
     vcard = models.ForeignKey(VCard, related_name='adrs')
     type = models.CharField(max_length=1024, verbose_name=_("type"), choices=TYPE_CHOICES)
-    street_address = models.CharField(max_length=1024, verbose_name=_("street address"))
-    locality = models.CharField(max_length=1024, verbose_name=_("locality"))
-    region  = models.CharField(max_length=1024, verbose_name=_("region"))
-    country_name = models.CharField(max_length=1024, verbose_name=_("country name"))
-    post_office_box= models.CharField(max_length=1024, verbose_name=_("post office box"), blank=True)
-    extended_address = models.CharField(max_length=1024, verbose_name=_("extended address"), blank=True)
-    postal_code = models.CharField(max_length=1024, verbose_name=_("postal code"))
+    street_address = models.CharField(max_length=1024, verbose_name=_("street address"), blank=True, null=True)
+    locality = models.CharField(max_length=1024, verbose_name=_("locality"), blank=True, null=True)
+    region  = models.CharField(max_length=1024, verbose_name=_("region"), blank=True, null=True)
+    country_name = models.CharField(max_length=1024, verbose_name=_("country name"), blank=True, null=True)
+    post_office_box= models.CharField(max_length=1024, verbose_name=_("post office box"), blank=True, null=True)
+    extended_address = models.CharField(max_length=1024, verbose_name=_("extended address"), blank=True, null=True)
+    postal_code = models.CharField(max_length=1024, verbose_name=_("postal code"), blank=True, null=True)
     # value = models.CharField(max_lengt =1024, verbose_name=_("Value"))
 
     class Meta:
