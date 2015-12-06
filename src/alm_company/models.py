@@ -53,7 +53,7 @@ class Company(models.Model):
 
     @classmethod
     def build_company(cls, name=None, subdomain=None):
-        subdomain = Company.generate_subdomain(name)
+        subdomain = subdomain or Company.generate_subdomain(name)
         company = Company(name=name, subdomain=subdomain)
         company.save()
         return company

@@ -58,7 +58,7 @@ from almanet.utils.api import (
     firstOfQuerySet,
     )
 from tastypie.authentication import BasicAuthentication
-from almanet.utils.env import get_subscr_id
+# from almanet.utils.env import get_subscr_id
 from almanet.utils.ds import StreamList
 from django.conf.urls import url
 from django.contrib.contenttypes.models import ContentType
@@ -3563,6 +3563,12 @@ class AppStateResource(Resource):
                 self.wrap_view('search'),
                 name='api_search'
             ),
+            url(
+                r"^(?P<resource_name>%s)/(?P<slug>\w+)/dashboard%s$" %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('dashboard'),
+                name='api_dashboard'
+            ),
         ]
 
     def obj_get(self, bundle, **kwargs):
@@ -3681,6 +3687,37 @@ class AppStateResource(Resource):
             {
                 'sales_cycles': SalesCycleResource().get_bundle_list(sales_cycles, request),
                 'activities': ActivityResource().get_bundle_list(activities, request)
+            })
+
+    def dashboard(self, request, **kwargs):
+        '''
+        prepare data for dashboard
+        '''
+        new_sales_cycles_q = Q(company_id=request.company.id, is_global=False, rel_activities__isnull=True, milestone__isnull=True)
+        successful_sales_cycles_q = Q(company_id=request.company.id, is_global=False, milestone__is_system=1)
+        open_sales_cycles_q = Q(company_id=request.company.id, is_global=False) & (Q(rel_activities__isnull=False) | Q(milestone__isnull=False, milestone__is_system=0))
+
+        rv = {
+            'panels': {
+                'new_sales_cycles': {
+                    'all': SalesCycle.objects.filter(new_sales_cycles_q).distinct().count(),
+                    'my': SalesCycle.objects.filter(new_sales_cycles_q & Q(owner_id=request.user.id)).distinct().count(),
+                },
+                'successful_sales_cycles': {
+                    'all': SalesCycle.objects.filter(successful_sales_cycles_q).count(),
+                    'my': SalesCycle.objects.filter(successful_sales_cycles_q & Q(owner_id=request.user.id)).count(),
+                },
+                'open_sales_cycles': {
+                    'all': SalesCycle.objects.filter(open_sales_cycles_q).distinct().count(),
+                    'my': SalesCycle.objects.filter(open_sales_cycles_q & Q(owner_id=request.user.id)).distinct().count(),
+                },
+            }
+        }
+        
+        return self.create_response(
+            request,
+            {
+                'objects': rv
             })
 
     def get_categories(self, request, **kwargs):

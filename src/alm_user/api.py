@@ -31,8 +31,9 @@ from tastypie.authentication import (
     BasicAuthentication,
     )
 from almanet.settings import DEFAULT_SERVICE, TIME_ZONE
-from almanet.utils.api import RequestContext, CommonMeta, CustomToManyField
+from almanet.utils.api import RequestContext, CommonMeta
 from almanet.utils.env import get_subscr_id
+# from almanet.utils.env import get_subscr_id
 from almastorage.models import SwiftFile
 import json
 import datetime

@@ -122,8 +122,8 @@ class VCard(models.Model):
             self.fn += self.given_name
         if self.family_name:
             self.fn += (' ' if self.fn else '') + self.family_name
-        if not self.fn and self.email_set.first():
-            self.fn = self.email_set.first().value.split('@')[0].replace('.', ' ')
+        if not self.fn and self.emails.first():
+            self.fn = self.emails.first().value.split('@')[0].replace('.', ' ')
         if not self.fn:
             raise BadVCardError('This is bad vcard since user does not know anything about this contact.')
 
@@ -618,7 +618,7 @@ class VCard(models.Model):
             i.value[0]   = j.organization_name
             i.value.append(j.organization_unit)
 
-        for j in self.email_set.all():
+        for j in self.emails.all():
             i = v.add('email')
             i.value = j.value
             i.type_param = j.type
@@ -734,7 +734,7 @@ class VCard(models.Model):
 
     @classmethod
     @transaction.atomic
-    def merge_model_objects(cls, primary_object, alias_objects=[], keep_old=True):
+    def merge_model_objects(cls, primary_object, alias_objects=[], keep_old=True, **kwargs):
         """
 
         """
@@ -813,6 +813,11 @@ class VCard(models.Model):
                 
             if not keep_old:
                 alias_object.delete()
+        if kwargs.get('fn'):
+            primary_object.fn = kwargs.get('fn')
+        elif kwargs.get('given_name') or kwargs.get('family_name'):
+            primary_object.given_name = kwargs.get('given_name', '')
+            primary_object.family_name = kwargs.get('family_name', '')
         primary_object.save()
         return primary_object
 
@@ -880,7 +885,7 @@ class Tel(SerializableModel):
         ('xadditional',  _(u"xadditional")),
     )
 
-    vcard = models.ForeignKey(VCard)
+    vcard = models.ForeignKey(VCard, related_name='tels')
     # making a choice field of type is incorrect as arbitrary
     # types of phone number are allowed by the vcard specs.
     type  = models.CharField(max_length=30, verbose_name=_("type of phone number"), help_text=_("for instance WORK or HOME"), choices=TYPE_CHOICES)
@@ -906,7 +911,7 @@ class Email(SerializableModel):
         (PREF, _(u"pref")),
     )
 
-    vcard = models.ForeignKey(VCard)
+    vcard = models.ForeignKey(VCard, related_name='emails')
     type = models.CharField(max_length=30, verbose_name=_("type of email"), choices=TYPE_CHOICES)
     value = models.EmailField(max_length=100, verbose_name=_("value"))
 
@@ -979,15 +984,15 @@ class Adr(SerializableModel):
         ('xlegal',  _(u"xlegal")),
     )
 
-    vcard = models.ForeignKey(VCard)
+    vcard = models.ForeignKey(VCard, related_name='adrs')
     type = models.CharField(max_length=1024, verbose_name=_("type"), choices=TYPE_CHOICES)
-    street_address = models.CharField(max_length=1024, verbose_name=_("street address"))
-    locality = models.CharField(max_length=1024, verbose_name=_("locality"))
-    region  = models.CharField(max_length=1024, verbose_name=_("region"))
-    country_name = models.CharField(max_length=1024, verbose_name=_("country name"))
-    post_office_box= models.CharField(max_length=1024, verbose_name=_("post office box"), blank=True)
-    extended_address = models.CharField(max_length=1024, verbose_name=_("extended address"), blank=True)
-    postal_code = models.CharField(max_length=1024, verbose_name=_("postal code"))
+    street_address = models.CharField(max_length=1024, verbose_name=_("street address"), blank=True, null=True)
+    locality = models.CharField(max_length=1024, verbose_name=_("locality"), blank=True, null=True)
+    region  = models.CharField(max_length=1024, verbose_name=_("region"), blank=True, null=True)
+    country_name = models.CharField(max_length=1024, verbose_name=_("country name"), blank=True, null=True)
+    post_office_box= models.CharField(max_length=1024, verbose_name=_("post office box"), blank=True, null=True)
+    extended_address = models.CharField(max_length=1024, verbose_name=_("extended address"), blank=True, null=True)
+    postal_code = models.CharField(max_length=1024, verbose_name=_("postal code"), blank=True, null=True)
     # value = models.CharField(max_lengt =1024, verbose_name=_("Value"))
 
     class Meta:
@@ -1041,7 +1046,7 @@ class Category(SerializableModel):
     Specifies application category information about the
     contact.  Also known as "tags".
     """
-    vcard = models.ForeignKey(VCard)
+    vcard = models.ForeignKey(VCard, related_name='categories')
     data = models.CharField(max_length=100)
 
     class Meta:
@@ -1133,7 +1138,7 @@ class Note(SerializableModel):
     Supplemental information or a comment that is
     associated with the vCard.
     """
-    vcard = models.ForeignKey(VCard)
+    vcard = models.ForeignKey(VCard, related_name='notes')
     data = models.TextField()
 
     def __unicode__(self):
@@ -1207,7 +1212,7 @@ class Title(SerializableModel):
     """
     The position or job of the contact
     """
-    vcard = models.ForeignKey(VCard)
+    vcard = models.ForeignKey(VCard, related_name='titles')
     data = models.CharField(max_length=100)
 
     class Meta:
@@ -1246,7 +1251,7 @@ class Url(SerializableModel):
         ('website', _(u"website")),
         ('github', _(u"github")),
     )
-    vcard = models.ForeignKey(VCard)
+    vcard = models.ForeignKey(VCard, related_name='urls')
     type = models.CharField(max_length=40, verbose_name=_("type"), choices=TYPE_CHOICES)
     value = models.URLField()
 
