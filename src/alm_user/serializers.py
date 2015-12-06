@@ -5,6 +5,7 @@ from alm_vcard.models import VCard
 
 from alm_user.models import User, Account
 from alm_company.models import Company
+from alm_crm.models import UsersGroup
 from alm_crm.serializers import RequestContextMixin
 from alm_company.serializers import CompanySerializer
 
@@ -12,6 +13,7 @@ class UserSerializer(RequestContextMixin, serializers.ModelSerializer):
 
     companies = serializers.SerializerMethodField()
     vcard = VCardSerializer(required=False)
+    group_ids = serializers.PrimaryKeyRelatedField(source='groups', many=True, queryset=UsersGroup.objects.all())
     is_active = serializers.SerializerMethodField()
     is_supervisor = serializers.SerializerMethodField()
     userpic = serializers.SerializerMethodField()
