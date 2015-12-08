@@ -9,6 +9,7 @@ from alm_crm.models import UsersGroup
 from alm_crm.serializers import RequestContextMixin
 from alm_company.serializers import CompanySerializer
 
+
 class UserSerializer(RequestContextMixin, serializers.ModelSerializer):
 
     companies = serializers.SerializerMethodField()
@@ -27,13 +28,19 @@ class UserSerializer(RequestContextMixin, serializers.ModelSerializer):
         return CompanySerializer(companies, many=True).data
 
     def get_is_active(self, obj):
+        if not hasattr(self.request, 'account'):
+            return None
         return self.request.account.is_active
 
     def get_is_supervisor(self, obj):
+        if not hasattr(self.request, 'account'):
+            return None
         return self.request.account.is_supervisor
 
     def get_userpic(self, obj):
         return obj.userpic_obj.url
 
     def get_unfollow_list(self, obj):
+        if not hasattr(self.request, 'account'):
+            return None
         return self.request.account.unfollow_list.all().values_list('id', flat=True)

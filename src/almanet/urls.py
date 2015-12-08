@@ -24,7 +24,7 @@ urlpatterns = patterns(
     url(r'^$', landing, name='landing_page'),
     url(r'^admin/', include(admin.site.urls)),
     url(r'^auth/', include('alm_user.urls')),
-    url(r'^api/', include('almanet.api_urls')),
+    url(r'^', include('almanet.public_api_urls')),
 
 
     # TODO: temp, needs to be deleted

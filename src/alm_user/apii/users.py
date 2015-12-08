@@ -1,24 +1,23 @@
-import dateutil
 import base64
+
+from django.contrib.auth import login, authenticate
 
 from rest_framework.decorators import list_route
 from rest_framework.response import Response
-from rest_framework import viewsets
-
-from alm_user.models import User, Account
-from alm_company.models import Company
-from almanet.models import Subscription
+from rest_framework import viewsets, status
 from almastorage.models import SwiftFile
 
-from alm_user.serializers import UserSerializer
+from almanet.models import Subscription
 from alm_vcard.serializers import VCardSerializer
-
-from alm_crm.apii import CompanyObjectAPIMixin
 from alm_crm.utils.data_processing import (
     processing_custom_field_data,
-    )
+)
 
-class UserViewSet(CompanyObjectAPIMixin, viewsets.ModelViewSet):
+from ..serializers import UserSerializer
+from ..models import User
+
+
+class UserViewSet(viewsets.ModelViewSet):
     
     serializer_class = UserSerializer
     pagination_class = None

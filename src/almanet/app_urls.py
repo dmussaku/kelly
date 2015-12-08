@@ -25,7 +25,7 @@ from alm_crm.apii import (
     comments,
 )
 
-from alm_user.apii import users
+from alm_user.apii import users, sessions
 
 from alm_vcard import api as vcard_api
 
@@ -117,6 +117,7 @@ urlpatterns = patterns(
     url(r'^$', RedirectHomeView.as_view()),
     url(r'^(?P<service_slug>[-a-zA-Z0-9_]+)/', include('alm_crm.app_urls')),
     url(r'^api/v1/', include(router.urls, namespace='v1')),
+    url(r'^api/v1/session/', sessions.SessionAPIView.as_view()),
     url(r'^api/', include(v1_api.urls)),
     url(r'^auth/signout/$', logout_view, {'next_page': login_url},
         name='user_logout'),
