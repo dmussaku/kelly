@@ -42,7 +42,7 @@ class ReportViewSet(viewsets.ViewSet):
         query_params = request.query_params
 
         data = {
-            'users': query_params.getlist('users', []),
+            'users': query_params.get('users') and query_params.get('users').split(',') or [],
             'date_from': query_params.get('date_from', ''),
             'date_to': query_params.get('date_to', ''),
             'order': query_params.get('order', 'asc'),
