@@ -1,0 +1,1211 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2015-10-08 20:15+0600\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+
+#: alm_company/models.py:13
+msgid "subdomain"
+msgstr ""
+
+#: alm_company/models.py:17
+msgid "company"
+msgstr "компания"
+
+#: alm_crm/models.py:56
+msgid "Main flow"
+msgstr "Основной поток"
+
+#: alm_crm/models.py:57
+msgid "Automatically generated cycle"
+msgstr "Автоматически созданный цикл"
+
+#: alm_crm/models.py:64 alm_vcard/models.py:1214
+msgid "title"
+msgstr ""
+
+#: alm_crm/models.py:66
+msgid "color code"
+msgstr ""
+
+#: alm_crm/models.py:70
+msgid "milestone"
+msgstr "этап"
+
+#: alm_crm/models.py:87
+msgid "Call/request"
+msgstr "Звонок/Заявка"
+
+#: alm_crm/models.py:88
+msgid "Dispatching business offer"
+msgstr "Отправка КП"
+
+#: alm_crm/models.py:89
+msgid "Negotiating contract"
+msgstr "Согласование договора"
+
+#: alm_crm/models.py:90
+msgid "Invoicing"
+msgstr "Выставление счета"
+
+#: alm_crm/models.py:91
+msgid "Payment control"
+msgstr "Контроль оплаты"
+
+#: alm_crm/models.py:92
+msgid "Service provision"
+msgstr "Предоставление услуги"
+
+#: alm_crm/models.py:93
+msgid "Successful"
+msgstr "Успешно завершено"
+
+#: alm_crm/models.py:94
+msgid "Failed"
+msgstr "Не реализовано"
+
+#: alm_crm/models.py:114
+msgid "new_contact"
+msgstr ""
+
+#: alm_crm/models.py:115
+msgid "lead_contact"
+msgstr ""
+
+#: alm_crm/models.py:116
+msgid "opportunity_contact"
+msgstr ""
+
+#: alm_crm/models.py:117
+msgid "client_contact"
+msgstr ""
+
+#: alm_crm/models.py:123
+msgid "company type"
+msgstr ""
+
+#: alm_crm/models.py:124
+msgid "user type"
+msgstr ""
+
+#: alm_crm/models.py:127
+msgid "Imported at "
+msgstr ""
+
+#: alm_crm/models.py:130
+msgid "contact status"
+msgstr ""
+
+#: alm_crm/models.py:134
+msgid "contact type"
+msgstr ""
+
+#: alm_crm/models.py:154
+msgid "contact"
+msgstr ""
+
+#: alm_crm/models.py:175 alm_crm/models.py:180 alm_crm/models.py:186
+#: alm_crm/models.py:191
+msgid "Unknown"
+msgstr ""
+
+#: alm_crm/models.py:200 alm_crm/models.py:203
+msgid "Unknown organization"
+msgstr ""
+
+#: alm_crm/models.py:371
+msgid "incorrect modifier"
+msgstr ""
+
+#: alm_crm/models.py:585
+msgid "No name"
+msgstr "Без имени"
+
+#: alm_crm/models.py:1030
+msgid "product name"
+msgstr ""
+
+#: alm_crm/models.py:1031
+msgid "product description"
+msgstr ""
+
+#: alm_crm/models.py:1042
+msgid "product"
+msgstr ""
+
+#: alm_crm/models.py:1135
+msgid "product_group"
+msgstr ""
+
+#: alm_crm/models.py:1144
+msgid "New"
+msgstr ""
+
+#: alm_crm/models.py:1145
+msgid "Pending"
+msgstr ""
+
+#: alm_crm/models.py:1146
+msgid "Completed"
+msgstr ""
+
+#: alm_crm/models.py:1487
+msgid "Milestone change"
+msgstr ""
+
+#: alm_crm/models.py:1488
+msgid "Milestone edited"
+msgstr ""
+
+#: alm_crm/models.py:1489
+msgid "Milestone deleted"
+msgstr ""
+
+#: alm_crm/models.py:1490
+msgid "Products changed"
+msgstr ""
+
+#: alm_crm/models.py:1491
+msgid "Success close"
+msgstr ""
+
+#: alm_crm/models.py:1492
+msgid "Fail close"
+msgstr ""
+
+#: alm_crm/models.py:2055
+msgid "contact_list"
+msgstr ""
+
+#: alm_crm/models.py:2126
+msgid "sales_cycle_product_stat"
+msgstr ""
+
+#: alm_crm/models.py:2135
+msgid "all"
+msgstr ""
+
+#: alm_crm/models.py:2136
+msgid "recent"
+msgstr ""
+
+#: alm_crm/models.py:2137
+msgid "cold"
+msgstr ""
+
+#: alm_crm/models.py:2138
+msgid "lead"
+msgstr ""
+
+#: alm_crm/models.py:2146
+msgid "filter"
+msgstr ""
+
+#: alm_crm/models.py:2162
+msgid "hashtag"
+msgstr ""
+
+#: alm_crm/models.py:2181
+msgid "hashtag_reference"
+msgstr ""
+
+#: alm_crm/models.py:2212
+msgid "custom_section"
+msgstr ""
+
+#: alm_crm/models.py:2234
+msgid "custom_field"
+msgstr ""
+
+#: alm_crm/models.py:2271
+msgid "custom_field_value"
+msgstr ""
+
+#: alm_user/forms.py:22 alm_user/forms.py:164 almanet/forms.py:16
+msgid "Email"
+msgstr "E-mail"
+
+#: alm_user/forms.py:32
+#, python-format
+msgid "Email %s is already registered"
+msgstr "E-mail %s уже зарегистрирован"
+
+#: alm_user/forms.py:40
+#, python-format
+msgid "The following company names are busy: %(names)s"
+msgstr "Следующие поддомены уже заняты: %(names)s"
+
+#: alm_user/forms.py:43
+msgid "Subdomain is already taken"
+msgstr "Поддомен занят"
+
+#: alm_user/forms.py:46
+msgid "Subdomain must be written in latin alphabet letters"
+msgstr "Поддомены должны содержать только буква латинского алфавита"
+
+#: alm_user/forms.py:54
+msgid "Please input language"
+msgstr "Пожалуйста, введите язык"
+
+#: alm_user/forms.py:56
+msgid "Invalid language"
+msgstr "Неправильно введенный язык"
+
+#: alm_user/forms.py:63
+msgid "Enter valid password"
+msgstr "Введите Новый пароль"
+
+#: alm_user/forms.py:104 alm_user/templates/user/registration.html:103
+msgid "Password"
+msgstr "Пароль"
+
+#: alm_user/forms.py:107
+#, python-format
+msgid ""
+"Please enter a correct %(username)s and password. Note that both fields may "
+"be case-sensitive."
+msgstr ""
+
+#: alm_user/forms.py:109
+msgid "This account is inactive."
+msgstr "Это аккаунт не активный"
+
+#: alm_user/forms.py:165
+msgid "Account with such email is not registered."
+msgstr "Пользователь с таким email не найден"
+
+#: alm_user/forms.py:208
+msgid "Old password"
+msgstr "Старый пароль"
+
+#: alm_user/forms.py:210
+msgid "New Password"
+msgstr "Новый пароль"
+
+#: alm_user/forms.py:212
+msgid "Repeat your password"
+msgstr "Повторите пароль"
+
+#: alm_user/forms.py:215
+msgid "New passwords are not equal"
+msgstr "Пароли не совпадают"
+
+#: alm_user/forms.py:216
+msgid "Enter valid old password."
+msgstr "Введите старый пароль"
+
+#: alm_user/models.py:116
+msgid "ru-RU"
+msgstr ""
+
+#: alm_user/models.py:117
+msgid "en-US"
+msgstr ""
+
+#: alm_user/models.py:119
+msgid "first name"
+msgstr ""
+
+#: alm_user/models.py:121
+msgid "last name"
+msgstr ""
+
+#: alm_user/models.py:122
+msgid "email address"
+msgstr ""
+
+#: alm_user/models.py:127
+msgid "language"
+msgstr ""
+
+#: alm_user/models.py:142
+msgid "user"
+msgstr ""
+
+#: alm_user/models.py:298
+msgid "referral"
+msgstr ""
+
+#: alm_user/emails/previews.py:16
+msgid "token"
+msgstr ""
+
+#: alm_user/emails/previews.py:17
+msgid "Site name"
+msgstr ""
+
+#: alm_user/emails/previews.py:18
+msgid "Http protocol"
+msgstr ""
+
+#: alm_user/templates/emails/base.txt:2
+msgid "Hi"
+msgstr "Здравствуйте"
+
+#: alm_user/templates/emails/password_reset_email.txt:3
+#: alm_user/templates/emails/subdomain_forgot_email.txt:3
+#, python-format
+msgid ""
+"You're receiving this email because you requested a password reset for your "
+"user account at %(site_name)s."
+msgstr ""
+"Вы получили это письмо потому что ваш пароль для %(site_name)s был сброшен."
+
+#: alm_user/templates/emails/password_reset_email.txt:6
+msgid "Please go to the following page and choose a new password:"
+msgstr "Пожалуйста проследуйте по ссылке и выберите новый пароль"
+
+#: alm_user/templates/emails/password_reset_email.txt:8
+#: alm_user/templates/emails/subdomain_forgot_email.txt:10
+msgid "Your username, in case you've forgotten:"
+msgstr "Ваш логин, если вы забыли"
+
+#: alm_user/templates/emails/password_reset_subject.txt:1
+msgid "Password reset email"
+msgstr "Сброс пароля"
+
+#: alm_user/templates/emails/registration_greeting_email.txt:2
+#, python-format
+msgid "Thanks for registration at %(site_name)s."
+msgstr "Спасибо за регистрацию на %(site_name)s."
+
+#: alm_user/templates/emails/registration_greeting_email.txt:5
+msgid "Registration is completed. Please use the following link to sign in"
+msgstr "Регистрация завершена, пожалуйста проследуйте по ссылке для логина"
+
+#: alm_user/templates/emails/registration_greeting_subject.txt:1
+msgid "Successful registration email"
+msgstr ""
+
+#: alm_user/templates/emails/subdomain_forgot_email.txt:6
+msgid "Here's the list of companies you are currently registered with:"
+msgstr "Вот список ваших компаний и их поддомены"
+
+#: alm_user/templates/emails/subdomain_forgot_subject.txt:1
+msgid "Subdomains"
+msgstr "Поддомены"
+
+#: alm_user/templates/user/login-register.html:9
+#: alm_user/templates/user/registration.html:14
+#: alm_user/templates/user/user_login.html:10 templates/index2.html:125
+msgid "Sign in"
+msgstr "Логин"
+
+#: alm_user/templates/user/login-register.html:10
+#: alm_user/templates/user/registration.html:15
+#: alm_user/templates/user/registration.html:110
+#: alm_user/templates/user/user_login.html:11
+msgid "Register"
+msgstr "Регистрация"
+
+#: alm_user/templates/user/login-register.html:15
+msgid ""
+"The registration is now closed. To learn more or participate in beta, leave "
+"your email below."
+msgstr ""
+"В настоящее время регистрация закрыта. Для того чтобы узнать больше или "
+"учавствовать в закрытом тестирование оставьте свой почтовый адрес."
+
+#: alm_user/templates/user/login-register.html:28
+msgid "Participate in beta"
+msgstr "Учавстовать в закрытом тестирование"
+
+#: alm_user/templates/user/password_reset.html:9
+#: alm_user/templates/user/password_reset_done.html:9
+msgid "Password reset"
+msgstr "Сброс пароля"
+
+#: alm_user/templates/user/password_reset.html:11
+msgid ""
+"Forgotten your password? Enter your email address below, and we'll email "
+"instructions for setting a new one."
+msgstr ""
+
+#: alm_user/templates/user/password_reset.html:33
+msgid "Reset my password"
+msgstr "Сбросить пароль"
+
+#: alm_user/templates/user/password_reset_confirm.html:11
+msgid "Enter new password"
+msgstr "Введите Новый пароль"
+
+#: alm_user/templates/user/password_reset_confirm.html:12
+msgid ""
+"Please enter your new password twice so we can verify you typed it in "
+"correctly."
+msgstr ""
+
+#: alm_user/templates/user/password_reset_confirm.html:37
+msgid "Confirm password"
+msgstr "Подтвердите пароль"
+
+#: alm_user/templates/user/password_reset_confirm.html:43
+msgid "Change my password"
+msgstr ""
+
+#: alm_user/templates/user/password_reset_confirm.html:56
+msgid "Password reset unsuccessful"
+msgstr ""
+
+#: alm_user/templates/user/password_reset_confirm.html:58
+msgid ""
+"The password reset link was invalid, possibly because it has already been "
+"used.  Please request a new password reset."
+msgstr ""
+
+#: alm_user/templates/user/password_reset_done.html:11
+msgid ""
+"We've emailed you instructions for setting your password. You should be "
+"receiving them shortly."
+msgstr ""
+
+#: alm_user/templates/user/password_reset_done.html:13
+#: alm_user/templates/user/registration-done.html:13
+#: alm_user/templates/user/subdomain_forgot_done.html:13
+msgid ""
+"If you don't receive an email, please make sure you've entered the address "
+"you registered with, and check your spam folder."
+msgstr ""
+
+#: alm_user/templates/user/password_reset_done.html:15
+#: alm_user/templates/user/registration-done.html:15
+#: alm_user/templates/user/subdomain_forgot_done.html:14
+msgid "Return to main page"
+msgstr "Вернуться на главную"
+
+#: alm_user/templates/user/password_reset_success.html:9
+msgid "Password reset successful"
+msgstr "Пароль успешно восстановлен"
+
+#: alm_user/templates/user/password_reset_success.html:11
+msgid "Your password has been changed, for sign in go to"
+msgstr "Пожалуйста, для входа в систему продите на: "
+
+#: alm_user/templates/user/password_reset_success.html:11
+msgid "login page"
+msgstr "страницу входа"
+
+#: alm_user/templates/user/profile.html:3
+msgid "User Profile"
+msgstr ""
+
+#: alm_user/templates/user/referral-complete.html:9
+msgid "Thank you! Our managers will contact you."
+msgstr "Спасибо! Мы свяжемся с вами в ближайшее время."
+
+#: alm_user/templates/user/registration-done.html:9
+msgid "Registration successful"
+msgstr ""
+
+#: alm_user/templates/user/registration-done.html:11
+msgid ""
+"Thank you for registring with Almasales you can go ahead and log in to your "
+"account by following the link below. We also sent you the confirmation "
+"email, so check it out"
+msgstr ""
+"Спасибо за регистрацию с Almasales, вы можете залогиниться в ваш аккаунт"
+
+#: alm_user/templates/user/registration.html:48
+msgid "Company"
+msgstr "Компания"
+
+#: alm_user/templates/user/registration.html:59
+msgid "Subdomain"
+msgstr "Поддомен"
+
+#: alm_user/templates/user/registration.html:79
+msgid "Language"
+msgstr "Язык"
+
+#: alm_user/templates/user/registration.html:80
+msgid "Choose language"
+msgstr "Выбрать язык"
+
+#: alm_user/templates/user/services.html:3
+#: almanet/templates/almanet/service/service_delete.html:3
+#: almanet/templates/almanet/service/service_detail.html:3
+#: almanet/templates/almanet/service/service_list.html:3
+msgid "Service List Page"
+msgstr ""
+
+#: alm_user/templates/user/settings.html:3
+msgid "User Profile Settings Page"
+msgstr ""
+
+#: alm_user/templates/user/settings_password.html:3
+msgid "User Profile Password Settings Page"
+msgstr ""
+
+#: alm_user/templates/user/subdomain_forgot.html:3
+#: alm_user/templates/user/subdomain_forgot.html:9
+msgid "Forgot subdomain"
+msgstr "Забыли ваш поддомен?"
+
+#: alm_user/templates/user/subdomain_forgot.html:11
+msgid ""
+"Forgotten your subdomain? Enter an email below and we will send you all the "
+"companies that you are involved in via email"
+msgstr ""
+"Забыли ваш поддомен? Введите ваш e-mail и мы вышлем все названия компаний, с "
+"которыми вы зарегистрированы."
+
+#: alm_user/templates/user/subdomain_forgot.html:33
+msgid "Send subdomains"
+msgstr "Отправить поддомены"
+
+#: alm_user/templates/user/subdomain_forgot_done.html:9
+msgid "Subdomains sent"
+msgstr "Поддомены отправлены"
+
+#: alm_user/templates/user/subdomain_forgot_done.html:11
+msgid ""
+"We've emailed you the list of companies you are currently registered with. "
+"You should be receiving them shortly."
+msgstr ""
+"Мы выслали список ваших компаний вам на e-mailВы должны их вскоре получить"
+
+#: alm_user/templates/user/user_list.html:3
+msgid "User List Page"
+msgstr ""
+
+#: alm_user/templates/user/user_login.html:48
+msgid "Forgot your password?"
+msgstr "Забыли пароль?"
+
+#: alm_user/templates/user/user_login.html:51
+msgid "Legal details"
+msgstr "Соглашение о порядке предоставления услуг"
+
+#: alm_user/templates/user/user_login.html:54
+msgid "Login"
+msgstr "Войти"
+
+#: alm_user/templates/user/user_login.html:62
+msgid "Companies that you are logged into"
+msgstr "Компании в которые вы залогинены"
+
+#: alm_vcard/admin.py:170
+msgid "Select VCF"
+msgstr ""
+
+#: alm_vcard/models.py:27
+msgid "The vCard could not be converted into a vObject"
+msgstr ""
+
+#: alm_vcard/models.py:63
+msgid "formatted name"
+msgstr ""
+
+#: alm_vcard/models.py:64
+msgid "The formatted string associated with the vCard object"
+msgstr ""
+
+#: alm_vcard/models.py:66
+msgid "family name"
+msgstr ""
+
+#: alm_vcard/models.py:68
+msgid "given name"
+msgstr ""
+
+#: alm_vcard/models.py:78
+msgid "additional name"
+msgstr ""
+
+#: alm_vcard/models.py:81
+msgid "honorific prefix"
+msgstr ""
+
+#: alm_vcard/models.py:84
+msgid "honorific suffix"
+msgstr ""
+
+#: alm_vcard/models.py:86
+msgid "birthday"
+msgstr ""
+
+#: alm_vcard/models.py:88
+msgid "class"
+msgstr ""
+
+#: alm_vcard/models.py:90
+msgid "last revision"
+msgstr ""
+
+#: alm_vcard/models.py:92
+msgid "sort string"
+msgstr ""
+
+#: alm_vcard/models.py:98
+msgid "unique identifier"
+msgstr ""
+
+#: alm_vcard/models.py:101
+msgid "vcard"
+msgstr ""
+
+#: alm_vcard/models.py:102
+msgid "vcards"
+msgstr ""
+
+#: alm_vcard/models.py:229
+msgid "name"
+msgstr ""
+
+#: alm_vcard/models.py:866 alm_vcard/models.py:977
+msgid "home"
+msgstr "домашний"
+
+#: alm_vcard/models.py:867 alm_vcard/models.py:973
+msgid "INTL"
+msgstr ""
+
+#: alm_vcard/models.py:868
+msgid "message"
+msgstr ""
+
+#: alm_vcard/models.py:869 alm_vcard/models.py:972
+msgid "work"
+msgstr "рабочий"
+
+#: alm_vcard/models.py:870
+msgid "prefered"
+msgstr ""
+
+#: alm_vcard/models.py:871
+msgid "fax"
+msgstr ""
+
+#: alm_vcard/models.py:872
+msgid "cell phone"
+msgstr "сотовый"
+
+#: alm_vcard/models.py:873
+msgid "video"
+msgstr ""
+
+#: alm_vcard/models.py:874
+msgid "pager"
+msgstr ""
+
+#: alm_vcard/models.py:875
+msgid "bbs"
+msgstr ""
+
+#: alm_vcard/models.py:876
+msgid "modem"
+msgstr ""
+
+#: alm_vcard/models.py:877
+msgid "car phone"
+msgstr ""
+
+#: alm_vcard/models.py:878
+msgid "isdn"
+msgstr ""
+
+#: alm_vcard/models.py:879
+msgid "pcs"
+msgstr ""
+
+#: alm_vcard/models.py:880
+msgid "xadditional"
+msgstr ""
+
+#: alm_vcard/models.py:886
+msgid "type of phone number"
+msgstr ""
+
+#: alm_vcard/models.py:886
+msgid "for instance WORK or HOME"
+msgstr ""
+
+#: alm_vcard/models.py:887 alm_vcard/models.py:911
+msgid "value"
+msgstr ""
+
+#: alm_vcard/models.py:890
+msgid "telephone number"
+msgstr ""
+
+#: alm_vcard/models.py:891
+msgid "telephone numbers"
+msgstr ""
+
+#: alm_vcard/models.py:904
+msgid "internet"
+msgstr "рабочий"
+
+#: alm_vcard/models.py:905
+msgid "x400"
+msgstr ""
+
+#: alm_vcard/models.py:906 alm_vcard/models.py:978
+msgid "pref"
+msgstr "персональный"
+
+#: alm_vcard/models.py:910
+msgid "type of email"
+msgstr ""
+
+#: alm_vcard/models.py:914
+msgid "email"
+msgstr ""
+
+#: alm_vcard/models.py:915
+msgid "emails"
+msgstr ""
+
+#: alm_vcard/models.py:933 alm_vcard/models.py:936
+msgid "geographic uri"
+msgstr ""
+
+#: alm_vcard/models.py:937
+msgid "geographic uri's"
+msgstr ""
+
+#: alm_vcard/models.py:945
+msgid "organization name"
+msgstr ""
+
+#: alm_vcard/models.py:946
+msgid "organization unit"
+msgstr ""
+
+#: alm_vcard/models.py:949
+msgid "organization"
+msgstr ""
+
+#: alm_vcard/models.py:950
+msgid "organizations"
+msgstr ""
+
+#: alm_vcard/models.py:974
+msgid "postal"
+msgstr ""
+
+#: alm_vcard/models.py:975
+msgid "parcel"
+msgstr ""
+
+#: alm_vcard/models.py:976
+msgid "dom"
+msgstr ""
+
+#: alm_vcard/models.py:979
+msgid "xlegal"
+msgstr ""
+
+#: alm_vcard/models.py:983 alm_vcard/models.py:1250
+msgid "type"
+msgstr ""
+
+#: alm_vcard/models.py:984
+msgid "street address"
+msgstr ""
+
+#: alm_vcard/models.py:985
+msgid "locality"
+msgstr ""
+
+#: alm_vcard/models.py:986
+msgid "region"
+msgstr ""
+
+#: alm_vcard/models.py:987
+msgid "country name"
+msgstr ""
+
+#: alm_vcard/models.py:988
+msgid "post office box"
+msgstr ""
+
+#: alm_vcard/models.py:989
+msgid "extended address"
+msgstr ""
+
+#: alm_vcard/models.py:990
+msgid "postal code"
+msgstr ""
+
+#: alm_vcard/models.py:994
+msgid "address"
+msgstr ""
+
+#: alm_vcard/models.py:995
+msgid "addresses"
+msgstr ""
+
+#: alm_vcard/models.py:1035
+msgid "agent"
+msgstr ""
+
+#: alm_vcard/models.py:1036
+msgid "agents"
+msgstr ""
+
+#: alm_vcard/models.py:1048
+msgid "category"
+msgstr ""
+
+#: alm_vcard/models.py:1049
+msgid "categories"
+msgstr ""
+
+#: alm_vcard/models.py:1068
+msgid "key"
+msgstr ""
+
+#: alm_vcard/models.py:1069
+msgid "keys"
+msgstr ""
+
+#: alm_vcard/models.py:1081
+msgid "label"
+msgstr ""
+
+#: alm_vcard/models.py:1082
+msgid "labels"
+msgstr ""
+
+#: alm_vcard/models.py:1114
+msgid "mailer"
+msgstr ""
+
+#: alm_vcard/models.py:1115
+msgid "mailers"
+msgstr ""
+
+#: alm_vcard/models.py:1127
+msgid "nickname"
+msgstr ""
+
+#: alm_vcard/models.py:1128
+msgid "nicknames"
+msgstr ""
+
+#: alm_vcard/models.py:1143
+msgid "note"
+msgstr ""
+
+#: alm_vcard/models.py:1144
+msgid "notes"
+msgstr ""
+
+#: alm_vcard/models.py:1182
+msgid "role"
+msgstr ""
+
+#: alm_vcard/models.py:1183
+msgid "roles"
+msgstr ""
+
+#: alm_vcard/models.py:1215
+msgid "titles"
+msgstr ""
+
+#: alm_vcard/models.py:1237
+msgid "time zone"
+msgstr ""
+
+#: alm_vcard/models.py:1238
+msgid "time zones"
+msgstr ""
+
+#: alm_vcard/models.py:1246
+msgid "website"
+msgstr "корпоративный"
+
+#: alm_vcard/models.py:1247
+msgid "github"
+msgstr "личный"
+
+#: alm_vcard/models.py:1254
+msgid "url"
+msgstr ""
+
+#: alm_vcard/models.py:1255
+msgid "url's"
+msgstr ""
+
+#: alm_vcard/templates/vcard/vcard_detail.html:3
+#: alm_vcard/templates/vcard/vcard_list.html:3
+msgid "VCard List Page"
+msgstr ""
+
+#: almanet/decorators.py:20
+msgid "To access this page subdomain required"
+msgstr ""
+
+#: almanet/models.py:14
+msgid "service title"
+msgstr ""
+
+#: almanet/models.py:15
+msgid "service description"
+msgstr ""
+
+#: almanet/models.py:17
+msgid "service slug"
+msgstr ""
+
+#: almanet/models.py:20
+msgid "service"
+msgstr ""
+
+#: almanet/models.py:49
+msgid "subscription"
+msgstr ""
+
+#: almanet/models.py:62
+msgid "company_id"
+msgstr ""
+
+#: almanet/settings.py:217
+msgid "Russian"
+msgstr ""
+
+#: almanet/settings.py:218
+msgid "English"
+msgstr ""
+
+#: almanet/templates/almanet/value_list.html:3
+msgid "Value List Page"
+msgstr ""
+
+#: almanet/utils/gcal.py:49
+#, python-format
+msgid "Activity was created at %(cycle)s for contact %(contact)s."
+msgstr ""
+
+#: templates/index2.html:108
+msgid "Main"
+msgstr "Главная"
+
+#: templates/index2.html:110
+msgid "Plans"
+msgstr "Планы"
+
+#: templates/index2.html:112 templates/index2.html.py:334
+#: templates/index2.html:348 templates/index2.html.py:400
+msgid "Contacts"
+msgstr "Контакты"
+
+#: templates/index2.html:138
+msgid "Selling - is our mission!"
+msgstr "Миссия продавать!"
+
+#: templates/index2.html:146
+msgid "Your email"
+msgstr "Ваш e-mail"
+
+#: templates/index2.html:149 templates/index2.html.py:314
+msgid "Try service"
+msgstr "Попробовать сервис"
+
+#: templates/index2.html:166
+msgid "Will increase your sales capacity through:"
+msgstr "увеличивает Ваши продажи, через:"
+
+#: templates/index2.html:170
+msgid "Goals"
+msgstr "Цели"
+
+#: templates/index2.html:171
+msgid "Set the goal and prepare and develop financial and sales plan"
+msgstr "Разработка целей и подготовка планов по продажам"
+
+#: templates/index2.html:175
+msgid "Product"
+msgstr "Продукт"
+
+#: templates/index2.html:176
+msgid "Identifying the ideal product/client sales channels"
+msgstr "Определение идеального продукта/каналов продаж"
+
+#: templates/index2.html:180
+msgid "Reports"
+msgstr "Отчеты"
+
+#: templates/index2.html:181
+msgid "Implement KPI and Reports with ALMASALES"
+msgstr "Внедрение KPI и отчетов"
+
+#: templates/index2.html:185
+msgid "Tools"
+msgstr "Инструменты"
+
+#: templates/index2.html:186
+msgid "Strengthen sales instruments"
+msgstr "Усовершенствования инструментов продаж"
+
+#: templates/index2.html:195
+msgid "Our capabilites"
+msgstr "Наши возможности"
+
+#: templates/index2.html:196
+msgid "Check out what Almasales can do for your business"
+msgstr "Проверьте наши возможности для вашего бизнеса"
+
+#: templates/index2.html:208
+msgid "Client database and map"
+msgstr "Клиентская карта и база"
+
+#: templates/index2.html:209
+msgid "Activity management"
+msgstr "Управление взаимодействиями"
+
+#: templates/index2.html:210
+msgid "Products management"
+msgstr "Управление ассортиментом"
+
+#: templates/index2.html:211
+msgid "Data warehouse"
+msgstr "Электронный архив материалов"
+
+#: templates/index2.html:212
+msgid "Control orders"
+msgstr "Поручения и контроль их выполнения"
+
+#: templates/index2.html:213
+msgid "Work planning"
+msgstr "Планирование работы"
+
+#: templates/index2.html:214
+msgid "Building sales strategy"
+msgstr "Построение стратегии продаж"
+
+#: templates/index2.html:215
+msgid "Forecasting sales"
+msgstr "Прогнозирование продаж"
+
+#: templates/index2.html:216
+msgid "Control of sales plan"
+msgstr "Контроль плана продаж"
+
+#: templates/index2.html:217
+msgid "Adjusting KPI’s for sales managers"
+msgstr "Настройка KPI для продавцов"
+
+#: templates/index2.html:218
+msgid "Sales cycle analysis"
+msgstr "Анализ «воронки» продаж"
+
+#: templates/index2.html:219
+msgid "Marketing effectiveness analysis"
+msgstr "Анализ эффективности маркетинга"
+
+#: templates/index2.html:220
+msgid "Business process standardization"
+msgstr "Стандартизация бизнес процессов"
+
+#: templates/index2.html:236
+msgid "Be mobile"
+msgstr "Будьте мобильнее"
+
+#: templates/index2.html:238
+msgid ""
+"Our mobile app allows you to stay connect to your sales department anywhere "
+"at any time."
+msgstr ""
+"Разработанное нами удобное мобильное приложение, поможет вам работать в "
+"нашей программе где угодно."
+
+#: templates/index2.html:285
+msgid "The singularity of ALMASALES"
+msgstr "Особенность ALMASALES"
+
+#: templates/index2.html:287
+msgid ""
+"lies in its philosophy, including OKR methodology (Objectives and Key "
+"results), implemented by such companies as  Google, Facebook, Apple, LinkedIn"
+msgstr ""
+"заложена в его философии, включающей методологию OKR (Objectives and Key "
+"results), используемую такими мировыми компаниями как Google, Facebook, "
+"Apple, LinkedIn"
+
+#: templates/index2.html:329
+msgid "Starters plan"
+msgstr "Стартовый план"
+
+#: templates/index2.html:331 templates/index2.html.py:345
+#: templates/index2.html:359
+msgid "month"
+msgstr "месяц"
+
+#: templates/index2.html:333 templates/index2.html.py:347
+#: templates/index2.html:361
+msgid "Users"
+msgstr "Пользователей"
+
+#: templates/index2.html:335 templates/index2.html.py:349
+#: templates/index2.html:363
+msgid "per user"
+msgstr "на пользователя"
+
+#: templates/index2.html:336 templates/index2.html.py:350
+#: templates/index2.html:364
+msgid "First month is free"
+msgstr "Первый месяц бесплатно"
+
+#: templates/index2.html:338 templates/index2.html.py:352
+#: templates/index2.html:366
+msgid "Choose plan"
+msgstr "Выбрать план"
+
+#: templates/index2.html:343
+msgid "Medium business"
+msgstr "Средний бизнес"
+
+#: templates/index2.html:357
+msgid "Corporate business"
+msgstr "Крупный бизнес"
+
+#: templates/index2.html:362
+msgid "Unlimited"
+msgstr "Безлимит"
+
+#: templates/index2.html:377
+msgid "We are always happy with your feedback"
+msgstr "Мы всегда рады вашим предложениям."
+
+#: templates/index2.html:391
+msgid "Where to find us"
+msgstr "Где нас найти"
+
+#: templates/index2.html:392
+msgid ""
+"You can find us by address: Samal 1, house 1, Almaty, Kazakhstan 050010."
+msgstr ""
+" Вы можете найти нас по адресу Республика Казахстан, г. Алматы, мкр. Самал "
+"1, д.1 "
+
+#: templates/index2.html:430
+msgid "Subscribe"
+msgstr "Подписаться на рассылку"
+
+#: templates/layout.crm.html:63
+msgid "contacts"
+msgstr "контакты"
+
+#: templates/layout.crm.html:66
+msgid "feed"
+msgstr "лента"
+
+#~ msgid "Forgot your subdomain?"
+#~ msgstr "Забыли ваш поддомен?"

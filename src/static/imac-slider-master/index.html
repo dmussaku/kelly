@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible"  content="IE=edge,chrome=1">
+
+    <title>iMac Slider - jQuery Slider Plugin - "Teste com GIT e GITHUB"</title>
+
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+      }
+      .imac {
+        position: relative;
+        overflow: hidden;
+        background: url('images/imac.png') no-repeat;
+        padding: 29px 0 0 31px;
+        width: 707px;
+        height: 644px;
+      }
+      .imac img {
+        display: none;
+        width: 675px;
+        height: 405px;
+      }
+      .imac img:first-child {
+        display: block;
+      }
+      .imac .arrow {
+        position: absolute;
+        top: 30%;
+        left: 0;
+        width: 100%;
+      }
+      .imac .arrow a {
+        display: block;
+        background: url('images/arrows.png') no-repeat 0 0;
+        margin: 0 40px;
+        width: 41px;
+        height: 51px;
+      }
+      .imac .arrow .aleft {
+        float: left;
+      }
+      .imac .arrow .aright {
+        background-position: -51px 0;
+        float: right;
+      }
+      .imac:hover .arrow .aleft {
+        background-position: 0 -61px;
+      }
+      .imac:hover .arrow .aright {
+        background-position: -51px -61px;
+      }
+      .hidden {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+     <div class="content">
+       <div class="imac">
+         <img src="http://lorempixel.com/600/400/abstract/1" alt="">
+         <img src="http://lorempixel.com/600/400/abstract/2" alt="">
+         <img src="http://lorempixel.com/600/400/abstract/3" alt="">
+         <img src="http://lorempixel.com/600/400/abstract/4" alt="">
+         <img src="http://lorempixel.com/600/400/abstract/5" alt="">
+         <img src="http://lorempixel.com/600/400/abstract/6" alt="">
+         <img src="http://lorempixel.com/600/400/abstract/7" alt="">
+         <img src="http://lorempixel.com/600/400/abstract/8" alt="">
+         <img src="http://lorempixel.com/600/400/abstract/9" alt="">
+       </div>
+     </div>
+
+      <!-- SCRIPTS -->
+      <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+      <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.8.3.min.js"><\/script>')</script>
+      <script src="js/imac-slider.js"></script>
+      <!--[if lt IE 9]>
+        <script src="js/vendor/html5.js"></script>
+      <![endif]-->
+  </body>
+</html>

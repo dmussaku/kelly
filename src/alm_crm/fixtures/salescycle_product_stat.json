@@ -1,0 +1,28 @@
+[
+{
+    "pk": 1, 
+    "model": "alm_crm.salescycleproductstat", 
+    "fields": {
+        "sales_cycle": 1, 
+        "company_id": 1, 
+        "product": 1, 
+        "real_value": 0,
+        "projected_value": 0,
+        "date_created": "2014-09-10T00:00:00Z",
+        "date_edited": "2014-11-24T07:49:32.991Z" 
+    }
+},
+{
+    "pk": 2, 
+    "model": "alm_crm.salescycleproductstat", 
+    "fields": {
+        "sales_cycle": 1, 
+        "company_id": 1, 
+        "product": 2, 
+        "real_value": 0,
+        "projected_value": 0,
+        "date_created": "2014-09-10T00:00:00Z",
+        "date_edited": "2014-11-24T07:49:32.991Z" 
+    }
+}
+]

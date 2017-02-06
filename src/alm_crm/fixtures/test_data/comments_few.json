@@ -1,0 +1,2875 @@
+[
+{
+    "pk": 1,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Data on US housing starts for October will also be released. - (by cmruser #3, on activity #2 of sales_cycle #1)",
+        "owner":3,
+        "date_created":"2014-01-03T01:46:00.827Z",
+        "date_edited":"2014-01-03T01:46:00.827Z",
+        "object_id":2,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 2,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"The week also lifts the lid on the thinking of Federal Reserve. - (by cmruser #2, on activity #3 of sales_cycle #2)",
+        "owner":2,
+        "date_created":"2014-02-01T01:30:00.827Z",
+        "date_edited":"2014-02-01T01:30:00.827Z",
+        "object_id":3,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 3,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Also due on Monday are US industrial production statistics for October and the start of the Chicago Fed`s annual agriculture conference. - (by cmruser #3, on activity #10 of sales_cycle #6)",
+        "owner":3,
+        "date_created":"2014-02-01T01:41:00.827Z",
+        "date_edited":"2014-02-01T01:41:00.827Z",
+        "object_id":10,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 4,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"The Senate Banking panel`s Subcommittee on Financial Institutions and Consumer Protection will host the hearing. - (by cmruser #3, on activity #20 of sales_cycle #10)",
+        "owner":3,
+        "date_created":"2014-02-01T01:01:00.827Z",
+        "date_edited":"2014-02-01T01:01:00.827Z",
+        "object_id":20,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 5,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Also expected on Thursday are an update on existing home sales and earnings from Gap, BestBuy and Dollar Tree. - (by cmruser #3, on activity #21 of sales_cycle #11)",
+        "owner":3,
+        "date_created":"2014-01-01T01:09:00.827Z",
+        "date_edited":"2014-01-01T01:09:00.827Z",
+        "object_id":21,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 6,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Tuesday brings the Los Angeles Auto Show, earnings from Home Depot and the expected $2 billion-plus initial public offering (IPO) of real estate investment trust Paramount Group. - (by cmruser #3, on activity #24 of sales_cycle #17)",
+        "owner":3,
+        "date_created":"2014-01-03T01:49:00.827Z",
+        "date_edited":"2014-01-03T01:49:00.827Z",
+        "object_id":24,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 7,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Data on US housing starts for October will also be released. - (by cmruser #3, on activity #29 of sales_cycle #25)",
+        "owner":3,
+        "date_created":"2014-01-01T01:21:00.827Z",
+        "date_edited":"2014-01-01T01:21:00.827Z",
+        "object_id":29,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 8,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"The week also lifts the lid on the thinking of Federal Reserve. - (by cmruser #3, on activity #33 of sales_cycle #28)",
+        "owner":3,
+        "date_created":"2014-02-01T01:41:00.827Z",
+        "date_edited":"2014-02-01T01:41:00.827Z",
+        "object_id":33,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 9,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Also expected on Thursday are an update on existing home sales and earnings from Gap, BestBuy and Dollar Tree. - (by cmruser #1, on activity #35 of sales_cycle #31)",
+        "owner":1,
+        "date_created":"2014-01-01T01:41:00.827Z",
+        "date_edited":"2014-01-01T01:41:00.827Z",
+        "object_id":35,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 10,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Monday brings the delayed start of the Shanghai-Hong Kong exchange link, when cross-trading of shares on the two exchanges is due to start in a move that would open up China` $4.2 trillion stock market to foreigners - (by cmruser #2, on activity #36 of sales_cycle #31)",
+        "owner":2,
+        "date_created":"2014-01-03T01:11:00.827Z",
+        "date_edited":"2014-01-03T01:11:00.827Z",
+        "object_id":36,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 11,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"The week also lifts the lid on the thinking of Federal Reserve. - (by cmruser #3, on activity #48 of sales_cycle #54)",
+        "owner":3,
+        "date_created":"2014-02-01T01:05:00.827Z",
+        "date_edited":"2014-02-01T01:05:00.827Z",
+        "object_id":48,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 12,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Data on US housing starts for October will also be released. - (by cmruser #2, on activity #50 of sales_cycle #55)",
+        "owner":2,
+        "date_created":"2014-01-01T01:57:00.827Z",
+        "date_edited":"2014-01-01T01:57:00.827Z",
+        "object_id":50,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 13,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Tuesday brings the Los Angeles Auto Show, earnings from Home Depot and the expected $2 billion-plus initial public offering (IPO) of real estate investment trust Paramount Group. - (by cmruser #3, on activity #51 of sales_cycle #57)",
+        "owner":3,
+        "date_created":"2014-01-01T01:59:00.827Z",
+        "date_edited":"2014-01-01T01:59:00.827Z",
+        "object_id":51,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 14,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Also due on Monday are US industrial production statistics for October and the start of the Chicago Fed`s annual agriculture conference. - (by cmruser #2, on activity #53 of sales_cycle #60)",
+        "owner":2,
+        "date_created":"2014-01-01T01:24:00.827Z",
+        "date_edited":"2014-01-01T01:24:00.827Z",
+        "object_id":53,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 15,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"The Senate Banking panel`s Subcommittee on Financial Institutions and Consumer Protection will host the hearing. - (by cmruser #1, on activity #57 of sales_cycle #61)",
+        "owner":1,
+        "date_created":"2014-02-03T01:53:00.827Z",
+        "date_edited":"2014-02-03T01:53:00.827Z",
+        "object_id":57,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 16,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Tuesday brings the Los Angeles Auto Show, earnings from Home Depot and the expected $2 billion-plus initial public offering (IPO) of real estate investment trust Paramount Group. - (by cmruser #2, on activity #59 of sales_cycle #62)",
+        "owner":2,
+        "date_created":"2014-01-03T01:04:00.827Z",
+        "date_edited":"2014-01-03T01:04:00.827Z",
+        "object_id":59,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 17,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Tuesday brings the Los Angeles Auto Show, earnings from Home Depot and the expected $2 billion-plus initial public offering (IPO) of real estate investment trust Paramount Group. - (by cmruser #3, on activity #64 of sales_cycle #65)",
+        "owner":3,
+        "date_created":"2014-02-03T01:55:00.827Z",
+        "date_edited":"2014-02-03T01:55:00.827Z",
+        "object_id":64,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 18,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Also due on Monday are US industrial production statistics for October and the start of the Chicago Fed`s annual agriculture conference. - (by cmruser #1, on activity #71 of sales_cycle #71)",
+        "owner":1,
+        "date_created":"2014-01-01T01:44:00.827Z",
+        "date_edited":"2014-01-01T01:44:00.827Z",
+        "object_id":71,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 19,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"The Senate Banking panel`s Subcommittee on Financial Institutions and Consumer Protection will host the hearing. - (by cmruser #2, on activity #72 of sales_cycle #71)",
+        "owner":2,
+        "date_created":"2014-01-03T01:10:00.827Z",
+        "date_edited":"2014-01-03T01:10:00.827Z",
+        "object_id":72,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 20,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"The Senate Banking panel`s Subcommittee on Financial Institutions and Consumer Protection will host the hearing. - (by cmruser #3, on activity #74 of sales_cycle #72)",
+        "owner":3,
+        "date_created":"2014-01-03T01:35:00.827Z",
+        "date_edited":"2014-01-03T01:35:00.827Z",
+        "object_id":74,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 21,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Monday brings the delayed start of the Shanghai-Hong Kong exchange link, when cross-trading of shares on the two exchanges is due to start in a move that would open up China` $4.2 trillion stock market to foreigners - (by cmruser #1, on activity #76 of sales_cycle #73)",
+        "owner":1,
+        "date_created":"2014-01-03T01:46:00.827Z",
+        "date_edited":"2014-01-03T01:46:00.827Z",
+        "object_id":76,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 22,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Data on US housing starts for October will also be released. - (by cmruser #3, on activity #77 of sales_cycle #76)",
+        "owner":3,
+        "date_created":"2014-01-01T01:43:00.827Z",
+        "date_edited":"2014-01-01T01:43:00.827Z",
+        "object_id":77,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 23,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Monday brings the delayed start of the Shanghai-Hong Kong exchange link, when cross-trading of shares on the two exchanges is due to start in a move that would open up China` $4.2 trillion stock market to foreigners - (by cmruser #1, on activity #78 of sales_cycle #76)",
+        "owner":1,
+        "date_created":"2014-01-03T01:48:00.827Z",
+        "date_edited":"2014-01-03T01:48:00.827Z",
+        "object_id":78,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 24,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Also expected on Thursday are an update on existing home sales and earnings from Gap, BestBuy and Dollar Tree. - (by cmruser #1, on activity #79 of sales_cycle #78)",
+        "owner":1,
+        "date_created":"2014-01-01T01:54:00.827Z",
+        "date_edited":"2014-01-01T01:54:00.827Z",
+        "object_id":79,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 25,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"The Senate Banking panel`s Subcommittee on Financial Institutions and Consumer Protection will host the hearing. - (by cmruser #3, on activity #80 of sales_cycle #78)",
+        "owner":3,
+        "date_created":"2014-01-03T01:01:00.827Z",
+        "date_edited":"2014-01-03T01:01:00.827Z",
+        "object_id":80,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 26,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Friday brings a US Senate hearing on the New York Federal Reserve, which has been accused of being too cosy with the Wall Street banks it is supposed to regulate. - (by cmruser #1, on activity #84 of sales_cycle #80)",
+        "owner":1,
+        "date_created":"2014-02-03T01:38:00.827Z",
+        "date_edited":"2014-02-03T01:38:00.827Z",
+        "object_id":84,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 27,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Also due on Monday are US industrial production statistics for October and the start of the Chicago Fed`s annual agriculture conference. - (by cmruser #2, on activity #85 of sales_cycle #82)",
+        "owner":2,
+        "date_created":"2014-01-01T01:59:00.827Z",
+        "date_edited":"2014-01-01T01:59:00.827Z",
+        "object_id":85,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 28,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Tuesday brings the Los Angeles Auto Show, earnings from Home Depot and the expected $2 billion-plus initial public offering (IPO) of real estate investment trust Paramount Group. - (by cmruser #3, on activity #86 of sales_cycle #82)",
+        "owner":3,
+        "date_created":"2014-01-03T01:29:00.827Z",
+        "date_edited":"2014-01-03T01:29:00.827Z",
+        "object_id":86,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 29,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Friday brings a US Senate hearing on the New York Federal Reserve, which has been accused of being too cosy with the Wall Street banks it is supposed to regulate. - (by cmruser #2, on activity #89 of sales_cycle #88)",
+        "owner":2,
+        "date_created":"2014-02-01T01:20:00.827Z",
+        "date_edited":"2014-02-01T01:20:00.827Z",
+        "object_id":89,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 30,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Monday brings the delayed start of the Shanghai-Hong Kong exchange link, when cross-trading of shares on the two exchanges is due to start in a move that would open up China` $4.2 trillion stock market to foreigners - (by cmruser #2, on activity #96 of sales_cycle #94)",
+        "owner":2,
+        "date_created":"2014-02-01T01:46:00.827Z",
+        "date_edited":"2014-02-01T01:46:00.827Z",
+        "object_id":96,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 31,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Friday brings a US Senate hearing on the New York Federal Reserve, which has been accused of being too cosy with the Wall Street banks it is supposed to regulate. - (by cmruser #3, on activity #104 of sales_cycle #100)",
+        "owner":3,
+        "date_created":"2014-02-01T01:32:00.827Z",
+        "date_edited":"2014-02-01T01:32:00.827Z",
+        "object_id":104,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 32,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Friday brings a US Senate hearing on the New York Federal Reserve, which has been accused of being too cosy with the Wall Street banks it is supposed to regulate. - (by cmruser #3, on activity #109 of sales_cycle #102)",
+        "owner":3,
+        "date_created":"2014-02-03T01:05:00.827Z",
+        "date_edited":"2014-02-03T01:05:00.827Z",
+        "object_id":109,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 33,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"The Senate Banking panel`s Subcommittee on Financial Institutions and Consumer Protection will host the hearing. - (by cmruser #2, on activity #110 of sales_cycle #103)",
+        "owner":2,
+        "date_created":"2014-01-01T01:47:00.827Z",
+        "date_edited":"2014-01-01T01:47:00.827Z",
+        "object_id":110,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 34,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"The Senate Banking panel`s Subcommittee on Financial Institutions and Consumer Protection will host the hearing. - (by cmruser #1, on activity #111 of sales_cycle #103)",
+        "owner":1,
+        "date_created":"2014-01-03T01:57:00.827Z",
+        "date_edited":"2014-01-03T01:57:00.827Z",
+        "object_id":111,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 35,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Monday brings the delayed start of the Shanghai-Hong Kong exchange link, when cross-trading of shares on the two exchanges is due to start in a move that would open up China` $4.2 trillion stock market to foreigners - (by cmruser #3, on activity #117 of sales_cycle #106)",
+        "owner":3,
+        "date_created":"2014-01-03T01:34:00.827Z",
+        "date_edited":"2014-01-03T01:34:00.827Z",
+        "object_id":117,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 36,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Monday brings the delayed start of the Shanghai-Hong Kong exchange link, when cross-trading of shares on the two exchanges is due to start in a move that would open up China` $4.2 trillion stock market to foreigners - (by cmruser #3, on activity #119 of sales_cycle #110)",
+        "owner":3,
+        "date_created":"2014-02-03T01:19:00.827Z",
+        "date_edited":"2014-02-03T01:19:00.827Z",
+        "object_id":119,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 37,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"The Senate Banking panel`s Subcommittee on Financial Institutions and Consumer Protection will host the hearing. - (by cmruser #1, on activity #122 of sales_cycle #112)",
+        "owner":1,
+        "date_created":"2014-02-01T01:01:00.827Z",
+        "date_edited":"2014-02-01T01:01:00.827Z",
+        "object_id":122,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 38,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"The week also lifts the lid on the thinking of Federal Reserve. - (by cmruser #2, on activity #123 of sales_cycle #113)",
+        "owner":2,
+        "date_created":"2014-01-01T01:41:00.827Z",
+        "date_edited":"2014-01-01T01:41:00.827Z",
+        "object_id":123,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 39,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Tuesday brings the Los Angeles Auto Show, earnings from Home Depot and the expected $2 billion-plus initial public offering (IPO) of real estate investment trust Paramount Group. - (by cmruser #1, on activity #125 of sales_cycle #114)",
+        "owner":1,
+        "date_created":"2014-02-01T01:39:00.827Z",
+        "date_edited":"2014-02-01T01:39:00.827Z",
+        "object_id":125,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 40,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Data on US housing starts for October will also be released. - (by cmruser #1, on activity #126 of sales_cycle #115)",
+        "owner":1,
+        "date_created":"2014-01-01T01:09:00.827Z",
+        "date_edited":"2014-01-01T01:09:00.827Z",
+        "object_id":126,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 41,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Also expected on Thursday are an update on existing home sales and earnings from Gap, BestBuy and Dollar Tree. - (by cmruser #1, on activity #129 of sales_cycle #117)",
+        "owner":1,
+        "date_created":"2014-02-01T01:22:00.827Z",
+        "date_edited":"2014-02-01T01:22:00.827Z",
+        "object_id":129,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 42,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Tuesday brings the Los Angeles Auto Show, earnings from Home Depot and the expected $2 billion-plus initial public offering (IPO) of real estate investment trust Paramount Group. - (by cmruser #3, on activity #132 of sales_cycle #120)",
+        "owner":3,
+        "date_created":"2014-01-01T01:03:00.827Z",
+        "date_edited":"2014-01-01T01:03:00.827Z",
+        "object_id":132,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 43,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"The Senate Banking panel`s Subcommittee on Financial Institutions and Consumer Protection will host the hearing. - (by cmruser #3, on activity #136 of sales_cycle #125)",
+        "owner":3,
+        "date_created":"2014-01-01T01:32:00.827Z",
+        "date_edited":"2014-01-01T01:32:00.827Z",
+        "object_id":136,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 44,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"The week also lifts the lid on the thinking of Federal Reserve. - (by cmruser #2, on activity #137 of sales_cycle #128)",
+        "owner":2,
+        "date_created":"2014-01-01T01:23:00.827Z",
+        "date_edited":"2014-01-01T01:23:00.827Z",
+        "object_id":137,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 45,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Also expected on Thursday are an update on existing home sales and earnings from Gap, BestBuy and Dollar Tree. - (by cmruser #2, on activity #139 of sales_cycle #129)",
+        "owner":2,
+        "date_created":"2014-01-01T01:55:00.827Z",
+        "date_edited":"2014-01-01T01:55:00.827Z",
+        "object_id":139,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 46,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Monday brings the delayed start of the Shanghai-Hong Kong exchange link, when cross-trading of shares on the two exchanges is due to start in a move that would open up China` $4.2 trillion stock market to foreigners - (by cmruser #3, on activity #140 of sales_cycle #131)",
+        "owner":3,
+        "date_created":"2014-01-01T01:35:00.827Z",
+        "date_edited":"2014-01-01T01:35:00.827Z",
+        "object_id":140,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 47,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"The week also lifts the lid on the thinking of Federal Reserve. - (by cmruser #3, on activity #147 of sales_cycle #136)",
+        "owner":3,
+        "date_created":"2014-02-01T01:59:00.827Z",
+        "date_edited":"2014-02-01T01:59:00.827Z",
+        "object_id":147,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 48,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Tuesday brings the Los Angeles Auto Show, earnings from Home Depot and the expected $2 billion-plus initial public offering (IPO) of real estate investment trust Paramount Group. - (by cmruser #3, on activity #149 of sales_cycle #136)",
+        "owner":3,
+        "date_created":"2014-02-03T01:51:00.827Z",
+        "date_edited":"2014-02-03T01:51:00.827Z",
+        "object_id":149,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 49,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Monday brings the delayed start of the Shanghai-Hong Kong exchange link, when cross-trading of shares on the two exchanges is due to start in a move that would open up China` $4.2 trillion stock market to foreigners - (by cmruser #1, on activity #151 of sales_cycle #138)",
+        "owner":1,
+        "date_created":"2014-02-01T01:45:00.827Z",
+        "date_edited":"2014-02-01T01:45:00.827Z",
+        "object_id":151,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 50,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Tuesday brings the Los Angeles Auto Show, earnings from Home Depot and the expected $2 billion-plus initial public offering (IPO) of real estate investment trust Paramount Group. - (by cmruser #2, on activity #154 of sales_cycle #139)",
+        "owner":2,
+        "date_created":"2014-01-01T01:34:00.827Z",
+        "date_edited":"2014-01-01T01:34:00.827Z",
+        "object_id":154,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 51,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"The Senate Banking panel`s Subcommittee on Financial Institutions and Consumer Protection will host the hearing. - (by cmruser #3, on activity #156 of sales_cycle #140)",
+        "owner":3,
+        "date_created":"2014-01-03T01:19:00.827Z",
+        "date_edited":"2014-01-03T01:19:00.827Z",
+        "object_id":156,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 52,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Also expected on Thursday are an update on existing home sales and earnings from Gap, BestBuy and Dollar Tree. - (by cmruser #1, on activity #157 of sales_cycle #141)",
+        "owner":1,
+        "date_created":"2014-01-01T01:54:00.827Z",
+        "date_edited":"2014-01-01T01:54:00.827Z",
+        "object_id":157,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 53,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Friday brings a US Senate hearing on the New York Federal Reserve, which has been accused of being too cosy with the Wall Street banks it is supposed to regulate. - (by cmruser #3, on activity #158 of sales_cycle #142)",
+        "owner":3,
+        "date_created":"2014-01-01T01:49:00.827Z",
+        "date_edited":"2014-01-01T01:49:00.827Z",
+        "object_id":158,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 54,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"The week also lifts the lid on the thinking of Federal Reserve. - (by cmruser #2, on activity #162 of sales_cycle #147)",
+        "owner":2,
+        "date_created":"2014-01-01T01:43:00.827Z",
+        "date_edited":"2014-01-01T01:43:00.827Z",
+        "object_id":162,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 55,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"The Senate Banking panel`s Subcommittee on Financial Institutions and Consumer Protection will host the hearing. - (by cmruser #1, on activity #163 of sales_cycle #151)",
+        "owner":1,
+        "date_created":"2014-01-01T01:31:00.827Z",
+        "date_edited":"2014-01-01T01:31:00.827Z",
+        "object_id":163,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 56,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Tuesday brings the Los Angeles Auto Show, earnings from Home Depot and the expected $2 billion-plus initial public offering (IPO) of real estate investment trust Paramount Group. - (by cmruser #3, on activity #164 of sales_cycle #151)",
+        "owner":3,
+        "date_created":"2014-01-03T01:16:00.827Z",
+        "date_edited":"2014-01-03T01:16:00.827Z",
+        "object_id":164,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 57,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Also expected on Thursday are an update on existing home sales and earnings from Gap, BestBuy and Dollar Tree. - (by cmruser #1, on activity #165 of sales_cycle #154)",
+        "owner":1,
+        "date_created":"2014-01-01T01:39:00.827Z",
+        "date_edited":"2014-01-01T01:39:00.827Z",
+        "object_id":165,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 58,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"The Senate Banking panel`s Subcommittee on Financial Institutions and Consumer Protection will host the hearing. - (by cmruser #1, on activity #167 of sales_cycle #156)",
+        "owner":1,
+        "date_created":"2014-01-01T01:28:00.827Z",
+        "date_edited":"2014-01-01T01:28:00.827Z",
+        "object_id":167,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 59,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Friday brings a US Senate hearing on the New York Federal Reserve, which has been accused of being too cosy with the Wall Street banks it is supposed to regulate. - (by cmruser #2, on activity #168 of sales_cycle #156)",
+        "owner":2,
+        "date_created":"2014-01-03T01:24:00.827Z",
+        "date_edited":"2014-01-03T01:24:00.827Z",
+        "object_id":168,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 60,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Also due on Monday are US industrial production statistics for October and the start of the Chicago Fed`s annual agriculture conference. - (by cmruser #2, on activity #170 of sales_cycle #157)",
+        "owner":2,
+        "date_created":"2014-02-01T01:32:00.827Z",
+        "date_edited":"2014-02-01T01:32:00.827Z",
+        "object_id":170,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 61,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Also due on Monday are US industrial production statistics for October and the start of the Chicago Fed`s annual agriculture conference. - (by cmruser #1, on activity #171 of sales_cycle #158)",
+        "owner":1,
+        "date_created":"2014-01-01T01:19:00.827Z",
+        "date_edited":"2014-01-01T01:19:00.827Z",
+        "object_id":171,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 62,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Also due on Monday are US industrial production statistics for October and the start of the Chicago Fed`s annual agriculture conference. - (by cmruser #3, on activity #172 of sales_cycle #159)",
+        "owner":3,
+        "date_created":"2014-02-01T01:07:00.827Z",
+        "date_edited":"2014-02-01T01:07:00.827Z",
+        "object_id":172,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 63,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Also due on Monday are US industrial production statistics for October and the start of the Chicago Fed`s annual agriculture conference. - (by cmruser #2, on activity #177 of sales_cycle #163)",
+        "owner":2,
+        "date_created":"2014-01-01T01:17:00.827Z",
+        "date_edited":"2014-01-01T01:17:00.827Z",
+        "object_id":177,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 64,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Friday brings a US Senate hearing on the New York Federal Reserve, which has been accused of being too cosy with the Wall Street banks it is supposed to regulate. - (by cmruser #3, on activity #181 of sales_cycle #166)",
+        "owner":3,
+        "date_created":"2014-02-01T01:40:00.827Z",
+        "date_edited":"2014-02-01T01:40:00.827Z",
+        "object_id":181,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 65,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Also due on Monday are US industrial production statistics for October and the start of the Chicago Fed`s annual agriculture conference. - (by cmruser #2, on activity #185 of sales_cycle #168)",
+        "owner":2,
+        "date_created":"2014-02-03T01:39:00.827Z",
+        "date_edited":"2014-02-03T01:39:00.827Z",
+        "object_id":185,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 66,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Also due on Monday are US industrial production statistics for October and the start of the Chicago Fed`s annual agriculture conference. - (by cmruser #2, on activity #195 of sales_cycle #178)",
+        "owner":2,
+        "date_created":"2014-01-01T01:02:00.827Z",
+        "date_edited":"2014-01-01T01:02:00.827Z",
+        "object_id":195,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 67,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"The week also lifts the lid on the thinking of Federal Reserve. - (by cmruser #1, on activity #196 of sales_cycle #179)",
+        "owner":1,
+        "date_created":"2014-02-01T01:43:00.827Z",
+        "date_edited":"2014-02-01T01:43:00.827Z",
+        "object_id":196,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 68,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Also due on Monday are US industrial production statistics for October and the start of the Chicago Fed`s annual agriculture conference. - (by cmruser #2, on activity #198 of sales_cycle #182)",
+        "owner":2,
+        "date_created":"2014-01-03T01:10:00.827Z",
+        "date_edited":"2014-01-03T01:10:00.827Z",
+        "object_id":198,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 69,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Data on US housing starts for October will also be released. - (by cmruser #1, on activity #201 of sales_cycle #184)",
+        "owner":1,
+        "date_created":"2014-01-01T01:54:00.827Z",
+        "date_edited":"2014-01-01T01:54:00.827Z",
+        "object_id":201,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 70,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Also due on Monday are US industrial production statistics for October and the start of the Chicago Fed`s annual agriculture conference. - (by cmruser #1, on activity #204 of sales_cycle #186)",
+        "owner":1,
+        "date_created":"2014-01-03T01:06:00.827Z",
+        "date_edited":"2014-01-03T01:06:00.827Z",
+        "object_id":204,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 71,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Friday brings a US Senate hearing on the New York Federal Reserve, which has been accused of being too cosy with the Wall Street banks it is supposed to regulate. - (by cmruser #3, on activity #206 of sales_cycle #188)",
+        "owner":3,
+        "date_created":"2014-01-03T01:41:00.827Z",
+        "date_edited":"2014-01-03T01:41:00.827Z",
+        "object_id":206,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 72,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Also due on Monday are US industrial production statistics for October and the start of the Chicago Fed`s annual agriculture conference. - (by cmruser #2, on activity #212 of sales_cycle #190)",
+        "owner":2,
+        "date_created":"2014-02-03T01:07:00.827Z",
+        "date_edited":"2014-02-03T01:07:00.827Z",
+        "object_id":212,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 73,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"The week also lifts the lid on the thinking of Federal Reserve. - (by cmruser #3, on activity #213 of sales_cycle #192)",
+        "owner":3,
+        "date_created":"2014-01-01T01:19:00.827Z",
+        "date_edited":"2014-01-01T01:19:00.827Z",
+        "object_id":213,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 74,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Data on US housing starts for October will also be released. - (by cmruser #3, on activity #218 of sales_cycle #195)",
+        "owner":3,
+        "date_created":"2014-02-03T01:52:00.827Z",
+        "date_edited":"2014-02-03T01:52:00.827Z",
+        "object_id":218,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 75,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Tuesday brings the Los Angeles Auto Show, earnings from Home Depot and the expected $2 billion-plus initial public offering (IPO) of real estate investment trust Paramount Group. - (by cmruser #1, on activity #219 of sales_cycle #196)",
+        "owner":1,
+        "date_created":"2014-01-01T01:41:00.827Z",
+        "date_edited":"2014-01-01T01:41:00.827Z",
+        "object_id":219,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 76,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Also expected on Thursday are an update on existing home sales and earnings from Gap, BestBuy and Dollar Tree. - (by cmruser #1, on activity #222 of sales_cycle #199)",
+        "owner":1,
+        "date_created":"2014-01-01T01:31:00.827Z",
+        "date_edited":"2014-01-01T01:31:00.827Z",
+        "object_id":222,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 77,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Also expected on Thursday are an update on existing home sales and earnings from Gap, BestBuy and Dollar Tree. - (by cmruser #3, on activity #223 of sales_cycle #199)",
+        "owner":3,
+        "date_created":"2014-01-03T01:37:00.827Z",
+        "date_edited":"2014-01-03T01:37:00.827Z",
+        "object_id":223,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 78,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"The Senate Banking panel`s Subcommittee on Financial Institutions and Consumer Protection will host the hearing. - (by cmruser #2, on activity #224 of sales_cycle #200)",
+        "owner":2,
+        "date_created":"2014-02-01T01:18:00.827Z",
+        "date_edited":"2014-02-01T01:18:00.827Z",
+        "object_id":224,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 79,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Friday brings a US Senate hearing on the New York Federal Reserve, which has been accused of being too cosy with the Wall Street banks it is supposed to regulate. - (by cmruser #3, on activity #225 of sales_cycle #202)",
+        "owner":3,
+        "date_created":"2014-01-01T01:22:00.827Z",
+        "date_edited":"2014-01-01T01:22:00.827Z",
+        "object_id":225,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 80,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Tuesday brings the Los Angeles Auto Show, earnings from Home Depot and the expected $2 billion-plus initial public offering (IPO) of real estate investment trust Paramount Group. - (by cmruser #2, on activity #226 of sales_cycle #204)",
+        "owner":2,
+        "date_created":"2014-01-01T01:44:00.827Z",
+        "date_edited":"2014-01-01T01:44:00.827Z",
+        "object_id":226,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 81,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"The week also lifts the lid on the thinking of Federal Reserve. - (by cmruser #1, on activity #227 of sales_cycle #204)",
+        "owner":1,
+        "date_created":"2014-01-03T01:07:00.827Z",
+        "date_edited":"2014-01-03T01:07:00.827Z",
+        "object_id":227,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 82,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Also expected on Thursday are an update on existing home sales and earnings from Gap, BestBuy and Dollar Tree. - (by cmruser #3, on activity #234 of sales_cycle #212)",
+        "owner":3,
+        "date_created":"2014-02-01T01:04:00.827Z",
+        "date_edited":"2014-02-01T01:04:00.827Z",
+        "object_id":234,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 83,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"The week also lifts the lid on the thinking of Federal Reserve. - (by cmruser #3, on activity #236 of sales_cycle #219)",
+        "owner":3,
+        "date_created":"2014-02-01T01:20:00.827Z",
+        "date_edited":"2014-02-01T01:20:00.827Z",
+        "object_id":236,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 84,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"The Senate Banking panel`s Subcommittee on Financial Institutions and Consumer Protection will host the hearing. - (by cmruser #1, on activity #237 of sales_cycle #220)",
+        "owner":1,
+        "date_created":"2014-01-01T01:12:00.827Z",
+        "date_edited":"2014-01-01T01:12:00.827Z",
+        "object_id":237,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 85,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Friday brings a US Senate hearing on the New York Federal Reserve, which has been accused of being too cosy with the Wall Street banks it is supposed to regulate. - (by cmruser #1, on activity #240 of sales_cycle #223)",
+        "owner":1,
+        "date_created":"2014-01-01T01:30:00.827Z",
+        "date_edited":"2014-01-01T01:30:00.827Z",
+        "object_id":240,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 86,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Friday brings a US Senate hearing on the New York Federal Reserve, which has been accused of being too cosy with the Wall Street banks it is supposed to regulate. - (by cmruser #3, on activity #242 of sales_cycle #225)",
+        "owner":3,
+        "date_created":"2014-01-01T01:22:00.827Z",
+        "date_edited":"2014-01-01T01:22:00.827Z",
+        "object_id":242,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 87,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Monday brings the delayed start of the Shanghai-Hong Kong exchange link, when cross-trading of shares on the two exchanges is due to start in a move that would open up China` $4.2 trillion stock market to foreigners - (by cmruser #3, on activity #244 of sales_cycle #227)",
+        "owner":3,
+        "date_created":"2014-01-01T01:33:00.827Z",
+        "date_edited":"2014-01-01T01:33:00.827Z",
+        "object_id":244,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 88,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"The week also lifts the lid on the thinking of Federal Reserve. - (by cmruser #2, on activity #245 of sales_cycle #227)",
+        "owner":2,
+        "date_created":"2014-01-03T01:11:00.827Z",
+        "date_edited":"2014-01-03T01:11:00.827Z",
+        "object_id":245,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 1
+    }
+},
+{
+    "pk": 89,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Monday brings the delayed start of the Shanghai-Hong Kong exchange link, when cross-trading of shares on the two exchanges is due to start in a move that would open up China` $4.2 trillion stock market to foreigners - (by cmruser #4, on activity #248 of sales_cycle #232)",
+        "owner":4,
+        "date_created":"2014-02-01T01:19:00.827Z",
+        "date_edited":"2014-02-01T01:19:00.827Z",
+        "object_id":248,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 90,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Also expected on Thursday are an update on existing home sales and earnings from Gap, BestBuy and Dollar Tree. - (by cmruser #5, on activity #249 of sales_cycle #233)",
+        "owner":5,
+        "date_created":"2014-01-01T01:05:00.827Z",
+        "date_edited":"2014-01-01T01:05:00.827Z",
+        "object_id":249,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 91,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Data on US housing starts for October will also be released. - (by cmruser #5, on activity #250 of sales_cycle #235)",
+        "owner":5,
+        "date_created":"2014-01-01T01:46:00.827Z",
+        "date_edited":"2014-01-01T01:46:00.827Z",
+        "object_id":250,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 92,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Also expected on Thursday are an update on existing home sales and earnings from Gap, BestBuy and Dollar Tree. - (by cmruser #5, on activity #251 of sales_cycle #235)",
+        "owner":5,
+        "date_created":"2014-01-03T01:42:00.827Z",
+        "date_edited":"2014-01-03T01:42:00.827Z",
+        "object_id":251,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 93,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"The week also lifts the lid on the thinking of Federal Reserve. - (by cmruser #5, on activity #252 of sales_cycle #236)",
+        "owner":5,
+        "date_created":"2014-02-01T01:51:00.827Z",
+        "date_edited":"2014-02-01T01:51:00.827Z",
+        "object_id":252,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 94,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"The week also lifts the lid on the thinking of Federal Reserve. - (by cmruser #5, on activity #257 of sales_cycle #238)",
+        "owner":5,
+        "date_created":"2014-02-03T01:20:00.827Z",
+        "date_edited":"2014-02-03T01:20:00.827Z",
+        "object_id":257,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 95,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Also due on Monday are US industrial production statistics for October and the start of the Chicago Fed`s annual agriculture conference. - (by cmruser #5, on activity #260 of sales_cycle #246)",
+        "owner":5,
+        "date_created":"2014-01-01T01:11:00.827Z",
+        "date_edited":"2014-01-01T01:11:00.827Z",
+        "object_id":260,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 96,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"The week also lifts the lid on the thinking of Federal Reserve. - (by cmruser #4, on activity #261 of sales_cycle #246)",
+        "owner":4,
+        "date_created":"2014-01-03T01:28:00.827Z",
+        "date_edited":"2014-01-03T01:28:00.827Z",
+        "object_id":261,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 97,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"The week also lifts the lid on the thinking of Federal Reserve. - (by cmruser #5, on activity #263 of sales_cycle #248)",
+        "owner":5,
+        "date_created":"2014-01-01T01:48:00.827Z",
+        "date_edited":"2014-01-01T01:48:00.827Z",
+        "object_id":263,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 98,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"The Senate Banking panel`s Subcommittee on Financial Institutions and Consumer Protection will host the hearing. - (by cmruser #4, on activity #264 of sales_cycle #248)",
+        "owner":4,
+        "date_created":"2014-01-03T01:22:00.827Z",
+        "date_edited":"2014-01-03T01:22:00.827Z",
+        "object_id":264,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 99,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"The week also lifts the lid on the thinking of Federal Reserve. - (by cmruser #5, on activity #267 of sales_cycle #253)",
+        "owner":5,
+        "date_created":"2014-02-01T01:49:00.827Z",
+        "date_edited":"2014-02-01T01:49:00.827Z",
+        "object_id":267,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 100,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"The Senate Banking panel`s Subcommittee on Financial Institutions and Consumer Protection will host the hearing. - (by cmruser #5, on activity #270 of sales_cycle #255)",
+        "owner":5,
+        "date_created":"2014-02-01T01:33:00.827Z",
+        "date_edited":"2014-02-01T01:33:00.827Z",
+        "object_id":270,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 101,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Data on US housing starts for October will also be released. - (by cmruser #5, on activity #271 of sales_cycle #255)",
+        "owner":5,
+        "date_created":"2014-02-03T01:39:00.827Z",
+        "date_edited":"2014-02-03T01:39:00.827Z",
+        "object_id":271,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 102,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Monday brings the delayed start of the Shanghai-Hong Kong exchange link, when cross-trading of shares on the two exchanges is due to start in a move that would open up China` $4.2 trillion stock market to foreigners - (by cmruser #5, on activity #274 of sales_cycle #259)",
+        "owner":5,
+        "date_created":"2014-02-01T01:06:00.827Z",
+        "date_edited":"2014-02-01T01:06:00.827Z",
+        "object_id":274,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 103,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Monday brings the delayed start of the Shanghai-Hong Kong exchange link, when cross-trading of shares on the two exchanges is due to start in a move that would open up China` $4.2 trillion stock market to foreigners - (by cmruser #5, on activity #277 of sales_cycle #261)",
+        "owner":5,
+        "date_created":"2014-01-01T01:18:00.827Z",
+        "date_edited":"2014-01-01T01:18:00.827Z",
+        "object_id":277,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 104,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Also due on Monday are US industrial production statistics for October and the start of the Chicago Fed`s annual agriculture conference. - (by cmruser #5, on activity #278 of sales_cycle #261)",
+        "owner":5,
+        "date_created":"2014-01-03T01:24:00.827Z",
+        "date_edited":"2014-01-03T01:24:00.827Z",
+        "object_id":278,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 105,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Tuesday brings the Los Angeles Auto Show, earnings from Home Depot and the expected $2 billion-plus initial public offering (IPO) of real estate investment trust Paramount Group. - (by cmruser #4, on activity #279 of sales_cycle #262)",
+        "owner":4,
+        "date_created":"2014-01-01T01:05:00.827Z",
+        "date_edited":"2014-01-01T01:05:00.827Z",
+        "object_id":279,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 106,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Also expected on Thursday are an update on existing home sales and earnings from Gap, BestBuy and Dollar Tree. - (by cmruser #5, on activity #281 of sales_cycle #263)",
+        "owner":5,
+        "date_created":"2014-02-03T01:39:00.827Z",
+        "date_edited":"2014-02-03T01:39:00.827Z",
+        "object_id":281,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 107,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Data on US housing starts for October will also be released. - (by cmruser #5, on activity #283 of sales_cycle #264)",
+        "owner":5,
+        "date_created":"2014-01-03T01:37:00.827Z",
+        "date_edited":"2014-01-03T01:37:00.827Z",
+        "object_id":283,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 108,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Monday brings the delayed start of the Shanghai-Hong Kong exchange link, when cross-trading of shares on the two exchanges is due to start in a move that would open up China` $4.2 trillion stock market to foreigners - (by cmruser #4, on activity #289 of sales_cycle #271)",
+        "owner":4,
+        "date_created":"2014-02-01T01:56:00.827Z",
+        "date_edited":"2014-02-01T01:56:00.827Z",
+        "object_id":289,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 109,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Friday brings a US Senate hearing on the New York Federal Reserve, which has been accused of being too cosy with the Wall Street banks it is supposed to regulate. - (by cmruser #5, on activity #294 of sales_cycle #273)",
+        "owner":5,
+        "date_created":"2014-02-03T01:19:00.827Z",
+        "date_edited":"2014-02-03T01:19:00.827Z",
+        "object_id":294,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 110,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Also expected on Thursday are an update on existing home sales and earnings from Gap, BestBuy and Dollar Tree. - (by cmruser #5, on activity #295 of sales_cycle #274)",
+        "owner":5,
+        "date_created":"2014-01-01T01:19:00.827Z",
+        "date_edited":"2014-01-01T01:19:00.827Z",
+        "object_id":295,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 111,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Friday brings a US Senate hearing on the New York Federal Reserve, which has been accused of being too cosy with the Wall Street banks it is supposed to regulate. - (by cmruser #5, on activity #296 of sales_cycle #274)",
+        "owner":5,
+        "date_created":"2014-01-03T01:39:00.827Z",
+        "date_edited":"2014-01-03T01:39:00.827Z",
+        "object_id":296,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 112,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Friday brings a US Senate hearing on the New York Federal Reserve, which has been accused of being too cosy with the Wall Street banks it is supposed to regulate. - (by cmruser #5, on activity #298 of sales_cycle #275)",
+        "owner":5,
+        "date_created":"2014-02-01T01:48:00.827Z",
+        "date_edited":"2014-02-01T01:48:00.827Z",
+        "object_id":298,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 113,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Data on US housing starts for October will also be released. - (by cmruser #4, on activity #300 of sales_cycle #275)",
+        "owner":4,
+        "date_created":"2014-02-03T01:21:00.827Z",
+        "date_edited":"2014-02-03T01:21:00.827Z",
+        "object_id":300,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 114,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Also expected on Thursday are an update on existing home sales and earnings from Gap, BestBuy and Dollar Tree. - (by cmruser #4, on activity #301 of sales_cycle #277)",
+        "owner":4,
+        "date_created":"2014-01-01T01:19:00.827Z",
+        "date_edited":"2014-01-01T01:19:00.827Z",
+        "object_id":301,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 115,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Data on US housing starts for October will also be released. - (by cmruser #4, on activity #302 of sales_cycle #277)",
+        "owner":4,
+        "date_created":"2014-01-03T01:17:00.827Z",
+        "date_edited":"2014-01-03T01:17:00.827Z",
+        "object_id":302,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 116,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Tuesday brings the Los Angeles Auto Show, earnings from Home Depot and the expected $2 billion-plus initial public offering (IPO) of real estate investment trust Paramount Group. - (by cmruser #4, on activity #304 of sales_cycle #278)",
+        "owner":4,
+        "date_created":"2014-02-01T01:39:00.827Z",
+        "date_edited":"2014-02-01T01:39:00.827Z",
+        "object_id":304,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 117,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Also expected on Thursday are an update on existing home sales and earnings from Gap, BestBuy and Dollar Tree. - (by cmruser #5, on activity #306 of sales_cycle #278)",
+        "owner":5,
+        "date_created":"2014-02-03T01:53:00.827Z",
+        "date_edited":"2014-02-03T01:53:00.827Z",
+        "object_id":306,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 118,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Tuesday brings the Los Angeles Auto Show, earnings from Home Depot and the expected $2 billion-plus initial public offering (IPO) of real estate investment trust Paramount Group. - (by cmruser #5, on activity #308 of sales_cycle #279)",
+        "owner":5,
+        "date_created":"2014-01-03T01:45:00.827Z",
+        "date_edited":"2014-01-03T01:45:00.827Z",
+        "object_id":308,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 119,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Data on US housing starts for October will also be released. - (by cmruser #5, on activity #310 of sales_cycle #281)",
+        "owner":5,
+        "date_created":"2014-02-01T01:49:00.827Z",
+        "date_edited":"2014-02-01T01:49:00.827Z",
+        "object_id":310,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 120,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Also due on Monday are US industrial production statistics for October and the start of the Chicago Fed`s annual agriculture conference. - (by cmruser #4, on activity #311 of sales_cycle #281)",
+        "owner":4,
+        "date_created":"2014-02-03T01:25:00.827Z",
+        "date_edited":"2014-02-03T01:25:00.827Z",
+        "object_id":311,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 121,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Data on US housing starts for October will also be released. - (by cmruser #5, on activity #312 of sales_cycle #282)",
+        "owner":5,
+        "date_created":"2014-01-01T01:10:00.827Z",
+        "date_edited":"2014-01-01T01:10:00.827Z",
+        "object_id":312,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 122,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Tuesday brings the Los Angeles Auto Show, earnings from Home Depot and the expected $2 billion-plus initial public offering (IPO) of real estate investment trust Paramount Group. - (by cmruser #4, on activity #315 of sales_cycle #283)",
+        "owner":4,
+        "date_created":"2014-01-03T01:38:00.827Z",
+        "date_edited":"2014-01-03T01:38:00.827Z",
+        "object_id":315,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 123,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Friday brings a US Senate hearing on the New York Federal Reserve, which has been accused of being too cosy with the Wall Street banks it is supposed to regulate. - (by cmruser #4, on activity #316 of sales_cycle #284)",
+        "owner":4,
+        "date_created":"2014-01-01T01:14:00.827Z",
+        "date_edited":"2014-01-01T01:14:00.827Z",
+        "object_id":316,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 124,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Friday brings a US Senate hearing on the New York Federal Reserve, which has been accused of being too cosy with the Wall Street banks it is supposed to regulate. - (by cmruser #4, on activity #317 of sales_cycle #284)",
+        "owner":4,
+        "date_created":"2014-01-03T01:17:00.827Z",
+        "date_edited":"2014-01-03T01:17:00.827Z",
+        "object_id":317,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 125,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"The week also lifts the lid on the thinking of Federal Reserve. - (by cmruser #4, on activity #318 of sales_cycle #285)",
+        "owner":4,
+        "date_created":"2014-01-01T01:58:00.827Z",
+        "date_edited":"2014-01-01T01:58:00.827Z",
+        "object_id":318,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 126,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Friday brings a US Senate hearing on the New York Federal Reserve, which has been accused of being too cosy with the Wall Street banks it is supposed to regulate. - (by cmruser #5, on activity #319 of sales_cycle #285)",
+        "owner":5,
+        "date_created":"2014-01-03T01:29:00.827Z",
+        "date_edited":"2014-01-03T01:29:00.827Z",
+        "object_id":319,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 127,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Monday brings the delayed start of the Shanghai-Hong Kong exchange link, when cross-trading of shares on the two exchanges is due to start in a move that would open up China` $4.2 trillion stock market to foreigners - (by cmruser #5, on activity #320 of sales_cycle #288)",
+        "owner":5,
+        "date_created":"2014-02-01T01:02:00.827Z",
+        "date_edited":"2014-02-01T01:02:00.827Z",
+        "object_id":320,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 128,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Tuesday brings the Los Angeles Auto Show, earnings from Home Depot and the expected $2 billion-plus initial public offering (IPO) of real estate investment trust Paramount Group. - (by cmruser #4, on activity #323 of sales_cycle #292)",
+        "owner":4,
+        "date_created":"2014-01-03T01:35:00.827Z",
+        "date_edited":"2014-01-03T01:35:00.827Z",
+        "object_id":323,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 129,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Friday brings a US Senate hearing on the New York Federal Reserve, which has been accused of being too cosy with the Wall Street banks it is supposed to regulate. - (by cmruser #4, on activity #325 of sales_cycle #293)",
+        "owner":4,
+        "date_created":"2014-02-01T01:36:00.827Z",
+        "date_edited":"2014-02-01T01:36:00.827Z",
+        "object_id":325,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 130,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Also expected on Thursday are an update on existing home sales and earnings from Gap, BestBuy and Dollar Tree. - (by cmruser #4, on activity #327 of sales_cycle #293)",
+        "owner":4,
+        "date_created":"2014-02-03T01:42:00.827Z",
+        "date_edited":"2014-02-03T01:42:00.827Z",
+        "object_id":327,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 131,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"The week also lifts the lid on the thinking of Federal Reserve. - (by cmruser #5, on activity #328 of sales_cycle #294)",
+        "owner":5,
+        "date_created":"2014-01-01T01:44:00.827Z",
+        "date_edited":"2014-01-01T01:44:00.827Z",
+        "object_id":328,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 132,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Monday brings the delayed start of the Shanghai-Hong Kong exchange link, when cross-trading of shares on the two exchanges is due to start in a move that would open up China` $4.2 trillion stock market to foreigners - (by cmruser #4, on activity #329 of sales_cycle #294)",
+        "owner":4,
+        "date_created":"2014-01-03T01:26:00.827Z",
+        "date_edited":"2014-01-03T01:26:00.827Z",
+        "object_id":329,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 133,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"The week also lifts the lid on the thinking of Federal Reserve. - (by cmruser #5, on activity #331 of sales_cycle #295)",
+        "owner":5,
+        "date_created":"2014-02-01T01:45:00.827Z",
+        "date_edited":"2014-02-01T01:45:00.827Z",
+        "object_id":331,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 134,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Tuesday brings the Los Angeles Auto Show, earnings from Home Depot and the expected $2 billion-plus initial public offering (IPO) of real estate investment trust Paramount Group. - (by cmruser #4, on activity #332 of sales_cycle #296)",
+        "owner":4,
+        "date_created":"2014-01-01T01:45:00.827Z",
+        "date_edited":"2014-01-01T01:45:00.827Z",
+        "object_id":332,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 135,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Monday brings the delayed start of the Shanghai-Hong Kong exchange link, when cross-trading of shares on the two exchanges is due to start in a move that would open up China` $4.2 trillion stock market to foreigners - (by cmruser #5, on activity #334 of sales_cycle #299)",
+        "owner":5,
+        "date_created":"2014-02-01T01:34:00.827Z",
+        "date_edited":"2014-02-01T01:34:00.827Z",
+        "object_id":334,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 136,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"The week also lifts the lid on the thinking of Federal Reserve. - (by cmruser #5, on activity #336 of sales_cycle #300)",
+        "owner":5,
+        "date_created":"2014-01-01T01:14:00.827Z",
+        "date_edited":"2014-01-01T01:14:00.827Z",
+        "object_id":336,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 137,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Also due on Monday are US industrial production statistics for October and the start of the Chicago Fed`s annual agriculture conference. - (by cmruser #4, on activity #338 of sales_cycle #301)",
+        "owner":4,
+        "date_created":"2014-02-01T01:48:00.827Z",
+        "date_edited":"2014-02-01T01:48:00.827Z",
+        "object_id":338,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 138,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Friday brings a US Senate hearing on the New York Federal Reserve, which has been accused of being too cosy with the Wall Street banks it is supposed to regulate. - (by cmruser #4, on activity #341 of sales_cycle #302)",
+        "owner":4,
+        "date_created":"2014-01-01T01:03:00.827Z",
+        "date_edited":"2014-01-01T01:03:00.827Z",
+        "object_id":341,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 139,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Friday brings a US Senate hearing on the New York Federal Reserve, which has been accused of being too cosy with the Wall Street banks it is supposed to regulate. - (by cmruser #5, on activity #342 of sales_cycle #306)",
+        "owner":5,
+        "date_created":"2014-02-01T01:23:00.827Z",
+        "date_edited":"2014-02-01T01:23:00.827Z",
+        "object_id":342,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 140,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"The Senate Banking panel`s Subcommittee on Financial Institutions and Consumer Protection will host the hearing. - (by cmruser #4, on activity #344 of sales_cycle #309)",
+        "owner":4,
+        "date_created":"2014-01-01T01:45:00.827Z",
+        "date_edited":"2014-01-01T01:45:00.827Z",
+        "object_id":344,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 141,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Also expected on Thursday are an update on existing home sales and earnings from Gap, BestBuy and Dollar Tree. - (by cmruser #5, on activity #345 of sales_cycle #309)",
+        "owner":5,
+        "date_created":"2014-01-03T01:12:00.827Z",
+        "date_edited":"2014-01-03T01:12:00.827Z",
+        "object_id":345,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 142,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Tuesday brings the Los Angeles Auto Show, earnings from Home Depot and the expected $2 billion-plus initial public offering (IPO) of real estate investment trust Paramount Group. - (by cmruser #4, on activity #346 of sales_cycle #311)",
+        "owner":4,
+        "date_created":"2014-02-01T01:22:00.827Z",
+        "date_edited":"2014-02-01T01:22:00.827Z",
+        "object_id":346,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 143,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Tuesday brings the Los Angeles Auto Show, earnings from Home Depot and the expected $2 billion-plus initial public offering (IPO) of real estate investment trust Paramount Group. - (by cmruser #4, on activity #350 of sales_cycle #314)",
+        "owner":4,
+        "date_created":"2014-02-01T01:15:00.827Z",
+        "date_edited":"2014-02-01T01:15:00.827Z",
+        "object_id":350,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 144,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"The Senate Banking panel`s Subcommittee on Financial Institutions and Consumer Protection will host the hearing. - (by cmruser #4, on activity #356 of sales_cycle #317)",
+        "owner":4,
+        "date_created":"2014-01-03T01:26:00.827Z",
+        "date_edited":"2014-01-03T01:26:00.827Z",
+        "object_id":356,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 145,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Also expected on Thursday are an update on existing home sales and earnings from Gap, BestBuy and Dollar Tree. - (by cmruser #4, on activity #359 of sales_cycle #319)",
+        "owner":4,
+        "date_created":"2014-02-01T01:03:00.827Z",
+        "date_edited":"2014-02-01T01:03:00.827Z",
+        "object_id":359,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 146,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Also due on Monday are US industrial production statistics for October and the start of the Chicago Fed`s annual agriculture conference. - (by cmruser #4, on activity #362 of sales_cycle #321)",
+        "owner":4,
+        "date_created":"2014-01-01T01:55:00.827Z",
+        "date_edited":"2014-01-01T01:55:00.827Z",
+        "object_id":362,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 147,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Data on US housing starts for October will also be released. - (by cmruser #4, on activity #363 of sales_cycle #321)",
+        "owner":4,
+        "date_created":"2014-01-03T01:36:00.827Z",
+        "date_edited":"2014-01-03T01:36:00.827Z",
+        "object_id":363,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 148,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Data on US housing starts for October will also be released. - (by cmruser #5, on activity #365 of sales_cycle #324)",
+        "owner":5,
+        "date_created":"2014-02-03T01:28:00.827Z",
+        "date_edited":"2014-02-03T01:28:00.827Z",
+        "object_id":365,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 149,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Monday brings the delayed start of the Shanghai-Hong Kong exchange link, when cross-trading of shares on the two exchanges is due to start in a move that would open up China` $4.2 trillion stock market to foreigners - (by cmruser #4, on activity #366 of sales_cycle #325)",
+        "owner":4,
+        "date_created":"2014-01-01T01:47:00.827Z",
+        "date_edited":"2014-01-01T01:47:00.827Z",
+        "object_id":366,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 150,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"The week also lifts the lid on the thinking of Federal Reserve. - (by cmruser #4, on activity #367 of sales_cycle #325)",
+        "owner":4,
+        "date_created":"2014-01-03T01:48:00.827Z",
+        "date_edited":"2014-01-03T01:48:00.827Z",
+        "object_id":367,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 151,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"The Senate Banking panel`s Subcommittee on Financial Institutions and Consumer Protection will host the hearing. - (by cmruser #5, on activity #368 of sales_cycle #327)",
+        "owner":5,
+        "date_created":"2014-01-01T01:48:00.827Z",
+        "date_edited":"2014-01-01T01:48:00.827Z",
+        "object_id":368,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 152,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Tuesday brings the Los Angeles Auto Show, earnings from Home Depot and the expected $2 billion-plus initial public offering (IPO) of real estate investment trust Paramount Group. - (by cmruser #4, on activity #370 of sales_cycle #328)",
+        "owner":4,
+        "date_created":"2014-01-01T01:50:00.827Z",
+        "date_edited":"2014-01-01T01:50:00.827Z",
+        "object_id":370,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 153,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Friday brings a US Senate hearing on the New York Federal Reserve, which has been accused of being too cosy with the Wall Street banks it is supposed to regulate. - (by cmruser #4, on activity #371 of sales_cycle #328)",
+        "owner":4,
+        "date_created":"2014-01-03T01:06:00.827Z",
+        "date_edited":"2014-01-03T01:06:00.827Z",
+        "object_id":371,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 154,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Friday brings a US Senate hearing on the New York Federal Reserve, which has been accused of being too cosy with the Wall Street banks it is supposed to regulate. - (by cmruser #4, on activity #374 of sales_cycle #332)",
+        "owner":4,
+        "date_created":"2014-01-01T01:42:00.827Z",
+        "date_edited":"2014-01-01T01:42:00.827Z",
+        "object_id":374,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 155,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Monday brings the delayed start of the Shanghai-Hong Kong exchange link, when cross-trading of shares on the two exchanges is due to start in a move that would open up China` $4.2 trillion stock market to foreigners - (by cmruser #4, on activity #377 of sales_cycle #335)",
+        "owner":4,
+        "date_created":"2014-02-01T01:17:00.827Z",
+        "date_edited":"2014-02-01T01:17:00.827Z",
+        "object_id":377,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 156,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Tuesday brings the Los Angeles Auto Show, earnings from Home Depot and the expected $2 billion-plus initial public offering (IPO) of real estate investment trust Paramount Group. - (by cmruser #4, on activity #380 of sales_cycle #338)",
+        "owner":4,
+        "date_created":"2014-02-01T01:59:00.827Z",
+        "date_edited":"2014-02-01T01:59:00.827Z",
+        "object_id":380,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 157,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"The Senate Banking panel`s Subcommittee on Financial Institutions and Consumer Protection will host the hearing. - (by cmruser #4, on activity #382 of sales_cycle #340)",
+        "owner":4,
+        "date_created":"2014-01-01T01:10:00.827Z",
+        "date_edited":"2014-01-01T01:10:00.827Z",
+        "object_id":382,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 158,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"The Senate Banking panel`s Subcommittee on Financial Institutions and Consumer Protection will host the hearing. - (by cmruser #5, on activity #383 of sales_cycle #340)",
+        "owner":5,
+        "date_created":"2014-01-03T01:28:00.827Z",
+        "date_edited":"2014-01-03T01:28:00.827Z",
+        "object_id":383,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 159,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"The Senate Banking panel`s Subcommittee on Financial Institutions and Consumer Protection will host the hearing. - (by cmruser #4, on activity #384 of sales_cycle #343)",
+        "owner":4,
+        "date_created":"2014-02-01T01:04:00.827Z",
+        "date_edited":"2014-02-01T01:04:00.827Z",
+        "object_id":384,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 160,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"The Senate Banking panel`s Subcommittee on Financial Institutions and Consumer Protection will host the hearing. - (by cmruser #5, on activity #388 of sales_cycle #346)",
+        "owner":5,
+        "date_created":"2014-02-01T01:01:00.827Z",
+        "date_edited":"2014-02-01T01:01:00.827Z",
+        "object_id":388,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 161,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Tuesday brings the Los Angeles Auto Show, earnings from Home Depot and the expected $2 billion-plus initial public offering (IPO) of real estate investment trust Paramount Group. - (by cmruser #4, on activity #390 of sales_cycle #346)",
+        "owner":4,
+        "date_created":"2014-02-03T01:56:00.827Z",
+        "date_edited":"2014-02-03T01:56:00.827Z",
+        "object_id":390,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 162,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Also expected on Thursday are an update on existing home sales and earnings from Gap, BestBuy and Dollar Tree. - (by cmruser #5, on activity #392 of sales_cycle #347)",
+        "owner":5,
+        "date_created":"2014-01-03T01:52:00.827Z",
+        "date_edited":"2014-01-03T01:52:00.827Z",
+        "object_id":392,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 163,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"The Senate Banking panel`s Subcommittee on Financial Institutions and Consumer Protection will host the hearing. - (by cmruser #4, on activity #395 of sales_cycle #352)",
+        "owner":4,
+        "date_created":"2014-02-01T01:48:00.827Z",
+        "date_edited":"2014-02-01T01:48:00.827Z",
+        "object_id":395,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 164,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"The week also lifts the lid on the thinking of Federal Reserve. - (by cmruser #5, on activity #397 of sales_cycle #356)",
+        "owner":5,
+        "date_created":"2014-01-01T01:45:00.827Z",
+        "date_edited":"2014-01-01T01:45:00.827Z",
+        "object_id":397,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 165,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Data on US housing starts for October will also be released. - (by cmruser #4, on activity #398 of sales_cycle #357)",
+        "owner":4,
+        "date_created":"2014-01-01T01:31:00.827Z",
+        "date_edited":"2014-01-01T01:31:00.827Z",
+        "object_id":398,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 166,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Monday brings the delayed start of the Shanghai-Hong Kong exchange link, when cross-trading of shares on the two exchanges is due to start in a move that would open up China` $4.2 trillion stock market to foreigners - (by cmruser #5, on activity #403 of sales_cycle #359)",
+        "owner":5,
+        "date_created":"2014-02-03T01:31:00.827Z",
+        "date_edited":"2014-02-03T01:31:00.827Z",
+        "object_id":403,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 167,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Also due on Monday are US industrial production statistics for October and the start of the Chicago Fed`s annual agriculture conference. - (by cmruser #4, on activity #404 of sales_cycle #360)",
+        "owner":4,
+        "date_created":"2014-01-01T01:47:00.827Z",
+        "date_edited":"2014-01-01T01:47:00.827Z",
+        "object_id":404,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 168,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Monday brings the delayed start of the Shanghai-Hong Kong exchange link, when cross-trading of shares on the two exchanges is due to start in a move that would open up China` $4.2 trillion stock market to foreigners - (by cmruser #4, on activity #410 of sales_cycle #363)",
+        "owner":4,
+        "date_created":"2014-02-03T01:40:00.827Z",
+        "date_edited":"2014-02-03T01:40:00.827Z",
+        "object_id":410,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 169,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Monday brings the delayed start of the Shanghai-Hong Kong exchange link, when cross-trading of shares on the two exchanges is due to start in a move that would open up China` $4.2 trillion stock market to foreigners - (by cmruser #5, on activity #412 of sales_cycle #366)",
+        "owner":5,
+        "date_created":"2014-02-01T01:08:00.827Z",
+        "date_edited":"2014-02-01T01:08:00.827Z",
+        "object_id":412,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 170,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Tuesday brings the Los Angeles Auto Show, earnings from Home Depot and the expected $2 billion-plus initial public offering (IPO) of real estate investment trust Paramount Group. - (by cmruser #5, on activity #415 of sales_cycle #368)",
+        "owner":5,
+        "date_created":"2014-02-01T01:30:00.827Z",
+        "date_edited":"2014-02-01T01:30:00.827Z",
+        "object_id":415,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 171,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"The week also lifts the lid on the thinking of Federal Reserve. - (by cmruser #5, on activity #417 of sales_cycle #368)",
+        "owner":5,
+        "date_created":"2014-02-03T01:23:00.827Z",
+        "date_edited":"2014-02-03T01:23:00.827Z",
+        "object_id":417,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 172,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Also due on Monday are US industrial production statistics for October and the start of the Chicago Fed`s annual agriculture conference. - (by cmruser #4, on activity #421 of sales_cycle #370)",
+        "owner":4,
+        "date_created":"2014-02-03T01:35:00.827Z",
+        "date_edited":"2014-02-03T01:35:00.827Z",
+        "object_id":421,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 173,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"The week also lifts the lid on the thinking of Federal Reserve. - (by cmruser #5, on activity #424 of sales_cycle #373)",
+        "owner":5,
+        "date_created":"2014-02-01T01:39:00.827Z",
+        "date_edited":"2014-02-01T01:39:00.827Z",
+        "object_id":424,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 174,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"The Senate Banking panel`s Subcommittee on Financial Institutions and Consumer Protection will host the hearing. - (by cmruser #4, on activity #429 of sales_cycle #377)",
+        "owner":4,
+        "date_created":"2014-02-01T01:42:00.827Z",
+        "date_edited":"2014-02-01T01:42:00.827Z",
+        "object_id":429,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 175,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"The week also lifts the lid on the thinking of Federal Reserve. - (by cmruser #5, on activity #431 of sales_cycle #377)",
+        "owner":5,
+        "date_created":"2014-02-03T01:57:00.827Z",
+        "date_edited":"2014-02-03T01:57:00.827Z",
+        "object_id":431,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 176,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"The Senate Banking panel`s Subcommittee on Financial Institutions and Consumer Protection will host the hearing. - (by cmruser #4, on activity #432 of sales_cycle #378)",
+        "owner":4,
+        "date_created":"2014-01-01T01:48:00.827Z",
+        "date_edited":"2014-01-01T01:48:00.827Z",
+        "object_id":432,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 177,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"The week also lifts the lid on the thinking of Federal Reserve. - (by cmruser #4, on activity #437 of sales_cycle #379)",
+        "owner":4,
+        "date_created":"2014-02-03T01:05:00.827Z",
+        "date_edited":"2014-02-03T01:05:00.827Z",
+        "object_id":437,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 178,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Data on US housing starts for October will also be released. - (by cmruser #5, on activity #440 of sales_cycle #381)",
+        "owner":5,
+        "date_created":"2014-02-01T01:43:00.827Z",
+        "date_edited":"2014-02-01T01:43:00.827Z",
+        "object_id":440,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 179,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Also expected on Thursday are an update on existing home sales and earnings from Gap, BestBuy and Dollar Tree. - (by cmruser #4, on activity #442 of sales_cycle #383)",
+        "owner":4,
+        "date_created":"2014-02-01T01:36:00.827Z",
+        "date_edited":"2014-02-01T01:36:00.827Z",
+        "object_id":442,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 180,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Monday brings the delayed start of the Shanghai-Hong Kong exchange link, when cross-trading of shares on the two exchanges is due to start in a move that would open up China` $4.2 trillion stock market to foreigners - (by cmruser #4, on activity #443 of sales_cycle #384)",
+        "owner":4,
+        "date_created":"2014-01-01T01:36:00.827Z",
+        "date_edited":"2014-01-01T01:36:00.827Z",
+        "object_id":443,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 181,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Monday brings the delayed start of the Shanghai-Hong Kong exchange link, when cross-trading of shares on the two exchanges is due to start in a move that would open up China` $4.2 trillion stock market to foreigners - (by cmruser #4, on activity #444 of sales_cycle #384)",
+        "owner":4,
+        "date_created":"2014-01-03T01:19:00.827Z",
+        "date_edited":"2014-01-03T01:19:00.827Z",
+        "object_id":444,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 182,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Also due on Monday are US industrial production statistics for October and the start of the Chicago Fed`s annual agriculture conference. - (by cmruser #4, on activity #448 of sales_cycle #391)",
+        "owner":4,
+        "date_created":"2014-01-03T01:43:00.827Z",
+        "date_edited":"2014-01-03T01:43:00.827Z",
+        "object_id":448,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 183,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Tuesday brings the Los Angeles Auto Show, earnings from Home Depot and the expected $2 billion-plus initial public offering (IPO) of real estate investment trust Paramount Group. - (by cmruser #4, on activity #451 of sales_cycle #393)",
+        "owner":4,
+        "date_created":"2014-01-01T01:59:00.827Z",
+        "date_edited":"2014-01-01T01:59:00.827Z",
+        "object_id":451,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 184,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"The Senate Banking panel`s Subcommittee on Financial Institutions and Consumer Protection will host the hearing. - (by cmruser #4, on activity #456 of sales_cycle #398)",
+        "owner":4,
+        "date_created":"2014-02-03T01:06:00.827Z",
+        "date_edited":"2014-02-03T01:06:00.827Z",
+        "object_id":456,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 185,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"The Senate Banking panel`s Subcommittee on Financial Institutions and Consumer Protection will host the hearing. - (by cmruser #5, on activity #458 of sales_cycle #399)",
+        "owner":5,
+        "date_created":"2014-01-03T01:12:00.827Z",
+        "date_edited":"2014-01-03T01:12:00.827Z",
+        "object_id":458,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 186,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Friday brings a US Senate hearing on the New York Federal Reserve, which has been accused of being too cosy with the Wall Street banks it is supposed to regulate. - (by cmruser #4, on activity #461 of sales_cycle #402)",
+        "owner":4,
+        "date_created":"2014-02-01T01:05:00.827Z",
+        "date_edited":"2014-02-01T01:05:00.827Z",
+        "object_id":461,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 187,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Data on US housing starts for October will also be released. - (by cmruser #5, on activity #464 of sales_cycle #407)",
+        "owner":5,
+        "date_created":"2014-02-01T01:08:00.827Z",
+        "date_edited":"2014-02-01T01:08:00.827Z",
+        "object_id":464,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 188,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Data on US housing starts for October will also be released. - (by cmruser #4, on activity #469 of sales_cycle #409)",
+        "owner":4,
+        "date_created":"2014-02-01T01:19:00.827Z",
+        "date_edited":"2014-02-01T01:19:00.827Z",
+        "object_id":469,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 189,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Tuesday brings the Los Angeles Auto Show, earnings from Home Depot and the expected $2 billion-plus initial public offering (IPO) of real estate investment trust Paramount Group. - (by cmruser #4, on activity #474 of sales_cycle #414)",
+        "owner":4,
+        "date_created":"2014-02-01T01:01:00.827Z",
+        "date_edited":"2014-02-01T01:01:00.827Z",
+        "object_id":474,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 190,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"The week also lifts the lid on the thinking of Federal Reserve. - (by cmruser #4, on activity #479 of sales_cycle #419)",
+        "owner":4,
+        "date_created":"2014-01-01T01:11:00.827Z",
+        "date_edited":"2014-01-01T01:11:00.827Z",
+        "object_id":479,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 191,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Monday brings the delayed start of the Shanghai-Hong Kong exchange link, when cross-trading of shares on the two exchanges is due to start in a move that would open up China` $4.2 trillion stock market to foreigners - (by cmruser #4, on activity #482 of sales_cycle #423)",
+        "owner":4,
+        "date_created":"2014-02-01T01:41:00.827Z",
+        "date_edited":"2014-02-01T01:41:00.827Z",
+        "object_id":482,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 192,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Friday brings a US Senate hearing on the New York Federal Reserve, which has been accused of being too cosy with the Wall Street banks it is supposed to regulate. - (by cmruser #5, on activity #485 of sales_cycle #428)",
+        "owner":5,
+        "date_created":"2014-02-01T01:53:00.827Z",
+        "date_edited":"2014-02-01T01:53:00.827Z",
+        "object_id":485,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 193,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"The week also lifts the lid on the thinking of Federal Reserve. - (by cmruser #4, on activity #488 of sales_cycle #432)",
+        "owner":4,
+        "date_created":"2014-02-01T01:29:00.827Z",
+        "date_edited":"2014-02-01T01:29:00.827Z",
+        "object_id":488,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 194,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Data on US housing starts for October will also be released. - (by cmruser #5, on activity #490 of sales_cycle #432)",
+        "owner":5,
+        "date_created":"2014-02-03T01:38:00.827Z",
+        "date_edited":"2014-02-03T01:38:00.827Z",
+        "object_id":490,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 195,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"The Senate Banking panel`s Subcommittee on Financial Institutions and Consumer Protection will host the hearing. - (by cmruser #4, on activity #492 of sales_cycle #433)",
+        "owner":4,
+        "date_created":"2014-01-03T01:55:00.827Z",
+        "date_edited":"2014-01-03T01:55:00.827Z",
+        "object_id":492,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 196,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"The week also lifts the lid on the thinking of Federal Reserve. - (by cmruser #5, on activity #493 of sales_cycle #434)",
+        "owner":5,
+        "date_created":"2014-01-01T01:53:00.827Z",
+        "date_edited":"2014-01-01T01:53:00.827Z",
+        "object_id":493,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 197,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"The Senate Banking panel`s Subcommittee on Financial Institutions and Consumer Protection will host the hearing. - (by cmruser #5, on activity #494 of sales_cycle #434)",
+        "owner":5,
+        "date_created":"2014-01-03T01:18:00.827Z",
+        "date_edited":"2014-01-03T01:18:00.827Z",
+        "object_id":494,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 198,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"The week also lifts the lid on the thinking of Federal Reserve. - (by cmruser #5, on activity #496 of sales_cycle #438)",
+        "owner":5,
+        "date_created":"2014-01-01T01:56:00.827Z",
+        "date_edited":"2014-01-01T01:56:00.827Z",
+        "object_id":496,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 199,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Also expected on Thursday are an update on existing home sales and earnings from Gap, BestBuy and Dollar Tree. - (by cmruser #4, on activity #498 of sales_cycle #439)",
+        "owner":4,
+        "date_created":"2014-02-03T01:58:00.827Z",
+        "date_edited":"2014-02-03T01:58:00.827Z",
+        "object_id":498,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 200,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"The week also lifts the lid on the thinking of Federal Reserve. - (by cmruser #4, on activity #504 of sales_cycle #445)",
+        "owner":4,
+        "date_created":"2014-02-01T01:46:00.827Z",
+        "date_edited":"2014-02-01T01:46:00.827Z",
+        "object_id":504,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 201,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Friday brings a US Senate hearing on the New York Federal Reserve, which has been accused of being too cosy with the Wall Street banks it is supposed to regulate. - (by cmruser #5, on activity #506 of sales_cycle #445)",
+        "owner":5,
+        "date_created":"2014-02-03T01:46:00.827Z",
+        "date_edited":"2014-02-03T01:46:00.827Z",
+        "object_id":506,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 202,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Also due on Monday are US industrial production statistics for October and the start of the Chicago Fed`s annual agriculture conference. - (by cmruser #5, on activity #511 of sales_cycle #451)",
+        "owner":5,
+        "date_created":"2014-01-01T01:37:00.827Z",
+        "date_edited":"2014-01-01T01:37:00.827Z",
+        "object_id":511,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 203,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Data on US housing starts for October will also be released. - (by cmruser #4, on activity #513 of sales_cycle #452)",
+        "owner":4,
+        "date_created":"2014-02-01T01:20:00.827Z",
+        "date_edited":"2014-02-01T01:20:00.827Z",
+        "object_id":513,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 204,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"The week also lifts the lid on the thinking of Federal Reserve. - (by cmruser #4, on activity #514 of sales_cycle #453)",
+        "owner":4,
+        "date_created":"2014-01-01T01:53:00.827Z",
+        "date_edited":"2014-01-01T01:53:00.827Z",
+        "object_id":514,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 205,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Also expected on Thursday are an update on existing home sales and earnings from Gap, BestBuy and Dollar Tree. - (by cmruser #4, on activity #516 of sales_cycle #454)",
+        "owner":4,
+        "date_created":"2014-02-01T01:51:00.827Z",
+        "date_edited":"2014-02-01T01:51:00.827Z",
+        "object_id":516,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 206,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Also expected on Thursday are an update on existing home sales and earnings from Gap, BestBuy and Dollar Tree. - (by cmruser #5, on activity #518 of sales_cycle #454)",
+        "owner":5,
+        "date_created":"2014-02-03T01:04:00.827Z",
+        "date_edited":"2014-02-03T01:04:00.827Z",
+        "object_id":518,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 207,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"The week also lifts the lid on the thinking of Federal Reserve. - (by cmruser #5, on activity #519 of sales_cycle #455)",
+        "owner":5,
+        "date_created":"2014-01-01T01:53:00.827Z",
+        "date_edited":"2014-01-01T01:53:00.827Z",
+        "object_id":519,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 208,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Friday brings a US Senate hearing on the New York Federal Reserve, which has been accused of being too cosy with the Wall Street banks it is supposed to regulate. - (by cmruser #5, on activity #525 of sales_cycle #460)",
+        "owner":5,
+        "date_created":"2014-02-01T01:22:00.827Z",
+        "date_edited":"2014-02-01T01:22:00.827Z",
+        "object_id":525,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 209,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"The Senate Banking panel`s Subcommittee on Financial Institutions and Consumer Protection will host the hearing. - (by cmruser #4, on activity #526 of sales_cycle #463)",
+        "owner":4,
+        "date_created":"2014-01-01T01:04:00.827Z",
+        "date_edited":"2014-01-01T01:04:00.827Z",
+        "object_id":526,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 210,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Data on US housing starts for October will also be released. - (by cmruser #5, on activity #528 of sales_cycle #465)",
+        "owner":5,
+        "date_created":"2014-01-01T01:48:00.827Z",
+        "date_edited":"2014-01-01T01:48:00.827Z",
+        "object_id":528,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 211,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Tuesday brings the Los Angeles Auto Show, earnings from Home Depot and the expected $2 billion-plus initial public offering (IPO) of real estate investment trust Paramount Group. - (by cmruser #5, on activity #532 of sales_cycle #467)",
+        "owner":5,
+        "date_created":"2014-01-03T01:26:00.827Z",
+        "date_edited":"2014-01-03T01:26:00.827Z",
+        "object_id":532,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 212,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"The Senate Banking panel`s Subcommittee on Financial Institutions and Consumer Protection will host the hearing. - (by cmruser #5, on activity #534 of sales_cycle #469)",
+        "owner":5,
+        "date_created":"2014-01-03T01:41:00.827Z",
+        "date_edited":"2014-01-03T01:41:00.827Z",
+        "object_id":534,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 213,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Data on US housing starts for October will also be released. - (by cmruser #4, on activity #535 of sales_cycle #470)",
+        "owner":4,
+        "date_created":"2014-02-01T01:59:00.827Z",
+        "date_edited":"2014-02-01T01:59:00.827Z",
+        "object_id":535,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 214,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Also due on Monday are US industrial production statistics for October and the start of the Chicago Fed`s annual agriculture conference. - (by cmruser #4, on activity #537 of sales_cycle #471)",
+        "owner":4,
+        "date_created":"2014-01-01T01:11:00.827Z",
+        "date_edited":"2014-01-01T01:11:00.827Z",
+        "object_id":537,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 215,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"The Senate Banking panel`s Subcommittee on Financial Institutions and Consumer Protection will host the hearing. - (by cmruser #4, on activity #539 of sales_cycle #472)",
+        "owner":4,
+        "date_created":"2014-01-01T01:00:00.827Z",
+        "date_edited":"2014-01-01T01:00:00.827Z",
+        "object_id":539,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 216,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Also expected on Thursday are an update on existing home sales and earnings from Gap, BestBuy and Dollar Tree. - (by cmruser #5, on activity #542 of sales_cycle #480)",
+        "owner":5,
+        "date_created":"2014-02-01T01:21:00.827Z",
+        "date_edited":"2014-02-01T01:21:00.827Z",
+        "object_id":542,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 217,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Also expected on Thursday are an update on existing home sales and earnings from Gap, BestBuy and Dollar Tree. - (by cmruser #4, on activity #545 of sales_cycle #481)",
+        "owner":4,
+        "date_created":"2014-01-01T01:53:00.827Z",
+        "date_edited":"2014-01-01T01:53:00.827Z",
+        "object_id":545,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 218,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Data on US housing starts for October will also be released. - (by cmruser #5, on activity #546 of sales_cycle #481)",
+        "owner":5,
+        "date_created":"2014-01-03T01:19:00.827Z",
+        "date_edited":"2014-01-03T01:19:00.827Z",
+        "object_id":546,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 219,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"Data on US housing starts for October will also be released. - (by cmruser #5, on activity #547 of sales_cycle #482)",
+        "owner":5,
+        "date_created":"2014-02-01T01:30:00.827Z",
+        "date_edited":"2014-02-01T01:30:00.827Z",
+        "object_id":547,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 220,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"The Senate Banking panel`s Subcommittee on Financial Institutions and Consumer Protection will host the hearing. - (by cmruser #5, on activity #549 of sales_cycle #484)",
+        "owner":5,
+        "date_created":"2014-02-01T01:29:00.827Z",
+        "date_edited":"2014-02-01T01:29:00.827Z",
+        "object_id":549,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+},
+{
+    "pk": 221,
+    "model": "alm_crm.Comment",
+    "fields": {
+        "comment":"The Senate Banking panel`s Subcommittee on Financial Institutions and Consumer Protection will host the hearing. - (by cmruser #5, on activity #550 of sales_cycle #484)",
+        "owner":5,
+        "date_created":"2014-02-03T01:30:00.827Z",
+        "date_edited":"2014-02-03T01:30:00.827Z",
+        "object_id":550,
+        "content_type":["alm_crm", "activity"],
+        "subscription_id": 2
+    }
+}
+]

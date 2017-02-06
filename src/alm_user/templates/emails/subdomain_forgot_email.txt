@@ -1,0 +1,13 @@
+{% extends "emails/base.txt" %}{% load almanet_tags %}
+{% load i18n %}
+{% blocktrans %}You're receiving this email because you requested a password reset for your user account at {{ site_name }}.{% endblocktrans %}
+
+{% block body %}
+{% trans "Here's the list of companies you are currently registered with:" %}
+{% for account in accounts %}
+	{{account.company.name}} - {{account.company.subdomain}}
+{% endfor %}
+{% trans "Your username, in case you've forgotten:" %} {{ email }}
+{% endblock %}
+
+

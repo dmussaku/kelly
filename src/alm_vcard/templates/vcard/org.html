@@ -1,0 +1,14 @@
+{% extends "user/base.html" %}
+{% load i18n crm_tags%}
+{% block content %}
+<div>
+	<div id="org-{{org.pk}}" org-pk="{{org.pk}}" update-url="{% crm_url 'org_update' id=org.pk %}">
+		organization_name - {{org.organization_name}}
+		organization_unit - {{org.organization_unit}}
+		<button class="btn btn-primary" onclick="edit_org('org-{{org.pk}}',{{org.pk}})" >
+	          edit
+	        </button>
+
+	</div>
+</div>
+{% endblock %}

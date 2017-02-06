@@ -1,70 +1,332 @@
- [
-    {
-        "pk": 1,
-        "model": "alm_crm.SalesCycle",
-        "fields": {
-            "products":[],
-            "owner":1,
-            "followers":[],
-            "contact":1,
-            "latest_activity":4,
-            "projected_value":1,
-            "real_value":1,
-            "status":"N",
-            "date_created":"2014-09-10 00:00:00+00:00",
-            "from_date":"2014-09-10 00:00:00+00:00",
-            "to_date":"2014-09-10 00:00:00+00:00"
-        }
-    },
-    {
-        "pk": 2,
-        "model": "alm_crm.SalesCycle",
-        "fields": {
-            "products":[],
-            "owner":1,
-            "followers":[],
-            "contact":1,
-            "latest_activity":6,
-            "projected_value":2,
-            "real_value":2,
-            "status":"N",
-            "date_created":"2014-09-10 00:00:00+00:00",
-            "from_date":"2014-09-10 00:00:00+00:00",
-            "to_date":"2014-09-10 00:00:00+00:00"
-        }
-    },
-    {
-        "pk": 3,
-        "model": "alm_crm.SalesCycle",
-        "fields": {
-            "products":[],
-            "owner":1,
-            "followers":[1],
-            "contact":1,
-            "latest_activity":7,
-            "projected_value":3,
-            "real_value":3,
-            "status":"N",
-            "date_created":"2014-09-10 00:00:00+00:00",
-            "from_date":"2014-09-10 00:00:00+00:00",
-            "to_date":"2014-09-10 00:00:00+00:00"
-        }
-    },
-    {
-        "pk": 4,
-        "model": "alm_crm.SalesCycle",
-        "fields": {
-            "products":[],
-            "owner":2,
-            "followers":[],
-            "contact":1,
-            "latest_activity":null,
-            "projected_value":4,
-            "real_value":4,
-            "status":"N",
-            "date_created":"2014-09-10 00:00:00+00:00",
-            "from_date":"2014-09-10 00:00:00+00:00",
-            "to_date":"2014-09-10 00:00:00+00:00"
-        }
+[
+{
+    "pk": 1, 
+    "model": "alm_crm.salescycle", 
+    "fields": {
+        "is_global": true,
+        "contact": 1,
+        "description": "\u0410\u0432\u0442\u043e\u043c\u0430\u0442\u0438\u0447\u0435\u0441\u043a\u0438 \u0441\u043e\u0437\u0434\u0430\u043d\u043d\u044b\u0439 \u0446\u0438\u043a\u043b", 
+        "company_id": 1, 
+        "owner": 1, 
+        "date_created": "2015-01-23T00:00:00Z", 
+        "date_edited": "2015-08-10T07:30:23.743Z", 
+        "to_date": "2015-01-23T00:00:00Z",
+        "from_date": "2015-01-23T00:00:00Z",
+        "followers": [],
+        "latest_activity": null,
+        "projected_value": null,
+        "real_value": 1,
+        "status": "N",
+        "milestone": null,
+        "title": "\u041e\u0441\u043d\u043e\u0432\u043d\u043e\u0439 \u043f\u043e\u0442\u043e\u043a"
     }
+},
+{
+    "pk": 2, 
+    "model": "alm_crm.salescycle", 
+    "fields": {
+        "is_global": true,
+        "contact": 2,
+        "description": "\u0410\u0432\u0442\u043e\u043c\u0430\u0442\u0438\u0447\u0435\u0441\u043a\u0438 \u0441\u043e\u0437\u0434\u0430\u043d\u043d\u044b\u0439 \u0446\u0438\u043a\u043b", 
+        "company_id": 1, 
+        "owner": 2, 
+        "date_created": "2015-01-23T00:00:00Z", 
+        "date_edited": "2015-08-10T07:30:23.745Z", 
+        "to_date": "2015-01-23T00:00:00Z",
+        "from_date": "2015-01-23T00:00:00Z",
+        "followers": [],
+        "latest_activity": null,
+        "projected_value": null,
+        "real_value": null,
+        "status": "N",
+        "milestone": null,
+        "title": "\u041e\u0441\u043d\u043e\u0432\u043d\u043e\u0439 \u043f\u043e\u0442\u043e\u043a"
+    }
+},
+{
+    "pk": 3, 
+    "model": "alm_crm.salescycle", 
+    "fields": {
+        "is_global": true,
+        "contact": 3,
+        "description": "\u0410\u0432\u0442\u043e\u043c\u0430\u0442\u0438\u0447\u0435\u0441\u043a\u0438 \u0441\u043e\u0437\u0434\u0430\u043d\u043d\u044b\u0439 \u0446\u0438\u043a\u043b", 
+        "company_id": 1, 
+        "owner": 3, 
+        "date_created": "2015-03-04T08:54:12.823Z", 
+        "date_edited": "2015-08-10T07:30:23.865Z", 
+        "to_date": "2015-03-04T08:54:12.823Z", 
+        "from_date": "2015-03-04T08:54:12.823Z", 
+        "followers": [],
+        "latest_activity": null,
+        "projected_value": null,
+        "real_value": null,
+        "status": "N",
+        "milestone": null,
+        "title": "\u041e\u0441\u043d\u043e\u0432\u043d\u043e\u0439 \u043f\u043e\u0442\u043e\u043a"
+    }
+},
+{
+    "pk": 4, 
+    "model": "alm_crm.salescycle", 
+    "fields": {
+        "is_global": true,
+        "contact": 4,
+        "description": "\u0410\u0432\u0442\u043e\u043c\u0430\u0442\u0438\u0447\u0435\u0441\u043a\u0438 \u0441\u043e\u0437\u0434\u0430\u043d\u043d\u044b\u0439 \u0446\u0438\u043a\u043b", 
+        "company_id": 1, 
+        "owner": 4, 
+        "date_created": "2015-03-04T08:56:58.522Z", 
+        "date_edited": "2015-08-10T07:30:23.827Z", 
+        "to_date": "2015-03-04T08:56:58.522Z", 
+        "from_date": "2015-03-04T08:56:58.522Z", 
+        "followers": [],
+        "latest_activity": null,
+        "projected_value": null,
+        "real_value": null,
+        "status": "N",
+        "milestone": null,
+        "title": "\u041e\u0441\u043d\u043e\u0432\u043d\u043e\u0439 \u043f\u043e\u0442\u043e\u043a"
+    }
+},
+{
+    "pk": 5, 
+    "model": "alm_crm.salescycle", 
+    "fields": {
+        "is_global": true,
+        "contact": 5,
+        "description": "\u0410\u0432\u0442\u043e\u043c\u0430\u0442\u0438\u0447\u0435\u0441\u043a\u0438 \u0441\u043e\u0437\u0434\u0430\u043d\u043d\u044b\u0439 \u0446\u0438\u043a\u043b", 
+        "company_id": 1, 
+        "owner": 5, 
+        "date_created": "2015-03-04T08:59:41.838Z", 
+        "date_edited": "2015-08-10T07:30:23.833Z", 
+        "to_date": "2015-03-04T08:59:41.838Z", 
+        "from_date": "2015-03-04T08:59:41.838Z", 
+        "followers": [],
+        "latest_activity": null,
+        "projected_value": null,
+        "real_value": null,
+        "status": "N",
+        "milestone": null,
+        "title": "\u041e\u0441\u043d\u043e\u0432\u043d\u043e\u0439 \u043f\u043e\u0442\u043e\u043a"
+    }
+},
+{
+    "pk": 6, 
+    "model": "alm_crm.salescycle", 
+    "fields": {
+        "is_global": true,
+        "contact": 6,
+        "description": "\u0410\u0432\u0442\u043e\u043c\u0430\u0442\u0438\u0447\u0435\u0441\u043a\u0438 \u0441\u043e\u0437\u0434\u0430\u043d\u043d\u044b\u0439 \u0446\u0438\u043a\u043b", 
+        "company_id": 1, 
+        "owner": 6, 
+        "date_created": "2015-01-23T00:00:00Z", 
+        "date_edited": "2015-08-10T07:30:23.743Z", 
+        "to_date": "2015-01-23T00:00:00Z", 
+        "from_date": "2015-01-23T00:00:00Z", 
+        "followers": [],
+        "latest_activity": null,
+        "projected_value": null,
+        "real_value": null,
+        "status": "N",
+        "milestone": null,
+        "title": "\u041e\u0441\u043d\u043e\u0432\u043d\u043e\u0439 \u043f\u043e\u0442\u043e\u043a"
+    }
+},
+{
+    "pk": 7, 
+    "model": "alm_crm.salescycle", 
+    "fields": {
+        "is_global": true,
+        "contact": 7,
+        "description": "\u0410\u0432\u0442\u043e\u043c\u0430\u0442\u0438\u0447\u0435\u0441\u043a\u0438 \u0441\u043e\u0437\u0434\u0430\u043d\u043d\u044b\u0439 \u0446\u0438\u043a\u043b", 
+        "company_id": 1, 
+        "owner": 7, 
+        "date_created": "2015-01-23T00:00:00Z", 
+        "date_edited": "2015-08-10T07:30:23.745Z", 
+        "to_date": "2015-01-23T00:00:00Z", 
+        "from_date": "2015-01-23T00:00:00Z", 
+        "followers": [],
+        "latest_activity": null,
+        "projected_value": null,
+        "real_value": null,
+        "status": "N",
+        "milestone": null,
+        "title": "\u041e\u0441\u043d\u043e\u0432\u043d\u043e\u0439 \u043f\u043e\u0442\u043e\u043a"
+    }
+},
+{
+    "pk": 8, 
+    "model": "alm_crm.salescycle", 
+    "fields": {
+        "is_global": true,
+        "contact": 8,
+        "description": "\u0410\u0432\u0442\u043e\u043c\u0430\u0442\u0438\u0447\u0435\u0441\u043a\u0438 \u0441\u043e\u0437\u0434\u0430\u043d\u043d\u044b\u0439 \u0446\u0438\u043a\u043b", 
+        "company_id": 1, 
+        "owner": 8, 
+        "date_created": "2015-03-04T08:54:12.823Z", 
+        "date_edited": "2015-08-10T07:30:23.865Z", 
+        "to_date": "2015-03-04T08:54:12.823Z", 
+        "from_date": "2015-03-04T08:54:12.823Z", 
+        "followers": [],
+        "latest_activity": null,
+        "projected_value": null,
+        "real_value": null,
+        "status": "N",
+        "milestone": null,
+        "title": "\u041e\u0441\u043d\u043e\u0432\u043d\u043e\u0439 \u043f\u043e\u0442\u043e\u043a"
+    }
+},
+{
+    "pk": 9, 
+    "model": "alm_crm.salescycle", 
+    "fields": {
+        "is_global": true,
+        "contact": 19,
+        "description": "\u0410\u0432\u0442\u043e\u043c\u0430\u0442\u0438\u0447\u0435\u0441\u043a\u0438 \u0441\u043e\u0437\u0434\u0430\u043d\u043d\u044b\u0439 \u0446\u0438\u043a\u043b", 
+        "company_id": 1, 
+        "owner": 9, 
+        "date_created": "2015-03-04T08:56:58.522Z", 
+        "date_edited": "2015-08-10T07:30:23.827Z", 
+        "to_date": "2015-03-04T08:56:58.522Z", 
+        "from_date": "2015-03-04T08:56:58.522Z", 
+        "followers": [],
+        "latest_activity": null,
+        "projected_value": null,
+        "real_value": null,
+        "status": "N",
+        "milestone": null,
+        "title": "\u041e\u0441\u043d\u043e\u0432\u043d\u043e\u0439 \u043f\u043e\u0442\u043e\u043a"
+    }
+},
+{
+    "pk": 10, 
+    "model": "alm_crm.salescycle", 
+    "fields": {
+        "is_global": true,
+        "contact": 10,
+        "description": "\u0410\u0432\u0442\u043e\u043c\u0430\u0442\u0438\u0447\u0435\u0441\u043a\u0438 \u0441\u043e\u0437\u0434\u0430\u043d\u043d\u044b\u0439 \u0446\u0438\u043a\u043b", 
+        "company_id": 1, 
+        "owner": 10, 
+        "date_created": "2015-03-04T08:59:41.838Z", 
+        "date_edited": "2015-08-10T07:30:23.833Z", 
+        "to_date": "2015-03-04T08:59:41.838Z", 
+        "from_date": "2015-03-04T08:59:41.838Z", 
+        "followers": [],
+        "latest_activity": null,
+        "projected_value": null,
+        "real_value": null,
+        "status": "N",
+        "milestone": null,
+        "title": "\u041e\u0441\u043d\u043e\u0432\u043d\u043e\u0439 \u043f\u043e\u0442\u043e\u043a"
+    }
+},
+{
+    "pk": 11, 
+    "model": "alm_crm.salescycle", 
+    "fields": {
+        "is_global": false,
+        "contact": 1,
+        "description": "SalesCycle description 1", 
+        "company_id": 1, 
+        "owner": 1, 
+        "date_created": "2015-01-23T00:00:00Z", 
+        "date_edited": "2015-08-10T07:30:23.743Z", 
+        "to_date": "2015-01-23T00:00:00Z", 
+        "from_date": "2015-01-23T00:00:00Z", 
+        "followers": [],
+        "latest_activity": null,
+        "projected_value": null,
+        "real_value": null,
+        "status": "N",
+        "milestone": null,
+        "title": "Sales Cycle title 1"
+    }
+},
+{
+    "pk": 12, 
+    "model": "alm_crm.salescycle", 
+    "fields": {
+        "is_global": false,
+        "contact": 2,
+        "description": "SalesCycle description 2", 
+        "company_id": 1, 
+        "owner": 2, 
+        "date_created": "2015-01-23T00:00:00Z", 
+        "date_edited": "2015-08-10T07:30:23.745Z", 
+        "to_date": "2015-01-23T00:00:00Z",
+        "from_date": "2015-01-23T00:00:00Z",
+        "followers": [],
+        "latest_activity": null,
+        "projected_value": null,
+        "real_value": null,
+        "status": "N",
+        "milestone": null,
+        "title": "Sales Cycle title 2"
+    }
+},
+{
+    "pk": 13, 
+    "model": "alm_crm.salescycle", 
+    "fields": {
+        "is_global": false,
+        "contact": 3,
+        "description": "SalesCycle description 3", 
+        "company_id": 1, 
+        "owner": 3, 
+        "date_created": "2015-03-04T08:54:12.823Z", 
+        "date_edited": "2015-08-10T07:30:23.865Z", 
+        "to_date": "2015-03-04T08:54:12.823Z", 
+        "from_date": "2015-03-04T08:54:12.823Z", 
+        "followers": [],
+        "latest_activity": null,
+        "projected_value": null,
+        "real_value": null,
+        "status": "N",
+        "milestone": null,
+        "title": "Sales Cycle title 3"
+    }
+},
+{
+    "pk": 14, 
+    "model": "alm_crm.salescycle", 
+    "fields": {
+        "is_global": false,
+        "contact": 4,
+        "description": "SalesCycle description 4", 
+        "company_id": 1, 
+        "owner": 4, 
+        "date_created": "2015-03-04T08:56:58.522Z", 
+        "date_edited": "2015-08-10T07:30:23.827Z", 
+        "to_date": "2015-03-04T08:56:58.522Z", 
+        "from_date": "2015-03-04T08:56:58.522Z", 
+        "followers": [],
+        "latest_activity": null,
+        "projected_value": null,
+        "real_value": null,
+        "status": "N",
+        "milestone": null,
+        "title": "Sales Cycle title 4"
+    }
+},
+{
+    "pk": 15, 
+    "model": "alm_crm.salescycle", 
+    "fields": {
+        "is_global": false,
+        "contact": 5,
+        "description": "SalesCycle description 5", 
+        "company_id": 1, 
+        "owner": 5, 
+        "date_created": "2015-03-04T08:59:41.838Z", 
+        "date_edited": "2015-08-10T07:30:23.833Z", 
+        "to_date": "2015-03-04T08:59:41.838Z", 
+        "from_date": "2015-03-04T08:59:41.838Z", 
+        "followers": [],
+        "latest_activity": null,
+        "projected_value": null,
+        "real_value": null,
+        "status": "N",
+        "milestone": null,
+        "title": "Sales Cycle title 5"
+    }
+}
 ]

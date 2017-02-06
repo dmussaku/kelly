@@ -1,14 +1,27 @@
-from os import *
+import re
+# from os import *
 import datetime
+import json
 from datetime import *
 from time import *
-import re
-from django.db import models
-import vobject
-from vobject.vcard import *
+from django.db import models, transaction as tx
 from django.utils.translation import ugettext as _
 from django.conf import settings
+from django.contrib.contenttypes import generic
+from django.contrib.contenttypes.models import ContentType
+from django.db import transaction
+from django.db.models import get_models, Model
+from django.db.models.signals import post_save, post_delete
+from django.contrib.contenttypes.generic import GenericForeignKey
+from django.core.cache import cache
+from django.contrib.contenttypes.generic import GenericForeignKey
 
+import vobject
+from vobject.vcard import *
+from almanet.utils.metaprogramming import SerializableModel
+from almanet.utils.cache import build_key, extract_id
+from almanet.utils.json import date_handler
+from .serializer import serialize_objs, vcard_rel_fields
 
 class VObjectImportException(Exception):
     message = _("The vCard could not be converted into a vObject")
@@ -20,6 +33,10 @@ class AttributeImportException(Exception):
         self.attribute = attribute
 
         self.message = "Could not load " + attribute
+
+
+class BadVCardError(Exception):
+    pass
 
 
 class VCard(models.Model):
@@ -86,60 +103,83 @@ class VCard(models.Model):
         db_table = settings.DB_PREFIX.format('vcard')
 
     def __unicode__(self):
+        return self.fn
 
-        if self.fn != "":
-            return self.fn
-
-        unicodeName = self.given_name + ' ' + self.family_name
-
-        if unicodeName != " ":
-            return unicodeName
-
-        return "name undefined"
-
+    def save(self, **kwargs):
+        # if not self.fn or self.fn == '':
+        self.fill_fn()
+        super(self.__class__, self).save(**kwargs)
 
     @classmethod
-    def importFrom(cls, type, data):
-        """
-        The contact sets its properties as specified in the argument 'data'
-        according to the specification given in the string passed as
-        argument 'type'
+    def after_delete(cls, sender, instance, **kwargs):
+        cache.delete(build_key(cls._meta.model_name, instance.pk))
 
-        'type' can be either 'vCard' or 'vObject'
+    def fill_fn(self):
+        if self.fn and (not self.given_name) and (not self.family_name):
+            return
+        self.fn = '' 
+        if self.given_name:
+            self.fn += self.given_name
+        if self.family_name:
+            self.fn += (' ' if self.fn else '') + self.family_name
+        if not self.fn and self.emails.first():
+            self.fn = self.emails.first().value.split('@')[0].replace('.', ' ')
+        if not self.fn:
+            raise BadVCardError('This is bad vcard since user does not know anything about this contact.')
 
-        'vCard' is a string containing containing contact information
-        formatted according to the vCard specification
+    @classmethod
+    def importFromVCardMultiple(cls, data, autocommit=False):
+        """Return imported vcard objects as generator"""
+        return cls.fromVCard(data, multiple=True, autocommit=autocommit)
 
-        'vObject' is a vobject containing vcard contact information
+    @classmethod
+    def exportToVCardMultiple(cls, vcards):
+        """Return exported vcards as generator"""
+        return (vcard.toVCard() for vcard in vcards)
 
-        It returns a Contact object.
-        """
-        if type == "vCard":
-            return cls.fromVCard(data)
+    # @classmethod
+    # def importFrom(cls, tp, data, multiple=False, autocommit=False):
+    #     """
+    #     The contact sets its properties as specified in the argument 'data'
+    #     according to the specification given in the string passed as
+    #     argument 'tp'
 
-        if type == "vObject":
-            return cls.fromVObject(data)
+    #     'tp' can be either 'vCard' or 'vObject'
 
-    def exportTo(self, type):
+    #     'vCard' is a string containing containing contact information
+    #     formatted according to the vCard specification
+
+    #     'vObject' is a vobject containing vcard contact information
+
+    #     It returns a Contact object.
+    #     """
+    #     if tp.lower() == "vcard":
+    #         return cls.fromVCard(data, multiple=multiple)
+
+    #     if tp.lower() == "vobject":
+    #         return cls.fromVObject(data)
+
+    def exportTo(self, tp):
         """
         The contact returns an object with its properties in a format as
-        defined by the argument type.
+        defined by the argument tp.
 
-        'type' can be either 'vCard' or 'vObject'
+        'tp' can be either 'vCard' or 'vObject'
 
         'vCard' is a string containing containing contact information
         formatted according to the vCard specification
 
         'vObject' is a vobject containing vcard contact information
         """
-        if type == "vCard":
+        if tp.lower() == "vcard":
             return self.toVCard()
 
-        if type == "vObject":
+        if tp.lower() == "vobject":
             return self.toVObject()
 
     @classmethod
-    def fromVObject(cls, vObject):
+    @transaction.atomic
+    def fromVObject(cls, vObject, autocommit=False):
         """
         Contact sets its properties as specified by the supplied
         vObject. Returns a contact object.
@@ -475,13 +515,6 @@ class VCard(models.Model):
 
                 continue
 
-            # if property.name.upper() == "SOUND":
-
-            #    sound = Sound()
-            #    sound.data = property.value
-
-            #    contact.childModels.append(sound)
-
             if property.name.upper() == "TITLE":
                 try:
 
@@ -495,7 +528,7 @@ class VCard(models.Model):
 
                 continue
 
-            if property.name.upper() == "URL":
+            if property.name.upper() == "X-URL":
                 try:
 
                     url = Url()
@@ -510,38 +543,34 @@ class VCard(models.Model):
 
                 continue
 
-            # if property.name.upper() == "LOGO":
-
-            #    logo = Logo()
-            #    logo.data = property.value
-
-            #    contact.childModels.append( logo)
-
             if property.name.upper() == "VERSION":
                 continue
 
             contact.errorList.append(property.name.upper())
-
-        # nObject.save()
-
-        # contact.n = nObject
+        if autocommit:
+            contact.commit()
         return contact
 
     def commit(self):
-        self.save()
-        for m in self.childModels:
-            m.vcard = self
-            m.save()
+        with tx.atomic():
+            self.save()
+            for m in self.childModels:
+                m.vcard = self
+                m.save()
+        return self
 
     @classmethod
-    def fromVCard(cls, vCardString):
+    def fromVCard(cls, vCardString, multiple=False, autocommit=False):
         """
         Contact sets its properties as specified by the supplied
         string. The string is in vCard format. Returns a Contact object.
         """
+        if multiple:
+            return (cls.fromVObject(vObject, autocommit=autocommit)
+                    for vObject in vobject.readComponents(vCardString))
         vObject = vobject.readOne(vCardString)
 
-        return cls.fromVObject(vObject)
+        return cls.fromVObject(vObject, autocommit=autocommit)
 
     def toVObject(self):
         """
@@ -552,11 +581,11 @@ class VCard(models.Model):
         n = v.add('n')
 
         n.value = vobject.vcard.Name(
-               given = self.given_name,
-               family = self.family_name,
-               additional = self.additional_name,
-               prefix = self.honorific_prefix,
-               suffix = self.honorific_suffix)
+            given = self.given_name,
+            family = self.family_name,
+            additional = self.additional_name,
+            prefix = self.honorific_prefix,
+            suffix = self.honorific_suffix)
 
         fn = v.add('fn')
 
@@ -572,6 +601,7 @@ class VCard(models.Model):
             jcode     = j.postal_code if j.postal_code else ''
             jcountry  = j.country_name if j.country_name else ''
             jextended = j.extended_address if j.extended_address else ''
+            jcity = j.locality if j.locality else ''
 
             i.type_param = j.type
             i.value = vobject.vcard.Address(
@@ -580,14 +610,15 @@ class VCard(models.Model):
                      street = jstreet,
                      region = jregion,
                      code = jcode,
-                     country = jcountry)
+                     country = jcountry,
+                     city=jcity)
 
         for j in self.org_set.all():
             i = v.add('org')
             i.value[0]   = j.organization_name
             i.value.append(j.organization_unit)
 
-        for j in self.email_set.all():
+        for j in self.emails.all():
             i = v.add('email')
             i.value = j.value
             i.type_param = j.type
@@ -687,8 +718,8 @@ class VCard(models.Model):
             i.value = j.data
 
         for j in self.url_set.all():
-            i = v.add('url')
-            i.value = j.data
+            i = v.add('x-url')
+            i.value = j.dataf
 
         return v
 
@@ -698,31 +729,147 @@ class VCard(models.Model):
         """
         return self.toVObject().serialize()
 
-"""
-class N(models.Model):
-    contact = models.ForeignKey(Contact, unique=True)
-    family_name = models.CharField(max_length = 1024, verbose_name = _("Family Name"))
-    given_name = models.CharField(max_length = 1024, verbose_name = _("Given Name"))
-    additional_name  = models.CharField(max_length = 1024, verbose_name = _("Additional Name"))
-    honorific_prefix = models.CharField(max_length = 1024, verbose_name = _("Honorific Prefix"))
-    honorific_suffix = models.CharField(max_length = 1024, verbose_name = _("Honorific Suffix"))
+    def serialize(self):
+        return serialize_objs(self)
 
-    class Meta:
-        verbose_name = _("name")
-        verbose_name_plural = _("names")
+    @classmethod
+    @transaction.atomic
+    def merge_model_objects(cls, primary_object, alias_objects=[], keep_old=True, **kwargs):
+        """
 
-    def __unicode__(self):
-        return '' + self.given_name + ' ' + self.family_name
-"""
+        """
+        if not isinstance(alias_objects, list):
+            alias_objects = [alias_objects]
+        
+        # check that all aliases are the same class as primary one and that
+        # they are subclass of model
+        primary_class = primary_object.__class__
+        
+        if not issubclass(primary_class, Model):
+            raise TypeError('Only django.db.models.Model subclasses can be merged')
+        
+        for alias_object in alias_objects:
+            if not isinstance(alias_object, primary_class):
+                raise TypeError('Only models of same class can be merged')
+        
+        # Get a list of all GenericForeignKeys in all models
+        # TODO: this is a bit of a hack, since the generics framework should provide a similar
+        # method to the ForeignKey field for accessing the generic related fields.
+        generic_fields = []
+        for model in get_models():
+            for field_name, field in filter(lambda x: isinstance(x[1], GenericForeignKey), model.__dict__.iteritems()):
+                generic_fields.append(field)
+                
+        blank_local_fields = set([field.attname for field in primary_object._meta.local_fields if getattr(primary_object, field.attname) in [None, '']])
+        
+        # Loop through all alias objects and migrate their data to the primary object.
+        for alias_object in alias_objects:
+            # Migrate all foreign key references from alias object to primary object.
+            for related_object in alias_object._meta.get_all_related_objects():
+                try:
+                    # The variable name on the alias_object model.
+                    alias_varname = related_object.get_accessor_name()
+                    # The variable name on the related model.
+                    obj_varname = related_object.field.name
+                    related_objects = getattr(alias_object, alias_varname)
+                    for obj in related_objects.all():
+                        setattr(obj, obj_varname, primary_object)
+                        obj.save()
+                except:
+                    pass
+    
+            # Migrate all many to many references from alias object to primary object.
+            for related_many_object in alias_object._meta.get_all_related_many_to_many_objects():
+                alias_varname = related_many_object.get_accessor_name()
+                obj_varname = related_many_object.field.name
+                
+                if alias_varname is not None:
+                    # standard case
+                    related_many_objects = getattr(alias_object, alias_varname).all()
+                else:
+                    # special case, symmetrical relation, no reverse accessor
+                    related_many_objects = getattr(alias_object, obj_varname).all()
+                for obj in related_many_objects.all():
+                    getattr(obj, obj_varname).remove(alias_object)
+                    getattr(obj, obj_varname).add(primary_object)
+    
+            # Migrate all generic foreign key references from alias object to primary object.
+            for field in generic_fields:
+                filter_kwargs = {}
+                filter_kwargs[field.fk_field] = alias_object._get_pk_val()
+                filter_kwargs[field.ct_field] = field.get_content_type(alias_object)
+                for generic_related_object in field.model.objects.filter(**filter_kwargs):
+                    setattr(generic_related_object, field.name, primary_object)
+                    generic_related_object.save()
+                    
+            # Try to fill all missing values in primary object by values of duplicates
+            filled_up = set()
+            for field_name in blank_local_fields:
+                val = getattr(alias_object, field_name) 
+                if val not in [None, '']:
+                    setattr(primary_object, field_name, val)
+                    filled_up.add(field_name)
+            blank_local_fields -= filled_up
+                
+            if not keep_old:
+                alias_object.delete()
+        if kwargs.get('fn'):
+            primary_object.fn = kwargs.get('fn')
+        elif kwargs.get('given_name') or kwargs.get('family_name'):
+            primary_object.given_name = kwargs.get('given_name', '')
+            primary_object.family_name = kwargs.get('family_name', '')
+        primary_object.save()
+        return primary_object
 
 
-class Tel(models.Model):
+    @classmethod
+    def after_save(cls, sender, instance, **kwargs):
+        cache.set(build_key(cls._meta.model_name, instance.pk), json.dumps(serialize_objs(instance), default=date_handler))
+        # TODO: each time when contact is updated vcard is recreated. So if it is the case then reinvalidate cache
+        if hasattr(instance, 'contact'):
+            contact = instance.contact
+            contact_id = contact.id
+            cached_contact = cache.get(build_key(contact.__class__._meta.model_name, contact_id))
+            if cached_contact is None:
+                return
+            cached_contact = json.loads(cached_contact)
+            old_id = cached_contact['vcard_id']
+            cached_contact['vcard_id'] = instance.pk
+            cache.set(build_key(contact.__class__._meta.model_name, contact_id), json.dumps(cached_contact, default=date_handler))
+            cache.delete(build_key(cls._meta.model_name, old_id))
+
+    @classmethod
+    def get_by_ids(cls, *ids):
+        """Get vcard by ids from cache with fallback to postgres."""
+        rv = cache.get_many([build_key(cls._meta.model_name, vcard_id) for vcard_id in ids])
+        rv = {extract_id(k, coerce=int): json.loads(v) for k, v in rv.iteritems()}
+
+        not_found_ids = [vcard_id for vcard_id in ids if not vcard_id in rv]
+        if not not_found_ids:
+            return rv.values()
+        vcards_qs = cls.objects.filter(pk__in=not_found_ids).prefetch_related(*vcard_rel_fields())
+        more_rv = serialize_objs(vcards_qs)
+        cache.set_many({build_key(cls._meta.model_name, vcard_raw['id']): json.dumps(vcard_raw, default=date_handler) for vcard_raw in more_rv})
+        return rv.values() + more_rv
+
+    @classmethod
+    def cache_all(cls):
+        vcard_qs = VCard.objects.all().prefetch_related(*vcard_rel_fields())
+        vcards_raw = serialize_objs(vcard_qs)
+        cache.set_many({build_key(cls._meta.model_name, vcard_raw['id']): json.dumps(vcard_raw, default=date_handler) for vcard_raw in vcards_raw})
+
+
+post_save.connect(VCard.after_save, sender=VCard)
+post_delete.connect(VCard.after_delete, sender=VCard)
+
+
+class Tel(SerializableModel):
     """
     A telephone number of a contact
     """
     TYPE_CHOICES = (
-        ('VOICE', _(u"INTL")),
         ('HOME', _(u"home")),
+        ('VOICE', _(u"INTL")),
         ('MSG',  _(u"message")),
         ('WORK',  _(u"work")),
         ('pref',  _(u"prefered")),
@@ -735,9 +882,10 @@ class Tel(models.Model):
         ('car',  _(u"car phone")),
         ('isdn',  _(u"isdn")),
         ('pcs',  _(u"pcs")),
+        ('xadditional',  _(u"xadditional")),
     )
 
-    vcard = models.ForeignKey(VCard)
+    vcard = models.ForeignKey(VCard, related_name='tels')
     # making a choice field of type is incorrect as arbitrary
     # types of phone number are allowed by the vcard specs.
     type  = models.CharField(max_length=30, verbose_name=_("type of phone number"), help_text=_("for instance WORK or HOME"), choices=TYPE_CHOICES)
@@ -747,19 +895,24 @@ class Tel(models.Model):
         verbose_name = _("telephone number")
         verbose_name_plural = _("telephone numbers")
 
+    class SerializerMeta:
+        exclude = ['vcard']
+        alias = 'tels'
 
-class Email(models.Model):
+
+class Email(SerializableModel):
     """
     An email of a contact
     """
+    TYPES = INTERNET, X400, PREF = ('INTERNET', 'x400', 'pref')
     TYPE_CHOICES = (
-        ('INTERNET', _(u"internet")),
-        ('x400', _(u"x400")),
-        ('pref', _(u"pref")),
+        (INTERNET, _(u"internet")),
+        (X400, _(u"x400")),
+        (PREF, _(u"pref")),
     )
 
-    vcard = models.ForeignKey(VCard)
-    type  = models.CharField(max_length=30, verbose_name=_("type of email"), choices=TYPE_CHOICES)
+    vcard = models.ForeignKey(VCard, related_name='emails')
+    type = models.CharField(max_length=30, verbose_name=_("type of email"), choices=TYPE_CHOICES)
     value = models.EmailField(max_length=100, verbose_name=_("value"))
 
     class Meta:
@@ -768,6 +921,10 @@ class Email(models.Model):
 
     def __unicode__(self):
         return '%s' % self.value
+
+    class SerializerMeta:
+        exclude = ['vcard']
+        alias = 'emails'
 
 
 class Geo(models.Model):
@@ -785,51 +942,91 @@ class Geo(models.Model):
         verbose_name_plural = _("geographic uri's")
 
 
-class Org(models.Model):
-    """
-    An organization and unit the contact is affiliated with.
-    """
-    vcard = models.ForeignKey(VCard)
-    organization_name = models.CharField(max_length=1024, verbose_name=_("organization name"))
-    organization_unit = models.CharField(max_length=1024, verbose_name=_("organization unit"), blank=True)
+# class Org(SerializableModel):
+#     """
+#     An organization and unit the contact is affiliated with.
+#     """
+#     vcard = models.ForeignKey(VCard)
+#     organization_name = models.CharField(max_length=1024, verbose_name=_("organization name"))
+#     organization_unit = models.CharField(max_length=1024, verbose_name=_("organization unit"), blank=True)
 
-    class Meta:
-        verbose_name = _("organization")
-        verbose_name_plural = _("organizations")
+#     class Meta:
+#         verbose_name = _("organization")
+#         verbose_name_plural = _("organizations")
 
-    @property
-    def name(self):
-        return self.organization_name
+#     def __eq__(self, r):
+#         l = self
+#         return (
+#             l.organization_name == r.organization_name and
+#             l.organization_unit == r.organization_unit)
+
+#     @property
+#     def name(self):
+#         return self.organization_name
+
+#     class SerializerMeta:
+#         exclude = ['vcard']
+#         alias = 'orgs'
 
 
-class Adr(models.Model):
+class Adr(SerializableModel):
     """
     An address
     """
     TYPE_CHOICES = (
+        ('WORK',  _(u"work")),
         ('INTL', _(u"INTL")),
         ('POSTAL', _(u"postal")),
         ('PARCEL',  _(u"parcel")),
-        ('WORK',  _(u"work")),
         ('dom',  _(u"dom")),
         ('home',  _(u"home")),
         ('pref',  _(u"pref")),
+        ('xlegal',  _(u"xlegal")),
     )
 
-    vcard = models.ForeignKey(VCard)
-    post_office_box = models.CharField(max_length=1024, verbose_name=_("post office box"), blank=True)
-    extended_address = models.CharField(max_length=1024, verbose_name=_("extended address"), blank=True)
-    street_address = models.CharField(max_length=1024, verbose_name=_("street address"))
-    locality = models.CharField(max_length=1024, verbose_name=_("locality"))
-    region  = models.CharField(max_length=1024, verbose_name=_("region"))
-    postal_code = models.CharField(max_length=1024, verbose_name=_("postal code"))
-    country_name = models.CharField(max_length=1024, verbose_name=_("country name"))
+    vcard = models.ForeignKey(VCard, related_name='adrs')
     type = models.CharField(max_length=1024, verbose_name=_("type"), choices=TYPE_CHOICES)
+    street_address = models.CharField(max_length=1024, verbose_name=_("street address"), blank=True, null=True)
+    locality = models.CharField(max_length=1024, verbose_name=_("locality"), blank=True, null=True)
+    region  = models.CharField(max_length=1024, verbose_name=_("region"), blank=True, null=True)
+    country_name = models.CharField(max_length=1024, verbose_name=_("country name"), blank=True, null=True)
+    post_office_box= models.CharField(max_length=1024, verbose_name=_("post office box"), blank=True, null=True)
+    extended_address = models.CharField(max_length=1024, verbose_name=_("extended address"), blank=True, null=True)
+    postal_code = models.CharField(max_length=1024, verbose_name=_("postal code"), blank=True, null=True)
     # value = models.CharField(max_lengt =1024, verbose_name=_("Value"))
 
     class Meta:
         verbose_name = _("address")
         verbose_name_plural = _("addresses")
+
+    def __eq__(self, r):
+        l = self
+        return (
+            l.post_office_box == r.post_office_box and
+            l.extended_address == r.extended_address and
+            l.street_address == r.street_address and
+            l.region == r.region and
+            l.postal_code == r.postal_code and
+            l.country_name == r.country_name and
+            l.type == r.type)
+
+    @classmethod
+    def create_from_list(cls, params):
+        adr = cls(vcard=params[0], type=params[1])
+        try:
+            adr.street_address = params[2]
+            adr.locality = params[3]
+            adr.region = params[4]
+            adr.country_name = params[5]
+            adr.post_office_box = params[6]
+        except:
+            pass
+        adr.save()
+        return adr
+
+    class SerializerMeta:
+        exclude = ['vcard']
+        alias = 'adrs'
 
 
 class Agent(models.Model):
@@ -844,17 +1041,24 @@ class Agent(models.Model):
         verbose_name_plural = _("agents")
 
 
-class Category(models.Model):
+class Category(SerializableModel):
     """
     Specifies application category information about the
     contact.  Also known as "tags".
     """
-    vcard = models.ForeignKey(VCard)
+    vcard = models.ForeignKey(VCard, related_name='categories')
     data = models.CharField(max_length=100)
 
     class Meta:
         verbose_name = _("category")
         verbose_name_plural = _("categories")
+
+    def __unicode__(self):
+        return self.data
+
+    class SerializerMeta:
+        exclude = ['vcard']
+        alias = 'categories'
 
 
 class Key(models.Model):
@@ -929,17 +1133,24 @@ class Nickname(models.Model):
         verbose_name_plural = _("nicknames")
 
 
-class Note(models.Model):
+class Note(SerializableModel):
     """
     Supplemental information or a comment that is
     associated with the vCard.
     """
-    vcard = models.ForeignKey(VCard)
+    vcard = models.ForeignKey(VCard, related_name='notes')
     data = models.TextField()
+
+    def __unicode__(self):
+        return self.data
 
     class Meta:
         verbose_name = _("note")
         verbose_name_plural = _("notes")
+
+    class SerializerMeta:
+        exclude = ['vcard']
+        alias = 'notes'
 
 
 # class Photo(models.Model):
@@ -997,16 +1208,24 @@ class Role(models.Model):
 #    data = models.TextField()
 
 
-class Title(models.Model):
+class Title(SerializableModel):
     """
     The position or job of the contact
     """
-    vcard = models.ForeignKey(VCard)
+    vcard = models.ForeignKey(VCard, related_name='titles')
     data = models.CharField(max_length=100)
 
     class Meta:
         verbose_name = _("title")
         verbose_name_plural = _("titles")
+
+    def __eq__(self, r):
+        l = self
+        return l.data == r.data
+
+    class SerializerMeta:
+        exclude = ['vcard']
+        alias = 'titles'
 
 
 class Tz(models.Model):
@@ -1024,13 +1243,22 @@ class Tz(models.Model):
         verbose_name_plural = _("time zones")
 
 
-class Url(models.Model):
+class Url(SerializableModel):
     """
     A Url associted with a contact.
     """
-    vcard = models.ForeignKey(VCard)
-    data = models.URLField()
+    TYPE_CHOICES = (
+        ('website', _(u"website")),
+        ('github', _(u"github")),
+    )
+    vcard = models.ForeignKey(VCard, related_name='urls')
+    type = models.CharField(max_length=40, verbose_name=_("type"), choices=TYPE_CHOICES)
+    value = models.URLField()
 
     class Meta:
         verbose_name = _("url")
         verbose_name_plural = _("url's")
+
+    class SerializerMeta:
+        exclude = ['vcard']
+        alias = 'urls'

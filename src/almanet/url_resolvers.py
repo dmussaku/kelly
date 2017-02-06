@@ -11,14 +11,14 @@ def get_domain():
     return domain
 
 
-def reverse(viewname, subdomain=None, scheme=None,
+def reverse(viewname, urlconf=None, subdomain=None, scheme=None,
             args=None, kwargs=None, current_app=None):
     domain = get_domain()
     scheme = scheme or settings.DEFAULT_URL_SCHEME
     if subdomain is not None and subdomain != '':
         domain = '%s.%s' % (subdomain, domain)
     host, _ = HostsMiddleware().get_host(domain)
-    urlconf = host.urlconf
+    urlconf = urlconf or host.urlconf
     path = django_reverse(
         viewname, urlconf=urlconf, args=args,
         kwargs=kwargs, current_app=current_app) or ''

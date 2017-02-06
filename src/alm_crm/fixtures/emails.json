@@ -1,0 +1,92 @@
+[
+{
+    "pk": 1, 
+    "model": "alm_vcard.email", 
+    "fields": {
+        "type": "WORK", 
+        "vcard": 11, 
+        "value": "r.kamun@gmail.com"
+    }
+},
+{
+    "pk": 2, 
+    "model": "alm_vcard.email", 
+    "fields": {
+        "type": "WORK", 
+        "vcard": 12, 
+        "value": "r.kamun@gmail.com"
+    }
+},
+{
+    "pk": 3, 
+    "model": "alm_vcard.email", 
+    "fields": {
+        "type": "HOME", 
+        "vcard": 13, 
+        "value": "r.kamun@gmail.com"
+    }
+},
+{
+    "pk": 4, 
+    "model": "alm_vcard.email", 
+    "fields": {
+        "type": "WORK", 
+        "vcard": 14, 
+        "value": "r.kamun@gmail.com"
+    }
+},
+{
+    "pk": 5, 
+    "model": "alm_vcard.email", 
+    "fields": {
+        "type": "HOME", 
+        "vcard": 15, 
+        "value": "r.kamun@gmail.com"
+    }
+},
+{
+    "pk": 6, 
+    "model": "alm_vcard.email", 
+    "fields": {
+        "type": "pref", 
+        "vcard": 16, 
+        "value": "almusin@gmail.com"
+    }
+},
+{
+    "pk": 7, 
+    "model": "alm_vcard.email", 
+    "fields": {
+        "type": "pref", 
+        "vcard": 17, 
+        "value": "abish.abdeldinov@gmail.com"
+    }
+},
+{
+    "pk": 8, 
+    "model": "alm_vcard.email", 
+    "fields": {
+        "type": "pref", 
+        "vcard": 18, 
+        "value": "alexfixxed@gmail.com"
+    }
+},
+{
+    "pk": 9, 
+    "model": "alm_vcard.email", 
+    "fields": {
+        "type": "pref", 
+        "vcard": 19, 
+        "value": "kaznur-shan@mail.ru"
+    }
+},
+{
+    "pk": 10, 
+    "model": "alm_vcard.email", 
+    "fields": {
+        "type": "pref", 
+        "vcard": 20, 
+        "value": "aigerim.sarmanova@list.ru"
+    }
+}
+]

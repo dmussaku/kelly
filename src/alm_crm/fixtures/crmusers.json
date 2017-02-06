@@ -1,29 +1,62 @@
 [
-    {
-        "pk": 1,
-        "model": "alm_crm.CRMUser",
-        "fields": {
-        	"user_id":1,
-            "organization_id": 1,
-            "subscription_id": 1
-        }
-    },
-    {
-        "pk": 2,
-        "model": "alm_crm.CRMUser",
-        "fields": {
-        	"user_id":2,
-            "organization_id": 1,
-            "subscription_id": 1
-        }
-    },
-    {
-        "pk": 3,
-        "model": "alm_crm.CRMUser",
-        "fields": {
-        	"user_id":3,
-            "organization_id": 1,
-            "subscription_id": 1
-        }
+{
+    "pk": 1, 
+    "model": "alm_crm.crmuser", 
+    "fields": {
+        "organization_id": 1, 
+        "is_supervisor": false, 
+        "company_id": 1,
+        "date_created": "2014-09-10T00:00:00Z",
+        "date_edited": "2014-11-24T07:49:32.991Z",  
+        "user_id": 1 
     }
+},
+{
+    "pk": 2, 
+    "model": "alm_crm.crmuser", 
+    "fields": {
+        "organization_id": 1, 
+        "is_supervisor": false, 
+        "company_id": 1,
+        "date_created": "2014-09-10T00:00:00Z",
+        "date_edited": "2014-11-24T07:49:32.991Z",  
+        "user_id": 2 
+    }
+},
+{
+    "pk": 3, 
+    "model": "alm_crm.crmuser", 
+    "fields": {
+        "organization_id": 1, 
+        "is_supervisor": false, 
+        "company_id": 1,
+        "date_created": "2014-09-10T00:00:00Z",
+        "date_edited": "2014-11-24T07:49:32.991Z",  
+        "user_id": 3 
+    }
+},
+{
+    "pk": 4, 
+    "model": "alm_crm.crmuser", 
+    "fields": {
+        "organization_id": 1, 
+        "is_supervisor": false, 
+        "company_id": 1,
+        "date_created": "2014-09-10T00:00:00Z",
+        "date_edited": "2014-11-24T07:49:32.991Z",  
+        "user_id": 4 
+    }
+},
+{
+    "pk": 5, 
+    "model": "alm_crm.crmuser", 
+    "fields": {
+        "organization_id": 1, 
+        "is_supervisor": false, 
+        "company_id": 1,
+        "date_created": "2014-09-10T00:00:00Z",
+        "date_edited": "2014-11-24T07:49:32.991Z",  
+        "user_id": 5 
+    }
+}
 ]

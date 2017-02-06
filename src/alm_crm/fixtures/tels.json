@@ -1,0 +1,91 @@
+[
+{
+    "pk": 1, 
+    "model": "alm_vcard.tel", 
+    "fields": {
+        "type": "CELL", 
+        "vcard": 11, 
+        "value": "77772952190"
+    }
+},
+{
+    "pk": 2, 
+    "model": "alm_vcard.tel", 
+    "fields": {
+        "type": "CELL", 
+        "vcard": 12, 
+        "value": "77777777777"
+    }
+},
+{
+    "pk": 3, 
+    "model": "alm_vcard.tel", 
+    "fields": {
+        "type": "WORK", 
+        "vcard": 13, 
+        "value": "77772952190"
+    }
+},
+{
+    "pk": 4, 
+    "model": "alm_vcard.tel", 
+    "fields": {
+        "type": "CELL", 
+        "vcard": 14, 
+        "value": "77777777777"
+    }
+},
+{
+    "pk": 5, 
+    "model": "alm_vcard.tel", 
+    "fields": {
+        "type": "home", 
+        "vcard": 15, 
+        "value": "+77772952190"
+    }
+},
+{
+    "pk": 6, 
+    "model": "alm_vcard.tel", 
+    "fields": {
+        "type": "WORK", 
+        "vcard": 16, 
+        "value": "77772952190"
+    }
+},
+{
+    "pk": 7, 
+    "model": "alm_vcard.tel", 
+    "fields": {
+        "type": "CELL", 
+        "vcard": 17, 
+        "value": "77777777777"
+    }
+},
+{
+    "pk": 8, 
+    "model": "alm_vcard.tel", 
+    "fields": {
+        "type": "WORK", 
+        "vcard": 18, 
+        "value": "77772952190"
+    }
+},
+{
+    "pk": 9, 
+    "model": "alm_vcard.tel", 
+    "fields": {
+        "type": "CELL", 
+        "vcard": 19, 
+        "value": "77777777777"
+    }
+},
+{
+    "pk": 10, 
+    "model": "alm_vcard.tel", 
+    "fields": {
+        "type": "CELL", 
+        "vcard": 20, 
+        "value": "+75555152876"
+    }
+}]

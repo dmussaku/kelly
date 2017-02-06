@@ -1,63 +1,90 @@
 from django import forms
 from django.forms import ModelForm
 from django.conf import settings
+from django.utils.text import capfirst
 from django.utils.translation import ugettext_lazy as _
+from django.contrib.auth import authenticate
 from django.contrib.auth.hashers import check_password
 from django.contrib.auth.tokens import default_token_generator
-from alm_user.models import User
-from alm_user.emails import UserResetPasswordEmail, UserRegistrationEmail
+from alm_user.models import Account, User, Referral
+from alm_user.emails import (
+    UserResetPasswordEmail, 
+    UserRegistrationEmail,
+    SubdomainForgotEmail,
+    )
 from alm_company.models import Company
+import re
 
 # need to finish validation errors for the passwords form
 
 
-class RegistrationForm(forms.ModelForm):
-
+class RegistrationForm(forms.Form):
+    email = forms.EmailField(label=_("Email"), max_length=254)
+    company_name = forms.CharField(max_length=200)
+    company_subdomain = forms.CharField(max_length=20)
+    language = forms.ChoiceField(choices=User.LANGUAGES_OPTIONS)
     password = forms.CharField(widget=forms.PasswordInput(),
                                max_length=100)
-    confirm_password = forms.CharField(widget=forms.PasswordInput(),
-                                       max_length=100)
-    company_name = forms.CharField(max_length=100)
 
-    class Meta:
+    def clean_email(self):
+        email = self.cleaned_data['email']
+        if email in [user.email for user in User.objects.all()]:
+            raise forms.ValidationError( _("Email %s is already registered") % email)
+        return email
 
-        model = User
-        fields = ['first_name', 'last_name', 'email', 'timezone']
-
-    def clean_company_name(self):
-        company_name = self.cleaned_data['company_name']
-        if company_name in settings.BUSY_SUBDOMAINS:
+    def clean_company_subdomain(self):
+        company_subdomain = self.cleaned_data['company_subdomain']
+        if company_subdomain in settings.BUSY_SUBDOMAINS:
             busy_subdomains = ', '.join(settings.BUSY_SUBDOMAINS)
             raise forms.ValidationError(_(
                 "The following company names are busy: %(names)s") % {
                 'names': busy_subdomains})
-        return company_name
+        if company_subdomain in [company.subdomain for company in Company.objects.all()]:
+            raise forms.ValidationError( _("Subdomain is already taken") )
+        if not re.match('\w', company_subdomain):
+            raise forms.ValidationError( 
+                _("Subdomain must be written in latin alphabet letters") 
+                )
+        return company_subdomain
 
-    def clean(self):
+    def clean_language(self):
+        language = self.cleaned_data['language']
+        print language
+        if not language:
+            raise forms.ValidationError( _("Please input language") )
+        if not any(language in lang for lang in User.LANGUAGES_OPTIONS):
+            raise forms.ValidationError( _("Invalid language") )
+        return language
+
+    def clean_password(self):
         password = self.cleaned_data.get('password', None)
-        confirm_password = self.cleaned_data.get('confirm_password', None)
-        if (not password):
-            return super(RegistrationForm, self).clean()
-        if (not confirm_password):
-            return super(RegistrationForm, self).clean()
-        if (password != confirm_password):
-            raise forms.ValidationError('Password Mismatch')
-        else:
-            return super(RegistrationForm, self).clean()
+        if not password:
+            raise forms.ValidationError( 
+                _("Enter valid password") 
+                )
+        return password
 
     def save(self, commit=True):
-        user = super(RegistrationForm, self).save(commit=commit)
+        user = User(email=self.cleaned_data['email'])
         user.set_password(self.cleaned_data['password'])
+        username = self.cleaned_data['email']
+        language = self.cleaned_data['language']
+        password = self.cleaned_data['password']
         if commit:
             gened_subdomain = Company.generate_subdomain(
-                self.cleaned_data['company_name'])
+                self.cleaned_data['company_subdomain'])
             company = Company(
                 name=self.cleaned_data['company_name'],
                 subdomain=gened_subdomain)
             company.save()
+            user.language = language
             user.save()
-            company.users.add(user)
-            user.owned_company.add(company)
+            account = Account(
+                company=company,
+                user=user,
+                is_supervisor=True
+                )
+            account.save()
             mail_context = {
                 'site_name': settings.SITE_NAME,
                 'gu__user__email': user.email,
@@ -65,17 +92,81 @@ class RegistrationForm(forms.ModelForm):
             UserRegistrationEmail(**mail_context).send(
                 to=(user.email,),
                 bcc=settings.BCC_EMAILS)
+        user = authenticate(username=username, password=password)
         return user
+
+class AuthenticationForm(forms.Form):
+    """
+    Base class for authenticating users. Extend this to get a form that accepts
+    username/password logins.
+    """
+    username = forms.CharField(max_length=254)
+    password = forms.CharField(label=_("Password"), widget=forms.PasswordInput)
+
+    error_messages = {
+        'invalid_login': _("Please enter a correct %(username)s and password. "
+                           "Note that both fields may be case-sensitive."),
+        'inactive': _("This account is inactive."),
+    }
+
+    def __init__(self, request=None, *args, **kwargs):
+        """
+        The 'request' parameter is set for custom auth use by subclasses.
+        The form data comes in via the standard 'data' kwarg.
+        """
+        self.request = request
+        self.user_cache = None
+        super(AuthenticationForm, self).__init__(*args, **kwargs)
+
+        # Set the label for the "username" field.
+        self.username_field = User._meta.get_field(User.USERNAME_FIELD)
+        if self.fields['username'].label is None:
+            self.fields['username'].label = capfirst(self.username_field.verbose_name)
+
+    def clean(self):
+        username = self.cleaned_data.get('username')
+        password = self.cleaned_data.get('password')
+
+        if username and password:
+            self.user_cache = authenticate(username=username,
+                                           password=password)
+            print self.user_cache
+            if self.user_cache is None:
+                raise forms.ValidationError(
+                    self.error_messages['invalid_login'],
+                    code='invalid_login',
+                    params={'username': self.username_field.verbose_name},
+                )
+            else:
+                accounts = self.user_cache.accounts.all()
+                if len(accounts) == 1 and not accounts[0].is_active:
+                    raise forms.ValidationError(
+                        self.error_messages['inactive'],
+                        code='inactive',
+                    )
+        return self.cleaned_data
+
+    def check_for_test_cookie(self):
+        warnings.warn("check_for_test_cookie is deprecated; ensure your login "
+                "view is CSRF-protected.", DeprecationWarning)
+
+    def get_user_id(self):
+        if self.user_cache:
+            return self.user_cache.id
+        return None
+
+    def get_user(self):
+        return self.user_cache
 
 
 class PasswordResetForm(forms.Form):
-
+    # subdomain = forms.CharField(label=_("Subdomain"), max_length=254)
     email = forms.EmailField(label=_("Email"), max_length=254)
-
-    error_messages = (_("User with such email is not registered."))
+    error_messages = (_("Account with such email is not registered."))
 
     def clean_email(self):
         email = self.cleaned_data['email']
+        # subdomain = self.cleaned_data['subdomain']
         try:
             self.cached_user = User.objects.get(email=email)
         except User.DoesNotExist:
@@ -149,3 +240,16 @@ class UserPasswordSettingsForm(forms.Form):
         self.user.set_password(self.cleaned_data['password'])
         self.user.save()
         return self.user
+
+
+class ReferralForm(ModelForm):
+
+    class Meta:
+        model = Referral
+
+    def __init__(self, request=None, *args, **kwargs):
+        if kwargs.get('data', None):
+            self.referer = kwargs['data'].get('referer', None)
+
+        self.request = request
+        super(self.__class__, self).__init__(*args, **kwargs)

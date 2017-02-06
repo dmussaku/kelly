@@ -1,0 +1,54 @@
+[
+{
+    "pk": 4, 
+    "model": "alm_crm.filter", 
+    "fields": {
+        "title": "", 
+        "filter_text": "*\u0425\u0425\u0425\u0425", 
+        "company_id": 1, 
+        "base": "all", 
+        "owner": 1, 
+        "date_created": "2015-02-23T10:17:12.520Z", 
+        "date_edited": "2015-08-10T07:31:12.692Z"
+    }
+},
+{
+    "pk": 5, 
+    "model": "alm_crm.filter", 
+    "fields": {
+        "title": "\u0418\u0432\u0430\u043d", 
+        "filter_text": "\u0418\u0432\u0430\u043d", 
+        "company_id": 1, 
+        "base": "all", 
+        "owner": 2, 
+        "date_created": "2015-05-25T09:13:50.000Z", 
+        "date_edited": "2015-08-10T07:31:12.695Z"
+    }
+},
+{
+    "pk": 8, 
+    "model": "alm_crm.filter", 
+    "fields": {
+        "title": "\u0444\u0438\u043b\u044c\u0442\u0440", 
+        "filter_text": "ag", 
+        "company_id": 1, 
+        "base": "all", 
+        "owner": 3, 
+        "date_created": "2015-07-15T04:06:26.993Z", 
+        "date_edited": "2015-08-10T07:31:12.697Z"
+    }
+},
+{
+    "pk": 9, 
+    "model": "alm_crm.filter", 
+    "fields": {
+        "title": "\u0444\u0438\u043b\u044c\u0442\u0440", 
+        "filter_text": "ag", 
+        "company_id": 1, 
+        "base": "all", 
+        "owner": 3, 
+        "date_created": "2015-07-15T04:06:54.733Z", 
+        "date_edited": "2015-08-10T07:31:12.699Z"
+    }
+}
+]

@@ -1,0 +1,119 @@
+[
+{
+    "pk": 1, 
+    "model": "alm_user.user", 
+    "fields": {
+        "first_name": "Bruce", 
+        "last_name": "Wayne", 
+        "userpic": null, 
+        "company": [
+            1
+        ], 
+        "is_active": true, 
+        "vcard": 1, 
+        "last_login": "2014-11-11T07:51:02.253Z", 
+        "is_admin": false, 
+        "timezone": "Asia/Almaty", 
+        "password": "pbkdf2_sha256$12000$dcNiQ9QChKm8$uVTTDuMI5Fjbm9CKEvYksxDj+F3jETaO7yp1ImxYpSk=", 
+        "vcard": 1, 
+        "date_edited": "2015-08-10T07:25:08.030Z"
+    }
+},
+{
+    "pk": 2, 
+    "model": "alm_user.user", 
+    "fields": {
+        "first_name": "Nurlan", 
+        "last_name": "Abiken", 
+        "userpic": null, 
+        "company": [
+            1
+        ], 
+        "is_active": true, 
+        "vcard": 2, 
+        "last_login": "2014-11-11T10:08:02.503Z", 
+        "is_admin": false, 
+        "timezone": "Asia/Almaty", 
+        "password": "pbkdf2_sha256$12000$dcNiQ9QChKm8$uVTTDuMI5Fjbm9CKEvYksxDj+F3jETaO7yp1ImxYpSk=", 
+        "vcard": 2, 
+        "date_edited": "2015-08-10T07:25:08.030Z"
+    }
+},
+{
+    "pk": 3, 
+    "model": "alm_user.user", 
+    "fields": {
+        "first_name": "Rustem", 
+        "last_name": "Kamun", 
+        "userpic": "userpics/boiger_1.png", 
+        "unfollow_list": [], 
+        "is_supervisor": true, 
+        "last_login": "2015-08-03T03:47:56.545Z", 
+        "date_created": "2015-01-23T00:00:00Z", 
+        "timezone": "Asia/Almaty", 
+        "password": "pbkdf2_sha256$12000$dcNiQ9QChKm8$uVTTDuMI5Fjbm9CKEvYksxDj+F3jETaO7yp1ImxYpSk=", 
+        "vcard": 3, 
+        "date_edited": "2015-08-10T07:25:08.030Z"
+    }
+},
+{
+    "pk": 4, 
+    "model": "alm_user.user", 
+    "fields": {
+        "first_name": "Daniyar", 
+        "last_name": "Mussakulov", 
+        "userpic": null, 
+        "company": [
+            1
+        ], 
+        "is_active": true, 
+        "vcard": 3, 
+        "last_login": "2014-11-11T10:08:02.503Z", 
+        "is_admin": false, 
+        "timezone": "Asia/Almaty", 
+        "password": "pbkdf2_sha256$12000$uQEJ43F8rAZU$ODuZN6takJyPkVmeYAEdXerDqYNVmpbfekYHU3vOVWw=", 
+        "vcard": 4, 
+        "date_edited": "2015-08-10T07:25:08.038Z"
+    }
+},
+{
+    "pk": 5, 
+    "model": "alm_user.user", 
+    "fields": {
+        "first_name": "Sattar", 
+        "last_name": "Stamkulov", 
+        "userpic": null, 
+        "company": [
+            1
+        ], 
+        "is_active": true, 
+        "vcard": 4, 
+        "last_login": "2014-11-11T10:08:02.503Z", 
+        "is_admin": false, 
+        "timezone": "Asia/Almaty", 
+        "password": "pbkdf2_sha256$12000$W3fa2GroEE7I$ESGdsnG6PPTB6SwlPWqTOkr+9EwJKXdN3C0lveFehXM=", 
+        "vcard": 5, 
+        "date_edited": "2015-08-10T07:25:08.689Z"
+    }
+},
+{
+    "pk": 6, 
+    "model": "alm_user.user", 
+    "fields": {
+        "first_name": "Askar", 
+        "last_name": "Akshabay", 
+        "userpic": null, 
+        "company": [
+            2
+        ], 
+        "is_active": true, 
+        "vcard": 5, 
+        "last_login": "2015-01-22T10:10:03.205Z", 
+        "is_admin": false, 
+        "timezone": "Asia/Almaty", 
+        "password": "pbkdf2_sha256$12000$koKvttF7ZcCT$alBFGE8zHCqzJy/QWzVSQR+KYem9cwtbz1YB4ktCZ6c=", 
+        "vcard": 10, 
+        "date_edited": "2015-08-10T07:25:08.014Z"
+    }
+}
+]

@@ -1,0 +1,443 @@
+{% load static from staticfiles %}
+<!--DOCTYPE html -->
+<html>
+    <head>
+        <meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
+        <!-- this code between <header> ... </header> -->
+        <link rel="stylesheet" href="{% static 'flat-ui/bootstrap/css/bootstrap.css' %}">
+        <link rel="stylesheet" href="{% static 'flat-ui/css/flat-ui.css' %}">
+        <!-- Using only with Flat-UI (free)-->
+        <link rel="stylesheet" href="{% static 'common-files/css/icon-font.css' %}">
+        <!-- end -->
+        <link rel="stylesheet" href="{% static 'common-files/css/animations.css' %}">
+        <!-- this code directly before </body> -->
+        <script src="{% static 'common-files/js/jquery-1.10.2.min.js' %}"></script>
+        <script src="{% static 'flat-ui/js/bootstrap.min.js' %}"></script>
+        <script src="{% static 'common-files/js/jquery.scrollTo-1.4.3.1-min.js' %}"></script>
+        <script src="{% static 'common-files/js/modernizr.custom.js' %}"></script>
+        <script src="{% static 'common-files/js/page-transitions.js' %}"></script>
+        <script src="{% static 'common-files/js/easing.min.js' %}"></script>
+        <script src="{% static 'common-files/js/jquery.svg.js' %}"></script>
+        <script src="{% static 'common-files/js/jquery.svganim.js' %}"></script>
+        <script src="{% static 'common-files/js/jquery.parallax.min.js' %}"></script>
+        <script src="{% static 'common-files/js/startup-kit.js' %}"></script>
+
+        <!-- header -->
+        <link rel="stylesheet" href="{% static 'ui-kit/ui-kit-header/css/style.css' %}">
+        <!-- content -->
+        <link rel="stylesheet" href="{% static 'ui-kit/ui-kit-content/css/style.css' %}">
+        <!-- blog -->
+        <link rel="stylesheet" href="{% static 'ui-kit/ui-kit-blog/css/style.css' %}">
+        <!-- contacts -->
+        <link rel="stylesheet" href="{% static 'ui-kit/ui-kit-contacts/css/style.css' %}">
+        <!-- crew -->
+        <link rel="stylesheet" href="{% static 'ui-kit/ui-kit-crew/css/style.css' %}">
+        <!-- price -->
+        <link rel="stylesheet" href="{% static 'ui-kit/ui-kit-price/css/style.css' %}">
+        <!-- projects -->
+        <link rel="stylesheet" href="{% static 'ui-kit/ui-kit-projects/css/style.css' %}">
+        <!-- footer -->
+        <link rel="stylesheet" href="{% static 'ui-kit/ui-kit-footer/css/style.css' %}">
+    </head>
+    <body>
+        <header class="header-11">
+            <div class="container">
+                <div class="row">
+                    <div class="navbar col-sm-12" role="navigation">
+                        <div class="navbar-header">
+                            <button type="button" class="navbar-toggle"></button>
+                            <a class="brand" href="#"><img src="{% static 'common-files/img/logo2.png' %}" width="160" height="160" alt=""></a>
+                        </div>
+                        <div class="collapse navbar-collapse pull-right">
+                            <ul class="nav pull-left">
+                                <li><a href="#main">Главная</a></li>
+                                <li><a href="#about">О компании</a></li>
+                                <li><a href="#plans">Планы</a></li>
+                                <li><a href="#blog">Блог</a></li>
+                                <li><a href="#contacts">Контакты</a></li>
+                            </ul>
+                            <form class="navbar-form pull-left">
+                                <a class="btn btn-info" href="{% url 'user_login' %}">Войти</a>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="header-background"></div>
+        </header>
+        <section class="header-11-sub bg-midnight-blue" id='main'>
+            <div class="background">&nbsp;</div>
+            <div class="container">
+                <div class="row">
+                    <div class="col-sm-4">
+                        <h3>Миссия продавать!</h3>
+                        <h4>ALMASALES – увеличим продажи вместе.</h4>
+                        <!--                           Особенность ALMASALES заложена в его философии, включающей методологию OKR (Objectives and Keyresults)-->
+
+                        <div class="signup-form">
+                            <form action="plans.html">
+                                <div class="form-group">
+                                    <input class="form-control" type="text" placeholder="Ваш E-mail">
+                                </div>
+                                <div class="form-group">
+                                    <button type="submit" class="btn btn-block btn-info">Попробовать сервис</button>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="additional-links">Если хотите узнать больше <a href="#">проверьте наши возможности.</a></div>
+                    </div>
+                    <!--                    <div class="col-sm-7 col-sm-offset-1 player-wrapper">
+                                            <div class="player">
+                                                <iframe id="pPlayer" src="http://player.vimeo.com/video/80282064?title=0&amp;byline=0&amp;portrait=0&amp;api=1&amp;player_id=pPlayer" frameborder="0" webkitallowfullscreen="" mozallowfullscreen="" allowfullscreen=""></iframe>
+                                            </div>
+                                        </div>-->
+                </div>
+            </div>
+        </section>
+
+        <section class="content-4" id='about'>
+            <div class="container">
+                <h3>AlmaSales увеличивает Ваши продажи, через</h3>
+                <div class="center-block row features">
+                    <div class="col-sm-3">
+                        <img src="{% static 'common-files/icons/retina-ready-s@2x.png' %}" alt="" width="117" height="104">
+                        <h6>Цели</h6>
+                        <p>Разрабатывать цели и подготавливать планы по продажам</p>
+                    </div>
+                    <div class="col-sm-3">
+                        <img src="{% static 'common-files/icons/Pocket@2x.png' %}" alt="" width="104" height="104">
+                        <h6>Продукт</h6>
+                        <p>Определить идеальный продукт/каналы продаж</p>
+                    </div>
+                    <div class="col-sm-3">
+                        <img src="{% static 'common-files/icons/Graph@2x.png' %}" alt="" width="101" height="101">
+                        <h6>Отчеты</h6>
+                        <p>Внедрить KPI и отчеты</p>
+                    </div>
+                    <div class="col-sm-3">
+                        <img src="{% static 'common-files/icons/Settings@2x.png' %}" alt="" width="101" height="101">
+                        <h6>Инструмент</h6>
+                        <p>Усовершенствовать инструменты продаж</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-14 v-center">
+            <div>
+                <div class="container">
+                    <h3>Наши возможности</h3>
+                    <p class="lead">Проверьте наши возможности для вашего бизнеса</p>
+                    <div class="row features">
+                        <div class="col-sm-8">
+                            <img src="{% static 'common-files/img/content/1.png' %}" alt="">
+                            <br/><br/>
+                            <img src="{% static 'common-files/img/content/4.png' %}" alt="">
+                            <br/><br/>
+                            <img src="{% static 'common-files/img/content/6.png' %}" alt="">
+                        </div>
+                        <div class="col-sm-4 ">
+                            <div class="">
+                                <h6>- Клиентская карта и база</h6>
+                                <h6>- Управление взаимодействиями</h6>
+                                <h6>- Управление ассортиментом</h6>
+                                <h6>- Электронный архив материалов</h6>
+                                <h6>- Поручения и контроль их выполнения</h6>
+                                <h6>- Планирование работы</h6>
+                                <h6>- Построение стратегии продаж</h6>
+                                <h6>- Прогнозирование продаж</h6>
+                                <h6>- Контроль плана продаж</h6>
+                                <h6>- Настройка KPI для продавцов</h6>
+                                <h6>- Анализ «воронки» продаж</h6>
+                                <h6>- Анализ эффективности маркетинга</h6>
+                                <h6>- Стандартизация бизнес процессов</h6>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-27 bg-clouds">
+            <div class="container">
+                <div class="row">
+                    <div class="col-sm-4 ">
+                        <img class="" src="{% static 'common-files/icons/Responsive1@2x.png' %}" width="271" height="271" alt="">
+
+                    </div>
+                    <div class="col-sm-7 col-sm-offset-1">
+                        <h3>Будьте мобильнее</h3>
+                        <p>
+                            Разработанное нами удобное мобильное приложение, поможет вам работать в нашей программе где угодно.
+                        </p>
+                        <div class="btns">
+                            <a class="btn btn-inverse" href="https://itunes.apple.com/kz/app/almasales/id1010144591?mt=8"><span class="fui-apple"> </span>
+                                <span>Appstore</span></a>
+                            <a class="btn btn-inverse" href="#"><span class="fui-android"> </span>
+                                <span>Google Play</span></a>
+                            <a class="btn btn-inverse" href="#"><span class="fui-microsoft"> </span> <span>Microsoft Market</span></a>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-26 bg-clouds" id='blog'>
+            <div class="container">
+                <div class="row">
+                    <div class="col-sm-8 col-sm-offset-2">
+                        <h3>Особенность ALMASALES</h3>
+                        <p class="lead"> заложена в его философии, включающей методологию OKR (Objectives and Key results), используемую такими мировыми компаниями как Google, Facebook, Apple, LinkedIn</p>
+                        <p>&nbsp;</p><p>&nbsp;</p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class=" col-sm-offset-4 col-sm-4">
+                        <div class="signup-form">
+                            <form action="plans.html">
+                                <div class="form-group">
+                                    <input class="form-control" type="text" placeholder="Ваш E-mail">
+                                </div>
+                                <div class="form-group">
+                                    <button type="submit" class="btn btn-block btn-info">Попробовать сервис</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="price-3" id='plans'>
+            <div class="container">
+                <div class="plans">
+                    <div class="plan">
+                        <div class="title">
+                            <div class="img"><img src="{% static 'common-files/icons/retina-ready-s@2x.png' %}" width="117" height="104" alt=""></div>
+                            Стартовый план
+                        </div>
+                        <div class="price">50$/month</div>
+                        <div class="description">
+                            100 Контактов<br>
+                            <b>unlimited</b> data<br>
+                            <b>unlimited</b> users<br>
+                            first 10 day free
+                        </div>
+                        <a class="btn btn-primary" href="registration.html">Выбрать план</a>
+                    </div>
+                    <div class="plan plan-2">
+                        <div class="title">
+                            <div class="img"><img src="{% static 'common-files/icons/rocket@2x.png' %}" width="101" height="101" alt=""></div>
+                            Средний бизнес
+                        </div>
+                        <div class="price">39$/month</div>
+                        <div class="description">
+                            5,000 Контактов<br>
+                            <b>unlimited</b> data<br>
+                            <b>unlimited</b> users<br>
+                            first 30 day free
+                        </div>
+                        <a class="btn btn-primary" href="registration.html">Выбрать план</a>
+                    </div>
+                    <div class="plan">
+                        <div class="title">
+                            <div class="img"><img src="{% static 'common-files/icons/magic-wand@2x.png' %}" width="100" height="100" alt=""></div>
+                            Крупный бизнес
+                        </div>
+                        <div class="price">59$/month</div>
+                        <div class="description">
+                            20,000 Контактов<br>
+                            <b>unlimited</b> data<br>
+                            <b>unlimited</b> users<br>
+                            first 100 day free
+                        </div>
+                        <a class="btn btn-primary" href="registration.html">Выбрать план</a>
+                    </div>
+                </div>
+            </div>
+            <!--/.container-->
+        </section>
+
+        <section class="crew-1" id=''>
+            <div class="container">
+                <h3>Наша команда</h3>
+                <div class="members">
+                    <div class="member-wrapper">
+                        <div class="member">
+                            <div class="photo-wrapper">
+                                <div class="photo" style="background-image: url(file:///Users/mailubai/Sites/Startup%20Framework/Developer/common-files/img/crew/vladimir-k.png' %});"><img src="{% static '../../common-files/img/crew/vladimir-k.png' %}" alt="" style="display: none;"></div>
+                                <div class="overlay"><span class="fui-eye"></span></div>
+                            </div>
+                            <div class="info">
+                                <div class="name">Алтаев Санжар</div>
+                                Генеральный директор
+                            </div>
+                        </div>
+                    </div>
+                    <div class="member-wrapper">
+                        <div class="member">
+                            <div class="photo-wrapper">
+                                <div class="photo" style="background-image: url(file:///Users/mailubai/Sites/Startup%20Framework/Developer/common-files/img/crew/sergey-s.png' %});"><img src="{% static '../../common-files/img/crew/sergey-s.png' %}" alt="" style="display: none;"></div>
+                                <div class="overlay"><span class="fui-eye"></span></div>
+                            </div>
+                            <div class="info">
+                                <div class="name">Майлюбаев Ернар</div>
+                                UI Designer
+                            </div> 
+                        </div>
+                    </div>
+                    <div class="member-wrapper">
+                        <div class="member">
+                            <div class="photo-wrapper">
+                                <div class="photo" style="background-image: url(file:///Users/mailubai/Sites/Startup%20Framework/Developer/common-files/img/crew/adrian-v.png' %});"><img src="{% static '../../common-files/img/crew/adrian-v.png' %}" alt="" style="display: none;"></div>
+                                <div class="overlay"><span class="fui-eye"></span></div>
+                            </div>
+                            <div class="info">
+                                <div class="name">Камун Рустем</div>
+                                Founder
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="members">
+                    <div class="member-wrapper">
+                        <div class="member">
+                            <div class="photo-wrapper">
+                                <div class="photo" style="background-image: url(file:///Users/mailubai/Sites/Startup%20Framework/Developer/common-files/img/crew/edvard-k.png' %});"><img src="{% static '../../common-files/img/crew/edvard-k.png' %}" alt="" style="display: none;"></div>
+                                <div class="overlay"><span class="fui-eye"></span></div>
+                            </div>
+                            <div class="info">
+                                <div class="name">Омаров Асхат</div>
+                                UI Designer
+                            </div>
+                        </div>
+                    </div>
+                    <div class="member-wrapper">
+                        <div class="member">
+                            <div class="photo-wrapper">
+                                <div class="photo" style="background-image: url(file:///Users/mailubai/Sites/Startup%20Framework/Developer/common-files/img/crew/oxana-n.png' %});"><img src="{% static '../../common-files/img/crew/oxana-n.png' %}" alt="" style="display: none;"></div>
+                                <div class="overlay"><span class="fui-eye"></span></div>
+                            </div>
+                            <div class="info">
+                                <div class="name">Мусакулов Данияр</div>
+                                UI Designer
+                            </div>
+                        </div>
+                    </div>
+                    <div class="member-wrapper">
+                        <div class="member">
+                            <div class="photo-wrapper">
+                                <div class="photo" style="background-image: url(file:///Users/mailubai/Sites/Startup%20Framework/Developer/common-files/img/crew/tatiana-y.png' %});"><img src="{% static '../../common-files/img/crew/tatiana-y.png' %}" alt="" style="display: none;"></div>
+                                <div class="overlay"><span class="fui-eye"></span></div>
+                            </div>
+                            <div class="info">
+                                <div class="name"></div>
+                                Founder
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--/.container-->
+        </section>
+
+        <section id="contacts" class="contacts-2">
+            <div class="container">
+                <div class="row">
+                    <div class="col-sm-8">
+                        <h3>Мы всегда рады вашим предложениям.</h3>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <form>
+                            <label class="h6">Имя / Фамилия</label>
+                            <input type="text" class="form-control">
+                            <label class="h6">E-mail</label>
+                            <input type="text" class="form-control">
+                            <label class="h6">Сообщение</label>
+                            <textarea rows="7" class="form-control"></textarea>
+                            <button type="submit" class="btn btn-primary"><span class="fui-mail"></span></button>
+                        </form>
+                    </div>
+                    <div class="col-sm-5 col-sm-offset-1">
+                        <h6>Где нас найти</h6>
+                        <p>Вы можете найти нас по адресу Республика Казахстан, г. Алматы, мкр. Самал 1, д. 1 </p>
+                        <div class="map">
+                            <!--map-->
+                            <iframe width="100%" height="100%" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="https://maps.google.com/?ie=UTF8&amp;t=m&amp;ll=40.714353,-74.005973&amp;spn=0.04554,0.072956&amp;z=12&amp;output=embed"></iframe>
+                        </div>
+                        <h6>Контакты</h6>
+                        <div class="links">
+                            <a href="#"><span class="fui-phone"></span> +7 777 00 777 05</a><br>
+                            <a href="#"><span class="fui-mail"></span> info@almasales.com</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <footer class="footer-6">
+            <div class="container">
+                <div class="row">
+                    <div class="col-sm-3">
+                        <div><a class="brand" href="#"><img src="{% static 'common-files/img/logo2.png' %}" width="140" alt=""></a></div>
+                    </div>
+                    <nav>
+                        <div class="col-sm-6">
+                            <h6>О нас</h6>
+                            <ul>
+                                <li><a href="#">О нас</a></li>
+                                <li><a href="#">Блог</a></li>
+                                <li><a href="#contacts">Контакты</a></li>
+                            </ul>
+                        </div>
+
+                    </nav>
+                    <div class="col-sm-3">
+                        <h6>Подписаться на рассылку</h6>
+                        <div class="input-group">
+                            <input type="text" class="form-control">
+                            <span class="input-group-btn">
+                                <button class="btn" type="button">
+                                    <span class="fui-arrow-right"> </span>
+                                </button>
+                            </span>
+                        </div>
+                        <div class="social-btns">
+                            <a href="#">
+                                <div class="fui-facebook"></div>
+                                <div class="fui-facebook"></div>
+                            </a>
+                            <a href="#">
+                                <div class="fui-twitter"></div>
+                                <div class="fui-twitter"></div>
+                            </a>
+                            <a href="#">
+                                <div class="fui-vimeo"></div>
+                                <div class="fui-vimeo"></div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </body>
+    <script>
+          $(function() {
+            $('a[href*=#]:not([href=#])').click(function() {
+              if (location.pathname.replace(/^\//,'') == this.pathname.replace(/^\//,'') && location.hostname == this.hostname) {
+                var target = $(this.hash);
+                target = target.length ? target : $('[name=' + this.hash.slice(1) +']');
+                if (target.length) {
+                  $('html,body').animate({
+                    scrollTop: target.offset().top
+                  }, 1000);
+                  return false;
+                }
+              }
+            });
+          });
+    </script>
+</html>

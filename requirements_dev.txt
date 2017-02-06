@@ -1,0 +1,2 @@
+Werkzeug
+django-cors-headers

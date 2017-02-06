@@ -1,0 +1,16 @@
+# db
+ssh port 3022
+ip 92.46.60.13
+login - xepa4ep
+
+# db psql
+psql -h db.alma.net almanet xepa4ep
+password: f1b0nacc1
+
+# app
+ssh port - 3023
+www port - 3081
+login - xepa4ep
+pass - 87772962124ZAQ
+ip - 92.46.60.13
+internal ip - 10.10.10.245

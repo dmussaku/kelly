@@ -3,45 +3,55 @@
         "pk":1,
         "model": "alm_crm.Mention",
         "fields": {
-            "user_id":1,
+            "user":1,
             "content_type":["alm_crm", "activity"],
-            "object_id":1
+            "object_id":1,
+            "date_created": "2014-09-10T00:00:00Z",
+            "date_edited": "2014-11-24T07:49:32.991Z" 
         }
     },
     {
         "pk": 2,
         "model": "alm_crm.Mention",
         "fields": {
-        	"user_id":1,
+        	"user":1,
             "content_type":["alm_crm", "activity"],
-        	"object_id":2
+        	"object_id":2,
+            "date_created": "2014-09-10T00:00:00Z",
+            "date_edited": "2014-11-24T07:49:32.991Z"
         }
     },
     {
         "pk": 3,
         "model": "alm_crm.Mention",
         "fields": {
-        	"user_id":1,
+        	"user":1,
             "content_type":["alm_crm", "activity"],
-        	"object_id":3
+        	"object_id":3,
+            "date_created": "2014-09-10T00:00:00Z",
+            "date_edited": "2014-11-24T07:49:32.991Z"
         }
     },
     {
         "pk": 4,
         "model": "alm_crm.Mention",
         "fields": {
-        	"user_id":1,
+        	"user":1,
             "content_type":["alm_crm", "activity"],
-        	"object_id":4
+        	"object_id":4,
+            "date_created": "2014-09-10T00:00:00Z",
+            "date_edited": "2014-11-24T07:49:32.991Z" 
         }
     },
     {
         "pk": 5,
         "model": "alm_crm.Mention",
         "fields": {
-            "user_id":1,
+            "user":1,
             "content_type":["alm_crm", "salescycle"],
-            "object_id":4
+            "object_id":4,
+            "date_created": "2014-09-10T00:00:00Z",
+            "date_edited": "2014-11-24T07:49:32.991Z" 
         }
     }
 ]

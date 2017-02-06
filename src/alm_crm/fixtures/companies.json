@@ -1,0 +1,22 @@
+[
+{
+    "pk": 1, 
+    "model": "alm_company.company", 
+    "fields": {
+        "date_created": "2015-01-23T00:00:00Z", 
+        "subdomain": "almacloud", 
+        "name": "Almacloud", 
+        "date_edited": "2015-01-23T00:00:00Z"
+    }
+},
+{
+    "pk": 2, 
+    "model": "alm_company.company", 
+    "fields": {
+        "date_created": "2015-03-03T13:47:12.850Z", 
+        "subdomain": "arta", 
+        "name": "Arta", 
+        "date_edited": "2015-03-03T13:47:12.850Z"
+    }
+}
+]

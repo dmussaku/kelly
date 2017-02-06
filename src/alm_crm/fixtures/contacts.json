@@ -1,54 +1,162 @@
 [
-    {
-        "pk": 1,
-        "model": "alm_crm.Contact",
-        "fields": {
-            "status":0,
-            "tp":"user",
-            "date_created":"2014-09-10 00:00:00+00:00",
-            "vcard":null,
-            "company_contact":null,
-            "followers":[],
-            "assignees":[]
-        }
-    },
-    {
-        "pk": 2,
-        "model": "alm_crm.Contact",
-        "fields": {
-            "status":1,
-            "tp":"user",
-            "date_created":"2014-09-10 00:00:00+00:00",
-            "vcard":null,
-            "company_contact":null,
-            "followers":[],
-            "assignees":[]
-        }
-    },
-    {
-        "pk": 3,
-        "model": "alm_crm.Contact",
-        "fields": {
-            "status":1,
-            "tp":"user",
-            "date_created":"2014-09-10 00:00:00+00:00",
-            "vcard":null,
-            "company_contact":null,
-            "followers":[],
-            "assignees":[]
-        }
-    },
-    {
-        "pk": 4,
-        "model": "alm_crm.Contact",
-        "fields": {
-            "status":2,
-            "tp":"user",
-            "date_created":"2014-09-10 00:00:00+00:00",
-            "vcard":null,
-            "company_contact":null,
-            "followers":[],
-            "assignees":[]
-        }
+{
+    "pk": 1, 
+    "model": "alm_crm.contact", 
+    "fields": {
+        "status": 1, 
+        "import_task": null, 
+        "latest_activity": null, 
+        "parent": null, 
+        "company_id": 1, 
+        "tp": "user", 
+        "owner": 1, 
+        "date_created": "2015-02-11T10:50:50.965Z", 
+        "vcard": 11, 
+        "date_edited": "2015-08-10T07:30:01.556Z"
     }
+},
+{
+    "pk": 2, 
+    "model": "alm_crm.contact", 
+    "fields": {
+        "status": 0, 
+        "import_task": null, 
+        "latest_activity": null, 
+        "parent": null, 
+        "company_id": 1, 
+        "tp": "user", 
+        "owner": 2, 
+        "date_created": "2015-02-11T10:50:50.990Z", 
+        "vcard": 12, 
+        "date_edited": "2015-08-10T07:30:01.560Z"
+    }
+},
+{
+    "pk": 3, 
+    "model": "alm_crm.contact", 
+    "fields": {
+        "status": 2, 
+        "import_task": null, 
+        "latest_activity": null, 
+        "parent": null, 
+        "company_id": 1, 
+        "tp": "user", 
+        "owner": 3, 
+        "date_created": "2015-02-11T10:50:51.036Z", 
+        "vcard": 13, 
+        "date_edited": "2015-08-10T07:30:01.563Z"
+    }
+},
+{
+    "pk": 4, 
+    "model": "alm_crm.contact", 
+    "fields": {
+        "status": 3, 
+        "import_task": null, 
+        "latest_activity": null, 
+        "parent": null, 
+        "company_id": 1, 
+        "tp": "user", 
+        "owner": 4, 
+        "date_created": "2015-02-11T10:50:51.051Z", 
+        "vcard": 14, 
+        "date_edited": "2015-08-10T07:30:01.567Z"
+    }
+},
+{
+    "pk": 5, 
+    "model": "alm_crm.contact", 
+    "fields": {
+        "status": 0, 
+        "import_task": null, 
+        "latest_activity": null, 
+        "parent": null, 
+        "company_id": 1, 
+        "tp": "user", 
+        "owner": 5, 
+        "date_created": "2015-02-11T10:50:51.058Z", 
+        "vcard": 15, 
+        "date_edited": "2015-08-10T07:30:01.571Z"
+    }
+},
+{
+    "pk": 6, 
+    "model": "alm_crm.contact", 
+    "fields": {
+        "status": 1, 
+        "import_task": null, 
+        "latest_activity": null, 
+        "parent": null, 
+        "company_id": 1, 
+        "tp": "user", 
+        "owner": 6, 
+        "date_created": "2015-02-11T10:50:51.076Z", 
+        "vcard": 16, 
+        "date_edited": "2015-08-10T07:30:01.574Z"
+    }
+},
+{
+    "pk": 7, 
+    "model": "alm_crm.contact", 
+    "fields": {
+        "status": 0, 
+        "import_task": null, 
+        "latest_activity": null, 
+        "parent": null, 
+        "company_id": 1, 
+        "tp": "user", 
+        "owner": 7, 
+        "date_created": "2015-02-11T10:50:51.109Z", 
+        "vcard": 17, 
+        "date_edited": "2015-08-10T07:30:01.578Z"
+    }
+},
+{
+    "pk": 8, 
+    "model": "alm_crm.contact", 
+    "fields": {
+        "status": 2, 
+        "import_task": null, 
+        "latest_activity": null, 
+        "parent": null, 
+        "company_id": 1, 
+        "tp": "user", 
+        "owner": 8, 
+        "date_created": "2015-02-11T10:50:51.120Z", 
+        "vcard": 18, 
+        "date_edited": "2015-08-10T07:30:01.581Z"
+    }
+},
+{
+    "pk": 9, 
+    "model": "alm_crm.contact", 
+    "fields": {
+        "status": 3, 
+        "import_task": null, 
+        "latest_activity": null, 
+        "parent": null, 
+        "company_id": 1, 
+        "tp": "user", 
+        "owner": 9, 
+        "date_created": "2015-02-11T10:50:51.127Z", 
+        "vcard": 19, 
+        "date_edited": "2015-08-10T07:30:01.585Z"
+    }
+},
+{
+    "pk": 10, 
+    "model": "alm_crm.contact", 
+    "fields": {
+        "status": 1, 
+        "import_task": null, 
+        "latest_activity": null, 
+        "parent": null, 
+        "company_id": 1, 
+        "tp": "user", 
+        "owner": 10, 
+        "date_created": "2015-02-11T10:50:51.134Z", 
+        "vcard": 20, 
+        "date_edited": "2015-08-10T07:30:01.588Z"
+    }
+}
 ]

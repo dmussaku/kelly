@@ -1,0 +1,92 @@
+[
+{
+    "pk": 1, 
+    "model": "alm_vcard.org", 
+    "fields": {
+        "organization_name": "\u0410\u043b\u043c\u0430\u043a\u043b\u0430\u0443\u0434", 
+        "organization_unit": "", 
+        "vcard": 11
+    }
+},
+{
+    "pk": 2, 
+    "model": "alm_vcard.org", 
+    "fields": {
+        "organization_name": "\u0410\u043b\u043c\u0430\u043a\u043b\u0430\u0443\u0434", 
+        "organization_unit": "", 
+        "vcard": 12
+    }
+},
+{
+    "pk": 3, 
+    "model": "alm_vcard.org", 
+    "fields": {
+        "organization_name": "\u0410\u043b\u043c\u0430\u043a\u043b\u0430\u0443\u0434", 
+        "organization_unit": "", 
+        "vcard": 13
+    }
+},
+{
+    "pk": 4, 
+    "model": "alm_vcard.org", 
+    "fields": {
+        "organization_name": "\u0410\u043b\u043c\u0430\u043a\u043b\u0430\u0443\u0434", 
+        "organization_unit": "", 
+        "vcard": 14
+    }
+},
+{
+    "pk": 5, 
+    "model": "alm_vcard.org", 
+    "fields": {
+        "organization_name": "\u0410\u043b\u043c\u0430\u043a\u043b\u0430\u0443\u0434", 
+        "organization_unit": "", 
+        "vcard": 15
+    }
+},
+{
+    "pk": 6, 
+    "model": "alm_vcard.org", 
+    "fields": {
+        "organization_name": "\u0410\u043b\u043c\u0430\u043a\u043b\u0430\u0443\u0434", 
+        "organization_unit": "", 
+        "vcard": 16
+    }
+},
+{
+    "pk": 7, 
+    "model": "alm_vcard.org", 
+    "fields": {
+        "organization_name": "\u0410\u043b\u043c\u0430\u043a\u043b\u0430\u0443\u0434", 
+        "organization_unit": "", 
+        "vcard": 17
+    }
+},
+{
+    "pk": 8, 
+    "model": "alm_vcard.org", 
+    "fields": {
+        "organization_name": "\u0410\u043b\u043c\u0430\u041a\u043b\u0430\u0443\u0434", 
+        "organization_unit": "", 
+        "vcard": 18
+    }
+},
+{
+    "pk": 9, 
+    "model": "alm_vcard.org", 
+    "fields": {
+        "organization_name": "Cleanium, \u0445\u0438\u043c\u0447\u0438\u0441\u0442\u043a\u0430", 
+        "organization_unit": "", 
+        "vcard": 19
+    }
+},
+{
+    "pk": 10, 
+    "model": "alm_vcard.org", 
+    "fields": {
+        "organization_name": "J Tour", 
+        "organization_unit": "", 
+        "vcard": 20
+    }
+}
+]

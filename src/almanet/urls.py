@@ -1,11 +1,9 @@
 from django.contrib import admin
-
 from django.conf.urls import patterns, include, url
 from django.conf.urls.static import static
 from django.conf import settings
 from almanet.views import fork_index
 from almanet.views import (
-    TestView2,
     ServiceList,
     connect_service,
     disconnect_service,
@@ -13,16 +11,25 @@ from almanet.views import (
     ServiceUpdateView,
     ServiceDeleteView,
     ServiceDetailView,
+    RedirectHomeView,
+    landing_form,
+    landing
     )
+from django.views.generic import TemplateView
 
 admin.autodiscover()
 
 urlpatterns = patterns(
     '',
+    url(r'^$', landing, name='landing_page'),
+    url(r'^admin/', include(admin.site.urls)),
     url(r'^auth/', include('alm_user.urls')),
+    url(r'^api/', include('almanet.api_urls')),
+
+    
     # TODO: temp, needs to be deleted
-    url(r'^crm/', include('alm_crm.urls')),
-    url(r'^vcard/', include('alm_vcard.urls')),
+    # url(r'^crm/', include('alm_crm.urls')),
+    # url(r'^vcard/', include('alm_vcard.urls')),
     url(r'^services/$', ServiceList.as_view(
         template_name='almanet/service/service_list.html'),
         name='service_list'),
@@ -37,7 +44,10 @@ urlpatterns = patterns(
     url(r'^services/service_update/(?P<pk>\d+)/$', ServiceUpdateView.as_view(), name='service_update'),
     url(r'^services/service_detail/(?P<pk>\d+)/$', ServiceDetailView.as_view(), name='service_detail'),
     url(r'^services/service_delete/(?P<pk>\d+)/$', ServiceDeleteView.as_view(), name='service_delete'),
-
+    url(r'api/doc/', include('tastypie_swagger.urls', namespace='tastypie_swagger')),
+    url(r'agreement/$', TemplateView.as_view(template_name='almanet/agreement.crm.html'), name='agreement'),
+    # url(r'landing_form/$', landing_form, name='landing_form'),
+    url(r'^files', include('almastorage.urls')),
 )
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
@@ -51,3 +61,11 @@ if settings.DEBUG:
     urlpatterns += patterns(
         '',
         url(r'^email-previews', view=site.urls))
+
+
+if settings.USE_PROFILER:
+    import debug_toolbar
+    urlpatterns += patterns(
+        '',
+        url(r'^__debug__/', include(debug_toolbar.urls)),
+    )

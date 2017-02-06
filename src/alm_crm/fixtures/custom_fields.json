@@ -1,0 +1,112 @@
+[
+{
+    "pk": 1,
+    "model": "alm_crm.CustomField",
+    "fields": {
+        "title": "Custom Field #1",
+        "date_created":"2014-02-01T01:43:00.827Z",
+        "date_edited":"2014-02-01T01:43:00.827Z",
+        "content_type":["alm_crm", "product"],
+        "company_id": 1
+    }
+},
+{
+    "pk": 2,
+    "model": "alm_crm.CustomField",
+    "fields": {
+        "title": "Custom Field #2",
+        "date_created":"2014-02-01T02:18:00.827Z",
+        "date_edited":"2014-02-01T02:18:00.827Z",
+        "content_type":["alm_crm", "product"],
+        "company_id": 1
+    }
+},
+{
+    "pk": 3,
+    "model": "alm_crm.CustomField",
+    "fields": {
+        "title": "Custom Field #3",
+        "date_created":"2014-02-01T03:19:00.827Z",
+        "date_edited":"2014-02-01T03:19:00.827Z",
+        "content_type":["alm_crm", "product"],
+        "company_id": 1
+    }
+},
+{
+    "pk": 4,
+    "model": "alm_crm.CustomField",
+    "fields": {
+        "title": "Custom Field #4",
+        "date_created":"2014-02-01T04:57:00.827Z",
+        "date_edited":"2014-02-01T04:57:00.827Z",
+        "content_type":["alm_crm", "product"],
+        "company_id": 1
+    }
+},
+{
+    "pk": 5,
+    "model": "alm_crm.CustomField",
+    "fields": {
+        "title": "Custom Field #5",
+        "date_created":"2014-02-01T05:55:00.827Z",
+        "date_edited":"2014-02-01T05:55:00.827Z",
+        "content_type":["alm_crm", "product"],
+        "company_id": 1
+    }
+},
+{
+    "pk": 6,
+    "model": "alm_crm.CustomField",
+    "fields": {
+        "title": "Custom Field #6",
+        "date_created":"2014-02-01T06:36:00.827Z",
+        "date_edited":"2014-02-01T06:36:00.827Z",
+        "content_type":["alm_crm", "contact"],
+        "company_id": 1
+    }
+},
+{
+    "pk": 7,
+    "model": "alm_crm.CustomField",
+    "fields": {
+        "title": "Custom Field #7",
+        "date_created":"2014-02-01T07:01:00.827Z",
+        "date_edited":"2014-02-01T07:01:00.827Z",
+        "content_type":["alm_crm", "contact"],
+        "company_id": 1
+    }
+},
+{
+    "pk": 8,
+    "model": "alm_crm.CustomField",
+    "fields": {
+        "title": "Custom Field #8",
+        "date_created":"2014-02-01T08:17:00.827Z",
+        "date_edited":"2014-02-01T08:17:00.827Z",
+        "content_type":["alm_crm", "contact"],
+        "company_id": 1
+    }
+},
+{
+    "pk": 9,
+    "model": "alm_crm.CustomField",
+    "fields": {
+        "title": "Custom Field #9",
+        "date_created":"2014-02-01T09:12:00.827Z",
+        "date_edited":"2014-02-01T09:12:00.827Z",
+        "content_type":["alm_crm", "contact"],
+        "company_id": 1
+    }
+},
+{
+    "pk": 10,
+    "model": "alm_crm.CustomField",
+    "fields": {
+        "title": "Custom Field #10",
+        "date_created":"2014-02-01T10:48:00.827Z",
+        "date_edited":"2014-02-01T10:48:00.827Z",
+        "content_type":["alm_crm", "product"],
+        "company_id": 1
+    }
+}
+]

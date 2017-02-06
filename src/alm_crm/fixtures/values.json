@@ -1,65 +1,132 @@
 [
-    {
-        "pk": 1, 
-        "model": "alm_crm.Value", 
-        "fields": {
-            "salary":"monthly",
-            "amount":100000,
-            "currency":"KZT"
-        }
-    },
-    {
-        "pk": 2, 
-        "model": "alm_crm.Value", 
-        "fields": {
-            "salary":"instant",
-            "amount":120000,
-            "currency":"KZT"
-        }
-    },
-    {
-        "pk": 3, 
-        "model": "alm_crm.Value", 
-        "fields": {
-            "salary":"annualy",
-            "amount":100000,
-            "currency":"USD"
-        }
-    },
-    {
-        "pk": 4, 
-        "model": "alm_crm.Value", 
-        "fields": {
-            "salary":"monthly",
-            "amount":1000000,
-            "currency":"KZT"
-        }
-    },
-    {
-        "pk": 5, 
-        "model": "alm_crm.Value", 
-        "fields": {
-            "salary":"monthly",
-            "amount":190000,
-            "currency":"KZT"
-        }
-    },
-    {
-        "pk": 6, 
-        "model": "alm_crm.Value", 
-        "fields": {
-            "salary":"instant",
-            "amount":1000000,
-            "currency":"KZT"
-        }
-    },
-    {
-        "pk": 7, 
-        "model": "alm_crm.Value", 
-        "fields": {
-            "salary":"monthly",
-            "amount":120000,
-            "currency":"KZT"
-        }
+{
+    "pk": 1, 
+    "model": "alm_crm.value", 
+    "fields": {
+        "salary": "instant", 
+        "company_id": 1, 
+        "currency": "KZT", 
+        "amount": 40000000, 
+        "owner": 1, 
+        "date_created": "2015-03-03T04:19:43.685Z", 
+        "date_edited": "2015-08-10T07:30:24.642Z"
     }
+},
+{
+    "pk": 2, 
+    "model": "alm_crm.value", 
+    "fields": {
+        "salary": "instant", 
+        "company_id": 1, 
+        "currency": "KZT", 
+        "amount": 3666, 
+        "owner": 2, 
+        "date_created": "2015-04-13T08:02:57.731Z", 
+        "date_edited": "2015-08-10T07:30:24.644Z"
+    }
+},
+{
+    "pk": 3, 
+    "model": "alm_crm.value", 
+    "fields": {
+        "salary": "instant", 
+        "company_id": 1, 
+        "currency": "KZT", 
+        "amount": 0, 
+        "owner": 3, 
+        "date_created": "2015-04-27T09:47:44.691Z", 
+        "date_edited": "2015-08-10T07:30:24.647Z"
+    }
+},
+{
+    "pk": 4, 
+    "model": "alm_crm.value", 
+    "fields": {
+        "salary": "instant", 
+        "company_id": 1, 
+        "currency": "KZT", 
+        "amount": 0, 
+        "owner": 4, 
+        "date_created": "2015-06-16T04:36:28.088Z", 
+        "date_edited": "2015-08-10T07:30:24.649Z"
+    }
+},
+{
+    "pk": 5, 
+    "model": "alm_crm.value", 
+    "fields": {
+        "salary": "instant", 
+        "company_id": 1, 
+        "currency": "KZT", 
+        "amount": 163680, 
+        "owner": 5, 
+        "date_created": "2015-04-28T05:27:25.366Z", 
+        "date_edited": "2015-08-10T07:30:24.651Z"
+    }
+},
+{
+    "pk": 6, 
+    "model": "alm_crm.value", 
+    "fields": {
+        "salary": "instant", 
+        "company_id": 1, 
+        "currency": "KZT", 
+        "amount": 0, 
+        "owner": 6, 
+        "date_created": "2015-04-29T02:48:39.241Z", 
+        "date_edited": "2015-08-10T07:30:24.654Z"
+    }
+},
+{
+    "pk": 7, 
+    "model": "alm_crm.value", 
+    "fields": {
+        "salary": "instant", 
+        "company_id": 1, 
+        "currency": "KZT", 
+        "amount": 0, 
+        "owner": 7, 
+        "date_created": "2015-04-29T03:54:57.886Z", 
+        "date_edited": "2015-08-10T07:30:24.656Z"
+    }
+},
+{
+    "pk": 8, 
+    "model": "alm_crm.value", 
+    "fields": {
+        "salary": "instant", 
+        "company_id": 1, 
+        "currency": "KZT", 
+        "amount": 0, 
+        "owner": 8, 
+        "date_created": "2015-04-29T05:58:46.560Z", 
+        "date_edited": "2015-08-10T07:30:24.658Z"
+    }
+},
+{
+    "pk": 9, 
+    "model": "alm_crm.value", 
+    "fields": {
+        "salary": "instant", 
+        "company_id": 1, 
+        "currency": "KZT", 
+        "amount": 247, 
+        "owner": 9, 
+        "date_created": "2015-04-29T09:14:10.711Z", 
+        "date_edited": "2015-08-10T07:30:24.661Z"
+    }
+},
+{
+    "pk": 10, 
+    "model": "alm_crm.value", 
+    "fields": {
+        "salary": "instant", 
+        "company_id": 1, 
+        "currency": "KZT", 
+        "amount": 764012, 
+        "owner": 10, 
+        "date_created": "2015-04-29T09:17:10.490Z", 
+        "date_edited": "2015-08-10T07:30:24.663Z"
+    }
+}
 ]

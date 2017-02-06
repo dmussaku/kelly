@@ -1,0 +1,14 @@
+[
+{
+    "pk": 1, 
+    "model": "alm_crm.hashtagreference", 
+    "fields": {
+        "company_id": 1, 
+        "object_id": 2, 
+        "content_type": 39, 
+        "hashtag": 3, 
+        "date_created": "2015-07-15T04:13:19.147Z", 
+        "date_edited": "2015-07-15T04:13:19.148Z"
+    }
+}
+]

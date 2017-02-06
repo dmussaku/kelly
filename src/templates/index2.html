@@ -1,0 +1,488 @@
+{% load static from staticfiles %}
+{% load i18n %}
+{% load almanet_tags %}
+<!--DOCTYPE html -->
+<html >
+    <head>
+        <meta charset="UTF-8">
+        <title>Alma.Net • CRM</title>
+        <!-- this code between <header> ... </header> -->
+        <link rel="stylesheet" href="{% static  'flat-ui/bootstrap/css/bootstrap.css' %}">
+        <link rel="stylesheet" href="{% static  'flat-ui/css/flat-ui.css' %}">
+        <!-- Using only with Flat-UI (free)-->
+        <link rel="stylesheet" href="{% static  'common-files/css/icon-font.css' %}">
+        <!-- end -->
+        <link rel="stylesheet" href="{% static  'common-files/css/animations.css' %}">
+        <!-- this code directly before </body> -->
+        <script src="{% static 'common-files/js/jquery-1.10.2.min.js' %}"></script>
+        <script src="{% static 'flat-ui/js/bootstrap.min.js' %}"></script>
+        <script src="{% static 'common-files/js/jquery.scrollTo-1.4.3.1-min.js' %}"></script>
+        <script src="{% static 'common-files/js/modernizr.custom.js' %}"></script>
+        <script src="{% static 'common-files/js/page-transitions.js' %}"></script>
+        <script src="{% static 'common-files/js/easing.min.js' %}"></script>
+        <script src="{% static 'common-files/js/jquery.svg.js' %}"></script>
+        <script src="{% static 'common-files/js/jquery.svganim.js' %}"></script>
+        <script src="{% static 'common-files/js/jquery.parallax.min.js' %}"></script>
+        <script src="{% static 'common-files/js/startup-kit.js' %}"></script>
+        <script src="{% static 'js/imac-slider.js' %}"></script>
+
+        <!-- header -->
+        <link rel="stylesheet" href="{% static  'ui-kit/ui-kit-header/css/style.css' %}">
+        <!-- content -->
+        <link rel="stylesheet" href="{% static  'ui-kit/ui-kit-content/css/style.css' %}">
+        <!-- blog -->
+        <link rel="stylesheet" href="{% static  'ui-kit/ui-kit-blog/css/style.css' %}">
+        <!-- contacts -->
+        <link rel="stylesheet" href="{% static  'ui-kit/ui-kit-contacts/css/style.css' %}">
+        <!-- crew -->
+        <link rel="stylesheet" href="{% static  'ui-kit/ui-kit-crew/css/style.css' %}">
+        <!-- price -->
+        <link rel="stylesheet" href="{% static  'ui-kit/ui-kit-price/css/style.css' %}">
+        <!-- projects -->
+        <link rel="stylesheet" href="{% static  'ui-kit/ui-kit-projects/css/style.css' %}">
+        <!-- footer -->
+        <link rel="stylesheet" href="{% static  'ui-kit/ui-kit-footer/css/style.css' %}">
+        <style>
+            body {
+                margin: 0;
+                padding: 0;
+            }
+            .imac {
+                position: relative;
+                overflow: hidden;
+                background: url("{% static 'images/imac.png' %}") no-repeat;
+                padding: 29px 0 0 31px;
+                width: 738px;
+                height: 644px;
+            }
+            .imac img {
+                display: none;
+                width: 675px;
+                height: 405px;
+            }
+            .imac img:first-child {
+                display: block;
+            }
+            .imac .arrow {
+                position: absolute;
+                top: 30%;
+                left: 0;
+                width: 100%;
+            }
+            .imac .arrow a {
+                display: block;
+                background: url("{% static 'images/arrows.png' %}")}} no-repeat 0 0;
+                margin: 0 40px;
+                width: 41px;
+                height: 51px;
+            }
+            .imac .arrow .aleft {
+                float: left;
+            }
+            .imac .arrow .aright {
+                background-position: -51px 0;
+                float: right;
+            }
+            .imac:hover .arrow .aleft {
+                background-position: 0 -61px;
+            }
+            .imac:hover .arrow .aright {
+                background-position: -51px -61px;
+            }
+            .hidden {
+                display: none;
+            }
+        </style>
+    </head>
+    <body>
+        <header class="header-11" id='main'>
+            <div class="container">
+                <div class="row">
+                    <div class="navbar col-sm-12" role="navigation">
+                        <div class="navbar-header">
+                            <button type="button" class="navbar-toggle"></button>
+                            <a class="brand" href="#"><img src="{% static 'common-files/img/logo2.png' %}" width="160" height="160" alt=""></a>
+                        </div>
+                        <div class="collapse navbar-collapse pull-right">
+                            <ul class="nav pull-left">
+                                <li><a href="#main">{{_("Main")}} </a></li>
+                                <!--                                <li><a href="#">О компании</a></li>-->
+                                <li><a href="#plans">{{_("Plans")}} </a></li>
+                                <!--                                <li><a href="#">Блог</a></li>-->
+                                <li><a href="#contacts">{{_("Contacts")}} </a></li>
+                                <li>
+                                    <a style="padding:34px 0px 0px;" href="{% url 'landing_page' %}?lang=ru">
+                                        <img src="{% static 'images/ru.png' %}"/>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a style="padding:34px 0px 0px;" href="{% url 'landing_page' %}?lang=en">
+                                        <img src="{% static 'images/us.png' %}"/>
+                                    </a>
+                                </li>
+                            </ul>
+                            <form class="navbar-form pull-left">
+                                <a class="btn btn-info" href="{% url 'user_login' %}">{{_("Sign in")}}</a>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="header-background"></div>
+        </header>
+        <section class="header-11-sub bg-midnight-blue">
+            <div class="background">&nbsp;</div>
+            <div class="container">
+                <div class="row">
+                    <div class="col-sm-5">
+                        <h2>{{_("Selling - is our mission!")}}</h2>
+                        <!--                        <h4>ALMASALES – увеличим продажи вместе.</h4>-->
+                        <!--                           Особенность ALMASALES заложена в его философии, включающей методологию OKR (Objectives and Keyresults)-->
+
+                        <div class="signup-form">
+                            <form action="" method="post">
+                                {% csrf_token %}
+                                <div class="form-group">
+                                    <input class="form-control" type="text" name="email" placeholder="{{_('Your email')}}">
+                                </div>
+                                <div class="form-group">
+                                    <button type="submit" class="btn btn-block btn-info">{{_("Try service")}} </button>
+                                </div>
+                            </form>
+                        </div>
+                        <!--                        <div class="additional-links">Если хотите узнать больше <a href="#">проверьте наши возможности.</a></div>-->
+                    </div>
+                    <!--                    <div class="col-sm-7 col-sm-offset-1 player-wrapper">
+                                            <div class="player">
+                                                <iframe id="pPlayer" src="http://player.vimeo.com/video/80282064?title=0&amp;byline=0&amp;portrait=0&amp;api=1&amp;player_id=pPlayer" frameborder="0" webkitallowfullscreen="" mozallowfullscreen="" allowfullscreen=""></iframe>
+                                            </div>
+                                        </div>-->
+                </div>
+            </div>
+        </section>
+
+        <section class="content-4">
+            <div class="container">
+                <h3>AlmaSales {{_("Will increase your sales capacity through:")}} </h3>
+                <div class="center-block row features">
+                    <div class="col-sm-3">
+                        <img src="{% static 'common-files/icons/retina-ready-s@2x.png' %}" alt="" width="117" height="104">
+                        <h6>{{_("Goals")}}</h6>
+                        <p>{{_("Set the goal and prepare and develop financial and sales plan")}}</p>
+                    </div>
+                    <div class="col-sm-3">
+                        <img src="{% static 'common-files/icons/Pocket@2x.png' %}" alt="" width="104" height="104">
+                        <h6>{{_("Product")}}</h6>
+                        <p>{{_("Identifying the ideal product/client sales channels")}} </p>
+                    </div>
+                    <div class="col-sm-3">
+                        <img src="{% static 'common-files/icons/Graph@2x.png' %}" alt="" width="101" height="101">
+                        <h6>{{_("Reports")}}</h6>
+                        <p>{{_("Implement KPI and Reports with ALMASALES")}} </p>
+                    </div>
+                    <div class="col-sm-3">
+                        <img src="{% static 'common-files/icons/Settings@2x.png' %}" alt="" width="101" height="101">
+                        <h6>{{_("Tools")}}</h6>
+                        <p>{{_("Strengthen sales instruments")}}</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-14 v-center">
+            <div>
+                <div class="container">
+                    <h3>{{_("Our capabilites")}}</h3>
+                    <p class="lead">{{_("Check out what Almasales can do for your business")}}</p>
+                    <div class="row features">
+                        <div class="col-sm-8">
+                            <div class="imac">
+                                <img src="{% static 'common-files/img/content/1.png' %}" alt="">
+                                <img src="{% static 'common-files/img/content/4.png' %}" alt="">
+                                <img src="{% static 'common-files/img/content/6.png' %}" alt="">
+                            </div>
+
+                        </div>
+                        <div class="col-sm-4 ">
+                            <div class="" style="color:black;">
+                                <h6>- {{_("Client database and map")}}</h6>
+                                <h6>- {{_("Activity management")}}</h6>
+                                <h6>- {{ _("Products management") }}</h6>
+                                <h6>- {{ _("Data warehouse") }}</h6>
+                                <h6>- {{ _("Control orders") }}</h6>
+                                <h6>- {{ _("Work planning") }}</h6>
+                                <h6>- {{ _("Building sales strategy") }}</h6>
+                                <h6>- {{ _("Forecasting sales") }}</h6>
+                                <h6>- {{ _("Control of sales plan") }}</h6>
+                                <h6>- {{ _("Adjusting KPI’s for sales managers") }} </h6>
+                                <h6>- {{ _("Sales cycle analysis") }}</h6>
+                                <h6>- {{ _("Marketing effectiveness analysis") }} </h6>
+                                <h6>- {{ _("Business process standardization") }} </h6>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-27 bg-clouds">
+            <div class="container">
+                <div class="row">
+                    <div class="col-sm-4 ">
+                        <img class="" src="{% static 'common-files/icons/Responsive1@2x.png' %}" width="271" height="271" alt="">
+
+                    </div>
+                    <div class="col-sm-7 col-sm-offset-1">
+                        <h3>{{ _("Be mobile") }}</h3>
+                        <p>
+                            {{ _("Our mobile app allows you to stay connect to your sales department anywhere at any time.") }}
+                            }
+                        </p>
+                        <div class="btns">
+                            <a class="btn btn-inverse" href="https://itunes.apple.com/kz/app/almasales/id1010144591?mt=8"><span class="fui-apple"> </span>
+                                <span>Appstore</span></a>
+                            <a class="btn btn-inverse" href="#"><span class="fui-android"> </span>
+                                <span>Google Play</span></a>
+                            <a class="btn btn-inverse" href="#"><span class="fui-microsoft"> </span> <span>Microsoft Market</span></a>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-30">
+            <div class="container">
+                <div class="row features">
+                    <div class="col-sm-3 box-1">
+                        <div class="img" style="margin:0px;">
+                            <img src="{% static 'images/iphone1.png' %}" width="220" height="391" alt="">
+                        </div>
+                    </div>
+                    <div class="col-sm-3 box-2">
+                        <div class="img">
+                            <img src="{% static 'images/iphone2.png' %}" width="220" height="391" alt="">
+                        </div>
+                    </div>
+                    <div class="col-sm-3 box-3">
+                        <div class="img">
+                            <img src="{% static 'images/iphone3.png' %}" width="220" height="391" alt="">
+                        </div>
+                    </div>
+                    <div class="col-sm-3 box-4">
+                        <div class="img">
+                            <img src="{% static 'images/iphone4.png' %}" width="220" height="391" alt="">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-26 bg-clouds">
+            <div class="container">
+                <div class="row">
+                    <div class="col-sm-8 col-sm-offset-2">
+                        <h3>{{ _("The singularity of ALMASALES") }}</h3>
+                        <p class="lead"> 
+                        {{ _("lies in its philosophy, including OKR methodology (Objectives and Key results), implemented by such companies as  Google, Facebook, Apple, LinkedIn") }}
+                        </p>
+                        <p>&nbsp;</p><p>&nbsp;</p>
+                    </div>
+                </div>
+                <!--
+                <div class="signup-form">
+                    <form action="" method="post">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <input class="form-control" type="text" name="email" placeholder="Ваш E-mail">
+                        </div>
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-block btn-info">Попробовать сервис</button>
+                        </div>
+                    </form>
+                </div>
+                -->
+                <div class="row">
+                    <div class=" col-sm-offset-4 col-sm-4">
+                        <div class="signup-form">
+                            <form action="" method="post">
+                                {% csrf_token %}
+                                <div class="form-group">
+                                    <input class="form-control" type="email" name="email" placeholder="{{_('Your email')}}">
+                                </div>
+                                <div class="form-group">
+                                    <button type="submit" class="btn btn-block btn-info">{{ _("Try service") }}</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="price-3" id='plans'>
+            <div class="container">
+                <div class="plans">
+                    <div class="plan">
+                        <div class="title">
+                            <div class="img"><img src="{% static 'common-files/icons/retina-ready-s@2x.png' %}" width="117" height="104" alt=""></div>
+                            {{ _("Starters plan") }}
+                        </div>
+                        <div class="price">25$/{{ _("month") }}</div>
+                        <div class="description">
+                            <b>10</b> {{ _("Users") }}<br>
+                            <b>100</b> {{ _("Contacts") }}<br>
+                            <b>1 GB</b> {{ _("per user") }}<br>
+                            {{ _("First month is free") }}
+                        </div>
+                        <a class="btn btn-primary" href="{% url 'user_registration' %}">{{ _("Choose plan") }}</a>
+                    </div>
+                    <div class="plan plan-2">
+                        <div class="title">
+                            <div class="img"><img src="{% static 'common-files/icons/rocket@2x.png' %}" width="101" height="101" alt=""></div>
+                            {{ _("Medium business") }}
+                        </div>
+                        <div class="price">50$/{{ _("month") }}</div>
+                        <div class="description">
+                            <b>20</b> {{ _("Users") }}<br>
+                            <b>2000</b> {{ _("Contacts") }} <br>
+                            <b>5 GB</b> {{ _("per user") }} <br>
+                            {{ _("First month is free") }} 
+                        </div>
+                        <a class="btn btn-primary" href="{% url 'user_registration' %}">{{ _("Choose plan") }}</a>
+                    </div>
+                    <div class="plan">
+                        <div class="title">
+                            <div class="img"><img src="{% static 'common-files/icons/magic-wand@2x.png' %}" width="100" height="100" alt=""></div>
+                            {{ _("Corporate business") }}
+                        </div>
+                        <div class="price">100$/{{ _("month") }}</div>
+                        <div class="description">
+                            <b>30+</b> {{ _("Users") }}<br>
+                            <b>{{ _("Unlimited") }} </b><br>
+                            <b>10 GB</b> {{ _("per user") }}<br>
+                            {{ _("First month is free") }} 
+                        </div>
+                        <a class="btn btn-primary" href="{% url 'user_registration' %}">{{ _("Choose plan") }}</a>
+                    </div>
+                </div>
+            </div>
+            <!--/.container-->
+        </section>
+
+        <section id="contacts" class="contacts-2" style='padding-bottom:20px;'>
+            <div class="container">
+                <div class="row">
+                    <div class="col-sm-8">
+                        <h3>{{ _("We are always happy with your feedback") }}</h3>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <!-- <form>
+                            <label class="h6">Имя / Фамилия</label>
+                            <input type="text" class="form-control">
+                            <label class="h6">E-mail</label>
+                            <input type="text" class="form-control">
+                            <label class="h6">Сообщение</label>
+                            <textarea rows="7" class="form-control"></textarea>
+                            <button type="submit" class="btn btn-primary"><span class="fui-mail"></span></button>
+                        </form> -->
+                        <h6>{{ _("Where to find us") }}</h6>
+                        <p>{{ _("You can find us by address: Samal 1, house 1, Almaty, Kazakhstan 050010.") }}</p>
+                        <div class="map" style='height:300px;'>
+                            <!--map-->
+                            <iframe width="100%" height="100%" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="https://maps.google.com/?ie=UTF8&amp;t=m&amp;ll=43.237874,76.956366&amp;spn=0.04554,0.072956&amp;z=15&amp;output=embed"></iframe>
+                        </div>
+                    </div>
+                    <div class="col-sm-5 col-sm-offset-1">
+                        
+                        <h6>{{ _("Contacts") }}</h6>
+                        <div class="links">
+                            <a href="#"><span class="fui-phone"></span> +7 777 00 777 05</a><br>
+                            <a href="#"><span class="fui-phone"></span> +7 708 88 870 88</a><br>
+                            <a href="#"><span class="fui-mail"></span> info@almasales.com</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <footer class="footer-6" style='padding-bottom:30px; padding-top:10px;'>
+            <div class="container">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div><a class="brand" href="#"><img src="{% static 'common-files/img/logo2.png' %}" width="140" alt=""></a></div>
+                    </div>
+                    <nav>
+                        <!-- <div class="col-sm-6">
+                            &nbsp;
+                            <h6>О нас</h6>
+                            <ul>
+                                <li><a href="#">О нас</a></li>
+                                <li><a href="#">Блог</a></li>
+                                <li><a href="#contacts">Контакты</a></li>
+                            </ul>
+                        </div> -->
+
+                    </nav>
+                    <div class="col-sm-3 col-sm-offset-1">
+                        <h6>{{ _("Subscribe") }}</h6>
+                        <div class="input-group">
+                            <input type="text" class="form-control">
+                            <span class="input-group-btn">
+                                <button class="btn" type="button">
+                                    <span class="fui-arrow-right"> </span>
+                                </button>
+                            </span>
+                        </div>
+                        <!-- <div class="social-btns">
+                            <a href="#">
+                                <div class="fui-facebook"></div>
+                                <div class="fui-facebook"></div>
+                            </a>
+                            <a href="#">
+                                <div class="fui-twitter"></div>
+                                <div class="fui-twitter"></div>
+                            </a>
+                            <a href="#">
+                                <div class="fui-vimeo"></div>
+                                <div class="fui-vimeo"></div>
+                            </a>
+                        </div> -->
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </body>
+    <script>
+          $(function() {
+            $('a[href*=#]:not([href=#])').click(function() {
+              if (location.pathname.replace(/^\//,'') == this.pathname.replace(/^\//,'') && location.hostname == this.hostname) {
+                var target = $(this.hash);
+                target = target.length ? target : $('[name=' + this.hash.slice(1) +']');
+                if (target.length) {
+                  $('html,body').animate({
+                    scrollTop: target.offset().top
+                  }, 1000);
+                  return false;
+                }
+              }
+            });
+          });
+    </script>
+    {% settings_value 'DEBUG' as debug_mode_on %}
+    {% if debug_mode_on %}
+    <script type="text/javascript" src="{% static 'js/bundle.js' %}"></script>
+    <script>
+ (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+ (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+ m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+ })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ ga('create', 'UA-68079753-1', 'auto');
+ ga('send', 'pageview');
+
+</script>
+    {% endif %}
+</html>

@@ -1,0 +1,29 @@
+[
+{
+    "pk": 1, 
+    "model": "alm_crm.hashtag", 
+    "fields": {
+        "text": "#neftehim", 
+        "date_edited": "2015-06-03T04:39:54.560Z", 
+        "date_created": "2015-06-03T04:39:54.560Z"
+    }
+},
+{
+    "pk": 2, 
+    "model": "alm_crm.hashtag", 
+    "fields": {
+        "text": "#mail", 
+        "date_edited": "2015-06-03T07:48:23.233Z", 
+        "date_created": "2015-06-03T07:48:23.233Z"
+    }
+},
+{
+    "pk": 3, 
+    "model": "alm_crm.hashtag", 
+    "fields": {
+        "text": "#hastag", 
+        "date_edited": "2015-07-15T04:13:11.681Z", 
+        "date_created": "2015-07-15T04:13:06.662Z"
+    }
+}
+]

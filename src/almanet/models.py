@@ -3,6 +3,10 @@ from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from django.utils.text import slugify
 from almanet.url_resolvers import reverse as almanet_reverse
+from almanet.utils.metaprogramming import SerializableModel
+from django.db.models import signals
+from django.utils import timezone
+from datetime import datetime
 
 
 class Service(models.Model):
@@ -26,38 +30,47 @@ class Service(models.Model):
 
 
 class Subscription(models.Model):
-
+    # global_sales_cycle_id = models.IntegerField(_('sales_cycle_id'), null=True, blank=True)
     service = models.ForeignKey(Service, related_name='subscriptions')
     user = models.ForeignKey('alm_user.User', related_name='subscriptions')
     organization = models.ForeignKey(
         'alm_company.Company', related_name='subscriptions')
     is_active = models.BooleanField(default=True)
+    date_created = models.DateTimeField(auto_now_add=True, blank=True)
+    date_edited = models.DateTimeField(auto_now=True, blank=True)
 
     def __init__(self, *args, **kwargs):
         super(Subscription, self).__init__(*args, **kwargs)
-        if hasattr(self, 'user') and not self.user is None:
-            self.organization = self.user.get_company()
+        if hasattr(self, 'user') and self.user is not None:
+            if not hasattr(self, 'organization') or not self.organization:
+                self.organization = self.user.get_company()
 
     class Meta:
         verbose_name = _('subscription')
         db_table = settings.DB_PREFIX.format('subscription')
-
-    @property
-    def backend(self):
-        # TODO backend pattern
-        return self
 
     def get_home_url(self):
         url_key = '{}_home'.format(settings.DEFAULT_SERVICE)
         return almanet_reverse(
             url_key,
             subdomain=self.organization.subdomain,
-            kwargs={'slug': self.service.slug.lower()})
-
+            kwargs={'service_slug': self.service.slug.lower()})
 
 class SubscriptionObject(models.Model):
-    subscription_id = models.IntegerField(_('subscription id'),
-                                          null=True, blank=True)
+    # subscription_id = models.IntegerField(_('subscription id'),
+    #                                       null=True, blank=True)
+    company_id = models.IntegerField(_('company_id'), null=True, blank=True)
+    date_created = models.DateTimeField(auto_now_add=True, blank=True)
+    date_edited = models.DateTimeField(auto_now=True, blank=True)
+    
+    class Meta:
+        abstract = True
 
+    def save(self, **kwargs):
+        super(SubscriptionObject, self).save(**kwargs)
+
+
+class SerializableSubscriptionObject(SubscriptionObject, SerializableModel):
+    
     class Meta:
         abstract = True

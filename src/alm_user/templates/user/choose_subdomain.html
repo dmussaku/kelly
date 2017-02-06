@@ -1,0 +1,25 @@
+{% extends "user/base.html" %}
+{% load i18n almanet_tags %}
+{% load static from staticfiles %}
+{% block head_title %} Login page {% endblock %}
+{% block content %}
+    {{ message }}
+<div class="login">
+    <div class="login-body">
+        <div>
+            {% if companies %}
+                <p>Компании, в которые вы залогинены</p>
+                {% for company in companies %}
+                    <a href="{% subdomain_url 'crm_home' subdomain=company.subdomain service_slug='crm'  %}" class="login-submit">{{ company.name }}</a>
+                    <br/>
+                {% endfor %}
+            {% endif %}
+        </div>
+        <p class="p1 text-center">
+            <a href='https://appsto.re/kz/pvzn8.i' target="_blank">
+                <img style='display:inline-block' src="{% static 'img/app_store_badge.svg' %}" />
+            </a>
+        </p>
+    </div>
+</div>
+{% endblock %}
